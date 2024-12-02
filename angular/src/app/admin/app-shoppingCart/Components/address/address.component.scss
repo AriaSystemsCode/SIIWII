@@ -78,10 +78,12 @@
     }
 .add-new-add-btn{
     background-color: transparent;
-    border: none;
+    border: 1px solid #EBEBEB;
+    border-radius: 6px;
     outline: none;
     color: #1B101B ;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 }
@@ -102,4 +104,26 @@ textarea{
 ul.address-warper-cont {
     max-height: 18em;
     overflow-y: auto;
+}
+
+.acBtn {
+ 
+display: flex;
+// flex-direction: column;
+justify-content: center;
+// align-items: center;
+padding: 8px;
+gap: 5px;
+
+// width: 69px;
+// height: 36px;
+
+border: 1px solid #EEEEEE;
+border-radius: 6px;
+
+
+}
+
+.delText {
+    color: #F6851D;
 }

@@ -40,6 +40,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
 
     currentRouteUrl = '';
     openSub = false
+    openAdSub= false
     tenantLogo:any;
     constructor(
         injector: Injector,
@@ -78,7 +79,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
    
         this._accountsServiceProxy.getAccountSummary().subscribe(result =>{
             this.accountSummary = result;
-            console.log(this.accountSummary,'accountSummary')
+            // console.log(this.accountSummary,'accountSummary')
 
             if(result.logoUrl!=undefined)
                 this.tenantLogo=`${this.attachmentBaseUrl}/${this.accountSummary.logoUrl}`

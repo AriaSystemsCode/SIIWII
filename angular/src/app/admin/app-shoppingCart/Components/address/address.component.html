@@ -1,4 +1,4 @@
-<div class="selected-addr-comp mb-3"  *ngIf="selectedAddress&&isCreateOredit">
+<div class="selected-addr-comp mb-3"  *ngIf="isCreateOredit">
     <div class="selected-add-edit row">
         <div class="col-md-12 mb-3" *ngIf="showAddressType">
             <label class="label mt-2 mb-2">{{l("AddressType")}}</label>
@@ -20,7 +20,7 @@
         </div>
         <div class="col-md-12 mb-3" >
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
-            <textarea class="form-control w-50  d-inline-block ml-4" style="min-height: 80px;" readonly>{{selectedAddress?.addressLine1+' ,'}}{{selectedAddress?.addressLine2+' ,'}}{{selectedAddress?.city+' ,'}}{{selectedAddress?.state+' ,'}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode  +' ,'}}{{selectedAddress?.postalCode}}</textarea>
+            <textarea class="form-control w-50  d-inline-block ml-4" style="min-height: 80px;" readonly>{{selectedAddress?.addressLine1 ? selectedAddress?.addressLine1+' ,' : ''}}{{selectedAddress?.addressLine2 ? selectedAddress?.addressLine2+' ,' : ''}}{{ selectedAddress?.city ? selectedAddress?.city+' ,' : ''}}{{selectedAddress?.state ? selectedAddress?.state+' ,' : ''}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode ? selectedAddress?.countryCode  +' ,' : ''}}{{selectedAddress?.postalCode ? selectedAddress?.postalCode : ''}}</textarea>
             <div class="pull-right">
             <button *ngIf="canChange"  class="savebtn text-center btn float-right" (click)="showAddressList()">
                 {{l("Change")}}
@@ -57,7 +57,8 @@
             <p class="mb-0">{{l("PleaseSelectFromTheSavedAddressesBelow")}}</p>
         </div>
         <hr>
-        <div class="filter-add-comp col-12 mb-1">
+        <div class="filter-add-comp col-12 mb-1 d-flex">
+            <div class="w-100">
             <input class="filter-adress-list form-control w-100" 
             placeholder="Lookin in company addresses ...."
             #filterVal
@@ -65,32 +66,42 @@
             type="text"/> 
             <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
         </div>
+            <div class="d-flex justify-content-end" *ngIf="showAddBtn">
+                <button class="ml-2 add-new-add-btn" (click)="openAddAddressForm()">
+                    <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
+                </button>
+            </div>
+        </div>
         <ul class="address-warper-cont">
             <li *ngFor="let address of savedAddressesList" class="address-warper mt-3 mb-3 pt-1 pb-1">
                 <input  *ngIf="selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
                  [checked]="address.id==selectedAddress.id" name="selectedAdd"  [id]="address.id"/> 
                     <input *ngIf="!selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
                       name="selectedAdd"  [id]="address.id"/> 
-                 <label> {{address?.addressLine1+' ,'}}{{address?.addressLine2+' ,'}}{{address?.city+' ,'}}{{address?.state+' ,'}}{{address?.countryCode +' ,'}}{{address?.postalCode}}</label>
-                 <div class="pull-right mt-2"  *ngIf="showAddBtn">
-                    <button (click)="editAddress(address.id)">
-                        {{l("Edit")}}
-                        <i class="fas fa-edit ml-1 mr-1"></i>
+                 <label> {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}{{ address?.addressLine2 ? address?.addressLine2+' ,' : ''}}{{address?.city ? address?.city+' ,' : ''}}{{ address?.state ? address?.state+' ,' : ''}}{{ address?.countryName ? address?.countryName +',' : address?.countryCode ?  address?.countryCode +' ,' : ''}}{{address?.postalCode ? address?.postalCode : ''}}</label>
+                 <div class="pull-right mt-2 d-flex"  *ngIf="showAddBtn">
+                    <button (click)="editAddress(address.id)" class="acBtn">
+                        <img class="mx-1" src="../../../../../assets/icons/edit-icon.png">
+
+                            
+                            
+                            
+                        <p >{{l("Edit")}}</p>
+                        <!-- <i class="fas fa-edit ml-1 mr-1"></i> -->
                     </button>
-                    <button (click)="deleteAddress(address.id)">
-                        {{l("Delete")}}
-                        <i class="fas fa-trash ml-1 mr-1" aria-hidden="true"></i>
+                    <button (click)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && ((currentTab == 4 && shipInfoIndex == 2) ||  (currentTab == 5 && billingIndexInfo == 1))  ? deleteTempAddress(address.id):  deleteAddress(address.id)" class="acBtn">
+                        <img class="mx-1" src="../../../../../assets/icons/fluent_delete.png">
+
+                            
+                        <p class="delText">{{l("Delete")}}</p>
+                        <!-- <i class="fas fa-trash ml-1 mr-1" aria-hidden="true"></i> -->
                     </button>
 
                  </div>
             </li>
         </ul>
         <label class="noAddressMsg" *ngIf="savedAddressesList.length==0"> No Addresses found</label>
-        <div class="d-flex justify-content-end" *ngIf="showAddBtn">
-        <button class=" mb-3 ml-2 add-new-add-btn" (click)="openAddAddressForm()">
-            <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
-        </button>
-    </div>
+       
         </div>
 </div>
 
@@ -102,10 +113,10 @@
             <p class="mb-0">{{l("PleaseEnterThenewAddressInformation")}}</p>
         </div>
         <hr>
-        <form class="form" #addressForm="ngForm"  method="post" novalidate (ngSubmit)="saveAddress(addressForm)">
+        <form class="form" #addressForm="ngForm"  method="post" novalidate (ngSubmit)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && (currentTab == 4 && (shipInfoIndex == 2) ||  (currentTab == 5 && billingIndexInfo == 1)) ? savetempAddress(addressForm) :  saveAddress(addressForm)">
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Code")}}</label>
                     <input
                         type="text"
@@ -117,19 +128,19 @@
                         required
                     />
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Name")}}</label>
                     <input
                         type="text"
                         placeholder="Adress Name..."
                         class="form-control w-100"
-                        name="addressName"
-                        [(ngModel)]="addressName"
+                        name="name"
+                        [(ngModel)]="name"
                         #Name="ngModel"
                         required
                     />
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineOne")}}</label>
                     <input
                         type="text"
@@ -141,7 +152,7 @@
                         required
                     />
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineTow")}}</label>
                     <input
                         type="text"
@@ -152,7 +163,7 @@
                         #addressTwo="ngModel"
                     />
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("City")}}</label>
                     <input
                         type="text"
@@ -164,7 +175,7 @@
                         required
                     />
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("State")}}</label>
                     <input
                         type="text"

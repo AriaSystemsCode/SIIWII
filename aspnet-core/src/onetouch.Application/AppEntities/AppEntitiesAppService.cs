@@ -922,7 +922,9 @@ namespace onetouch.AppEntities
                 entity.TenantOwner = int.Parse (input.TenantOwner.ToString ());
                 //MMT30[Start]
                 //entity.ExtraData = input.ExtraData;
-
+                //145
+                entity.TimeStamp = input.TimeStamp;
+                //145
                 // I3-13 [Begin]
                 if (string.IsNullOrEmpty(input.Code))
                 { entity.Code = input.Code; }

@@ -80,6 +80,8 @@
                             (focus)="onFocus()" (blur)="onBlur()"
                             (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
                             [ngClass]="isFocused ? 'focused-calendar' : ''"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                          
                         ></p-calendar>
                         <img  src="../../../../../assets/icons/calendar.png"  (click)="openCalendar(calendar1)"  alt="" srcset="">
@@ -99,7 +101,8 @@
                             (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
                             [readonlyInput]="false"
                           [minDate]="minSEnteredDate"
-
+                          [showOtherMonths]="true"
+                          [selectOtherMonths]="true"
                         ></p-calendar>
                         <img (click)="openCalendar(calendar2)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
                        
@@ -131,6 +134,8 @@
                             [minDate]="minStartDate"
                             [readonlyInput]="false"
                             (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                         ></p-calendar>
                         <img (click)="openCalendar(calendar3)" src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
                         </div>
@@ -157,7 +162,8 @@
                             [showIcon]="true"
                             [readonlyInput]="false"
                             (ngModelChange)="changeAvailbeDate(orderForm.get('availableDate'))"
-
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                             [minDate]="minCompleteDate"
                         ></p-calendar>
                         <img (click)="openCalendar(calendar4)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
@@ -224,7 +230,7 @@
 
                             <div *ngIf="!isCompantIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                           
                                     *ngIf="!isBuyerTempAccount"
                                     [options]="buyerCompanies"
                                     formControlName="buyerCompanyName"
@@ -299,7 +305,7 @@
     (completeMethod)="handleBuyerNameSearch($event)"
     (ngModelChange)="handleBuyerNameChange($event)"
      (click)="loadInitialContacts()"
-    [disabled]="buyerComapnyId === 0"
+   
     [placeholder]=" 'Please Select Buyer Name'"
     field="name"
     [forceSelection]="false">
@@ -463,14 +469,15 @@
                     </div>
                     <!-- buyer email -->
                     <!-- buyer company branch -->
-                <div class="col-md-6"  *ngIf="!isBuyerTempAccount">
+
+                <div class="col-md-6" >
                     <div class="mb-3">
                         <label for="" class="form-label"
                             >Branch*</label
                         >
                             <div>
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                                *ngIf="!isBuyerTempAccount" 
                                     [options]="buyerBranches"
                                     formControlName="buyerCompanyBranch"
                                     [filter]="true"
@@ -479,21 +486,102 @@
                                     [required]="!isBuyerTempAccount"
                                 ></p-dropdown>
                             </div>
+                            <input
+                            type="text"
+                            name=""
+                            id=""
+                            
+                            [value]="'Main'"
+                            readonly
+                            class="form-control"
+                            placeholder="Main"
+                            formControlName="buyerBranchName"
+                            *ngIf="isBuyerTempAccount"    />
             
-                                        <small
+                                        <!-- <small
                                             class="text-danger"
                                             *ngIf="
                                                 submitted &&
                                                 orderForm
-                                                    .get('buyerCompanyBranch')
+                                                    .get('buyerBranchName')
                                                     ?.hasError('required')
                                             "
                                         >
                                              Branch is required
-                                        </small>
+                                        </small> -->
                                     </div>
                                 </div>
                   <!-- buyer company branch -->
+
+                  <!--price level and currency  -->
+
+                  <div class="col-md-6 d-flex price-sec"      *ngIf="isBuyerTempAccount" >
+              
+                       
+
+
+
+                                <div class="mb-3 w-100">
+                                    <label for="" class="form-label"
+                                        >  {{l("Currency")}}</label
+                                    >
+                                        <div>
+                                            <p-dropdown [options]="allCurrencies"  
+                                            (onChange)="changeTouchState($event)"
+                                        [(ngModel)]="accountInfoTemp.currencyId" 
+                                        formControlName="currencyId"
+
+                                            placeholder="USD"             ></p-dropdown>
+                                        
+                                        </div>
+                                       
+                                                    <small
+                                                        class="text-danger"
+                                                        *ngIf="
+                                                            submitted &&
+                                                            orderForm
+                                                                .get('currencyId')
+                                                                ?.hasError('required')
+                                                        "
+                                                    >
+                                                    Currency is required
+                                                    </small>
+                                                </div>
+                                       
+
+                                                <div class="mb-3 w-100">
+                                                    <label for="" class="form-label"
+                                                        >{{l("PriceLevel")}}</label
+                                                    >
+                                                        <div>
+                                                            <p-dropdown
+                                                       
+                                                       
+                                                            [options]="allPriceLevel" 
+                                                          [(ngModel)]="accountInfoTemp.priceLevel"
+                                                                formControlName="priceLevel"
+                                                                (change)="changePrice($event)"
+                                                                placeholder="MSRP"
+                                                             
+                                                            ></p-dropdown>
+                                                        </div>
+                                                       
+                                                                    <small
+                                                                        class="text-danger"
+                                                                        *ngIf="
+                                                                            submitted &&
+                                                                            orderForm
+                                                                                .get('priceLevel')
+                                                                                ?.hasError('required')
+                                                                        "
+                                                                    >
+                                                                    Price Level is required
+                                                                    </small>
+                                                 </div>
+                  <!-- price level and currency -->
+                </div>
+
+                  <!-- price level and currency -->
                 </div>
             </form>
         </div>
@@ -527,7 +615,7 @@
                             </div>
                             <div *ngIf="!isSellerCompanyIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                           
                                     [options]="sellerCompanies"
                                     formControlName="sellerCompanyName"
                                     [filter]="true"
@@ -732,7 +820,7 @@
                             >
                                 <div >
                                     <p-dropdown
-                                    [virtualScroll]="true" [itemSize]="30"
+                                
                                         [options]="sellerBranches"
                                         formControlName="sellerCompanyBranch"
                                         [filter]="true"

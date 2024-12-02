@@ -2291,6 +2291,9 @@ namespace onetouch.Migrations
                     b.Property<int>("TenantOwner")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EntityObjectStatusId");
@@ -2958,6 +2961,10 @@ namespace onetouch.Migrations
 
                     b.Property<long?>("ListingItemId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("ManufacturerCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(250)
@@ -7025,9 +7032,6 @@ namespace onetouch.Migrations
                     b.Property<byte>("SharingLevel")
                         .HasColumnType("tinyint");
 
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
-
                     b.ToTable("AppMarketplaceItemLists", t =>
                         {
                             t.HasTrigger("AppMarketplaceItemLists_Trigger");
@@ -7056,9 +7060,6 @@ namespace onetouch.Migrations
 
                     b.Property<long>("StockAvailability")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Variations")
                         .HasColumnType("nvarchar(max)");
@@ -7374,6 +7375,9 @@ namespace onetouch.Migrations
 
                     b.Property<long?>("LanguageId")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("OrderConfirmationTimeStamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentTermsCode")
                         .HasMaxLength(50)

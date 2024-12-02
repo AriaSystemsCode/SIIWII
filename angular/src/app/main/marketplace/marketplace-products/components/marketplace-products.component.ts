@@ -62,7 +62,7 @@ export class MarketplaceProductsComponent
     sortBy: number;
     appSession: AppSessionService;
     skipCount: number = 0;
-    maxResultCount: number = 10;
+    maxResultCount: number = 12;
     pagesNumber: number;
     displayFitlers: boolean = false;
     filterType: string;
@@ -112,8 +112,8 @@ export class MarketplaceProductsComponent
                 });
         }
         this.sortingData = [
-            { label: "Product Name", value: "name" },
-            { label: "Product code", value: "code" },
+            { label: "Product Name", value: "name" }, 
+            { label: "Product code", value: "manufacturercode" },
             { label: "Price low to high", value: "price" },
             { label: "Price high to low", value: "price desc" },
         ];

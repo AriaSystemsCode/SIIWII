@@ -18,9 +18,9 @@ namespace onetouch.AppSubscriptionPlans.Dtos
 
         public decimal Amount { get; set; }
 
-        public DateTime DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
 
-        public DateTime PayDate { get; set; }
+        public DateTime? PayDate { get; set; }
         public virtual IList<AppEntityAttachmentDto> EntityAttachments { get; set; }
 
     }

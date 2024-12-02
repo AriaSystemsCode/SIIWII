@@ -13,9 +13,13 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     // @Input("orderConfirmationFile") orderConfirmationFile;
     @Input("transactionFormPath") transactionFormPath;
     @Input("orderId") orderId;
+    @Input("regenrate") regenrate;
+
     loadingError: boolean = false;
     showReport: boolean = false;
-
+    visible: boolean = false;
+    SuccessMsg: boolean = false;
+    showbar: boolean = true;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -25,20 +29,37 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     ngOnInit(): void {
     }
     ngOnChanges(changes: SimpleChanges) {
-        this.loadPdf();
+        // this.loadPdf();
+    this.isOrderConfirmationNeedsReprint()
+
     }
     ngAfterViewInit() {
         // this.loadPdf();
     }
     async loadPdf() {
         this.showReport = false;
-        this.showMainSpinner()
+        if(this.visible){
+            this.visible = true
+
+        } else {
+this.showMainSpinner()
+        }
+        
         try {
             await this.delay(10000);
             this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
                 .pipe(finalize(() => {
-                    this.showReport = true;
+                    // this.visible = false
+                    this.SuccessMsg = true
+                    if( this.SuccessMsg) {
+                    this.showbar = false;
+                      
+                    //    this.loadPdf()
+       
+                    }
                     this.hideMainSpinner()
+                    this.showReport = true
+                     
                 }))
                 .subscribe(async (res) => {
                     try {
@@ -72,7 +93,26 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
             this.hideMainSpinner();
         }
     }
+    isOrderConfirmationNeedsReprint(){
+        
+        this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+        .subscribe((res) => {
+          console.log(res,'rep')
+          if (res) {
+            this.visible = res
 
+           this.loadPdf()
+       
+
+          }
+          else {
+            this.loadPdf()
+          }
+       
+        });
+      
+        
+      }
     //     var base64String =res;
     //     var pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
 

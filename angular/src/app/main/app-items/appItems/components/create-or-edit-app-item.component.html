@@ -1,7 +1,7 @@
 <div [@routerTransition] [ngClass]="{'d-none':displayVariations}">
     <form #productForm="ngForm" (ngSubmit)="saveProduct(productForm)">
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal">
-            <div class="kt-subheader kt-grid__item" *ngIf="!displayVariations">
+            <div class="kt-subheader kt-grid__item ml-5" *ngIf="!displayVariations">
                 <div [class]="containerClass" style="background-color: #EEEEEEEE;">
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
@@ -432,7 +432,7 @@
                             <div class=" ml-4 pl-4 row pt-4" *ngIf="defaultCurrencyMSRPPriceIndex > -1"
                                 style="gap:20px">
                                 <div class="row mr-5 pr-5">
-                                    <h6 class="font-weight-bold">
+                                    <h6 class="font-weight-bold pt-3 pr-2">
                                         <span class="text-danger">*</span>
                                         {{ 'MSRP' | localize}}
                                     </h6>
@@ -517,7 +517,7 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
-                        <div class="row align-items-baseline"
+                        <div class="align-items-baseline"
                             *ngIf="!(!appItem?.variationItems?.length  && listingMode !== undefined)">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <h6 class="font-weight-bold">
@@ -580,14 +580,14 @@
                             <p-accordion>
                                 <p-accordionTab>
                                     <ng-template pTemplate="header">
-                                        <div class="d-inline-block custom-header p-3">
+                                        <div class="d-inline-block custom-header p-3 ml-3">
                                             <h6 class="mb-1 font-weight-bold">{{extraAttributeObject.value.header | localize}}</h6>
                                             <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
                                         </div>
                                     </ng-template>
-                                    <div class="row justify-content-center mt-4">
+                                    <div class="row pl-3 mt-4">
                                         <div class="col-lg-8 col-md-10 col">
-                                            <div class="row justify-content-center pt-4">
+                                            <div class="row  pt-4">
                                                 <div class="col-md-6 col-12 mb-4"
                                                     [ngClass]="{ 'd-none' : extraAttr.isSelectedOnVariation && extraAttr.isVariation}"
                                                     *ngFor="let extraAttr of extraAttributeObject.value.extraAttributes">

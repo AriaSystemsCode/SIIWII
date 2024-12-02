@@ -15,7 +15,12 @@ import { AppConsts } from '@shared/AppConsts';
 @Component({
   selector: 'app-tenant-invoices',
   templateUrl: './tenant-invoices.component.html',
-  styleUrls: ['./tenant-invoices.component.scss']
+  styleUrls: ['./tenant-invoices.component.scss'],
+  styles: [`
+        .p-icon-wrapper {
+            position: initial !important;
+        }
+    `]
 })
 export class TenantInvoicesComponent extends AppComponentBase {
   @ViewChild('entityTypeHistoryModal', { static: true }) entityTypeHistoryModal: EntityTypeHistoryModalComponent;

@@ -240,7 +240,16 @@ color: #9E9E9E !important;
     background: white !important;
     border-color: #7d5e7a !important;
 }
-
+.Canstatus {
+    border-radius: 4px;
+    background: #D0D0D0;
+    width: 90px;
+    height: 30px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
 .status {
     border-radius: 4px;
     background: #D0D0D0;
@@ -645,4 +654,129 @@ input.ng-invalid.ng-touched {
     background:  #4A0D4A !important;
     color: white;
 
+}
+.addNbtn {
+    /* Group 1552 */
+
+width: 158px;
+height: 38px;
+
+filter: drop-shadow(2px 2px 4px rgba(22, 22, 22, 0.05));
+
+display: flex;
+justify-content: center;
+align-items: center;
+background-color: #FFFFFF;
+gap: 5px;
+border: 1px solid #eee;
+border-radius: 4px;
+svg {
+    color: #777777;
+}
+span {
+
+font-weight: 700;
+font-size: 14px;
+line-height: 21px;
+color: #4A0D4A;
+
+
+}
+
+}
+
+.syncBtn{
+
+    border: 1.5px solid #F88011 !important;
+    border-radius: 6px;
+    padding: 5px 10px;
+    color:#F88011 ;
+        }
+
+
+
+
+        .previewbtn{
+            border-radius: 6px;
+            background:  #4A0D4A;
+            box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10);
+            color: #fff;
+            // position: absolute;
+            // top: 5px;
+            // right: 5px;
+            // z-index: 9999;
+            width: 99px;
+            height: 46px;
+        }
+        .cancelbtn{
+            background-color: #fff;
+            color: #700066;
+            border:1px solid #EBEBEB;
+            // position: absolute;
+            // top: 5px;
+            // right: 127px;
+            // z-index: 9999;
+            border-radius: 6px;
+              
+            width: 99px;
+            height: 46px;
+        }
+
+
+
+        
+::ng-deep {
+    .p-dialog {
+        border-radius: 20px;
+      border: 1px solid #EEE;
+      background: #FFF;
+      padding: 32px 32px 44px 32px !important;
+      margin: 10px;
+      box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.15);
+      }
+        .p-dialog .p-dialog-header {
+          border:  none !important;
+          background: white !important;
+          padding: 0 !important;
+        }
+    .p-button-text {
+        // button {
+            background-color: #4A0D4A !important;
+            color: #FFF !important;
+            border:  none !important;
+            border-radius: 6px !important;
+            padding: 8px 32px;
+        // }
+      
+    }
+
+ 
+
+}
+.p-button-no {
+    color: #4A0D4A !important;
+    border-radius: 8px !important;
+background: #FFF !important;
+box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25) !important;
+border:  none !important;
+display: flex !important;
+padding: 8px 32px !important;
+align-items: center !important;
+}
+.msg-text {
+    font-weight: 700 !important;
+    font-size: 22px !important;
+    line-height: 36px !important;
+    
+    color: #1B101B !important;
+    
+    
+        }
+.btns {
+    gap: 24px !important;
+}
+.img-hd {
+    position: inherit !important;
+    width: 100px !important;
+height: 100px !important;
 }

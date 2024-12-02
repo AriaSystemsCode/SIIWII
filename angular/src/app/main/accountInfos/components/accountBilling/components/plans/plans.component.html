@@ -48,7 +48,7 @@
           <td class="plan-header">-</td>
         </tr>
         <tr>
-          <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Description</td>
+          <td class="head-c plan-header"  >Description</td>
           
           <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'" class="text-col">{{ plan?.appSubscriptionPlanHeader?.description }}</td>
           <td class="plan-header">
@@ -85,7 +85,7 @@
                 <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails" >
                   <!-- Display the feature limit if the feature matches -->
                   <span *ngIf="detail?.featureName === feature?.featureName">
-                    {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}
+                    {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}  {{ detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'MONTHLY' ? '/ '+ detail?.featurePeriodLimit : detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'YEARLY' ? '/ '+ detail?.featurePeriodLimit: ''  }}
                   </span>
                 </ng-container>
               </ng-container>

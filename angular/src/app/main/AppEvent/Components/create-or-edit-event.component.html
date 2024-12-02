@@ -399,8 +399,8 @@
                                         id="description"
                                         name="description"
                                         #description="ngModel"
-                                        rows="10"
-                                        class="border-0 pl-3 pt-0 pb-2 w-100 form-control"
+                                        rows="20"
+                                        class="border-0 pl-3 pt-0 pb-2 w-100"
                                         placeholder="Ex: topics, schedule, etc."
                                         (keyup)="onChangeDescriptions()"
                                         [maxlength]="
@@ -411,6 +411,7 @@
                                             patterns.charactersWithoutSpaces
                                         "
                                         required
+                                        style="resize: none;"
                                     ></textarea>
                                     <validation-messages
                                         [formCtrl]="description"

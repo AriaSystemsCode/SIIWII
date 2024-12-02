@@ -35,7 +35,7 @@ height: 35px;
     }
 }
 .msrp h5, .msrp span {
-    color: #b6b7b9 !important;
+    color: #595959 !important;
 }
 td {
     color: black !important;
@@ -392,6 +392,7 @@ input:checked + .slider:before {
     .p-inputnumber-buttons-stacked .p-inputnumber-input {
         max-width: 133px !important;
         // border-radius: 10px !important;
+        color: #595959;
 border: 1px solid #D9D9D9 !important;
 background: #FFF !important;
     }
@@ -749,7 +750,7 @@ padding: 0 !important;
 }
 .seller {
     font-size: 10px !important;
-    color: #9E9E9E;
+    color: #595959;
     font-weight: 600;
 }
 .card-text {

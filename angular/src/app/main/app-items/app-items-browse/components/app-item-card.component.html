@@ -1,4 +1,4 @@
-<div class="single-item position-relative" [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
+<div class="single-item  mb-0 position-relative" #singleItem [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
     border: 2px solid #EDEDED !important;">
     <div class="purple-selection position-absolute p-2" style="width: 45px;top: 3px;"
         *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections  ) && !singleItemPerRowMode  ">
@@ -9,27 +9,40 @@
     <div class="single-item-photo" #photoDiv (click)="viewItemHandler()"
     [ngStyle]="{'width': singleItemPerRowMode ? '215px' : 'auto'}"
     >
-        <img class="w-100" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl" alt=""
+        <!--  <img class="w-100" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl" alt=""
             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"  
-            [ngStyle]="{'height.px': singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" />
+            [ngStyle]="{'height.px': singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" />  -->
+          <!--   <app-image-display
+            [image]="attachmentBaseUrl + '/' + item.appItem.imageUrl"
+            [sycAttachmentCategory]="sycAttachmentCategoryImage"
+            [staticHeight]="singleItemPerRowMode ? bodyDiv.clientHeight : 200"
+            >
+        </app-image-display> 
+         [ngStyle]="{'width.px':(singleItemPerRowMode ? bodyDiv.clientHeight : 200) * acceptedAspectRatio ,'height.px':singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" -->
+        <img  class="img-thumbnail p-0" 
+         [ngStyle]="{'width.px': !singleItemPerRowMode ? singleItem.clientWidth : ( bodyDiv.clientHeight * acceptedAspectRatio)  ,'height.px': !singleItemPerRowMode ? (singleItem.clientWidth / acceptedAspectRatio ) : bodyDiv.clientHeight }"
+        [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl"   onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"/>
     </div>
+    <!-- [ngStyle]="{'height': singleItemPerRowMode ? 'fit-content' : 'auto'}" -->
     <div class="single-item-body col d-flex position-static p-0 pl-2" #bodyDiv
-         [ngStyle]="{'height': singleItemPerRowMode ? 'fit-content' : 'auto'}"
+    [ngStyle]="{'height': singleItemPerRowMode ? '230px' : 'auto'}"
     >
         <div class="row w-100">
 
             <div class="pl-2 pr-0 pt-3 w-100"
+            style="line-height: 1;"
                 [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 0 : 0}">
 
-                <div class="d-flex  p-3  flex-nowrap"
-                [ngClass]="{ 'justify-content-between': !singleItemPerRowMode }"
+                <div class="p-3  flex-nowrap"
+                [ngClass]="{ 'justify-content-between': !singleItemPerRowMode ,
+                'd-flex': !singleItemPerRowMode }"
                 >
-                    <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" style="white-space: nowrap;" (click)="viewItemHandler()">
-                        {{item.appItem.code | textSubstring:6}}
+                    <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" style="white-space: nowrap;font-size: 14px !important;" (click)="viewItemHandler()">
+                        <!-- {{item.appItem.code | textSubstring:6}} -->
+                        {{item.appItem.code }}
                     </h4>
-                    <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;">
+                    <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E; font-size: 10px !important;">
                         <div class="price pt-2" 
-                        [ngClass]="{ 'pl-5 ml-5': singleItemPerRowMode }"
                          style="float: right;
                         clear: both;">
                       {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:
@@ -39,7 +52,7 @@
                     </h6>
                 </div>
 
-                <p class="mb-2 product-name pl-3" style="color: #9E9E9E;">
+                <p class="mb-2 product-name pl-3" style="color: #9E9E9E;line-height: 21px;">
                     {{ item?.appItem?.name | textSubstring: 60 }}
                 </p>
 
@@ -93,7 +106,8 @@
                         ></i>
                     </span>
                 </p> -->
-                <div class="share-level">
+                <div class="share-level" 
+                [ngClass]=" { 'share-level-div': singleItemPerRowMode }">
                     <span *ngIf="item?.appItem?.sharingLevel === '1' || item?.appItem?.sharingLevel === '2' ">
                         <div class="fa fa-check-circle" style="color: #2DC74F;"></div> Shared
                     </span>

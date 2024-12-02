@@ -14,6 +14,7 @@ import {
     AppItemsListsServiceProxy,
     AppItemsServiceProxy,
     GetAppItemForViewDto,
+    SycAttachmentCategoryDto,
 } from "@shared/service-proxies/service-proxies";
 import { AppItemsBrowseComponentActionsMenuFlags, AppItemsBrowseComponentStatusesFlags } from "../models/app-item-browse-inputs.model";
 import { AppItemBrowseEvents } from "../models/appItems-browse-events";
@@ -42,6 +43,9 @@ export class AppItemCardComponent extends AppComponentBase {
     BrowseModeEnum = BrowseMode
     get mainFilterCtrl() { return this.filterForm.get('filterType') }
 
+
+    @Input()   sycAttachmentCategoryImage :SycAttachmentCategoryDto
+    @Input()   acceptedAspectRatio
     constructor(
         injector: Injector,
     ) {

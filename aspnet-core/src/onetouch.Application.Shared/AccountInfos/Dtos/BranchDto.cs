@@ -64,7 +64,9 @@ namespace onetouch.AccountInfos.Dtos
 		//Mariam
 		public long? AccountId { set; get; }
 		//Mariam
-
+		//I45
+		public string? SSIN { set; get; }
+		//I45
 		public int? TenantId { get; set; }
 		public bool UseDTOTenant { get; set; }
 	}

@@ -1,9 +1,10 @@
 import {
   Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild
   , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AddVariationToInputDto, AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -18,6 +19,7 @@ import { CommentParentComponent } from '@app/main/interactions/components/commen
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
 import { AppConsts } from '@shared/AppConsts';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -86,20 +88,75 @@ export class ShoppingCartViewComponentComponent
   shareDone:boolean=false;
   openActions:boolean =false
   temp: TreeNode<any>[] = null;
+  addLine:boolean=true;
+  visible:boolean = false
+  allVariations: GetAppMarketItemForViewDto[] = [];
+  displayedVariations: any[] = [];
+  incrementCount: number = 10;
+totalVariationsCount: number = 0;
+
+  selectedVariation: string = '';
+  selectedPrice: number = 0; // Holds the selected price
+selectedQuantity: number = 0; // Holds the entered quantity
+selectedImg: number = 0; // Holds the entered quantity
+amount: number = 0; // Holds the calculated amount
+showAddLine : boolean = false
+newData:any
+showSaveCancel : boolean = false
+// visibleD: boolean = false;
+cancelBtn: boolean = false;
+saveBtn: boolean = false;
+SuccessMsg: boolean = false;
+addNewLinebtn : boolean = true;
+filterForm: FormGroup;
+comNew : boolean
+conNew : boolean
+TempComp : boolean = false
+currentFilter: string = '';
+regenrate : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private userClickService: UserClickService,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private _formBuilder: FormBuilder,
   ) {
     super(injector);
 
   }
   ngOnInit(): void {
-    // this.onGeneratOrderReport(true,undefined,true,true);
-   console.log(this.openActions, "openActions")
+    this.initFilterForm()
+    // this.onGeneratOrderReport(true,undefined,true,true); 
+    // if (      this.appTransactionsForViewDto?.sellerCompanySSIN){
+    //   this.getSellerVariations()
+
+    // }
+ let value = localStorage.getItem("comNew"); 
+
+ if (value) {
+  this.comNew = Boolean((value));
+ }else {
+  this.comNew = false
+ }
+ let value2 = localStorage.getItem("conNew");
+ if (value2) {
+  this.conNew = Boolean((value2));
+}  else {
+  this.conNew = false;
+
+}
+// if(this.appTransactionsForViewDto?.buyerCompanySSIN == ''){
+//  this.TempComp = false
+
+// } else {
+//  this.TempComp = true
+
+// }
+ console.log(this.comNew,'this.comNew')
+ console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
     // this.onGeneratOrderReport(true,undefined,true,true);
@@ -236,7 +293,7 @@ export class ShoppingCartViewComponentComponent
 this.temp=temp;
     this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
     .pipe(finalize(() => {
 this.hideMainSpinner();
     }))
@@ -295,7 +352,7 @@ this.hideMainSpinner();
      )
      .subscribe((res) => {
        this.shoppingCartDetails = res;
-
+        console.log(this.shoppingCartTreeNodes,'llll')
        this?.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
 
        this.userClickService.userClicked("refreshShoppingInfoInTopbar");
@@ -317,26 +374,46 @@ this.hideMainSpinner();
   }
 }
 
-  expandCollapseRecursive(node: TreeNode, isExpand: boolean) {
-    node.expanded = isExpand;
-    if (node.children) {
-      for (let i = 0; i < node.children.length; i++) {
-        this.expandCollapseRecursive(node.children[i], isExpand);
-      }
-    }
+   // Recursive function to extract only third-level nodes (variations)
+getThirdLevelVariations(node: any, level: number = 1): any[] {
+  let variations: any[] = [];
+
+  // If the current node is a third-level node and has no children, add it to the variations
+  if (level === 3 && node.children === null) {
+    variations.push(node);
   }
 
-  onShowVariations($event) {
-    const temp = cloneDeep(this.shoppingCartTreeNodes);
-    temp.forEach((node) => {
-      this.expandCollapseRecursive(node, this.showVariations);
+  // If the node has children, process them recursively
+  if (node.children && node.children.length > 0) {
+    node.children.forEach((child) => {
+      variations = variations.concat(this.getThirdLevelVariations(child, level + 1));
     });
-
-    if (this.oldShowVariations != this.showVariations)
-      this.getShoppingCartData(temp);
-
-    this.oldShowVariations = this.showVariations;
   }
+
+  return variations;
+}
+
+onShowVariations(event) {
+  // Check if shoppingCartTreeNodes is an array
+ 
+   if (event?.target?.checked) {
+    if (Array.isArray(this.shoppingCartTreeNodes)) {
+      // Get the third-level variations from the shoppingCartTreeNodes
+      const thirdLevelVariations = this.shoppingCartTreeNodes.map((rootNode) => {
+        return this.getThirdLevelVariations(rootNode);
+      }).flat(); // Flatten the array to get a single list of third-level variations
+  
+      console.log('Third-Level Variations:', thirdLevelVariations); 
+      this.shoppingCartTreeNodes = thirdLevelVariations
+  
+      // Now, you can use `thirdLevelVariations` to display the variations or process them
+    } 
+   } else {
+    this.getShoppingCartData();
+   }
+
+}
+
 
   onContinueShopping() {
     if (this.validateOrder && this.shoppingCartTreeNodes)
@@ -466,6 +543,43 @@ this.hideMainSpinner();
     });
   }
   onDelete(rowNode) {
+    console.log(rowNode,'rowNode')
+    if(rowNode?.node?.data?.added) {
+      Swal.fire({
+        title: "Remove",
+        text: "Are you sure you want to permanently remove this ?",
+        showCancelButton: true,
+        cancelButtonText: "No",
+        imageUrl: "../../../assets/posts/deletePost.svg",
+        imageWidth: 70,
+        imageHeight: 70,
+        confirmButtonText: "Yes",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        backdrop: true,
+        customClass: {
+          confirmButton: "swal-btn swal-confirm bgPurple",
+          cancelButton: "swal-btn",
+          title: "swal-title purpleColor",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+      this.addLine = true
+      this.showAddLine = false;
+      this.showSaveCancel = false;
+     
+     
+        this.selectedVariation = '';
+      this.selectedQuantity = 0;
+      this.selectedPrice = 0
+      this.amount = 0;
+      this.shoppingCartTreeNodes.pop(); // Removes the last item
+      this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  this.addNewLinebtn = true
+
+    }
+  });
+    } else {
     Swal.fire({
       title: "Remove",
       text: "Are you sure you want to permanently remove this ?",
@@ -496,7 +610,7 @@ this.hideMainSpinner();
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
                   this.hideMainSpinner();
@@ -514,7 +628,7 @@ this.hideMainSpinner();
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
                   this.hideMainSpinner();
@@ -530,7 +644,7 @@ this.hideMainSpinner();
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
                   this.hideMainSpinner();
@@ -543,7 +657,23 @@ this.hideMainSpinner();
       }
     });
   }
+}
   onEditQty(rowNode) {
+
+
+    if(rowNode.node.data.added) { 
+
+
+      this.selectedQuantity =     rowNode.node.data.updatedQty
+      this.updateAmount()
+
+      rowNode.node.data.amount =  this.amount
+      rowNode.node.data.qty =  this.selectedQuantity 
+      rowNode.node.data.showEditQty = false;
+
+    }else {
+
+    
     rowNode.node.data.invalidUpdatedQty = "";
     this.showMainSpinner();
 
@@ -558,7 +688,7 @@ this.hideMainSpinner();
           )
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
-            this.onGeneratOrderReport(true,undefined,false,true);
+            // this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
             this.getShoppingCartData();
             this.hideMainSpinner();
@@ -589,7 +719,7 @@ this.hideMainSpinner();
             )
             .subscribe((res) => {
               if (res) this.notify.info("Successfully Updated.");
-              this.onGeneratOrderReport(true,undefined,false,true);
+              // this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
               // rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
@@ -611,6 +741,7 @@ this.hideMainSpinner();
 
     }
   }
+}
   hide() {
     this.resetData();
     this.modal.hide();
@@ -619,8 +750,9 @@ this.hideMainSpinner();
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
     this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-    if (this.shoppingCartMode == ShoppingCartMode.view)
+    // if (this.shoppingCartMode == ShoppingCartMode.view)
       this.hideShoppingCartModal.emit(true);
+    
   }
 
   minimizedOrders: any[] = [];
@@ -654,11 +786,11 @@ this.hideMainSpinner();
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
-        this.onGeneratOrderReport(true,undefined,false,true);
+        // this.onGeneratOrderReport(true,undefined,false,true);
         this.hideMainSpinner();
         this.showTabs = true;
       });
@@ -689,8 +821,11 @@ this.hideMainSpinner();
         this._AppTransactionServiceProxy.discardTransaction(this.orderId)
           .subscribe(() => {
             this.hideMainSpinner();
+            localStorage.removeItem("comNew");
+            localStorage.removeItem("conNew");
             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
             this.hide();
+
           });
       }
     });
@@ -700,6 +835,8 @@ this.hideMainSpinner();
     this.showMainSpinner();
     this._AppTransactionServiceProxy.cancelTransaction(this.orderId)
       .subscribe(() => {
+        localStorage.removeItem("comNew");
+        localStorage.removeItem("conNew");
         this.hideMainSpinner();
         this.getShoppingCartData();
       });
@@ -714,69 +851,154 @@ this.hideMainSpinner();
         this.getShoppingCartData();
       });
   }
+  isOrderConfirmationNeedsReprint(){
+        
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    .subscribe((res) => {
+      console.log(res,'rep')
+      if (res) {
+        // this.visible = res
 
+      //  this.regenrate = res
+       if(  res){
+        this.toGenerate()
+
+       }
+       this.getOrderConfirmation()
+
+      }
+      // else {
+      //   this.regenrate = true
+
+      // }
+   
+    });
+  
+    
+  }
   PlaceOrder() {
-    Swal.fire({
-      title: "",
-      text: "Are you sure that you want to place the order?",
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      backdrop: true,
-      customClass: {
-        popup: 'popup-class',
-        icon: 'icon-class',
-        content: 'content-class',
-        actions: 'actions-class',
-        confirmButton: 'confirm-button-class2',
+    // Swal.fire({
+    //   title: "",
+    //   text: "Are you sure that you want to place the order?",
+    //   icon: "info",
+    //   showCancelButton: true,
+    //   confirmButtonText: "Yes",
+    //   cancelButtonText: "No",
+    //   allowOutsideClick: false,
+    //   allowEscapeKey: false,
+    //   backdrop: true,
+    //   customClass: {
+    //     popup: 'popup-class',
+    //     icon: 'icon-class',
+    //     content: 'content-class',
+    //     actions: 'actions-class',
+    //     confirmButton: 'confirm-button-class2',
 
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
+    //   },
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
         this.showMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
+        this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
+
             this.onGeneratOrderReport(true,undefined,true,true);
-            this.hideMainSpinner();
+         
+            localStorage.removeItem("comNew");
+            localStorage.removeItem("conNew");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+         this.getShoppingCartData()
+
+
         }
           ))
           .subscribe((res) => {
+
             if (res) {
-              Swal.fire({
-                title: "",
-                text: "Order #" + this.transactionCode + " has been placed successfully",
-                icon: "success",
-                showCancelButton: false,
-                confirmButtonText: "OK",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                backdrop: true,
-                customClass: {
-                  popup: 'popup-class',
-                  icon: 'icon-class',
-                  content: 'content-class',
-                  actions: 'actions-class',
-                  confirmButton: 'confirm-button-class2',
-                },
-              }).then((result) => {
-                if (result.isConfirmed) {
-                }
-              });
+            this.getShoppingCartData()
+
+            this.hideMainSpinner();
+
+              this.visible = false
+              this.SuccessMsg = true
+
+            //   Swal.fire({
+            //     title: "",
+            //     text: "Order #" + this.transactionCode + " has been placed successfully",
+            //     icon: "success",
+            //     showCancelButton: false,
+            //     confirmButtonText: "OK",
+            //     allowOutsideClick: false,
+            //     allowEscapeKey: false,
+            //     backdrop: true,
+            //     customClass: {
+            //       popup: 'popup-class',
+            //       icon: 'icon-class',
+            //       content: 'content-class',
+            //       actions: 'actions-class',
+            //       confirmButton: 'confirm-button-class2',
+            //     },
+            //   }).then((result) => {
+            //     if (result.isConfirmed) {
+            //     }
+            //   });
             }
           });
+    //   }
+    // });
+  }
+  toGenerate(){
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    .pipe(finalize(() => {
+      this.onGeneratOrderReport(true,undefined,true,false)
+      // this.getOrderConfirmation()
+  }
+    ))
+    .subscribe((res) => {
+
+      if (res) {
       }
     });
   }
+  sync(){
+    this.showMainSpinner();
+    this._AppTransactionServiceProxy.syncTransaction(this.orderId)
+      .pipe(finalize(() => {
+        this.hideMainSpinner()
+        this.getShoppingCartData();
 
+      } ))
+      .subscribe((res) => {
+        // if (res) {
+        //   Swal.fire({
+        //     title: "",
+        //     text:  "Transaction has been sync successfully",
+        //     icon: "success",
+        //     showCancelButton: false,
+        //     confirmButtonText: "OK",
+        //     allowOutsideClick: false,
+        //     allowEscapeKey: false,
+        //     backdrop: true,
+        //     customClass: {
+        //       popup: 'popup-class',
+        //       icon: 'icon-class',
+        //       content: 'content-class',
+        //       actions: 'actions-class',
+        //       confirmButton: 'confirm-button-class2',
+        //     },
+        //   }).then((result) => {
+        //     if (result.isConfirmed) {
+        //     }
+        //   });
+        // }
+      });
+    
+  }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
         this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
@@ -784,12 +1006,14 @@ this.hideMainSpinner();
   }
 
   ontabInfoValid(activetab) {
+    
     switch (activetab) {
       case ShoppingCartoccordionTabs.orderInfo:
         this.orderInfoValid = true;
         break;
 
       case ShoppingCartoccordionTabs.BuyerContactInfo:
+      
         this.buyerContactInfoValid = true;
         break;
 
@@ -820,9 +1044,26 @@ this.hideMainSpinner();
     this.currentTab= this.activeIndex ;
   }
 
+  refreshShoppingCart(event) {
+    if (this.appTransactionsForViewDto?.entityStatusCode?.toUpperCase() == 'OPEN') {
+
+    if (event) {
+    this.getShoppingCartData()
+      }
+  
+    }
+  }
+  
   onChangeAppTransactionsForViewDto($event) {
     $event.companeyNames=this.companeyNames;
     this.appTransactionsForViewDto = $event;
+  }
+
+  TempCompValid($event) {
+   if($event && this.appTransactionsForViewDto?.buyerCompanySSIN == '') {
+    this.TempComp = $event;
+    
+   }
   }
 
   printTransaction() {
@@ -891,7 +1132,7 @@ this.hideMainSpinner();
     for (let i = 0; i < $event.tenantTransactionInfo?.length; i++) {
       printInfoParam.TransactionId = $event.tenantTransactionInfo[i].transactionId.toString();
       printInfoParam.tenantId =$event.tenantTransactionInfo[i].tenantId;
-      this.onGeneratOrderReport(true,printInfoParam,false,false);
+      // this.onGeneratOrderReport(true,printInfoParam,false,false);
     }
   }
   createReportViewer() {
@@ -921,5 +1162,269 @@ this.hideMainSpinner();
     }
 }
 
+
+initFilterForm() {  
+
+
+  // if (this.showHeader) {
+      this.filterForm = this._formBuilder.group({
+        selectedVariation: ['', Validators.required],
+        selectedQuantity: [null, [Validators.required, Validators.min(1)]],
+        selectedPrice: [null, [Validators.required, Validators.min(1)]]
+
+      });
+ 
+
+}
+
+addNewLine() {
+  console.log(this.newData, 'newData'); // Log new data for debugging
+  const filters = this.filterForm.value;
+
+  // Get the item data from the selected line (newData)
+  const appItem = this.newData?.value?.appItem;
+
+  // Initialize the new parent node without using itself within the definition
+  const newParentNode: any = {
+   
+    data: {}, // We’ll fill this data field after initializing the node
+    children: [], // Children will be added afterward
+    expanded: true // Expand the new node by default
+  };
+
+  // Fill the parent node's data to match the required structure
+  newParentNode.data = {
+    code: appItem?.code,
+    manufacturerCode: appItem?.manufacturerCode,
+    name: appItem?.name,
+    qty: filters.selectedQuantity,
+    price: filters.selectedPrice,
+    amount: filters.selectedQuantity * filters.selectedPrice,
+    image: appItem?.imageUrl,
+    parentId: 0, // Top-level node
+    // lineId: new Date().getTime(), // Unique identifier for lineId
+    colorId: 0,
+    colorCode: "", // Empty if not applicable
+    sizeId: 0,
+    sizeCode: "", // Empty if not applicable
+    editQty: true,
+    noOfPrePacks: 0,
+    prePackQty: 0,
+    added:true
+  };
+
+  // Define a child node that references the parent node's lineId
+  // const childNode = {
+  //   // key: 'new-child-' + new Date().getTime(), // Unique key for child
+  //   data: {
+  //     code: appItem?.code + '-child', // Custom code for the child
+  //     manufacturerCode: appItem?.manufacturerCode,
+  //     name: appItem?.name,
+  //     qty: this.selectedQuantity,
+  //     price: appItem?.price,
+  //     amount: this.selectedQuantity * appItem?.price,
+  //     image: appItem?.imageUrl,
+  //     parentId: newParentNode.data.lineId, // Link to parent
+  //     // lineId: new Date().getTime() + 1, // Unique lineId for child
+  //     colorId: 0,
+  //     colorCode: "", // Empty if not applicable
+  //     sizeId: 0,
+  //     sizeCode: "", // Empty if not applicable
+  //     editQty: true,
+  //     noOfPrePacks: 0,
+  //     prePackQty: 0
+  //   },
+  //   children: null // No further children for this level
+  // };
+
+  // Add the child node to the parent's children array
+  // newParentNode.children.push(childNode);
+
+  // Add the new parent node to the shopping cart tree
+  this.shoppingCartTreeNodes.push(newParentNode);
+
+  // Update the tree structure in the UI
+  this.cdr.detectChanges();
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  console.log(this.shoppingCartTreeNodes, 'Updated shopping cart tree nodes');
+
+  // Reset variables
+  this.showSaveCancel = false;
+  this.addLine = true
+  // this.selectedVariation = '';
+  // this.selectedQuantity = 0;
+  // this.selectedPrice = 0
+  // this.amount = 0;
+  // this.getSellerVariations()
+  this.addLine = false
+}
+handleVarSearch(event: any, dropdown?: any) {
+  const filterText = event.filter?.trim();
+  this.currentFilter = filterText; // Store the current filter text
+  this.allVariations = []; // Reset all variations for new filter
+  this.displayedVariations = []; // Clear displayed variations
+
+  // Load initial set of items matching the filter
+  this.loadMore(new MouseEvent('click'), dropdown, filterText);
+}
+
+getSellerVariations(
+  skipCount: number = 0,
+  maxResultCount: number = this.incrementCount,
+  filter: string = ''
+) {
+  this._AppTransactionServiceProxy
+    .getAllSellerVariations(
+      this.appTransactionsForViewDto?.sellerCompanySSIN,
+      filter, // Pass filter to the backend
+      this.appTransactionsForViewDto?.buyerContactSSIN,
+      this.appTransactionsForViewDto?.currencyCode,
+      undefined,
+      skipCount,
+      maxResultCount
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((res) => {
+      this.totalVariationsCount = res.totalCount;
+
+      if (filter && skipCount === 0) {
+        // Replace variations on new filter
+        this.allVariations = res.items;
+      } else {
+        // Append new items otherwise
+        this.allVariations = [...this.allVariations, ...res.items];
+      }
+
+      // Update displayed variations
+      this.displayedVariations = [...this.allVariations];
+    });
+}
+
+
+loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
+  // Prevent dropdown from closing
+  event.stopPropagation();
+
+  // Determine the next `skipCount` based on the filter and loaded variations
+  const nextSkipCount = this.allVariations.length;
+
+  // Check if there are more items to load or if filtering is applied
+  if (this.displayedVariations.length < this.totalVariationsCount || filter) {
+    this.getSellerVariations(nextSkipCount, this.incrementCount, filter);
+
+    // Keep the dropdown open after fetching more items
+    setTimeout(() => {
+      dropdown.overlayVisible = true;
+    }, 0);
+  }
+}
+
+
+onVariationSelect(event: any) {
+  // Reset quantity and price when a new variation is selected  
+  console.log(event,'mmmmmmevv')
+// this.filterForm.reset();
+  // filters.reset()
+  this.filterForm.controls['selectedQuantity']?.setValue(0);
+  this.selectedQuantity = 0;
+  // this.selectedPrice = 0;
+  this.newData = event;
+
+  if ( event.value.appItem.price) {
+    this.selectedImg = event.value.appItem.image
+   
+     this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
+    //  this.selectedPrice = filters.selectedPrice
+    this.updateAmount(); // Recalculate the amount when a new price is selected
+  }
+}
+
+updateAmount() {
+  const filters = this.filterForm.value;
+  
+ this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
+  // Calculate the amount based on the quantity and selected price
+  this.amount = this.selectedQuantity * this.selectedPrice;
+}
+
+updatePrice() {
+  const filters = this.filterForm.value;
+  this.selectedQuantity = filters.selectedQuantity
+
+  // Calculate the amount based on the quantity and selected price
+  this.amount = filters.selectedQuantity * this.selectedPrice;
+}
+
+saveVariations() {
+  const body = new AddVariationToInputDto();
+  const filters = this.filterForm.value;
+  
+ this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
+  // Assign each property to the DTO object
+  body.variationSSIN = this.newData?.value?.appItem?.ssin;
+  body.qty = this.selectedQuantity;
+  body.price = this.selectedPrice;
+  body.transactionId = this.orderId;
+  body.transactionType = this.appTransactionsForViewDto?.transactionType;
+
+  this._AppTransactionServiceProxy.addVariationToTransaction(body)
+    .pipe(finalize(() =>  {
+        this.selectedVariation = '';
+  this.selectedQuantity = 0;
+  this.selectedPrice = 0
+  this.amount = 0;
+  // this.filterForm.value.reset()
+  // this.hideMainSpinner()
+  this.getShoppingCartData();
+  this.showSaveCancel = false
+
+    }))
+    .subscribe((res) => {
+      console.log(this.displayedVariations, 'displayedVariations');
+      // Handle post-save logic here
+    });
+    this.addNewLinebtn = true
+}
+
+cancelAddLine() {
+  this.addLine = true
+  this.showAddLine = false;
+  this.showSaveCancel = false;
+ 
+  this.addNewLinebtn = true
+ 
+    this.selectedVariation = '';
+    this.filterForm.controls['selectedQuantity']?.setValue(0);
+    this.filterForm.controls['selectedPrice']?.setValue(0);
+
+    this.selectedQuantity = 0;
+
+  this.selectedPrice = 0
+  this.amount = 0;
+  this.shoppingCartTreeNodes.pop(); // Removes the last item
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  // Reset selections as needed
+}
+
+ngDoCheck() {
+        
+  let value = localStorage.getItem("comNew"); 
+
+  if (value) {
+   this.comNew = Boolean((value));
+  }else {
+   this.comNew = false
+  }
+  let value2 = localStorage.getItem("conNew");
+  if (value2) {
+   this.conNew = Boolean((value2));
+ }  else {
+   this.conNew = false;
+ 
+ }
+  
+}
 
 }
