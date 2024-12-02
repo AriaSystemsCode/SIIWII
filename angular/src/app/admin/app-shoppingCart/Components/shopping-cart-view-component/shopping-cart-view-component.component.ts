@@ -856,6 +856,8 @@ this.hideMainSpinner();
                 this.printInfoParam.orderConfirmationRole = res.contactRole;
                 this.printInfoParam.contactName = res.contactName;
                 console.log(this.printInfoParam.orderConfirmationRole, 'OrderConfirmationRole set');
+                console.log(this.printInfoParam.contactName, 'contactName set');
+ 
                 
                 // Ensure dependent logic is executed after the async operation
                 this.reportUrl = this.printInfoParam.getReportUrl();
