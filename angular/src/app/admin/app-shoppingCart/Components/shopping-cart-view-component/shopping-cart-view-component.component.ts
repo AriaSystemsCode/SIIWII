@@ -86,6 +86,7 @@ export class ShoppingCartViewComponentComponent
   shareDone:boolean=false;
   openActions:boolean =false
   temp: TreeNode<any>[] = null;
+  orderConfirmationData:any
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -236,7 +237,7 @@ export class ShoppingCartViewComponentComponent
 this.temp=temp;
     this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, undefined, 0, 10, this.transactionPosition.Current)
     .pipe(finalize(() => {
 this.hideMainSpinner();
     }))
@@ -654,7 +655,7 @@ this.hideMainSpinner();
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
@@ -776,7 +777,7 @@ this.hideMainSpinner();
 
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
         this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
@@ -836,64 +837,73 @@ this.hideMainSpinner();
   offShareTransaction() {
     this.onshare = false;
   }
-  async onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean,refreshData:boolean=true) {
-    if (($event && this.appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='DRAFT') || ($event && FromPlaceOrder)) {
-      this.reportUrl="";
-      if(printInfoParam)
-      this.printInfoParam=printInfoParam;
-    else{
-      this.printInfoParam= new ProductCatalogueReportParams();
-      this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
-      this.printInfoParam.TransactionId = this.orderId.toString();
-      //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
-      
-    //   if(this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder){
-    //   this.printInfoParam.orderConfirmationRole="Seller";
-    //  // this.printInfoParam.contactName= this.appTransactionsForViewDto.sellerContactName;
-    //   }
+  async onGeneratOrderReport($event, printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?: boolean, refreshData: boolean = true) {
+    if (($event && this.appTransactionsForViewDto?.entityStatusCode?.toUpperCase() != 'DRAFT') || ($event && FromPlaceOrder)) {
+        this.reportUrl = "";
+        if (printInfoParam) {
+            this.printInfoParam = printInfoParam;
+        } else {
+            this.printInfoParam = new ProductCatalogueReportParams();
+            this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+            this.printInfoParam.TransactionId = this.orderId.toString();
 
+            this.printInfoParam.saveToPDF = true;
+            this.printInfoParam.tenantId = this.appSession?.tenantId;
+            this.printInfoParam.userId = this.appSession?.userId;
 
+            // Asynchronous handling for setting orderConfirmationRole
+            this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId).subscribe((res) => {
+                this.printInfoParam.orderConfirmationRole = res.contactRole;
+                this.printInfoParam.contactName = res.contactName;
+                console.log(this.printInfoParam.orderConfirmationRole, 'OrderConfirmationRole set');
+                
+                // Ensure dependent logic is executed after the async operation
+                this.reportUrl = this.printInfoParam.getReportUrl();
+                this.createReportViewer();
 
-    //   if(this.appTransactionsForViewDto.transactionType== TransactionType.PurchaseOrder){
-    //   this.printInfoParam.orderConfirmationRole="Buyer";
-    // //  this.printInfoParam.contactName=this.appTransactionsForViewDto.buyerContactName;
-    //   } 
+                if (refreshData) {
+                    this.getShoppingCartData();
+                }
+            });
 
-      this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
-      this.printInfoParam.saveToPDF = true;
-      this.printInfoParam.tenantId = this.appSession?.tenantId
-      this.printInfoParam.userId = this.appSession?.userId
+            // Any logic dependent on the above call must be moved here
+        }
     }
-     this.reportUrl = this.printInfoParam.getReportUrl()
-
-     if(refreshData)
-        this.getShoppingCartData();
-
-      this.createReportViewer();
-    }
-  }
+}
 
   getOrderConfirmation(){
     this.transactionFormPath="";
      this.transactionFormPath=this._transactionFormPath;
    }
 
-  onShareTransactionByMessage($event: { tenantTransactionInfo: TenantTransactionInfo[], appTransactionsForViewDto: GetAppTransactionsForViewDto })
-  {
-    this.appTransactionsForViewDto=$event.appTransactionsForViewDto;
-    let printInfoParam= new ProductCatalogueReportParams();
-    //printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
-    printInfoParam.reportTemplateName = this.transactionReportTemplateName;
-    printInfoParam.saveToPDF = true;
-    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto?.enteredByUserRole);
-    printInfoParam.userId = this.appSession?.userId
+   onShareTransactionByMessage($event: { tenantTransactionInfo: TenantTransactionInfo[], appTransactionsForViewDto: GetAppTransactionsForViewDto }) {
+    // Assign the incoming data
+    this.appTransactionsForViewDto = $event.appTransactionsForViewDto;
 
-    for (let i = 0; i < $event.tenantTransactionInfo?.length; i++) {
-      printInfoParam.TransactionId = $event.tenantTransactionInfo[i].transactionId.toString();
-      printInfoParam.tenantId =$event.tenantTransactionInfo[i].tenantId;
-      this.onGeneratOrderReport(true,printInfoParam,false,false);
-    }
-  }
+    // Asynchronously fetch tenant role
+    this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId)
+        .subscribe((res) => {
+           
+            const printInfoParam = new ProductCatalogueReportParams();
+            
+            // Set fetched data
+            printInfoParam.orderConfirmationRole = res.contactRole;
+            printInfoParam.contactName = res.contactName;
+            printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+            printInfoParam.saveToPDF = true;
+            printInfoParam.userId = this.appSession?.userId;
+
+            // Iterate through tenantTransactionInfo and generate reports
+            for (let i = 0; i < $event.tenantTransactionInfo?.length; i++) {
+                printInfoParam.TransactionId = $event.tenantTransactionInfo[i].transactionId.toString();
+                printInfoParam.tenantId = $event.tenantTransactionInfo[i].tenantId;
+
+                // Pass the updated params to onGeneratOrderReport
+                this.onGeneratOrderReport(true, printInfoParam, false, false);
+            }
+        });
+}
+
   createReportViewer() {
     // Resolve the factory for ReportViewerComponent
     const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
@@ -920,6 +930,15 @@ this.hideMainSpinner();
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
-
+getTransactionRoleOrderConfirmation() {
+  this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId)
+  .subscribe((res) => {
+    if (res) {
+        console.log(res,'ressss')
+        this.orderConfirmationData.contactRole = res.contactRole
+        this.orderConfirmationData.contactName = res.contactName
+    }
+  });
+}
 
 }
