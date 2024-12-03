@@ -13,6 +13,7 @@ import { ReactionsService } from '../services/reactions.service';
 })
 export class InteractionsComponent extends AppComponentBase implements OnInit, OnChanges {
     @Output() refreshStats : EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output() toName : EventEmitter<string> = new EventEmitter<string>()
     @Input() entityId: number
     @Input() relatedEntityId: number
     @Input() postCreatorUserId: number
@@ -22,6 +23,7 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
     @Input() commentType:any;
+    @Input() comment:any;
     showReactionsPopup: boolean = false
     defaultReactionType: Reactions = this._reactionService.defaultReactionType
     currentUserReaction: AppEntityUserReactionDto = new AppEntityUserReactionDto()
@@ -160,6 +162,7 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     }
     showAddComment(){
         this.triggerCommentsList(true)
+        this.toName.emit(this.comment.messages.toName)
         if(this.showComments) this.commentParentComponent.focusAddComment()
     }
 }

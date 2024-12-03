@@ -162,17 +162,44 @@ regenrate : boolean = false
     // this.onGeneratOrderReport(true,undefined,true,true);
 
   }
-  loadCommentsList() {
-    const screenWidth = window.innerWidth;
-    const tabletWidth = 768; // iPads and tablets
-    // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
-   //if(screenWidth <= tabletWidth)
-    this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
-    
-    //else 
-      this.commentParentComponent?.last?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
-      
-  }
+//   loadCommentsList() {
+//     this.ensureCommentsComponentReady().then(() => {
+//         this.commentParentComponent?.first?.show(
+//             this.appTransactionsForViewDto.creatorUserId,
+//             this.orderId
+//         );
+//         this.commentParentComponent?.last?.show(
+//             this.appTransactionsForViewDto.creatorUserId,
+//             this.orderId
+//         );
+//     });
+// }
+
+// ensureCommentsComponentReady(): Promise<void> {
+//     return new Promise((resolve) => {
+//         const checkInterval = setInterval(() => {
+//             if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+//                 clearInterval(checkInterval);
+//                 resolve();
+//             }
+//         }, 10);
+//     });
+// }
+loadCommentsList() {
+  setTimeout(() => {
+      if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+          this.commentParentComponent?.first?.show(
+              this.appTransactionsForViewDto.creatorUserId,
+              this.orderId
+          );
+          this.commentParentComponent?.last?.show(
+              this.appTransactionsForViewDto.creatorUserId,
+              this.orderId
+          );
+      }
+  }, 200);
+}
+
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode= ShoppingCartMode.createOrEdit) {
 

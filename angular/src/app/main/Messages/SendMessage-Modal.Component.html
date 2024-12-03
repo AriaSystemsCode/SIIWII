@@ -179,6 +179,7 @@
                                 placeholder=""
                                 type="Text"
                                 [(ngModel)]="subject"
+                                (keydown)="updateSubjectValue($event)"
                                 name="subject"
                                 required
                             />
@@ -201,6 +202,7 @@
                                 placeholder=""
                                 type="Text"
                                 [(ngModel)]="subject"
+                                (keyup)="updateSubjectValue($event)"
                                 name="subject"
                                 required
                             />
@@ -477,6 +479,7 @@
                                     placeholder=""
                                     type="Text"
                                     [(ngModel)]="subject"
+                                    (keyup)="updateSubjectValue($event)"
                                     name="subject"
                                     required
                                 />
@@ -499,6 +502,7 @@
                                     placeholder=""
                                     type="Text"
                                     [(ngModel)]="subject"
+                                    (keyup)="updateSubjectValue($event)"
                                     name="subject"
                                     required
                                 />
@@ -630,14 +634,15 @@
             >
         </div>
         <div class="row align-items-start mb-3 mb-1 border-bottom">
-
+     
             <div class="col-md-1">
                 <div class="InputText">
                     <span class="text-input-label"
                         >{{ "To" | localize }}:</span
-                    >
+                    > 
                 </div>
             </div>
+            <br>
             <div
                 class="p-0 sendusers mb-1 col-md-11">
                 <p-autoComplete
@@ -648,6 +653,7 @@
                         email-autocomplete
                         sendMessageInputs
                     "
+                    [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="toUsers"
                     [forceSelection]="true"
                     [suggestions]="filteredUsers"
@@ -658,7 +664,7 @@
                     id="MultiSelectInputTo"
                     [required]="true"
                     [multiple]="true"
-                >
+                > 
                 </p-autoComplete>
             </div>
             <div
@@ -766,6 +772,7 @@
                     type="Text"
                     [(ngModel)]="subject"
                     name="subject"
+                    (keyup)="updateSubjectValue($event)"
                     required
                 />
                 </div>
@@ -790,6 +797,7 @@
                     type="Text"
                     [(ngModel)]="subject"
                     name="subject"
+                    (keyup)="updateSubjectValue($event)"
                     required
                 />
             </div>
@@ -886,7 +894,7 @@
             class="sendBtn"
             (click)="sendMessage()"
         >
-        <i class="fa  fa-paper-plane mr-1" style="color: white;"></i>  {{ "Send" | localize }}
+        <i class="fa  fa-paper-plane mr-1" style="color: white;"></i>  {{ "Send" | localize }}  {{subject}}
         </button>
         
     </div>

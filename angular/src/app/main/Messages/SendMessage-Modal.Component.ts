@@ -8,6 +8,8 @@ import {
     EventEmitter,
     OnInit,
     ElementRef,
+    SimpleChanges,
+    ChangeDetectorRef,
 } from "@angular/core";
 import {
     CreateOrEditAccountInfoDto,
@@ -73,6 +75,7 @@ export class SendMessageModalComponent
     @Input() modalView:boolean;
     @Input() parentId:any;
     @Input() entityId:any;
+    @Input() toName:string = '';
     active: boolean;
     displayCC: boolean = false;
     displayBCC: boolean = false;
@@ -94,15 +97,25 @@ export class SendMessageModalComponent
         injector: Injector,
         private _tokenService: TokenService,
         private _MessageServiceProxy: MessageServiceProxy,
-        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private cdr: ChangeDetectorRef
 
     ) {
         super(injector);
     }
 
     ngOnInit(): void {
-      //  this.initUploaders();
+        // const toNameArray: string[] = this.toName.split(',').map((name) => name.trim());
+        this.filterUsersFilterByEntity('')
     }
+    ngOnChanges(changes: SimpleChanges): void {
+      
+    }
+    updateSubjectValue(newValue): void {
+        console.log(newValue,'newValuenewValuenewValue')
+        this.subject = newValue;
+        this.cdr.detectChanges();  // Manually trigger change detection
+      }
     mesasgeObjectType: MesasgeObjectType = MesasgeObjectType.Message
     show(id?: number, threadId?: number, forward?: boolean,mesasgeObjectType?: MesasgeObjectType) {
         this.showMainSpinner();
@@ -476,7 +489,7 @@ export class SendMessageModalComponent
 
             this.attachmentsUploader.uploadAllFiles();
     }
-
+  
     sendMessage(): void {
         this.showMainSpinner();
         if(this.attachments?.length>0)
@@ -559,28 +572,40 @@ export class SendMessageModalComponent
                         this.filteredUsers.push(Users[i].users);
                     }
                 }
+                console.log(this.filteredUsers,'this.filteredUsers')
             });
     }
-        // get Users related to entity
-        filterUsersFilterByEntity(event): void {
-            this._appEntitiesServiceProxy.
-            getContactsToMention(this.entityId,event.query)
-                .subscribe((Users) => {
-                    this.filteredUsers = [];
-                    for (var i = 0; i < Users.length; i++) {
-                        //xxx
-                        if (
-                            Users[i]?.users?.value.toString() !=
-                            this.appSession.userId.toString()
-                        ) {
-                            //xxx
-                            //I2-9 -  receipt name, last name @ tenant name
-                            Users[i].users={name:Users[i].userName,value:Users[i].userId.toString()}
-
-                            //  Users[i].users.name += "@" + Users[i].tenantName;
-                            this.filteredUsers.push(Users[i].users);
+    
+               // get Users related to entity
+               filterUsersFilterByEntity(event): void {
+                this._appEntitiesServiceProxy
+                    .getContactsToMention(this.entityId, event.query)
+                    .subscribe((users) => {
+                        this.filteredUsers = [];
+                        for (let i = 0; i < users.length; i++) {
+                            if (users[i]?.users?.value.toString() !== this.appSession.userId.toString()) {
+                                users[i].users = {
+                                    name: users[i].name + '@' + users[i].tenantName,
+                                    value: users[i].userId.toString()
+                                };
+                                this.filteredUsers.push(users[i].users);
+                            }
                         }
-                    }
-                });
-        }
+            
+                        // Normalize names in toNameArray to match filteredUsers
+                        const toNameArray: string[] = this.toName
+                            .split(',')
+                            .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
+            
+                        // Set default selected users
+                        this.toUsers = this.filteredUsers.filter((user) =>
+                            toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
+                        );
+            
+                        // Debugging logs
+                        console.log('Filtered Users:', this.filteredUsers);
+                        console.log('toNameArray:', toNameArray);
+                        console.log('Default toUsers:', this.toUsers);
+                    });
+            }
 }
