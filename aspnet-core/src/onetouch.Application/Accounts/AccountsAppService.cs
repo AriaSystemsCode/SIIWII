@@ -173,6 +173,20 @@ namespace onetouch.Accounts
                 }
             }
         }
+        //X527[Start]
+        //public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
+        //{
+        //    var account = await _appContactRepository.GetAll().Include(z=>z.EntityFk).Where(z => z.TenantId == null && z.SSIN == input.AccountSSIN).FirstOrDefaultAsync();
+        //    if (account!=null && account.EntityFk.TenantOwner!=null)
+        //    {
+        //        var entities = _appEntityRepository.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+        //            .Where(z => z.TenantOwner == account.EntityFk.TenantOwner);
+
+        //        var pagedAndFilteredAccounts = entities.OrderBy("CreationDate desc").PageBy(input);
+        //    }
+
+        //}
+        //X527[End]
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -8447,7 +8461,7 @@ namespace onetouch.Accounts
             return appContactAddressDtos;
 
         }
-
+       
 
     }
 

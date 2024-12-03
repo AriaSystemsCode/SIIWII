@@ -112,6 +112,9 @@ namespace onetouch.AppPosts
                         .WhereIf(!string.IsNullOrEmpty(input.ToCreationDateFilter.ToString())
                         , x => x.CreationTime <= input.ToCreationDateFilter )
                         //Iteration#29,1 MMT News Digest changes[End]
+                        //Iteration#I40 - X527[Start]
+                        .WhereIf(input.TenantId!=null, z=>z.TenantId==input.TenantId)
+                        //Iteration#I40 - X527[End]
                         .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Description == input.DescriptionFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppContactNameFilter), e => e.AppContactFk != null && e.AppContactFk.Name == input.AppContactNameFilter)
@@ -160,9 +163,18 @@ namespace onetouch.AppPosts
                     }
                     else
                     {
-                        pagedAndFilteredAppPosts = filteredAppPosts
-                        .OrderBy(input.Sorting ?? "id desc")
-                        .PageBy(input);
+                        if (input.TenantId != null)
+                        {
+                            pagedAndFilteredAppPosts = filteredAppPosts
+                            .OrderBy("CreationTime desc")
+                            .PageBy(input);
+                        }
+                        else
+                        {
+                            pagedAndFilteredAppPosts = filteredAppPosts
+                            .OrderBy(input.Sorting ?? "id desc")
+                            .PageBy(input);
+                        }
                     }
                 }
                 else
@@ -171,6 +183,12 @@ namespace onetouch.AppPosts
                     .OrderBy(input.Sorting ?? "id desc")
                     .PageBy(input);
                 }
+                //X527
+                if (input.NoOfPostToReturn != null)
+                {
+                    pagedAndFilteredAppPosts = pagedAndFilteredAppPosts.Take(int.Parse(input.NoOfPostToReturn.ToString()));
+                }
+                //X527
                 //Iteration#29,1 MMT News Digest changes[Start]
                 var appPosts = from o in pagedAndFilteredAppPosts
                                join o1 in _lookup_appContactRepository.GetAll() on o.AppContactId equals o1.Id into j1
