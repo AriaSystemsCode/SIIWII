@@ -174,18 +174,48 @@ namespace onetouch.Accounts
             }
         }
         //X527[Start]
-        //public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
-        //{
-        //    var account = await _appContactRepository.GetAll().Include(z=>z.EntityFk).Where(z => z.TenantId == null && z.SSIN == input.AccountSSIN).FirstOrDefaultAsync();
-        //    if (account!=null && account.EntityFk.TenantOwner!=null)
-        //    {
-        //        var entities = _appEntityRepository.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-        //            .Where(z => z.TenantOwner == account.EntityFk.TenantOwner);
+        public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                List<AppEntityAttachmentDto> retrunResult = new List<AppEntityAttachmentDto>();
+                int totalCount = 0;
+                
+                var account = await _appContactRepository.GetAll().Include(z => z.EntityFk).Where(z => z.TenantId == null && z.SSIN == input.AccountSSIN).FirstOrDefaultAsync();
+                if (account != null && account.EntityFk.TenantOwner != null)
+                {
+                    long catgImage = await _helper.SystemTables.GetAttachmentCategoryId("IMAGE");
+                    long catgVideo = await _helper.SystemTables.GetAttachmentCategoryId("VIDEO");
+                    var entities = from t in _appEntityAttachmentRepository.GetAll().Include(z => z.AttachmentFk)
+                                   .Where(z=>z.AttachmentCategoryId== catgImage || z.AttachmentCategoryId == catgVideo)
+                                   join
+                                  e in _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                        .Where(z => z.TenantOwner == account.EntityFk.TenantOwner && z.EntityAttachments.Count() > 0)
+                        on t.EntityId equals e.Id into j
+                                   from j1 in j
+                                   select new AppEntityAttachmentDto()
+                                   {
+                                       Url = "attachments/" + "-1" + "/" + t.AttachmentFk.Attachment,
+                                       DisplayName = t.AttachmentFk.Name,
+                                       AttachmentCategoryId = t.AttachmentCategoryId,
+                                       Id = t.Id,
+                                       
+                                   };
 
-        //        var pagedAndFilteredAccounts = entities.OrderBy("CreationDate desc").PageBy(input);
-        //    }
+                    var pagedAndFilteredAccounts = entities.OrderBy("Id desc").PageBy(input);
+                    retrunResult = await pagedAndFilteredAccounts.ToListAsync();
+                    totalCount = await pagedAndFilteredAccounts.CountAsync();
 
-        //}
+
+
+                }
+                var x = new PagedResultDto<AppEntityAttachmentDto>(
+                           totalCount,
+                           retrunResult
+                   );
+                return x;
+            }
+        }
         //X527[End]
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
@@ -8464,5 +8494,6 @@ namespace onetouch.Accounts
        
 
     }
+    
 
 }
