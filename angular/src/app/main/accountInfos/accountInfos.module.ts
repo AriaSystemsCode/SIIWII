@@ -44,9 +44,6 @@ import { MyMembersModule } from '../teamMembers/my-members.module';
 import { PublishAccountService } from './services/publishAccountService';
 import { PublishService } from '../app-items/app-item-shared/services/publish.service';
 import { ShareAccountComponent } from './components/share-account.component';
-
-
-import { AccountBillingComponent } from './components/accountBilling/AccountBilling/accountbilling.component';
 import { AddOnsComponent } from './components/accountBilling/components/add-ons/add-ons.component';
 import { ActivityLogComponent } from './components/accountBilling/components/activity-log/activity-log.component';
 import { TenantInvoicesComponent } from './components/accountBilling/components/tenant-invoices/tenant-invoices.component';
@@ -54,6 +51,11 @@ import { PlansComponent } from './components/accountBilling/components/plans/pla
 import { MainModule } from '../main.module';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
+import { TabViewModule } from 'primeng/tabview';
+import { MarketplaceAccountProfileComponent } from './components/marketplace-account-profile-view/marketplace-account-profile/marketplace-account-profile.component';
+import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
+import { OverviewTabComponent } from './components/marketplace-account-profile-view/overview-tab/overview-tab.component';
+import { PostsModule } from '../posts/posts.module';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -71,7 +73,9 @@ import { DialogModule } from 'primeng/dialog';
         AddOnsComponent,
         ActivityLogComponent,
         TenantInvoicesComponent,
-        PlansComponent
+        PlansComponent,
+        MarketplaceAccountProfileComponent,
+        OverviewTabComponent
     ],
     imports: [
         CommonModule,
@@ -108,7 +112,9 @@ import { DialogModule } from 'primeng/dialog';
         AccountModule,
         MyMembersModule,MainModule,
         ConfirmDialogModule,
-        DialogModule
+        DialogModule,
+        TabViewModule,
+        PostsModule,
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

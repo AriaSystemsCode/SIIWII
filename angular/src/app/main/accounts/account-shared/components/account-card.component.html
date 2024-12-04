@@ -13,7 +13,7 @@
     >
         <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
     </div> -->
-    <img style="height: 100px;width: 100px; border-radius: 6px;" [ngStyle]="{
+    <img style="height: 100px;width: 100px; border-radius: 6px;"  (click)="clickCardHandler()" [ngStyle]="{
         'background-image':
         account.account.logoUrl ?
         'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
