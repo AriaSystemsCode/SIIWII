@@ -5,13 +5,13 @@ import * as moment from 'moment';
 @Component({
   selector: 'app-overview-tab',
   templateUrl: './overview-tab.component.html',
-  styleUrls: ['./overview-tab.component.scss']
+  styleUrls: ['./overview-tab.component.scss'],
 })
 export class OverviewTabComponent {
   postData: any;
    baseUrl = "https://localhost:44301/";
 
-progressValue = 50;
+progressValue = 30;
 
   constructor() {
     this.postData = {
@@ -50,6 +50,10 @@ progressValue = 50;
 }
 
 }
-rating: number = 3.3; // Rating out of 5
+
+ngOnInit() {
+  this.rating = 3.4
+}
+rating: number = 3.4; // Rating out of 5
 
 }

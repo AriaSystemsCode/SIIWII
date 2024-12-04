@@ -253,15 +253,14 @@ color: #FFFFFF;
       .star-rating {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 10px;
       }
       
       .stars-outer {
         position: relative;
         display: inline-block;
-        font-size: 1.5rem;
-        color: #ccc;
-        overflow: hidden;
+        font-size: 26px; /* Adjust size as needed */
+        color: #ccc; /* Gray stars */
         line-height: 1;
       }
       
@@ -270,8 +269,13 @@ color: #FFFFFF;
         top: 0;
         left: 0;
         white-space: nowrap;
-        color: gold;
+        color: #F6851D;
         overflow: hidden;
+      }
+      
+      .rating-value {
+        font-size: 1rem;
+        color: #333;
       }
       
       .rating-value {
@@ -285,3 +289,23 @@ color: #FFFFFF;
         color: #444;
       }
       
+
+      .help-btn{
+ 
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 8.5px 16px;
+gap: 10px;
+position: absolute;
+bottom: 5px;
+right: 5px;
+
+height: 35px;
+
+border: 1px solid rgba(238, 238, 238, 0.933333);
+filter: drop-shadow(2px 2px 10px rgba(22, 22, 22, 0.1));
+border-radius: 6px;
+
+      }

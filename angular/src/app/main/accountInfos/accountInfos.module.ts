@@ -56,6 +56,7 @@ import { MarketplaceAccountProfileComponent } from './components/marketplace-acc
 import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
 import { OverviewTabComponent } from './components/marketplace-account-profile-view/overview-tab/overview-tab.component';
 import { PostsModule } from '../posts/posts.module';
+import { InteractionsModule } from '../interactions/interactions.module';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -115,6 +116,7 @@ import { PostsModule } from '../posts/posts.module';
         DialogModule,
         TabViewModule,
         PostsModule,
+        InteractionsModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
