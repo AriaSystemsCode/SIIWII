@@ -5971,55 +5971,62 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
         //MMT-OC[Start]
-        public async Task<TenantContactRole> GetTenantRoleInTransaction(long transactionId)
+        public async Task<TenantContactRole> GetTenantRoleInTransaction(long transactionId,long? tenantId)
         {
-            TenantContactRole returnObj = new TenantContactRole();
-            var myAccount = await _appContactRepository.GetAll().Where(a => a.TenantId == AbpSession.TenantId & a.IsProfileData == true &
-                a.ParentId == null).FirstOrDefaultAsync();
-            if (myAccount != null)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var transactionContacts = await _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == transactionId).ToListAsync();
-                var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk)
-                               .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.AccountId == myAccount.Id).ToListAsync();
+                if (tenantId == null)
+                    tenantId = AbpSession.TenantId;
 
-                //from o in _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == transactionId)
-                //           join c in _appContactRepository.GetAll().Include(z => z.EntityFk)
-                //         .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.AccountId == myAccount.Id)
-                //       on o.ContactSSIN equals c.SSIN into j
-                //     from s in j.DefaultIfEmpty()
-                /*  select new TenantContactRole
-                  {
-                      ContactName = o.ContactName,
-                      ContactRole = o.ContactRole
-                  };*/
-                var joined = transactionContacts.Join(contacts,Z=>Z.ContactSSIN, web => web.SSIN,
-                            (Z, web) =>  new TenantContactRole {
-                                ContactName = Z.ContactName,
-                                ContactRole = Z.ContactRole
-                            });
-
-                //join b in  on a.ContactSSIN equals b.SSIN into j
-                //select new TenantContactRole
-               // {
-                 
-               // };
-
-                var contList = joined.ToList();
-                if (contList != null && contList.Count() > 0)
+                TenantContactRole returnObj = new TenantContactRole();
+                var myAccount = await _appContactRepository.GetAll().Where(a => a.TenantId == tenantId & a.IsProfileData == true &
+                    a.ParentId == null).FirstOrDefaultAsync();
+                if (myAccount != null)
                 {
-                    foreach (var cont in contList)
+                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    var transactionContacts = await _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == transactionId).ToListAsync();
+                    var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                                   .Where(z => z.TenantId == tenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.AccountId == myAccount.Id).ToListAsync();
+
+                    //from o in _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == transactionId)
+                    //           join c in _appContactRepository.GetAll().Include(z => z.EntityFk)
+                    //         .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.AccountId == myAccount.Id)
+                    //       on o.ContactSSIN equals c.SSIN into j
+                    //     from s in j.DefaultIfEmpty()
+                    /*  select new TenantContactRole
+                      {
+                          ContactName = o.ContactName,
+                          ContactRole = o.ContactRole
+                      };*/
+                    var joined = transactionContacts.Join(contacts, Z => Z.ContactSSIN, web => web.SSIN,
+                                (Z, web) => new TenantContactRole
+                                {
+                                    ContactName = Z.ContactName,
+                                    ContactRole = Z.ContactRole
+                                });
+
+                    //join b in  on a.ContactSSIN equals b.SSIN into j
+                    //select new TenantContactRole
+                    // {
+
+                    // };
+
+                    var contList = joined.ToList();
+                    if (contList != null && contList.Count() > 0)
                     {
-                        if (cont.ContactRole == ContactRoleEnum.Buyer.ToString() || cont.ContactRole == ContactRoleEnum.Seller.ToString() ||
-                            cont.ContactRole == ContactRoleEnum.SalesRep1.ToString() || cont.ContactRole == ContactRoleEnum.SalesRep2.ToString())
+                        foreach (var cont in contList)
                         {
-                            returnObj = cont;
-                            break;
+                            if (cont.ContactRole == ContactRoleEnum.Buyer.ToString() || cont.ContactRole == ContactRoleEnum.Seller.ToString() ||
+                                cont.ContactRole == ContactRoleEnum.SalesRep1.ToString() || cont.ContactRole == ContactRoleEnum.SalesRep2.ToString())
+                            {
+                                returnObj = cont;
+                                break;
+                            }
                         }
                     }
                 }
+                return returnObj;
             }
-            return returnObj;
         }
         //MMT-OC[End]
         //Iteration45[Start]

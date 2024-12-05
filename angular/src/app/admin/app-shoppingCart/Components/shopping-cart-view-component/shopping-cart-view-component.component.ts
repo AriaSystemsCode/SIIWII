@@ -1356,7 +1356,7 @@ onShowVariations(event) {
             this.printInfoParam.userId = this.appSession?.userId;
 
             // Asynchronous handling for setting orderConfirmationRole
-            this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId).subscribe((res) => {
+            this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId,this.appTransactionsForViewDto.tenantId).subscribe((res) => {
                 this.printInfoParam.orderConfirmationRole = res.contactRole;
                 this.printInfoParam.contactName = res.contactName;
            
@@ -1385,29 +1385,29 @@ onShowVariations(event) {
     // Assign the incoming data
     this.appTransactionsForViewDto = $event.appTransactionsForViewDto;
 
-    // Asynchronously fetch tenant role
-    this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId)
-        .subscribe((res) => {
-           
-            const printInfoParam = new ProductCatalogueReportParams();
-            
-            // Set fetched data
-            printInfoParam.orderConfirmationRole = res.contactRole;
-            printInfoParam.contactName = res.contactName;
-            printInfoParam.reportTemplateName = this.transactionReportTemplateName;
-            printInfoParam.saveToPDF = true;
-            printInfoParam.userId = this.appSession?.userId;
+    // Iterate through tenantTransactionInfo to fetch tenant roles and generate reports
+    $event.tenantTransactionInfo.forEach((tenantInfo) => {
+        this._AppTransactionServiceProxy.getTenantRoleInTransaction(tenantInfo.transactionId, tenantInfo.tenantId)
+            .subscribe((res) => {
+                const printInfoParam = new ProductCatalogueReportParams();
 
-            // Iterate through tenantTransactionInfo and generate reports
-            for (let i = 0; i < $event.tenantTransactionInfo?.length; i++) {
-                printInfoParam.TransactionId = $event.tenantTransactionInfo[i].transactionId.toString();
-                printInfoParam.tenantId = $event.tenantTransactionInfo[i].tenantId;
+                // Set fetched data
+                printInfoParam.orderConfirmationRole = res.contactRole;
+                printInfoParam.contactName = res.contactName;
+                printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+                printInfoParam.saveToPDF = true;
+                printInfoParam.userId = this.appSession?.userId;
+
+                // Set transaction-specific data
+                printInfoParam.TransactionId = tenantInfo.transactionId.toString();
+                printInfoParam.tenantId = tenantInfo.tenantId;
 
                 // Pass the updated params to onGeneratOrderReport
                 this.onGeneratOrderReport(true, printInfoParam, false, false);
-            }
-        });
+            });
+    });
 }
+
 
   createReportViewer() {
     // Resolve the factory for ReportViewerComponent

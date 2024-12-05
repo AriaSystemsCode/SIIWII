@@ -24757,14 +24757,17 @@ export class AppTransactionServiceProxy {
 
     /**
      * @param transactionId (optional) 
+     * @param tenantId (optional) 
      * @return Success
      */
-    getTenantRoleInTransaction(transactionId: number | undefined): Observable<TenantContactRole> {
+    getTenantRoleInTransaction(transactionId: number | undefined, tenantId: number | null | undefined): Observable<TenantContactRole> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetTenantRoleInTransaction?";
         if (transactionId === null)
             throw new Error("The parameter 'transactionId' cannot be null.");
         else if (transactionId !== undefined)
             url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
