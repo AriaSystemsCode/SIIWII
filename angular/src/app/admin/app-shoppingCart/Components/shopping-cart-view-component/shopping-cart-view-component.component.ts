@@ -148,13 +148,20 @@ regenrate : boolean = false
   this.conNew = false;
 
 }
-// if(this.appTransactionsForViewDto?.buyerCompanySSIN == ''){
-//  this.TempComp = false
+const button = document.getElementById("stickyButton");
+  const rightCol = document.getElementById("rightCol");
 
-// } else {
-//  this.TempComp = true
-
-// }
+  window.addEventListener("scroll", () => {
+    const rect = rightCol.getBoundingClientRect();
+    if (rect.top < 20 && rect.bottom > window.innerHeight) {
+      button.style.position = "fixed";
+      button.style.bottom = "20px";
+      button.style.right = rect.left + "px"; // Adjust based on the right column's position
+    } else {
+      button.style.position = "absolute";
+      button.style.bottom = "20px";
+    }
+  });
  console.log(this.comNew,'this.comNew')
  console.log(this.conNew,'this.conNew')
   }
