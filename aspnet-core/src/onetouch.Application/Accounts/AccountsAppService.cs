@@ -2210,9 +2210,9 @@ namespace onetouch.Accounts
             return ret;
         }
 
-        public async Task ApplyRelationOnProfile(long input)
+        public async Task<string> ApplyRelationOnProfile(long input)
         {
-
+            string ret = "";
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var marketplaceContact = await _appMarketplaceContactRepository.GetAll()
@@ -2223,6 +2223,11 @@ namespace onetouch.Accounts
 
                 if (marketplaceContact != null)
                 {
+                     
+                    var retType = await _helper.SystemTables.GetEntityObjectTypeById(marketplaceContact.AccountTypeId);
+
+                    ret = GetAction(retType.Code, false);
+
                     var entity = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories)
                                         .Include(x => x.EntityClassifications)
                                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -2248,13 +2253,14 @@ namespace onetouch.Accounts
                     foreach (var contactAddress in contactDto.ContactAddresses)
                     {
                         contactAddress.Id = 0;
-                        //contactAddress.AddressId = 0;
+                        contactAddress.AddressId = 0;
                         contactAddress.AccountId = 0;
-
+                        
                         contactAddress.AddressFk.Id = 0;
-                        //contactAddress.AddressFk.TenantId = AbpSession.TenantId;
+                        contactAddress.AddressFk.TenantId = AbpSession.TenantId;
                         contactAddress.AddressFk.AccountId = 0;
-
+                        //
+                        contactAddress.AddressFk.Code = Guid.NewGuid().ToString();
 
                     }
                     var contactDto_Id = await _appEntitiesAppService.SaveContact(contactDto);
@@ -2292,6 +2298,8 @@ namespace onetouch.Accounts
                     //End
                 }
             }
+
+            return ret;
         }
         public async Task ApplyRelationOnBranch(AppMarketplaceContact marketplaceContact, long accountId)
         {

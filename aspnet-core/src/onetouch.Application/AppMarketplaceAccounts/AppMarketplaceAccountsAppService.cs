@@ -211,8 +211,10 @@ namespace onetouch.AppMarketplaceAccounts
                     foreach (var account in accountsList)
                     {
                         account.AvaliableConnectionName = GetAction(account.Account.AccountType);
-                        account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                        //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                        account.ConnectionName = "";
                     }
+
                     var totalCount = await filteredAccounts.CountAsync();
 
                     // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
