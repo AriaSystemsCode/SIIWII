@@ -130,8 +130,13 @@
   </div>
 
 
-  <ng-template pTemplate="footer">
-    <p-button  (click)="visible = false;confirm()" label="Yes" class="p-button-text" ></p-button>
-    <p-button  (click)="visible = false" label="Cancel" Class="p-button-no"></p-button>
-</ng-template>
+      
+  <div  class="d-flex justify-content-center btns" style="gap: 15px;">
+                                            
+    <button  (click)="confirm();visible = false" label="Yes" class="p-button-text" >Yes</button>
+    <button  (click)="visible = false ;"  label="Cancel" Class="p-button-no">Cancel</button>
+
+  </div>
+
+
 </p-dialog>
