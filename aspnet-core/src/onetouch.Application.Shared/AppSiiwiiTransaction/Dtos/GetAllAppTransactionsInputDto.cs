@@ -29,6 +29,9 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public bool fromExport { set; get; } = false;
         public bool hasParentItems { set; get; } = false;
         public string? TimeZoneValue { get; set; }
+        //I45
+        public string? ReferenceFilter { get; set; }
+        //I45
     }
   
 }
