@@ -917,6 +917,73 @@ export class AccountsServiceProxy {
     }
 
     /**
+     * @param accountSSIN (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllAccountMediaAttachment(accountSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppEntityAttachmentDto> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/GetAllAccountMediaAttachment?";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "AccountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllAccountMediaAttachment(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllAccountMediaAttachment(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfAppEntityAttachmentDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfAppEntityAttachmentDto>;
+        }));
+    }
+
+    protected processGetAllAccountMediaAttachment(response: HttpResponseBase): Observable<PagedResultDtoOfAppEntityAttachmentDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfAppEntityAttachmentDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param filter (optional) 
      * @param filterType (optional) 
      * @param name (optional) 
@@ -2099,7 +2166,7 @@ export class AccountsServiceProxy {
      * @param input (optional) 
      * @return Success
      */
-    applyRelationOnProfile(input: number | undefined): Observable<void> {
+    applyRelationOnProfile(input: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ApplyRelationOnProfile?";
         if (input === null)
             throw new Error("The parameter 'input' cannot be null.");
@@ -2111,6 +2178,7 @@ export class AccountsServiceProxy {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -2121,14 +2189,14 @@ export class AccountsServiceProxy {
                 try {
                     return this.processApplyRelationOnProfile(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<string>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<string>;
         }));
     }
 
-    protected processApplyRelationOnProfile(response: HttpResponseBase): Observable<void> {
+    protected processApplyRelationOnProfile(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2137,7 +2205,11 @@ export class AccountsServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -7538,9 +7610,10 @@ export class AppEntitiesServiceProxy {
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
+     * @param hasManual (optional) 
      * @return Success
      */
-    getAllAccountTypesForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllAccountTypesForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, hasManual: boolean | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllAccountTypesForTableDropdownWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -7572,6 +7645,10 @@ export class AppEntitiesServiceProxy {
             throw new Error("The parameter 'maxResultCount' cannot be null.");
         else if (maxResultCount !== undefined)
             url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (hasManual === null)
+            throw new Error("The parameter 'hasManual' cannot be null.");
+        else if (hasManual !== undefined)
+            url_ += "hasManual=" + encodeURIComponent("" + hasManual) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -17655,12 +17732,14 @@ export class AppPostsServiceProxy {
      * @param appContactNameFilter (optional) 
      * @param appEntityNameFilter (optional) 
      * @param postId (optional) 
+     * @param tenantId (optional) 
+     * @param noOfPostToReturn (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, typeFilter: PostType | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, appContactNameFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, postId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppPostForViewDto> {
+    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, typeFilter: PostType | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, appContactNameFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, postId: number | undefined, tenantId: number | null | undefined, noOfPostToReturn: number | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppPostForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppPosts/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -17684,6 +17763,10 @@ export class AppPostsServiceProxy {
             throw new Error("The parameter 'postId' cannot be null.");
         else if (postId !== undefined)
             url_ += "PostId=" + encodeURIComponent("" + postId) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (noOfPostToReturn !== undefined && noOfPostToReturn !== null)
+            url_ += "NoOfPostToReturn=" + encodeURIComponent("" + noOfPostToReturn) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -47518,6 +47601,62 @@ export class SystemTablesServiceProxy {
     }
 
     /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getEntityObjectTypeById(id: number | undefined): Observable<SycEntityObjectType> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeById?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SycEntityObjectType>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SycEntityObjectType>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeById(response: HttpResponseBase): Observable<SycEntityObjectType> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SycEntityObjectType.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return Success
      */
     getObjectTenantActivityLogId(): Observable<number> {
@@ -58372,6 +58511,66 @@ export interface IAccountInfoAppEntityLookupTableDto {
     [key: string]: any;
 }
 
+export class PagedResultDtoOfAppEntityAttachmentDto implements IPagedResultDtoOfAppEntityAttachmentDto {
+    totalCount!: number;
+    items!: AppEntityAttachmentDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfAppEntityAttachmentDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(AppEntityAttachmentDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfAppEntityAttachmentDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfAppEntityAttachmentDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfAppEntityAttachmentDto {
+    totalCount: number;
+    items: AppEntityAttachmentDto[] | undefined;
+
+    [key: string]: any;
+}
+
 export class AccountDto implements IAccountDto {
     name!: string | undefined;
     showSync!: boolean;
@@ -67118,66 +67317,6 @@ export class PagedResultDtoOfString implements IPagedResultDtoOfString {
 export interface IPagedResultDtoOfString {
     totalCount: number;
     items: string[] | undefined;
-
-    [key: string]: any;
-}
-
-export class PagedResultDtoOfAppEntityAttachmentDto implements IPagedResultDtoOfAppEntityAttachmentDto {
-    totalCount!: number;
-    items!: AppEntityAttachmentDto[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IPagedResultDtoOfAppEntityAttachmentDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.totalCount = _data["totalCount"];
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(AppEntityAttachmentDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): PagedResultDtoOfAppEntityAttachmentDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PagedResultDtoOfAppEntityAttachmentDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["totalCount"] = this.totalCount;
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IPagedResultDtoOfAppEntityAttachmentDto {
-    totalCount: number;
-    items: AppEntityAttachmentDto[] | undefined;
 
     [key: string]: any;
 }

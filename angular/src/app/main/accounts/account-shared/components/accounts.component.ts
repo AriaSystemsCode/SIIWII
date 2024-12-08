@@ -425,12 +425,12 @@ export class AccountsComponent
                         this.hideMainSpinner();
                     })
                 )
-                .subscribe((/*result:string*/) => {
+                .subscribe((result:string) => {
                     let accountIndx = this.accounts.findIndex(x=>x.account.id == account.account.id);
                     if(accountIndx >=0){
                         this.accounts[accountIndx]=account;
                         this.accounts[accountIndx].avaliableConnectionName="";
-                        this.accounts[accountIndx].connectionName=this.l(""/*result*/);
+                        this.accounts[accountIndx].connectionName=this.l(result);
                     }
                 });
     }

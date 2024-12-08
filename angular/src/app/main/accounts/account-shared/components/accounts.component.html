@@ -175,7 +175,7 @@
                             
                             </div>
                             <div class="d-md-block d-none col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
-                                <app-accounts-list-filters [filterForm]="filterForm"></app-accounts-list-filters>
+                                <app-accounts-list-filters [filterForm]="filterForm" [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
                             </div> 
                             <div class="col-12 col-md-7 col-lg-9">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -318,5 +318,5 @@
 
 <!-- The filter panel -->
 <div class="col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters filter-sm d-block d-md-none" [ngClass]="{'active': filterVisible}">
-  <app-accounts-list-filters [filterForm]="filterForm"></app-accounts-list-filters>
+  <app-accounts-list-filters [filterForm]="filterForm"  [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
 </div>
