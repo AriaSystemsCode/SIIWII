@@ -38,11 +38,12 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     }
     async loadPdf() {
         this.showReport = false;
-        if(this.visible){
-            this.visible = true
+        if(!this.visible){
+        //     this.visible = true
 
-        } else {
+        // } else {
 this.showMainSpinner()
+
         }
         
         try {
@@ -98,7 +99,7 @@ this.showMainSpinner()
         this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
         .subscribe((res) => {
           console.log(res,'rep')
-          if (res) {
+          if (res == true) {
             this.visible = res
 
            this.loadPdf()

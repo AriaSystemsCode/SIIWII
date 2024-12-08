@@ -628,18 +628,17 @@
                             </div>
                         </p-accordionTab>
                         <!-- order Preview tab -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG" 
-                            *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint();getOrderConfirmation()">
+                        <p-accordionTab class="shoppingCartAccordionTabBG"  (click)="currentTab=7"
+                            *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getShoppingCartData();isOrderConfirmationNeedsReprint()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
                                 </div>
                             </ng-template> 
                             <ng-template pTemplate="content">
-                                <app-order-preview 
+                                <app-order-preview  *ngIf="currentTab == 7"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     [transactionFormPath]="transactionFormPath"
-                               
                                   
                                     [orderId]="orderId"></app-order-preview>
                             </ng-template>

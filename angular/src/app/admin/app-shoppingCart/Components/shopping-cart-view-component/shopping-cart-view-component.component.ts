@@ -1124,11 +1124,12 @@ onShowVariations(event) {
         // this.visible = res
 
       //  this.regenrate = res
-       if(  res){
+      //  if(  res){
         this.toGenerate()
 
-       }
+      //  }
        this.getOrderConfirmation()
+       
 
       }
       // else {
@@ -1216,14 +1217,14 @@ onShowVariations(event) {
   toGenerate(){
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
     .pipe(finalize(() => {
-      this.onGeneratOrderReport(true,undefined,true,false)
+      this.onGeneratOrderReport(true,undefined,true,true)
       // this.getOrderConfirmation()
   }
     ))
     .subscribe((res) => {
 
-      if (res) {
-      }
+      // if (res) {
+      // }
     });
   }
   sync(){
