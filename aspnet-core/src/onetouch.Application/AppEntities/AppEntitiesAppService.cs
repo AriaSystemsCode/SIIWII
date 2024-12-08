@@ -727,12 +727,18 @@ namespace onetouch.AppEntities
             return await GetAllEntityTypeForTableDropdown(input);
         }
 
-        public async Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input)
+        public async Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input, bool hasManual = true)
         {
             var objectContactId = await _helper.SystemTables.GetObjectContactId();
 
-            var filteredContactTypes =  _lookup_sycEntityObjectTypeRepository.GetAll().Where(e => e.ObjectId == objectContactId && (e.ParentId < 1 || e.ParentId == null))
-                 ;
+
+            var filteredContactTypes = _lookup_sycEntityObjectTypeRepository.GetAll()
+                .Where(e => e.ObjectId == objectContactId && (e.ParentId < 1 || e.ParentId == null)
+                &&
+                                             ((!e.Name.ToUpper().Contains("MANUAL") && !hasManual) || hasManual)
+
+                )
+                ;
 
             var pagedAndFilteredAppEntities = filteredContactTypes
                .OrderBy(input.Sorting ?? "Name asc")

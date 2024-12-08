@@ -173,6 +173,50 @@ namespace onetouch.Accounts
                 }
             }
         }
+        //X527[Start]
+        public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                List<AppEntityAttachmentDto> retrunResult = new List<AppEntityAttachmentDto>();
+                int totalCount = 0;
+                
+                var account = await _appContactRepository.GetAll().Include(z => z.EntityFk).Where(z => z.TenantId == null && z.SSIN == input.AccountSSIN).FirstOrDefaultAsync();
+                if (account != null && account.EntityFk.TenantOwner != null)
+                {
+                    long catgImage = await _helper.SystemTables.GetAttachmentCategoryId("IMAGE");
+                    long catgVideo = await _helper.SystemTables.GetAttachmentCategoryId("VIDEO");
+                    var entities = from t in _appEntityAttachmentRepository.GetAll().Include(z => z.AttachmentFk)
+                                   .Where(z=>z.AttachmentCategoryId== catgImage || z.AttachmentCategoryId == catgVideo)
+                                   join
+                                  e in _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                        .Where(z => z.TenantOwner == account.EntityFk.TenantOwner && z.EntityAttachments.Count() > 0)
+                        on t.EntityId equals e.Id into j
+                                   from j1 in j
+                                   select new AppEntityAttachmentDto()
+                                   {
+                                       Url = "attachments/" + "-1" + "/" + t.AttachmentFk.Attachment,
+                                       DisplayName = t.AttachmentFk.Name,
+                                       AttachmentCategoryId = t.AttachmentCategoryId,
+                                       Id = t.Id,
+                                       
+                                   };
+
+                    var pagedAndFilteredAccounts = entities.OrderBy("Id desc").PageBy(input);
+                    retrunResult = await pagedAndFilteredAccounts.ToListAsync();
+                    totalCount = await pagedAndFilteredAccounts.CountAsync();
+
+
+
+                }
+                var x = new PagedResultDto<AppEntityAttachmentDto>(
+                           totalCount,
+                           retrunResult
+                   );
+                return x;
+            }
+        }
+        //X527[End]
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -2166,9 +2210,9 @@ namespace onetouch.Accounts
             return ret;
         }
 
-        public async Task ApplyRelationOnProfile(long input)
+        public async Task<string> ApplyRelationOnProfile(long input)
         {
-
+            string ret = "";
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var marketplaceContact = await _appMarketplaceContactRepository.GetAll()
@@ -2179,6 +2223,11 @@ namespace onetouch.Accounts
 
                 if (marketplaceContact != null)
                 {
+                     
+                    var retType = await _helper.SystemTables.GetEntityObjectTypeById(marketplaceContact.AccountTypeId);
+
+                    ret = GetAction(retType.Code, false);
+
                     var entity = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories)
                                         .Include(x => x.EntityClassifications)
                                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -2204,13 +2253,14 @@ namespace onetouch.Accounts
                     foreach (var contactAddress in contactDto.ContactAddresses)
                     {
                         contactAddress.Id = 0;
-                        //contactAddress.AddressId = 0;
+                        contactAddress.AddressId = 0;
                         contactAddress.AccountId = 0;
-
+                        
                         contactAddress.AddressFk.Id = 0;
-                        //contactAddress.AddressFk.TenantId = AbpSession.TenantId;
+                        contactAddress.AddressFk.TenantId = AbpSession.TenantId;
                         contactAddress.AddressFk.AccountId = 0;
-
+                        //
+                        contactAddress.AddressFk.Code = Guid.NewGuid().ToString();
 
                     }
                     var contactDto_Id = await _appEntitiesAppService.SaveContact(contactDto);
@@ -2248,6 +2298,8 @@ namespace onetouch.Accounts
                     //End
                 }
             }
+
+            return ret;
         }
         public async Task ApplyRelationOnBranch(AppMarketplaceContact marketplaceContact, long accountId)
         {
@@ -8447,8 +8499,9 @@ namespace onetouch.Accounts
             return appContactAddressDtos;
 
         }
-
+       
 
     }
+    
 
 }

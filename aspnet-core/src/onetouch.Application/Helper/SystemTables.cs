@@ -130,6 +130,13 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
             return obj;
         }
+
+        public async Task<SycEntityObjectType> GetEntityObjectTypeById(long id)
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Id == id);
+            return obj;
+        }
+
         public async Task<long> GetObjectTenantActivityLogId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "TENANTACTIVITYLOG");
