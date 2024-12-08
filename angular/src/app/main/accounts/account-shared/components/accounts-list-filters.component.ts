@@ -259,6 +259,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             this.sortBy,
             this.accountTypeFilterMetaData.listSkipCount,
             this.accountTypeFilterMetaData.listMaxResultCount,
+            undefined, 
         )
         .subscribe(result => {
             componentRef.onListLoadCallback(result)

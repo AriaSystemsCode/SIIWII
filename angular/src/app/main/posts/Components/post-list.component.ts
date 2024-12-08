@@ -316,6 +316,8 @@ export class PostListComponent
                 this.contactNameFilter,
                 this.entityNameFilter,
                 0,
+                undefined,
+                undefined,
                 "",
                 this.skipCount,
                 this.maxResultCount
@@ -484,6 +486,8 @@ export class PostListComponent
                 "",
                 "",
                 postid,
+                undefined,
+                undefined,
                 "",
                 0,
                 1
