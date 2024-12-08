@@ -57,6 +57,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     transactionTypeFilter :number 
     transactionNumberFilter = ''
     variationCodeFilter = ''
+    referenceNumberFilter = ''
     minPrice :number 
     maxPrice :number 
     minAmount :number 
@@ -115,6 +116,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 transactionNumberFilter: undefined,
                 nameFilter: undefined,
                 variationCodeFilter: undefined,
+                referenceNumberFilter: undefined,
                 minPrice: undefined,
                 maxPrice : undefined,
                 minAmount: undefined,
@@ -201,7 +203,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
             filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
-            undefined,undefined,
+            undefined,undefined,filters.referenceNumberFilter,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
