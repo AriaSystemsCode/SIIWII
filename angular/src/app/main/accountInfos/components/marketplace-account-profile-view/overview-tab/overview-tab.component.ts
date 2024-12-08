@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { AppPostDto, GetAppPostForViewDto } from '@shared/service-proxies/service-proxies';
+import { AppPostDto, AppPostsServiceProxy, GetAppPostForViewDto } from '@shared/service-proxies/service-proxies';
 import * as moment from 'moment';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-overview-tab',
@@ -12,8 +13,8 @@ export class OverviewTabComponent {
    baseUrl = "https://localhost:44301/";
 
 progressValue = 30;
-
-  constructor() {
+posts : any []
+  constructor(     private _postService: AppPostsServiceProxy,) {
     this.postData = {
       
       
@@ -53,7 +54,39 @@ progressValue = 30;
 
 ngOnInit() {
   this.rating = 3.4
+  this.getAllPosts()
 }
 rating: number = 3.4; // Rating out of 5
+getAllPosts() {
+  // this.loading = true;
+  const subs = this._postService
+      .getAll(
+         undefined,
+         undefined,
+        undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+         undefined,
+          0,
+          2486,
+          2,
+          "",
+         0,
+         5
+      )
+      .pipe(
+          finalize(() => {
+              // this.loading = false;
+          })
+      )
+      .subscribe((result) => {
+          // this.totalCount = result.totalCount;
+      
+      this.posts = result.items
 
+      });
+  // this.subscriptions.push(subs);
+}
 }

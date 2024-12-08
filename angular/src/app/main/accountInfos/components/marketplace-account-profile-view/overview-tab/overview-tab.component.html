@@ -267,11 +267,13 @@
 
              <span>There is no data</span>
              </p> -->
+             <div *ngFor="let postData of posts; let i = index">
              <app-post-card
              [post]="postData"
          
          >
          </app-post-card>
+         </div>
      </div>
      <div class="mb-2 right-sec p-3">
         <div class="d-flex justify-content-between">
