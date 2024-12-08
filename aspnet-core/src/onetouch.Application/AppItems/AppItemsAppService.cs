@@ -3746,7 +3746,7 @@ namespace onetouch.AppItems
                         marketplaceItem.TimeStamp = appItem.EntityFk.TimeStamp;
                         //i45
                     }
-
+                    marketplaceItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (!input.SyncProduct)
                         marketplaceItem.SharingLevel = input.SharingLevel;
                     else

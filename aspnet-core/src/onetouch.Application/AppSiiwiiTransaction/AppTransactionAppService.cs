@@ -2647,7 +2647,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 .WhereIf(!string.IsNullOrEmpty(colorCodeFilter), e => e.AttributeValue == colorCodeFilter || (e.AttributeValueId != null && e.AttributeValueId.ToString() == colorCodeFilter))
                                 .ToList();
                             var lineColorsList = lineColorExtraData.Select(e => new LookupLabelDto()
-                            { Code = e.EntityObjectTypeCode, Label = e.AttributeValue, Value = (e.AttributeValueId == null ? 0 : (long)e.AttributeValueId) }).DistinctBy(e => e.Label).ToList();
+                            { Code = e.EntityObjectTypeCode, Label = e.AttributeValue, Value =  (e.AttributeValueId == null ? 0 : (long)e.AttributeValueId) }).DistinctBy(e => e.Label).ToList();
                             foreach (var color in lineColorsList)
                             {  // add color line
                                 DetailView colorDetailView = new DetailView();
@@ -2668,7 +2668,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 colorDetailView.Data.SizeCode = "";
                                 colorDetailView.Data.editQty = false;
                                 colorDetailView.Children = new List<DetailView>();
-
+                                
                                 foreach (var size in lineVariations)
                                 {  // add size color line
                                     if (size.EntityExtraData.Where(e => e.AttributeValue == color.Label && e.AttributeId == 101)
@@ -2694,13 +2694,19 @@ namespace onetouch.AppSiiwiiTransaction
 
                                             if (size.EntityAttachments.Count() > 0)
                                             {
-                                                var lineAttachmentDefault = size.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
-                                                var lineAttachment = size.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
+                                                var lineAttachmentDefault = size.EntityAttachments.FirstOrDefault();
+                                                var lineAttachment = size.EntityAttachments.FirstOrDefault();
                                                 sizeColorDetailView.Data.Image = (lineAttachmentDefault == null ?
                                                            (lineAttachment != null ? "attachments/" + line.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
                                                             : "attachments/" + (line.TenantId.HasValue ? line.TenantId : -1) + "/" +
                                                             lineAttachmentDefault.AttachmentFk.Attachment);
                                             }
+                                            //I45
+                                            if (!string.IsNullOrEmpty(sizeColorDetailView.Data.Image))
+                                            {
+                                                colorDetailView.Data.Image = sizeColorDetailView.Data.Image;
+                                            }
+                                            //I45
                                             sizeColorDetailView.Data.ParentId = line.Id;
                                             sizeColorDetailView.Data.ColorId = (long)color.Value;
                                             sizeColorDetailView.Data.ColorCode = color.Label;
