@@ -580,7 +580,7 @@ namespace onetouch.AppSiiwiiTransaction
                     else
                         input.CurrencyExchangeRate = 1;
                 }
-
+               
                 input.CurrencyExchangeRate = input.CurrencyExchangeRate == 0 ? 1 : input.CurrencyExchangeRate;
 
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
@@ -608,6 +608,10 @@ namespace onetouch.AppSiiwiiTransaction
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
 
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
+                appTrans.EnteredDate = input.EnteredDate.Date;
+                appTrans.CompleteDate = input.CompleteDate.Date;
+                appTrans.AvailableDate = input.AvailableDate.Date;
+                appTrans.StartDate = input.StartDate.Date;
                 //XX
                 appTrans.AppTransactionContacts = new List<AppTransactionContacts>();
                 if (string.IsNullOrEmpty(appTrans.SSIN))
@@ -1057,7 +1061,10 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
-                appTrans.EnteredDate = input.EnteredDate;
+                appTrans.EnteredDate = input.EnteredDate.Date;
+                appTrans.CompleteDate = input.CompleteDate.Date;
+                appTrans.AvailableDate = input.AvailableDate.Date;
+                appTrans.StartDate = input.StartDate.Date;
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 //MMT-Fix Status
@@ -2174,6 +2181,7 @@ namespace onetouch.AppSiiwiiTransaction
                                          .WhereIf(input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
                                          .WhereIf(input.StatusId > 0, e => e.EntityObjectStatusId == input.StatusId)
                                          .WhereIf(input.EntityTypeIdFilter > 0, e => e.EntityObjectTypeId == input.EntityTypeIdFilter)
+                                         .WhereIf(!string.IsNullOrEmpty(input.ReferenceFilter), z => z.Reference.Contains(input.ReferenceFilter))
                                          .WhereIf(!string.IsNullOrEmpty(input.BuyerSSIN), e => e.BuyerContactSSIN == input.BuyerSSIN)
                                          .WhereIf(!string.IsNullOrEmpty(input.SellerSSIN), e => e.SellerContactSSIN == input.SellerSSIN)
                                          .WhereIf(!string.IsNullOrEmpty(input.SellerName), e => e.SellerCompanyName.Contains(input.SellerName))
