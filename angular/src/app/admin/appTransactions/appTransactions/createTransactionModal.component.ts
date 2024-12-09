@@ -165,8 +165,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             istemp: [false],
             buyerBranchName:[""],
             reference:[""],
-            priceLevel:[""],
-            currencyId:[""],
+            priceLevel:['MSRP'],
+            currencyId:[438],
  
 
         });
@@ -225,8 +225,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             istemp: [false],
             buyerBranchName:[""],
             reference:[""],
-            priceLevel:[""],
-            currencyId:[""],
+            priceLevel:['MSRP'],
+            currencyId:[438],
    
 
             
@@ -830,8 +830,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     
 
                         reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
-                        priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "",
-                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : ""
+                        priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "MSRP",
+                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : 438
                     }; 
 
          
