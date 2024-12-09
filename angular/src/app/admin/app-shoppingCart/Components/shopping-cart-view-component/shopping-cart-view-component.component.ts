@@ -1115,32 +1115,24 @@ onShowVariations(event) {
         this.getShoppingCartData();
       });
   }
-  isOrderConfirmationNeedsReprint(){
-        
+  isOrderConfirmationNeedsReprint(): void {
     this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-    .subscribe((res) => {
-      console.log(res,'rep')
-      if (res) {
-        // this.visible = res
+        .subscribe((res) => {
+            if (res) {
+                this.regenrate = res;
+                this.toGenerate();
+                this.getOrderConfirmation();
+            }
+        });
+}
+stopReport(event) {
 
-      //  this.regenrate = res
-      //  if(  res){
-        this.toGenerate()
+  if (event) {
+  this.regenrate = false
+    }
 
-      //  }
-       this.getOrderConfirmation()
-       
-
-      }
-      // else {
-      //   this.regenrate = true
-
-      // }
-   
-    });
   
-    
-  }
+}
   PlaceOrder() {
     // Swal.fire({
     //   title: "",

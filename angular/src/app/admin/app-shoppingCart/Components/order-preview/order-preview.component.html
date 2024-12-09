@@ -53,9 +53,15 @@
         <div *ngIf="SuccessMsg" class="d-flex justify-content-center btns" >
         
      
-            <button  (click)="visible = false;showReport = true;SuccessMsg = false;showbar = false" label="Ok" class="p-button-text" >Ok</button>
+            <button  (click)="visible = false;showReport = true;SuccessMsg = false;showbar = false;stopReport.emit(true)" label="Ok" class="p-button-text" >Ok</button>
           </div>
         </div>
       
     
       </p-dialog>
+
+
+
+
+
+      
