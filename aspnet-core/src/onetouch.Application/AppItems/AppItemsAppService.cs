@@ -1051,7 +1051,9 @@ namespace onetouch.AppItems
                         var firstAttributeID = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
                             .FirstOrDefault().ToString();
                         var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
-                        var firstAttributeValue = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
+                        var firstAttributeValue = firstItem.EntityFk.EntityExtraData
+                            .WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId))
+                            .Where(x=>!string.IsNullOrEmpty(x.EntityObjectTypeCode)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
                         //var firstattributeValues1 = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID1)).Select (z=> z.AttributeValue)).Distinct().ToList ();
                         var firstattributeValues = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
                                                    .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();//.ToList().FirstOrDefault().Distinct().ToList();
@@ -2240,6 +2242,10 @@ namespace onetouch.AppItems
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
+            if (input.Id==0 && entity.TenantOwner!=null)
+            {
+                entity.AttachmentSourceTenantId = -1;
+            }
             //MMT30[End]
 
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
@@ -2613,6 +2619,10 @@ namespace onetouch.AppItems
                     childEntity.TimeStamp = timeStamp;
                     if(appItemChild.TenantOwner==null)
                         appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                    if (input.Id == 0 && childEntity.TenantOwner != null)
+                    {
+                        childEntity.AttachmentSourceTenantId = -1;
+                    }
                     if (string.IsNullOrEmpty(appItemChild.SSIN))
                     {
                         appItemChild.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(childEntity));
