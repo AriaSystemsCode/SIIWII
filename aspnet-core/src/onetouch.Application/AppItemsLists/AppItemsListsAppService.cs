@@ -1436,134 +1436,138 @@ namespace onetouch.AppItemsLists
         [AbpAuthorize(AppPermissions.Pages_AppItemsLists_Create)]
         public async Task<int> CopyItemsFromItemList(long appItemListId)
         {
-            int retutnval = 0;
-            var itmList = await _appMarketplaceItemListRepository.GetAll().Where(z => z.Id == appItemListId).Include(z => z.AppItemsListDetails).FirstOrDefaultAsync();
-            if (itmList == null)
-                return retutnval;
-            else {
-               
-                if (itmList.AppItemsListDetails != null && itmList.AppItemsListDetails.Count > 0)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                int retutnval = 0;
+                var itmList = await _appMarketplaceItemListRepository.GetAll().Where(z => z.Id == appItemListId).Include(z => z.AppItemsListDetails).FirstOrDefaultAsync();
+                if (itmList == null)
+                    return retutnval;
+                else
                 {
-                    foreach (var det in itmList.AppItemsListDetails)
+
+                    if (itmList.AppItemsListDetails != null && itmList.AppItemsListDetails.Count > 0)
                     {
-                        var itemExist = await _appItemRepository.GetAll().Where(z => z.SSIN == det.AppMarketplaceItemSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
-                        if (itemExist != null) continue;
-
-                        AppMarketplaceItems.AppMarketplaceItems marketItem =await _appMarketplaceItem.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
-                            .Include(z=>z.EntityCategories)
-                            .Include(z => z.EntityClassifications)
-                            .Include(z=>z.EntityExtraData)
-                            .Include(z=>z.ItemPricesFkList)
-                            .Include(z=>z.ItemSizeScaleHeadersFkList).ThenInclude(z=>z.AppItemSizeScalesDetails)
-                            .Where(z => z.SSIN == det.AppMarketplaceItemSSIN)
-                            .Include(z=>z.ParentFkList).ThenInclude(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
-                            .Include(z => z.ParentFkList).ThenInclude(z => z.EntityExtraData).FirstOrDefaultAsync();
-
-                        if (marketItem != null && marketItem.ParentId== null)
+                        foreach (var det in itmList.AppItemsListDetails)
                         {
-                            var item =  ObjectMapper.Map<AppItem>(marketItem);
-                            CreateOrEditAppItemDto itemC = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
-                            itemC.Id = 0;
-                            itemC.ListingItemId = null;
-                            foreach (var prc in itemC.AppItemPriceInfos)
+                            var itemExist = await _appItemRepository.GetAll().Where(z => z.SSIN == det.AppMarketplaceItemSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                            if (itemExist != null) continue;
+
+                            AppMarketplaceItems.AppMarketplaceItems marketItem = await _appMarketplaceItem.GetAll()
+                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                .Include(z => z.EntityCategories)
+                                .Include(z => z.EntityClassifications)
+                                .Include(z => z.EntityExtraData)
+                                .Include(z => z.ItemPricesFkList)
+                                .Include(z => z.ItemSizeScaleHeadersFkList).ThenInclude(z => z.AppItemSizeScalesDetails)
+                                .Where(z => z.SSIN == det.AppMarketplaceItemSSIN)
+                                .Include(z => z.ParentFkList).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                .Include(z => z.ParentFkList).ThenInclude(z => z.EntityExtraData).FirstOrDefaultAsync();
+
+                            if (marketItem != null && marketItem.ParentId == null)
                             {
-                                prc.Id = 0;
-                            }
-                            foreach (var scale in itemC.AppItemSizesScaleInfo)
-                            {
-                                scale.Id = 0;
-                                foreach (var size in scale.AppSizeScalesDetails)
+                                var item = ObjectMapper.Map<AppItem>(marketItem);
+                                CreateOrEditAppItemDto itemC = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
+                                itemC.Id = 0;
+                                itemC.ListingItemId = null;
+                                foreach (var prc in itemC.AppItemPriceInfos)
                                 {
-                                    size.Id = 0;
+                                    prc.Id = 0;
                                 }
-                            }
-                            //code
-                            string nextCode = "";
-                            bool llNewCodeFound = false;
-                            while (!llNewCodeFound)
-                            {
-                                nextCode = await _appItemsAppService.GenerateProductCode(int.Parse(marketItem.EntityObjectTypeId.ToString()), true, AbpSession.TenantId);
-                                if (!string.IsNullOrEmpty(nextCode))
+                                foreach (var scale in itemC.AppItemSizesScaleInfo)
                                 {
-                                    var appItemExist = await _appItemRepository.GetAll().Where(r => r.Code == nextCode && r.ItemType == 0 && r.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
-                                    if (appItemExist != null)
+                                    scale.Id = 0;
+                                    foreach (var size in scale.AppSizeScalesDetails)
                                     {
-                                        continue;
+                                        size.Id = 0;
+                                    }
+                                }
+                                //code
+                                string nextCode = "";
+                                bool llNewCodeFound = false;
+                                while (!llNewCodeFound)
+                                {
+                                    nextCode = await _appItemsAppService.GenerateProductCode(int.Parse(marketItem.EntityObjectTypeId.ToString()), true, AbpSession.TenantId);
+                                    if (!string.IsNullOrEmpty(nextCode))
+                                    {
+                                        var appItemExist = await _appItemRepository.GetAll().Where(r => r.Code == nextCode && r.ItemType == 0 && r.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                                        if (appItemExist != null)
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            llNewCodeFound = true;
+                                        }
                                     }
                                     else
                                     {
                                         llNewCodeFound = true;
                                     }
+
                                 }
-                                else
+                                if (!llNewCodeFound || string.IsNullOrEmpty(nextCode))
+                                    nextCode = marketItem.Code;
+                                itemC.Code = nextCode;
+
+                                IList<VariationItemDto> variationListOrg = ObjectMapper.Map<IList<VariationItemDto>>(marketItem.ParentFkList);
+                                foreach (var vari in variationListOrg)
+                                    vari.Id = 0;
+                                var identifier = await GetProductTypeIdentifier(int.Parse(marketItem.EntityObjectTypeId.ToString()), AbpSession.TenantId);
+                                if (identifier == null)
                                 {
-                                    llNewCodeFound = true;
+                                    var orgItem = await _appItemRepository.GetAll().Where(z => z.SSIN == marketItem.SSIN && z.TenantId == z.TenantOwner).FirstOrDefaultAsync();
+                                    identifier = orgItem.SycIdentifierId;
                                 }
+                                var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(identifier.ToString()), nextCode, variationListOrg, marketItem.EntityObjectTypeId, AbpSession.TenantId);
+                                itemC.SycIdentifierId = identifier;
 
-                            }
-                            if (!llNewCodeFound || string.IsNullOrEmpty(nextCode))
-                                nextCode = marketItem.Code;
-                            itemC.Code = nextCode;
-
-                            IList<VariationItemDto> variationListOrg = ObjectMapper.Map<IList<VariationItemDto>>(marketItem.ParentFkList);
-                            foreach (var vari in variationListOrg)
-                                vari.Id = 0;
-                            var identifier = await GetProductTypeIdentifier(int.Parse(marketItem.EntityObjectTypeId.ToString()), AbpSession.TenantId);
-                            if (identifier == null)
-                            {
-                                var orgItem = await _appItemRepository.GetAll().Where(z => z.SSIN == marketItem.SSIN && z.TenantId == z.TenantOwner).FirstOrDefaultAsync();
-                                identifier = orgItem.SycIdentifierId;
-                            }
-                            var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(identifier.ToString()), nextCode, variationListOrg, marketItem.EntityObjectTypeId, AbpSession.TenantId);
-                            itemC.SycIdentifierId = identifier;
-                            
-                            foreach (var att in itemC.EntityAttachments)
-                            {
-                                att.Id = 0;
-                            }
-                            foreach (var ext in itemC.EntityExtraData)
-                            {
-                                ext.Id = 0;
-                                ext.EntityId = 0;
-                            }
-                            //code
-                            foreach (var vari in itemC.VariationItems)
-                            {
-                                //var listItem = itmList.AppItemsListDetails.FirstOrDefault(z => z.AppMarketplaceItemSSIN == vari.SSIN);
-                                //if (listItem == null)
-                                //    itemC.VariationItems.Remove(vari);
-
-                                var orgVari = variationList.FirstOrDefault(z=>z.SSIN == vari.SSIN);
-                                
-                                if (orgVari != null)
-                                    vari.Code = orgVari.Code;
-                                vari.ListingItemId = null;
-                                vari.Id = 0;
-                                vari.ParentId = 0;
-                                foreach (var att in vari.EntityAttachments)
+                                foreach (var att in itemC.EntityAttachments)
                                 {
                                     att.Id = 0;
                                 }
-                                foreach (var ext in vari.EntityExtraData)
+                                foreach (var ext in itemC.EntityExtraData)
                                 {
                                     ext.Id = 0;
                                     ext.EntityId = 0;
                                 }
-                                foreach (var prc in vari.AppItemPriceInfos)
+                                //code
+                                foreach (var vari in itemC.VariationItems)
                                 {
-                                    prc.Id = 0;
+                                    //var listItem = itmList.AppItemsListDetails.FirstOrDefault(z => z.AppMarketplaceItemSSIN == vari.SSIN);
+                                    //if (listItem == null)
+                                    //    itemC.VariationItems.Remove(vari);
+
+                                    var orgVari = variationList.FirstOrDefault(z => z.SSIN == vari.SSIN);
+
+                                    if (orgVari != null)
+                                        vari.Code = orgVari.Code;
+                                    vari.ListingItemId = null;
+                                    vari.Id = 0;
+                                    vari.ParentId = 0;
+                                    foreach (var att in vari.EntityAttachments)
+                                    {
+                                        att.Id = 0;
+                                    }
+                                    foreach (var ext in vari.EntityExtraData)
+                                    {
+                                        ext.Id = 0;
+                                        ext.EntityId = 0;
+                                    }
+                                    foreach (var prc in vari.AppItemPriceInfos)
+                                    {
+                                        prc.Id = 0;
+                                    }
                                 }
+                                retutnval++;
+                                itemC.NonLookupValues = new List<LookupLabelDto>();
+                                var created = await _appItemsAppService.CreateOrEdit(itemC);
+
                             }
-                            retutnval++;
-                            itemC.NonLookupValues = new List<LookupLabelDto>();
-                            var created = await _appItemsAppService.CreateOrEdit(itemC);
-                           
                         }
                     }
                 }
+                return retutnval;
             }
-            return retutnval;
-
         }
         private async Task<long?> GetProductTypeIdentifier(int productTypeId, long? tenantId)
         {
