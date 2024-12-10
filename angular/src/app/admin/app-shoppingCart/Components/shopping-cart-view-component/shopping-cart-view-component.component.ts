@@ -1139,7 +1139,8 @@ onShowVariations(event) {
         .subscribe((res) => {
             if (res) {
                 this.regenrate = res;
-                this.toGenerate();
+                // this.toGenerate();
+      this.onGeneratOrderReport(true,undefined,true,true)
                 this.getOrderConfirmation();
             }
         });
@@ -1228,7 +1229,6 @@ stopReport(event) {
   toGenerate(){
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
     .pipe(finalize(() => {
-      this.onGeneratOrderReport(true,undefined,true,true)
       // this.getOrderConfirmation()
   }
     ))

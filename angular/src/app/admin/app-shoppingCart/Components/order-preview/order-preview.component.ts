@@ -52,7 +52,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     
         if (this.regenrate == true) {
             this.visible = true;
-        } else if (!this.visible) {
+        } else if (!this.regenrate) {
             this.showMainSpinner();
         }
     

@@ -631,7 +631,7 @@
                         </p-accordionTab>
                         <!-- order Preview tab -->
                         <p-accordionTab class="shoppingCartAccordionTabBG"  (click)="currentTab=7"
-                            *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getShoppingCartData();isOrderConfirmationNeedsReprint()">
+                            *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
@@ -1336,7 +1336,7 @@ height: 48px;"
                     </p-accordionTab>
                    <!-- order Preview tab -->
                    <p-accordionTab class="shoppingCartAccordionTabBG" 
-                   *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint();getOrderConfirmation()">
+                   *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint()">
                    <ng-template pTemplate="header">
                        <div class="d-inline-block custom-header d-flex">
                            <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
@@ -1518,7 +1518,7 @@ height: 48px;"
   
   
 
-    <div  class="d-flex justify-content-center btns" >
+    <div  class="d-flex justify-content-center btns mb-2" >
     
         <button  (click)="visible = false ;"  label="No" Class="p-button-no">No</button>
         <button  (click)="PlaceOrder();" label="Yes" class="p-button-text" >Yes</button>
