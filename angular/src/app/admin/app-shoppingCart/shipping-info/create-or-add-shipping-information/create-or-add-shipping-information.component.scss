@@ -17,7 +17,7 @@
 }
 .tab-cont{
     // background-color: #f1f2f3;
-    padding: 10px;
+    // padding: 10px;
     .container-fluid{
         background-color: #fff;
     }
@@ -65,7 +65,10 @@
     // overflow: hidden scroll;
 }
 
-
+.edit-mode  {
+    padding-left: 20px;
+    padding-right: 20px;
+}
 
 ::ng-deep {
     .p-dialog {

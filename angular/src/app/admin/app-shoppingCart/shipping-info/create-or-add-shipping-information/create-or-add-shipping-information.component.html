@@ -1,7 +1,7 @@
 <div class="position-relative tab-cont thin-scroll">
 <div >
     <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-        <div class="header p-2 my-2 d-flex  justify-content-between">
+        <div class="header p-2 my-3 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
          
     
@@ -88,11 +88,11 @@
 </div>
 
 <div class="row edit-mode " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-    <div class="col-6 mb-4">
+    <div class="col-md-6 col-12 mb-4">
         <label class="label mt-1 mb-1">{{l("Store")}}</label>
 <input type="text" class="form-control w-100" (input)="enterStore()"  [(ngModel)]="storeVal" #store/>
     </div>
-    <div class="col-6 mb-4">
+    <div class="col-m-6 col-12 mb-4">
         <label class="label mt-1 mb-1">{{l("ShipVia")}}</label>
         <p-dropdown
         (onChange)="selectShipVia($event)"
@@ -134,7 +134,7 @@
     (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-shipping-information>
 </div>
-<div  *ngIf="showSaveBtn " class="d-flex justify-content-end">
+<div  *ngIf="showSaveBtn " class="d-flex justify-content-end pr-3">
     <button
 *ngIf="showSaveBtn"
 (click)="cancel()"
@@ -153,7 +153,7 @@ Cancel
 </div>
 
 <div  *ngIf="!showSaveBtn " class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-    <div class="header p-2 my-2 d-flex  justify-content-end">
+    <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
    
         <button 
         [disabled]="!(shippingTabValid)" (click)="createOrEditTransaction()" 

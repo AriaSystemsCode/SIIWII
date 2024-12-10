@@ -1,5 +1,5 @@
-<div class="selected-addr-comp mb-3"  *ngIf="isCreateOredit">
-    <div class="selected-add-edit row">
+<div class="selected-addr-comp mb-3" style="padding: 0 20px;" *ngIf="isCreateOredit">
+    <div class="selected-add-edit row" >
         <div class="col-md-12 mb-3" *ngIf="showAddressType">
             <label class="label mt-2 mb-2">{{l("AddressType")}}</label>
             <div class="w-50 d-inline-block ml-2 ">
@@ -19,10 +19,10 @@
 
         </div>
         <div class="col-md-12 mb-3" >
-            <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
-            <textarea class="form-control w-50  d-inline-block ml-4" style="min-height: 80px;" readonly>{{selectedAddress?.addressLine1 ? selectedAddress?.addressLine1+' ,' : ''}}{{selectedAddress?.addressLine2 ? selectedAddress?.addressLine2+' ,' : ''}}{{ selectedAddress?.city ? selectedAddress?.city+' ,' : ''}}{{selectedAddress?.state ? selectedAddress?.state+' ,' : ''}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode ? selectedAddress?.countryCode  +' ,' : ''}}{{selectedAddress?.postalCode ? selectedAddress?.postalCode : ''}}</textarea>
+            <label class="label mt-2 mb-2 mr-4" >{{l("Address")}}</label>
+            <textarea class="form-control   d-inline-block ml-md-4 textAr" style="min-height: 80px;" readonly>{{selectedAddress?.addressLine1 ? selectedAddress?.addressLine1+' ,' : ''}}{{selectedAddress?.addressLine2 ? selectedAddress?.addressLine2+' ,' : ''}}{{ selectedAddress?.city ? selectedAddress?.city+' ,' : ''}}{{selectedAddress?.state ? selectedAddress?.state+' ,' : ''}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode ? selectedAddress?.countryCode  +' ,' : ''}}{{selectedAddress?.postalCode ? selectedAddress?.postalCode : ''}}</textarea>
             <div class="pull-right">
-            <button *ngIf="canChange"  class="savebtn text-center btn float-right" (click)="showAddressList()">
+            <button *ngIf="canChange"  class="savebtn text-center btn float-right mt-2" (click)="showAddressList()">
                 {{l("Change")}}
                 <i class="fas fa-edit ml-1 mr-1"></i>
            </button>      
@@ -40,7 +40,7 @@
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
         </div>
         <div class="col-md-12">
-            <label class="label mt-2 mb-2 mr-4">{{l("Address")}} :</label>
+            <label class="label mt-2 mb-2 mr-4" style="margin-left: 10px;">{{l("Address")}} :</label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="selectedAddressDetails">
                 {{selectedAddressDetails?.addressLine1+' ,'}}{{selectedAddressDetails?.addressLine2+' ,'}}{{selectedAddressDetails?.city+' ,'}}{{selectedAddressDetails?.state+' ,'}}{{selectedAddressDetails?.countryName  ? selectedAddressDetails?.countryName : selectedAddressDetails?.countryCode+' ,'}}{{selectedAddressDetails?.postalCode}}
             </label>
@@ -60,7 +60,7 @@
         <div class="filter-add-comp col-12 mb-1 d-flex">
             <div class="w-100">
             <input class="filter-adress-list form-control w-100" 
-            placeholder="Lookin in company addresses ...."
+            placeholder="Lookin in addresses .."
             #filterVal
             (keyup)="filterAddressList(filterVal.value)"
             type="text"/> 
@@ -74,12 +74,14 @@
         </div>
         <ul class="address-warper-cont">
             <li *ngFor="let address of savedAddressesList" class="address-warper mt-3 mb-3 pt-1 pb-1">
+                <div class="d-flex align-items-center">
                 <input  *ngIf="selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
                  [checked]="address.id==selectedAddress.id" name="selectedAdd"  [id]="address.id"/> 
                     <input *ngIf="!selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
                       name="selectedAdd"  [id]="address.id"/> 
                  <label> {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}{{ address?.addressLine2 ? address?.addressLine2+' ,' : ''}}{{address?.city ? address?.city+' ,' : ''}}{{ address?.state ? address?.state+' ,' : ''}}{{ address?.countryName ? address?.countryName +',' : address?.countryCode ?  address?.countryCode +' ,' : ''}}{{address?.postalCode ? address?.postalCode : ''}}</label>
-                 <div class="pull-right mt-2 d-flex"  *ngIf="showAddBtn">
+                </div>
+                 <div class="p mt-2 d-flex"  *ngIf="showAddBtn">
                     <button (click)="editAddress(address.id)" class="acBtn">
                         <img class="mx-1" src="../../../../../assets/icons/edit-icon.png">
 

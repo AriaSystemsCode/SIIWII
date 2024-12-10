@@ -89,7 +89,7 @@
             <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
         </div>
         <div class="row edit-mode ">
-            <div class="col-6 mb-4">
+            <div class="col-md-6 col-12 mb-4">
                 <label class="label mt-1 mb-1">{{l("PaymentTerms")}}:</label>
                 <p-dropdown
                 id="payTerms"
@@ -133,7 +133,7 @@
 
 
 <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
-    <div class="header p-2 my-2 d-flex  justify-content-end">
+    <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
         <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
             {{l("Continue")}}
        </button>

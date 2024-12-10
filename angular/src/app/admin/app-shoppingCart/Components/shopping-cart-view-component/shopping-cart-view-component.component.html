@@ -426,14 +426,14 @@
                                             [tableStyle]="{'min-width':'45rem'}">
                                             <ng-template pTemplate="header">
                                                 <tr>
-                                                    <th *ngFor="let col of cols" class="purpleColor"
+                                                    <th *ngFor="let col of cols" class="purpleColor" style="width: 7rem;" 
                                                         [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                         {{ col.header }}
                                                     </th>
                                                     <!--  <th> <img
                                                     src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
                                             </th> -->
-                                                    <th class="purpleColor" *ngIf="canChange">
+                                                    <th class="purpleColor" *ngIf="canChange" style="width: 5rem;" >
                                                         {{l("Action")}}
                                                     </th>
                                                 </tr>
@@ -549,7 +549,7 @@
 
                                         <form [formGroup]="filterForm" *ngIf="!addLine" style="display: flex; justify-content: space-evenly; gap: 30px;">
                                             <div class="mb-3 w-100">
-                                              <label class="form-label">Product Variation Code</label>
+                                              <label class="form-label" style="white-space: nowrap;">Product Variation Code</label>
                                               <p-dropdown
                                                 [options]="displayedVariations"
                                                 [filter]="true"
@@ -608,10 +608,12 @@
                                             </div>
                                         </form>
                                           
-                                          <div class="d-flex justify-content-end">
-                                            <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"    [disabled]="filterForm.invalid">
+                                        <div *ngIf="showAddLine"  class="d-flex justify-content-end">
+                                            <button (click)="cancelsaveLine()" class="cancelbtn text-center btn float-right">Cancel</button>
+                                            <button (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"  [disabled]="filterForm.invalid" class="previewbtn text-center btn ml-2">Save</button>
+                                            <!-- <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"  [disabled]="filterForm.invalid">
                                               <span>Add line</span>
-                                            </button>
+                                            </button> -->
                                           </div>
                                           
                                           <div *ngIf="showSaveCancel" class="d-flex justify-content-end mt-3">
@@ -1110,7 +1112,7 @@ height: 48px;"
                                         </p-dropdown>
                                     </div>
                                 </div>
-                                <div class="row pt-1 pl-4">
+                                <div class="row pt-1 pl-4 ml-1">
                                     <label for="ShowVariations" class="row">
                                         <input #ShowVariations="ngModel" id="ShowVariations" type="checkbox"
                                             name="ShowVariations" [(ngModel)]="showVariations"
@@ -1131,14 +1133,14 @@ height: 48px;"
                                         [tableStyle]="{'min-width':'375px'}">
                                         <ng-template pTemplate="header">
                                             <tr>
-                                                <th *ngFor="let col of cols" class="purpleColor"
+                                                <th *ngFor="let col of cols" class="purpleColor" style="width: 4rem;" 
                                                     [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                     {{ col.header }}
                                                 </th>
                                                 <!--  <th> <img
                                                 src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
                                         </th> -->
-                                                <th class="purpleColor" *ngIf="canChange">
+                                                <th class="purpleColor" *ngIf="canChange" style="width: 3rem;" >
                                                     {{l("Action")}}
                                                 </th>
                                             </tr>
@@ -1156,9 +1158,9 @@ height: 48px;"
                                         <td>{{ rowData.amount }}</td>
                                         <td>{{ rowData.image }}</td> -->
                                                 <!-- style="white-space: nowrap;  overflow: hidden;" -->
-                                                <td *ngFor="let col of cols; let i = index"  style="width: 7rem;"  class="p-treeTable"
+                                                <td *ngFor="let col of cols; let i = index"  style="width: 4rem;" [ngClass]=""  class="p-treeTable"
                                                     [ngClass]="{'col-2':col.field=='manufacturerCode'}">
-                                                    <p-treeTableToggler [rowNode]="rowNode"
+                                                    <p-treeTableToggler [rowNode]="rowNode" style="width: 5px !important;"
                                                         *ngIf="i === 0"></p-treeTableToggler>
                                                     <label *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                         {{ rowData[col.field] }}</label>
@@ -1170,10 +1172,10 @@ height: 48px;"
 
                                                     <label *ngIf="col.field=='image'">
                                                         <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                                                class="imgIcon" />
+                                                                class="imgIcon" style="height: 35px; width: 35px;border-radius: 8px;" />
 
                                                                   <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                                                class="imgIcon" />
+                                                                class="imgIcon" style="height: 35px; width: 35px;border-radius: 8px;" />
                                                     </label>
 
                                                     <label
@@ -1202,7 +1204,7 @@ height: 48px;"
                                                     </label>
                                                 </td>
 
-                                                <td class="p-treeTable"  style="width: 5rem;"  *ngIf="canChange">
+                                                <td class="p-treeTable"  style="width: 3rem;"  *ngIf="canChange">
                                                     <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                                 class="imgIcon" (click)="onDelete(rowNode)" />
                                             <img *ngIf="rowNode?.node?.data?.editQty" src=""
@@ -1259,9 +1261,9 @@ height: 48px;"
                                     </button>
 
 
-                                    <div *ngIf="!addLine" style="display: flex; justify-content: space-evenly; gap: 30px;">
+                                    <div *ngIf="!addLine" >
                                         <div class="mb-3 w-100">
-                                          <label class="form-label">Product Variation Code</label>
+                                          <label class="form-label" style="white-space: nowrap;">Product Variation Code</label>
                                           <p-dropdown
                                           [options]="displayedVariations"
                                           [filter]="true"
@@ -1285,9 +1287,8 @@ height: 48px;"
                                           </ng-template>
                                         </p-dropdown>
                                         
-                                        
                                         </div>
-                                      
+                                      <div style="display: flex; justify-content: space-evenly; gap: 30px;">
                                         <div class="mb-3 w-100">
                                           <label class="form-label">Quantity</label>
                                           <input
@@ -1314,12 +1315,15 @@ height: 48px;"
                                           <label>Amount</label>
                                           <p>{{ amount | currency }}</p>
                                         </div>
+                                    </div>
                                       </div>
                                       
-                                      <div class="d-flex justify-content-end">
-                                        <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"  [disabled]="filterForm.invalid">
+                                      <div *ngIf="showAddLine"  class="d-flex justify-content-end">
+                                        <button (click)="cancelsaveLine()" class="cancelbtn text-center btn float-right">Cancel</button>
+                                        <button (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"  [disabled]="filterForm.invalid" class="previewbtn text-center btn ml-2">Save</button>
+                                        <!-- <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"  [disabled]="filterForm.invalid">
                                           <span>Add line</span>
-                                        </button>
+                                        </button> -->
                                       </div>
                                       
                                       <div *ngIf="showSaveCancel" class="d-flex justify-content-end mt-3">
@@ -1543,3 +1547,28 @@ height: 48px;"
       <button  (click)="SuccessMsg = false;" label="Ok" class="p-button-text" >Ok</button>
     </div>
   </p-dialog> 
+
+
+
+
+  <p-dialog [(visible)]="syncMsg" [modal]="true" [style]="{ width: '474px' }" [draggable]="false" >
+    <div class="d-flex justify-content-center img-hd m-auto">
+        <img src="../../../../../assets/icons/success-Purble.svg">
+    
+    </div>
+        <div class=" con-body">
+    
+          <p class="mb-3 text-center">
+                
+                <span class="msg-text ml-2 ">Transaction synced successfuly</span>
+        </p>
+    
+        </div>
+      
+      
+        <div class="d-flex justify-content-center btns" >
+        
+     
+          <button  (click)="syncMsg = false;" label="Ok" class="p-button-text" >Ok</button>
+        </div>
+      </p-dialog> 

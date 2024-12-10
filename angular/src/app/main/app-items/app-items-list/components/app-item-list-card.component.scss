@@ -149,7 +149,7 @@ color: #595959;
 
 padding: 24px 24px 32px !important;
 min-width: 350px !important;
-height: 270px !important;
+height: 280px !important;
 
 background: #FFFFFF !important;
 border: 1px solid #EEEEEE !important;
@@ -167,6 +167,9 @@ border-radius: 10px !important;
  
 
 }
+.btns {
+    margin-top: 2.5rem;
+}
 .p-button-no {
     color: #4A0D4A !important;
     border-radius: 8px !important;
@@ -176,6 +179,7 @@ border:  none !important;
 display: flex !important;
 padding: 8px 32px !important;
 align-items: center !important;
+margin-right: 5px;
 }
 .msg-text {
     font-weight: 700 !important;

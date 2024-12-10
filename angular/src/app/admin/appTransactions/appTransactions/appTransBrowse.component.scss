@@ -89,6 +89,15 @@ font-weight: 700;
     .p-datatable-thead {
         color: #1B101B !important;
     }
+    .p-datatable .p-sortable-column .p-sortable-column-icon {
+        color: #000 !important;
+    }
+    .purpleSortableIcon {
+        .p-icon-wrapper {
+            position: initial !important;
+    
+        }
+    }
 }
 
 .top-sec {
@@ -98,12 +107,14 @@ font-weight: 700;
 }
 
 .period-btn {
+    
     width: Hug (150px)px;
 height: Hug (37px)px;
 padding: 11px 20px 11px 20px;
 gap: 10px;
 border-radius: 8px;
-background-color: #EEE;
+background-color: #fff;
+border: 1px solid rgba(238, 238, 238, 0.933333) !important;
 color: #4A0D4A;
 opacity: 0px;
 border: none;

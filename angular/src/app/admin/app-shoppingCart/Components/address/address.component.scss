@@ -61,6 +61,10 @@
         .address-warper{
             list-style: none;
             border-bottom: 1px dashed #a584a3;
+            display: flex !important
+;
+    justify-content: space-between !important;
+    align-items: center;
      input[type="radio"]{
     width: fit-content;
         display: inline-block;
@@ -127,3 +131,20 @@ border-radius: 6px;
 .delText {
     color: #F6851D;
 }
+
+// .pull-right {
+//     padding-right: 22px;
+// }
+@media(min-width:567px){
+.textAr {
+    width: 50%;
+}
+}
+
+
+@media(max-width:567px){
+    .textAr {
+        width: 100%;
+    }
+    }
+    

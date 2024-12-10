@@ -11,8 +11,8 @@
  
         </div> -->
         <!-- <hr class="my-2" /> -->
-        <div class="row ">
-            <h6 class="col-6 mt-4 pl-3" ><span class="headertxt previewTitle ml-2 white-space-nowrap" style="white-space: nowrap;"> Entered By :  <span style="color: #888;
+        <div class="row mb-3">
+            <h6 class="col-6 mt-4 pl-3 mb-3" ><span class="headertxt previewTitle ml-md-2 white-space-nowrap" style="white-space: nowrap;"> Entered By :  <span style="color: #888;
                
                 font-size: 14px; margin-left: 5px; ">{{fullName}}</span></span></h6>
             <div class="col-6"    *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange">
@@ -658,7 +658,7 @@ Cancel
             </div>
         </div>
         <hr class="my-2" />
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end pr-3">
             <button
             [disabled]="!(isContactsValid && isSalesOrderValidForm())"
             *ngIf="createOrEditorderInfo && !showSaveBtn"

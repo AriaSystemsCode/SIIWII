@@ -68,7 +68,7 @@
                                                         src="../../../assets/landingPage/Search.png" />
                                                     </button>
                                             </span>
-                                            <input [(ngModel)]="filterText" formControlName="search" autoFocus
+                                            <input [(ngModel)]="filterText"   formControlName="search" autoFocus
                                                 class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
                                                 type="text" >
                                          
@@ -279,7 +279,7 @@
                             </div>
 
                             <div class="row mb-2 ">
-                                <div class="col-sm-12 d-flex justify-content-between">
+                                <div class="row col-12 d-flex justify-content-between align-items-center" style="gap: 10px; margin-left: 10px;">
                                     <div>
                                         <button id="monthlybtn" class="mr-2" [ngClass]="{'period-btn': !showHeader, 'selected-month-btn': showHeader}"
                                         (click)="showDetails = false;showHeader = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getAppTransactions() ">
