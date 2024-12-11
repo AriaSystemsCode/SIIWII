@@ -115,6 +115,7 @@ TempComp : boolean = false
 currentFilter: string = '';
 regenrate : boolean = false
 syncMsg : boolean = false
+mainLoad : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1137,11 +1138,17 @@ onShowVariations(event) {
   isOrderConfirmationNeedsReprint(): void {
     this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
         .subscribe((res) => {
-            if (res) {
-                this.regenrate = res;
+            if (res == true) {
+                this.regenrate = true;
+              this.mainLoad = false
+
                 // this.toGenerate();
       this.onGeneratOrderReport(true,undefined,true,true)
                 this.getOrderConfirmation();
+            }  else {
+              this.regenrate = false;
+
+              this.mainLoad = true
             }
         });
 }
