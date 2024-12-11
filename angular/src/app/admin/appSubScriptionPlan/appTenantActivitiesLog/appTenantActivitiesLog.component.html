@@ -552,7 +552,7 @@
                                         text-align: left;
                                         text-underline-position: from-font;
                                         text-decoration-skip-ink: none;color:#595959;" >
-											{{record.appTenantActivityLog.activityDateTime |  momentFormat:'L' }}
+										{{formatDate(record.appTenantActivityLog.activityDateTime)}}
                                         </span>
                                         <span *ngIf="!record.appTenantActivityLog.activityDateTime">-</span>
                                     </td>

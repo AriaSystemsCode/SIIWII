@@ -68,19 +68,22 @@ export class AppNavigationService {
         let AppTenantSubscriptionPlan = new AppMenuItem('Tenant Subscription Plans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans')
         if (this.isHost) {
         let AppTenantActivityLog = new AppMenuItem('Tenant Activities Log', '', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantActivitiesLog')
-        adminMenu.items.push(AppTenantActivityLog);
+        adminMenu.items.push(AppTenantActivityLog,
+                AppSubscriptionPlanHeaders,
+                AppSubscriptionPlanDetail,
+                AppTenantSubscriptionPlan,
+                new AppMenuItem('AppTenantInvoices', 'Pages.Administration.AppTenantInvoices', 'flaticon-more', '/app/admin/appSubscriptionPlans/appTenantInvoices'));
         }
             if (!this.isHost) {
             adminMenu.items.push(
                 new AppMenuItem('AccountProfile', 'Pages.Accounts', 'flaticon-more', '/app/main/account')
             )
         }
+
         adminMenu.items.push(
                 // new AppMenuItem('Merge/Convert Accounts', '', 'flaticon-interface-8', '/app/main/accounts/accounts/merge-convert-accounts-tool'),
                 
-                    AppSubscriptionPlanHeaders,
-                    AppSubscriptionPlanDetail,
-                    AppTenantSubscriptionPlan,
+        
                  //   AppTenantActivityLog,
                 new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [
                 new AppMenuItem('AppTenantPlans', 'Pages.Administration.AppTenantPlans', 'flaticon-more', '/app/admin/appTenantPlans/appTenantPlans'),
@@ -98,7 +101,7 @@ export class AppNavigationService {
             
             new AppMenuItem('SycCurrencyExchangeRates', 'Pages.Administration.SycCurrencyExchangeRates', 'flaticon-more', '/app/admin/sycCurrencyExchangeRates/sycCurrencyExchangeRates'),
             
-            new AppMenuItem('AppTenantInvoices', 'Pages.Administration.AppTenantInvoices', 'flaticon-more', '/app/admin/appSubscriptionPlans/appTenantInvoices'),
+            
             
 
             

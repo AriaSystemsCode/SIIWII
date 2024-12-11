@@ -16,6 +16,7 @@ import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistor
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { AppSessionService } from '@shared/common/session/app-session.service';
+import { DateType } from 'devextreme/ui/date_box';
 
 
 @Component({
@@ -250,7 +251,10 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
             this._fileDownloadService.downloadTempFile(result);
          });
     }
-    
+    formatDate(input: string )
+    {
+        return moment(input).format('MM/DD/YYYY HH:mm:ss a');
+    }
     
     
     
