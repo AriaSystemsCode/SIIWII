@@ -382,13 +382,16 @@ margin-bottom: 0;
     color: white;
 }
 
-.btn-no {
-    background-color: white;
-    color: #4A0D4A;
+.p-button-no {
+  color: #4A0D4A !important;
+  border-radius: 8px !important;
+background: #FFF !important;
+box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25) !important;
+border:  none !important;
+display: flex !important;
+padding: 8px 32px !important;
+align-items: center !important;
 }
-
-
-
 
 
 
