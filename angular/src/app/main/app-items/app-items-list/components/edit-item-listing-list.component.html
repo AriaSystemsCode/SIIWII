@@ -225,7 +225,7 @@
                                     </div>
                                 </h3>
                             </div>
-                            <div class="col text-right" *ngIf="isRecordOwner">
+                            <div class="col text-right" >
                                 <div
                                     class="btn-group dropdown"
                                     dropdown
@@ -313,7 +313,7 @@
                                                 }}</a
                                             >
                                         </li>
-                                        <li *ngIf="list?.appItemsList?.itemsCount > 0 && list?.appItemsList?.tenantId == null">
+                                        <li >
                                             <a href="javascript:;" (click)="sync(list?.appItemsList?.id , list?.appItemsList?.itemsCount)">{{
                                                 "Sync to my products" | localize
                                             }}</a>

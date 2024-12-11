@@ -114,6 +114,7 @@ conNew : boolean
 TempComp : boolean = false
 currentFilter: string = '';
 regenrate : boolean = false
+syncMsg : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -407,6 +408,24 @@ cancelAddLine() {
   this.shoppingCartTreeNodes.pop(); // Removes the last item
   this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
   // Reset selections as needed
+}
+
+cancelsaveLine() {
+  this.addLine = true
+  this.showAddLine = false;
+  this.showSaveCancel = false;
+ 
+  this.addNewLinebtn = true
+ 
+    this.selectedVariation = '';
+    this.filterForm.controls['selectedQuantity']?.setValue(0);
+    this.filterForm.controls['selectedPrice']?.setValue(0);
+
+    this.selectedQuantity = 0;
+
+  this.selectedPrice = 0
+  this.amount = 0;
+  
 }
 
   
@@ -1120,7 +1139,8 @@ onShowVariations(event) {
         .subscribe((res) => {
             if (res) {
                 this.regenrate = res;
-                this.toGenerate();
+                // this.toGenerate();
+      this.onGeneratOrderReport(true,undefined,true,true)
                 this.getOrderConfirmation();
             }
         });
@@ -1209,7 +1229,6 @@ stopReport(event) {
   toGenerate(){
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
     .pipe(finalize(() => {
-      this.onGeneratOrderReport(true,undefined,true,true)
       // this.getOrderConfirmation()
   }
     ))
@@ -1225,6 +1244,7 @@ stopReport(event) {
       .pipe(finalize(() => {
         this.hideMainSpinner()
         this.getShoppingCartData();
+        this.syncMsg = true
 
       } ))
       .subscribe((res) => {

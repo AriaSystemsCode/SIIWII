@@ -20,7 +20,9 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     showReport: boolean = false;
     visible: boolean = false;
     SuccessMsg: boolean = false;
+    startload: boolean = false;
     showbar: boolean = true;
+    dialogClosed: boolean = false; // New flag to track dialog closure
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -30,7 +32,9 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     ngOnInit(): void {
     }
     ngOnChanges(changes: SimpleChanges) {
-        this.loadPdf();
+        if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
+            this.loadPdf();
+        }
     // this.isOrderConfirmationNeedsReprint()
 
     }
@@ -38,11 +42,17 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         // this.loadPdf();
     }
     async loadPdf() {
+        // if (this.startload) {
+        //     // Guard condition to prevent reopening
+        //     return;
+        // }
+    
         this.showReport = false;
+        this.startload = true;
     
         if (this.regenrate == true) {
             this.visible = true;
-        } else {
+        } else if (!this.regenrate) {
             this.showMainSpinner();
         }
     
@@ -57,7 +67,6 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
                         }
                         this.hideMainSpinner();
                         this.showReport = true;
-                  
                     })
                 )
                 .subscribe(
@@ -92,6 +101,17 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
             this.hideMainSpinner();
         }
     }
+    onDialogClose() {
+        this.dialogClosed = true; // Set the flag to prevent re-triggering
+        this.visible = false;
+        this.startload = false;
+        this.showReport = true;
+        this.SuccessMsg = false;
+        this.showbar = false;
+        // Reset regenrate if necessary to prevent reopening
+        this.regenrate = false;
+    }
+    
     
     // isOrderConfirmationNeedsReprint(){
         

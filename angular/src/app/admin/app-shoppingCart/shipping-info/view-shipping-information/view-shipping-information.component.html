@@ -1,6 +1,6 @@
 
     <div class="container-fluid pt-1 mb-3 tab-cont thin-scroll">
-        <div class="header p-2 my-2 d-flex  justify-content-between">
+        <div class="header p-2 my-3 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>   
             <div >
                 <button
@@ -76,7 +76,7 @@
                 <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto.buyerStore}}</label>
         
             </div>
-            <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.shipViaCode">
+            <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.shipViaCode" style="margin-left: 10px;">
                 <label class="label mt-1 mb-1 w-50">{{l("ShipVia")}}</label>
                 <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto?.shipViaName}}</label>
                 <!-- <label class="label mt-1 mb-1 w-50">{{l("Store")}}</label> -->
