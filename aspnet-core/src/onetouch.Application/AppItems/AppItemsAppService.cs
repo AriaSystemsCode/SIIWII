@@ -1042,7 +1042,7 @@ namespace onetouch.AppItems
                         //MMT
                         string firstAttributeId = "";
                         var frstAttId = varAppItems.Select(x => x.EntityFk.EntityAttachments.Where(z => z.Attributes.Contains("=")).Select(a => a.Attributes)).FirstOrDefault();
-                        if (frstAttId != null & frstAttId.Count() > 0)
+                        if (frstAttId != null && frstAttId.Count() > 0)
                             firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
                         var firstItem = varAppItems.FirstOrDefault();
