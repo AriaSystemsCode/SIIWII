@@ -438,6 +438,9 @@ namespace onetouch
                ;
 
             configuration.CreateMap<AppMarketplaceContact, AppContactDto>();
+            configuration.CreateMap<AppMarketplaceContact, onetouch.Accounts.Dtos.AccountDto>();
+            configuration.CreateMap<AppMarketplaceContact, onetouch.AccountInfos.Dtos.BranchDto>();
+            
             configuration.CreateMap<AppMarketplaceContact, AppContact>()
             .ForMember(d => d.AppContactAddresses, s => s.MapFrom(ss => ss.ContactAddresses));
             configuration.CreateMap<AppContact, AppMarketplaceContact>()

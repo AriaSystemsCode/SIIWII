@@ -521,7 +521,8 @@ namespace onetouch.Accounts
                 .Include(x => x.AppContactAddresses)
                 .Include(x => x.AccountFk)
                 .Where(x => x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
-                .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && x.AccountId == input.AccountId && x.IsProfileData)
+                //.WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && x.AccountId == input.AccountId && x.IsProfileData)
+                .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && ((x.AccountId == input.AccountId && x.IsProfileData)||(!x.IsProfileData && x.EntityFk.EntityObjectTypeId== presonEntityObjectTypeId) ))
                 .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.View, x => x.AccountId == input.AccountId)
                 .WhereIf(input.AccountId == null && input.FilterType == MemberFilterTypeEnum.MarketPlace, x => x.TenantId == null && !x.IsProfileData)
                 .WhereIf(!string.IsNullOrEmpty(input.Filter),
@@ -530,6 +531,7 @@ namespace onetouch.Accounts
                 //MMT - 08/18/2022 Sort my team members by Surname when there are no records, gives an error[Start]
                 //var pagedAndFilteredContacts = contactInfo
                 //       .OrderBy(input.Sorting ?? "name asc")
+
                 //       .PageBy(input);
 
                 IQueryable<AppContact> pagedAndFilteredContacts = null;
