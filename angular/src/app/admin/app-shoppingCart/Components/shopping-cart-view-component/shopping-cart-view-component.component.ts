@@ -1141,16 +1141,19 @@ onShowVariations(event) {
         this.getShoppingCartData();
       });
   }
-  isOrderConfirmationNeedsReprint(): void {
-    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-        .subscribe((res) => {
-            if (res) {
-                this.regenrate = res;
-                // this.toGenerate();
-      this.onGeneratOrderReport(true,undefined,true,true)
-                this.getOrderConfirmation();
-            }
-        });
+  isOrderConfirmationNeedsReprint() {
+    this.getOrderConfirmation();
+
+    this.onGeneratOrderReport(true,undefined,true,true)
+    // this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    //     .subscribe((res) => {
+    //         if (res) {
+    //             this.regenrate = res;
+    //             // this.toGenerate();
+    //   this.onGeneratOrderReport(true,undefined,true,true)
+    //             this.getOrderConfirmation();
+    //         }
+    //     });
 }
 stopReport(event) {
 

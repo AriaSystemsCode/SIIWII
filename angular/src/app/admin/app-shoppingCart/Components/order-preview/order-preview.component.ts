@@ -32,9 +32,9 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     ngOnInit(): void {
     }
     ngOnChanges(changes: SimpleChanges) {
-        if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
+        // if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
             this.loadPdf();
-        }
+        // }
     // this.isOrderConfirmationNeedsReprint()
 
     }
@@ -47,24 +47,24 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         //     return;
         // }
     
-        this.showReport = false;
-        this.startload = true;
+        // this.showReport = false;
+        // this.startload = true;
     
-        if (this.regenrate == true) {
-            this.visible = true;
-        } else if (!this.regenrate) {
+        // if (this.regenrate == true) {
+        //     this.visible = true;
+        // } else if (!this.regenrate) {
             this.showMainSpinner();
-        }
+        // }
     
         try {
             await this.delay(10000);
             const subs = this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
                 .pipe(
                     finalize(() => {
-                        this.SuccessMsg = true;
-                        if (this.SuccessMsg) {
-                            this.showbar = false;
-                        }
+                        // this.SuccessMsg = true;
+                        // if (this.SuccessMsg) {
+                        //     this.showbar = false;
+                        // }
                         this.hideMainSpinner();
                         this.showReport = true;
                     })
