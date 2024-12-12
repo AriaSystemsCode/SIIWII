@@ -32,6 +32,8 @@ using DevExpress.Xpo;
 using onetouch.SystemObjects;
 using Tweetinvi.Core.Extensions;
 using onetouch.AppSiiwiiTransaction;
+using System.Security.Cryptography;
+using Microsoft.CodeAnalysis;
 
 namespace onetouch.Web.Services
 {
@@ -156,21 +158,41 @@ namespace onetouch.Web.Services
                             if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null
                                 
                                 || (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE" &&
-                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "roleType") != null))
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "roleType") != null)
+                                || (parameterName.ToUpper() == "LANGUAGENAME" &&
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name.ToUpper() == "MUSERCOUNTRY") != null)
+                                
+                                )
                             {
-
-                                if (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE")
+                                switch (parameterName.ToUpper())
                                 {
-                                    report.Parameters["roleType"].Value = Convert.ChangeType(
-                                    parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
+                                    case "ORDERCONFIRMATIONROLE":
+                                      report.Parameters["roleType"].Value = Convert.ChangeType(
+                                      parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
 
+                                        break;
+                                    case "LANGUAGENAME":
+                                        report.Parameters["muserCountry"].Value = Convert.ChangeType(
+                                      parameters.Get("languageName").ToUpper(), report.Parameters["muserCountry"].Type);
+                                        break;
+                                    default:
+                                        report.Parameters[parameterName].Value = Convert.ChangeType(
+                                    parameters.Get(parameterName), report.Parameters[parameterName].Type);
+                                        break;
                                 }
-                                else
-                                {
-                                    report.Parameters[parameterName].Value = Convert.ChangeType(
-                                  parameters.Get(parameterName), report.Parameters[parameterName].Type);
 
-                                }
+                                //if (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE")
+                                //{
+                                //    report.Parameters["roleType"].Value = Convert.ChangeType(
+                                //    parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
+
+                                //}
+                                //else
+                                //{
+                                //  report.Parameters[parameterName].Value = Convert.ChangeType(
+                                //  parameters.Get(parameterName), report.Parameters[parameterName].Type);
+
+                                //}
 
                                 if (parameterName.ToUpper() == "TRANSACTIONID")
                                 {

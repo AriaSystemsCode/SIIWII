@@ -125,7 +125,7 @@ namespace onetouch
         {
             configuration.CreateMap<CreateOrEditSycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
             configuration.CreateMap<SycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
-            configuration.CreateMap<CreateOrEditAppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantInvoiceDto, AppTenantInvoice>().ReverseMap().ForMember(z => z.EntityAttachments, z => z.MapFrom(z => z.EntityAttachments));
             configuration.CreateMap<AppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
             configuration.CreateMap<AppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
