@@ -111,11 +111,7 @@ export class SendMessageModalComponent
     ngOnChanges(changes: SimpleChanges): void {
       
     }
-    updateSubjectValue(newValue): void {
-        console.log(newValue,'newValuenewValuenewValue')
-        this.subject = newValue;
-        this.cdr.detectChanges();  // Manually trigger change detection
-      }
+  
     mesasgeObjectType: MesasgeObjectType = MesasgeObjectType.Message
     show(id?: number, threadId?: number, forward?: boolean,mesasgeObjectType?: MesasgeObjectType) {
         this.showMainSpinner();
