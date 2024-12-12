@@ -1135,8 +1135,9 @@ onShowVariations(event) {
       });
   }
   isOrderConfirmationNeedsReprint() {
-    this.onGeneratOrderReport(true,undefined,true,true)
     this.getOrderConfirmation();
+
+    this.onGeneratOrderReport(true,undefined,true,true)
     // this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
     //     .subscribe((res) => {
     //         if (res) {
