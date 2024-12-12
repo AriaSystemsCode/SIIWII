@@ -351,7 +351,7 @@ namespace onetouch.AppSubScriptionPlan
         [AbpAuthorize(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails)]
         public async Task<PagedResultDto<AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto>> GetAllAppSubscriptionPlanHeaderForLookupTable(GetAllForLookupTableInput input)
         {
-            var query = _lookup_appSubscriptionPlanHeaderRepository.GetAll().WhereIf(
+            var query = _lookup_appSubscriptionPlanHeaderRepository.GetAll().Where(z=>z.IsStandard).WhereIf(
                    !string.IsNullOrWhiteSpace(input.Filter),
                   e => e.Code != null && e.Code.Contains(input.Filter)
                );
