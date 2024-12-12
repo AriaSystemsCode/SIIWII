@@ -1200,16 +1200,7 @@ onShowVariations(event) {
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
-getTransactionRoleOrderConfirmation() {
-  this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId)
-  .subscribe((res) => {
-    if (res) {
-        console.log(res,'ressss')
-        this.orderConfirmationData.contactRole = res.contactRole
-        this.orderConfirmationData.contactName = res.contactName
-    }
-  });
-}
+
 
 initFilterForm() {  
 
