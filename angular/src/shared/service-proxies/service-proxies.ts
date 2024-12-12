@@ -25212,6 +25212,62 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param transactionId (optional) 
+     * @return Success
+     */
+    getTenantRoleInTransaction(transactionId: number | undefined): Observable<TenantContactRole> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetTenantRoleInTransaction?";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantRoleInTransaction(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantRoleInTransaction(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TenantContactRole>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TenantContactRole>;
+        }));
+    }
+
+    protected processGetTenantRoleInTransaction(response: HttpResponseBase): Observable<TenantContactRole> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TenantContactRole.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -82488,6 +82544,58 @@ export class AccountDefaultAddressDto implements IAccountDefaultAddressDto {
 export interface IAccountDefaultAddressDto {
     addressType: string | undefined;
     addressId: number;
+
+    [key: string]: any;
+}
+
+export class TenantContactRole implements ITenantContactRole {
+    contactRole!: string | undefined;
+    contactName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ITenantContactRole) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.contactRole = _data["contactRole"];
+            this.contactName = _data["contactName"];
+        }
+    }
+
+    static fromJS(data: any): TenantContactRole {
+        data = typeof data === 'object' ? data : {};
+        let result = new TenantContactRole();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["contactRole"] = this.contactRole;
+        data["contactName"] = this.contactName;
+        return data;
+    }
+}
+
+export interface ITenantContactRole {
+    contactRole: string | undefined;
+    contactName: string | undefined;
 
     [key: string]: any;
 }
