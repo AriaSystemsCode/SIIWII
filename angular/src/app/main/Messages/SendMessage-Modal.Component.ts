@@ -72,6 +72,7 @@ export class SendMessageModalComponent
     demoUiEditor: DemoUiEditorComponent;
     public uploader: FileUploader;
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
+    @Output() refresh: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() modalView:boolean;
     @Input() parentId:any;
     @Input() entityId:any;
@@ -526,7 +527,7 @@ export class SendMessageModalComponent
         this.saving = true;
         this._MessageServiceProxy
             .createMessage(this.messages)
-            .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();}))
+            .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();this.refresh.emit(true)}))
             .subscribe(() => {
                 this.notify.info(this.l("SendSuccessfully"));
                 if(this.SendMessageModal)this.SendMessageModal.hide();

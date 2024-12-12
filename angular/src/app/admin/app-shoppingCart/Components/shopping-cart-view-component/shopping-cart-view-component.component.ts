@@ -185,6 +185,12 @@ regenrate : boolean = false
 //         }, 10);
 //     });
 // }
+
+getCommentsRefreshed (event){
+  if(event){
+    this.loadCommentsList()
+  }
+}
 loadCommentsList() {
   setTimeout(() => {
       if (this.commentParentComponent?.first && this.commentParentComponent?.last) {

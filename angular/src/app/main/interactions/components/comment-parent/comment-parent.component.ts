@@ -16,6 +16,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @ViewChild("SendMessageModalComponent") SendMessageModalComponent: SendMessageModalComponent
 
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
+    @Output() refreshComments : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
     @Input() commentType:any;
@@ -150,13 +151,12 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
  this.cdr.detectChanges();
 //  this.setToName(event)
     }
-    // setToName(toName: string): void {
-    //     this.toName = toName;
-    //     console.log('toName set to:', this.toName); // Debugging log
-    //     this.cdr.detectChanges();
-        
-    // }
-    ngDoCheck(){
-// this.setToName(this.toName)
-    }
+  
+    refreshAfterSave(event){
+      
+        if(event){
+            this.refreshComments.emit(true)
+        }
+           }
+         
 }
