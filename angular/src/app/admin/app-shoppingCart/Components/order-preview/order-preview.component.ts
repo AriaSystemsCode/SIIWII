@@ -14,6 +14,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     @Input("transactionFormPath") transactionFormPath;
     @Input("orderId") orderId;
     @Input("regenrate") regenrate;
+    @Input("mainLoad") mainLoad;
     @Output("stopReport") stopReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
     loadingError: boolean = false;
@@ -23,6 +24,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     startload: boolean = false;
     showbar: boolean = true;
     dialogClosed: boolean = false; // New flag to track dialog closure
+
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -49,10 +51,11 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     
         this.showReport = false;
         this.startload = true;
+        this.visible =  false
     
         if (this.regenrate == true) {
             this.visible = true;
-        } else if (!this.regenrate) {
+        } else if (this.mainLoad) {
             this.showMainSpinner();
         }
     
