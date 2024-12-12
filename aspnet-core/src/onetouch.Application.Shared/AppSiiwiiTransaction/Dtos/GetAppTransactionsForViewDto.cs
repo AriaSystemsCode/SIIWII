@@ -21,7 +21,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public virtual bool LastRecord { set; get; } = false;
         public virtual bool FirstRecord { set; get; } = false;
-        public virtual DateTime EnteredDate { set; get; }
+       // public virtual DateTime EnteredDate { set; get; }
         public long CreatorUserId { set; get; }
         public byte[] OrderConfirmationFile { set; get; }
         public virtual List<ContactInformationOutputDto> SharedWithUsers{set; get;}
@@ -42,6 +42,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         //Iteration45[Start]
         public virtual bool ShowSync { set; get; } = false;
         public virtual DateTime LastModifiedDate { set; get; }
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { get; set; }
         //Iteration45[End]
     }
 

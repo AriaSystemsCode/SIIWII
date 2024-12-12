@@ -140,7 +140,7 @@ export class SendMessageModalComponent
                     else this.subject = result[0].messages.subject;
                     for (let i = 0; i < result.length; i++) {
                         this.htmlEditorInput +=
-                            "--------- Replay message ---------" + "<br>";
+                            "--------- Reply message ---------" + "<br>";
                         this.htmlEditorInput +=
                             "From: " +
                             result[i].messages.senderName +

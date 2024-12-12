@@ -22758,12 +22758,13 @@ export class AppTransactionServiceProxy {
      * @param statusId (optional) 
      * @param fromExport (optional) 
      * @param hasParentItems (optional) 
+     * @param timeZoneValue (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
+    getAll(withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, timeZoneValue: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAll?";
         if (withDetails === null)
             throw new Error("The parameter 'withDetails' cannot be null.");
@@ -22809,6 +22810,8 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'hasParentItems' cannot be null.");
         else if (hasParentItems !== undefined)
             url_ += "hasParentItems=" + encodeURIComponent("" + hasParentItems) + "&";
+        if (timeZoneValue !== undefined && timeZoneValue !== null)
+            url_ += "TimeZoneValue=" + encodeURIComponent("" + timeZoneValue) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -24090,13 +24093,14 @@ export class AppTransactionServiceProxy {
      * @param statusId (optional) 
      * @param fromExport (optional) 
      * @param hasParentItems (optional) 
+     * @param timeZoneValue (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @param position (optional) 
      * @return Success
      */
-    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
+    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, timeZoneValue: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAppTransactionsForView?";
         if (transactionId === null)
             throw new Error("The parameter 'transactionId' cannot be null.");
@@ -24146,6 +24150,8 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'hasParentItems' cannot be null.");
         else if (hasParentItems !== undefined)
             url_ += "hasParentItems=" + encodeURIComponent("" + hasParentItems) + "&";
+        if (timeZoneValue !== undefined && timeZoneValue !== null)
+            url_ += "TimeZoneValue=" + encodeURIComponent("" + timeZoneValue) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -70665,6 +70671,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     nonLookupValues!: LookupLabelDto[] | undefined;
     manufacturerCode!: string | undefined;
     tenantId!: number | undefined;
+    tenantOwner!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -70807,6 +70814,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             }
             this.manufacturerCode = _data["manufacturerCode"];
             this.tenantId = _data["tenantId"];
+            this.tenantOwner = _data["tenantOwner"];
             this.id = _data["id"];
         }
     }
@@ -70947,6 +70955,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         }
         data["manufacturerCode"] = this.manufacturerCode;
         data["tenantId"] = this.tenantId;
+        data["tenantOwner"] = this.tenantOwner;
         data["id"] = this.id;
         return data;
     }
@@ -70996,6 +71005,7 @@ export interface ICreateOrEditAppItemDto {
     nonLookupValues: LookupLabelDto[] | undefined;
     manufacturerCode: string | undefined;
     tenantId: number | undefined;
+    tenantOwner: number | undefined;
     id: number;
 
     [key: string]: any;
@@ -75680,6 +75690,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
     appSubscriptionPlanHeaderId!: number;
     appFeatureId!: number | undefined;
     appSubscriptionPlanHeaderCode!: string | undefined;
+    appSubscriptionPlanHeaderName!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -75719,6 +75730,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
             this.appSubscriptionPlanHeaderId = _data["appSubscriptionPlanHeaderId"];
             this.appFeatureId = _data["appFeatureId"];
             this.appSubscriptionPlanHeaderCode = _data["appSubscriptionPlanHeaderCode"];
+            this.appSubscriptionPlanHeaderName = _data["appSubscriptionPlanHeaderName"];
             this.id = _data["id"];
         }
     }
@@ -75756,6 +75768,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
         data["appSubscriptionPlanHeaderId"] = this.appSubscriptionPlanHeaderId;
         data["appFeatureId"] = this.appFeatureId;
         data["appSubscriptionPlanHeaderCode"] = this.appSubscriptionPlanHeaderCode;
+        data["appSubscriptionPlanHeaderName"] = this.appSubscriptionPlanHeaderName;
         data["id"] = this.id;
         return data;
     }
@@ -75782,6 +75795,7 @@ export interface IAppSubscriptionPlanDetailDto {
     appSubscriptionPlanHeaderId: number;
     appFeatureId: number | undefined;
     appSubscriptionPlanHeaderCode: string | undefined;
+    appSubscriptionPlanHeaderName: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -77079,8 +77093,8 @@ export class AppTenantInvoiceDto implements IAppTenantInvoiceDto {
     invoiceNumber!: string | undefined;
     invoiceDate!: moment.Moment;
     amount!: number;
-    dueDate!: moment.Moment;
-    payDate!: moment.Moment;
+    dueDate!: moment.Moment | undefined;
+    payDate!: moment.Moment | undefined;
     attachment!: string | undefined;
     displayName!: string | undefined;
     tenantName!: string | undefined;
@@ -77145,8 +77159,8 @@ export interface IAppTenantInvoiceDto {
     invoiceNumber: string | undefined;
     invoiceDate: moment.Moment;
     amount: number;
-    dueDate: moment.Moment;
-    payDate: moment.Moment;
+    dueDate: moment.Moment | undefined;
+    payDate: moment.Moment | undefined;
     attachment: string | undefined;
     displayName: string | undefined;
     tenantName: string | undefined;
@@ -77268,8 +77282,8 @@ export class CreateOrEditAppTenantInvoiceDto implements ICreateOrEditAppTenantIn
     invoiceNumber!: string;
     invoiceDate!: moment.Moment;
     amount!: number;
-    dueDate!: moment.Moment;
-    payDate!: moment.Moment;
+    dueDate!: moment.Moment | undefined;
+    payDate!: moment.Moment | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     id!: number | undefined;
 
@@ -77339,8 +77353,8 @@ export interface ICreateOrEditAppTenantInvoiceDto {
     invoiceNumber: string;
     invoiceDate: moment.Moment;
     amount: number;
-    dueDate: moment.Moment;
-    payDate: moment.Moment;
+    dueDate: moment.Moment | undefined;
+    payDate: moment.Moment | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     id: number | undefined;
 
@@ -79451,7 +79465,6 @@ export interface IAppTransactionContactDto {
 export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewDto {
     lastRecord!: boolean;
     firstRecord!: boolean;
-    enteredDate!: moment.Moment;
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
     sharedWithUsers!: ContactInformationOutputDto[] | undefined;
@@ -79467,6 +79480,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     entityClassificationsNames!: PagedResultDtoOfString;
     showSync!: boolean;
     lastModifiedDate!: moment.Moment;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -79508,6 +79523,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     lFromPlaceOrder!: boolean;
     currencyExchangeRate!: number;
     reference!: string | undefined;
+    enteredDate!: moment.Moment;
     createManualAccount!: boolean;
     createManualContact!: boolean;
     tenantId!: number | undefined;
@@ -79554,7 +79570,6 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             }
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
-            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
             this.orderConfirmationFile = _data["orderConfirmationFile"];
             if (Array.isArray(_data["sharedWithUsers"])) {
@@ -79574,6 +79589,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.entityClassificationsNames = _data["entityClassificationsNames"] ? PagedResultDtoOfString.fromJS(_data["entityClassificationsNames"]) : <any>undefined;
             this.showSync = _data["showSync"];
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -79623,6 +79640,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.lFromPlaceOrder = _data["lFromPlaceOrder"];
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
+            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.createManualAccount = _data["createManualAccount"];
             this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
@@ -79695,7 +79713,6 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         }
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
-        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
         data["orderConfirmationFile"] = this.orderConfirmationFile;
         if (Array.isArray(this.sharedWithUsers)) {
@@ -79715,6 +79732,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["entityClassificationsNames"] = this.entityClassificationsNames ? this.entityClassificationsNames.toJSON() : <any>undefined;
         data["showSync"] = this.showSync;
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -79764,6 +79783,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["lFromPlaceOrder"] = this.lFromPlaceOrder;
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
+        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["createManualAccount"] = this.createManualAccount;
         data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
@@ -79825,7 +79845,6 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
 export interface IGetAppTransactionsForViewDto {
     lastRecord: boolean;
     firstRecord: boolean;
-    enteredDate: moment.Moment;
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
     sharedWithUsers: ContactInformationOutputDto[] | undefined;
@@ -79841,6 +79860,8 @@ export interface IGetAppTransactionsForViewDto {
     entityClassificationsNames: PagedResultDtoOfString;
     showSync: boolean;
     lastModifiedDate: moment.Moment;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -79882,6 +79903,7 @@ export interface IGetAppTransactionsForViewDto {
     lFromPlaceOrder: boolean;
     currencyExchangeRate: number;
     reference: string | undefined;
+    enteredDate: moment.Moment;
     createManualAccount: boolean;
     createManualContact: boolean;
     tenantId: number | undefined;
@@ -80318,6 +80340,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
     statusId!: number;
     fromExport!: boolean;
     hasParentItems!: boolean;
+    timeZoneValue!: string | undefined;
     sorting!: string | undefined;
     skipCount!: number;
     maxResultCount!: number;
@@ -80356,6 +80379,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
             this.statusId = _data["statusId"];
             this.fromExport = _data["fromExport"];
             this.hasParentItems = _data["hasParentItems"];
+            this.timeZoneValue = _data["timeZoneValue"];
             this.sorting = _data["sorting"];
             this.skipCount = _data["skipCount"];
             this.maxResultCount = _data["maxResultCount"];
@@ -80392,6 +80416,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
         data["statusId"] = this.statusId;
         data["fromExport"] = this.fromExport;
         data["hasParentItems"] = this.hasParentItems;
+        data["timeZoneValue"] = this.timeZoneValue;
         data["sorting"] = this.sorting;
         data["skipCount"] = this.skipCount;
         data["maxResultCount"] = this.maxResultCount;
@@ -80417,6 +80442,7 @@ export interface IGetAllAppTransactionsInputDto {
     statusId: number;
     fromExport: boolean;
     hasParentItems: boolean;
+    timeZoneValue: string | undefined;
     sorting: string | undefined;
     skipCount: number;
     maxResultCount: number;
@@ -80496,7 +80522,6 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     netDueDays!: number;
     lastRecord!: boolean;
     firstRecord!: boolean;
-    enteredDate!: moment.Moment;
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
     sharedWithUsers!: ContactInformationOutputDto[] | undefined;
@@ -80512,6 +80537,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     entityClassificationsNames!: PagedResultDtoOfString;
     showSync!: boolean;
     lastModifiedDate!: moment.Moment;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -80553,6 +80580,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     lFromPlaceOrder!: boolean;
     currencyExchangeRate!: number;
     reference!: string | undefined;
+    enteredDate!: moment.Moment;
     createManualAccount!: boolean;
     createManualContact!: boolean;
     tenantId!: number | undefined;
@@ -80608,7 +80636,6 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.netDueDays = _data["netDueDays"];
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
-            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
             this.orderConfirmationFile = _data["orderConfirmationFile"];
             if (Array.isArray(_data["sharedWithUsers"])) {
@@ -80628,6 +80655,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.entityClassificationsNames = _data["entityClassificationsNames"] ? PagedResultDtoOfString.fromJS(_data["entityClassificationsNames"]) : <any>undefined;
             this.showSync = _data["showSync"];
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -80677,6 +80706,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.lFromPlaceOrder = _data["lFromPlaceOrder"];
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
+            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.createManualAccount = _data["createManualAccount"];
             this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
@@ -80758,7 +80788,6 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["netDueDays"] = this.netDueDays;
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
-        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
         data["orderConfirmationFile"] = this.orderConfirmationFile;
         if (Array.isArray(this.sharedWithUsers)) {
@@ -80778,6 +80807,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["entityClassificationsNames"] = this.entityClassificationsNames ? this.entityClassificationsNames.toJSON() : <any>undefined;
         data["showSync"] = this.showSync;
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -80827,6 +80858,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["lFromPlaceOrder"] = this.lFromPlaceOrder;
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
+        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["createManualAccount"] = this.createManualAccount;
         data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
@@ -80897,7 +80929,6 @@ export interface IGetAllAppTransactionsForViewDto {
     netDueDays: number;
     lastRecord: boolean;
     firstRecord: boolean;
-    enteredDate: moment.Moment;
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
     sharedWithUsers: ContactInformationOutputDto[] | undefined;
@@ -80913,6 +80944,8 @@ export interface IGetAllAppTransactionsForViewDto {
     entityClassificationsNames: PagedResultDtoOfString;
     showSync: boolean;
     lastModifiedDate: moment.Moment;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -80954,6 +80987,7 @@ export interface IGetAllAppTransactionsForViewDto {
     lFromPlaceOrder: boolean;
     currencyExchangeRate: number;
     reference: string | undefined;
+    enteredDate: moment.Moment;
     createManualAccount: boolean;
     createManualContact: boolean;
     tenantId: number | undefined;
