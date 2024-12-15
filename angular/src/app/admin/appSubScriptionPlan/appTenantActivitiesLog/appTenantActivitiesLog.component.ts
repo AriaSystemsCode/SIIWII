@@ -253,7 +253,7 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
     }
     formatDate(input: string )
     {
-        return moment(input).format('MM/DD/YYYY HH:mm:ss a');
+        return moment(input).format('MM/DD/YYYY HH:mm:ss');
     }
     
     
