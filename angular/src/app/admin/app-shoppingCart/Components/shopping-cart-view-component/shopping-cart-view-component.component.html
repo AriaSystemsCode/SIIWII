@@ -705,7 +705,7 @@
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                         <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
                             <app-comment-parent [addNewThread]="true"  *ngIf="appTransactionsForViewDto"
-                            [cartStyle]="true" #commentParentComponent 
+                            [cartStyle]="true" #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                             (newCommentAdded)="onGeneratOrderReport(true)">
                             </app-comment-parent>
                         </div>
