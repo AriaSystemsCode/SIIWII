@@ -55,6 +55,7 @@ using onetouch.AppMarketplaceContacts;
 using onetouch.AppMarketplaceAccounts;
 using onetouch.EmailingTemplates;
 using Abp.Domain.Entities;
+using Stripe;
 
 namespace onetouch.Accounts
 {
@@ -359,12 +360,26 @@ namespace onetouch.Accounts
 
                     var accountsList = await _accounts.ToListAsync();
                     var totalCount = await filteredAccounts.CountAsync();
+                    var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                          .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
 
                     foreach (var account in accountsList)
                     {
-                        account.AvaliableConnectionName = GetAction(account.Account.AccountType, false);
-                        account.ConnectionName = GetAction(account.Account.AccountType, true);
+                        var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);
+                        if (accountConnection != null && accountConnection.Id > 0)
+                        {
+                            account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
+                            account.AvaliableConnectionName = "";
+                        }
+                        else
+                        {
+                            //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                            account.AvaliableConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, true);
+                            account.ConnectionName = "";
+                        }
                     }
+
                     // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
 
                     //foreach (var account in accountsList)
@@ -388,13 +403,11 @@ namespace onetouch.Accounts
             }
         }
 
-
-        public string GetAction(string accountTypeCode, bool neeedAction)
+        public string GetAction(string accountTypeCode, string currentTenantAccount, bool neeedAction = false)
         {
 
             int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
-            var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
-            var currentTenantEdition = tenant == null ? "Personal" : tenant.Name;
+            var currentTenantEdition = currentTenantAccount;
             currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
             string action = "";
             if (!string.IsNullOrEmpty(accountTypeCode))
@@ -410,27 +423,10 @@ namespace onetouch.Accounts
                 if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
                 if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
                 if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
-
-
             }
-
-
 
             return action;
         }
-
-
-        //public bool checkArray(long[] ids, string names)
-        //{ bool ret = false;
-        //    try
-        //    {
-        //        string[] namesArray = names.Split(";");
-
-        //        if (ids.Where(r => namesArray.Contains(r.ToString())).Count() > 0)
-        //            return true;
-        //    }catch(Exception ex) { }
-        //    return ret;
-        //}
 
         public List<string> GetLookUPLabels(string Ids, List<LookupLabelDto> tmpAccountType)
         {
@@ -2223,12 +2219,20 @@ namespace onetouch.Accounts
                     .FirstOrDefaultAsync(x =>
                     x.IsProfileData == true && x.Id == input);
 
-                if (marketplaceContact != null)
+                var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == marketplaceContact.SSIN);
+
+                if (marketplaceContact != null && accountConnection == null )
                 {
                      
                     var retType = await _helper.SystemTables.GetEntityObjectTypeById(marketplaceContact.AccountTypeId);
 
-                    ret = GetAction(retType.Code, false);
+
+                    var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                           .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
+
+
+                    ret = GetAction(retType.Code, currentTenantAccount, false);
 
                     var entity = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories)
                                         .Include(x => x.EntityClassifications)
