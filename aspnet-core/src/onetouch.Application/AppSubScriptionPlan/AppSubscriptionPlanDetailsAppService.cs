@@ -91,9 +91,9 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter)
                         .WhereIf(tenantPlan != null, z => z.AppSubscriptionPlanHeaderId == tenantPlan);
 
-                var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
-                    .OrderBy(input.Sorting ?? "id asc")
-                    .PageBy(input);
+                var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails;
+                 //   .OrderBy(input.Sorting ?? "id asc")
+                   // .PageBy(input);
 
                 var appSubscriptionPlanDetails = from o in pagedAndFilteredAppSubscriptionPlanDetails
                                                  //join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll().WhereIf(tenantPlan!=null,z => z.Id== tenantPlan) on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
@@ -128,10 +128,14 @@ namespace onetouch.AppSubScriptionPlan
                                                      o.AppSubscriptionPlanHeaderFk
                                                      //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
                                                  };
-
-                var totalCount = await filteredAppSubscriptionPlanDetails.CountAsync();
+                
+                var totalCount = await appSubscriptionPlanDetails.Distinct().CountAsync();
                 if (input.AddFeaturesOnly)
-                    totalCount = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).CountAsync();
+                    totalCount = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().CountAsync();
+
+                appSubscriptionPlanDetails= appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input);
+
                 var dbList = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().ToListAsync();
                 var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
 
