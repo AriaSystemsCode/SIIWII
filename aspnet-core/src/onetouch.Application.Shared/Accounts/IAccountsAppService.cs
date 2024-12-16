@@ -33,7 +33,7 @@ namespace onetouch.Accounts
 		Task DeleteContact(EntityDto input);
 		Task<ContactDto> CreateOrEditContact(ContactDto input);
 		Task<ContactForEditDto> GetContactForView(long input);
-        Task<ContactForEditDto> GetContactForViewFromMyConnections(long input);
+        
         
         //Mariam[End]
         Task<PagedResultDto<LookupAccountOrTenantDto>> GetTenantsWithManualAccounts(GetTenantsWithManualAccounts input);
