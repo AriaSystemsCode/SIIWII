@@ -37,7 +37,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
             this.loadPdf();
         }
-    // this.isOrderConfirmationNeedsReprint()
+   
 
     }
     ngAfterViewInit() {
@@ -115,38 +115,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         this.regenrate = false;
     }
     
-    
-    // isOrderConfirmationNeedsReprint(){
-        
-    //     const subs =  this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-    //     .subscribe((res) => {
-    //       console.log(res,'rep')
-    //       if (res == true) {
-    //         this.visible = res
-
-    //        this.loadPdf()
-       
-
-    //       }
-    //       else {
-    //         this.loadPdf()
-    //       }
-       
-    //     });
-    //     this.subscriptions.push(subs)
-        
-    //   }
-    //     var base64String =res;
-    //     var pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
-
-    //     if (base64String && pdfViewer) {
-    //         pdfViewer.src = 'data:application/pdf;base64,' + base64String;
-    //         this.loadingError = false;
-    //     }
-    //     else
-    //         this.loadingError = true;
-    // });
-
+   
     delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
