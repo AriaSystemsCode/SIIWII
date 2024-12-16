@@ -131,11 +131,7 @@ mainLoad : boolean = false
   }
   ngOnInit(): void {
     this.initFilterForm()
-    // this.onGeneratOrderReport(true,undefined,true,true); 
-    // if (      this.appTransactionsForViewDto?.sellerCompanySSIN){
-    //   this.getSellerVariations()
-
-    // }
+  
  let value = localStorage.getItem("comNew"); 
 
  if (value) {
@@ -150,18 +146,10 @@ mainLoad : boolean = false
   this.conNew = false;
 
 }
-// if(this.appTransactionsForViewDto?.buyerCompanySSIN == ''){
-//  this.TempComp = false
 
-// } else {
-//  this.TempComp = true
-
-// }
- console.log(this.comNew,'this.comNew')
- console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
-    // this.onGeneratOrderReport(true,undefined,true,true);
+   
 
   }
 

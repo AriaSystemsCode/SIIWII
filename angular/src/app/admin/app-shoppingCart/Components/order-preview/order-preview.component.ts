@@ -41,7 +41,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
 
     }
     ngAfterViewInit() {
-        // this.loadPdf();
+     
     }
     async loadPdf() {
         // if (this.startload) {
