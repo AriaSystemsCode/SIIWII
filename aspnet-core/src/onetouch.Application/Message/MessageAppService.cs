@@ -1768,6 +1768,31 @@ namespace onetouch.Message
                 }
             }
         }
+        public async Task<OverAllRatingDto> GetOverAllRatings(long entityId)
+        {
+            OverAllRatingDto ratingDto = new OverAllRatingDto();
+
+            ratingDto.TotalNumberOfRating = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId);
+            
+            var oneTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 1);
+            var twoTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 2);
+            var threeTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 3);
+            var fourTotal= await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 4);
+            var fiveTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 5);
+            if (ratingDto.TotalNumberOfRating > 0)
+            {
+                ratingDto.OneTotal = (decimal.Parse(oneTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
+                ratingDto.TwoTotal = (decimal.Parse(twoTotal.ToString()) /decimal.Parse( ratingDto.TotalNumberOfRating.ToString())) ;
+                ratingDto.ThreeTotal = (decimal.Parse(threeTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString())) ;
+                ratingDto.FourTotal = (decimal.Parse(fourTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString())) ;
+                ratingDto.FiveTotal = (decimal.Parse(fiveTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
+                var totalRating = (1 * decimal.Parse(oneTotal.ToString())) + (2 * decimal.Parse(twoTotal.ToString())) +
+                    (3 * decimal.Parse(threeTotal.ToString())) + (4 * decimal.Parse(fourTotal.ToString())) +
+                    (5 * decimal.Parse(fiveTotal.ToString()));
+                ratingDto.OverAllRating = totalRating / decimal.Parse(ratingDto.TotalNumberOfRating.ToString());
+             }
+             return ratingDto;
+        }
         //I40-X527[End]
     }
 }
