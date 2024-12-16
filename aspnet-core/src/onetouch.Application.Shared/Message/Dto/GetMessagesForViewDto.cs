@@ -7,5 +7,7 @@ namespace onetouch.Message.Dto
   public  class GetMessagesForViewDto
     {
         public MessagesDto Messages { get; set; }
+        public int? Rating { get; set; }
+        public string UserIsPurchaserOrNot { get; set; }
     }
 }

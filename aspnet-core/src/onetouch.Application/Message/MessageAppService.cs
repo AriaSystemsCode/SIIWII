@@ -9,6 +9,7 @@ using Abp.Linq.Extensions;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.PowerShell.Commands;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
@@ -16,12 +17,15 @@ using NPOI.SS.Formula.Functions;
 using NUglify.Helpers;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
+using onetouch.AppMarketplaceContacts;
 using onetouch.AppMarketplaceMessages;
+using onetouch.AppMarketplaceTransactions;
 using onetouch.AppPosts;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.Authorization;
 using onetouch.Authorization.Users;
 using onetouch.Authorization.Users.Dto;
+using onetouch.Configuration;
 using onetouch.Helpers;
 using onetouch.Message.Dto;
 using onetouch.Migrations;
@@ -54,15 +58,25 @@ namespace onetouch.Message
         private readonly IRepository<AppEntityReactionsCount, long> _appEntityReactionsCount;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
         private readonly IRepository<AppPost, long> _appPostRepo;
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceAccounts;
+        private readonly IRepository<AppEntityRating,long> _appEntityRatingRepository;
+        private readonly IConfigurationRoot _appConfiguration;
+        private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
+        private readonly IRepository<AppMarketplaceTransactionHeaders, long> _appMarketplaceTransactionHeaders;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            IRepository<AppEntityClassification, long> appEntityClassificationRepository,
+            IRepository<AppEntityClassification, long> appEntityClassificationRepository, IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
-            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo
+            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo, IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
+             IRepository<AppMarketplaceContact, long> appMarketplaceAccounts, IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppEntityRating, long> appEntityRatingRepository
             )
         {
+            _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
+            _appEntityExtraDataRepository = appEntityExtraDataRepository;
+            _appEntityRatingRepository = appEntityRatingRepository;
+            _appConfiguration = appConfigurationAccessor.Configuration;
             _MessagesRepository = messagesRepository;
             _lookup_MessagesRepository = lookup_MessagesRepository;
             _appEntityRepository = appEntityRepository;
@@ -73,7 +87,8 @@ namespace onetouch.Message
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _AppMarketplaceMessagesRepository = appMarketplaceMessagesRepository;
             _appPostRepo = appPostRepo;
-        }
+             _appMarketplaceAccounts=appMarketplaceAccounts;
+    }
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
         {
@@ -742,6 +757,59 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<List<GetMessagesForViewDto>> CreateMessage(CreateMessageInput input)
         {
+            //I40-X27[Start]
+            if (input.MesasgeObjectType == MesasgeObjectType.Review)
+            {
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+                    var review = await CreateMarketplaceMessageForSenderUser(input);
+                    if (input.To != null)
+                    {
+                        var wntityObj = await _appEntityRepository.GetAll().Where(z => z.Id == input.RelatedEntityId).FirstOrDefaultAsync();
+                        if (wntityObj != null && wntityObj.TenantOwner != null && wntityObj.TenantOwner!=0)
+                        {
+                            var tenant = await TenantManager.GetByIdAsync(wntityObj.TenantOwner);
+                            if (tenant!=null)
+                            {
+                                string userName = "admin@" + tenant.TenancyName;
+                                var adminUser = await UserManager.FindByNameAsync(userName);
+                                if (adminUser != null)
+                                    input.To = adminUser.Id.ToString();
+                                //input.To
+                            }
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(input.To))
+                    {
+                        var user = UserManager.GetUserById(long.Parse(input.To));
+                        if (user != null)
+                        {
+                            if (input.MentionedUsers == null)
+                                input.MentionedUsers = new List<MentionedUserInfo>();
+                            if (input.MentionedUsers.FirstOrDefault(z => z.UserId == user.Id && z.TenantId == long.Parse(user.TenantId.ToString())) == null)
+                                input.MentionedUsers.Add(new MentionedUserInfo { UserId = user.Id, TenantId = long.Parse(user.TenantId.ToString()) });
+                        }
+                    }
+                    if (input.MentionedUsers != null && input.MentionedUsers.Count > 0)
+                    {
+                        foreach (var userId in input.MentionedUsers)
+                        {
+                            CreateMessageForRecieversInput createMessageForRecieversInput = new CreateMessageForRecieversInput();
+                            createMessageForRecieversInput.Messageid = review.Id;
+                            createMessageForRecieversInput.ThreadId = review.ThreadId;
+                            createMessageForRecieversInput.CreateMessageInput = input;
+                            createMessageForRecieversInput.CreateMessageInput.To = userId.UserId.ToString();
+                            string[] toList = new string[1];
+                            toList[0] = userId.UserId.ToString();
+                            createMessageForRecieversInput.UsersList = toList;
+                            await CreateMessageForRecieverUsers(createMessageForRecieversInput);
+                        }
+                    }
+
+                    return GetCommentsForView(review.Id);
+                }
+            }
+            //I40-X27[End]
             //MMT39
             if (input.MesasgeObjectType == MesasgeObjectType.Comment)
             {
@@ -1186,7 +1254,14 @@ namespace onetouch.Message
             {
                 AppEntityDto appEntity = new AppEntityDto();
                 ObjectMapper.Map(input, appEntity);
-                appEntity.Name = "COMMENT";
+                if (input.MesasgeObjectType == MesasgeObjectType.Review)
+                {
+                    appEntity.Name = "REVIEW";
+                }
+                else
+                {
+                  appEntity.Name = "COMMENT";
+                }
                 appEntity.Code = input.Code;
 
                 if (string.IsNullOrEmpty(input.Code))
@@ -1198,11 +1273,16 @@ namespace onetouch.Message
                     appEntity.Code = input.Code;
                 }
                 appEntity.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusSentMessageID();
-
-                if (input.MesasgeObjectType == MesasgeObjectType.Comment)
-                { appEntity.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeComment(); }
-                else { appEntity.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeMessageID(); }
-
+                if (input.MesasgeObjectType == MesasgeObjectType.Review)
+                {
+                    appEntity.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeReview();
+                }
+                else
+                {
+                    if (input.MesasgeObjectType == MesasgeObjectType.Comment)
+                    { appEntity.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeComment(); }
+                    else { appEntity.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeMessageID(); }
+                }
                 appEntity.ObjectId = await _helper.SystemTables.GetsydObjectMessageID();
                 appEntity.TenantId =null;
                 appEntity.RelatedEntityId = input.RelatedEntityId;
@@ -1308,5 +1388,386 @@ namespace onetouch.Message
             }
         }
         //MMT39
+        //I40-X527[Start]
+        [AbpAllowAnonymous]
+        public async Task<MessagePagedResultDto> GetAllReviews(GetAllMessagesInput input)
+        {
+            var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeReview();
+            var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
+            var orgComponentId = input.MainComponentEntitlyId;
+            IQueryable<AppMarketplaceMessage> filteredMessages = null;
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                ////MMT
+                //if (input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0)
+                //{
+                //    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == input.MainComponentEntitlyId).FirstOrDefaultAsync();
+                //    if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
+                //    {
+                //        var transactionSSIN = entity.SSIN;
+                //        if (!string.IsNullOrEmpty(transactionSSIN))
+                //        {
+                //            var entityShared = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                //            if (entityShared != null)
+                //            {
+                //                input.MainComponentEntitlyId = entityShared.Id;
+                //            }
+                //        }
+                //    }
+                //}
+                ////MMT
+                filteredMessages = _AppMarketplaceMessagesRepository.GetAll()
+                                   //.Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                   //.Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
+                                   .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
+                                   .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
+                            //Iteration37-MMT[Start]
+                            //.WhereIf(input.MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
+                            //.Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) ==  input.MessageCategoryFilter.ToString()).Count() > 0)
+                            //Iteration37-MMT[End]
+
+                            .WhereIf(input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
+                                e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
+                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
+
+                            .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
+                            .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
+                            .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
+                            .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
+                            .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
+                            .WhereIf(input.ThreadId != null && input.ThreadId > 0, e => e.ThreadId == input.ThreadId)
+                        .Where(
+                                 x =>
+                                 //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
+                                 x.OriginalMessageId == x.Id && (x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage ? x.EntityFk.TenantId == AbpSession.TenantId : true)
+                             );
+
+                var pagedAndFilteredMessages = filteredMessages
+                    .OrderBy(input.Sorting ?? "id desc")
+                    .PageBy(input);
+                var appComments = from o in pagedAndFilteredMessages
+                                  select new
+                                   GetMessagesForViewDto()
+                                  {
+                                      Messages = new MessagesDto
+                                      {
+                                          SenderId = o.SenderId,
+                                          // To = o.To,
+                                          // CC = o.CC,
+                                          // BCC = o.BCC,
+                                          Subject = o.Subject,
+                                          Body = o.Body,
+                                          BodyFormat = o.BodyFormat,
+                                          SendDate = o.CreationTime,
+                                          ReceiveDate = o.CreationTime,
+                                          EntityCode = o.EntityCode,
+                                          Id = o.Id,
+                                          SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
+                                       + " " + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString(),
+                                      //  + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
+                                          ThreadId = o.ThreadId,
+                                          ParentId = o.ParentId,
+                                          EntityId = (int)o.EntityId,
+                                          ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
+                                          HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
+                                          EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
+                                          RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                          ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                      },
+                                  }
+                                ;
+
+                var totalCount = await filteredMessages.CountAsync();
+                var unreadCount = 0;
+
+                var results = await appComments.ToListAsync();
+                //MMT
+                /*  if (orgComponentId != null && orgComponentId != 0 && orgComponentId != input.MainComponentEntitlyId)
+                  {
+                      var filteredMessages2 = _MessagesRepository.GetAll()
+                                                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
+                                                       .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
+                                                       .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
+                                                       .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
+                                                       .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
+                                                .WhereIf(orgComponentId != null && orgComponentId != 0,
+                                                    e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)orgComponentId).Count() > 0 ||
+                                                         e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)orgComponentId).Count() > 0)
+
+                                                .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
+                                                .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
+                                                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
+                                                .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
+                                                .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
+                                                .WhereIf(input.ThreadId != null && input.ThreadId > 0, e => e.ThreadId == input.ThreadId)
+                                            .Where(
+                                                     x =>
+                                                     //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
+                                                     x.OriginalMessageId == x.Id && (x.UserId == AbpSession.UserId || x.SenderId == AbpSession.UserId)
+                                                     && x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage && x.TenantId == AbpSession.TenantId
+                                                 );
+
+                      var pagedAndFilteredMessages2 = filteredMessages2
+                          .OrderBy(input.Sorting ?? "id desc")
+                          .PageBy(input);
+                      var appComments2 = from o in pagedAndFilteredMessages2
+                                         select new
+                                          GetMessagesForViewDto()
+                                         {
+                                             Messages = new MessagesDto
+                                             {
+                                                 SenderId = o.SenderId,
+                                                 To = o.To,
+                                                 CC = o.CC,
+                                                 BCC = o.BCC,
+                                                 Subject = o.Subject,
+                                                 Body = o.Body,
+                                                 BodyFormat = o.BodyFormat,
+                                                 SendDate = o.CreationTime,
+                                                 ReceiveDate = o.CreationTime,
+                                                 EntityCode = o.EntityCode,
+                                                 Id = o.Id,
+                                                 SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
+                                              + "." + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                               + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
+                                                 ThreadId = o.ThreadId,
+                                                 ParentId = o.ParentId,
+                                                 EntityId = (int)o.EntityId,
+                                                 ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
+                                                 HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
+                                                 EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
+                                                 RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                                 ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                             },
+                                         }
+                                      ;
+
+                      //  totalCount += await filteredMessages2.CountAsync();
+
+                      var results2 = await appComments2.ToListAsync();
+                      foreach (var msg in results2)
+                      {
+                          if (msg.Messages.SenderId == AbpSession.UserId)
+                          {
+                              var messg = results.FirstOrDefault(z => z.Messages.Subject == msg.Messages.Subject &&
+                                 z.Messages.SenderId == msg.Messages.SenderId && z.Messages.Body == msg.Messages.Body);
+                              if (messg == null)
+                              {
+                                  msg.Messages.SenderName = GetUserNameByID(msg.Messages.SenderId);
+                                  msg.Messages.ToName = GetUsersNamesByID(msg.Messages.To);
+                                  results.Add(msg);
+                                  totalCount += 1;
+                              }
+                              else
+                              {
+                                  if (msg.Messages.UserId != null && !messg.Messages.To.Contains(msg.Messages.UserId.ToString()))
+                                      messg.Messages.To += "," + msg.Messages.UserId.ToString();
+
+                                  messg.Messages.SenderName = GetUserNameByID(messg.Messages.SenderId);
+                                  messg.Messages.ToName = GetUsersNamesByID(messg.Messages.To);
+                              }
+
+                          }
+                          else
+                          {
+                              msg.Messages.SenderName = GetUserNameByID(msg.Messages.SenderId);
+                              msg.Messages.ToName = GetUsersNamesByID(msg.Messages.To);
+                              results.Add(msg);
+                              totalCount += 1;
+                          }
+                      }
+
+
+                      //results.AddRange(results2);
+                  }
+                  //MMT */
+                string myAccountSSIN = "";
+                var myAccount = await _appMarketplaceAccounts.GetAll()
+                                   .Where(z => z.OwnerId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+                if (myAccount!=null)
+                {
+                    myAccountSSIN = myAccount.SSIN;
+                }
+                var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                foreach (var x in results)
+                {
+                    string userCompanySSIN = "";
+                    var user = UserManager.GetUserById(long.Parse(x.Messages.SenderId.ToString()));
+                    if (user != null )
+                    {
+                        if (user.TenantId != null)
+                        {
+                            var tenant =await TenantManager.GetByIdAsync(int.Parse(user.TenantId.ToString()));
+                            if (tenant!=null)
+                            {
+                                var account =await _appMarketplaceAccounts.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                                    .Where(z => z.OwnerId == user.TenantId && z.ParentId==null).FirstOrDefaultAsync();
+                                if (account != null)
+                                {
+                                    userCompanySSIN = account.SSIN;
+                                    x.Messages.SenderCompanyName = account.Name;
+                                    if (account.EntityAttachments.Count() > 0)
+                                    {
+                                        var companyLogo = account.EntityAttachments.Where(z => z.AttachmentCategoryId == logoCategory).FirstOrDefault();
+                                        if (companyLogo != null)
+                                        {
+                                           x.Messages.ProfilePictureUrl = imagesUrl + "-1" + @"/" + companyLogo.AttachmentFk.Attachment;
+                                        }
+                                    }
+                                }
+                                //x.Messages.ProfilePictureUrl =   tenant.LogoFileType
+                            }
+                        }
+                        else
+                        {
+                            var account = await   _appMarketplaceAccounts.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                   .Where(z => z.Name=="SIIWII" && z.ParentId == null).FirstOrDefaultAsync();
+
+                            if (account != null)
+                            {
+                                x.Messages.SenderCompanyName = account.Name;
+                                if (account.EntityAttachments.Count() > 0)
+                                {
+                                    var companyLogo = account.EntityAttachments.Where(z => z.AttachmentCategoryId == logoCategory).FirstOrDefault();
+                                    if (companyLogo != null)
+                                    {
+                                        x.Messages.ProfilePictureUrl = imagesUrl + "-1" + @"/" + companyLogo.AttachmentFk.Attachment;
+                                    }
+                                }
+                            }
+                        }
+                        x.Rating = await GetUserEntityRating(long.Parse(x.Messages.RelatedEntityId.ToString()),long.Parse(x.Messages.SenderId.ToString()));
+                        x.UserIsPurchaserOrNot = "";
+                        if (!string.IsNullOrEmpty(myAccountSSIN) && !string.IsNullOrEmpty(userCompanySSIN))
+                        {
+                            var trans =await _appMarketplaceTransactionHeaders.GetAll().Where(z => (z.SellerCompanySSIN == myAccountSSIN && z.BuyerCompanySSIN == userCompanySSIN) ||
+                            (z.BuyerCompanySSIN == myAccountSSIN && z.SellerCompanySSIN == userCompanySSIN)).FirstOrDefaultAsync();
+                            if (trans != null)
+                                x.UserIsPurchaserOrNot = "Verified Purchaser";
+                                
+                        }
+                    }
+                    
+                    //var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == x.Messages.SenderId).ProfilePictureId;
+                    //if (profilePictureId != null)
+                    //{ x.Messages.ProfilePictureId = (Guid)profilePictureId; }
+                    if (x.Messages.ParentFKList != null && x.Messages.ParentFKList.Count > 0)
+                    {
+                        x.Messages.ParentFKList.ForEach(z => z.HasChildren = (z.ParentFKList != null && z.ParentFKList.Count > 0) ? true : false);
+                        foreach (var ch in x.Messages.ParentFKList)
+                        {
+                            if (ch.ParentFKList != null && ch.ParentFKList.Count > 0)
+                            {
+                                x.Messages.ParentFKList.ForEach(z => z.HasChildren = (z.ParentFKList != null && z.ParentFKList.Count > 0) ? true : false);
+                            }
+
+                        }
+                    }
+                    //x.Messages.ParentFKList.ForEach(z=>z.ParentFKList= appComments.Where(a=>a.Messages.Id==z.Id).Select(z => z.Messages.ParentFKList).FirstOrDefault());
+                }
+                return new MessagePagedResultDto(
+                    totalCount, unreadCount,
+                    results
+                );
+            }
+        }
+        public async Task<int> GetUserEntityRating(long entityId, long userId)
+        {
+            int returnValue = 0;
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                string userSSIN = "";
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => x.EntityFk.TenantId == null &&
+                         x.AttributeId == 715 && x.AttributeValue == userId.ToString());
+                if (contactEntityExtraData != null)
+                {
+                    userSSIN = contactEntityExtraData.EntityFk.SSIN;
+                }
+                string entitySSIN = "";
+                var entity = await _appEntityRepository.GetAll().Where(z => z.Id == entityId).FirstOrDefaultAsync();
+                if (entity != null)
+                {
+                    entitySSIN = entity.SSIN;
+                }
+                if (!string.IsNullOrEmpty(entitySSIN) && !string.IsNullOrEmpty(userSSIN))
+                {
+                    var existingRating = await _appEntityRatingRepository.GetAll().Where(z => z.UserSSIN == userSSIN && z.EntitySSIN == entitySSIN).FirstOrDefaultAsync();
+                    if (existingRating != null)
+                    {
+                        returnValue = existingRating.Rating;
+                    }
+                }
+            }
+            return returnValue;
+        }
+        public async Task<bool> CreateUserEntityRating(int ratingNumber, long entityId)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var entity = await _appEntityRepository.GetAll().Where(z => z.Id == entityId).FirstOrDefaultAsync();
+                if (entity != null)
+                {
+                    var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
+                    if (user != null)
+                    {
+                        if (user.TenantId != null)
+                        {
+                            var tenant = await TenantManager.GetByIdAsync(int.Parse(user.TenantId.ToString()));
+                            if (tenant != null)
+                            {
+                                var account = await _appMarketplaceAccounts.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                    .Where(z => z.OwnerId == user.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+                            }
+                        }
+                    }
+                    AppEntityRating rating = new AppEntityRating();
+                    var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId &&
+                             x.AttributeId == 715 && x.AttributeValue == AbpSession.UserId.ToString());
+                    if (contactEntityExtraData != null)
+                    {
+                        if (AbpSession.TenantId != null && AbpSession.TenantId != 0)
+                        {
+
+                            rating.UserSSIN = contactEntityExtraData.EntityFk.SSIN;
+                        }
+                    }
+                    rating.EntitySSIN = entity.SSIN;
+                    rating.EntityId = entity.Id;
+                    rating.EntityObjectTypeCode = entity.EntityObjectTypeCode;
+                    rating.EntityObjectTypeId = entity.EntityObjectTypeId;
+                    rating.ObjectId = entity.ObjectId;
+                    rating.ObjectCode = entity.ObjectCode;
+                    rating.Rating = ratingNumber;
+                    if (!string.IsNullOrEmpty(rating.UserSSIN) && !string.IsNullOrEmpty(rating.EntitySSIN))
+                    {
+                        var existingRating = await _appEntityRatingRepository.GetAll().Where(z => z.UserSSIN == rating.UserSSIN && z.EntitySSIN == rating.EntitySSIN).FirstOrDefaultAsync();
+                        if (existingRating != null)
+                        {
+                            existingRating.Rating = ratingNumber;
+                            await _appEntityRatingRepository.UpdateAsync(existingRating);
+                            return true;
+                        }
+                        else
+                        {
+                            await _appEntityRatingRepository.InsertAsync(rating);
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        //I40-X527[End]
     }
 }
