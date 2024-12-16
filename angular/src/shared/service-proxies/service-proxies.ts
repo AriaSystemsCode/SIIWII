@@ -1104,13 +1104,16 @@ export class AccountsServiceProxy {
 
     /**
      * @param accountTypeCode (optional) 
+     * @param currentTenantAccount (optional) 
      * @param neeedAction (optional) 
      * @return Success
      */
-    getAction(accountTypeCode: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
+    getAction(accountTypeCode: string | null | undefined, currentTenantAccount: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAction?";
         if (accountTypeCode !== undefined && accountTypeCode !== null)
             url_ += "accountTypeCode=" + encodeURIComponent("" + accountTypeCode) + "&";
+        if (currentTenantAccount !== undefined && currentTenantAccount !== null)
+            url_ += "currentTenantAccount=" + encodeURIComponent("" + currentTenantAccount) + "&";
         if (neeedAction === null)
             throw new Error("The parameter 'neeedAction' cannot be null.");
         else if (neeedAction !== undefined)
@@ -30835,12 +30838,20 @@ export class MarketplaceAccountsServiceProxy {
 
     /**
      * @param accountTypeCode (optional) 
+     * @param currentTenantAccount (optional) 
+     * @param neeedAction (optional) 
      * @return Success
      */
-    getAction(accountTypeCode: string | null | undefined): Observable<string> {
+    getAction(accountTypeCode: string | null | undefined, currentTenantAccount: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/MarketplaceAccounts/GetAction?";
         if (accountTypeCode !== undefined && accountTypeCode !== null)
             url_ += "accountTypeCode=" + encodeURIComponent("" + accountTypeCode) + "&";
+        if (currentTenantAccount !== undefined && currentTenantAccount !== null)
+            url_ += "currentTenantAccount=" + encodeURIComponent("" + currentTenantAccount) + "&";
+        if (neeedAction === null)
+            throw new Error("The parameter 'neeedAction' cannot be null.");
+        else if (neeedAction !== undefined)
+            url_ += "neeedAction=" + encodeURIComponent("" + neeedAction) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

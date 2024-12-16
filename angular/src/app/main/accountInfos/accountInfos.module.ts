@@ -57,6 +57,8 @@ import { AccountBillingComponent } from './components/accountBilling/accountBill
 import { OverviewTabComponent } from './components/marketplace-account-profile-view/overview-tab/overview-tab.component';
 import { PostsModule } from '../posts/posts.module';
 import { InteractionsModule } from '../interactions/interactions.module';
+import { MarketplaceProductsComponent } from '../marketplace/marketplace-products/components/marketplace-products.component';
+import { MarketplaceProductsModule } from '../marketplace/marketplace-products/marketplace-products.module';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -116,13 +118,17 @@ import { InteractionsModule } from '../interactions/interactions.module';
         DialogModule,
         TabViewModule,
         PostsModule,
-        InteractionsModule
+        InteractionsModule,
+        MarketplaceProductsModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
         PublishAccountService,PublishService
+    ],
+    exports:[
+        MarketplaceProductsModule
     ]
 })
 export class AccountInfosModule { }

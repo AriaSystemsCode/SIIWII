@@ -47,6 +47,7 @@
             // border: 4px 0px 0px 0px;
             opacity: 0px;
             border-radius: 50%;   
+            border: 2px solid white;
          }
          .info-sec {
             margin-left: 200px !important;
@@ -80,6 +81,8 @@
             // border: 4px 0px 0px 0px;
             opacity: 0px;
             border-radius: 50%;   
+            border: 2px solid white;
+
          }
          .info-sec {
             margin-left: 124px !important;
@@ -195,3 +198,27 @@
     }
    
 
+.accType{
+ 
+font-weight: 700;
+font-size: 14px;
+line-height: 21px;
+
+text-transform: capitalize;
+
+color: #1B101B;
+
+
+
+}
+
+.connections{
+
+font-weight: 600;
+font-size: 16px;
+line-height: 24px;
+text-transform: capitalize;
+
+color: #9E9E9E;
+
+}
