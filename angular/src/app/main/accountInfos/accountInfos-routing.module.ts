@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'edit-manual/:id', component: CreateEditManualAccountComponent, data: { permission: 'Pages.Accounts' } },
   { path: 'edit-external/:id', component: CreateEditExternalAccountComponent, data: { permission: 'Pages.Accounts' } },
   { path: 'view/:id', component: ViewOthersProfileComponent, data: { permission: 'Pages.Accounts' } },
-  { path: 'view-marketplace-acc', component: MarketplaceAccountProfileComponent, data: { permission: 'Pages.Accounts' } },
+  { path: 'view-marketplace-acc/:id', component: MarketplaceAccountProfileComponent, data: { permission: 'Pages.Accounts' } },
 ];
 
 @NgModule({

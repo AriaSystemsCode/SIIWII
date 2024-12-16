@@ -58,7 +58,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
               });
         } else {
             if(!this.id) return
-            this.router.navigate([`/app/main/account/view-marketplace-acc`], {
+            this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
                 queryParams: { fromMarketplace: this.fromMarketplace }
               });
         }
