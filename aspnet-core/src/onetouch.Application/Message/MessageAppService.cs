@@ -19,6 +19,7 @@ using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
 using onetouch.AppMarketplaceContacts;
 using onetouch.AppMarketplaceMessages;
+using onetouch.AppMarketplaceTransactions;
 using onetouch.AppPosts;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.Authorization;
@@ -61,16 +62,18 @@ namespace onetouch.Message
         private readonly IRepository<AppEntityRating,long> _appEntityRatingRepository;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
+        private readonly IRepository<AppMarketplaceTransactionHeaders, long> _appMarketplaceTransactionHeaders;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            IRepository<AppEntityClassification, long> appEntityClassificationRepository,
+            IRepository<AppEntityClassification, long> appEntityClassificationRepository, IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo, IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
              IRepository<AppMarketplaceContact, long> appMarketplaceAccounts, IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppEntityRating, long> appEntityRatingRepository
             )
         {
+            _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appEntityRatingRepository = appEntityRatingRepository;
             _appConfiguration = appConfigurationAccessor.Configuration;
@@ -1462,8 +1465,8 @@ namespace onetouch.Message
                                           EntityCode = o.EntityCode,
                                           Id = o.Id,
                                           SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
-                                       + "." + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString()
-                                        + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
+                                       + " " + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString(),
+                                      //  + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
                                           ThreadId = o.ThreadId,
                                           ParentId = o.ParentId,
                                           EntityId = (int)o.EntityId,
@@ -1581,11 +1584,18 @@ namespace onetouch.Message
                       //results.AddRange(results2);
                   }
                   //MMT */
+                string myAccountSSIN = "";
+                var myAccount = await _appMarketplaceAccounts.GetAll()
+                                   .Where(z => z.OwnerId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+                if (myAccount!=null)
+                {
+                    myAccountSSIN = myAccount.SSIN;
+                }
                 var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 foreach (var x in results)
                 {
-                    
+                    string userCompanySSIN = "";
                     var user = UserManager.GetUserById(long.Parse(x.Messages.SenderId.ToString()));
                     if (user != null )
                     {
@@ -1598,6 +1608,7 @@ namespace onetouch.Message
                                     .Where(z => z.OwnerId == user.TenantId && z.ParentId==null).FirstOrDefaultAsync();
                                 if (account != null)
                                 {
+                                    userCompanySSIN = account.SSIN;
                                     x.Messages.SenderCompanyName = account.Name;
                                     if (account.EntityAttachments.Count() > 0)
                                     {
@@ -1630,6 +1641,15 @@ namespace onetouch.Message
                             }
                         }
                         x.Rating = await GetUserEntityRating(long.Parse(x.Messages.RelatedEntityId.ToString()),long.Parse(x.Messages.SenderId.ToString()));
+                        x.UserIsPurchaserOrNot = "";
+                        if (!string.IsNullOrEmpty(myAccountSSIN) && !string.IsNullOrEmpty(userCompanySSIN))
+                        {
+                            var trans =await _appMarketplaceTransactionHeaders.GetAll().Where(z => (z.SellerCompanySSIN == myAccountSSIN && z.BuyerCompanySSIN == userCompanySSIN) ||
+                            (z.BuyerCompanySSIN == myAccountSSIN && z.SellerCompanySSIN == userCompanySSIN)).FirstOrDefaultAsync();
+                            if (trans != null)
+                                x.UserIsPurchaserOrNot = "Verified Purchaser";
+                                
+                        }
                     }
                     
                     //var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == x.Messages.SenderId).ProfilePictureId;
@@ -1663,7 +1683,7 @@ namespace onetouch.Message
                 string userSSIN = "";
                 var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => x.EntityFk.TenantId == null &&
                          x.AttributeId == 715 && x.AttributeValue == userId.ToString());
-                if (contactEntityExtraData == null)
+                if (contactEntityExtraData != null)
                 {
                     userSSIN = contactEntityExtraData.EntityFk.SSIN;
                 }
