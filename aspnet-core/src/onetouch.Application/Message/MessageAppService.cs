@@ -1441,7 +1441,7 @@ namespace onetouch.Message
                         .Where(
                                  x =>
                                  //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
-                                 x.OriginalMessageId == x.Id && (x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage ? x.EntityFk.TenantId == AbpSession.TenantId : true)
+                                 x.OriginalMessageId == x.Id 
                              );
 
                 var pagedAndFilteredMessages = filteredMessages
