@@ -8,6 +8,6 @@ namespace onetouch.Message.Dto
     {
         public MessagesDto Messages { get; set; }
         public int? Rating { get; set; }
-        public string UserIsPurchaserOrNot { get; set; }
+        public bool IsUserVerifiedPurchaser { get; set; }
     }
 }

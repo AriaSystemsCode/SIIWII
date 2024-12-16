@@ -1641,13 +1641,13 @@ namespace onetouch.Message
                             }
                         }
                         x.Rating = await GetUserEntityRating(long.Parse(x.Messages.RelatedEntityId.ToString()),long.Parse(x.Messages.SenderId.ToString()));
-                        x.UserIsPurchaserOrNot = "";
+                        
                         if (!string.IsNullOrEmpty(myAccountSSIN) && !string.IsNullOrEmpty(userCompanySSIN))
                         {
                             var trans =await _appMarketplaceTransactionHeaders.GetAll().Where(z => (z.SellerCompanySSIN == myAccountSSIN && z.BuyerCompanySSIN == userCompanySSIN) ||
                             (z.BuyerCompanySSIN == myAccountSSIN && z.SellerCompanySSIN == userCompanySSIN)).FirstOrDefaultAsync();
                             if (trans != null)
-                                x.UserIsPurchaserOrNot = "Verified Purchaser";
+                                x.IsUserVerifiedPurchaser = true;
                                 
                         }
                     }
