@@ -177,6 +177,8 @@ namespace onetouch.Accounts
         //X527[Start]
         public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
         {
+            var postObjectId = await _helper.SystemTables.GetObjectPostId();
+            var eventObjectId = await _helper.SystemTables.GetObjectEventId();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 List<AppEntityAttachmentDto> retrunResult = new List<AppEntityAttachmentDto>();
@@ -191,7 +193,8 @@ namespace onetouch.Accounts
                                    .Where(z=>z.AttachmentCategoryId== catgImage || z.AttachmentCategoryId == catgVideo)
                                    join
                                   e in _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                        .Where(z => z.TenantOwner == account.EntityFk.TenantOwner && z.EntityAttachments.Count() > 0)
+                        .Where(z => (z.TenantId==null  && z.TenantOwner == account.EntityFk.TenantOwner && z.EntityAttachments.Count() > 0) ||
+                        ((z.ObjectId== postObjectId || z.ObjectId== eventObjectId) && z.TenantId== account.EntityFk.TenantOwner))
                         on t.EntityId equals e.Id into j
                                    from j1 in j
                                    select new AppEntityAttachmentDto()

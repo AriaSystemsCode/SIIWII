@@ -23,6 +23,7 @@ using onetouch.AppMarketplaceTransactions;
 using onetouch.AppPosts;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.Authorization;
+using onetouch.Authorization.Roles;
 using onetouch.Authorization.Users;
 using onetouch.Authorization.Users.Dto;
 using onetouch.Configuration;
@@ -63,6 +64,7 @@ namespace onetouch.Message
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
         private readonly IRepository<AppMarketplaceTransactionHeaders, long> _appMarketplaceTransactionHeaders;
+        private readonly RoleManager _roleManager;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
@@ -70,9 +72,11 @@ namespace onetouch.Message
             IRepository<AppEntityClassification, long> appEntityClassificationRepository, IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo, IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
-             IRepository<AppMarketplaceContact, long> appMarketplaceAccounts, IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppEntityRating, long> appEntityRatingRepository
+             IRepository<AppMarketplaceContact, long> appMarketplaceAccounts, IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppEntityRating, long> appEntityRatingRepository,
+             RoleManager roleManager
             )
         {
+            _roleManager = roleManager;
             _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appEntityRatingRepository = appEntityRatingRepository;
@@ -1584,6 +1588,12 @@ namespace onetouch.Message
                       //results.AddRange(results2);
                   }
                   //MMT */
+                long? entityTenantId = null;
+                var entity = await _appEntityRepository.GetAll().Where(z => z.Id == input.MainComponentEntitlyId).FirstOrDefaultAsync();
+                if (entity!=null)
+                {
+                    entityTenantId = entity.TenantOwner;
+                }
                 string myAccountSSIN = "";
                 var myAccount = await _appMarketplaceAccounts.GetAll()
                                    .Where(z => z.OwnerId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
@@ -1591,14 +1601,28 @@ namespace onetouch.Message
                 {
                     myAccountSSIN = myAccount.SSIN;
                 }
+                
                 var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 foreach (var x in results)
                 {
+                    bool llAdminUser = false;
+                    long? userTeanantId = null;
                     string userCompanySSIN = "";
                     var user = UserManager.GetUserById(long.Parse(x.Messages.SenderId.ToString()));
                     if (user != null )
                     {
+                        var adminRole = _roleManager.Roles.Single(r =>r.TenantId==user.TenantId && r.Name == StaticRoleNames.Tenants.Admin);
+                        var userRoles = await UserManager.GetRolesAsync(user);
+                        if (userRoles != null && userRoles.Count > 0)
+                        {
+                            var userAdminRole = userRoles.FirstOrDefault(z => z == adminRole.Name);
+                            if (userAdminRole != null)
+                            {
+                                llAdminUser = true;
+                            }
+                        }
+                        userTeanantId = user.TenantId;
                         if (user.TenantId != null)
                         {
                             var tenant =await TenantManager.GetByIdAsync(int.Parse(user.TenantId.ToString()));
@@ -1642,13 +1666,34 @@ namespace onetouch.Message
                         }
                         x.Rating = await GetUserEntityRating(long.Parse(x.Messages.RelatedEntityId.ToString()),long.Parse(x.Messages.SenderId.ToString()));
                         
-                        if (!string.IsNullOrEmpty(myAccountSSIN) && !string.IsNullOrEmpty(userCompanySSIN))
+                        //if (!string.IsNullOrEmpty(myAccountSSIN) && !string.IsNullOrEmpty(userCompanySSIN))
                         {
-                            var trans =await _appMarketplaceTransactionHeaders.GetAll().Where(z => (z.SellerCompanySSIN == myAccountSSIN && z.BuyerCompanySSIN == userCompanySSIN) ||
-                            (z.BuyerCompanySSIN == myAccountSSIN && z.SellerCompanySSIN == userCompanySSIN)).FirstOrDefaultAsync();
-                            if (trans != null)
-                                x.IsUserVerifiedPurchaser = true;
-                                
+                            if (entityTenantId == userTeanantId)
+                            {
+                                x.IsProfileOwner = true;
+                                x.IsUserVerifiedPurchaser = false;
+                                x.IsAccountAdmin = false;
+                            }
+                            else
+                            {
+                                if (llAdminUser)
+                                {
+                                    x.IsProfileOwner = false;
+                                    x.IsUserVerifiedPurchaser = false;
+                                    x.IsAccountAdmin = true;
+                                }
+                                else
+                                {
+                                    var trans = await _appMarketplaceTransactionHeaders.GetAll().Where(z => (z.SellerCompanySSIN == myAccountSSIN && z.BuyerCompanySSIN == userCompanySSIN) ||
+                                    (z.BuyerCompanySSIN == myAccountSSIN && z.SellerCompanySSIN == userCompanySSIN)).FirstOrDefaultAsync();
+                                    if (trans != null)
+                                    {
+                                        x.IsUserVerifiedPurchaser = true;
+                                        x.IsProfileOwner = false;
+                                        x.IsAccountAdmin = false;
+                                    }
+                                }
+                            }  
                         }
                     }
                     
