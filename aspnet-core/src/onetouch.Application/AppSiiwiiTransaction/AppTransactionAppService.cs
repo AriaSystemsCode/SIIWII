@@ -1029,7 +1029,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                     }
                     //Iteration45[Start]
-                    appTrans.TimeStamp = DateTime.Now;
+                    appTrans.TimeStamp = DateTime.UtcNow;
                     //Iteration45[End]
 
                     appTrans.Id = header.Id;
@@ -1042,7 +1042,7 @@ namespace onetouch.AppSiiwiiTransaction
                 else
                 {
                     //Iteration45[Start]
-                    appTrans.TimeStamp = DateTime.Now;
+                    appTrans.TimeStamp = DateTime.UtcNow;
                     //Iteration45[End]
                     //XX
                     //var  AppTrans = Objmapper. ObjectMapper.Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input);
@@ -1550,7 +1550,7 @@ namespace onetouch.AppSiiwiiTransaction
                     appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
                 //Iteration45[Start]         
-                appTrans.TimeStamp = DateTime.Now;
+                appTrans.TimeStamp = DateTime.UtcNow;
                 //Iteration45[End]
                 if (appTrans.ShipViaId != null)
                 {
@@ -2476,7 +2476,7 @@ namespace onetouch.AppSiiwiiTransaction
                     filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
                     filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
                     //Iteration45[Start]
-                    filteredAppTransactions.TimeStamp = DateTime.Now;
+                    filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                     //Iteration45[End]
                     await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                     await CurrentUnitOfWork.SaveChangesAsync();
@@ -2525,7 +2525,7 @@ namespace onetouch.AppSiiwiiTransaction
                     filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
                     filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
                     //Iteration45[Start]
-                    filteredAppTransactions.TimeStamp = DateTime.Now;
+                    filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                     //Iteration45[End]
                     await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                     await CurrentUnitOfWork.SaveChangesAsync();
@@ -2562,7 +2562,7 @@ namespace onetouch.AppSiiwiiTransaction
                     filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
                     filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
                     //Iteration45[Start]
-                    filteredAppTransactions.TimeStamp = DateTime.Now;
+                    filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                     //Iteration45[End]
                     await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                     await CurrentUnitOfWork.SaveChangesAsync();
@@ -2790,7 +2790,7 @@ namespace onetouch.AppSiiwiiTransaction
                         filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
                         filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
                         //Iteration45[Start]
-                        filteredAppTransactions.TimeStamp = DateTime.Now;
+                        filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                         //Iteration45[End]
                         await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                         //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
@@ -2857,7 +2857,7 @@ namespace onetouch.AppSiiwiiTransaction
                 filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
                 filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
                 //Iteration45[Start]
-                filteredAppTransactions.TimeStamp = DateTime.Now;
+                filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                 //Iteration45[End]
                 await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                 //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
@@ -3119,7 +3119,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                     }
                     //Iteration45[Start]
-                    header.TimeStamp = DateTime.Now;
+                    header.TimeStamp = DateTime.UtcNow;
                     //Iteration45[End]
                     header.TotalQuantity += long.Parse(colorQty.ToString());
                     header.TotalAmount += double.Parse(colorAmt.ToString());
@@ -6526,7 +6526,7 @@ namespace onetouch.AppSiiwiiTransaction
                         det.ParentId = parentItemId;
                         detParent.ParentFkList.Add(det);
                         await _appTransactionDetails.UpdateAsync(detParent);
-                        header.TimeStamp = DateTime.Now;
+                        header.TimeStamp = DateTime.UtcNow;
                         header.TotalQuantity += long.Parse(input.Qty.ToString());
                         header.TotalAmount += double.Parse((input.Qty * input.Price).ToString());
                         await _appTransactionsHeaderRepository.UpdateAsync(header);

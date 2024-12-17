@@ -115,6 +115,7 @@ TempComp : boolean = false
 currentFilter: string = '';
 regenrate : boolean = false
 syncMsg : boolean = false
+mainLoad : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -130,11 +131,7 @@ syncMsg : boolean = false
   }
   ngOnInit(): void {
     this.initFilterForm()
-    // this.onGeneratOrderReport(true,undefined,true,true); 
-    // if (      this.appTransactionsForViewDto?.sellerCompanySSIN){
-    //   this.getSellerVariations()
-
-    // }
+  
  let value = localStorage.getItem("comNew"); 
 
  if (value) {
@@ -167,7 +164,7 @@ const button = document.getElementById("stickyButton");
  console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
-    // this.onGeneratOrderReport(true,undefined,true,true);
+   
 
   }
 
@@ -1157,19 +1154,22 @@ onShowVariations(event) {
         this.getShoppingCartData();
       });
   }
-  isOrderConfirmationNeedsReprint() {
-    this.getOrderConfirmation();
+  isOrderConfirmationNeedsReprint(): void {
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+        .subscribe((res) => {
+            if (res == true) {
+                this.regenrate = true;
+              this.mainLoad = false
 
-    this.onGeneratOrderReport(true,undefined,true,true)
-    // this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-    //     .subscribe((res) => {
-    //         if (res) {
-    //             this.regenrate = res;
-    //             // this.toGenerate();
-    //   this.onGeneratOrderReport(true,undefined,true,true)
-    //             this.getOrderConfirmation();
-    //         }
-    //     });
+                // this.toGenerate();
+      this.onGeneratOrderReport(true,undefined,true,true)
+                this.getOrderConfirmation();
+            }  else {
+              this.regenrate = false;
+
+              this.mainLoad = true
+            }
+        });
 }
 stopReport(event) {
 

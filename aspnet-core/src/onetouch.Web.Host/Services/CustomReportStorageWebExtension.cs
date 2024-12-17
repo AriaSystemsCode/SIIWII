@@ -245,7 +245,7 @@ namespace onetouch.Web.Services
                         var transactionHeader = _appTransactionHeadersRepository.GetAll().Where(z => z.Id == long.Parse(transactionId)).FirstOrDefault();
                         if (transactionHeader!=null)
                         {
-                            transactionHeader.OrderConfirmationTimeStamp = DateTime.Now;
+                            transactionHeader.OrderConfirmationTimeStamp = DateTime.UtcNow;
                             _appTransactionHeadersRepository.Update(transactionHeader);
                         }
                         //Iterqtion45[End]

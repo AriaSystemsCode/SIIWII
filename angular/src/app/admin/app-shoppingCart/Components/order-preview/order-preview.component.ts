@@ -14,6 +14,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     @Input("transactionFormPath") transactionFormPath;
     @Input("orderId") orderId;
     @Input("regenrate") regenrate;
+    @Input("mainLoad") mainLoad;
     @Output("stopReport") stopReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
     loadingError: boolean = false;
@@ -23,6 +24,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     startload: boolean = false;
     showbar: boolean = true;
     dialogClosed: boolean = false; // New flag to track dialog closure
+
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -32,14 +34,16 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     ngOnInit(): void {
     }
     ngOnChanges(changes: SimpleChanges) {
-        // if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
+        if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
             this.loadPdf();
-        // }
+        }
     // this.isOrderConfirmationNeedsReprint()
+        }
+   
 
-    }
+    
     ngAfterViewInit() {
-        // this.loadPdf();
+     
     }
     async loadPdf() {
         // if (this.startload) {
@@ -47,24 +51,25 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         //     return;
         // }
     
-        // this.showReport = false;
-        // this.startload = true;
+        this.showReport = false;
+        this.startload = true;
+        this.visible =  false
     
-        // if (this.regenrate == true) {
-        //     this.visible = true;
-        // } else if (!this.regenrate) {
+        if (this.regenrate == true) {
+            this.visible = true;
+        } else if (this.mainLoad) {
             this.showMainSpinner();
-        // }
+        }
     
         try {
             await this.delay(10000);
             const subs = this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
                 .pipe(
                     finalize(() => {
-                        // this.SuccessMsg = true;
-                        // if (this.SuccessMsg) {
-                        //     this.showbar = false;
-                        // }
+                        this.SuccessMsg = true;
+                        if (this.SuccessMsg) {
+                            this.showbar = false;
+                        }
                         this.hideMainSpinner();
                         this.showReport = true;
                     })
@@ -112,38 +117,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         this.regenrate = false;
     }
     
-    
-    // isOrderConfirmationNeedsReprint(){
-        
-    //     const subs =  this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-    //     .subscribe((res) => {
-    //       console.log(res,'rep')
-    //       if (res == true) {
-    //         this.visible = res
-
-    //        this.loadPdf()
-       
-
-    //       }
-    //       else {
-    //         this.loadPdf()
-    //       }
-       
-    //     });
-    //     this.subscriptions.push(subs)
-        
-    //   }
-    //     var base64String =res;
-    //     var pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
-
-    //     if (base64String && pdfViewer) {
-    //         pdfViewer.src = 'data:application/pdf;base64,' + base64String;
-    //         this.loadingError = false;
-    //     }
-    //     else
-    //         this.loadingError = true;
-    // });
-
+   
     delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
