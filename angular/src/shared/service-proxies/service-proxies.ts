@@ -32120,6 +32120,62 @@ export class MessageServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param entityId (optional) 
+     * @return Success
+     */
+    getOverAllRatings(entityId: number | undefined): Observable<OverAllRatingDto> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetOverAllRatings?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOverAllRatings(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOverAllRatings(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<OverAllRatingDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<OverAllRatingDto>;
+        }));
+    }
+
+    protected processGetOverAllRatings(response: HttpResponseBase): Observable<OverAllRatingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = OverAllRatingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -92640,6 +92696,78 @@ export interface ICreateMessageInput {
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     messageCategory: string | undefined;
     mentionedUsers: MentionedUserInfo[] | undefined;
+
+    [key: string]: any;
+}
+
+export class OverAllRatingDto implements IOverAllRatingDto {
+    overAllRating!: number;
+    totalNumberOfRating!: number;
+    oneTotal!: number;
+    twoTotal!: number;
+    threeTotal!: number;
+    fourTotal!: number;
+    fiveTotal!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IOverAllRatingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.overAllRating = _data["overAllRating"];
+            this.totalNumberOfRating = _data["totalNumberOfRating"];
+            this.oneTotal = _data["oneTotal"];
+            this.twoTotal = _data["twoTotal"];
+            this.threeTotal = _data["threeTotal"];
+            this.fourTotal = _data["fourTotal"];
+            this.fiveTotal = _data["fiveTotal"];
+        }
+    }
+
+    static fromJS(data: any): OverAllRatingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OverAllRatingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["overAllRating"] = this.overAllRating;
+        data["totalNumberOfRating"] = this.totalNumberOfRating;
+        data["oneTotal"] = this.oneTotal;
+        data["twoTotal"] = this.twoTotal;
+        data["threeTotal"] = this.threeTotal;
+        data["fourTotal"] = this.fourTotal;
+        data["fiveTotal"] = this.fiveTotal;
+        return data;
+    }
+}
+
+export interface IOverAllRatingDto {
+    overAllRating: number;
+    totalNumberOfRating: number;
+    oneTotal: number;
+    twoTotal: number;
+    threeTotal: number;
+    fourTotal: number;
+    fiveTotal: number;
 
     [key: string]: any;
 }
