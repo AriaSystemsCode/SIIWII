@@ -131,11 +131,7 @@ mainLoad : boolean = false
   }
   ngOnInit(): void {
     this.initFilterForm()
-    // this.onGeneratOrderReport(true,undefined,true,true); 
-    // if (      this.appTransactionsForViewDto?.sellerCompanySSIN){
-    //   this.getSellerVariations()
-
-    // }
+  
  let value = localStorage.getItem("comNew"); 
 
  if (value) {
@@ -168,7 +164,7 @@ const button = document.getElementById("stickyButton");
  console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
-    // this.onGeneratOrderReport(true,undefined,true,true);
+   
 
   }
 
@@ -449,6 +445,22 @@ cancelsaveLine() {
       
   // }
 
+// ensureCommentsComponentReady(): Promise<void> {
+//     return new Promise((resolve) => {
+//         const checkInterval = setInterval(() => {
+//             if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+//                 clearInterval(checkInterval);
+//                 resolve();
+//             }
+//         }, 10);
+//     });
+// }
+
+getCommentsRefreshed (event){
+  if(event){
+    this.loadCommentsList()
+  }
+}
 loadCommentsList() {
   setTimeout(() => {
       if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
