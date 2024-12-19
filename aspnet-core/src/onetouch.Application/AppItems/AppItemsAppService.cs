@@ -2336,6 +2336,43 @@ namespace onetouch.AppItems
                 List<AppEntity> colorsList = new List<AppEntity>();
                 foreach (var child in input.VariationItems)
                 {
+                    //XX
+                    var extEntitiesExtraData = child.EntityExtraData.Where(z =>( (z.AttributeValueId != 0 && z.AttributeValueId != null) || (
+                    z.EntityObjectTypeCode!=null)) && (z.EntityObjectTypeId==0 || string.IsNullOrEmpty(z.EntityObjectTypeId.ToString()))).ToList();
+                    if (extEntitiesExtraData != null && extEntitiesExtraData.Count() > 0)
+                    {
+                        foreach (var extraData in extEntitiesExtraData)
+                        {
+                            if (extraData.EntityObjectTypeId == null || extraData.EntityObjectTypeId == 0)
+                            {
+                                if (extraData.AttributeValueId != 0 && extraData.AttributeValueId != null)
+                                {
+                                    var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == extraData.AttributeValueId);
+                                    if (type != null)
+                                    {
+                                        extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+                                        input.VariationItems.ForEach(z => z.EntityExtraData
+                                        .Where(s => s.AttributeValueId == extraData.AttributeValueId).ForEach(a => a.EntityObjectTypeId = type.EntityObjectTypeId));
+                                    }
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
+                                    {
+
+                                        var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode);
+                                        if (type != null)
+                                        {
+                                            extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+                                            input.VariationItems.ForEach(z => z.EntityExtraData
+                                            .Where(s => s.EntityObjectTypeCode == extraData.EntityObjectTypeCode).ForEach(a => a.EntityObjectTypeId = type.EntityObjectTypeId));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //XX
                     var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
                     if (ext != null && sizesList.FirstOrDefault(z => z.Code == ext.AttributeCode) == null)
                     {

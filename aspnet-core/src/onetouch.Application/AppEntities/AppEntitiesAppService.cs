@@ -1031,23 +1031,26 @@ namespace onetouch.AppEntities
                             //mmt30
                             extraData.EntityCode =entity.Code;
                             //mmt30
-                            if (extraData.AttributeValueId != 0 && extraData.AttributeValueId != null)
+                            if (extraData.EntityObjectTypeId == null || extraData.EntityObjectTypeId == 0)
                             {
-                                var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == extraData.AttributeValueId);
-                                if (type!=null)
-                                    extraData.EntityObjectTypeId = type.EntityObjectTypeId;
-
-                            }
-                            else
-                            {
-                                if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
+                                if (extraData.AttributeValueId != 0 && extraData.AttributeValueId != null)
                                 {
-                                    var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode);
+                                    var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == extraData.AttributeValueId);
                                     if (type != null)
                                         extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+
                                 }
                                 else
-                                extraData.EntityObjectTypeId = null;
+                                {
+                                    if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
+                                    {
+                                        var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode);
+                                        if (type != null)
+                                            extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+                                    }
+                                    else
+                                        extraData.EntityObjectTypeId = null;
+                                }
                             }
                             if (extraData.AttributeValueId == 0) extraData.AttributeValueId = null;
                             entity.EntityExtraData.Add(extraData);
