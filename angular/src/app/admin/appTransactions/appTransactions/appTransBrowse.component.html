@@ -68,7 +68,7 @@
                                                         src="../../../assets/landingPage/Search.png" />
                                                     </button>
                                             </span>
-                                            <input [(ngModel)]="filterText" formControlName="search" autoFocus
+                                            <input [(ngModel)]="filterText"   formControlName="search" autoFocus
                                                 class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
                                                 type="text" >
                                          
@@ -197,6 +197,16 @@
                                             </p-dropdown>
                                         </div>
                                     </div>
+
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="referenceNumberFilter">{{l("Reference Number")}}</label>
+                                            <input type="text" class="form-control" id="referenceNumberFilter"
+                                                formControlName="referenceNumberFilter" [(ngModel)]="referenceNumberFilter"
+                                                (keyup)="getAppTransactions()">
+                                        </div>
+                                    </div>
                                 </div>
                             </div> 
 
@@ -226,6 +236,7 @@
                                                 (keyup)="getVariationDetail()">
                                         </div>
                                     </div>
+
                                 </div>
 
                                 <div class="row w-100 pl-3 pt-3">
@@ -268,7 +279,7 @@
                             </div>
 
                             <div class="row mb-2 ">
-                                <div class="col-sm-12 d-flex justify-content-between">
+                                <div class="row col-12 d-flex justify-content-between align-items-center" style="gap: 10px; margin-left: 10px;">
                                     <div>
                                         <button id="monthlybtn" class="mr-2" [ngClass]="{'period-btn': !showHeader, 'selected-month-btn': showHeader}"
                                         (click)="showDetails = false;showHeader = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getAppTransactions() ">
@@ -532,12 +543,12 @@
                                 <tr >
                                     <td>{{ product?.transactionType == 0 ?   'Sales Order'  : 'Purchase Order' }}</td>
                                     <td>{{ product.transactionNumber }}</td>
-                                    <td><img [src]="product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
+                                    <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
                                     <td>{{ product?.manufacturerCode }}</td>
                                     <td>{{ product.name }}</td>
                                     <td>{{ product.qty }}</td>
-                                    <td>{{ product.price }}</td>
-                                    <td>{{ product.amount }}</td>
+                                    <td style="text-align: right !important;">{{ product.price | number: '1.2-2'  }}</td>
+                                    <td style="text-align: right !important;">{{ product.amount | number: '1.2-2'  }}</td>
                                 </tr>
                             </ng-template>
                         </p-table>

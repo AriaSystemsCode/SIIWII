@@ -165,8 +165,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             istemp: [false],
             buyerBranchName:[""],
             reference:[""],
-            priceLevel:[""],
-            currencyId:[""],
+            priceLevel:['MSRP'],
+            currencyId:[438],
  
 
         });
@@ -225,8 +225,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             istemp: [false],
             buyerBranchName:[""],
             reference:[""],
-            priceLevel:[""],
-            currencyId:[""],
+            priceLevel:['MSRP'],
+            currencyId:[438],
    
 
             
@@ -815,14 +815,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         buyerBranchName: this.isBuyerTempAccount ?   this.orderForm.controls['buyerBranchName']?.setValue('Main') : this.orderForm.controls['buyerCompanyBranch']?.value?.name ,
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
-                            // completeDate: moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
-                            // enteredDate: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
-                            // startDate: moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
-                            // availableDate: moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
-                            completeDate: moment(this.orderForm.controls['completeDate']?.value).toISOString().slice(0, 19),
-                        enteredDate: moment(this.orderForm.controls['enteredDate']?.value).toISOString().slice(0, 19),
-                        startDate: moment(this.orderForm.controls['startDate']?.value).toISOString().slice(0, 19),
-                        availableDate: moment(this.orderForm.controls['availableDate']?.value).toISOString().slice(0, 19),
+                            completeDate: moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
+                            enteredDate: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
+                            startDate: moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
+                            availableDate: moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
+                        //     completeDate: moment(this.orderForm.controls['completeDate']?.value).toISOString().slice(0, 19),
+                        // enteredDate: moment(this.orderForm.controls['enteredDate']?.value).toISOString().slice(0, 19),
+                        // startDate: moment(this.orderForm.controls['startDate']?.value).toISOString().slice(0, 19),
+                        // availableDate: moment(this.orderForm.controls['availableDate']?.value).toISOString().slice(0, 19),
 
 
 
@@ -830,8 +830,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     
 
                         reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
-                        priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "",
-                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : ""
+                        priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "MSRP",
+                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : 438
                     }; 
 
          

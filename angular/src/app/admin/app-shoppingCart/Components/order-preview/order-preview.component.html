@@ -37,12 +37,12 @@
 
 
 
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '500px' }" [draggable]="false" >
+<p-dialog [(visible)]="visible && startload" [modal]="true" [style]="{ width: '500px' }" [draggable]="false" >
     <div class="d-flex justify-content-start  mb-3">
         
             
             
-            <span  class=" ml-2 ">Regenrating order confirmation</span>
+            <span  class=" ml-2 regText ">Regenrating order confirmation</span>
     </div>
         <div class=" con-body">
     
@@ -53,9 +53,15 @@
         <div *ngIf="SuccessMsg" class="d-flex justify-content-center btns" >
         
      
-            <button  (click)="visible = false;showReport = true" label="Ok" class="p-button-text" >Ok</button>
+            <button     (click)="onDialogClose()"  label="Ok" class="p-button-text" >Ok</button>
           </div>
         </div>
       
     
       </p-dialog>
+
+
+
+
+
+      

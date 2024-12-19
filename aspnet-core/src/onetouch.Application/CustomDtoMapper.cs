@@ -201,13 +201,13 @@ namespace onetouch
             configuration.CreateMap<AppItem, AppItemVariationDto>()
                                 .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.Code))
                 .ForMember(d => d.ItemName, s => s.MapFrom(ss => ss.Name))
-                .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData))
+                .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk!=null?  ss.EntityFk.EntityExtraData:null))
                 .ForMember(d => d.State, s => s.MapFrom(ss => StateEnum.ActiveOrEmpty))
-                .ForMember(d => d.ImgURL, s => s.MapFrom(ss =>
+                .ForMember(d => d.ImgURL, s => s.MapFrom(ss => (ss.EntityFk != null ? (
                     (ss.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
                     (ss.EntityFk.EntityAttachments.FirstOrDefault() == null ? ss.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                    : ss.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)
-                ));
+                    : ss.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)): null
+                )));
             configuration.CreateMap<AppItemVariationDto, AppItem>();
             configuration.CreateMap<AppItem, AppItemVariationDto>()
                  .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments))
@@ -278,8 +278,9 @@ namespace onetouch
             configuration.CreateMap<TicketDto, Ticket>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppItemDto, AppItem>();
             configuration.CreateMap<AppItem, CreateOrEditAppItemDto>()
-                .ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk.TenantId != null)))
-                .ForMember(d => d.EntityDepartments, s => s.MapFrom(ss => ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk.TenantId == null)))
+                .ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories!=null? ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk !=null && x.EntityObjectCategoryFk.TenantId != null): null))
+                .ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories!=null? ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk != null && x.EntityObjectCategoryFk.TenantId != null): null))
+                .ForMember(d => d.EntityDepartments, s => s.MapFrom(ss => ss.EntityFk.EntityCategories != null ? ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk != null && x.EntityObjectCategoryFk.TenantId == null):null))
                 .ForMember(d => d.EntityClassifications, s => s.MapFrom(ss => ss.EntityFk.EntityClassifications))
                 .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments))
                 .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData))
@@ -287,9 +288,9 @@ namespace onetouch
                 .ForMember(d => d.AppItemSizesScaleInfo, s => s.MapFrom(ss => ss.ItemSizeScaleHeadersFkList))
                 .ForMember(d => d.VariationItems, s => s.MapFrom(ss => ss.ParentFkList))
                 .ForMember(d => d.EntityObjectTypeId, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeId))
-                .ForMember(d => d.variations ,s=> s.MapFrom(ss => new List<ExtraDataAttrDto>()))
-                .ForMember(d => d.Listed, s => s.MapFrom(ss => (ss.ListingItemFkList != null && ss.ListingItemFkList.Count() > 0) ? true : false))
-                .ForMember(d => d.Published, s => s.MapFrom(ss => (ss.PublishedListingItemFkList != null && ss.PublishedListingItemFkList.Count() > 0) ? true : false));
+                .ForMember(d => d.variations, s => s.MapFrom(ss => new List<ExtraDataAttrDto>()));
+               // .ForMember(d => d.Listed, s => s.MapFrom(ss => (ss.ListingItemFkList != null && ss.ListingItemFkList.Count() > 0) ? true : false));
+              //  .ForMember(d => d.Published, s => s.MapFrom(ss => (ss.PublishedListingItemFkList != null && ss.PublishedListingItemFkList.Count() > 0) ? true : false));
 
             configuration.CreateMap<AppItemForViewDto, AppItem>();
             configuration.CreateMap<AppItem, AppItemForViewDto>()
@@ -339,8 +340,8 @@ namespace onetouch
 
             configuration.CreateMap<AppEntityExtraDataDto, AppEntityExtraData>();
             configuration.CreateMap<AppEntityExtraData, AppEntityExtraDataDto>()
-            .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityObjectTypeFk == null ? null : ss.EntityObjectTypeFk.Code))
-            .ForMember(d => d.EntityObjectTypeName, s => s.MapFrom(ss => ss.EntityObjectTypeFk == null ? null : ss.EntityObjectTypeFk.Name))
+            .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityObjectTypeFk == null ? (!string.IsNullOrEmpty(ss.EntityObjectTypeCode)? ss.EntityObjectTypeCode:null) : ss.EntityObjectTypeFk.Code))
+            .ForMember(d => d.EntityObjectTypeName, s => s.MapFrom(ss => ss.EntityObjectTypeFk == null ? (!string.IsNullOrEmpty(ss.EntityObjectTypeName) ? ss.EntityObjectTypeName : null) : ss.EntityObjectTypeFk.Name))
             .ForMember(d => d.AttributeValueFkName, s => s.MapFrom(ss => ss.AttributeValueFk == null ? null : ss.AttributeValueFk.Name))
             .ForMember(d => d.AttributeValueFkCode, s => s.MapFrom(ss => ss.AttributeValueFk == null ? null : ss.AttributeValueFk.Code));
             ;
@@ -899,11 +900,12 @@ namespace onetouch
             //I45
             configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppItem>()
                .ForMember(a => a.SSIN, b => b.MapFrom(ent => ent.Code))
-               .ForMember(a => a.EntityFk, b => b.MapFrom(ent => new AppEntity()))
+               .ForMember(a => a.EntityFk, b => b.MapFrom(ent => ent))
                .ForMember(a => a.ItemPricesFkList, b => b.MapFrom(ent => ent.ItemPricesFkList))
                .ForMember(a => a.ItemSizeScaleHeadersFkList, b => b.MapFrom(ent => ent.ItemSizeScaleHeadersFkList))
                .ForMember(a => a.ItemPricesFkList, b => b.MapFrom(ent => ent.ItemPricesFkList))
                .ForMember(a => a.ParentFkList, b => b.MapFrom(ent =>  ent.ParentFkList ))
+               .ForPath(a => a.EntityFk.EntityAttachments, b => b.MapFrom(ent => ent.EntityAttachments))
                .ForMember(a => a.ManufacturerCode, b => b.MapFrom(ent => ent.ManufacturerCode));
             configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppEntity>()
                .ForMember(a => a.EntitiesRelationships, b => b.MapFrom(ent => ent.EntitiesRelationships))
@@ -999,11 +1001,11 @@ namespace onetouch
                .ForMember(d => d.ItemName, s => s.MapFrom(ss => ss.Name))
                .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityExtraData))
                .ForMember(d => d.State, s => s.MapFrom(ss => StateEnum.ActiveOrEmpty))
-               .ForMember(d => d.ImgURL, s => s.MapFrom(ss =>
+               .ForMember(d => d.ImgURL, s => s.MapFrom(ss => ss.EntityAttachments !=null ?
                    (ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
-                   (ss.EntityAttachments.FirstOrDefault() == null ? ss.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                   : ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)
-               ));
+                   (ss.EntityAttachments.FirstOrDefault() != null && ss.EntityAttachments.FirstOrDefault().AttachmentFk!=null ? ss.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                   :(ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk!=null? ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment:null))
+               :null));
             //MMR45
             configuration.CreateMap <GetAllAppTenantActivitiesLogForExcelInput, GetAllAppTenantActivitiesLogInput>();
 

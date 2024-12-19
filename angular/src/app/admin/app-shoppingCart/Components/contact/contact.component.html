@@ -2,7 +2,7 @@
 <form #contactForm="ngForm" class="pl-2">
     <div class="row" style="width: 100%;" *ngIf="isCreateOrEdit">
         <!-- company name -->
-        <div class="col-md-6 ">
+        <div class="col-md-6 pr-0">
             <div class="formGroup">
                 <div class="d-flex justify-content-between">
 
@@ -76,13 +76,13 @@
         <!-- phone -->
         <div class="col-md-6">
             <div class="row">
-                <div class="col-6 pl-4">
+                <div class="col-6 pl-md-4">
                     <label class="label">Phone type</label>
                 </div>
                 <div class="col">
                     <label class="label">Phone Number</label>
                 </div>
-                <div class="col-12">
+                <div class="col-12 pl-md-2 pl-0">
                     <div class="groupForm">
                         <!-- <p-autoComplete
                         #autoComplete
@@ -136,7 +136,7 @@
         <!-- phone -->
 
         <!-- contact name -->
-        <div class="col-md-6 my-2">
+        <div class="col-md-6 my-2 pr-0">
             <div class="formGroup">
                 <div class="d-flex justify-content-between">
 
@@ -207,7 +207,7 @@
         <!-- contact name -->
 
         <!-- Email -->
-        <div class="col-md-6 my-2 pr-0 pl-4">
+        <div class="col-md-6 my-2 pr-0 pl-md-4">
             <div>
                 <label class="label">Email</label>
                 <input type="text" placeholder="Email..." class="form-control w-100"
@@ -257,7 +257,7 @@
         <!-- branches -->
 
         <!-- Department -->
-        <div class="col-md-12 my-2" *ngIf="showDepartment">
+        <div class="col-md-12 my-2 pr-0" *ngIf="showDepartment">
             <div>
                 <label class="label">Department</label>
                 <input type="text" placeholder="Department Name..." class="form-control w-100" name="DepartmentName"
@@ -298,12 +298,12 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="d-flex align-items-center   w-100">
-                        <h6 class="previewTitle m-0 p-0  col-6">Phone :</h6>
-                        <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        <h6 class="previewTitle m-0 p-0  col-md-4 col-6">Phone :</h6>
+                        <p class=" previewValue text-nowrap  m-0 p-0  col-md-8 col-6" 
                             *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber || appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber">
                             {{appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber ? appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber  : appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber}}
                         </p>
-                        <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        <p class=" previewValue text-nowrap  m-0 p-0 col-md-8 col-6"
                             *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber && !appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber">
                             -
                         </p>
@@ -333,14 +333,14 @@
         <div class="col-md-6 my-2">
             <div>
                 <div class="d-flex    w-100">
-                    <h6 class="previewTitle m-0 p-0  col-6">Email :</h6>
-                    <p class=" previewValue  m-0 p-0  col-6"
+                    <h6 class="previewTitle m-0 p-0  col-md-4 col-6">Email :</h6>
+                    <p class=" previewValue  m-0 p-0  col-md-8 col-6" style="word-break: break-word;"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         {{
                         appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail
                         }}
                     </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-md-8 col-6"
                         *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         -
                     </p>

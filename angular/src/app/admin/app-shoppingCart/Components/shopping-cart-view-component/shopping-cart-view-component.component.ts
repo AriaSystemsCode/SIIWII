@@ -115,6 +115,8 @@ TempComp : boolean = false
 currentFilter: string = '';
 regenrate : boolean = false
   orderConfirmationData:any
+syncMsg : boolean = false
+mainLoad : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -130,11 +132,7 @@ regenrate : boolean = false
   }
   ngOnInit(): void {
     this.initFilterForm()
-    // this.onGeneratOrderReport(true,undefined,true,true); 
-    // if (      this.appTransactionsForViewDto?.sellerCompanySSIN){
-    //   this.getSellerVariations()
-
-    // }
+  
  let value = localStorage.getItem("comNew"); 
 
  if (value) {
@@ -149,15 +147,7 @@ regenrate : boolean = false
   this.conNew = false;
 
 }
-// if(this.appTransactionsForViewDto?.buyerCompanySSIN == ''){
-//  this.TempComp = false
 
-// } else {
-//  this.TempComp = true
-
-// }
- console.log(this.comNew,'this.comNew')
- console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
     // this.onGeneratOrderReport(true,undefined,true,true);
@@ -176,30 +166,7 @@ regenrate : boolean = false
 //     });
 // }
 
-// ensureCommentsComponentReady(): Promise<void> {
-//     return new Promise((resolve) => {
-//         const checkInterval = setInterval(() => {
-//             if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
-//                 clearInterval(checkInterval);
-//                 resolve();
-//             }
-//         }, 10);
-//     });
-// }
-loadCommentsList() {
-  setTimeout(() => {
-      if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
-          this.commentParentComponent?.first?.show(
-              this.appTransactionsForViewDto.creatorUserId,
-              this.orderId
-          );
-          this.commentParentComponent?.last?.show(
-              this.appTransactionsForViewDto.creatorUserId,
-              this.orderId
-          );
-      }
-  }, 200);
-}
+  }
 
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode= ShoppingCartMode.createOrEdit) {
@@ -321,7 +288,7 @@ loadCommentsList() {
 this.temp=temp;
     this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
     .pipe(finalize(() => {
 this.hideMainSpinner();
     }))
@@ -814,7 +781,7 @@ onShowVariations(event) {
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
@@ -879,31 +846,31 @@ onShowVariations(event) {
         this.getShoppingCartData();
       });
   }
-  isOrderConfirmationNeedsReprint(){
-        
+  isOrderConfirmationNeedsReprint(): void {
     this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-    .subscribe((res) => {
-      console.log(res,'rep')
-      if (res) {
-        // this.visible = res
+        .subscribe((res) => {
+            if (res == true) {
+                this.regenrate = true;
+              this.mainLoad = false
 
-      //  this.regenrate = res
-       if(  res){
-        this.toGenerate()
+                // this.toGenerate();
+      this.onGeneratOrderReport(true,undefined,true,true)
+                this.getOrderConfirmation();
+            }  else {
+              this.regenrate = false;
 
-       }
-       this.getOrderConfirmation()
+              this.mainLoad = true
+            }
+        });
+}
+stopReport(event) {
 
-      }
-      // else {
-      //   this.regenrate = true
+  if (event) {
+  this.regenrate = false
+    }
 
-      // }
-   
-    });
   
-    
-  }
+}
   PlaceOrder() {
     // Swal.fire({
     //   title: "",
@@ -980,14 +947,13 @@ onShowVariations(event) {
   toGenerate(){
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
     .pipe(finalize(() => {
-      this.onGeneratOrderReport(true,undefined,true,false)
       // this.getOrderConfirmation()
   }
     ))
     .subscribe((res) => {
 
-      if (res) {
-      }
+      // if (res) {
+      // }
     });
   }
   sync(){
@@ -996,6 +962,7 @@ onShowVariations(event) {
       .pipe(finalize(() => {
         this.hideMainSpinner()
         this.getShoppingCartData();
+        this.syncMsg = true
 
       } ))
       .subscribe((res) => {
@@ -1026,7 +993,7 @@ onShowVariations(event) {
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
         this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);

@@ -1,7 +1,7 @@
 
     <div class="container-fluid InfoForm thin-scroll">
-        <div  *ngFor="let salesRep of salesReps ;let salesRepIndex = index">
-        <div class="header p-3 my-2 d-flex align-items-center justify-content-between p-2">
+        <div  *ngFor="let salesRep of salesReps ;let salesRepIndex = index" >
+        <div class="header  d-flex align-items-center justify-content-between p-2">
             <h6 *ngIf="salesRepIndex>0"><span class="headertxt"> Sales Rep {{salesRepIndex}} : </span></h6>
             <div *ngIf="salesRepIndex==0">
                 <button
