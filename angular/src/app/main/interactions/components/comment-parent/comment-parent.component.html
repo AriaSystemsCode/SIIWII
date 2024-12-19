@@ -43,5 +43,5 @@
 <SendMessageModal [entityId]="entityId" 
 [parentId]="parentId" [toName]="toName"
 *ngIf="(!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp) "  
-#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()"></SendMessageModal>
+#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()" (refresh)="refreshAfterSave($event)"></SendMessageModal>
 </div>

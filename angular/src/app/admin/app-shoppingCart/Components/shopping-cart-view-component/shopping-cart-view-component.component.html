@@ -652,7 +652,7 @@
 
 
                 </div>
-                <div class="col-4   p-4">
+                <div class="col-4   p-4" id="rightCol">
                     <div class="row">
                         <h4 class="purpleColor font-weight-bold col-12"> {{l("Order Summary")}} </h4>
                         <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor order-summary">
@@ -665,7 +665,7 @@
                                 <div class="font-weight-bold">{{appTransactionsForViewDto?.totalQuantity ?
                                     appTransactionsForViewDto?.totalQuantity : 0 }}</div>
                             </div>
-                            <div class=" row w-100 mt-4 ml-1">
+                            <div class=" row w-100 mt-4 ml-1 position-relative " style="height: 50px;">
                                  <!-- [disabled]="appTransactionsForViewDto?.totalAmount<=0" -->
                                 <button type="button"
                                     class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
@@ -678,8 +678,8 @@
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}">
                                     {{l("Placeyourorder")}}
                                 </button> -->
-                                <button type="button" class="btn  bgPurple border-0 w-100 pointer"
-                                    style="height: 37px;"
+                                <button type="button" class="btn  bgPurple border-0  pointer"  
+                                    style="height: 37px;position: fixed; width: 380px ;z-index: 999999;"
                                     *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
                                     [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}"
@@ -706,7 +706,7 @@
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                         <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
                             <app-comment-parent [addNewThread]="true"  *ngIf="appTransactionsForViewDto"
-                            [cartStyle]="true" #commentParentComponent 
+                            [cartStyle]="true" #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                             (newCommentAdded)="onGeneratOrderReport(true)">
                             </app-comment-parent>
                         </div>

@@ -129,29 +129,24 @@ export class MarketplaceViewProductComponent
         console.log(this.filteredColors,'this.filteredColors')
 
     }
-    onFilterTextChanged() {
-        this.showIconClose = this.filterText.trim() !== '';
-        console.log(this.filterText,'this.filterText')
-        if (!this.filterText) {
-          // If no filter text, show all colors
-          this.filteredColors = this.colorsData;
-        
-        console.log(this.filteredColors,'this.filteredColors')
+ onFilterTextChanged() {
+    this.showIconClose = this.filterText.trim() !== '';
+    console.log(this.filterText, 'this.filterText');
 
-        } else {
-          
+    if (!this.filterText) {
+        this.filteredColors = this.colorsData;
+    } else {
+        const filterTextLower = this.filterText.toLowerCase();
 
-          const filterTextLower = this.filterText.toLowerCase();
-        console.log(filterTextLower,'filterTextLower')
-
-          this.filteredColors = this.colorsData.filter(color =>
+        this.filteredColors = this.colorsData.filter(color =>
             (color.colorName && color.colorName.toLowerCase().includes(filterTextLower)) ||
             (color.colorCodeSelectedValues && color.colorCodeSelectedValues.toLowerCase().includes(filterTextLower))
-          );
-        console.log( this.filteredColors,'final')
+        );
+    }
 
-        }
-      }
+ 
+}
+
       clearFilterText(inputElement: HTMLInputElement) {
         this.filterText = '';
         this.filteredColors = this.colorsData;
@@ -265,7 +260,8 @@ export class MarketplaceViewProductComponent
         this.isColorView = false
         this.colorAttachmentForMainIamge = this.colorsData[index].colorImg;
         this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex].entityAttachments;
-       // console.log(this.colorsData[index]);
+       console.log(this.filteredColors[index]),'filll';
+       console.log(this.filteredColors),'fillmmmmml';
     }
     setColorView(value: boolean) {
         this.isColorView = value
@@ -312,7 +308,7 @@ export class MarketplaceViewProductComponent
                     variation.selectedValues.forEach((value) => {
                         if (
                             value.value ===
-                            this.colorsData[this.currentIndex].colorName
+                            this.filteredColors[this.currentIndex].colorName
                         ) {
                             value.edRestAttributes.forEach((attr) => {
                                 if (attr.extraAttrName === "SIZE") {
@@ -320,7 +316,7 @@ export class MarketplaceViewProductComponent
 
                                     attr.values.forEach((sizeValue) => {
                                         sizeValue.orderedPrePacks =
-                                            this.colorsData[
+                                            this.filteredColors[
                                                 this.currentIndex
                                             ]?.sizes[0].orderedPrePacks;
                                     });
@@ -331,7 +327,7 @@ export class MarketplaceViewProductComponent
                 }
             });
         }
-    
+      console.log(this.orderSummary,'summmm')
         this.calculateTotalOrderPriceAndQty(this.orderSummary);
     }
 
