@@ -114,7 +114,6 @@ conNew : boolean
 TempComp : boolean = false
 currentFilter: string = '';
 regenrate : boolean = false
-  orderConfirmationData:any
 syncMsg : boolean = false
 mainLoad : boolean = false
   constructor(
@@ -147,26 +146,335 @@ mainLoad : boolean = false
   this.conNew = false;
 
 }
+const button = document.getElementById("stickyButton");
+  const rightCol = document.getElementById("rightCol");
 
+  window.addEventListener("scroll", () => {
+    const rect = rightCol.getBoundingClientRect();
+    if (rect.top < 20 && rect.bottom > window.innerHeight) {
+      button.style.position = "fixed";
+      button.style.bottom = "20px";
+      button.style.right = rect.left + "px"; // Adjust based on the right column's position
+    } else {
+      button.style.position = "absolute";
+      button.style.bottom = "20px";
+    }
+  });
+ console.log(this.comNew,'this.comNew')
+ console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
-    // this.onGeneratOrderReport(true,undefined,true,true);
+   
 
   }
-//   loadCommentsList() {
-//     this.ensureCommentsComponentReady().then(() => {
-//         this.commentParentComponent?.first?.show(
-//             this.appTransactionsForViewDto.creatorUserId,
-//             this.orderId
-//         );
-//         this.commentParentComponent?.last?.show(
-//             this.appTransactionsForViewDto.creatorUserId,
-//             this.orderId
-//         );
+
+ 
+initFilterForm() {  
+
+
+  // if (this.showHeader) {
+      this.filterForm = this._formBuilder.group({
+        selectedVariation: ['', Validators.required],
+        selectedQuantity: [null, [Validators.required, Validators.min(1)]],
+        selectedPrice: [null, [Validators.required, Validators.min(1)]]
+
+      });
+ 
+
+}
+
+addNewLine() {
+  console.log(this.newData, 'newData'); // Log new data for debugging
+  const filters = this.filterForm.value;
+
+  // Get the item data from the selected line (newData)
+  const appItem = this.newData?.value?.appItem;
+
+  // Initialize the new parent node without using itself within the definition
+  const newParentNode: any = {
+   
+    data: {}, // We’ll fill this data field after initializing the node
+    children: [], // Children will be added afterward
+    expanded: true // Expand the new node by default
+  };
+
+  // Fill the parent node's data to match the required structure
+  newParentNode.data = {
+    code: appItem?.code,
+    manufacturerCode: appItem?.manufacturerCode,
+    name: appItem?.name,
+    qty: filters.selectedQuantity,
+    price: filters.selectedPrice,
+    amount: filters.selectedQuantity * filters.selectedPrice,
+    image: appItem?.imageUrl,
+    parentId: 0, // Top-level node
+    // lineId: new Date().getTime(), // Unique identifier for lineId
+    colorId: 0,
+    colorCode: "", // Empty if not applicable
+    sizeId: 0,
+    sizeCode: "", // Empty if not applicable
+    editQty: true,
+    noOfPrePacks: 0,
+    prePackQty: 0,
+    added:true
+  };
+
+  // Define a child node that references the parent node's lineId
+  // const childNode = {
+  //   // key: 'new-child-' + new Date().getTime(), // Unique key for child
+  //   data: {
+  //     code: appItem?.code + '-child', // Custom code for the child
+  //     manufacturerCode: appItem?.manufacturerCode,
+  //     name: appItem?.name,
+  //     qty: this.selectedQuantity,
+  //     price: appItem?.price,
+  //     amount: this.selectedQuantity * appItem?.price,
+  //     image: appItem?.imageUrl,
+  //     parentId: newParentNode.data.lineId, // Link to parent
+  //     // lineId: new Date().getTime() + 1, // Unique lineId for child
+  //     colorId: 0,
+  //     colorCode: "", // Empty if not applicable
+  //     sizeId: 0,
+  //     sizeCode: "", // Empty if not applicable
+  //     editQty: true,
+  //     noOfPrePacks: 0,
+  //     prePackQty: 0
+  //   },
+  //   children: null // No further children for this level
+  // };
+
+  // Add the child node to the parent's children array
+  // newParentNode.children.push(childNode);
+
+  // Add the new parent node to the shopping cart tree
+  this.shoppingCartTreeNodes.push(newParentNode);
+
+  // Update the tree structure in the UI
+  this.cdr.detectChanges();
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  console.log(this.shoppingCartTreeNodes, 'Updated shopping cart tree nodes');
+
+  // Reset variables
+  this.showSaveCancel = false;
+  this.addLine = true
+  // this.selectedVariation = '';
+  // this.selectedQuantity = 0;
+  // this.selectedPrice = 0
+  // this.amount = 0;
+  // this.getSellerVariations()
+  this.addLine = false
+}
+handleVarSearch(event: any, dropdown?: any) {
+  const filterText = event.filter?.trim();
+  this.currentFilter = filterText; // Store the current filter text
+  this.allVariations = []; // Reset all variations for new filter
+  this.displayedVariations = []; // Clear displayed variations
+
+  // Load initial set of items matching the filter
+  this.loadMore(new MouseEvent('click'), dropdown, filterText);
+}
+
+getSellerVariations(
+  skipCount: number = 0,
+  maxResultCount: number = this.incrementCount,
+  filter: string = ''
+) {
+  this._AppTransactionServiceProxy
+    .getAllSellerVariations(
+      this.appTransactionsForViewDto?.sellerCompanySSIN,
+      filter, // Pass filter to the backend
+      this.appTransactionsForViewDto?.buyerContactSSIN,
+      'USD',
+      undefined,
+      skipCount,
+      maxResultCount
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((res) => {
+      this.totalVariationsCount = res.totalCount;
+
+      if (filter && skipCount === 0) {
+        // Replace variations on new filter
+        this.allVariations = res.items;
+      } else {
+        // Append new items otherwise
+        this.allVariations = [...this.allVariations, ...res.items];
+      }
+
+      // Update displayed variations
+      this.displayedVariations = [...this.allVariations];
+    });
+}
+
+
+loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
+  // Prevent dropdown from closing
+  event.stopPropagation();
+
+  // Determine the next `skipCount` based on the filter and loaded variations
+  const nextSkipCount = this.allVariations.length;
+
+  // Check if there are more items to load or if filtering is applied
+  if (this.displayedVariations.length < this.totalVariationsCount || filter) {
+    this.getSellerVariations(nextSkipCount, this.incrementCount, filter);
+
+    // Keep the dropdown open after fetching more items
+    setTimeout(() => {
+      dropdown.overlayVisible = true;
+    }, 0);
+  }
+}
+
+
+onVariationSelect(event: any) {
+  // Reset quantity and price when a new variation is selected  
+  console.log(event,'mmmmmmevv')
+// this.filterForm.reset();
+  // filters.reset()
+  this.filterForm.controls['selectedQuantity']?.setValue(0);
+  this.selectedQuantity = 0;
+  // this.selectedPrice = 0;
+  this.newData = event;
+
+  if ( event.value.appItem.price) {
+    this.selectedImg = event.value.appItem.image
+   
+     this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
+    //  this.selectedPrice = filters.selectedPrice
+    this.updateAmount(); // Recalculate the amount when a new price is selected
+  }
+}
+
+updateAmount() {
+  const filters = this.filterForm.value;
+  
+ this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
+  // Calculate the amount based on the quantity and selected price
+  this.amount = this.selectedQuantity * this.selectedPrice;
+}
+
+updatePrice() {
+  const filters = this.filterForm.value;
+  this.selectedQuantity = filters.selectedQuantity
+
+  // Calculate the amount based on the quantity and selected price
+  this.amount = filters.selectedQuantity * this.selectedPrice;
+}
+
+saveVariations() {
+  const body = new AddVariationToInputDto();
+  const filters = this.filterForm.value;
+  
+ this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
+  // Assign each property to the DTO object
+  body.variationSSIN = this.newData?.value?.appItem?.ssin;
+  body.qty = this.selectedQuantity;
+  body.price = this.selectedPrice;
+  body.transactionId = this.orderId;
+  body.transactionType = this.appTransactionsForViewDto?.transactionType;
+
+  this._AppTransactionServiceProxy.addVariationToTransaction(body)
+    .pipe(finalize(() =>  {
+        this.selectedVariation = '';
+  this.selectedQuantity = 0;
+  this.selectedPrice = 0
+  this.amount = 0;
+  // this.filterForm.value.reset()
+  // this.hideMainSpinner()
+  this.getShoppingCartData();
+  this.showSaveCancel = false
+
+    }))
+    .subscribe((res) => {
+      console.log(this.displayedVariations, 'displayedVariations');
+      // Handle post-save logic here
+    });
+    this.addNewLinebtn = true
+}
+
+cancelAddLine() {
+  this.addLine = true
+  this.showAddLine = false;
+  this.showSaveCancel = false;
+ 
+  this.addNewLinebtn = true
+ 
+    this.selectedVariation = '';
+    this.filterForm.controls['selectedQuantity']?.setValue(0);
+    this.filterForm.controls['selectedPrice']?.setValue(0);
+
+    this.selectedQuantity = 0;
+
+  this.selectedPrice = 0
+  this.amount = 0;
+  this.shoppingCartTreeNodes.pop(); // Removes the last item
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  // Reset selections as needed
+}
+
+cancelsaveLine() {
+  this.addLine = true
+  this.showAddLine = false;
+  this.showSaveCancel = false;
+ 
+  this.addNewLinebtn = true
+ 
+    this.selectedVariation = '';
+    this.filterForm.controls['selectedQuantity']?.setValue(0);
+    this.filterForm.controls['selectedPrice']?.setValue(0);
+
+    this.selectedQuantity = 0;
+
+  this.selectedPrice = 0
+  this.amount = 0;
+  
+}
+
+  
+  // loadCommentsList() {
+  //   const screenWidth = window.innerWidth;
+  //   const tabletWidth = 768; // iPads and tablets
+  //   // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
+  //  //if(screenWidth <= tabletWidth)
+  //   this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    
+  //   //else 
+  //     this.commentParentComponent?.last?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+      
+  // }
+
+// ensureCommentsComponentReady(): Promise<void> {
+//     return new Promise((resolve) => {
+//         const checkInterval = setInterval(() => {
+//             if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+//                 clearInterval(checkInterval);
+//                 resolve();
+//             }
+//         }, 10);
 //     });
 // }
 
+getCommentsRefreshed (event){
+  if(event){
+    this.loadCommentsList()
   }
+}
+loadCommentsList() {
+  setTimeout(() => {
+      if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+          this.commentParentComponent?.first?.show(
+              this.appTransactionsForViewDto.creatorUserId,
+              this.orderId
+          );
+          this.commentParentComponent?.last?.show(
+              this.appTransactionsForViewDto.creatorUserId,
+              this.orderId
+          );
+      }
+  }, 200);
+}
 
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode= ShoppingCartMode.createOrEdit) {
@@ -1107,7 +1415,6 @@ stopReport(event) {
     }
 }
 
-
   getOrderConfirmation(){
     this.transactionFormPath="";
      this.transactionFormPath=this._transactionFormPath;
@@ -1168,269 +1475,5 @@ stopReport(event) {
     }
 }
 
-
-initFilterForm() {  
-
-
-  // if (this.showHeader) {
-      this.filterForm = this._formBuilder.group({
-        selectedVariation: ['', Validators.required],
-        selectedQuantity: [null, [Validators.required, Validators.min(1)]],
-        selectedPrice: [null, [Validators.required, Validators.min(1)]]
-
-      });
- 
-
-}
-
-addNewLine() {
-  console.log(this.newData, 'newData'); // Log new data for debugging
-  const filters = this.filterForm.value;
-
-  // Get the item data from the selected line (newData)
-  const appItem = this.newData?.value?.appItem;
-
-  // Initialize the new parent node without using itself within the definition
-  const newParentNode: any = {
-   
-    data: {}, // We’ll fill this data field after initializing the node
-    children: [], // Children will be added afterward
-    expanded: true // Expand the new node by default
-  };
-
-  // Fill the parent node's data to match the required structure
-  newParentNode.data = {
-    code: appItem?.code,
-    manufacturerCode: appItem?.manufacturerCode,
-    name: appItem?.name,
-    qty: filters.selectedQuantity,
-    price: filters.selectedPrice,
-    amount: filters.selectedQuantity * filters.selectedPrice,
-    image: appItem?.imageUrl,
-    parentId: 0, // Top-level node
-    // lineId: new Date().getTime(), // Unique identifier for lineId
-    colorId: 0,
-    colorCode: "", // Empty if not applicable
-    sizeId: 0,
-    sizeCode: "", // Empty if not applicable
-    editQty: true,
-    noOfPrePacks: 0,
-    prePackQty: 0,
-    added:true
-  };
-
-  // Define a child node that references the parent node's lineId
-  // const childNode = {
-  //   // key: 'new-child-' + new Date().getTime(), // Unique key for child
-  //   data: {
-  //     code: appItem?.code + '-child', // Custom code for the child
-  //     manufacturerCode: appItem?.manufacturerCode,
-  //     name: appItem?.name,
-  //     qty: this.selectedQuantity,
-  //     price: appItem?.price,
-  //     amount: this.selectedQuantity * appItem?.price,
-  //     image: appItem?.imageUrl,
-  //     parentId: newParentNode.data.lineId, // Link to parent
-  //     // lineId: new Date().getTime() + 1, // Unique lineId for child
-  //     colorId: 0,
-  //     colorCode: "", // Empty if not applicable
-  //     sizeId: 0,
-  //     sizeCode: "", // Empty if not applicable
-  //     editQty: true,
-  //     noOfPrePacks: 0,
-  //     prePackQty: 0
-  //   },
-  //   children: null // No further children for this level
-  // };
-
-  // Add the child node to the parent's children array
-  // newParentNode.children.push(childNode);
-
-  // Add the new parent node to the shopping cart tree
-  this.shoppingCartTreeNodes.push(newParentNode);
-
-  // Update the tree structure in the UI
-  this.cdr.detectChanges();
-  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
-  console.log(this.shoppingCartTreeNodes, 'Updated shopping cart tree nodes');
-
-  // Reset variables
-  this.showSaveCancel = false;
-  this.addLine = true
-  // this.selectedVariation = '';
-  // this.selectedQuantity = 0;
-  // this.selectedPrice = 0
-  // this.amount = 0;
-  // this.getSellerVariations()
-  this.addLine = false
-}
-handleVarSearch(event: any, dropdown?: any) {
-  const filterText = event.filter?.trim();
-  this.currentFilter = filterText; // Store the current filter text
-  this.allVariations = []; // Reset all variations for new filter
-  this.displayedVariations = []; // Clear displayed variations
-
-  // Load initial set of items matching the filter
-  this.loadMore(new MouseEvent('click'), dropdown, filterText);
-}
-
-getSellerVariations(
-  skipCount: number = 0,
-  maxResultCount: number = this.incrementCount,
-  filter: string = ''
-) {
-  this._AppTransactionServiceProxy
-    .getAllSellerVariations(
-      this.appTransactionsForViewDto?.sellerCompanySSIN,
-      filter, // Pass filter to the backend
-      this.appTransactionsForViewDto?.buyerContactSSIN,
-      this.appTransactionsForViewDto?.currencyCode,
-      undefined,
-      skipCount,
-      maxResultCount
-    )
-    .pipe(finalize(() => this.hideMainSpinner()))
-    .subscribe((res) => {
-      this.totalVariationsCount = res.totalCount;
-
-      if (filter && skipCount === 0) {
-        // Replace variations on new filter
-        this.allVariations = res.items;
-      } else {
-        // Append new items otherwise
-        this.allVariations = [...this.allVariations, ...res.items];
-      }
-
-      // Update displayed variations
-      this.displayedVariations = [...this.allVariations];
-    });
-}
-
-
-loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
-  // Prevent dropdown from closing
-  event.stopPropagation();
-
-  // Determine the next `skipCount` based on the filter and loaded variations
-  const nextSkipCount = this.allVariations.length;
-
-  // Check if there are more items to load or if filtering is applied
-  if (this.displayedVariations.length < this.totalVariationsCount || filter) {
-    this.getSellerVariations(nextSkipCount, this.incrementCount, filter);
-
-    // Keep the dropdown open after fetching more items
-    setTimeout(() => {
-      dropdown.overlayVisible = true;
-    }, 0);
-  }
-}
-
-
-onVariationSelect(event: any) {
-  // Reset quantity and price when a new variation is selected  
-  console.log(event,'mmmmmmevv')
-// this.filterForm.reset();
-  // filters.reset()
-  this.filterForm.controls['selectedQuantity']?.setValue(0);
-  this.selectedQuantity = 0;
-  // this.selectedPrice = 0;
-  this.newData = event;
-
-  if ( event.value.appItem.price) {
-    this.selectedImg = event.value.appItem.image
-   
-     this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
-    //  this.selectedPrice = filters.selectedPrice
-    this.updateAmount(); // Recalculate the amount when a new price is selected
-  }
-}
-
-updateAmount() {
-  const filters = this.filterForm.value;
-  
- this.selectedPrice = filters.selectedPrice
- this.selectedQuantity = filters.selectedQuantity
-  // Calculate the amount based on the quantity and selected price
-  this.amount = this.selectedQuantity * this.selectedPrice;
-}
-
-updatePrice() {
-  const filters = this.filterForm.value;
-  this.selectedQuantity = filters.selectedQuantity
-
-  // Calculate the amount based on the quantity and selected price
-  this.amount = filters.selectedQuantity * this.selectedPrice;
-}
-
-saveVariations() {
-  const body = new AddVariationToInputDto();
-  const filters = this.filterForm.value;
-  
- this.selectedPrice = filters.selectedPrice
- this.selectedQuantity = filters.selectedQuantity
-  // Assign each property to the DTO object
-  body.variationSSIN = this.newData?.value?.appItem?.ssin;
-  body.qty = this.selectedQuantity;
-  body.price = this.selectedPrice;
-  body.transactionId = this.orderId;
-  body.transactionType = this.appTransactionsForViewDto?.transactionType;
-
-  this._AppTransactionServiceProxy.addVariationToTransaction(body)
-    .pipe(finalize(() =>  {
-        this.selectedVariation = '';
-  this.selectedQuantity = 0;
-  this.selectedPrice = 0
-  this.amount = 0;
-  // this.filterForm.value.reset()
-  // this.hideMainSpinner()
-  this.getShoppingCartData();
-  this.showSaveCancel = false
-
-    }))
-    .subscribe((res) => {
-      console.log(this.displayedVariations, 'displayedVariations');
-      // Handle post-save logic here
-    });
-    this.addNewLinebtn = true
-}
-
-cancelAddLine() {
-  this.addLine = true
-  this.showAddLine = false;
-  this.showSaveCancel = false;
- 
-  this.addNewLinebtn = true
- 
-    this.selectedVariation = '';
-    this.filterForm.controls['selectedQuantity']?.setValue(0);
-    this.filterForm.controls['selectedPrice']?.setValue(0);
-
-    this.selectedQuantity = 0;
-
-  this.selectedPrice = 0
-  this.amount = 0;
-  this.shoppingCartTreeNodes.pop(); // Removes the last item
-  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
-  // Reset selections as needed
-}
-
-ngDoCheck() {
-        
-  let value = localStorage.getItem("comNew"); 
-
-  if (value) {
-   this.comNew = Boolean((value));
-  }else {
-   this.comNew = false
-  }
-  let value2 = localStorage.getItem("conNew");
-  if (value2) {
-   this.conNew = Boolean((value2));
- }  else {
-   this.conNew = false;
- 
- }
-  
-}
 
 }
