@@ -131,7 +131,7 @@ export class SendMessageModalComponent
                     else this.subject = result[0].messages.subject;
                     for (let i = 0; i < result.length; i++) {
                         this.htmlEditorInput +=
-                            "--------- Reply message ---------" + "<br>";
+                            "--------- Reply ---------" + "<br>";
                         this.htmlEditorInput +=
                             "From: " +
                             result[i].messages.senderName +
