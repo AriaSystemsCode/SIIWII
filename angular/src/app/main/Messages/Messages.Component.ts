@@ -278,9 +278,12 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             this.isFullListDisplayed = true;
         }
     }
+    isCollapsed: { [key: number]: boolean } = {}; // Store collapsed state for each message
 
     clickEventLongMsg(event) {
         this.longmsgId = event;
+        this.isCollapsed[event] = !this.isCollapsed[event];
+
     }
     focusAddComment(){
     if(this.addCommentComponent){

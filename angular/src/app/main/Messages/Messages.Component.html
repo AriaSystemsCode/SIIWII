@@ -730,28 +730,27 @@ margin-right: 6px;"></i>
                                             top: 20px;
                                         ">{{
                                     messagedetail.messages.sendDate
-                                    | niceDateFormatPipe
+                                    | date: "medium" 
                                     }}</span>
                             </div>
                             <br />
                             <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="
                             'Subject: '+messagedetail.messages.subject | safeHtml
-                        " class="msg-bodyformat pl-4  pt-2" [ngClass]="
-                            longmsgId == messagedetail.messages.id ||
-                            messagesDetails.length == 1
-                                ? ''
-                                : 'long-msg'
-                        ">
+                        " class="msg-bodyformat pl-4  pt-2" 
+                        [ngClass]="{
+                            'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                            'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                          }">
                 </span>
                 <br />
                             <span [innerHTML]="
                                         messagedetail.messages.bodyFormat | safeHtml
-                                    " class="msg-bodyformat pl-4" [ngClass]="
-                                        longmsgId == messagedetail.messages.id ||
-                                        messagesDetails.length == 1
-                                            ? ''
-                                            : 'long-msg'
-                                    " (click)="
+                                    " class="msg-bodyformat pl-4" 
+                                    [ngClass]="{
+                                        'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                                        'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                                      }"
+                                       (click)="
                                         clickEventLongMsg(messagedetail.messages.id)
                                     ">
                             </span>
@@ -1031,29 +1030,28 @@ margin-right: 6px;"></i>
                                             top: 20px;
                                         ">{{
                                     messagedetail.messages.sendDate
-                                    | niceDateFormatPipe
+                                    | date: "medium" 
                                     }}</span>
                             </div>
                             <br />
                             <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="'Subject: '+
                             messagedetail.messages.subject | safeHtml
-                        " class="msg-bodyformat pl-4 pt-2" [ngClass]="
-                            longmsgId == messagedetail.messages.id ||
-                            messagesDetails.length == 1
-                                ? ''
-                                : 'long-msg'
-                        ">
+                        " class="msg-bodyformat pl-4 pt-2"
+                        [ngClass]="{
+                            'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                            'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                          }">
                 </span>
                 <br />
 
                             <span [innerHTML]="
                                         messagedetail.messages.bodyFormat | safeHtml
-                                    " class="msg-bodyformat pl-4" [ngClass]="
-                                        longmsgId == messagedetail.messages.id ||
-                                        messagesDetails.length == 1
-                                            ? ''
-                                            : 'long-msg'
-                                    " (click)="
+                                    " class="msg-bodyformat pl-4"
+                                    [ngClass]="{
+                                        'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                                        'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                                      }"
+                                       (click)="
                                         clickEventLongMsg(messagedetail.messages.id)
                                     ">
                             </span>
