@@ -1,5 +1,5 @@
 import { formatDate } from "@angular/common";
-import { Injector, OnDestroy } from "@angular/core";
+import { Injector, Input, OnDestroy } from "@angular/core";
 import { ViewChild } from "@angular/core";
 import { Component, OnInit, AfterViewInit } from "@angular/core";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
@@ -81,6 +81,10 @@ export class PostListComponent
     progress: number = 0;
     @ViewChild("ProgressModal", { static: true })
     ProgressModal: ProgressComponent;
+
+    @Input() fromMarketplaceProfile: boolean = false;
+    @Input() accountId:number;
+    @Input() accountType:string="";
 
     public constructor(
         private _profileService: ProfileServiceProxy,
@@ -315,7 +319,7 @@ export class PostListComponent
                 undefined,
                 this.contactNameFilter,
                 this.entityNameFilter,
-                0,undefined,undefined,
+                0,this.accountId ? this.accountId : undefined,undefined,
                 "",
                 this.skipCount,
                 this.maxResultCount

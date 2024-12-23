@@ -52,6 +52,9 @@ export class PostCardComponent
     getAppEntityForViewDto: AppEntitiesRelationshipDto = null;
     appEntityTypes = AppEntityTypes;
 
+    
+   
+
     constructor(
         private _postService: AppPostsServiceProxy,
         private _entitiesService: AppEntitiesServiceProxy,
@@ -67,7 +70,6 @@ export class PostCardComponent
     }
 
     ngOnChanges(changes: SimpleChanges) {
-       
         if (this.post) {
             //Get ProfilePicture
             this.getProfilePictureById(this.post.appPost.profilePictureId);

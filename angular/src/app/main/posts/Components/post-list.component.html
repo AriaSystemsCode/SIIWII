@@ -1,5 +1,6 @@
 <div>
     <app-create-post-entry
+    *ngIf="!accountType || accountType.toUpperCase()== 'GROUP'"
         #createPostEntry
         [profilePicture]="profilePicture"
         (typeFile)="onTypeFile($event)"
