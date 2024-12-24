@@ -71,20 +71,20 @@
                 </div>
                 <div class="sidebar-item-data">
                   <div class="row row-item row-item-main-data">
-                    <div class="col-md-4 row-item-title emailColor">{{l("Email")}}</div>
-                    <div class="col-md-8 row-item-desc text-right">
+                    <div class="col-md-3 row-item-title emailColor">{{l("Email")}}</div>
+                    <div class="col-md-9 row-item-desc text-right">
                       <span > {{ accountDataForView?.eMailAddress || '-' }} </span>
                     </div>
                   </div>
                   <div class="row row-item row-item-main-data">
-                    <div class="col-md-4 row-item-title emailColor">{{l("Phone")}}</div>
-                    <div class="col-md-8 row-item-desc text-right">
+                    <div class="col-md-3 row-item-title emailColor">{{l("Phone")}}</div>
+                    <div class="col-md-9 row-item-desc text-right">
                       <span > {{ accountDataForView?.phone1Number || '-' }}</span>
                     </div>
                   </div>
                   <div class="row row-item row-item-main-data">
-                    <div class="col-md-4 row-item-title emailColor">{{l("Website")}}</div>
-                    <div class="col-md-8 row-item-desc text-right">
+                    <div class="col-md-3 row-item-title emailColor" *ngIf="!personalAccount">{{l("Website")}}</div>
+                    <div class="col-md-9 row-item-desc text-right">
                       <span> {{ accountDataForView?.website || '-' }} </span>
                     </div>
                   </div>
@@ -123,7 +123,7 @@
                   </a>
   
                     </li>
-                  <li class="nav-item" >
+                  <li class="nav-item" *ngIf="!personalAccount">
                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)" [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
                       <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.Branches" src="assets/profile/My-Addresses-Default.svg">
                       <i class=" fa fa-map-marker-alt sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Branches" style="color: #4A0D4A;"></i>
@@ -149,7 +149,7 @@
                     </a>
                   </li>
   
-                  <li class="nav-item" >
+                  <li class="nav-item"  *ngIf="!personalAccount">
                       <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.MembersList)" [ngClass]="currentTab == accountInfoPageTabsEnum.MembersList?'active':''">
                      
                         <i *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3"> </i>   
@@ -163,7 +163,7 @@
                         
                       </a>
                     </li>
-                    <li class="nav-item ml-2" *ngIf="accountLevel == accountLevelEnum.Profile">
+                    <li class="nav-item ml-2"  *ngIf="!personalAccount && accountLevel == accountLevelEnum.Profile">
                       <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)" [ngClass]="currentTab == accountInfoPageTabsEnum.AccountBilling?'active':''">
                         
                           <i *ngIf="currentTab != accountInfoPageTabsEnum.AccountBilling" class="fa fa-file-invoice" style="color: #84818A"> </i>   
@@ -673,6 +673,7 @@
                       (unPublish)="unPublishProfile()"
                       [isSync]="isSync"
                       [connectionCount]="connectionCount"
+                      [personalAccount]="personalAccount"
                   ></app-view-profile>
               </div>
               <div class="tab6" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.CreateOrEditMember}" >

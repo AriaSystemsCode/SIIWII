@@ -73,6 +73,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     sycAttachmentCategoryBanner: SycAttachmentCategoryDto
     sycAttachmentCategoryImage: SycAttachmentCategoryDto
     btnLoader: boolean = false;
+    @Input() personalAccount = false;
+    editPersonalAccount:boolean =false;
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
