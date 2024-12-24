@@ -54,7 +54,7 @@
                                             {{ mainFilterCtrl?.value?.label | localize }}
                                         </div>
                                     </div>
-                                    <div class="col-6 mb-4 mb-md-0 list-toolbar-search">
+                                    <div class="mb-4 mb-md-0 list-toolbar-search">
                                         <div class="kt-input-icon kt-input-icon--left">
                                             <input type="text" formControlName="search" class="form-control"
                                                 [placeholder]="
@@ -142,22 +142,22 @@
                                                 </svg>
                                                 
                                         
-                                        </a>
+                                            </a>
 
-                                        <a [title]="'ResetData' | localize"
-                                        class="btn   text-center text-primary toolbar-btn ResetData_btn transparent-button"
-                                        style="background-color: #FFFFFF !important;
-                                        border: 1px solid #EEEEEEEE !important;
-                                        color: #4A0D4A !important;
-                                        padding: 10px;
-                                        border-radius: 6px;
-                                        margin-left: 10px;"
-                                        (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
-                                            class="alarmInfo">
-                                        <!-- <i
-                                            class="d-inline-block w-100 flaticon2-reload icon-center"
-                                        ></i> -->
-                                    </a>
+                                            <a [title]="'ResetData' | localize"
+                                            class="btn   text-center text-primary toolbar-btn ResetData_btn transparent-button"
+                                            style="background-color: #FFFFFF !important;
+                                            border: 1px solid #EEEEEEEE !important;
+                                            color: #4A0D4A !important;
+                                            padding: 10px;
+                                            border-radius: 6px;
+                                            margin-left: 10px;"
+                                            (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
+                                                class="alarmInfo">
+                                            <!-- <i
+                                                class="d-inline-block w-100 flaticon2-reload icon-center"
+                                            ></i> -->
+                                        </a>
                                         <a style="padding-left: 10px;background-color: #4A0D4A !important;
                                         color: white !important;
                                         border-radius: 6px;" [title]="'ToggleView' | localize"
@@ -248,12 +248,18 @@
                                 </div>
                                 <div class="col d-flex flex-column justify-content-between">
                              
-                                    <div class="row  pl-1 pr-2">
+                                    <div class="row  pl-5 pr-2">
                                         <div *ngFor="
                                                 let account of accounts;
                                                 index as i;
                                                 let last = last
-                                            " class="col-12 mb-5 col-md-11 col-lg-6" >
+                                            " class="col-12 mb-5" [ngClass]="{
+                                                'col-md-12 single-item-per-row-layout':
+                                                    singleItemPerRowMode,
+                                                'col-md-6': !singleItemPerRowMode,
+                                                ' pb-5':
+                                                    singleItemPerRowMode && !last
+                                            }">
                                             <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"
                                                 [singleItemPerRowMode]="
                                                     singleItemPerRowMode
