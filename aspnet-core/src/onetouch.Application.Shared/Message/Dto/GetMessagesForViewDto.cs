@@ -9,6 +9,8 @@ namespace onetouch.Message.Dto
         public MessagesDto Messages { get; set; }
         public int? Rating { get; set; }
         public bool IsUserVerifiedPurchaser { get; set; }
+        public bool IsProfileOwner { get; set; }
+        public bool IsAccountAdmin { get; set; }
     }
     public class OverAllRatingDto
     { 
