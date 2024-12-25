@@ -99,6 +99,9 @@ namespace onetouch.AppMarketplaceAccounts
             {
                 try
                 {
+                    var currentTenantAccountSSIN = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).SSIN;
+
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
 
                     var filteredAccounts = _appMarketplaceContactRepository.GetAll()
@@ -155,7 +158,7 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
-                           .Where(e => (e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
+                           .Where(e => (e.SSIN != currentTenantAccountSSIN && e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
                            
                            //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 
