@@ -827,6 +827,16 @@ namespace onetouch.Accounts
                 var branch = ObjectMapper.Map<BranchDto>(account);
                 BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+
+                #region fillPersonal
+                ContactDto contactPersonalDto = new ContactDto();
+                if (presonEntityObjectTypeId == entity.EntityObjectTypeId)
+                {
+                    var retContactPersonalDto = await GetContactForView(id);
+                    contactPersonalDto = retContactPersonalDto != null ? retContactPersonalDto.Contact : null;
+
+                }
+                #endregion fillPersonal
                 var mainBranchSubtotal = _appContactRepository.GetAll()
                             .Include(e => e.ParentFk)
                             .Include(e => e.ParentFkList)
@@ -856,7 +866,7 @@ namespace onetouch.Accounts
                         .Select(x => x.AttachmentFk.Attachment).ToArray();
                 }
 
-                var output = new GetAccountForViewDto { Account = accountDto, ConnectionCount = ConnectionCount };
+                var output = new GetAccountForViewDto { Account = accountDto, Contact = contactPersonalDto, ConnectionCount = ConnectionCount };
 
                 if (output.Account.CountryId != null && output.Account.CountryId != 0)
                 {
