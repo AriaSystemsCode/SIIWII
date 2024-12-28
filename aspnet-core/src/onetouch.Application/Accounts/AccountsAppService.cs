@@ -2156,6 +2156,7 @@ namespace onetouch.Accounts
             else
             { await _appEntitiesAppService.SaveContact(contact); }
 
+            await CurrentUnitOfWork.SaveChangesAsync();
             await CreateAdminContact();
 
             await CurrentUnitOfWork.SaveChangesAsync();
@@ -2489,161 +2490,165 @@ namespace onetouch.Accounts
              
             return entity;
         }
-        protected virtual async Task<bool> ApplyPersonalExtraData(ContactDto input)
+        protected virtual async Task<bool> ApplyPersonalExtraData
+            (ContactDto input)
         {
             var account = _appContactRepository.GetAll().Include(x=> x.EntityFk).ThenInclude(x=> x.EntityExtraData).FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             if (account.EntityFk.EntityExtraData == null)
                 account.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
-
             var entity = account.EntityFk;
+            var entityDto = ObjectMapper.Map<AppEntityDto>(entity);
+
             if (!string.IsNullOrEmpty(input.FirstName))
             {
-                AppEntityExtraData appEntityExtraDto = new AppEntityExtraData();
-                appEntityExtraDto.EntityId = account.EntityFk.Id;
+                AppEntityExtraDataDto appEntityExtraDto = new AppEntityExtraDataDto();
+                appEntityExtraDto.EntityId = account.EntityId;
                 appEntityExtraDto.AttributeValueId = 0;
                 appEntityExtraDto.AttributeValue = input.FirstName;
                 appEntityExtraDto.AttributeId = 701;
                 appEntityExtraDto.EntityObjectTypeId = presonEntityObjectTypeId;
-                account.EntityFk.EntityExtraData.Add(appEntityExtraDto);
+                entityDto.EntityExtraData.Add(appEntityExtraDto);
             }
 
             if (!string.IsNullOrEmpty(input.LastName))
             {
-                AppEntityExtraData appEntityExtraLNameDto = new AppEntityExtraData();
-                appEntityExtraLNameDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraLNameDto = new AppEntityExtraDataDto();
+                appEntityExtraLNameDto.EntityId = account.EntityId;
                 appEntityExtraLNameDto.AttributeValueId = 0;
                 appEntityExtraLNameDto.AttributeValue = input.LastName;
                 appEntityExtraLNameDto.AttributeId = 702;
                 appEntityExtraLNameDto.EntityObjectTypeId = presonEntityObjectTypeId;
-                entity.EntityExtraData.Add(appEntityExtraLNameDto);
+                entityDto.EntityExtraData.Add(appEntityExtraLNameDto);
             }
 
             //if (input.TitleId != null && input.TitleId > 0)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 705;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
 
 
             DateTime jDate = DateTime.Now;
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = jDate.ToString();
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 707;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.JobTitle != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = "";
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 706;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.JoinDateIsPublic != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = "False";
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 713;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.LanguageIsPublic != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = "False";
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 708;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.Phone1IsPublic != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = "False";
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 710;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.UserId != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = input.UserId.ToString();
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 715;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
 
             //if (input.Phone2IsPublic != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = "False";
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 711;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.Phone3IsPublic != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = "False";
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 712;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.EmailAddressIsPublic != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = "False";
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 709;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.UserName != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = input.UserName;
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 703;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //if (input.UserNameIsPublic != null)
             {
-                AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
-                appEntityExtraTitleDto.EntityId = entity.Id;
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
                 appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
                 appEntityExtraTitleDto.AttributeValue = input.UserNameIsPublic.ToString();
                 appEntityExtraTitleDto.AttributeValueId = 0;
                 appEntityExtraTitleDto.AttributeId = 714;
-                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             //entity.Notes
 
-            await _appEntityRepository.UpdateAsync(entity);
+            //await _appEntityRepository.UpdateAsync(entity);
+            var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
+
             return true;   
         }
 
@@ -2718,9 +2723,22 @@ namespace onetouch.Accounts
                         //entityDto = await ApplyPersonalExtraData(entityDto, contactDto);
                         if (entity.EntityExtraData != null && entity.EntityExtraData.Count > 0)
                         {
-                            entity.EntityExtraData.ForEach(x => { x.Id = 0; }) ;
+                            //entity.EntityExtraData.ForEach(x => { x.Id = 0; }) ;
+                            entityDto.EntityExtraData = new List<AppEntityExtraDataDto>();
+                            foreach (var EntityExtraData in entity.EntityExtraData)
+                            { 
+                                AppEntityExtraDataDto appEntityExtraDto = new AppEntityExtraDataDto();
+                                appEntityExtraDto.EntityId = entityDto.Id;
+                                appEntityExtraDto.AttributeValueId = EntityExtraData.AttributeValueId;
+                                appEntityExtraDto.AttributeValue = EntityExtraData.AttributeValue;
+                                appEntityExtraDto.AttributeId = EntityExtraData.AttributeId;
+                                appEntityExtraDto.EntityObjectTypeId = EntityExtraData.EntityObjectTypeId;
+
+                                entityDto.EntityExtraData.Add(appEntityExtraDto);
+                            }
+
                         }
-                    
+
                     }
 
                     var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
