@@ -57,6 +57,10 @@ import { AccountBillingComponent } from './components/accountBilling/accountBill
 import { OverviewTabComponent } from './components/marketplace-account-profile-view/overview-tab/overview-tab.component';
 import { PostsModule } from '../posts/posts.module';
 import { InteractionsModule } from '../interactions/interactions.module';
+import { EventsBrowseModule } from '../AppEventsBrowse/events-browse.module';
+import { AccountSharedModule } from '../accounts/account-shared/account-shared.module';
+import { ConnectionsTabComponent } from './components/connections-tab/connections-tab.component';
+import { EventsTabComponent } from './components/events-tab/events-tab.component';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -76,7 +80,7 @@ import { InteractionsModule } from '../interactions/interactions.module';
         TenantInvoicesComponent,
         PlansComponent,
         MarketplaceAccountProfileComponent,
-        OverviewTabComponent
+        OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent
     ],
     imports: [
         CommonModule,
@@ -116,7 +120,7 @@ import { InteractionsModule } from '../interactions/interactions.module';
         DialogModule,
         TabViewModule,
         PostsModule,
-        InteractionsModule
+        InteractionsModule,EventsBrowseModule,AccountSharedModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

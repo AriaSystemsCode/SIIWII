@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AccountMainFilterEnum } from '@app/main/accounts/account-shared/models/accounts-main-filter.enum';
+import { SelectItem } from 'primeng/api';
 
 @Component({
   selector: 'app-marketplace-account-profile',
@@ -9,13 +11,15 @@ import { ActivatedRoute } from '@angular/router';
 export class MarketplaceAccountProfileComponent implements OnInit {
   accountId:number;
   accountType:string = "";
+  defaultMainFilter : AccountMainFilterEnum= AccountMainFilterEnum.AllAccounts
+  pageMainFilters : SelectItem [] = [{ label:'AllAccounts', value:AccountMainFilterEnum.AllAccounts }]
   constructor(private activatedRoute:ActivatedRoute) { }
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
       this.accountId = params['id']
     });
-    
+
     this.activatedRoute.queryParams.subscribe(params => {
     this.accountType= params['accountType'];
     });
@@ -23,7 +27,6 @@ export class MarketplaceAccountProfileComponent implements OnInit {
 
     //this.accountType=;
   }
-
 
 
 }
