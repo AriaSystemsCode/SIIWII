@@ -364,4 +364,12 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     }
 
 
+    onSearch(event: KeyboardEvent): void {
+        event.preventDefault(); // Prevent form submission if inside a form
+        event.stopPropagation(); // Prevent triggering other handlers
+        this.getAppTransactions();
+        this.getVariationDetail();
+    }
+
+
 }
