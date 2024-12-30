@@ -38,6 +38,11 @@
             </div>
         </div>
     </div>
+    <div class="  mt-5 p-5 text-center w-100"
+    *ngIf="postsToShow?.length == 0">
+    {{ "NoDataFound" | localize }}
+</div>
+
     <app-createor-edit-post
         #createOrEditModal
         [profilePicture]="profilePicture"

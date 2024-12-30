@@ -16,7 +16,7 @@ export class EventsTabComponent  implements AfterViewInit{
 
   @ViewChild('EventBrowseComponent') eventBrowseComponent: EventsBrowseComponent;
 ngAfterViewInit(): void {
-    const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents
+    const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"
     const showMainFiltersOptions: boolean = true
     const pageMainFilters: SelectItem[] = [
         { label: "AllEvents", value: EventsFilterTypesEnum.AllEvents },
