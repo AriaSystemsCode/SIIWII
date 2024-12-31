@@ -2653,7 +2653,19 @@ namespace onetouch.Accounts
         }
 
 
-        public async Task<string> ApplyRelationOnProfile(long input)
+        public async Task<long> AddRelation(long entityId, long relatedEntityId, int OwnerTenantId)
+        {
+            AppEntitiesRelationship entity = new AppEntitiesRelationship();
+            entity.EntityId = entityId;
+            entity.RelatedEntityId = relatedEntityId;
+            entity.TenantId = OwnerTenantId;
+
+
+            var retId = await _appEntityRelationShipRepository.InsertAndGetIdAsync(entity);
+            return retId;
+        }
+
+            public async Task<string> ApplyRelationOnProfile(long input)
         {
             string ret = "";
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
@@ -2665,25 +2677,6 @@ namespace onetouch.Accounts
                     .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
                     .FirstOrDefaultAsync(x =>
                     x.IsProfileData == true && x.Id == input);
-
-                // get current tenat >> entity
-               # region get current tenat >> entity
-                var currentTenantEntityId = _appContactRepository.GetAll().Include(e => e.EntityFk)
-                  .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
-
-                var relatedTenantEntityId = _appContactRepository.GetAll().Include(e => e.EntityFk)
-                  .FirstOrDefault(e => e.SSIN == marketplaceContact.SSIN && e.IsProfileData && e.ParentId == null);
-                //get entityRelation
-                AppEntitiesRelationship entitiesRelationship = await _appEntityRelationShipRepository.GetAll()
-                    .IgnoreQueryFilters().AsNoTracking()
-                    .FirstOrDefaultAsync(x => (x.EntityId == currentTenantEntityId.EntityId && x.RelatedEntityId == relatedTenantEntityId.EntityId) ||
-                    (x.RelatedEntityId == currentTenantEntityId.EntityId && x.EntityId == relatedTenantEntityId.EntityId));
-
-                onetouch.AppEntities.AppEntitiesRelationship appEntityReactionsDto = new onetouch.AppEntities.AppEntitiesRelationship();
-                entitiesRelationship = new AppEntitiesRelationship { EntityId = currentTenantEntityId.EntityId, EntityTable = "AppContacts", RelatedEntityId = relatedTenantEntityId.EntityId, TenantId = null };
-                 await _appEntityRelationShipRepository.InsertAsync(entitiesRelationship);
-
-                #endregion get current tenat >> entity
 
                 var accountConnection = _appContactRepository.GetAll()
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == marketplaceContact.SSIN);
@@ -2758,6 +2751,28 @@ namespace onetouch.Accounts
 
                     }
                     var contactDto_Id = await _appEntitiesAppService.SaveContact(contactDto);
+
+
+                    #region get current tenant >> entity
+                    var currentTenantEntityId = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                      .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                    var relatedTenantEntityId = contactDto.EntityId;
+                    //var relatedTenantEntityId = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                    // .FirstOrDefault(e => e.SSIN == marketplaceContact.SSIN && e.IsProfileData && e.ParentId == null);
+                    //get entityRelation
+
+                    //AppEntitiesRelationship entitiesRelationship = await _appEntityRelationShipRepository.GetAll()
+                    //    .IgnoreQueryFilters().AsNoTracking()
+                    //    .FirstOrDefaultAsync(x => (x.EntityId == currentTenantEntityId.EntityId && x.RelatedEntityId == relatedTenantEntityId.EntityId) ||
+                    //    (x.RelatedEntityId == currentTenantEntityId.EntityId && x.EntityId == relatedTenantEntityId.EntityId));
+
+                    onetouch.AppEntities.AppEntitiesRelationship appEntityReactionsDto = new onetouch.AppEntities.AppEntitiesRelationship();
+                    var entitiesRelationship = new AppEntitiesRelationship { EntityId = currentTenantEntityId.EntityId, EntityTable = "AppContacts", RelatedEntityId = relatedTenantEntityId, TenantId = null };
+                    await _appEntityRelationShipRepository.InsertAsync(entitiesRelationship);
+
+                    #endregion get current tenant >> entity
+
+
 
                     // Publish Account related branches [Start]
                     var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
