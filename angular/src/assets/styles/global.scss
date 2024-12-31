@@ -1043,3 +1043,17 @@ searchicon.p-element.p-icon-wrapper {
 .p-icon-wrapper{
     right: auto !important;
 }
+
+.marketplaceAccountProfile .tabview-custom .p-tabview-nav {
+    border-bottom: 4px solid #EEEEEE;
+    margin: 5px;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav li{
+    padding-bottom: 5px;
+}
