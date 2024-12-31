@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { EventsBrowseComponent } from '@app/main/AppEventsBrowse/components/events-browse/events-browse.component';
 import { EventsBrowseInputs } from '@app/main/AppEventsBrowse/models/Events-browse-inputs';
 import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
@@ -15,6 +15,8 @@ import { SelectItem } from 'primeng/api';
 export class EventsTabComponent  implements AfterViewInit{
 
   @ViewChild('EventBrowseComponent') eventBrowseComponent: EventsBrowseComponent;
+  @Input() accountId :number=0;
+  
 ngAfterViewInit(): void {
     const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"
     const showMainFiltersOptions: boolean = true

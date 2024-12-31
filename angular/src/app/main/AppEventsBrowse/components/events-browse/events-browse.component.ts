@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit, ViewChild } from '@angular/core';
+import { Component, Injector, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CreateOrEditEventComponent } from '@app/main/AppEvent/Components/create-or-edit-event.component';
@@ -67,6 +67,9 @@ export class EventsBrowseComponent extends AppComponentBase {
     get startDateCtrl () { return this.filterForm.get('startDate') }
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
+    @Input() fromMarketPlaceAccountProfile :boolean =false;
+    @Input() accountId :number =0;
+    
     constructor(
         injector: Injector,
         private _appEventsServiceProxy: AppEventsServiceProxy,

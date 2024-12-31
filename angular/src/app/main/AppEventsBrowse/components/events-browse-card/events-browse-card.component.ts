@@ -23,6 +23,9 @@ export class EventsBrowseCardComponent extends AppComponentBase {
     @Output() triggerEvent: EventEmitter<EventsBrowseActionsEvents> = new EventEmitter<EventsBrowseActionsEvents>();
     EventsFilterTypesEnum = EventsFilterTypesEnum
     EventsBrowseActionsEvents = EventsBrowseActionsEvents
+    @Input() fromMarketPlaceAccountProfile :boolean =false;
+    eventAddress="";
+
     get mainFilterCtrl() { return this.filterForm.get('filterType') }
     constructor(
         injector: Injector,
@@ -31,5 +34,41 @@ export class EventsBrowseCardComponent extends AppComponentBase {
     }
     _triggerEvent(event:EventsBrowseActionsEvents) {
         this.triggerEvent.emit(event);
+    }
+
+    getAddressDetails() :string {
+        this.eventAddress="";
+        this.eventAddress += this.item.appEvent?.address1
+            ? this.eventAddress != ""
+                ? " - " + this.item.appEvent?.address1
+                : this.item.appEvent?.address1
+            : "";
+        this.eventAddress += this.item.appEvent?.address2
+            ? this.eventAddress != ""
+                ? " - " + this.item.appEvent?.address2
+                : this.item.appEvent?.address2
+            : "";
+        this.eventAddress += this.item.appEvent?.city
+            ? this.eventAddress != ""
+                ? " - " + this.item.appEvent?.city
+                : this.item.appEvent?.city
+            : "";
+        this.eventAddress += this.item.appEvent?.state
+            ? this.eventAddress != ""
+                ? " - " + this.item.appEvent?.state
+                : this.item.appEvent?.state
+            : "";
+        this.eventAddress += this.item.appEvent?.postal
+            ? this.eventAddress != ""
+                ? " - " + this.item.appEvent?.postal
+                : this.item.appEvent?.postal
+            : "";
+        this.eventAddress += this.item.appEvent?.country
+            ? this.eventAddress != ""
+                ? " - " + this.item.appEvent?.country
+                : this.item.appEvent?.country
+            : "";
+
+            return this.eventAddress ? this.eventAddress : "online ask for the link";
     }
 }
