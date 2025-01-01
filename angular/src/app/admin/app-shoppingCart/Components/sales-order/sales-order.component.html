@@ -496,6 +496,7 @@ Cancel
                         <label class="label">Entered Date</label>
                         <div class="">
                             <p-calendar
+                            #calendar1
                             appendTo="body"
                                 [(ngModel)]="enteredDate"
                                 [showIcon]="true"
@@ -504,7 +505,7 @@ Cancel
                                 [selectOtherMonths]="true"
                             ></p-calendar>
                            
-                        <img src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
+                        <img src="../../../../../assets/icons/calendar.png"  style="cursor: pointer;" (click)="openCalendar(calendar1)"    alt="" srcset="">
 
                         </div>
                     </div>
@@ -523,6 +524,7 @@ Cancel
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
                         <p-calendar
+                        #calendar2
                         appendTo="body"
                             [(ngModel)]="startDate"
                             [showIcon]="true"
@@ -530,7 +532,7 @@ Cancel
                             [showOtherMonths]="true"
                             [selectOtherMonths]="true"
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                        <img src="../../../../../assets/icons/calendar.png"  style="cursor: pointer;" (click)="openCalendar(calendar2)"   alt="" srcset="">
 
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
@@ -548,6 +550,7 @@ Cancel
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Available Date</label>
                         <p-calendar
+                        #calendar3
                         appendTo="body"
                             [(ngModel)]="availableDate"
                             [showIcon]="true"
@@ -556,7 +559,7 @@ Cancel
                             [showOtherMonths]="true"
                             [selectOtherMonths]="true"
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                        <img src="../../../../../assets/icons/calendar.png"  style="cursor: pointer;" (click)="openCalendar(calendar3)"  alt="" srcset="">
 
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
@@ -576,6 +579,7 @@ Cancel
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
                         <p-calendar
+                        #calendar4
                         appendTo="body"
                             [(ngModel)]="completeDate"
                             [showIcon]="true"
@@ -585,7 +589,7 @@ Cancel
                             [showOtherMonths]="true"
                             [selectOtherMonths]="true"
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                        <img src="../../../../../assets/icons/calendar.png" style="cursor: pointer;" (click)="openCalendar(calendar4)"  alt="" srcset="">
 
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
