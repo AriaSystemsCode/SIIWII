@@ -72,7 +72,7 @@ export class MarketplaceAccountProfileComponent  extends AppComponentBase   impl
   
 
   navigateToTab(event): void {
-    console.log(event,'klkloiklk')
+    // console.log(event,'klkloiklk')
     this.activeTabIndex = event; // Set to the index of the "Posts" tab
   }
 
