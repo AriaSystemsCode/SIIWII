@@ -12,6 +12,7 @@ namespace onetouch.Accounts
     public interface IAccountsAppService : IApplicationService 
     {
         Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input);
+		Task<PagedResultDto<GetAccountForViewDto>> GetAllMyConnections(GetAllAccountsInput input);
 
         Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount);
 

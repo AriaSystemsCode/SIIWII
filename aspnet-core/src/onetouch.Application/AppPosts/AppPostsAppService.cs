@@ -184,7 +184,7 @@ namespace onetouch.AppPosts
                     .PageBy(input);
                 }
                 //X527
-                if (input.NoOfPostToReturn != null)
+                if (input.NoOfPostToReturn != null && input.NoOfPostToReturn != 0)
                 {
                     pagedAndFilteredAppPosts = pagedAndFilteredAppPosts.Take(int.Parse(input.NoOfPostToReturn.ToString()));
                 }
