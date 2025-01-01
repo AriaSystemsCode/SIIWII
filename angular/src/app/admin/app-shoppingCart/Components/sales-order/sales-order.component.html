@@ -29,7 +29,7 @@
 
             </button>
             </div>
-            <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12">
+            <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12 pl-md-0 pl-3">
                 <label class="label">Reference #</label>
                 <input
                 
@@ -282,7 +282,7 @@ Cancel
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-2 mr-2 ">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
+                        <div class="d-flex" style="gap: 50px;"> <label class="label pt-2 mr-2 ">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
 <div class="d-flex">
 
 
