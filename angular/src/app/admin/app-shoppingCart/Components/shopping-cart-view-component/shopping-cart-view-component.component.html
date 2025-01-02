@@ -652,7 +652,7 @@
 
 
                 </div>
-                <div class="col-4   p-4 " [ngClass]="showTabs ? 'fixScrollS':''" style="" id="rightCol">
+                <div class="col-4   p-4 " [ngClass]="showTabs  && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT' ? 'fixScrollS':''" style="" id="rightCol">
                 <!-- <div  id="rightCol"> -->
                     <div class="row">
                         <h4 class="purpleColor font-weight-bold col-12"> {{l("Order Summary")}} </h4>
