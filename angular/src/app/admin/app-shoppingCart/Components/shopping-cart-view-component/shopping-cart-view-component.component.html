@@ -652,7 +652,8 @@
 
 
                 </div>
-                <div class="col-4   p-4" id="rightCol">
+                <div class="col-4   p-4 " [ngClass]="showTabs ? 'fixScrollS':''" style="" id="rightCol">
+                <!-- <div  id="rightCol"> -->
                     <div class="row">
                         <h4 class="purpleColor font-weight-bold col-12"> {{l("Order Summary")}} </h4>
                         <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor order-summary">
@@ -678,8 +679,8 @@
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}">
                                     {{l("Placeyourorder")}}
                                 </button> -->
-                                <button type="button" class="btn  bgPurple border-0  pointer"  
-                                    style="height: 37px;position: fixed; width: 380px ;z-index: 999999;"
+                                <button type="button" class="btn  bgPurple border-0  pointer w-100"  
+                                 
                                     *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
                                     [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}"
@@ -714,7 +715,7 @@
                     </div>
 
                 </div>
-
+                <!-- </div> -->
                 <div class="mr-1 nextArrow">
                     <button *ngIf="showCarousel" (click)="goPrevious_Next_Transaction(transactionPosition.Next)"
                         [disabled]="appTransactionsForViewDto?.lastRecord" class="nextBtn"

@@ -786,3 +786,7 @@ align-items: center !important;
     width: 100px !important;
 height: 100px !important;
 }
+
+.fixScrollS {
+    position: fixed; max-width: 350px;right: 50px;
+}
