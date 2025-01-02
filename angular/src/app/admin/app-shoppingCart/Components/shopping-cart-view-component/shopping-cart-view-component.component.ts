@@ -1339,18 +1339,18 @@ stopReport(event) {
   }
 
   printTransaction() {
-    var page = window.open(this._transactionFormPath);
-    page.print();
-    // this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-    // .subscribe((res) => {
-    //     if (res == true) {
-    //       this.showMainSpinner()
-    //       this.onGeneratOrderReport(true,undefined,true,false,true)
-    //     }  else {
-    //      var page = window.open(this._transactionFormPath);
+    // var page = window.open(this._transactionFormPath);
     // page.print();
-    //     }
-    // });
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    .subscribe((res) => {
+        if (res == true) {
+          this.showMainSpinner()
+          this.onGeneratOrderReport(true,undefined,true,false,true)
+        }  else {
+         var page = window.open(this._transactionFormPath);
+    page.print();
+        }
+    });
 
   }
 
