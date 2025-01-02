@@ -398,13 +398,13 @@
                                         
                                 
 
-                                        <th style="width: 150px;white-space: nowrap;" pSortableColumn="totalQuantity"  class="purpleColor">
+                                        <th style="width: 150px;white-space: nowrap;;text-align: right !important" pSortableColumn="totalQuantity"  class="purpleColor">
                                             {{l('TotalQuantity')}}
                                             <p-sortIcon class="purpleSortableIcon" field="totalQuantity"></p-sortIcon>
                                             <!-- <p-columnFilter type="date" field="completeDate" display="menu"
                                                 class="ml-auto"></p-columnFilter> -->
                                         </th>
-                                        <th style="width: 150px" pSortableColumn="totalAmount"  class="purpleColor">
+                                        <th style="width: 150px;text-align: right !important" pSortableColumn="totalAmount"  class="purpleColor">
                                             {{l('TotalAmount')}}
                                             <p-sortIcon class="purpleSortableIcon" field="totalAmount"></p-sortIcon>
                                             <!-- <p-columnFilter type="date" field="completeDate" display="menu"
@@ -476,17 +476,17 @@
                                             </span>
                                             <!-- <span *ngIf="!record.creatorTenantName">-</span> -->
                                         </td>
-                                        <td style="width:150px">
-                                            <span class="p-column-title"> {{l('TotalQuantity')}}</span>
+                                        <td style="width:150px;text-align: right !important" >
+                                            <span class="p-column-title" style="text-align: right !important"> {{l('TotalQuantity')}}</span>
                                             <span >
-                                                {{record.totalQuantity }}
+                                                {{record.totalQuantity | number: '1.2-2' }}
                                             </span>
                                             <!-- <span *ngIf="!record.totalQuantity">-</span> -->
                                         </td>
-                                        <td style="width:150px">
-                                            <span class="p-column-title"> {{l('TotalAmount')}}</span>
+                                        <td style="width:150px;text-align: right !important">
+                                            <span class="p-column-title" style="text-align: right !important"> {{l('TotalAmount' )}}</span>
                                             <span >
-                                                {{record.totalAmount }}
+                                                {{record.totalAmount | number: '1.2-2' }}
                                             </span>
                                             <!-- <span *ngIf="!record.totalAmount">-</span> -->
                                         </td>
@@ -528,7 +528,7 @@
                                     <th>Image</th>
                                     <th>Variation Code</th>
                                     <th>Name</th>
-                                    <th>Qty.</th>
+                                    <th style="text-align: right !important;">Qty.</th>
                                     <th pSortableColumn="price"  style="text-align: right !important;">Price 
                                         <p-sortIcon class="purpleSortableIcon" field="price"></p-sortIcon>
 
@@ -546,7 +546,7 @@
                                     <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
                                     <td>{{ product?.manufacturerCode }}</td>
                                     <td>{{ product.name }}</td>
-                                    <td>{{ product.qty }}</td>
+                                    <td style="text-align: right !important;">{{ product.qty | number: '1.2-2' }}</td>
                                     <td style="text-align: right !important;">{{ product.price | number: '1.2-2'  }}</td>
                                     <td style="text-align: right !important;">{{ product.amount | number: '1.2-2'  }}</td>
                                 </tr>
