@@ -1301,10 +1301,23 @@ stopReport(event) {
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10,transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
-        this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
+
+           if(res1){
+          
+            if(res1?.entityStatusCode?.toUpperCase() !="DRAFT") {
+              this.show(res1.id, this.showCarousel, this.validateOrder, ShoppingCartMode.view);
+          
+    
+            } else {
+                this.show(res1.id, this.showCarousel, this.validateOrder, ShoppingCartMode.createOrEdit);
+             
+        }
+           }
+ 
+
       });
   }
 

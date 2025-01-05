@@ -328,7 +328,7 @@
                                         *ngIf="!shippingInfOValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                     </h6>
-                                    <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')" class="mx-2">*Please select or add ( ship to) address</p>
+                                    <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')" class="mx-2">*Please select or add ( ship to) address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==4">
@@ -352,7 +352,7 @@
                                     <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!BillingInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
-                                    <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')"  class="mx-2">*Please select or add billing address</p>
+                                    <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')"  class="mx-2">*Please select or add billing address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==5">
@@ -904,7 +904,7 @@ height: 48px;"
             </div>
         </div>  -->
     </div>
-    <p-tabView styleClass="tabview-custom" style="min-height: 70vh;">
+    <p-tabView styleClass="tabview-custom" class="tabSSec">
         <p-tabPanel>
             <ng-template pTemplate="header">
                 <div class="tab-header">
@@ -1034,7 +1034,7 @@ height: 48px;"
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                 </h6>
                             </div>
-                                <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')" class="mx-2 mt-1">*Please select or add ( ship to) address</p>
+                                <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')" class="mx-2 mt-1">*Please select or add ( ship to) address</p>
 
                             </div>
                         </ng-template>
@@ -1060,7 +1060,7 @@ height: 48px;"
                                     *ngIf="!BillingInfoValid"></i>
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
                             </div>
-                                <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')"  class="mx-2 mt-1">*Please select or add billing address</p>
+                                <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')"  class="mx-2 mt-1">*Please select or add billing address</p>
 
                             </div>
                         </ng-template>
