@@ -1344,11 +1344,25 @@ stopReport(event) {
     this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
     .subscribe((res) => {
         if (res == true) {
+
           this.showMainSpinner()
           this.onGeneratOrderReport(true,undefined,true,false,true)
+        
+
         }  else {
-         var page = window.open(this._transactionFormPath);
-    page.print();
+            this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
+          .pipe(
+              finalize(() => {
+       
+              })
+          )
+          .subscribe((res) => {
+            var page = window.open(res);
+            page.print();
+          }
+           
+          );
+   
         }
     });
 
@@ -1391,8 +1405,18 @@ stopReport(event) {
                 if(printTrans){
                   setTimeout(() => {
                     this.hideMainSpinner()
-                    var page = window.open(this._transactionFormPath);
-                    page.print();
+                    this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
+          .pipe(
+              finalize(() => {
+       
+              })
+          )
+          .subscribe((res) => {
+            var page = window.open(res);
+            page.print();
+          }
+           
+          );
                   },10000)
                 }
             });
