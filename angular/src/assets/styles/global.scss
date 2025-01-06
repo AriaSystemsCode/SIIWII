@@ -1057,3 +1057,8 @@ searchicon.p-element.p-icon-wrapper {
 .marketplaceAccountProfile  .tabview-custom .p-tabview-nav li{
     padding-bottom: 5px;
 }
+
+html{
+    overflow: auto !important;
+    overflow-y: auto !important;
+}

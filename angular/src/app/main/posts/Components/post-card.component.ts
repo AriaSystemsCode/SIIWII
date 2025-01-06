@@ -51,6 +51,7 @@ export class PostCardComponent
     InteractionsComponent: InteractionsComponent;
     getAppEntityForViewDto: AppEntitiesRelationshipDto = null;
     appEntityTypes = AppEntityTypes;
+    @Input() fromMarketplaceProfile: boolean;
 
     
    
