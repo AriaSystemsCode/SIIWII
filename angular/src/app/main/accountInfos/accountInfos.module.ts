@@ -61,6 +61,7 @@ import { EventsBrowseModule } from '../AppEventsBrowse/events-browse.module';
 import { AccountSharedModule } from '../accounts/account-shared/account-shared.module';
 import { ConnectionsTabComponent } from './components/connections-tab/connections-tab.component';
 import { EventsTabComponent } from './components/events-tab/events-tab.component';
+import { PostsTabComponent } from './components/posts-tab/posts-tab.component';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -80,7 +81,7 @@ import { EventsTabComponent } from './components/events-tab/events-tab.component
         TenantInvoicesComponent,
         PlansComponent,
         MarketplaceAccountProfileComponent,
-        OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent
+        OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent
     ],
     imports: [
         CommonModule,

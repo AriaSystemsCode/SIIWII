@@ -170,6 +170,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
     async ngOnInit() {
         await this.handleComponentMode()
+
+         //I40-get personalAccount
         //this.personalAccount=this.accountDataForView.accountType.toUpperCase().trim()=='PERSONAL' ;
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange()
@@ -465,6 +467,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             }
         )
     }
+     //I40-get personalAccount
  //   this.personalAccount= result ? result.account.accountType.toUpperCase().trim()=='PERSONAL' : false;
         this.isPublished= result ? result.isPublished : false;
         this.isSync= result ? result.isSync : false;

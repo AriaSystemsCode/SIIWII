@@ -63,15 +63,10 @@
                 <app-overview-tab></app-overview-tab>
         </p-tabPanel>
         <p-tabPanel header="Connections">
-            <app-connections-tab></app-connections-tab>
+            <app-connections-tab   [accountId]="accountId" [accountType]="accountType"></app-connections-tab>
         </p-tabPanel>
         <p-tabPanel header="Posts">
-            <app-post-list
-[fromMarketplaceProfile]="true"
-[accountId]="accountId"
-[accountType]="accountType"
-         >
-         </app-post-list>
+         <app-posts-tab  [accountId]="accountId" [accountType]="accountType"></app-posts-tab>
         </p-tabPanel>
 
         <p-tabPanel header="Events">

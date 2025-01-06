@@ -19,7 +19,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Output() disconnectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input() fromMarketplace;
     @Output() _createRelation : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
-
+    @Input() fromMarketplaceProfile:boolean=false;
 
     
     constructor(
@@ -30,6 +30,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     }
     ngOnChanges(changes: SimpleChanges): void {
         this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId
+            this.singleItemPerRowMode  =   this.singleItemPerRowMode ? (!this.fromMarketplaceProfile ? this.singleItemPerRowMode  : false ) :  false;
     }
     isRecordOwner : boolean
     get id () : number { return this.account.account.id }

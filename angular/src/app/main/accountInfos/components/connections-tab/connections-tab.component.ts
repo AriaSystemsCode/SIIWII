@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-connections-tab',
@@ -6,5 +6,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./connections-tab.component.scss']
 })
 export class ConnectionsTabComponent {
+  @Input() accountId: number;
+  @Input() accountType: string;
+
 
 }

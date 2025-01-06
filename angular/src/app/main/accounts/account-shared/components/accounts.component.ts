@@ -81,6 +81,9 @@ export class AccountsComponent
     mailbody: string;
     filterForm: FormGroup;
     @Input() fromMarketplace;
+    @Input() fromMarketplaceProfile;
+    @Input() accountType:string;
+    connectionType:string="All"
     
     get mainFilterCtrl(): AbstractControl {
         return this.filterForm?.get("mainFilterType");
@@ -110,7 +113,9 @@ export class AccountsComponent
         this.initFilterForm();
     }
     ngOnChanges(changes: SimpleChanges) {
-        if (changes.defaultMainFilter.firstChange) {
+        this.singleItemPerRowMode  =   this.singleItemPerRowMode ? (!this.fromMarketplaceProfile ? this.singleItemPerRowMode  : false ) :  false;
+
+        if (changes?.defaultMainFilter?.firstChange) {
             this.initFilterForm();
             this.setMainPageFilter(this.defaultMainFilter);
             debugger
@@ -119,6 +124,11 @@ export class AccountsComponent
             });
             this.applyFiltersOnChange();
         }
+
+      else if (this.fromMarketplaceProfile)
+        this.getConnections({
+            rows: this.primengTableHelper.defaultRecordsCountPerPage,
+        });
     }
 
       toggleFilter(): void {
@@ -155,6 +165,7 @@ export class AccountsComponent
 
     saveUserPreferenceForListView() {
         const key = "account-list-view-mode";
+        this.singleItemPerRowMode  =   this.singleItemPerRowMode ? (!this.fromMarketplaceProfile ? this.singleItemPerRowMode  : false ) :  false;
         const value = String(Number(this.singleItemPerRowMode));
         localStorage.setItem(key, value);
     }
@@ -162,9 +173,11 @@ export class AccountsComponent
         const key = "account-list-view-mode";
         const value = localStorage.getItem(key);
         if (value) this.singleItemPerRowMode = Boolean(Number(value));
+        this.singleItemPerRowMode  =   this.singleItemPerRowMode ? (!this.fromMarketplaceProfile ? this.singleItemPerRowMode  : false ) :  false;
     }
     triggerListView() {
         this.singleItemPerRowMode = !this.singleItemPerRowMode;
+        this.singleItemPerRowMode  =   this.singleItemPerRowMode ? (!this.fromMarketplaceProfile ? this.singleItemPerRowMode  : false ) :  false;
         this.saveUserPreferenceForListView();
     }
 
@@ -182,6 +195,57 @@ export class AccountsComponent
     resetList() {
         this.filterForm.reset();
         this.setMainPageFilter(this.defaultMainFilter);
+    }
+
+    getConnections(event?: LazyLoadEvent) {
+
+        //I40-Call getall connection
+        //I40- send connectionType 
+
+        if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
+            this.paginator.changePage(0);
+            return;
+        }
+        let apiCall;
+
+        if (this.fromMarketplaceProfile) {
+            apiCall = this._marketplaceAccountsServiceProxy.getAll(  
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                this.primengTableHelper.getSkipCount(this.paginator, event),
+                this.primengTableHelper.getMaxResultCount(this.paginator, event)
+            );
+        }
+        
+    apiCall.pipe(
+        finalize(() => {
+            this.primengTableHelper.hideLoadingIndicator();
+            if (!this.active) this.active = true;
+            this.loading = false;
+            this.hideMainSpinner();
+        })
+    ).subscribe((result) => {
+        this.accounts = result.items;
+        this.primengTableHelper.totalRecordsCount = result.totalCount;
+        this.primengTableHelper.records = result.items;
+    });
     }
 
     getAccounts(event?: LazyLoadEvent) {
@@ -227,7 +291,7 @@ export class AccountsComponent
                 filters.postalCode || undefined,
                 filters?.ssin || undefined,
                 filters?.accountTypeId || undefined,
-                filters?.accountType || undefined,
+                filters?.accountType  || undefined,
                 filters.accountTypes || undefined,
                 filters.statuses || undefined,
                 filters.languages || undefined,
