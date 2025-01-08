@@ -393,6 +393,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         this.address.postalCode=addressForm.value.postalCode;
         this.address.countryId=addressForm.value.AddressCountry;
         this.address.accountId=this.contactId;
+        this.address.tenantId=this.appSession.tenantId;
         this.addressIdForEdit?this.address.id=this.addressIdForEdit:null;
         let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
 
