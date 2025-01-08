@@ -29,9 +29,14 @@ export class MarketplaceAccountProfileComponent  extends AppComponentBase   impl
     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
     { "type": "video", "thumbnail": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg", "url": "https://app.testing.siiwii.net:4001/ATTACHMENTS/2491/750f337c-5970-6d19-8282-4ee7682abd47.mp4" },
     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
 
   ];
 media:any
+itemsPerPage: number = 10; // Number of items per page
+currentPage: number = 1; // Current page
+totalItems: number = 0; // Total items (retrieved from API)
   constructor(
     injector: Injector,
     private route: ActivatedRoute,
@@ -66,6 +71,8 @@ this.mediaItems = this.mediaItems.map((item) => {
   }
   return item;
 });
+
+
 }
 sanitizeUrl(url: string): SafeResourceUrl {
   return this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -130,7 +137,7 @@ sanitizeUrl(url: string): SafeResourceUrl {
 
   getAllMedia(){
     // this.showMainSpinner()
-    this._AccountsServiceProxy.getAllAccountMediaAttachment('449928',undefined,5,10).pipe(
+    this._AccountsServiceProxy.getAllAccountMediaAttachment('449928',undefined,5,  this.itemsPerPage).pipe(
       finalize(
           ()=>
             this.hideMainSpinner()
@@ -138,9 +145,18 @@ sanitizeUrl(url: string): SafeResourceUrl {
   ).subscribe((res)=>{
   
       this.media = res.items
+      // this.totalItems = res.totalCount; // Update total items for pagination
+      this.totalItems = this.mediaItems.length; // Update total items for pagination
       // this.marketPlaceData = res
       console.log(' this.media :',  res );
   
   })
   }
+
+  changePage(pageNumber: number): void {
+    this.currentPage = pageNumber;
+    this.getAllMedia(); // Fetch new page data
+  }
+  
+  
 }

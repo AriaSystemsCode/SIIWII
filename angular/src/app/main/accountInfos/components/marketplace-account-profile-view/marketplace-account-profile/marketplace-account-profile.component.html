@@ -5,7 +5,7 @@
         <img  class=" p-0 acc-img" [src]="attachmentBaseUrl + '/' + accountDataForView?.logoUrl"  onerror="this.src='../../assets/placeholders/_logo-placeholder.png'"/>
     </div>
     <div class="bottom-sec">
-    <div class="info-sec mt-2" style="margin-left: 200px;">
+    <div class="info-sec mt-2" style="margin-left: 190px;">
         <div class="d-flex justify-content-between align-items-center">
         <h4>{{accountDataForView?.name}}</h4>
 
@@ -15,7 +15,7 @@
                 <p class="m-0">connect</p></button>
         </div>
         <div class="d-flex justify-content-between">
-            <div class="d-md-flex d-none gap-3 justify-content-start align-items-center" style="gap: 10px;white-space: nowrap;">
+            <div class="d-md-flex d-none gap-3 justify-content-start align-items-center" style="gap: 5px;white-space: nowrap;">
                 <div class="d-flex align-items-center "><svg class="mr-2" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4 19.5V8.5H20V11.79C20.72 12.01 21.4 12.33 22 12.76V8.5C22 7.39 21.11 6.5 20 6.5H16V4.5C16 3.39 15.11 2.5 14 2.5H10C8.89 2.5 8 3.39 8 4.5V6.5H4C2.89 6.5 2.01 7.39 2.01 8.5L2 19.5C2 20.61 2.89 21.5 4 21.5H11.68C11.38 20.88 11.18 20.21 11.08 19.5H4ZM10 4.5H14V6.5H10V4.5Z" fill="#777777"/>
                     <path d="M18 13.5C15.24 13.5 13 15.74 13 18.5C13 21.26 15.24 23.5 18 23.5C20.76 23.5 23 21.26 23 18.5C23 15.74 20.76 13.5 18 13.5ZM19.65 20.85L17.5 18.7V15.5H18.5V18.29L20.35 20.14L19.65 20.85Z" fill="#777777"/>
@@ -50,7 +50,7 @@
         </div>
     </div>
 
-    <div class="d-md-none d-flex gap-3 justify-content-start align-items-center pl-2" style="gap: 10px;white-space: nowrap;font-size: 10px;margin-top: 25px;">
+    <div class="d-md-none d-flex gap-3 justify-content-start align-items-center pl-2" style="gap: 5px;white-space: nowrap;font-size: 10px;margin-top: 25px;">
         <div class="d-flex align-items-center white-space-nowrap"><svg class="mr-2" width="16" height="16" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 19.5V8.5H20V11.79C20.72 12.01 21.4 12.33 22 12.76V8.5C22 7.39 21.11 6.5 20 6.5H16V4.5C16 3.39 15.11 2.5 14 2.5H10C8.89 2.5 8 3.39 8 4.5V6.5H4C2.89 6.5 2.01 7.39 2.01 8.5L2 19.5C2 20.61 2.89 21.5 4 21.5H11.68C11.38 20.88 11.18 20.21 11.08 19.5H4ZM10 4.5H14V6.5H10V4.5Z" fill="#777777"/>
             <path d="M18 13.5C15.24 13.5 13 15.74 13 18.5C13 21.26 15.24 23.5 18 23.5C20.76 23.5 23 21.26 23 18.5C23 15.74 20.76 13.5 18 13.5ZM19.65 20.85L17.5 18.7V15.5H18.5V18.29L20.35 20.14L19.65 20.85Z" fill="#777777"/>
@@ -108,27 +108,35 @@
 
             <!-- <div *ngIf="isLoading" class="loading">Loading media...</div>
             <div *ngIf="!isLoading && mediaItems.length === 0" class="no-data">No media available.</div> -->
-            <div  class="d-flex flex-wrap">
-              <div *ngFor="let item of mediaItems" class="media-item m-2" style="height: 253px;">
+            <div  class="d-flex flex-wrap justify-content-center">
+              <div *ngFor="let item of mediaItems" class="media-item m-1" >
                 <ng-container *ngIf="item.type === 'image'; else videoTemplate">
-                  <img [src]="item.url" alt="Media Image" class="media-image" style="width: 256px;height: 253px;" />
+                  <img [src]="item.url" alt="Media Image" class="media-image imgSec" style="" />
                 </ng-container>
                 <ng-template #videoTemplate>
                   <div class="video-container">
                     <!-- <img [src]="item.thumbnail" alt="Video Thumbnail" class="media-image" />
                     <i class="pi pi-play-circle play-icon"></i> -->
                     <video
-                    style="width: 487px;height: 253px;border-radius: 8px;min-width: 350px;"
+                    style=""
                     (playing)="playVideo(item, $event)"
                     (click)="playVideo(item, $event)"
                     controls
                     [attr.src]=" item.safeUrl "
-                    class=""
+                    class="vSec"
                 ></video>
                   </div>
                 </ng-template>
               </div>
             </div>
+
+            <p-paginator
+            [rows]="itemsPerPage"
+            [totalRecords]="totalItems"
+            [(first)]="(currentPage - 1) * itemsPerPage"
+            (onPageChange)="changePage($event)"
+            styleClass="mt-3"
+          ></p-paginator>
         </p-tabPanel>
 
     </p-tabView>
