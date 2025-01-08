@@ -62,6 +62,7 @@ import { AccountSharedModule } from '../accounts/account-shared/account-shared.m
 import { ConnectionsTabComponent } from './components/connections-tab/connections-tab.component';
 import { EventsTabComponent } from './components/events-tab/events-tab.component';
 import { PostsTabComponent } from './components/posts-tab/posts-tab.component';
+import { ConnectionsCardComponent } from './components/connections-card/connections-card.component';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -81,7 +82,7 @@ import { PostsTabComponent } from './components/posts-tab/posts-tab.component';
         TenantInvoicesComponent,
         PlansComponent,
         MarketplaceAccountProfileComponent,
-        OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent
+        OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent, ConnectionsCardComponent
     ],
     imports: [
         CommonModule,

@@ -67,7 +67,7 @@ export class EventsBrowseComponent extends AppComponentBase {
     get startDateCtrl () { return this.filterForm.get('startDate') }
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
-    @Input() fromMarketPlaceAccountProfile :boolean =false;
+    @Input() fromMarketPlaceProfile :boolean =false;
     @Input() accountId :number =0;
     
     constructor(

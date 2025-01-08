@@ -1,7 +1,7 @@
-<div class="single-item row align-items-center h-100"      [ngClass]="{ 'marketplaceAccountProfileCard': fromMarketPlaceAccountProfile }">
+<div class="single-item row align-items-center h-100"      [ngClass]="{ 'marketplaceAccountProfileCard': fromMarketPlaceProfile }">
     <div class="single-item-photo mr-1 h-100" (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
-    [ngStyle]="{'width.px':fromMarketPlaceAccountProfile ? 232 : 116 ,
-    'height':fromMarketPlaceAccountProfile ? 'fit-content' : 120  }">
+    [ngStyle]="{'width.px':fromMarketPlaceProfile ? 232 : 116 ,
+    'height':fromMarketPlaceProfile ? 'fit-content' : 120  }">
         <img
             class="w-100 h-100" 
             [src]="attachmentBaseUrl + '/' + item.appEvent.logoURL"
@@ -16,7 +16,7 @@
         <div class="row">
             <div
             class="pt-3 col"
-            *ngIf="!fromMarketPlaceAccountProfile"
+            *ngIf="!fromMarketPlaceProfile"
         >
             <h3
                 class="m-0 mb-2 text-dark cursor-pointer"
@@ -81,7 +81,7 @@
 
             <div
                 class="col"
-                *ngIf="fromMarketPlaceAccountProfile"
+                *ngIf="fromMarketPlaceProfile"
             >
                 <h3
                     class="m-0 mb-2 text-dark cursor-pointer"
@@ -158,7 +158,7 @@
             </div>
 
 
-            <div *ngIf="!fromMarketPlaceAccountProfile">
+            <div *ngIf="!fromMarketPlaceProfile">
                 <app-events-browse-actions-menu
                         #appEventsActionsMenuComponent
                         [item]="item.appEvent"

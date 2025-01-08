@@ -23,7 +23,7 @@ export class EventsBrowseCardComponent extends AppComponentBase {
     @Output() triggerEvent: EventEmitter<EventsBrowseActionsEvents> = new EventEmitter<EventsBrowseActionsEvents>();
     EventsFilterTypesEnum = EventsFilterTypesEnum
     EventsBrowseActionsEvents = EventsBrowseActionsEvents
-    @Input() fromMarketPlaceAccountProfile :boolean =false;
+    @Input() fromMarketPlaceProfile :boolean =false;
     eventAddress="";
 
     get mainFilterCtrl() { return this.filterForm.get('filterType') }

@@ -6,9 +6,9 @@
                     <div class="kt-portlet__body">
                         <div class="row pt-5" *ngIf="active">
                             <div class="col-12 list-toolbar" 
-                            [ngClass]="{ 'border-dashed-bottom pb-4': !fromMarketPlaceAccountProfile }">
+                            [ngClass]="{ 'border-dashed-bottom pb-4': !fromMarketPlaceProfile }">
 
-                                <div class="row mb-3 justify-content-between"  *ngIf="!fromMarketPlaceAccountProfile">
+                                <div class="row mb-3 justify-content-between"  *ngIf="!fromMarketPlaceProfile">
                                     <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
                                             <button class="dropdown-toggle btn btn-sm font-weight-normal p-0"
@@ -59,7 +59,7 @@
                                             <i  class="d-inline-block w-100 flaticon2-reload icon-center"></i>
                                         </a>
                                         <a style="padding-left: 10px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
-                                            <i  class="d-inline-block w-100 " [ngClass]="singleItemPerRowMode||fromMarketPlaceAccountProfile  ? 'flaticon2-menu' : 'fa-bars fas'"></i>
+                                            <i  class="d-inline-block w-100 " [ngClass]="singleItemPerRowMode||fromMarketPlaceProfile  ? 'flaticon2-menu' : 'fa-bars fas'"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -98,7 +98,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3 col-sm-4 border-dashed-right left-aside-filters pt-4 mt-2"   *ngIf="!fromMarketPlaceAccountProfile">
+                            <div class="col-6 col-md-3 col-sm-4 border-dashed-right left-aside-filters pt-4 mt-2"   *ngIf="!fromMarketPlaceProfile">
                                     <app-events-browse-filters
                                         [filterForm]="filterForm"
                                         [filtersFlags]="filtersFlags"
@@ -107,15 +107,15 @@
                             </div>
                             <div  class="col d-flex flex-column justify-content-between app-items-container thin-scroll" >
                                 <div class="row pt-3 pl-5 pr-2">
-                                    <div *ngFor="let item of items;index as i" class="col-12 mb-5 " [ngClass]="singleItemPerRowMode || fromMarketPlaceAccountProfile ?'col-md-12 single-item-per-row-layout' : 'col-md-6'">
+                                    <div *ngFor="let item of items;index as i" class="col-12 mb-5 " [ngClass]="singleItemPerRowMode || fromMarketPlaceProfile ?'col-md-12 single-item-per-row-layout' : 'col-md-6'">
                                         <app-events-browse-card
                                             [item]="item"
                                             [filterForm]="filterForm"
                                             [actionsMenuFlags]="actionsMenuFlags"
                                             [statusesFlags]="statusesFlags"
-                                            [singleItemPerRowMode]="singleItemPerRowMode || fromMarketPlaceAccountProfile"
+                                            [singleItemPerRowMode]="singleItemPerRowMode || fromMarketPlaceProfile"
                                             (triggerEvent)="eventHandler($event,item.appEvent.id,i)"
-                                            [fromMarketPlaceAccountProfile]="fromMarketPlaceAccountProfile"
+                                            [fromMarketPlaceProfile]="fromMarketPlaceProfile"
                                         ></app-events-browse-card>
                                     </div>
                                     <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="items.length == 0 && !loading">{{'NoDataFound' | localize}}</div>
