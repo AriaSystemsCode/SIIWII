@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { EventsFilterTypesEnum, GetAppEventForViewDto } from '@shared/service-proxies/service-proxies';
@@ -12,7 +12,7 @@ import { EventsBrowseActionsMenuComponent } from '../events-browse-actions-menu/
   templateUrl: './events-browse-card.component.html',
   styleUrls: ['./events-browse-card.component.scss']
 })
-export class EventsBrowseCardComponent extends AppComponentBase {
+export class EventsBrowseCardComponent extends AppComponentBase implements OnChanges {
 
     @ViewChild("EventsBrowseActionsMenuComponent", { static: true }) eventsBrowseActionsMenuComponent: EventsBrowseActionsMenuComponent;
     @Input() item: GetAppEventForViewDto;
@@ -31,6 +31,10 @@ export class EventsBrowseCardComponent extends AppComponentBase {
         injector: Injector,
     ) {
         super(injector);
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        this.getAddressDetails();
     }
     _triggerEvent(event:EventsBrowseActionsEvents) {
         this.triggerEvent.emit(event);
@@ -69,6 +73,6 @@ export class EventsBrowseCardComponent extends AppComponentBase {
                 : this.item.appEvent?.country
             : "";
 
-            return this.eventAddress ? this.eventAddress : "online ask for the link";
+            return  this.eventAddress =  this.eventAddress ? this.eventAddress : "online ask for the link";
     }
 }

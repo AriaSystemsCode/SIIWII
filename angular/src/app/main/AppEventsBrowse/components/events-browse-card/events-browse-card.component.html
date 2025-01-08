@@ -140,9 +140,13 @@
            <div class="product-name p-4 font-weight-bold row border-left-0 pl-5 col-6"  style="border: 1px solid #EEEEEE; border-radius: 4px;">
             <img src="../../../../../assets/events/carbon_location-company.png" 
             style="width: 19px; height: 19px;"   class="mr-2" />  {{ "Location :   " | localize }}
-               <span style="color: #9E9E9E;" class="ml-2">
-                   {{ getAddressDetails() }} 
-                   </span>
+            <span *ngIf="eventAddress?.includes('online')" style="color: #9E9E9E;" class="ml-2">
+                {{ eventAddress }} 
+              </span>
+
+                   <span *ngIf="!eventAddress?.includes('online')" style="color: #9E9E9E;" class="ml-2">
+                    {{ eventAddress | textSubstring: 20 }} 
+                  </span>
            </div>
          
 
