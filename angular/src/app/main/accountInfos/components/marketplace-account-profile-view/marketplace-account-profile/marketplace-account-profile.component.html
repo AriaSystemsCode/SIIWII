@@ -101,10 +101,34 @@
             </p>
         </p-tabPanel>
         <p-tabPanel header="Media">
-            <p>
+            <!-- <p>
                 At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa
                 qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
-            </p>
+            </p> -->
+
+            <!-- <div *ngIf="isLoading" class="loading">Loading media...</div>
+            <div *ngIf="!isLoading && mediaItems.length === 0" class="no-data">No media available.</div> -->
+            <div  class="d-flex flex-wrap">
+              <div *ngFor="let item of mediaItems" class="media-item m-2" style="height: 253px;">
+                <ng-container *ngIf="item.type === 'image'; else videoTemplate">
+                  <img [src]="item.url" alt="Media Image" class="media-image" style="width: 256px;height: 253px;" />
+                </ng-container>
+                <ng-template #videoTemplate>
+                  <div class="video-container">
+                    <!-- <img [src]="item.thumbnail" alt="Video Thumbnail" class="media-image" />
+                    <i class="pi pi-play-circle play-icon"></i> -->
+                    <video
+                    style="width: 487px;height: 253px;border-radius: 8px;min-width: 350px;"
+                    (playing)="playVideo(item, $event)"
+                    (click)="playVideo(item, $event)"
+                    controls
+                    [attr.src]=" item.safeUrl "
+                    class=""
+                ></video>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
         </p-tabPanel>
 
     </p-tabView>

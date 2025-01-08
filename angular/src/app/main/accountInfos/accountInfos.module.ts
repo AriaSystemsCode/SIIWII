@@ -59,6 +59,7 @@ import { PostsModule } from '../posts/posts.module';
 import { InteractionsModule } from '../interactions/interactions.module';
 import { MarketplaceProductsComponent } from '../marketplace/marketplace-products/components/marketplace-products.component';
 import { MarketplaceProductsModule } from '../marketplace/marketplace-products/marketplace-products.module';
+import { SanitizeurlPipe } from '../posts/Pipes/sanitizeurl';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -119,7 +120,9 @@ import { MarketplaceProductsModule } from '../marketplace/marketplace-products/m
         TabViewModule,
         PostsModule,
         InteractionsModule,
-        MarketplaceProductsModule
+        MarketplaceProductsModule,
+        
+        
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
@@ -128,7 +131,7 @@ import { MarketplaceProductsModule } from '../marketplace/marketplace-products/m
         PublishAccountService,PublishService
     ],
     exports:[
-        MarketplaceProductsModule
+        MarketplaceProductsModule,
     ]
 })
 export class AccountInfosModule { }
