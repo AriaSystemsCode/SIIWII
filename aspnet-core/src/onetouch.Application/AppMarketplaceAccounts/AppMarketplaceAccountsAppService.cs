@@ -182,8 +182,9 @@ namespace onetouch.AppMarketplaceAccounts
                                         //ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? "Follow" : "",
                                         ConnectionName = "Follow",
                                         Account = new AccountDto
-                                        {
+                                        { 
                                             AccountTypeString = o.EntityObjectTypeCode,
+                                            TenantId = o.TenantOwner,
                                             AccountTypeId = o.EntityObjectTypeId,
                                             AccountType = o.EntityObjectTypeCode,
                                             SSIN = o.SSIN,

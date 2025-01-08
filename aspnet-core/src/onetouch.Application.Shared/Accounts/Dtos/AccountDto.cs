@@ -10,7 +10,7 @@ namespace onetouch.Accounts.Dtos
     {
 		public string Name { get; set; }
         public Boolean ShowSync { get; set; }
-
+        public int TenantId { get; set; }
         public string Description { get; set; }
 
 		public int Connections { get; set; }
