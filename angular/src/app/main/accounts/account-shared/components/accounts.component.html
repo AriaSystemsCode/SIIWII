@@ -5,7 +5,7 @@
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                         <div class="row">
-                            <div *ngIf="fromMarketplaceProfile"> 
+                            <div *ngIf="fromMarketplaceProfile && accounts  && accounts?.length>0"> 
                                 <input type="radio" id="all" name="option" />
                                 <label for="all" (click)="connectionType='All'">All</label>  <span style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
                                 <input type="radio" id="people" name="option" />

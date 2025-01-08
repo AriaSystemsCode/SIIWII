@@ -122,13 +122,14 @@ export class AccountsComponent
             this.getAccounts({
                 rows: this.primengTableHelper.defaultRecordsCountPerPage,
             });
-            this.applyFiltersOnChange();
         }
 
       else if (this.fromMarketplaceProfile)
         this.getConnections({
             rows: this.primengTableHelper.defaultRecordsCountPerPage,
         });
+
+        this.applyFiltersOnChange();
     }
 
       toggleFilter(): void {
@@ -155,11 +156,21 @@ export class AccountsComponent
             .subscribe((status) => {
                 if (status) {
                     debugger
+                    if(!this.fromMarketplaceProfile){
                     this.getAccounts({
                         rows: this.primengTableHelper
                             .defaultRecordsCountPerPage,
                     });
                 }
+
+            }
+
+            else
+            this.getConnections({
+                rows: this.primengTableHelper
+                    .defaultRecordsCountPerPage,
+            });
+
             });
     }
 
@@ -202,6 +213,9 @@ export class AccountsComponent
         //I40-Call getall connection
         //I40- send connectionType 
 
+
+        const filters = this.filterForm?.value;
+
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
@@ -228,7 +242,7 @@ export class AccountsComponent
                 undefined,
                 undefined,
                 undefined,
-                undefined,
+               filters?.sorting?.value || undefined,
                 this.primengTableHelper.getSkipCount(this.paginator, event),
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)
             );
