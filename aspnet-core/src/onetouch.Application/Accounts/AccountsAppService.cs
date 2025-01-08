@@ -448,6 +448,7 @@ namespace onetouch.Accounts
                                         Account = new AccountDto
                                         {
                                             AccountTypeString = o.EntityFk.EntityObjectTypeCode,
+                                            TenantId = o.EntityFk.TenantOwner,
                                             AccountTypeId = o.EntityFk.EntityObjectTypeId,
                                             AccountType = o.EntityFk.EntityObjectTypeCode,
                                             SSIN = o.SSIN,
@@ -497,7 +498,7 @@ namespace onetouch.Accounts
                             account.ConnectionName = "";
                         }
                     }
-
+                     
                     var x = new PagedResultDto<GetAccountForViewDto>(
                         totalCount,
                         accountsList
@@ -513,7 +514,10 @@ namespace onetouch.Accounts
 
             }
         }
-
+        public async Task<bool> GetSettingValue(string settingName, string ssin)
+        {
+            return true;
+        }
 
         public string GetAction(string accountTypeCode, string currentTenantEdition, bool needAction = false)
         {     
