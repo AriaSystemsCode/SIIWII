@@ -704,7 +704,7 @@
                     <div class="row mt-4 ml-3" 
                     [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
-                        <div class="w-100 comment-warper   order-summary p-4  mt-3 purpleColor" style="max-height: 555px; overflow-y: scroll;">
+                        <div class="w-100 comment-warper   order-summary p-4  mt-3 purpleColor" >
                             <app-comment-parent [addNewThread]="true"  *ngIf="appTransactionsForViewDto"
                             [cartStyle]="true" #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                             (newCommentAdded)="onGeneratOrderReport(true)">
