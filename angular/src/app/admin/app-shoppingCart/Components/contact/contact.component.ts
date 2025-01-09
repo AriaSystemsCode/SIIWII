@@ -49,6 +49,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     @Output() validateTempBuyer = new EventEmitter<boolean>();
     conNew:boolean = false
     comNew:boolean = false
+    emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,

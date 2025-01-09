@@ -510,6 +510,7 @@ addAddressDataToDto(index: number) {
         roleContact.contactAddressLine1 = this.selectedAddress.addressLine1 || roleContact.contactAddressLine1;
         roleContact.contactAddressLine2 = this.selectedAddress.addressLine2 || roleContact.contactAddressLine2;
         // roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
+        debugger;
         roleContact.contactAddressState = this.selectedAddress.state || roleContact.contactAddressState;
     }
 
