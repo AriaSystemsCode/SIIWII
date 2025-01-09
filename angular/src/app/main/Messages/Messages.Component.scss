@@ -333,6 +333,11 @@ li {
     overflow: hidden;
     cursor: pointer;
 }
+
+.collapsed {
+    -webkit-line-clamp: unset;  /* Remove line clamp when expanded */
+    cursor: pointer;
+  }
 .show-detail-btn{
     padding:11px 10px;
 
