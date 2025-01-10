@@ -508,10 +508,15 @@ gap: 8px;
 // height: 60px;
 
 border-radius: 16px 16px 0px 0px;
+min-height: 60px;
+height: 100px;
+border-bottom: 1px solid #EEEEEEEE;
 
 
   }
-
+.bottomSec {
+  padding: 8px 16px;
+}
   .rating {
     display: flex;
     align-items: center;
@@ -519,9 +524,7 @@ border-radius: 16px 16px 0px 0px;
     font-size: 2rem; /* Size of the stars */
     color: #ffc107; /* Gold color for filled stars */
   }
-  .fa-star-o{
-    color: blue; /* Empty stars are blue */
-  }
+  
   .rating i {
     cursor: pointer;
     transition: color 0.2s;
@@ -529,14 +532,14 @@ border-radius: 16px 16px 0px 0px;
   
   /* Change the color of unselected stars (fa-star-o) to blue */
   .rating .fa-star-o:before {
-    content: "\f006"; /* This is for the unfilled star */
-    color: blue;      /* Set the color to blue for empty stars */
+    content: "\f005"; /* This is for the unfilled star */
+    color: #E1E1E1;      /* Set the color to blue for empty stars */
   }
   
   /* Change the color of filled stars (fa-star) to gold */
   .rating .fa-star:before {
     content: "\f005"; /* This is for the filled star */
-    color: #ffc107;   /* Set the color to gold for filled stars */
+    color: #F6851D;   /* Set the color to gold for filled stars */
   }
   
   /* Optional: Change the color when hovering over a star */
@@ -568,3 +571,8 @@ border-radius: 6px;
 color: #fff;
   }
   
+
+  .iconImg {
+    height: 24px;
+    cursor: pointer;
+  }

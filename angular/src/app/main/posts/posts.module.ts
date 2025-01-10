@@ -62,7 +62,7 @@ import { AdsSidebarComponent } from '../../../shared/components/ads-sidebar/ads-
         TopPeopleComponent,
         TopCompanyComponent,
         AdsSidebarComponent,
-        SanitizeurlPipe
+        
         
     ],
 })

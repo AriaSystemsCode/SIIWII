@@ -44,7 +44,28 @@
               
             Head Quarter : </div>
           <div class="col-md-7 row-item-desc">
-            <span> hello head quarter</span>
+            
+            <p class="title-account" >
+            
+              <span *ngIf=" accountDataForView?.addressLine1">
+                  {{ accountDataForView.addressLine1 + ', '}}
+              </span>
+              <span *ngIf="accountDataForView?.addressLine2">
+                  {{ accountDataForView?.addressLine2 + ', '}}
+              </span>
+              <span *ngIf="accountDataForView?.city">
+                  {{ accountDataForView?.city + ', '}}
+              </span>
+              <span *ngIf="accountDataForView?.state">
+                  {{ accountDataForView?.state + ', ' }}
+              </span>
+              <span *ngIf="accountDataForView?.zipCode">
+                  {{accountDataForView?.zipCode }}{{accountDataForView?.countryName ? ', ' : '' }}
+              </span>
+              <span *ngIf="accountDataForView?.countryName">
+                  {{ accountDataForView?.countryName }} .
+              </span>
+          </p>
           </div>
         </div>
          <div *ngIf="accountDataForView?.accountType == 'BUSINESS'" class="mb-3">
@@ -92,7 +113,7 @@
                 
               About</div>
             <div class="">
-              <span> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deleniti exercitationem fuga sint veritatis ea reiciendis maxime impedit dicta inventore consequuntur corporis sunt numquam fugit voluptatem illum soluta, vel nostrum architecto. </span>
+              <span> {{accountDataForView?.description || '-'}} </span>
             </div>
           </div>
      
@@ -361,13 +382,20 @@
                 </ng-container>
               
                 <!-- Display the current rating or message -->
-                <span>{{ selectedRating ? selectedRating + ' out of 5 stars' : 'No rating yet' }}</span>
+                <!-- <span>{{ selectedRating ? selectedRating + ' out of 5 stars' : 'No rating yet' }}</span> -->
               </div>
               
               
              </div>
-             <div class="bottomSec d-flex justify-content-between w-100">
-              <div></div>
+             <div class="bottomSec d-flex justify-content-between w-100 align-items-center">
+              <div>
+                <div class="d-flex">
+          <img src="../../assets/placeholders/vAttach.png"  class="mr-2 iconImg" alt="" srcset="">
+          <img src="../../assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="" srcset="">
+          <img src="../../assets/placeholders/emojsIcons.png" class="mr-2 iconImg" alt="" srcset="">
+
+                </div>
+              </div>
              <button class="btnPost">Post</button>
              </div>
             </div>

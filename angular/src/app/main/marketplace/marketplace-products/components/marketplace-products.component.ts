@@ -5,7 +5,8 @@ import {
     OnDestroy,
     ViewChild,
     OnInit,
-   SimpleChanges, OnChanges, ViewChildren, ElementRef
+   SimpleChanges, OnChanges, ViewChildren, ElementRef,
+   Input
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
@@ -74,6 +75,7 @@ export class MarketplaceProductsComponent
     sellerSSIN: any;
     buyerSSIN: any;
     contactSSIN:any;
+    @Input() fromMarketAcoount: boolean;
 
     constructor(
         injector: Injector,

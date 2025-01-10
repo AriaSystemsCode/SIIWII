@@ -37,12 +37,15 @@ media:any
 itemsPerPage: number = 10; // Number of items per page
 currentPage: number = 1; // Current page
 totalItems: number = 0; // Total items (retrieved from API)
+isModalOpen = false; // Controls modal visibility
+selectedIndex = 0; // Index of the currently selected image
   constructor(
     injector: Injector,
     private route: ActivatedRoute,
     private _AccountsServiceProxy: AccountsServiceProxy,
     private sanitizer: DomSanitizer,
     private  _marketplaceAccountsServiceProxy : MarketplaceAccountsServiceProxy,
+    
   
 ) {
   super(injector);
@@ -61,7 +64,7 @@ totalItems: number = 0; // Total items (retrieved from API)
     // this.isHost = !this._abpSessionService.tenantId;
  this.getAccountDataForView()
 //  this.getAllMedia()
-
+ this.createRelation()
 this.mediaItems = this.mediaItems.map((item) => {
   if (item.type === 'video') {
     return {
@@ -108,24 +111,7 @@ sanitizeUrl(url: string): SafeResourceUrl {
   }
 
 
-  currentPlayingVideo: HTMLVideoElement;
-  onPlayingVideo(event) {
-      console.log(event.target, this.currentPlayingVideo);
-      event.preventDefault();
-      // play the first video that is chosen by the user
-      if (this.currentPlayingVideo === undefined) {
-          this.currentPlayingVideo = event.target;
-          this.currentPlayingVideo.play();
-      } else {
-          // if the user plays a new video, pause the last
-          // one and play the new one
-          if (event.target !== this.currentPlayingVideo) {
-              this.currentPlayingVideo.pause();
-              this.currentPlayingVideo = event.target;
-              this.currentPlayingVideo.play();
-          }
-      }
-  }
+
 
   playVideo(videoUrl: string, event) {
       let videoPrams={
@@ -157,6 +143,39 @@ sanitizeUrl(url: string): SafeResourceUrl {
     this.currentPage = pageNumber;
     this.getAllMedia(); // Fetch new page data
   }
+  openModal(index: number): void {
+    this.selectedIndex = index;
+    this.isModalOpen = true;
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+  }
+
+  prevMedia(): void {
+    if (this.selectedIndex > 0) {
+      this.selectedIndex--;
+    }
+  }
   
+  nextMedia(): void {
+    if (this.selectedIndex < this.mediaItems.length - 1) {
+      this.selectedIndex++;
+    }
+  }
   
+
+
+  createRelation() {
+    this._AccountsServiceProxy
+            .applyRelationOnProfile(this.accountId)
+            .pipe(
+                finalize(() => {;
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe((res) => {
+             console.log(res)
+            });
+}
 }
