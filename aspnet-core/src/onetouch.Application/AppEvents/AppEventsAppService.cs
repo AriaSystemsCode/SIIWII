@@ -127,6 +127,7 @@ namespace onetouch.AppEvents
                                             IsPublished = o.IsPublished,
                                             UserId = (long)o.CreatorUserId,
                                             UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).FullName,
+                                            ProfilePictureId = (Guid)UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).ProfilePictureId,
                                             Attachments = input.IncludeAttachments == true ? ObjectMapper.Map<List<AppEntityAttachmentDto>>(o.EntityFk.EntityAttachments) : null,
                                             Status = o.EntityFk.EntityObjectStatusFk.Name,
                                             BanarURL = imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityFk.EntityAttachments.Where(e => e.AttachmentCategoryId == BannerAttachmentCategoryId).FirstOrDefault().AttachmentFk.Attachment,
