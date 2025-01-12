@@ -63,14 +63,15 @@
                                     <div class="form-group m-form__group align-items-center">
                                         <div class="input-group">
                                             <span class="input-group-btn">
-                                                <button (click)="getAppTransactions();getVariationDetail()" class="searchBtn" type="submit">
+                                                <button class="searchBtn" type="submit">
                                                     <img 
                                                         src="../../../assets/landingPage/Search.png" />
                                                     </button>
                                             </span>
                                             <input [(ngModel)]="filterText"   formControlName="search" autoFocus
                                                 class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
-                                                type="text" >
+                                                type="text"     (keydown.enter)="onSearch($event)"
+                                               >
                                          
                                         </div>
                                     </div>
