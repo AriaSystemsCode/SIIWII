@@ -30,7 +30,6 @@ export class ConnectionsTabComponent extends AppComponentBase {
   }
   constructor(
     injector: Injector,
-    private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
     private _abpSessionService: AbpSessionService,
     private _accountsServiceProxy: AccountsServiceProxy,
     private _formBuilder: FormBuilder) {
@@ -39,19 +38,38 @@ export class ConnectionsTabComponent extends AppComponentBase {
   }
 
   isHost: boolean;
+  showData:boolean =true;
   ngOnInit() {
     this.isHost = !this._abpSessionService.tenantId;
     this.defineSortingOptions();
     this.initFilterForm();
+    this.GetSettingValue();
   }
+  
 
   ngOnChanges(changes: SimpleChanges) {
     this.singleItemPerRowMode = false;
-    this.getConnections({
-      rows: this.primengTableHelper.defaultRecordsCountPerPage,
-    });
+    if (this.showData) {
+      this.getConnections({
+        rows: this.primengTableHelper.defaultRecordsCountPerPage,
+      });
+    }
+    else
+      this.accounts = [];
   }
 
+  GetSettingValue(){
+    //I40-send SettingValueName 
+    this._accountsServiceProxy.getSettingValue(
+      "", this.accountDataForView?.ssin
+    ).pipe(
+      finalize(() => {
+        this.hideMainSpinner();
+      }))
+      .subscribe((result) => {
+        this.showData = result;
+      });
+  }
 
   initFilterForm() {
     if (this.filterForm) return;
@@ -77,18 +95,16 @@ export class ConnectionsTabComponent extends AppComponentBase {
   }
 
   getConnections(event?: LazyLoadEvent) {
-    //I40-Call getall connection
     //I40- send connectionType 
     if (this.primengTableHelper.shouldResetPaging(event)) {
       this.paginator.totalRecords = 10;
       this.paginator.changePage(0);
       return;
     }
-    let apiCall;
     const filters = this.filterForm?.value;
 
-    if (true) {
-      apiCall = this._marketplaceAccountsServiceProxy.getAll(
+   
+     this._accountsServiceProxy.getAllMyConnections(
         undefined,
         undefined,
         undefined,
@@ -96,9 +112,9 @@ export class ConnectionsTabComponent extends AppComponentBase {
         undefined,
         undefined,
         undefined,
+        this.accountDataForView?.ssin,
         undefined,
-        undefined,
-        undefined,
+       undefined,
         undefined,
         undefined,
         undefined,
@@ -109,17 +125,14 @@ export class ConnectionsTabComponent extends AppComponentBase {
         filters?.sorting?.value || undefined,
         this.primengTableHelper.getSkipCount(this.paginator, event),
         this.primengTableHelper.getMaxResultCount(this.paginator, event)
-      );
-    }
-
-    apiCall.pipe(
+      ).pipe(
       finalize(() => {
         this.primengTableHelper.hideLoadingIndicator();
         if (!this.active) this.active = true;
         this.loading = false;
         this.hideMainSpinner();
-      })
-    ).subscribe((result) => {
+      }))
+    .subscribe((result) => {
       this.accounts = result.items;
       this.primengTableHelper.totalRecordsCount = result.totalCount;
       this.primengTableHelper.records = result.items;

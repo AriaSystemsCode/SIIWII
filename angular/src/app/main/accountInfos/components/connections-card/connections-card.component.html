@@ -76,8 +76,7 @@
                   <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1">
                    <img  src="../../../../../assets/accounts/followers.png" />
                     <span style="color: rgba(158, 158, 158, 1);">
-                        <!-- //I40- set accountFollowers  -->
-                      {{ account.account?.accountFollowers  ? account.account?.accountFollowers   : '0' }}   {{ ' Followers' }}
+                      {{ account?.account?.connectioncount   ? account.account?.connectioncount   : '0' }}   {{ ' Followers' }}
                     </span>
                   </div>
 
@@ -89,7 +88,7 @@
                           }" style="min-width: 115px;">
                             {{ "About :" | localize }}
                           </b>
-                     <div> {{ account.account?.description | textSubstring : 40   }} </div> 
+                     <div> {{ account?.account?.description | textSubstring : 40   }} </div> 
                      </span>
                    </div>
                 </div>
