@@ -66,7 +66,7 @@
                     }" style="min-width: 115px;">
                       {{ "AccountType" | localize }}:
                     </b>
-                    <span class="accountType_value  mt-2">
+                    <span class="accountType_value  mt-2 ml-2">
                       {{ account.account.accountType || ('NotSpecified' | localize) }}
                     </span>
                   </div>
@@ -82,7 +82,7 @@
                             }" style="min-width: 115px;">
                               {{ "Ceo :" | localize }}
                             </b>
-                       <div class="domain-text" 
+                       <div class="domain-text ml-2" 
                        [title]="account?.account?.website"> {{ account?.account?.website | textSubstring : 30   }} </div> 
                        </span>
                      </div>
