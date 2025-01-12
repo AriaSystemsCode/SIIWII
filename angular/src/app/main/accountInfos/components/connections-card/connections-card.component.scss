@@ -1,0 +1,19 @@
+.domain-text {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .domain-text:hover::after {
+    content: attr(title); /* Display full string */
+    position: absolute;
+    bottom: 100%; /* Position above the text */
+    left: 0;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    z-index: 10;
+    font-size: 12px;
+  }
+  

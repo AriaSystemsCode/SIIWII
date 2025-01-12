@@ -7,7 +7,7 @@ import { GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 @Component({
   selector: 'app-connections-card',
   templateUrl: './connections-card.component.html',
-  styleUrls: ['../../../accounts/account-shared/components/account-card.component.scss']
+  styleUrls: ['../../../accounts/account-shared/components/account-card.component.scss', './connections-card.component.scss']
 })
 export class ConnectionsCardComponent extends AppComponentBase {
 
