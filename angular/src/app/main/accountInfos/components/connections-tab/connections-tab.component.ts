@@ -1,7 +1,7 @@
 import { Component, Injector, Input, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AccountsServiceProxy, GetAccountForViewDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, GetAccountForViewDto, LookupLabelDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AbpSessionService } from 'abp-ng2-module';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
@@ -22,8 +22,11 @@ export class ConnectionsTabComponent extends AppComponentBase {
   active: boolean = false;
   loading: boolean = false;
   @ViewChild("paginator", { static: true }) paginator: Paginator;
-  connectionType: string = "All";
+  connectionTypeId: number = 0;
+  accountsTypes:LookupLabelDto[]=[];
   filterForm: FormGroup;
+
+  
 
   get sortingCtrl(): AbstractControl {
     return this.filterForm?.get("sorting");
@@ -32,6 +35,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
     injector: Injector,
     private _abpSessionService: AbpSessionService,
     private _accountsServiceProxy: AccountsServiceProxy,
+    private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
     private _formBuilder: FormBuilder) {
     super(injector);
     this.overridePrimeTableSetting();
@@ -53,10 +57,32 @@ export class ConnectionsTabComponent extends AppComponentBase {
       this.getConnections({
         rows: this.primengTableHelper.defaultRecordsCountPerPage,
       });
+
+      this.getAllAccountTypesForTableDropdownWithPaging();
     }
     else
       this.accounts = [];
   }
+
+  getAllAccountTypesForTableDropdownWithPaging(){
+  this._appEntitiesServiceProxy.getAllAccountTypesForTableDropdownWithPaging(
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    0,
+    undefined,true
+)
+.subscribe(result => {
+this.accountsTypes=result.items;
+});
+}
 
   GetSettingValue(){
     //I40-send SettingValueName 
@@ -95,7 +121,6 @@ export class ConnectionsTabComponent extends AppComponentBase {
   }
 
   getConnections(event?: LazyLoadEvent) {
-    //I40- send connectionType 
     if (this.primengTableHelper.shouldResetPaging(event)) {
       this.paginator.totalRecords = 10;
       this.paginator.changePage(0);
@@ -113,7 +138,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
         undefined,
         undefined,
         this.accountDataForView?.ssin,
-        undefined,
+        this.connectionTypeId > 0 ? this.connectionTypeId : undefined,
        undefined,
         undefined,
         undefined,
@@ -217,6 +242,11 @@ disconnect(account: AccountDto): void {
           this.accounts[accountIndx].connectionName = this.l(result);
         }
       });
+  }
+
+  setConnectionType(code: number): void {
+    this.connectionTypeId = code;
+    this.getConnections();
   }
 
 }

@@ -52,10 +52,10 @@ export class ConnectionsCardComponent extends AppComponentBase {
     }
     viewProfile(): void {
             if(!this.id) return
-            this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
-                queryParams: { accountType:  this.account.account.accountType
-                }
-              });
+ this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
+                  queryParams: {
+                    accountType: this.account.account.accountType
+                  }});
     }
     clickCardHandler(){
         // view profile

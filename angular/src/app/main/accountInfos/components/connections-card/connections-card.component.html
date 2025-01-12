@@ -74,7 +74,7 @@
 
 
                   <div>
-                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" *ngIf="account.account?.domain">
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" *ngIf="account.account?.website">
                       <img  src="../../../../../assets/accounts/Ceo.png" />
                        <span style="color: rgba(158, 158, 158, 1);">
                            <b class="accountType_label pt-4" [ngStyle]="{
@@ -83,7 +83,7 @@
                               {{ "Ceo :" | localize }}
                             </b>
                        <div class="domain-text" 
-                       [title]="account?.account?.domain"> {{ account?.account?.domain | textSubstring : 30   }} </div> 
+                       [title]="account?.account?.website"> {{ account?.account?.website | textSubstring : 30   }} </div> 
                        </span>
                      </div>
                   </div>

@@ -1,7 +1,7 @@
 import { ActivatedRoute } from '@angular/router';
 import { AccountMainFilterEnum } from '@app/main/accounts/account-shared/models/accounts-main-filter.enum';
 import { SelectItem } from 'primeng/api';
-import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Injector, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -14,7 +14,7 @@ import { finalize } from 'rxjs';
   styleUrls: ['./marketplace-account-profile.component.scss'],
   providers:[MarketplaceAccountsServiceProxy,AppMarketplaceItemsServiceProxy]
 })
-export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit {
+export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit  {
   accountId:number;
   accountType:string = "";
   defaultMainFilter : AccountMainFilterEnum= AccountMainFilterEnum.AllAccounts
@@ -54,31 +54,44 @@ selectedIndex = 0; // Index of the currently selected image
   super(injector);
 }
 
-  async ngOnInit(): Promise<void> {
-    this.route.params.subscribe(params => {
-      this.accountId = params['id'];
-      console.log('accountId:', this.accountId);
-
+paramsSubscription;
+ngOnInit(): void {
+  this.paramsSubscription = this.route.params.subscribe(async (params) => {
+    this.accountId = params['id'];
+    await this.getData();
   });
- await this.getAccountDataForView()
-//  this.getAllMedia()
- this.createRelation()
-this.mediaItems = this.mediaItems.map((item) => {
-  if (item.type === 'video') {
-    return {
-      ...item,
-      safeUrl: this.sanitizeUrl(item.url), // Add sanitized URL
-    };
-  }
-  return item;
-});
+
 }
+
+  async getData(): Promise<void> {
+    await this.getAccountDataForView();
+    this.createRelation();
+    this.updateMediaItems();
+  }
+
+
+  private updateMediaItems(): void {
+    this.mediaItems = this.mediaItems.map((item) =>
+      item.type === 'video'
+        ? { ...item, safeUrl: this.sanitizeUrl(item.url) }
+        : item
+    );
+  }
+
+
 sanitizeUrl(url: string): SafeResourceUrl {
   return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 }
 
+ngOnDestroy(): void {
+  // Clean up the subscription to avoid memory leaks
+  if (this.paramsSubscription) {
+    this.paramsSubscription.unsubscribe();
+  }
+}
 
-   async getAccountDataForView() {
+
+   async getAccountDataForView(): Promise<void> {
 
     this.showMainSpinner();
 
