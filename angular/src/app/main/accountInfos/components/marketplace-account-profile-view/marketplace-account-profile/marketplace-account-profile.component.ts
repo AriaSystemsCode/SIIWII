@@ -122,58 +122,6 @@ ngOnDestroy(): void {
 
 
 
-  playVideo(videoUrl: string, event) {
-      let videoPrams={
-          value:event.target,
-          url :videoUrl
-      }
-      // this.videoClicked.emit(videoPrams);
-  }
-
-  getAllMedia(){
-    // this.showMainSpinner()
-    this._AccountsServiceProxy.getAllAccountMediaAttachment('449928',undefined,5,  this.itemsPerPage).pipe(
-      finalize(
-          ()=>
-            this.hideMainSpinner()
-      )
-  ).subscribe((res)=>{
-  
-      this.media = res.items
-      // this.totalItems = res.totalCount; // Update total items for pagination
-      this.totalItems = this.mediaItems.length; // Update total items for pagination
-      // this.marketPlaceData = res
-      console.log(' this.media :',  res );
-  
-  })
-  }
-
-  changePage(pageNumber: number): void {
-    this.currentPage = pageNumber;
-    this.getAllMedia(); // Fetch new page data
-  }
-  openModal(index: number): void {
-    this.selectedIndex = index;
-    this.isModalOpen = true;
-  }
-
-  closeModal(): void {
-    this.isModalOpen = false;
-  }
-
-  prevMedia(): void {
-    if (this.selectedIndex > 0) {
-      this.selectedIndex--;
-    }
-  }
-  
-  nextMedia(): void {
-    if (this.selectedIndex < this.mediaItems.length - 1) {
-      this.selectedIndex++;
-    }
-  }
-  
-
 
   createRelation() {
     this._AccountsServiceProxy

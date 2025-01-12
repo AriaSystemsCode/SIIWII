@@ -324,12 +324,12 @@
          </div>
         <hr class="hr">
 
-         <p *ngIf="posts.length == 0" class="">
+         <p *ngIf="posts?.length == 0" class="">
             <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
 
              <span>There is no data</span>
              </p>
-             <div *ngIf="posts.length > 0" >
+             <div *ngIf="posts?.length > 0" >
              <div *ngFor="let postData of posts; let i = index">
              <app-post-card
              [post]="postData"
@@ -353,61 +353,108 @@
        
         >
         </app-create-post-entry> -->
-        <div  class="addReview mb-4 pb-2">
-          <div class="topSec w-100" >
-      
-              <img style="height: 30px;"
-                  [src]="
-                       'assets/common/images/default-profile-picture.png'
-                  "
-                  class="rounded-circle logo"
-              />
-              
-              <input
-                  class=" flex-grow-0  col-lg-9 border-0" placeholder="Add your review"
-              
-              >
-              <div class="rating">
-                <!-- Loop to generate 5 stars -->
-                <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
-                  <i
-                    class="fa"
-                    [ngClass]="{
-                      'fa-star': i < selectedRating,     
-                      'fa-star-o': i >= selectedRating  
-                    }"
-                    (click)="setRating(i + 1)"          
-                    title="{{ i + 1 }} star"
-                  ></i>
-                </ng-container>
-              
-                <!-- Display the current rating or message -->
-                <!-- <span>{{ selectedRating ? selectedRating + ' out of 5 stars' : 'No rating yet' }}</span> -->
-              </div>
-              
-              
-             </div>
-             <div class="bottomSec d-flex justify-content-between w-100 align-items-center">
-              <div>
-                <div class="d-flex">
-          <img src="../../assets/placeholders/vAttach.png"  class="mr-2 iconImg" alt="" srcset="">
-          <img src="../../assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="" srcset="">
-          <img src="../../assets/placeholders/emojsIcons.png" class="mr-2 iconImg" alt="" srcset="">
-
-                </div>
-              </div>
-             <button class="btnPost">Post</button>
-             </div>
+        <div class="addReview mb-4 pb-2">
+          <div class="topSec w-100 d-flex align-items-center">
+            <img
+              style="height: 30px;"
+              src="assets/common/images/default-profile-picture.png"
+              class="rounded-circle logo"
+            />
+        
+            <input
+              class="flex-grow-0 col-lg-9 border-0"
+              placeholder="Add your review"
+              [(ngModel)]="reviewText"
+            />
+        
+            <div class="rating">
+              <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
+                <i
+                  class="fa"
+                  [ngClass]="{
+                    'fa-star': i < selectedRating,
+                    'fa-star-o': i >= selectedRating
+                  }"
+                  (click)="setRating(i + 1)"
+                  title="{{ i + 1 }} star"
+                ></i>
+              </ng-container>
             </div>
+          </div>
+        
+          <div class="bottomSec d-flex justify-content-between w-100 align-items-center">
+            <div class="d-flex">
+              <!-- Image Input -->
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onImageSelected($event)"
+                hidden
+                #imageInput
+              />
+              <img
+                src="assets/placeholders/imageAttach.png"
+                class="mr-2 iconImg"
+                alt="Image Attach"
+                (click)="imageInput.click()"
+              />
+            
+              <!-- Video Input -->
+              <input
+                type="file"
+                accept="video/*"
+                (change)="onVideoSelected($event)"
+                hidden
+                #videoInput
+              />
+              <img
+                src="assets/placeholders/vAttach.png"
+                class="mr-2 iconImg"
+                alt="Video Attach"
+                (click)="videoInput.click()"
+              />
+            
+              <!-- Emoji Picker -->
+              <img
+                src="assets/placeholders/emojsIcons.png"
+                class="mr-2 iconImg"
+                alt="Emoji Picker"
+             
+              />
+            </div>
+            
+        
+            <button class="btnPost" (click)="postReview()">Post</button>
+          </div>
+        
+          <!-- Emoji Picker -->
+          <!-- <div *ngIf="showEmojiPicker" class="emoji-picker">
+            <emoji-mart (emojiClick)="addEmoji($event)"></emoji-mart>
+          </div> -->
+        
+          <!-- Media Preview -->
+          <div *ngIf="selectedMedia?.length > 0" class="media-preview">
+            <div *ngFor="let media of selectedMedia; let i = index" class="media-item">
+              <ng-container *ngIf="media.type === 'image'; else videoTemplate">
+                <img [src]="media.url" alt="Selected Image" class="media-preview-image" />
+              </ng-container>
+              <ng-template #videoTemplate>
+                <video controls [src]="media.url" class="media-preview-video"></video>
+              </ng-template>
+              <button class="remove-media" (click)="removeMedia(i)">x</button>
+            </div>
+          </div>
+        </div>
+        
 
-        <p *ngIf="reviews.length == 0" class="">
+        <p *ngIf="reviews?.length == 0" class="">
           <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
 
            <span>There is no data</span>
            </p>
 
 
-        <div *ngIf="reviews.length > 0" class="review-section pb-2">
+        <div *ngIf="reviews?.length > 0" class="review-section pb-2">
             <!-- <h2>Customer Reviews</h2> -->
           
             <!-- Review Card -->
@@ -483,7 +530,7 @@
               </div>
             </div>
           
-          <button *ngIf="reviews.length < totalCount"  (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all review</button>
+          <button *ngIf="reviews?.length < totalCount"  (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all review</button>
           </div>
           
     </div>

@@ -576,3 +576,78 @@ color: #fff;
     height: 24px;
     cursor: pointer;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .addReview {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  
+  .topSec {
+    margin-bottom: 1rem;
+  }
+  
+  .logo {
+    margin-right: 1rem;
+  }
+  
+  .rating .fa {
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #ffc107;
+  }
+  
+  .rating .fa-star-o {
+    color: #ccc;
+  }
+  
+  .bottomSec .iconImg {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+  
+  .btnPost {
+    background-color: #6c2a6e;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .media-preview {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .media-preview-image,
+  .media-preview-video {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 5px;
+  }
+  
+  .remove-media {
+    position: absolute;
+    background: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  

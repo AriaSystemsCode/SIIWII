@@ -102,36 +102,7 @@
 
             <!-- <div *ngIf="isLoading" class="loading">Loading media...</div>
             <div *ngIf="!isLoading && mediaItems.length === 0" class="no-data">No media available.</div> -->
-            <div  class="d-flex flex-wrap justify-content-center">
-              <div *ngFor="let item of mediaItems; let i = index" class="media-item m-1" >
-                <ng-container *ngIf="item.type === 'image'; else videoTemplate">
-                  <img [src]="item.url" alt="Media Image" class="media-image imgSec" style=""   (click)="openModal(i)"/>
-                </ng-container>
-                <ng-template #videoTemplate>
-                  <div class="video-container">
-                    <!-- <img [src]="item.thumbnail" alt="Video Thumbnail" class="media-image" />
-                    <i class="pi pi-play-circle play-icon"></i> -->
-                    <video
-                    (click)="openModal(i)"
-       
-                    (playing)="playVideo(item, $event)"
-                    (click)="playVideo(item, $event)"
-                    controls
-                    [attr.src]=" item.safeUrl "
-                    class="vSec"
-                ></video>
-                  </div>
-                </ng-template>
-              </div>
-            </div>
-
-            <p-paginator
-            [rows]="itemsPerPage"
-            [totalRecords]="totalItems"
-            [(first)]="(currentPage - 1) * itemsPerPage"
-            (onPageChange)="changePage($event)"
-            styleClass="mt-3"
-          ></p-paginator>
+      <app-media-tab></app-media-tab>
         </p-tabPanel>
 
     </p-tabView>
@@ -139,39 +110,3 @@
 </div>
 
 
-<p-dialog
-  [(visible)]="isModalOpen"
-  [modal]="true"
-  [style]="{ width: '656px' }"
-  [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
-  [dismissableMask]="true"
-  header="Media"
-  (onHide)="closeModal()"
->
-  <div class="modal-content d-flex justify-content-center align-items-center">
-    <ng-container *ngIf="mediaItems[selectedIndex]?.type === 'image'; else videoTemplate">
-      <!-- Display image -->
-      <img 
-        [src]="mediaItems[selectedIndex]?.url" 
-        alt="Selected Media" 
-        class="modal-image" 
-        style="max-width: 100%; max-height:100%; border-radius: 8px;" 
-      />
-    </ng-container>
-
-    <ng-template #videoTemplate>
-      <!-- Display video -->
-      <video 
-        [src]="mediaItems[selectedIndex]?.url" 
-        controls 
-         
-        class="modal-video" 
-        style="max-width: 100%; max-height: 70vh; border-radius: 8px;"
-      ></video>
-    </ng-template>
-
-    <!-- Navigation Buttons -->
-    <button *ngIf="selectedIndex > 0" class="nav-button prev" (click)="prevMedia()">&#10094;</button>
-    <button *ngIf="selectedIndex < mediaItems.length - 1" class="nav-button next" (click)="nextMedia()">&#10095;</button>
-  </div>
-</p-dialog>
