@@ -14,8 +14,7 @@ import {  finalize, Observable } from 'rxjs';
   providers:[MarketplaceAccountsServiceProxy]
 })
 export class ConnectionsTabComponent extends AppComponentBase {
-  @Input() accountId: number;
-  @Input() accountType: string;
+  @Input() accountDataForView :AccountDto;
   singleItemPerRowMode: boolean = false;
   accounts: GetAccountForViewDto[] = [];
   sortingOptions: SelectItem[];

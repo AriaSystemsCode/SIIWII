@@ -54,13 +54,13 @@ selectedIndex = 0; // Index of the currently selected image
   super(injector);
 }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.route.params.subscribe(params => {
       this.accountId = params['id'];
       console.log('accountId:', this.accountId);
 
   });
- this.getAccountDataForView()
+ await this.getAccountDataForView()
 //  this.getAllMedia()
  this.createRelation()
 this.mediaItems = this.mediaItems.map((item) => {
@@ -78,13 +78,13 @@ sanitizeUrl(url: string): SafeResourceUrl {
 }
 
 
-   getAccountDataForView() {
+   async getAccountDataForView() {
 
     this.showMainSpinner();
 
   
 
-  this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5).pipe(
+  await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5).pipe(
     finalize(
         ()=>this.hideMainSpinner()
     )

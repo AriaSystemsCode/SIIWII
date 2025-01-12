@@ -129,7 +129,7 @@
                             }"style="    white-space: nowrap;
                                 position: absolute;
                                 right: 5px;cursor: auto;">
-                                <img class="pb-1" style="width: 20px;"  src="../../assets/accounts/ph_check-bold.png"/>    {{ account.connectionName | localize }}
+                                <img class="pb-1" style="width: 20px;"  src="../../assets/accounts/ph_check-bold.png"/>    {{ account?.connectionName?.trim() | localize }}
                             </button>
                         </span>
 
@@ -145,7 +145,7 @@
                                 <img  class="pb-1" style="width: 20px;"  *ngIf="account.avaliableConnectionName.toUpperCase().includes('FOLLOW')" src="../../assets/accounts/FOLLOW.png"/>
                                 <img class="pb-1"   *ngIf="account.avaliableConnectionName.toUpperCase().includes('CONNECT')" src="../../assets/accounts/CONNECT.png"/>
                                 <img class="pb-1"   *ngIf="account.avaliableConnectionName.toUpperCase().includes('EMPLOYEE')" src="../../assets/accounts/EMPLOYEE.png"/>
-                                <img class="pb-1" style="width: 20px;"  *ngIf="account.avaliableConnectionName.toUpperCase().includes('JOIN')" src="../../assets/accounts/JOIN.png"/>    {{ account.avaliableConnectionName | localize }}
+                                <img class="pb-1" style="width: 20px;"  *ngIf="account.avaliableConnectionName.toUpperCase().includes('JOIN')" src="../../assets/accounts/JOIN.png"/>    {{ account?.avaliableConnectionName?.trim() | localize }}
                             </button>
                         </span>
                     </div>

@@ -69,8 +69,8 @@
 </div>
     </section>
     
-<div class="card marketplaceAccountProfile" [(activeIndex)]="activeTabIndex">
-    <p-tabView styleClass="tabview-custom">
+<div class="card marketplaceAccountProfile">
+    <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex">
         <p-tabPanel header="Overview">
                 <app-overview-tab [accountDataForView]="accountDataForView" (activeTabIndexBtn)="navigateToTab($event)"></app-overview-tab>
         </p-tabPanel>
@@ -78,18 +78,19 @@
            <app-marketplace-products [fromMarketAcoount]="true"></app-marketplace-products>
         </p-tabPanel>
      
-        <p-tabPanel header="Connections">
-            <app-connections-tab   [accountId]="accountId" [accountType]="accountType"></app-connections-tab>
+        <p-tabPanel header="Connections"   *ngIf="accountDataForView">
+            <app-connections-tab   [accountDataForView]="accountDataForView"></app-connections-tab>
         </p-tabPanel>
 
 
-        <p-tabPanel header="Posts">
-         <app-posts-tab  [accountId]="accountId" [accountType]="accountType"></app-posts-tab>
+
+        <p-tabPanel header="Posts"  *ngIf="accountDataForView">
+         <app-posts-tab  [accountDataForView]="accountDataForView"></app-posts-tab>
         </p-tabPanel>
     
 
-        <p-tabPanel header="Events">
-        <app-events-tab [accountId]="accountId"></app-events-tab>
+        <p-tabPanel header="Events"   *ngIf="accountDataForView">
+        <app-events-tab [accountDataForView]="accountDataForView"></app-events-tab>
         </p-tabPanel>
 
         

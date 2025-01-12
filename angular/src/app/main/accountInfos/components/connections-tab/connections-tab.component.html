@@ -13,10 +13,10 @@
                                 <label for="people" (click)="connectionType='People';getConnections()">People</label>
                                 <span style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
                                 <input type="radio" id="groups" name="option"
-                                    *ngIf="accountType?.toUpperCase()!= 'GROUP'" />
+                                    *ngIf="accountDataForView?.accountType?.toUpperCase()!= 'GROUP'" />
                                 <label for="groups" (click)="connectionType='Groups';getConnections()"
-                                    *ngIf="accountType?.toUpperCase()!= 'GROUP'">Groups</label> <span
-                                    *ngIf="accountType?.toUpperCase()!= 'GROUP'"
+                                    *ngIf="accountDataForView?.accountType?.toUpperCase()!= 'GROUP'">Groups</label> <span
+                                    *ngIf="accountDataForView?.accountType?.toUpperCase()!= 'GROUP'"
                                     style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
                                 <input type="radio" id="business" name="option" />
                                 <label for="business"

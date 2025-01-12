@@ -9,6 +9,7 @@ import { ProgressComponent } from "@app/shared/common/progress/progress.componen
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+    AccountDto,
     AppEntitiesServiceProxy,
     AppEntityAttachmentDto,
     AppEventDto,
@@ -83,8 +84,7 @@ export class PostListComponent
     ProgressModal: ProgressComponent;
 
     @Input() fromMarketplaceProfile: boolean = false;
-    @Input() accountId:number;
-    @Input() accountType:string="";
+    @Input() accountDataForView :AccountDto;
 
     public constructor(
         private _profileService: ProfileServiceProxy,
@@ -319,7 +319,7 @@ export class PostListComponent
                 undefined,
                 this.contactNameFilter,
                 this.entityNameFilter,
-                0,this.accountId ? this.accountId : undefined,undefined,
+                0,this.accountDataForView?.tenantId ? this.accountDataForView?.tenantId : undefined,undefined,
                 "",
                 this.skipCount,
                 this.maxResultCount

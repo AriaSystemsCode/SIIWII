@@ -4,7 +4,7 @@ import { EventsBrowseInputs } from '@app/main/AppEventsBrowse/models/Events-brow
 import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
 import { EventsBrowseComponentFiltersDisplayFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentFiltersDisplayFlags';
 import { EventsBrowseComponentStatusesFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentStatusesFlags';
-import { EventsFilterTypesEnum } from '@shared/service-proxies/service-proxies';
+import { AccountDto, EventsFilterTypesEnum } from '@shared/service-proxies/service-proxies';
 import { SelectItem } from 'primeng/api';
 
 @Component({
@@ -15,7 +15,7 @@ import { SelectItem } from 'primeng/api';
 export class EventsTabComponent  implements AfterViewInit{
 
   @ViewChild('EventBrowseComponent') eventBrowseComponent: EventsBrowseComponent;
-  @Input() accountId :number=0;
+  @Input() accountDataForView :AccountDto;
   
 ngAfterViewInit(): void {
     const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"

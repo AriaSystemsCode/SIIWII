@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { CreateOrEditEventComponent } from '@app/main/AppEvent/Components/create-or-edit-event.component';
 import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEventsServiceProxy, AppPostDto, AppPostsServiceProxy, AttachmentsCategories, CreateOrEditAppPostDto, EventsFilterTypesEnum, GetAppEventForViewDto, GetAppPostForViewDto, PostType, ProfileServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEventsServiceProxy, AppPostDto, AppPostsServiceProxy, AttachmentsCategories, CreateOrEditAppPostDto, EventsFilterTypesEnum, GetAppEventForViewDto, GetAppPostForViewDto, PostType, ProfileServiceProxy } from '@shared/service-proxies/service-proxies';
 import { FileDownloadService } from '@shared/utils/file-download.service';
 import { debounceTime, finalize, tap } from 'rxjs/operators';
 import { EventsBrowseActionsEvents, EventsBrowseInputs } from '../../models/Events-browse-inputs';
@@ -68,7 +68,7 @@ export class EventsBrowseComponent extends AppComponentBase {
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
     @Input() fromMarketPlaceProfile :boolean =false;
-    @Input() accountId :number =0;
+    @Input() accountDataForView :AccountDto;
     
     constructor(
         injector: Injector,
@@ -332,7 +332,10 @@ export class EventsBrowseComponent extends AppComponentBase {
             filters?.city || undefined,
             filters?.state || undefined,
             filters?.postalCode || undefined,
+            this.accountDataForView.tenantId,
+                undefined,
             filters?.sorting.value ,
+           
             this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
             this.primengTableHelper.getMaxResultCount(this.paginator, event)
         )

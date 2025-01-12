@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { AccountDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-posts-tab',
@@ -8,8 +9,7 @@ import { Component, Input } from '@angular/core';
 
 
 export class PostsTabComponent {
-  @Input() accountId: number;
-  @Input() accountType: string;
+  @Input() accountDataForView :AccountDto;
 
 
 }
