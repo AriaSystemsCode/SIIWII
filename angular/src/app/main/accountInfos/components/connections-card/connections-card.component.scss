@@ -1,6 +1,10 @@
 .domain-text {
     position: relative;
     display: inline-block;
+    color: rgba(74, 13, 74, 1);
+    border: 1px solid  rgba(238, 238, 238, 0.93);
+    border-radius: 6px;
+    padding: 10px;
   }
   
   .domain-text:hover::after {
