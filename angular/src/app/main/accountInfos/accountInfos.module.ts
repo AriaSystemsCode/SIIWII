@@ -59,6 +59,7 @@ import { PostsModule } from '../posts/posts.module';
 import { InteractionsModule } from '../interactions/interactions.module';
 import { MarketplaceProductsComponent } from '../marketplace/marketplace-products/components/marketplace-products.component';
 import { MarketplaceProductsModule } from '../marketplace/marketplace-products/marketplace-products.module';
+import { MediaTabComponent } from './components/marketplace-account-profile-view/Media-tab/media-tab.component';
 
 @NgModule({
     declarations: [
@@ -79,7 +80,8 @@ import { MarketplaceProductsModule } from '../marketplace/marketplace-products/m
         TenantInvoicesComponent,
         PlansComponent,
         MarketplaceAccountProfileComponent,
-        OverviewTabComponent
+        OverviewTabComponent,
+        MediaTabComponent
     ],
     imports: [
         CommonModule,

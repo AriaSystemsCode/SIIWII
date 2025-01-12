@@ -1,0 +1,127 @@
+import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
+import { finalize } from 'rxjs';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import { AccountsServiceProxy, AppEntityAttachmentDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppConsts } from '@shared/AppConsts';
+
+
+@Component({
+  selector: 'app-media-tab',
+  templateUrl: './media-tab.component.html',
+  styleUrls: ['./media-tab.component.scss'],
+
+})
+export class MediaTabComponent    extends AppComponentBase implements OnInit  {
+
+
+  attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
+
+      mediaItems:AppEntityAttachmentDto[]
+    //    = [
+    //     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    //     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    //     { "type": "video", "thumbnail": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg", "url": "https://app.testing.siiwii.net:4001/ATTACHMENTS/2491/750f337c-5970-6d19-8282-4ee7682abd47.mp4" },
+    //     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    //     { "type": "video", "thumbnail": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg", "url": "https://app.testing.siiwii.net:4001/ATTACHMENTS/2491/750f337c-5970-6d19-8282-4ee7682abd47.mp4" },
+    //     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    //     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    //     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    
+    //   ];
+    media:any
+    itemsPerPage: number = 10; // Number of items per page
+    currentPage: number = 1; // Current page
+    totalItems: number = 0; // Total items (retrieved from API)
+    isModalOpen = false; // Controls modal visibility
+    selectedIndex = 0; // Index of the currently selected image
+
+
+  constructor(
+    injector: Injector,
+
+    private _AccountsServiceProxy: AccountsServiceProxy,
+    private sanitizer: DomSanitizer,
+    private  _marketplaceAccountsServiceProxy : MarketplaceAccountsServiceProxy,
+    
+  
+) {
+  super(injector);
+  }
+
+    ngOnInit(): void {
+   
+
+        this.getAllMedia()
+ 
+    //    this.mediaItems = this.mediaItems.map((item) => {
+    //      if (item.attachmentCategoryId != 3) {
+    //        return {
+    //          ...item,
+    //          safeUrl: this.sanitizeUrl(item.url), // Add sanitized URL
+    //        };
+    //      }
+    //      return item;
+    //    });
+    }
+
+
+    // playVideo(videoUrl: string, event) {
+    //     let videoPrams={
+    //         value:event.target,
+    //         url :videoUrl
+    //     }
+    //     // this.videoClicked.emit(videoPrams);
+    // }
+  
+
+sanitizeUrl(url: string): SafeResourceUrl {
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+}
+
+  getAllMedia(){
+    // this.showMainSpinner()
+    this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,5,  this.itemsPerPage).pipe(
+      finalize(
+          ()=>
+            this.hideMainSpinner()
+      )
+  ).subscribe((res)=>{
+  
+      this.mediaItems = res.items
+      // this.totalItems = res.totalCount; // Update total items for pagination
+      this.totalItems = this.mediaItems.length; // Update total items for pagination
+    //   this.marketPlaceData = res
+      console.log(' this.media :',  res );
+  
+  })
+  }
+
+  changePage(pageNumber: number): void {
+    this.currentPage = pageNumber;
+    this.getAllMedia(); // Fetch new page data
+  }
+  openModal(index: number): void {
+    this.selectedIndex = index;
+    this.isModalOpen = true;
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+  }
+
+  prevMedia(): void {
+    if (this.selectedIndex > 0) {
+      this.selectedIndex--;
+    }
+  }
+  
+  nextMedia(): void {
+    if (this.selectedIndex < this.mediaItems.length - 1) {
+      this.selectedIndex++;
+    }
+  }
+  
+
+
+}
