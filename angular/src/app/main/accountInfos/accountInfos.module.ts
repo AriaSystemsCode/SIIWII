@@ -63,6 +63,9 @@ import { ConnectionsTabComponent } from './components/connections-tab/connection
 import { EventsTabComponent } from './components/events-tab/events-tab.component';
 import { PostsTabComponent } from './components/posts-tab/posts-tab.component';
 import { ConnectionsCardComponent } from './components/connections-card/connections-card.component';
+import { MarketplaceProductsComponent } from '../marketplace/marketplace-products/components/marketplace-products.component';
+import { MarketplaceProductsModule } from '../marketplace/marketplace-products/marketplace-products.module';
+
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -122,13 +125,19 @@ import { ConnectionsCardComponent } from './components/connections-card/connecti
         DialogModule,
         TabViewModule,
         PostsModule,
-        InteractionsModule,EventsBrowseModule,AccountSharedModule
+        InteractionsModule,EventsBrowseModule,AccountSharedModule,
+        MarketplaceProductsModule,
+        
+        
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
         PublishAccountService,PublishService
+    ],
+    exports:[
+        MarketplaceProductsModule,
     ]
 })
 export class AccountInfosModule { }

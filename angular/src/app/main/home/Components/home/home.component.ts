@@ -29,7 +29,7 @@ export class HomeComponent implements OnInit {
 
         // reterive the post by postId
         this._postService
-          .getAll("", "", "",undefined,undefined,undefined,  "", "", postid,undefined,undefined, "", 0, 1)
+          .getAll("", "", "",undefined,undefined,undefined,  "", "", postid,  undefined,  undefined, "", 0, 1)
           .subscribe((res) => {
             if (res.items.length > 0) {
               if (res.items[0].type == PostType.TEXT)

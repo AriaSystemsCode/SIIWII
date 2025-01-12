@@ -98,6 +98,9 @@ namespace onetouch.AppEvents
                             .WhereIf(input.MaxToTimeFilter.HasValue, e => e.ToTime <= input.MaxToTimeFilter)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.TimeZoneFilter), e => e.TimeZone == input.TimeZoneFilter)
                             .WhereIf(input.PrivacyFilter.HasValue, e => input.PrivacyFilter == e.Privacy)
+                             //Iteration#I40 - X527[Start]
+                            .WhereIf(input.TenantId != null, z => z.TenantId == input.TenantId)
+                            //Iteration#I40 - X527[End]
                             .WhereIf(input.GuestCanInviteFriendsFilter.HasValue, e => input.GuestCanInviteFriendsFilter == e.GuestCanInviteFriends)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.AppEntityNameFilter), e => e.EntityFk != null && e.EntityFk.Name.ToUpper().TrimEnd().Contains(input.AppEntityNameFilter.ToUpper().TrimEnd()))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.CityFilter), e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.City.ToUpper().TrimEnd().Contains(input.CityFilter.ToUpper().TrimEnd()))
@@ -124,6 +127,7 @@ namespace onetouch.AppEvents
                                             IsPublished = o.IsPublished,
                                             UserId = (long)o.CreatorUserId,
                                             UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).FullName,
+                                            ProfilePictureId = (Guid)UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).ProfilePictureId,
                                             Attachments = input.IncludeAttachments == true ? ObjectMapper.Map<List<AppEntityAttachmentDto>>(o.EntityFk.EntityAttachments) : null,
                                             Status = o.EntityFk.EntityObjectStatusFk.Name,
                                             BanarURL = imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityFk.EntityAttachments.Where(e => e.AttachmentCategoryId == BannerAttachmentCategoryId).FirstOrDefault().AttachmentFk.Attachment,
@@ -152,7 +156,12 @@ namespace onetouch.AppEvents
                                         }
                                     }
                                 };
-
+                //X527
+                if (input.NoOfEventsToReturn != null && input.NoOfEventsToReturn!=0)
+                {
+                    filteredAppEvents = filteredAppEvents.Take(int.Parse(input.NoOfEventsToReturn.ToString()));
+                }
+                //X527
                 var totalCount = await filteredAppEvents.CountAsync();
 
                 var results = await appEvents.Select(r => r.res).ToListAsync();

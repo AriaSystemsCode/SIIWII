@@ -25,8 +25,8 @@
     @media(min-width:567px){
     
         .container-s{
-            margin-left: 30px;
-            margin-right: 30px;
+            margin-left: 45px;
+            margin-right: 45px;
             margin-bottom: 10px;
         }
         .cover-img {
@@ -47,9 +47,10 @@
             // border: 4px 0px 0px 0px;
             opacity: 0px;
             border-radius: 50%;   
+            border: 2px solid white;
          }
          .info-sec {
-            margin-left: 200px !important;
+            margin-left: 185px !important;
             margin-top: 10px;
          }
     }
@@ -80,6 +81,8 @@
             // border: 4px 0px 0px 0px;
             opacity: 0px;
             border-radius: 50%;   
+            border: 2px solid white;
+
          }
          .info-sec {
             margin-left: 124px !important;
@@ -101,7 +104,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 10px 16px;
+    padding: 8px;
     // gap: 50px;
     // border: none;
     // width: 128px;
@@ -194,4 +197,196 @@
  
     }
    
+    @media(max-width:770px){ 
 
+        .accType{
+            font-size: 11px;
+        }
+    }
+
+    @media(min-width:770px){ 
+
+        .accType{
+            font-size: 14px;
+        }
+    }
+.accType{
+ 
+font-weight: 700;
+// font-size: 14px;
+line-height: 21px;
+
+text-transform: capitalize;
+
+color: #1B101B;
+
+
+
+}
+
+.connections{
+
+font-weight: 600;
+// font-size: 16px;
+line-height: 24px;
+text-transform: capitalize;
+
+color: #9E9E9E;
+
+}
+
+
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .media-item {
+    position: relative;
+    // overflow: hidden;
+
+    // width: 253px;
+   
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  @media(min-width:770px){ 
+    .media-item {
+        height: 256px;
+        border-radius: 8px;
+
+    }
+    .imgSec {
+        width: 257px !important;
+        height: 256px !important;
+        border-radius: 8px;
+    }
+   .vSec{
+    width: 488px !important;
+    height: 256px !important;
+    border-radius: 8px !important;
+    min-width: 350px !important;
+   }
+  }
+
+
+  @media(max-width:770px){ 
+    .media-item {
+        height: 160px;
+        border-radius: 14px;
+
+    }
+    .imgSec {
+        width: 150px !important;
+        height: 165px !important;
+        border-radius: 14px;
+    }
+   .vSec{
+    width: 290px !important;
+    height: 160px !important;
+    border-radius: 14px !important;
+    min-width: 290px !important;
+   }
+  }
+
+
+
+
+  @media(max-width:426px){ 
+    .media-item {
+        height: 150px;
+        border-radius: 14px;
+
+    }
+    .imgSec {
+        width: 170px !important;
+        height: 150px !important;
+        border-radius: 14px;
+    }
+   .vSec{
+    width: 350px !important;
+    height: 150px !important;
+    border-radius: 14px !important;
+    min-width: 350px !important;
+   }
+  }
+  .media-image {
+    // width: 253px;
+    border-radius: 8px;
+
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+  
+  .video-container {
+    position: relative;
+    border-radius: 8px;
+
+  }
+  
+
+
+  .media-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .media-item {
+    cursor: pointer;
+  }
+  
+  .media-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .modal-content {
+    position: relative;
+    text-align: center;
+  }
+  
+  .modal-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #EEEEEE;
+    color: #4A0D4A;
+    border: none;
+    border-radius:6px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+  }
+
+  
+  .nav-button:hover {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #4A0D4A;
+    color: #FFFFFF;
+    border: none;
+    border-radius:6px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+  }
+  .nav-button.prev {
+    left: 10px;
+  }
+  
+  .nav-button.next {
+    right: 10px;
+  }
+  

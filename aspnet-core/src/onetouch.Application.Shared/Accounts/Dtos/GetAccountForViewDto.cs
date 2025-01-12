@@ -5,7 +5,7 @@ namespace onetouch.Accounts.Dtos
     public class GetAccountForViewDto
     {
 		public AccountDto Account { get; set; }
-
+        public ContactDto Contact { get; set; }
         public string ConnectionName { get; set; }
         public int ConnectionCount { get; set; }
         

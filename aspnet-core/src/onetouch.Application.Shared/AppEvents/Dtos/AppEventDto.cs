@@ -55,6 +55,8 @@ namespace onetouch.AppEvents.Dtos
         public IList<AppEntityAttachmentDto> Attachments { get; set; }
 
         public AppEntityAddressDto Address { get; set; }
-
+        //IT40-X527[Start]
+        public Guid ProfilePictureId { get; set; }
+        //IT40-X527[End]
     }
 }

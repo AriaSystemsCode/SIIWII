@@ -55,6 +55,7 @@ using onetouch.AppMarketplaceContacts;
 using onetouch.AppMarketplaceAccounts;
 using onetouch.EmailingTemplates;
 using Abp.Domain.Entities;
+using Stripe;
 
 namespace onetouch.Accounts
 {
@@ -66,6 +67,7 @@ namespace onetouch.Accounts
         private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         private readonly ICreateMarketplaceAccount _iCreateMarketplaceAccount;
         private readonly IRepository<AppEntity, long> _appEntityRepository;
+        private readonly IRepository<onetouch.AppEntities.AppEntitiesRelationship, long> _appEntityRelationShipRepository;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
         private readonly IRepository<AppAddress, long> _appAddressRepository;
         private readonly IRepository<AppContactAddress, long> _appContactAddressRepository;
@@ -111,7 +113,8 @@ namespace onetouch.Accounts
               TenantManager tenantManager, IRepository<AppEntityAttachment, long> appEntityAttachmentRepository, IRepository<AppAttachment, long> appAttachmentRepository
             , IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
             , ICreateMarketplaceAccount iCreateMarketplaceAccount
-            , IEmailingTemplateAppService emailingTemplateAppService)
+            , IEmailingTemplateAppService emailingTemplateAppService
+            , IRepository<onetouch.AppEntities.AppEntitiesRelationship, long> appEntityRelationShipRepository)
         {
             _emailingTemplateAppService = emailingTemplateAppService;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
@@ -141,6 +144,7 @@ namespace onetouch.Accounts
             _binaryObjectManager = binaryObjectManager;
             _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
+            _appEntityRelationShipRepository = appEntityRelationShipRepository;
 
         }
         private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
@@ -176,6 +180,8 @@ namespace onetouch.Accounts
         //X527[Start]
         public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
         {
+            var postObjectId = await _helper.SystemTables.GetObjectPostId();
+            var eventObjectId = await _helper.SystemTables.GetObjectEventId();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 List<AppEntityAttachmentDto> retrunResult = new List<AppEntityAttachmentDto>();
@@ -190,7 +196,8 @@ namespace onetouch.Accounts
                                    .Where(z=>z.AttachmentCategoryId== catgImage || z.AttachmentCategoryId == catgVideo)
                                    join
                                   e in _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                        .Where(z => z.TenantOwner == account.EntityFk.TenantOwner && z.EntityAttachments.Count() > 0)
+                        .Where(z => (z.TenantId==null  && z.TenantOwner == account.EntityFk.TenantOwner && z.EntityAttachments.Count() > 0) ||
+                        ((z.ObjectId== postObjectId || z.ObjectId== eventObjectId) && z.TenantId== account.EntityFk.TenantOwner))
                         on t.EntityId equals e.Id into j
                                    from j1 in j
                                    select new AppEntityAttachmentDto()
@@ -359,12 +366,26 @@ namespace onetouch.Accounts
 
                     var accountsList = await _accounts.ToListAsync();
                     var totalCount = await filteredAccounts.CountAsync();
+                    var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                          .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
 
                     foreach (var account in accountsList)
                     {
-                        account.AvaliableConnectionName = GetAction(account.Account.AccountType, false);
-                        account.ConnectionName = GetAction(account.Account.AccountType, true);
+                        var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);
+                        if (accountConnection != null && accountConnection.Id > 0)
+                        {
+                            account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
+                            account.AvaliableConnectionName = "";
+                        }
+                        else
+                        {
+                            //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                            account.AvaliableConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, true);
+                            account.ConnectionName = "";
+                        }
                     }
+
                     // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
 
                     //foreach (var account in accountsList)
@@ -388,49 +409,137 @@ namespace onetouch.Accounts
             }
         }
 
-
-        public string GetAction(string accountTypeCode, bool neeedAction)
+        public async Task<PagedResultDto<GetAccountForViewDto>> GetAllMyConnections(GetAllAccountsInput input)
         {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                try
+                {
+                    //long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                    //get tenantid for given SSIN
+                    if (string.IsNullOrEmpty(input.SSIN)) return new PagedResultDto<GetAccountForViewDto>(0,null);
 
-            int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
-            var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
-            var currentTenantEdition = tenant == null ? "Personal" : tenant.Name;
+                    var tenant = _appContactRepository.GetAll().Where(e => e.SSIN == input.SSIN && e.IsProfileData && (e.ParentId == null || e.ParentId <= 0))
+                        .FirstOrDefault();
+
+                    var filteredAccounts = _appContactRepository.GetAll()
+                            .Include(e => e.AppContactAddresses).ThenInclude(a => a.AddressFk)
+                            .ThenInclude(a => a.CountryFk)
+                            .Include(en => en.EntityFk).ThenInclude(encl => encl.EntityClassifications)
+                            .Include(en => en.EntityFk).ThenInclude(enca => enca.EntityCategories)
+                            .Include(en => en.EntityFk).ThenInclude(ena => ena.EntityAttachments)
+                            .ThenInclude(x => x.AttachmentFk)
+                            .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x => x.EntityFk.EntityObjectTypeId == input.AccountTypeId)
+                            .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityFk.EntityObjectTypeCode == input.AccountType)
+                            .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
+                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityFk.EntityObjectTypeId))
+                            .Where(e=> e.TenantId == tenant.TenantId && !e.IsProfileData && (e.ParentId == null || e.ParentId<=0));
+ 
+
+                    var pagedAndFilteredAccounts = filteredAccounts
+                    .OrderBy(input.Sorting ?? "name asc")
+                    .PageBy(input);
+
+                    var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+
+                    var _accounts = from o in pagedAndFilteredAccounts
+                                    select new GetAccountForViewDto()
+                                    {
+                                        Account = new AccountDto
+                                        {
+                                            AccountTypeString = o.EntityFk.EntityObjectTypeCode,
+                                            TenantId = o.EntityFk.TenantOwner,
+                                            AccountTypeId = o.EntityFk.EntityObjectTypeId,
+                                            AccountType = o.EntityFk.EntityObjectTypeCode,
+                                            SSIN = o.SSIN,
+                                            PriceLevel = o.PriceLevel,
+                                            Name = o.Name,
+                                            City = o.AppContactAddresses.FirstOrDefault().AddressFk.City,
+                                            State = o.AppContactAddresses.FirstOrDefault().AddressFk.State,
+                                            ZipCode = o.AppContactAddresses.FirstOrDefault().AddressFk.PostalCode,
+                                            AddressLine1 = o.AppContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
+                                            CountryName = o.AppContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
+                                            Status = input.FilterType != 1 ? (_appContactRepository.GetAll().Count(x => x.TenantId == null && x.Id == o.PartnerId) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)) :
+                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == o.Id) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)),
+                                            Id = o.Id,
+                                            IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && o.PartnerId == null,
+                                            LogoUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
+                                             ""
+                                             : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
+                                            Classfications = o.EntityFk.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(5).ToArray(),
+                                            Categories = o.EntityFk.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(5).ToArray(),
+                                            PartnerId = o.PartnerId,
+                                            ShowSync = false
+
+                                        },
+                                        AvaliableConnectionName = "Follow",
+                                        ConnectionName = ""
+                                    };
+
+                    var accountsList = await _accounts.ToListAsync();
+                    var totalCount = await filteredAccounts.CountAsync();
+                    var currentTenantAccountTypeCode = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                          .FirstOrDefault(e => e.TenantId == tenant.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
+
+                    foreach (var account in accountsList)
+                    {
+                        var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == tenant.Id && e.SSIN == account.Account.SSIN);
+
+                        if (accountConnection != null && accountConnection.Id > 0)
+                        {
+                            account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccountTypeCode, false);
+                            account.AvaliableConnectionName = "";
+                        }
+                        else
+                        {
+                            //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                            account.AvaliableConnectionName = GetAction(account.Account.AccountType, currentTenantAccountTypeCode, true);
+                            account.ConnectionName = "";
+                        }
+                    }
+                     
+                    var x = new PagedResultDto<GetAccountForViewDto>(
+                        totalCount,
+                        accountsList
+                    );
+
+                    return x;
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex;
+                }
+
+            }
+        }
+        public async Task<bool> GetSettingValue(string settingName, string ssin)
+        {
+            return true;
+        }
+
+        public string GetAction(string accountTypeCode, string currentTenantEdition, bool needAction = false)
+        {     
             currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
             string action = "";
             if (!string.IsNullOrEmpty(accountTypeCode))
             {
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionFOLLOW" : "MPActionFOLLOWED"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = needAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = needAction ? "MPActionFOLLOW" : "MPActionFOLLOWED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = needAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionEMPLOY" : " MPActionEMPLOYED"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = needAction ? "MPActionEMPLOY" : " MPActionEMPLOYED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = needAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = needAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = needAction ? "MPActionINVIT" : "MPActionINVITED"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = needAction ? "MPActionINVIT" : "MPActionINVITED"; }
                 if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
-
-
             }
-
-
 
             return action;
         }
-
-
-        //public bool checkArray(long[] ids, string names)
-        //{ bool ret = false;
-        //    try
-        //    {
-        //        string[] namesArray = names.Split(";");
-
-        //        if (ids.Where(r => namesArray.Contains(r.ToString())).Count() > 0)
-        //            return true;
-        //    }catch(Exception ex) { }
-        //    return ret;
-        //}
 
         public List<string> GetLookUPLabels(string Ids, List<LookupLabelDto> tmpAccountType)
         {
@@ -521,7 +630,8 @@ namespace onetouch.Accounts
                 .Include(x => x.AppContactAddresses)
                 .Include(x => x.AccountFk)
                 .Where(x => x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
-                .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && x.AccountId == input.AccountId && x.IsProfileData)
+                //.WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && x.AccountId == input.AccountId && x.IsProfileData)
+                .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && ((x.AccountId == input.AccountId && x.IsProfileData)||(!x.IsProfileData && x.EntityFk.EntityObjectTypeId== presonEntityObjectTypeId) ))
                 .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.View, x => x.AccountId == input.AccountId)
                 .WhereIf(input.AccountId == null && input.FilterType == MemberFilterTypeEnum.MarketPlace, x => x.TenantId == null && !x.IsProfileData)
                 .WhereIf(!string.IsNullOrEmpty(input.Filter),
@@ -530,6 +640,7 @@ namespace onetouch.Accounts
                 //MMT - 08/18/2022 Sort my team members by Surname when there are no records, gives an error[Start]
                 //var pagedAndFilteredContacts = contactInfo
                 //       .OrderBy(input.Sorting ?? "name asc")
+
                 //       .PageBy(input);
 
                 IQueryable<AppContact> pagedAndFilteredContacts = null;
@@ -720,6 +831,16 @@ namespace onetouch.Accounts
                 var branch = ObjectMapper.Map<BranchDto>(account);
                 BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+
+                #region fillPersonal
+                ContactDto contactPersonalDto = new ContactDto();
+                if (presonEntityObjectTypeId == entity.EntityObjectTypeId)
+                {
+                    var retContactPersonalDto = await GetContactForView(id);
+                    contactPersonalDto = retContactPersonalDto != null ? retContactPersonalDto.Contact : null;
+
+                }
+                #endregion fillPersonal
                 var mainBranchSubtotal = _appContactRepository.GetAll()
                             .Include(e => e.ParentFk)
                             .Include(e => e.ParentFkList)
@@ -749,7 +870,7 @@ namespace onetouch.Accounts
                         .Select(x => x.AttachmentFk.Attachment).ToArray();
                 }
 
-                var output = new GetAccountForViewDto { Account = accountDto, ConnectionCount = ConnectionCount };
+                var output = new GetAccountForViewDto { Account = accountDto, Contact = contactPersonalDto, ConnectionCount = ConnectionCount };
 
                 if (output.Account.CountryId != null && output.Account.CountryId != 0)
                 {
@@ -2039,6 +2160,7 @@ namespace onetouch.Accounts
             else
             { await _appEntitiesAppService.SaveContact(contact); }
 
+            await CurrentUnitOfWork.SaveChangesAsync();
             await CreateAdminContact();
 
             await CurrentUnitOfWork.SaveChangesAsync();
@@ -2083,6 +2205,12 @@ namespace onetouch.Accounts
                                     contactDto.Code = System.Guid.NewGuid().ToString();
                                     //contactDto.Code = "01";
                                     ContactDto savedContactDto = await CreateOrEditContact(contactDto);
+                                    if (contactDto.EntityObjectType == "PERSONAL")
+                                    {
+                                        //ContactDto savedContactDto = await addex(contactDto);
+                                        await ApplyPersonalExtraData(contactDto);
+                                    }
+
 
                                 }
                             }
@@ -2209,10 +2337,343 @@ namespace onetouch.Accounts
             ret = true;
             return ret;
         }
+        protected virtual async Task<AppEntityDto> ApplyPersonalExtraData(AppEntityDto entity, AppContactDto input)
+        {
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            if (!string.IsNullOrEmpty(entity.EntityObjectTypeCode))
+            { presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeName(entity.EntityObjectTypeCode); }
 
-        public async Task<string> ApplyRelationOnProfile(long input)
+            if (entity.EntityExtraData == null)
+                entity.EntityExtraData = new List<AppEntityExtraDataDto>();
+
+            if (!string.IsNullOrEmpty(input.Name))
+            {
+                AppEntityExtraDataDto appEntityExtraDto = new AppEntityExtraDataDto();
+                appEntityExtraDto.EntityId = entity.Id;
+                appEntityExtraDto.AttributeValueId = 0;
+                appEntityExtraDto.AttributeValue = input.Name;
+                appEntityExtraDto.AttributeId = 701;
+                appEntityExtraDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                entity.EntityExtraData.Add(appEntityExtraDto);
+            }
+
+            if (!string.IsNullOrEmpty(input.Name))
+            {
+                AppEntityExtraDataDto appEntityExtraLNameDto = new AppEntityExtraDataDto();
+                appEntityExtraLNameDto.EntityId = entity.Id;
+                appEntityExtraLNameDto.AttributeValueId = 0;
+                appEntityExtraLNameDto.AttributeValue = "";
+                appEntityExtraLNameDto.AttributeId = 702;
+                appEntityExtraLNameDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                entity.EntityExtraData.Add(appEntityExtraLNameDto);
+            }
+
+            //if (input.TitleId != null && input.TitleId > 0)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 705;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+
+
+            DateTime jDate = DateTime.Now;
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = jDate.ToString();
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 707;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.JobTitle != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 706;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.JoinDateIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 713;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.LanguageIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 708;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.Phone1IsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 710;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.UserId != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "0";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 715;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+
+            //if (input.Phone2IsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 711;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.Phone3IsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 712;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.EmailAddressIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 709;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.UserName != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = input.Name;
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 703;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.UserNameIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = entity.Id;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 714;
+                entity.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //entity.Notes
+             
+            return entity;
+        }
+        protected virtual async Task<bool> ApplyPersonalExtraData
+            (ContactDto input)
+        {
+            var account = _appContactRepository.GetAll().Include(x=> x.EntityFk).ThenInclude(x=> x.EntityExtraData).FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            if (account.EntityFk.EntityExtraData == null)
+                account.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+            var entity = account.EntityFk;
+            var entityDto = ObjectMapper.Map<AppEntityDto>(entity);
+
+            if (!string.IsNullOrEmpty(input.FirstName))
+            {
+                AppEntityExtraDataDto appEntityExtraDto = new AppEntityExtraDataDto();
+                appEntityExtraDto.EntityId = account.EntityId;
+                appEntityExtraDto.AttributeValueId = 0;
+                appEntityExtraDto.AttributeValue = input.FirstName;
+                appEntityExtraDto.AttributeId = 701;
+                appEntityExtraDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                entityDto.EntityExtraData.Add(appEntityExtraDto);
+            }
+
+            if (!string.IsNullOrEmpty(input.LastName))
+            {
+                AppEntityExtraDataDto appEntityExtraLNameDto = new AppEntityExtraDataDto();
+                appEntityExtraLNameDto.EntityId = account.EntityId;
+                appEntityExtraLNameDto.AttributeValueId = 0;
+                appEntityExtraLNameDto.AttributeValue = input.LastName;
+                appEntityExtraLNameDto.AttributeId = 702;
+                appEntityExtraLNameDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                entityDto.EntityExtraData.Add(appEntityExtraLNameDto);
+            }
+
+            //if (input.TitleId != null && input.TitleId > 0)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 705;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+
+
+            DateTime jDate = DateTime.Now;
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = jDate.ToString();
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 707;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.JobTitle != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 706;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.JoinDateIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 713;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.LanguageIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 708;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.Phone1IsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 710;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.UserId != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = input.UserId.ToString();
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 715;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+
+            //if (input.Phone2IsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 711;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.Phone3IsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 712;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.EmailAddressIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = "False";
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 709;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.UserName != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = input.UserName;
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 703;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //if (input.UserNameIsPublic != null)
+            {
+                AppEntityExtraDataDto appEntityExtraTitleDto = new AppEntityExtraDataDto();
+                appEntityExtraTitleDto.EntityId = account.EntityId;
+                appEntityExtraTitleDto.EntityObjectTypeId = presonEntityObjectTypeId;
+                appEntityExtraTitleDto.AttributeValue = input.UserNameIsPublic.ToString();
+                appEntityExtraTitleDto.AttributeValueId = 0;
+                appEntityExtraTitleDto.AttributeId = 714;
+                entityDto.EntityExtraData.Add(appEntityExtraTitleDto);
+            }
+            //entity.Notes
+
+            //await _appEntityRepository.UpdateAsync(entity);
+            var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
+
+            return true;   
+        }
+
+
+        public async Task<long> AddRelation(long entityId, long relatedEntityId, int OwnerTenantId)
+        {
+            AppEntitiesRelationship entity = new AppEntitiesRelationship();
+            entity.EntityId = entityId;
+            entity.RelatedEntityId = relatedEntityId;
+            entity.TenantId = OwnerTenantId;
+
+
+            var retId = await _appEntityRelationShipRepository.InsertAndGetIdAsync(entity);
+            return retId;
+        }
+
+            public async Task<string> ApplyRelationOnProfile(long input)
         {
             string ret = "";
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var marketplaceContact = await _appMarketplaceContactRepository.GetAll()
@@ -2221,16 +2682,22 @@ namespace onetouch.Accounts
                     .FirstOrDefaultAsync(x =>
                     x.IsProfileData == true && x.Id == input);
 
-                if (marketplaceContact != null)
-                {
-                     
+                var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == marketplaceContact.SSIN);
+
+                if (marketplaceContact != null && accountConnection == null )
+                {    
                     var retType = await _helper.SystemTables.GetEntityObjectTypeById(marketplaceContact.AccountTypeId);
 
-                    ret = GetAction(retType.Code, false);
+                    var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                           .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
+
+                    ret = GetAction(retType.Code, currentTenantAccount, false);
 
                     var entity = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories)
                                         .Include(x => x.EntityClassifications)
                                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                        .Include(x => x.EntityExtraData)
                                         .AsNoTracking()
                                         .FirstOrDefaultAsync(x => x.TenantId == null
                                          && x.Id == input);
@@ -2240,7 +2707,6 @@ namespace onetouch.Accounts
                     entityDto.Id = 0;
                     entityDto.Code = "";
                     entityDto.TenantId = AbpSession.TenantId;
-                    var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
 
                     AppContactDto contactDto = new AppContactDto();
                     ObjectMapper.Map(marketplaceContact, contactDto);
@@ -2248,6 +2714,31 @@ namespace onetouch.Accounts
                     contactDto.IsProfileData = false;
                     contactDto.TenantId = AbpSession.TenantId;
                     contactDto.Id = 0;
+                    
+                    if (presonEntityObjectTypeId == entityDto.EntityObjectTypeId)
+                    {
+                        //entityDto = await ApplyPersonalExtraData(entityDto, contactDto);
+                        if (entity.EntityExtraData != null && entity.EntityExtraData.Count > 0)
+                        {
+                            //entity.EntityExtraData.ForEach(x => { x.Id = 0; }) ;
+                            entityDto.EntityExtraData = new List<AppEntityExtraDataDto>();
+                            foreach (var EntityExtraData in entity.EntityExtraData)
+                            { 
+                                AppEntityExtraDataDto appEntityExtraDto = new AppEntityExtraDataDto();
+                                appEntityExtraDto.EntityId = entityDto.Id;
+                                appEntityExtraDto.AttributeValueId = EntityExtraData.AttributeValueId;
+                                appEntityExtraDto.AttributeValue = EntityExtraData.AttributeValue;
+                                appEntityExtraDto.AttributeId = EntityExtraData.AttributeId;
+                                appEntityExtraDto.EntityObjectTypeId = EntityExtraData.EntityObjectTypeId;
+
+                                entityDto.EntityExtraData.Add(appEntityExtraDto);
+                            }
+
+                        }
+
+                    }
+
+                    var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
                     contactDto.EntityId = savedEntity;
 
                     foreach (var contactAddress in contactDto.ContactAddresses)
@@ -2266,9 +2757,29 @@ namespace onetouch.Accounts
                     var contactDto_Id = await _appEntitiesAppService.SaveContact(contactDto);
 
 
+                    #region get current tenant >> entity
+                    var currentTenantEntityId = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                      .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                    var relatedTenantEntityId = contactDto.EntityId;
+                    //var relatedTenantEntityId = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                    // .FirstOrDefault(e => e.SSIN == marketplaceContact.SSIN && e.IsProfileData && e.ParentId == null);
+                    //get entityRelation
+
+                    //AppEntitiesRelationship entitiesRelationship = await _appEntityRelationShipRepository.GetAll()
+                    //    .IgnoreQueryFilters().AsNoTracking()
+                    //    .FirstOrDefaultAsync(x => (x.EntityId == currentTenantEntityId.EntityId && x.RelatedEntityId == relatedTenantEntityId.EntityId) ||
+                    //    (x.RelatedEntityId == currentTenantEntityId.EntityId && x.EntityId == relatedTenantEntityId.EntityId));
+
+                    onetouch.AppEntities.AppEntitiesRelationship appEntityReactionsDto = new onetouch.AppEntities.AppEntitiesRelationship();
+                    var entitiesRelationship = new AppEntitiesRelationship { EntityId = currentTenantEntityId.EntityId, EntityTable = "AppContacts", RelatedEntityId = relatedTenantEntityId, TenantId = null };
+                    await _appEntityRelationShipRepository.InsertAsync(entitiesRelationship);
+
+                    #endregion get current tenant >> entity
+
+
+
                     // Publish Account related branches [Start]
                     var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-
                     var branchInfo = await _appMarketplaceContactRepository.GetAll()
                     .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk)
                     .Where(x =>
@@ -2298,7 +2809,6 @@ namespace onetouch.Accounts
                     //End
                 }
             }
-
             return ret;
         }
         public async Task ApplyRelationOnBranch(AppMarketplaceContact marketplaceContact, long accountId)
@@ -3962,7 +4472,7 @@ namespace onetouch.Accounts
             }
         }
         //MAriam[End]
-
+        
         public void SetAccountSync(long AccountId)
         {
             var account = _appContactRepository.GetAll()

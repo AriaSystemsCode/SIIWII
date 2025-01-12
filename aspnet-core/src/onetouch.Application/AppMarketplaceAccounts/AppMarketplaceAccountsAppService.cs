@@ -99,6 +99,9 @@ namespace onetouch.AppMarketplaceAccounts
             {
                 try
                 {
+                    var currentTenantAccountSSIN = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).SSIN;
+
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
 
                     var filteredAccounts = _appMarketplaceContactRepository.GetAll()
@@ -155,7 +158,7 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
-                           .Where(e => (e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
+                           .Where(e => (e.SSIN != currentTenantAccountSSIN && e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
                            
                            //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 
@@ -179,8 +182,9 @@ namespace onetouch.AppMarketplaceAccounts
                                         //ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? "Follow" : "",
                                         ConnectionName = "Follow",
                                         Account = new AccountDto
-                                        {
+                                        { 
                                             AccountTypeString = o.EntityObjectTypeCode,
+                                            TenantId = o.TenantOwner,
                                             AccountTypeId = o.EntityObjectTypeId,
                                             AccountType = o.EntityObjectTypeCode,
                                             SSIN = o.SSIN,
@@ -207,12 +211,24 @@ namespace onetouch.AppMarketplaceAccounts
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
                                     };
 
+                    var currentTenantAccount = _appContactRepository.GetAll().Include(e=> e.EntityFk)
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;   
                     var accountsList = await _accounts.ToListAsync();
                     foreach (var account in accountsList)
                     {
-                        account.AvaliableConnectionName = GetAction(account.Account.AccountType);
-                        //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
-                        account.ConnectionName = "";
+                        var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN== account.Account.SSIN);
+                        if (accountConnection != null && accountConnection.Id > 0)
+                        {
+                            account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
+                            account.AvaliableConnectionName = "";
+                        }
+                        else
+                        {
+                            //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                            account.AvaliableConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, true);
+                            account.ConnectionName = "";
+                        }
                     }
 
                     var totalCount = await filteredAccounts.CountAsync();
@@ -239,33 +255,29 @@ namespace onetouch.AppMarketplaceAccounts
 
             }
         }
+        
 
-        public string GetAction(string accountTypeCode)
+        public string GetAction(string accountTypeCode, string currentTenantAccount, bool neeedAction = false)
         {
 
             int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
-            var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
-            var currentTenantEdition = tenant == null ? "Personal" : tenant.Name;
+            var currentTenantEdition = currentTenantAccount;
             currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
             string action = "";
             if (!string.IsNullOrEmpty(accountTypeCode))
             {
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionCONNECT"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionFOLLOW"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOIN"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionFOLLOW" : "MPActionFOLLOWED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = " MPActionEMPLOY"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionCONNECT"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOIN"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionEMPLOY" : " MPActionEMPLOYED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionINVITE"; }
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionINVITE"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
                 if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
-
-
             }
-
-
 
             return action;
         }
@@ -662,12 +674,10 @@ namespace onetouch.AppMarketplaceAccounts
                 }
                 #endregion if sync remove old data
 
-
-
                 var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
 
-                var foundContactInfo = _appContactRepository.GetAll().FirstOrDefault(e => e.Id == input.Id);
+                var foundContactInfo = _appContactRepository.GetAll().Include(e=> e.EntityFk).ThenInclude(e=> e.EntityExtraData).FirstOrDefault(e => e.Id == input.Id);
 
                 ObjectMapper.Map(input, appMarketplaceContact);
                 appMarketplaceContact.Id = 0;
@@ -685,7 +695,6 @@ namespace onetouch.AppMarketplaceAccounts
                 appMarketplaceContact.Code = input.SSIN;
                 appMarketplaceContact.SSIN = input.SSIN;
 
-
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
                 {
                     contactAddress.Id = 0;
@@ -696,7 +705,22 @@ namespace onetouch.AppMarketplaceAccounts
                     contactAddress.AddressFk.AccountId = 0;
                 }
 
-                long newId = 0;
+                appMarketplaceContact.EntityExtraData = new List<AppEntityExtraData>();
+                foreach (var EntityExtraData in foundContactInfo.EntityFk.EntityExtraData) {
+                     
+
+
+                    AppEntityExtraData appEntityExtraDto = new AppEntityExtraData();
+                    appEntityExtraDto.EntityId = appMarketplaceContact.Id;
+                    appEntityExtraDto.AttributeValueId = EntityExtraData.AttributeValueId;
+                    appEntityExtraDto.AttributeValue = EntityExtraData.AttributeValue;
+                    appEntityExtraDto.AttributeId = EntityExtraData.AttributeId;
+                    appEntityExtraDto.EntityObjectTypeId = EntityExtraData.EntityObjectTypeId;
+
+                    appMarketplaceContact.EntityExtraData.Add(appEntityExtraDto);
+                }
+
+                    long newId = 0;
                 { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
                 await CurrentUnitOfWork.SaveChangesAsync();
 

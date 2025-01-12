@@ -1104,13 +1104,16 @@ export class AccountsServiceProxy {
 
     /**
      * @param accountTypeCode (optional) 
+     * @param currentTenantAccount (optional) 
      * @param neeedAction (optional) 
      * @return Success
      */
-    getAction(accountTypeCode: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
+    getAction(accountTypeCode: string | null | undefined, currentTenantAccount: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAction?";
         if (accountTypeCode !== undefined && accountTypeCode !== null)
             url_ += "accountTypeCode=" + encodeURIComponent("" + accountTypeCode) + "&";
+        if (currentTenantAccount !== undefined && currentTenantAccount !== null)
+            url_ += "currentTenantAccount=" + encodeURIComponent("" + currentTenantAccount) + "&";
         if (neeedAction === null)
             throw new Error("The parameter 'neeedAction' cannot be null.");
         else if (neeedAction !== undefined)
@@ -30835,12 +30838,20 @@ export class MarketplaceAccountsServiceProxy {
 
     /**
      * @param accountTypeCode (optional) 
+     * @param currentTenantAccount (optional) 
+     * @param neeedAction (optional) 
      * @return Success
      */
-    getAction(accountTypeCode: string | null | undefined): Observable<string> {
+    getAction(accountTypeCode: string | null | undefined, currentTenantAccount: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/MarketplaceAccounts/GetAction?";
         if (accountTypeCode !== undefined && accountTypeCode !== null)
             url_ += "accountTypeCode=" + encodeURIComponent("" + accountTypeCode) + "&";
+        if (currentTenantAccount !== undefined && currentTenantAccount !== null)
+            url_ += "currentTenantAccount=" + encodeURIComponent("" + currentTenantAccount) + "&";
+        if (neeedAction === null)
+            throw new Error("The parameter 'neeedAction' cannot be null.");
+        else if (neeedAction !== undefined)
+            url_ += "neeedAction=" + encodeURIComponent("" + neeedAction) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -31886,6 +31897,276 @@ export class MessageServiceProxy {
             else {
                 result200 = <any>null;
             }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param bodyFilter (optional) 
+     * @param subjectFilter (optional) 
+     * @param messageTypeIndex (optional) 
+     * @param mainComponentEntitlyId (optional) 
+     * @param parentId (optional) 
+     * @param threadId (optional) 
+     * @param messageCategoryFilter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllReviews(filter: string | null | undefined, bodyFilter: string | null | undefined, subjectFilter: string | null | undefined, messageTypeIndex: number | undefined, mainComponentEntitlyId: number | null | undefined, parentId: number | null | undefined, threadId: number | null | undefined, messageCategoryFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<MessagePagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetAllReviews?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (bodyFilter !== undefined && bodyFilter !== null)
+            url_ += "BodyFilter=" + encodeURIComponent("" + bodyFilter) + "&";
+        if (subjectFilter !== undefined && subjectFilter !== null)
+            url_ += "SubjectFilter=" + encodeURIComponent("" + subjectFilter) + "&";
+        if (messageTypeIndex === null)
+            throw new Error("The parameter 'messageTypeIndex' cannot be null.");
+        else if (messageTypeIndex !== undefined)
+            url_ += "messageTypeIndex=" + encodeURIComponent("" + messageTypeIndex) + "&";
+        if (mainComponentEntitlyId !== undefined && mainComponentEntitlyId !== null)
+            url_ += "MainComponentEntitlyId=" + encodeURIComponent("" + mainComponentEntitlyId) + "&";
+        if (parentId !== undefined && parentId !== null)
+            url_ += "ParentId=" + encodeURIComponent("" + parentId) + "&";
+        if (threadId !== undefined && threadId !== null)
+            url_ += "ThreadId=" + encodeURIComponent("" + threadId) + "&";
+        if (messageCategoryFilter !== undefined && messageCategoryFilter !== null)
+            url_ += "MessageCategoryFilter=" + encodeURIComponent("" + messageCategoryFilter) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllReviews(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllReviews(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<MessagePagedResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<MessagePagedResultDto>;
+        }));
+    }
+
+    protected processGetAllReviews(response: HttpResponseBase): Observable<MessagePagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = MessagePagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param entityId (optional) 
+     * @param userId (optional) 
+     * @return Success
+     */
+    getUserEntityRating(entityId: number | undefined, userId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetUserEntityRating?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUserEntityRating(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUserEntityRating(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetUserEntityRating(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param ratingNumber (optional) 
+     * @param entityId (optional) 
+     * @return Success
+     */
+    createUserEntityRating(ratingNumber: number | undefined, entityId: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Message/CreateUserEntityRating?";
+        if (ratingNumber === null)
+            throw new Error("The parameter 'ratingNumber' cannot be null.");
+        else if (ratingNumber !== undefined)
+            url_ += "ratingNumber=" + encodeURIComponent("" + ratingNumber) + "&";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateUserEntityRating(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateUserEntityRating(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processCreateUserEntityRating(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param entityId (optional) 
+     * @return Success
+     */
+    getOverAllRatings(entityId: number | undefined): Observable<OverAllRatingDto> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetOverAllRatings?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOverAllRatings(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOverAllRatings(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<OverAllRatingDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<OverAllRatingDto>;
+        }));
+    }
+
+    protected processGetOverAllRatings(response: HttpResponseBase): Observable<OverAllRatingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = OverAllRatingDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -49370,6 +49651,58 @@ export class SystemTablesServiceProxy {
     }
 
     protected processGetEntityObjectTypeComment(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeReview(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeReview";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeReview(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeReview(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeReview(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -91796,6 +92129,7 @@ export interface IPagedResultDtoOfGetMarketplaceAccountForViewDto {
 export enum MesasgeObjectType {
     Message = 0,
     Comment = 1,
+    Review = 2,
 }
 
 export class MessagesDto implements IMessagesDto {
@@ -91832,6 +92166,7 @@ export class MessagesDto implements IMessagesDto {
     profilePictureId!: string;
     userImage!: GetProfilePictureOutput;
     profilePictureUrl!: string | undefined;
+    senderCompanyName!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -91892,6 +92227,7 @@ export class MessagesDto implements IMessagesDto {
             this.profilePictureId = _data["profilePictureId"];
             this.userImage = _data["userImage"] ? GetProfilePictureOutput.fromJS(_data["userImage"]) : <any>undefined;
             this.profilePictureUrl = _data["profilePictureUrl"];
+            this.senderCompanyName = _data["senderCompanyName"];
             this.id = _data["id"];
         }
     }
@@ -91950,6 +92286,7 @@ export class MessagesDto implements IMessagesDto {
         data["profilePictureId"] = this.profilePictureId;
         data["userImage"] = this.userImage ? this.userImage.toJSON() : <any>undefined;
         data["profilePictureUrl"] = this.profilePictureUrl;
+        data["senderCompanyName"] = this.senderCompanyName;
         data["id"] = this.id;
         return data;
     }
@@ -91989,6 +92326,7 @@ export interface IMessagesDto {
     profilePictureId: string;
     userImage: GetProfilePictureOutput;
     profilePictureUrl: string | undefined;
+    senderCompanyName: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -91996,6 +92334,8 @@ export interface IMessagesDto {
 
 export class GetMessagesForViewDto implements IGetMessagesForViewDto {
     messages!: MessagesDto;
+    rating!: number | undefined;
+    isUserVerifiedPurchaser!: boolean;
 
     [key: string]: any;
 
@@ -92015,6 +92355,8 @@ export class GetMessagesForViewDto implements IGetMessagesForViewDto {
                     this[property] = _data[property];
             }
             this.messages = _data["messages"] ? MessagesDto.fromJS(_data["messages"]) : <any>undefined;
+            this.rating = _data["rating"];
+            this.isUserVerifiedPurchaser = _data["isUserVerifiedPurchaser"];
         }
     }
 
@@ -92032,12 +92374,16 @@ export class GetMessagesForViewDto implements IGetMessagesForViewDto {
                 data[property] = this[property];
         }
         data["messages"] = this.messages ? this.messages.toJSON() : <any>undefined;
+        data["rating"] = this.rating;
+        data["isUserVerifiedPurchaser"] = this.isUserVerifiedPurchaser;
         return data;
     }
 }
 
 export interface IGetMessagesForViewDto {
     messages: MessagesDto;
+    rating: number | undefined;
+    isUserVerifiedPurchaser: boolean;
 
     [key: string]: any;
 }
@@ -92350,6 +92696,78 @@ export interface ICreateMessageInput {
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     messageCategory: string | undefined;
     mentionedUsers: MentionedUserInfo[] | undefined;
+
+    [key: string]: any;
+}
+
+export class OverAllRatingDto implements IOverAllRatingDto {
+    overAllRating!: number;
+    totalNumberOfRating!: number;
+    oneTotal!: number;
+    twoTotal!: number;
+    threeTotal!: number;
+    fourTotal!: number;
+    fiveTotal!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IOverAllRatingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.overAllRating = _data["overAllRating"];
+            this.totalNumberOfRating = _data["totalNumberOfRating"];
+            this.oneTotal = _data["oneTotal"];
+            this.twoTotal = _data["twoTotal"];
+            this.threeTotal = _data["threeTotal"];
+            this.fourTotal = _data["fourTotal"];
+            this.fiveTotal = _data["fiveTotal"];
+        }
+    }
+
+    static fromJS(data: any): OverAllRatingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OverAllRatingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["overAllRating"] = this.overAllRating;
+        data["totalNumberOfRating"] = this.totalNumberOfRating;
+        data["oneTotal"] = this.oneTotal;
+        data["twoTotal"] = this.twoTotal;
+        data["threeTotal"] = this.threeTotal;
+        data["fourTotal"] = this.fourTotal;
+        data["fiveTotal"] = this.fiveTotal;
+        return data;
+    }
+}
+
+export interface IOverAllRatingDto {
+    overAllRating: number;
+    totalNumberOfRating: number;
+    oneTotal: number;
+    twoTotal: number;
+    threeTotal: number;
+    fourTotal: number;
+    fiveTotal: number;
 
     [key: string]: any;
 }
