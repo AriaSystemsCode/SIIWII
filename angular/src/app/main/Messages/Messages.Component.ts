@@ -110,7 +110,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         } catch (err) {}
     } */
     newCommentAddedHandler(event){
-        this.selectMessage(this.messagesDetails[0].messages)
+      //  this.selectMessage(this.messagesDetails[0].messages);
+        this.getMesssage();
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
