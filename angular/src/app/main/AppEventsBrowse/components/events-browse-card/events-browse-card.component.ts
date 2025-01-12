@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { EventsFilterTypesEnum, GetAppEventForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AppPostsServiceProxy, EventsFilterTypesEnum, GetAppEventForViewDto } from '@shared/service-proxies/service-proxies';
 import { EventsBrowseActionsEvents } from '../../models/Events-browse-inputs';
 import { EventsBrowseComponentActionsMenuFlags } from "../../models/EventsBrowseComponentActionsMenuFlags";
 import { EventsBrowseComponentStatusesFlags } from "../../models/EventsBrowseComponentStatusesFlags";
@@ -25,17 +25,33 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
     EventsBrowseActionsEvents = EventsBrowseActionsEvents
     @Input() fromMarketPlaceProfile :boolean =false;
     eventAddress="";
+    profilePicture:string ="";
 
     get mainFilterCtrl() { return this.filterForm.get('filterType') }
     constructor(
         injector: Injector,
+        private _postService:AppPostsServiceProxy
     ) {
         super(injector);
     }
 
     ngOnChanges(changes: SimpleChanges) {
         this.getAddressDetails();
+        this.getProfilePictureById(this.item?.appEvent?.profilePictureId);
     }
+
+    getProfilePictureById(id: string) {
+    this._postService
+            .getProfilePictureAllByID(id)
+            .subscribe((data) => {
+                if (data.profilePicture) {
+                    this.profilePicture =
+                        "data:image/jpeg;base64," + data.profilePicture;
+                }
+            });
+    }
+
+
     _triggerEvent(event:EventsBrowseActionsEvents) {
         this.triggerEvent.emit(event);
     }

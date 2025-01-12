@@ -332,7 +332,7 @@ export class EventsBrowseComponent extends AppComponentBase {
             filters?.city || undefined,
             filters?.state || undefined,
             filters?.postalCode || undefined,
-            this.accountDataForView.tenantId,
+            this.accountDataForView?.tenantId ? this.accountDataForView?.tenantId : undefined,
                 undefined,
             filters?.sorting.value ,
            

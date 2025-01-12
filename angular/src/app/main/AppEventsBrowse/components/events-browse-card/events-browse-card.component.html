@@ -117,7 +117,9 @@
                     <div class="p-2 ml-2" style="border: 1px solid #EEEEEE; border-radius: 4px;    color: #4A0D4A;
                     position: relative;
                     top: -5px;">
-                        <img [src]="item?.appEvent?.userNameUrl" 
+                        <img    [src]="profilePicture
+                        ? profilePicture
+                        : '../../../../../assets/placeholders/appitem-placeholder.png'"
                              onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" 
                              style="width: 19px; height: 19px;" />
                         {{ item.appEvent.userName }}
