@@ -2,9 +2,9 @@ import { Component, ElementRef, EventEmitter, Injector, Input, OnDestroy, OnInit
 import { Reactions } from '@app/main/reactions/models/Reactions.enum';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppPostDto, AppPostsServiceProxy, CreateMessageInput, GetAppPostForViewDto, GetMessagesForViewDto, MesasgeObjectType, MessagePagedResultDto, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityUserReactionsCountDto, AppPostDto, AppPostsServiceProxy, CreateMessageInput, GetAppPostForViewDto, GetMessagesForViewDto, MesasgeObjectType, MessagePagedResultDto, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
 import * as moment from 'moment';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin, map } from 'rxjs';
 
 @Component({
   selector: 'app-overview-tab',
@@ -28,12 +28,13 @@ reviewRating : number
 selectedRating: number = 0; // Initialize with no rating
 value: number;
 overRating : OverAllRatingDto
+    usersReactionsStats: AppEntityUserReactionsCountDto = new AppEntityUserReactionsCountDto()
 
 mediaItems : AppEntityAttachmentDto[]
 
 
 reviewText: string = '';
-  
+isHelpful:any
   selectedMedia: { url: string; type: string; file?: File }[] = [];
   showEmojiPicker: boolean = false;
       messages: CreateMessageInput = new CreateMessageInput();
@@ -51,6 +52,7 @@ ngOnInit() {
   this.getAllReviws()
   this.getOverAllRatings()
   this.getAllMedia()
+
 }
 
 
@@ -121,13 +123,13 @@ getAllReviws() {
           undefined,
           undefined,
           undefined,
-          449928,
+          416177,
           // this.accountDataForView.entityId,
           undefined,
           undefined,
           "REVIEW",
           "",
-          this.skipCount,
+         0,
           this.maxResultCount
       )
       .pipe(
@@ -138,8 +140,44 @@ getAllReviws() {
         .subscribe(
         (result) => {
           // Append new reviews to the existing list
-          this.reviews = [...this.reviews, ...result.items];
+          this.reviews = result.items;
           this.totalCount = result.totalCount; // Update total count of reviews
+    
+        // Iterate over the reviews and call the methods
+        const observables = this.reviews.map((review) => {
+          return forkJoin({
+            likeCount: this._appEntitiesServiceProxy
+              .getUsersReactionsCount(review?.messages?.entityId)
+              .pipe(map((res) => res.likeCount || 0)),
+              reactId: this._appEntitiesServiceProxy
+              .getUsersReactionsCount(review?.messages?.entityId)
+              .pipe(map((res) => res.id )),
+            // isHelpful: this._appEntitiesServiceProxy
+            //   .getCurrentUserReaction(review?.messages?.entityId)
+            //   .pipe(map((res) => {
+            //     res.reactionSelected ==1 || false
+            //   } )),
+          }).pipe(
+            map((data) => ({
+              entityId: review?.messages?.entityId,
+              likeCount: data.likeCount,
+              reactId: data.reactId,
+              // isHelpful: data.isHelpful,
+            }))
+          );
+        });
+  
+        // Update the reviews list with the new data
+        forkJoin(observables).subscribe((results) => {
+          results.forEach((data) => {
+            const review = this.reviews.find((r) => r?.messages?.entityId === data.entityId);
+            if (review) {
+              review.likeCount = data.likeCount;
+              review.reactId = data.reactId;
+              // review.isHelpful = data.isHelpful;
+            }
+          });
+        });
         },
        
       );
@@ -161,7 +199,7 @@ getOverAllRatings() {
 
   const subs = this.messageServiceProxy
       .getOverAllRatings(
-          449928,
+        416177,
           // this.accountDataForView.entityId,
       )
       .pipe(
@@ -220,82 +258,13 @@ onVideoSelected(event: any): void {
   }
 }
 
-// Function to map selected media to the required format
-// prepareAttachments(): AppEntityAttachmentDto[] {
-//   return this.selectedMedia.map((media, index) => {
-//     const fileName = media.file?.name || 'default-name';
-//     return {
-//       attachmentCategoryId: media.type === 'image' ? 4 : 2, // Use appropriate category IDs
-//       attachmentCategoryEnum: 0,
-//       fileName: fileName,
-//       displayName: fileName,
-//       url: media.url, // Use media.url here
-//       guid: null,
-//       attributes: null,
-//       index: index,
-//       isDefault: index === 0, // Optional logic to mark the first as default
-//       id: 0,
-
-//       // Methods required by AppEntityAttachmentDto
-//       init: function (data: Partial<AppEntityAttachmentDto>) {
-//         Object.assign(this, data);
-//       },
-//       toJSON: function () {
-//         return {
-//           attachmentCategoryId: this.attachmentCategoryId,
-//           attachmentCategoryEnum: this.attachmentCategoryEnum,
-//           fileName: this.fileName,
-//           displayName: this.displayName,
-//           url: this.url,
-//           guid: this.guid,
-//           attributes: this.attributes,
-//           index: this.index,
-//           isDefault: this.isDefault,
-//           id: this.id,
-//         };
-//       },
-//     };
-//   });
-// }
 
 
-// Example function to send the data
-// sendAttachments(): void {
-//   const attachments = this.prepareAttachments();
-
-//   // Send the attachments array to the server (e.g., via HTTP POST)
-//   console.log('Sending attachments:', attachments);
-
-//   // Example API call (replace with your service logic)
-//   // this.http.post('/api/attachments', { entityAttachments: attachments }).subscribe((response) => {
-//   //   console.log('Attachments uploaded successfully', response);
-//   // });
-// }
-
-
-
-toggleEmojiPicker(): void {
-  this.showEmojiPicker = !this.showEmojiPicker;
-}
-
-addEmoji(event: any): void {
-  this.reviewText += event.emoji.native; // Assuming emoji-mart emits an emoji object
-}
 
 removeMedia(index: number): void {
   this.selectedMedia.splice(index, 1);
 }
 
-// postReview(): void {
-//   const reviewData = {
-//     text: this.reviewText,
-//     rating: this.selectedRating,
-//     media: this.selectedMedia,
-//   };
-//   console.log('Review posted:', reviewData);
-//   // Add logic to send the review data to a server or API
-//   this.resetForm();
-// }
 
 resetForm(): void {
   this.reviewText = '';
@@ -324,11 +293,12 @@ onUploadAttachments() {
           const guid = this.guid(); // Generate a unique GUID
           const file = files[i];
           const correspondingMedia = this.selectedMedia.find(media => media.file === file);
-
+          const isImage = file.type.startsWith("image/");
+          const isVideo = file.type.startsWith("video/");
           // Create a new AppEntityAttachmentDto object
           const att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
           att.fileName = file.name;
-          att.attachmentCategoryId = 4; // Example category ID
+          att.attachmentCategoryId = isImage ? 3 : 4; // Example category ID
           att.guid = guid;
         
          
@@ -365,7 +335,8 @@ onUploadAttachments() {
         this.messages.bodyFormat = this.reviewText;
         this.messages.body = this.reviewText;
         this.messages.mesasgeObjectType = MesasgeObjectType.Review
-        this.messages.relatedEntityId = 449928
+        this.messages.relatedEntityId = 416177
+
 
         // this.messages.relatedEntityId = this.accountDataForView?.entityId
         this.messages.subject = ''
@@ -384,7 +355,7 @@ onUploadAttachments() {
             .subscribe(() => {
       console.log('Review posted:', this.messages);
       this.messageServiceProxy
-      .createUserEntityRating(this.selectedRating ,449928)
+      .createUserEntityRating(this.selectedRating ,416177)
   
       .subscribe(() => {
         this.selectedRating =0;this.reviewText ='';
@@ -394,15 +365,16 @@ onUploadAttachments() {
             });
     }
 
- createReaction() {
+ createReaction(entityId:number) {
 
   const subs = this._appEntitiesServiceProxy.createOrUpdateReaction(
-    this.accountDataForView?.entityId,
-    6,
+    entityId,
+    1,
 )
   .pipe(
       finalize(() => {
-      
+        this.getAllRectsCount(entityId)
+  // this.getuserreact(entityId)
       })
   )
     .subscribe(
@@ -416,6 +388,41 @@ onUploadAttachments() {
 this.subscriptions.push(subs);
          
     }
+
+
+
+    getAllRectsCount(entityId:number){
+      this._appEntitiesServiceProxy.getUsersReactionsCount(entityId)
+      .subscribe((result) => {
+          
+          // this.usersReactionsStats.likeCount = result.likeCount || 0
+
+      })
+    }
+
+
+    // getuserreact(entityId:number){
+    //   this._appEntitiesServiceProxy.getCurrentUserReaction(entityId)
+    //   .subscribe((result) => {
+    //     console.log(result,'kkkkkssssllll')
+          
+    //       this.isHelpful = result
+
+    //   })
+    // }
+
+
+    deleteReaction(id:number,entityId:number){
+      this._appEntitiesServiceProxy.deleteUserReaction(id)     .pipe(finalize(() => { 
+        // this.getuserreact(entityId)
+        this.getAllRectsCount(entityId)
+      }))
+      .subscribe((result) => {
+
+
+      })
+    }
+
 
 ngOnDestroy() {
   this.unsubscribeToAllSubscriptions();
