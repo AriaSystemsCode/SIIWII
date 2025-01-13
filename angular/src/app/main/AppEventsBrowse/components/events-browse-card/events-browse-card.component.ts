@@ -24,6 +24,7 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
     EventsFilterTypesEnum = EventsFilterTypesEnum
     EventsBrowseActionsEvents = EventsBrowseActionsEvents
     @Input() fromMarketPlaceProfile :boolean =false;
+    @Input() fromOverviewMarketPlaceProfile :boolean =false;
     eventAddress="";
     profilePicture:string ="";
 

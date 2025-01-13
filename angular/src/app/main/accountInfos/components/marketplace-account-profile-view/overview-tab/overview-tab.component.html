@@ -212,6 +212,7 @@
            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
             <span>There is no data</span>
             </p> -->
+                   <!-- <app-events-tab [accountDataForView]="accountDataForView" [fromOverviewMarketPlaceProfile]="true"></app-events-tab> -->
             <div class="d-flex p-2">
                 <img src="../../assets/placeholders/appitem-placeholder.png" class="event-img" alt="" srcset="">
                 <div class="event-info p-2">
@@ -329,7 +330,7 @@
 
              <span>There is no data</span>
              </p>
-             <div *ngIf="posts?.length > 0" >
+             <!-- <div *ngIf="posts?.length > 0" >
              <div *ngFor="let postData of posts; let i = index">
              <app-post-card
              [post]="postData"
@@ -337,7 +338,8 @@
          >
          </app-post-card>
          </div>
-        </div>
+        </div> -->
+        <app-posts-tab  [accountDataForView]="accountDataForView"></app-posts-tab>
      </div>
      <div class="mb-2 right-sec p-3" #reviewsSection>
         <div class="d-flex justify-content-between">

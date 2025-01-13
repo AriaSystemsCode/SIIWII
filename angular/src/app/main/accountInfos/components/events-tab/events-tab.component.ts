@@ -16,6 +16,7 @@ export class EventsTabComponent  implements AfterViewInit{
 
   @ViewChild('EventBrowseComponent') eventBrowseComponent: EventsBrowseComponent;
   @Input() accountDataForView :AccountDto;
+  @Input() fromOverviewMarketPlaceProfile :boolean;
   
 ngAfterViewInit(): void {
     const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"

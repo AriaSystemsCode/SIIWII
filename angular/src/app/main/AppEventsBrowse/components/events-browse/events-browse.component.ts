@@ -68,6 +68,7 @@ export class EventsBrowseComponent extends AppComponentBase {
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
     @Input() fromMarketPlaceProfile :boolean =false;
+    @Input() fromOverviewMarketPlaceProfile :boolean =false;
     @Input() accountDataForView :AccountDto;
     
     constructor(
