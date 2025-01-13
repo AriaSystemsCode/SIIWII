@@ -53,15 +53,9 @@ export class ConnectionsTabComponent extends AppComponentBase {
 
   ngOnChanges(changes: SimpleChanges) {
     this.singleItemPerRowMode = false;
-    if (this.showData) {
-      this.getConnections({
-        rows: this.primengTableHelper.defaultRecordsCountPerPage,
-      });
 
-      this.getAllAccountTypesForTableDropdownWithPaging();
-    }
-    else
-      this.accounts = [];
+    this.GetSettingValue();
+   
   }
 
   getAllAccountTypesForTableDropdownWithPaging(){
@@ -77,7 +71,8 @@ export class ConnectionsTabComponent extends AppComponentBase {
     undefined,
     undefined,
     0,
-    undefined,true
+    3,
+    false
 )
 .subscribe(result => {
 this.accountsTypes=result.items;
@@ -94,6 +89,16 @@ this.accountsTypes=result.items;
       }))
       .subscribe((result) => {
         this.showData = result;
+
+        if (this.showData) {
+          this.getConnections({
+            rows: this.primengTableHelper.defaultRecordsCountPerPage,
+          });
+    
+          this.getAllAccountTypesForTableDropdownWithPaging();
+        }
+        else
+          this.accounts = [];
       });
   }
 
