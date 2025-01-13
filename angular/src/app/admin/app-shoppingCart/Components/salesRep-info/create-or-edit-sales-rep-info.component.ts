@@ -16,6 +16,8 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("SalesRepInfoValid") SalesRepInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
+
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   salesRepIndex = 1;
   salesReps: any[];
@@ -24,6 +26,10 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   oldappTransactionsForViewDto;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
+  visible: boolean = false;
+  cancelBtn: boolean = false;
+  saveBtn: boolean = false;
+  SuccessMsg: boolean = false;
 
   constructor(
     injector: Injector,
@@ -73,11 +79,17 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+      .pipe(finalize(() =>  {this.hideMainSpinner();
+        // this.generatOrderReport.emit(true) ; 
+        // this.SuccessMsg = true
+      }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto=JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+       this.refreshShoppingCart.emit(true)
+
           if (!this.showSaveBtn)
             this.ontabChange.emit(ShoppingCartoccordionTabs.SalesRepInfo);
 

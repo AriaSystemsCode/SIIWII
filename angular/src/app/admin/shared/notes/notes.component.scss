@@ -1,5 +1,6 @@
 .notes-cont{
-    background-color:#F2F3F8;
+    background-color:#F8F8F8;
+    padding: 25px 17px;
     .note-sub-cont{
         background-color:#fff;
     textarea.note-control {
@@ -25,4 +26,11 @@
       }
     }
 
+}
+
+::ng-deep {
+  textarea.form-control {
+    min-height: 100px !important;
+    padding: 5px !important;
+}
 }

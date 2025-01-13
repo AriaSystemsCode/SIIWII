@@ -19,7 +19,12 @@ import * as moment from 'moment';
 @Component({
     templateUrl: './appTenantInvoices.component.html',
     encapsulation: ViewEncapsulation.None,
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()],
+    styles: [`
+        .p-icon-wrapper {
+            position: initial !important;
+        }
+    `]
 })
 export class AppTenantInvoicesComponent extends AppComponentBase {
     
@@ -69,6 +74,7 @@ export class AppTenantInvoicesComponent extends AppComponentBase {
 
     getAppTenantInvoices(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
@@ -76,6 +82,7 @@ export class AppTenantInvoicesComponent extends AppComponentBase {
         this.primengTableHelper.showLoadingIndicator();
 
         this._appTenantInvoicesServiceProxy.getAll(
+            null,
             this.filterText,
             this.invoiceNumberFilter,
             this.maxInvoiceDateFilter === undefined ? this.maxInvoiceDateFilter : moment(this.maxInvoiceDateFilter).endOf('day'),

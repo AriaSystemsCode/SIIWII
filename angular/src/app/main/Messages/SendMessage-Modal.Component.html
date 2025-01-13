@@ -181,6 +181,7 @@
                                 [(ngModel)]="subject"
                                 name="subject"
                                 required
+                            
                             />
                         </div>
                         <div
@@ -295,9 +296,10 @@
                             multiple
                         />
                     </div>
+                  
                     <button
                     type="button"
-                    [class.disabled]="toUsers.length == 0 || subject == ''"
+                    [class.disabled]="toUsers.length == 0 ||  subject.trim() === ''"
                     [disabled]="toUsers.length == 0 || subject == ''"
                     class="sendBtn"
                     (click)="sendMessage()"
@@ -479,6 +481,7 @@
                                     [(ngModel)]="subject"
                                     name="subject"
                                     required
+                                 
                                 />
                             </div>
                             <div
@@ -592,6 +595,7 @@
                                 multiple
                             />
                         </div>
+                  
                         <button
                             type="button"
                             [class.disabled]="toUsers.length == 0 || subject == ''"
@@ -639,7 +643,7 @@
                 </div>
             </div>
             <div
-                class="p-0 sendusers mb-1 col-md-11">
+                class="p-0 sendusers mb-1 col-md-10">
                 <p-autoComplete
                     [style]="{ width: '100%' }"
                     [inputStyle]="{ width: '100%' }"
@@ -767,6 +771,7 @@
                     [(ngModel)]="subject"
                     name="subject"
                     required
+               
                 />
                 </div>
 
@@ -879,10 +884,11 @@
             multiple
         />
     </div>
+  
         <button
             type="button"
-            [class.disabled]="toUsers.length == 0 || subject == ''"
-            [disabled]="toUsers.length == 0 || subject == ''"
+            [class.disabled]="toUsers.length == 0 || htmlEditorInput == ''"
+            [disabled]="toUsers.length == 0 || htmlEditorInput == ''"
             class="sendBtn"
             (click)="sendMessage()"
         >

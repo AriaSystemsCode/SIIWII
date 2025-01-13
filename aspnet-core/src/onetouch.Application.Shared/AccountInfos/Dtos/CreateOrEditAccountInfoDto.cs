@@ -35,7 +35,7 @@ namespace onetouch.AccountInfos.Dtos
 
         //[Required]
         [StringLength(AccountInfoTempConsts.MaxTradeNameLength, MinimumLength = AccountInfoTempConsts.MinTradeNameLength)]
-        public string TradeName { get; set; }
+        public string TradeName { get; set; } = "";
 
 
         public string AccountType { get; set; }

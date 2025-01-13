@@ -16,6 +16,9 @@ using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
+using onetouch.AppEntities;
+using onetouch.SystemObjects;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -25,11 +28,18 @@ namespace onetouch.AppSubScriptionPlan
         private readonly IRepository<AppFeature, long> _appFeatureRepository;
         private readonly IAppFeaturesExcelExporter _appFeaturesExcelExporter;
         private readonly Helper _helper;
-        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter, Helper helper)
+        private readonly IRepository<AppEntity, long> _appEntityRepository;
+        private readonly ISycEntityObjectStatusesAppService _sycEntityObjectStatusesAppService;
+        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter, Helper helper, 
+            IRepository<AppEntity, long> appEntityRepository,
+             ISycEntityObjectStatusesAppService sycEntityObjectStatusesAppService
+            )
         {
             _appFeatureRepository = appFeatureRepository;
             _appFeaturesExcelExporter = appFeaturesExcelExporter;
             _helper = helper;
+            _appEntityRepository = appEntityRepository;
+            _sycEntityObjectStatusesAppService = sycEntityObjectStatusesAppService;
         }
 
         public async Task<PagedResultDto<GetAppFeatureForViewDto>> GetAll(GetAllAppFeaturesInput input)
@@ -146,12 +156,33 @@ namespace onetouch.AppSubScriptionPlan
             var appFeature = ObjectMapper.Map<AppFeature>(input);
             var appFeatureObjectId = await _helper.SystemTables.GetObjectStandardFeatureId();
             appFeature.ObjectId = appFeatureObjectId;
-            var StatusId = input.EntityStatusCode == "ACTIVE" ? await _helper.SystemTables.GetEntityObjectStatusItemActive() : await _helper.SystemTables.GetEntityObjectStatusItemDraft();
-            appFeature.EntityObjectStatusId = StatusId;
+           // var StatusId = input.EntityStatusCode == "ACTIVE" ? await _helper.SystemTables.GetEntityObjectStatusItemActive() : await _helper.SystemTables.GetEntityObjectStatusItemDraft();
+            appFeature.EntityObjectStatusId = input.EntityStatusId;
             var entityFeatureObjectType = await _helper.SystemTables.GetEntityObjectTypeFeature();
             appFeature.EntityObjectTypeId = entityFeatureObjectType.Id;
             appFeature.EntityObjectTypeCode = entityFeatureObjectType.Code;
             appFeature.TenantId = null;
+            //appFeature.UnitOfMeasurementId = null;
+            if (input.UnitOfMeasurementId !=null)
+            {
+                var uom = await _appEntityRepository.GetAll().Where(z => z.Id == input.UnitOfMeasurementId && z.EntityObjectTypeCode=="UOM").FirstOrDefaultAsync();
+                if (uom != null)
+                {
+                    appFeature.UnitOfMeasurementCode = uom.Code;
+                    appFeature.UnitOfMeasurementName = uom.Name;
+                }
+            }
+            if (input.CategoryId == 0 || input.CategoryId == null)
+                appFeature.CategoryCode = "";
+            else
+            {
+                var catgObj = await _appEntityRepository.GetAll().Where(z => z.Id == input.CategoryId).FirstOrDefaultAsync();
+                if (catgObj != null)
+                    appFeature.CategoryCode = catgObj.Code;
+            }
+            //    appFeature.EntityCategories = new List<AppEntityCategory>();
+            //    appFeature.EntityCategories.Add(new AppEntityCategory { EntityObjectCategoryId = input.CategoryId });
+            //  }
             await _appFeatureRepository.InsertAsync(appFeature);
 
         }
@@ -212,6 +243,9 @@ namespace onetouch.AppSubScriptionPlan
 
             return _appFeaturesExcelExporter.ExportToFile(appFeatureListDtos);
         }
-
+        public async Task<List<SycEntityObjectStatusLookupTableDto>> GetFeatureStatusList()
+        {
+            return await _sycEntityObjectStatusesAppService.GetAllSycEntityStatusForTableDropdown("STANDARDFEATURE");
+        }
     }
 }

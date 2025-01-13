@@ -24,6 +24,8 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   salesReps: any[];
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
+  @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
+
 
   constructor(
     injector: Injector,
@@ -79,4 +81,10 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
         }
       });
   }
+
+  isContactFormValid(value) {
+    if(this.activeTab==this.shoppingCartoccordionTabs.SalesRepInfo)
+      this.isContactsValid.emit(value)
+  }
+
 }

@@ -12,7 +12,8 @@
         color: #333333!important;
         &.p-highlight {
             border-color: $checkbox-border-color!important;
-            background: $white;
+            background : #4A0D4A !important;
+            color: white;
         }
     }
     &:not(.p-checkbox-disabled) .p-checkbox-box {
@@ -27,7 +28,7 @@
     }
     
     .p-checkbox-icon {
-        color: $black!important;
+        color: white !important;
     }
     .pi-check:before {
         font-weight: 600;

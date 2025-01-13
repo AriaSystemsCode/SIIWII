@@ -61,9 +61,12 @@
             </div>
         </div>
         <div  class="align-items-center buttons-list d-flex flex-column mt-4 sizescale-name" style="gap:20px" *ngIf="!readOnly">
-            <button class="btn btn-primary w-100" (click)="openSelectSizeRatioModal()" [disabled]="!appSizeScales?.sizeScaleId">{{'SelectSizeRatio'| localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(false)" [disabled]=" !appSizeScales?.sizeScaleId || (appSizeScales?.sizeScaleId && !appSizeRatios?.sizeScaleId) || sizeRatioForm.form.invalid">{{'SaveSizeRatio' | localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" [disabled]="!appSizeScales?.sizeScaleId || sizeRatioForm.form.invalid" style="background-color: #eba461 !important;
+            <button class="btn     w-100" (click)="openSelectSizeRatioModal()" [disabled]="!appSizeScales?.sizeScaleId"  style="background-color: #4A0D4A !important; color:white !important;
+            border: none !important;">{{'SelectSizeRatio'| localize}}</button>
+            <button class="btn     w-100" (click)="createOrEdit(false)" [disabled]=" !appSizeScales?.sizeScaleId || (appSizeScales?.sizeScaleId && !appSizeRatios?.sizeScaleId) || sizeRatioForm.form.invalid"
+            style="background-color: #EEEEEE !important;
+            border: none !important;">{{'SaveSizeRatio' | localize}}</button>
+            <button class="btn     w-100" (click)="createOrEdit(true)" [disabled]="!appSizeScales?.sizeScaleId || sizeRatioForm.form.invalid" style="background-color: #eba461 !important;
             border: none !important;">{{'SaveAsNewSizeRatio'| localize}}</button>
         </div>
         

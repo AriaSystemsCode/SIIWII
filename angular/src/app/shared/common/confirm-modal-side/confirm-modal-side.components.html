@@ -24,8 +24,15 @@
                 <p class="del-desc">{{content2}}</p>
 
                 <button (click)="onClickNo()" type="submit" class="btn btn-primary blue btn-blue {{type}}  mb-3"
+                style="border-radius: 5px;
+                background-color: #4A0D4A !important;
+                border: #4A0D4A !important;
+                color: white;"
                 ><span>{{buttonNo}}</span></button>
-            <button *ngIf="defualtButton" (click)="onClickYes()"  type="button" class="btn btn-default btn-gray mb-3"
+            <button *ngIf="defualtButton" (click)="onClickYes()"  type="button" class="btn btn-default btn-gray mb-3" style="border-radius: 5px;
+            background-color: white !important;
+            border: 1px solid #4A0D4A !important;
+            color: #4A0D4A !important;"
                 >{{buttonYes}}</button>
 
 

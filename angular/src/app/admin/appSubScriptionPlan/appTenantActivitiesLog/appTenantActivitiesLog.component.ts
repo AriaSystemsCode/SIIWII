@@ -2,7 +2,7 @@
 import { Component, Injector, ViewEncapsulation, ViewChild } from '@angular/core';
 import { ActivatedRoute , Router} from '@angular/router';
 import { AppTenantActivitiesLogServiceProxy, AppTenantActivityLogDto  } from '@shared/service-proxies/service-proxies';
-import { NotifyService } from 'abp-ng2-module';
+import { AbpSessionService, NotifyService } from 'abp-ng2-module';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
 
@@ -15,12 +15,20 @@ import { FileDownloadService } from '@shared/utils/file-download.service';
 import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistory/entity-type-history-modal.component';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { AppSessionService } from '@shared/common/session/app-session.service';
+import { DateType } from 'devextreme/ui/date_box';
 
 
 @Component({
+    selector:'app-tenantactivitieslog',
     templateUrl: './appTenantActivitiesLog.component.html',
     encapsulation: ViewEncapsulation.None,
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()], 
+    styles: [`
+        .p-icon-wrapper {
+            position: initial !important;
+        }
+    `]
 })
 export class AppTenantActivitiesLogComponent extends AppComponentBase {
     
@@ -33,9 +41,9 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
 
     advancedFiltersAreShown = false;
     filterText = '';
-    maxTenantIdFilter : number;
+    //maxTenantIdFilter : number;
 		maxTenantIdFilterEmpty : number;
-		minTenantIdFilter : number;
+		//minTenantIdFilter : number;
 		minTenantIdFilterEmpty : number;
     tenantNameFilter = '';
     maxUserIdFilter : number;
@@ -82,15 +90,19 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
     creditOrUsageFilter = '';
     monthFilter = '';
     yearFilter = '';
-
+   // isHostLogged : boolean;
 
     _entityTypeFullName = 'onetouch.AppSubScriptionPlan.AppTenantActivityLog';
     entityHistoryEnabled = false;
-
-
-
+    appSession: AppSessionService;
+    isHostLogged = (this.appSession.tenant == undefined ? true:this.appSession.tenant.id == null);
+    
+    maxTenantIdFilter =(this.appSession.tenant == undefined ? null:this.appSession.tenant.id);
+    minTenantIdFilter =(this.appSession.tenant == undefined ? null:this.appSession.tenant.id);
+    
     constructor(
         injector: Injector,
+        //private _abpSessionService: AbpSessionService,
         private _appTenantActivitiesLogServiceProxy: AppTenantActivitiesLogServiceProxy,
         private _notifyService: NotifyService,
         private _tokenAuth: TokenAuthServiceProxy,
@@ -103,6 +115,7 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
 
     ngOnInit(): void {
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
+        
     }
 
     private setIsEntityHistoryEnabled(): boolean {
@@ -112,6 +125,7 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
 
     getAppTenantActivitiesLog(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
@@ -237,7 +251,10 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
             this._fileDownloadService.downloadTempFile(result);
          });
     }
-    
+    formatDate(input: string )
+    {
+        return moment(input).format('MM/DD/YYYY HH:mm:ss');
+    }
     
     
     

@@ -62,7 +62,7 @@ export class MarketplaceProductsComponent
     sortBy: number;
     appSession: AppSessionService;
     skipCount: number = 0;
-    maxResultCount: number = 10;
+    maxResultCount: number = 12;
     pagesNumber: number;
     displayFitlers: boolean = false;
     filterType: string;
@@ -112,8 +112,8 @@ export class MarketplaceProductsComponent
                 });
         }
         this.sortingData = [
-            { label: "Product Name", value: "name" },
-            { label: "Product code", value: "code" },
+            { label: "Product Name", value: "name" }, 
+            { label: "Product code", value: "manufacturercode" },
             { label: "Price low to high", value: "price" },
             { label: "Price high to low", value: "price desc" },
         ];
@@ -323,18 +323,18 @@ export class MarketplaceProductsComponent
     onlyAvialbleStock: boolean;
     swtichStock(value) {
         this.onlyAvialbleStock = value.checked;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
 
     // start filter criteria
     appItemListId: any;
     selectCatalog(value) {
         this.appItemListId = value.id;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
     selectedDepartments: any;
     selectDepartment(value) {
@@ -347,62 +347,62 @@ export class MarketplaceProductsComponent
                 value.node.data.sycEntityObjectCategory.id,
             ];
         }
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
 
     minimumPrice: number;
     maximumPrice: number;
     setPriceFrom(value) {
         this.minimumPrice = value;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
     setPriceTo(value) {
         this.maximumPrice = value;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
 
     startShipData: any;
     setStartShipDate(value) {
         this.startShipData = value;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
 
     endShipData: any;
     setEndtShipDate(value) {
         this.endShipData = value;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
     startSoldOutData: any;
     setStartSoldOutDate(value) {
         this.startSoldOutData = value;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
     endSoldOutData: any;
     setEndSoldOutDate(value) {
         this.endSoldOutData = value;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
 
     brands: [] = [];
     selectBrands(value) {
         this.brands = value;
-        if (!this.isMobile) {
+        // if (!this.isMobile) {
             this.getAllProducts();
-        }
+        // }
     }
 
     resetProducts($event) {

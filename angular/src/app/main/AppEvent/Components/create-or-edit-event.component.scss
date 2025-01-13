@@ -50,7 +50,8 @@
     border: 1px solid #e2e5ec !important;
 }
 .content {
-    height: 571px;
+    //height: 571px;
+    height: auto;
 }
 
 input#fromDate, input#toDate , input.form-control.text-center.bs-timepicker-field ,textarea#description ,input#eventLink {

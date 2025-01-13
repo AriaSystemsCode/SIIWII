@@ -105,5 +105,13 @@ namespace onetouch.AppSiiwiiTransaction
         public virtual decimal CurrencyExchangeRate { get; set; }
         public virtual ICollection<AppTransactionContacts> AppTransactionContacts { get; set; }
         //Iteration#36,1 MMT 08/16/2023 Check out and manage placed orders [End]
+        //Iteration#42[Start]
+        public virtual string? Reference { set; get; }
+        public virtual DateTime EnteredDate { set; get; }
+        //Iteration#42[End]
+        //Iteration#45[Start]
+        public virtual DateTime OrderConfirmationTimeStamp { get; set; }
+       // public virtual DateTime TimeStamp { get; set; }
+        //Iteration#45[End]
     }
 }

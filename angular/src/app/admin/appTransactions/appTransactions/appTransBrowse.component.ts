@@ -1,8 +1,8 @@
-﻿import { Component, Injector, OnInit, ViewChild } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { AppTransactionServiceProxy, SycEntityObjectStatusesServiceProxy, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent, SelectItem } from 'primeng/api';
+import { LazyLoadEvent, SelectItem, SortEvent } from 'primeng/api';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
@@ -21,6 +21,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
     @ViewChild('dataTable', { static: true }) dataTable;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
+    @ViewChild('dataDetailTable', { static: true }) dataDetailTable;
     filterForm: FormGroup;
     pageMainFilters;
     showMainFiltersOptions = true;
@@ -47,37 +48,97 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     maxCompleteDateFilter: moment.Moment;
     minCompleteDateFilter: moment.Moment;
     orderId: number = 0;
+    showHeader: boolean = true;
+    showDetails: boolean = false;
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
+    products:any
+    selectedProduct: any;
+    variationDetails: any[];
+    transactionTypeFilter :number 
+    transactionNumberFilter = ''
+    variationCodeFilter = ''
+    referenceNumberFilter = ''
+    minPrice :number 
+    maxPrice :number 
+    minAmount :number 
+    maxAmount :number 
+    totalRecords: number = 0;
+    page: number = 0; // current page number
+    rowsPerPage: number = 10; // rows per page, can be changed by user
+    // totalRecords: number = 0;
+    // loading: boolean = false;
+    // page: number = 0;
+    // rowsPerPage: number = 10;
 
-
+    // filters: any;
+    sortField: string | undefined;
+    sortOrder: number | undefined;
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
         private _formBuilder: FormBuilder,
         private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
-        private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy
+        private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy,
+        private cdr: ChangeDetectorRef
     ) {
         super(injector);
+  
     }
     ngOnInit(): void {
+      
         this.setPageMainFilters();
         this.initFilterForm();
+        // this.getVariationDetail()
         // this.getAppTransactions();
     }
-    initFilterForm() {
-        this.filterForm = this._formBuilder.group({
-            search: undefined,
-            sellerNameFilter: undefined,
-            buyerNameFilter: undefined,
-            codeFilter: undefined,
-            statusFilter: 0,
-            maxCreateDateFilter: undefined,
-            minCreateDateFilter: undefined,
-            maxCompleteDateFilter: undefined,
-            minCompleteDateFilter: undefined,
-            mainFilterType: this.defaultMainFilter,
 
-        });
+    ngOnChanges(): void {
+  
+        this.initFilterForm();
+
+    }
+    initFilterForm() {  
+
+
+        // if (this.showHeader) {
+            this.filterForm = this._formBuilder.group({
+                search: undefined,
+                sellerNameFilter: undefined,
+                buyerNameFilter: undefined,
+                codeFilter: undefined,
+                statusFilter: 0,
+                maxCreateDateFilter: undefined,
+                minCreateDateFilter: undefined,
+                maxCompleteDateFilter: undefined,
+                minCompleteDateFilter: undefined,
+                mainFilterType: this.defaultMainFilter,
+                transactionTypeFilter: undefined,
+                transactionNumberFilter: undefined,
+                nameFilter: undefined,
+                variationCodeFilter: undefined,
+                referenceNumberFilter: undefined,
+                minPrice: undefined,
+                maxPrice : undefined,
+                minAmount: undefined,
+                maxAmount: undefined,
+    
+            });
+        // } 
+        //  else if (this.showDetails) {
+        //     this.filterForm = this._formBuilder.group({
+        //         search: undefined,
+        //         mainFilterType: this.defaultMainFilter,
+        //         transactionTypeFilter: undefined,
+        //         transactionNumberFilter: undefined,
+        //         nameFilter: undefined,
+        //         variationCodeFilter: undefined,
+        //         minPrice: undefined,
+        //         maxPrice : undefined,
+        //         minAmount: undefined,
+        //         maxAmount: undefined,
+    
+        //     });
+        //  }
 
         const selectedfilter = this.pageMainFilters.filter(
             (item) => this.defaultMainFilter.id == item.id
@@ -85,6 +146,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         if (!selectedfilter) return;
         this.mainFilterCtrl.setValue(selectedfilter);
     }
+
+
 
     setPageMainFilters() {
         this.pageMainFilters = [];
@@ -132,13 +195,15 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.loading = true;
         // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false, 0, filters.search,
+            false,0,filters.search,
             filters.codeFilter, undefined,
-            filters.mainFilterType?.id, filters.minCreateDateFilter
+            filters.mainFilterType?.id,filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
+            
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
             filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
+            undefined,undefined,filters.referenceNumberFilter,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
@@ -147,28 +212,47 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             this.loading = false;
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
+            // console.log(result.items,'dataaaaaaaaaaaaaaaaaaa')
             this.primengTableHelper.hideLoadingIndicator();
         });
     }
 
     onSelectionChange($event) {
+ 
         /* if($event.entityObjectStatusCode!="DRAFT")
              return ; */
         if ($event?.id)
             this.orderId = $event?.id;
+        
+        if (this.orderId) {
+            if($event.entityObjectStatusCode =="DRAFT") {
+                this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.createOrEdit);
 
-        if (this.orderId)
-            this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
+            } else {
+                this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
+                
+            }
+        }
     }
 
     reloadPage(): void {
         this.paginator.changePage(this.paginator.getPage());
     }
     resetList() {
-        this.filterForm.reset();
+        // this.filterForm.reset();
+       this.sortField = undefined
+       this.sortOrder = undefined
+        this.initFilterForm()
         this.dataTable.reset();
-        this.setMainPageFilter(this.defaultMainFilter);
-        this.getAppTransactions();
+        this.dataDetailTable.reset();
+        this.setMainPageFilter(this.defaultMainFilter); 
+        if(this.showHeader) {
+            this.getAppTransactions();
+
+        } else if (this.showDetails) {
+            this.getVariationDetail()
+
+        }
     }
 
     setMainPageFilter(filter) {
@@ -217,6 +301,53 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 this.display = true;
             });
     }
+    onSort(event: { field: string; order: number }) {
+        this.sortField = event.field;
+        this.sortOrder = event.order;
+        this.getVariationDetail();  // Trigger data load with new sorting
+    }
+    getVariationDetail(event?: { page?: number; rows?: number }) {
+        this.showMainSpinner();
+    
+        // Update pagination if pagination event passed
+        if (event) {
+            this.page = event.page ?? this.page;
+            this.rowsPerPage = event.rows ?? this.rowsPerPage;
+        }
+    
+        const skipCount = this.page * this.rowsPerPage;
+        const filters = this.filterForm.value;
+    
+        this._appTransactionServiceProxy
+            .getllTransactionVariationsDetail(
+                filters.variationCodeFilter,
+                filters.mainFilterType?.id == undefined ? undefined : filters.mainFilterType.id == 723 ? 0 : 1,
+                filters.search,
+                filters.transactionNumberFilter,
+                filters.minPrice,
+                filters.maxPrice,
+                filters.minAmount,
+                filters.maxAmount,
+                this.sortField ? `${this.sortField} ${this.sortOrder === 1 ? 'ASC' : 'DESC'}` : null,  // Sorting
+                skipCount,
+                this.rowsPerPage
+            )
+            .pipe(finalize(() => {
+                this.hideMainSpinner();
+            }))
+            .subscribe(
+                (result: any) => {
+                    this.variationDetails = result.items;
+                    this.totalRecords = result.totalCount;
+                },
+                (error) => {
+                    console.error('API Request Failed:', error);
+                    this.loading = false;
+                }
+            );
+    }
+    
+
 
 
     closeModal($event) {
@@ -233,4 +364,14 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         if($event)
           this.getAppTransactions();
     }
+
+
+    onSearch(event: KeyboardEvent): void {
+        event.preventDefault(); // Prevent form submission if inside a form
+        event.stopPropagation(); // Prevent triggering other handlers
+        this.getAppTransactions();
+        this.getVariationDetail();
+    }
+
+
 }

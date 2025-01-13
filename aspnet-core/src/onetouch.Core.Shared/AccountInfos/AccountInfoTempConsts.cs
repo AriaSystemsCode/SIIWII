@@ -34,7 +34,7 @@
 		public const int MinPhone3ExLength = 1;
 		public const int MaxPhone3ExLength = 10;
 						
-		public const int MinEMailAddressLength = 7;
+		public const int MinEMailAddressLength = 0;
 		public const int MaxEMailAddressLength = 100;
 						
     }

@@ -3,7 +3,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { PaginationSettings } from '@shared/components/shared-forms-components/dropdown-with-pagination/dropdown-with-pagination.component';
 import { AppEntitiesServiceProxy, AppItemVariationDto, AppItemVariationsDto, ExtraAttribute, LookupLabelDto, VariationItemDto } from '@shared/service-proxies/service-proxies';
 import { SelectItem } from 'primeng/api';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, tap } from 'rxjs';
 import { EExtraAttributeUsage } from '../../appItems/models/extra-attribute-usage.enum';
 import { FilteredExtraAttribute } from '../models/filtered-extra-attribute';
 import { IsVariationExtraAttribute } from '../models/IsVariationExtraAttribute';
@@ -72,9 +72,10 @@ export class ExtraAttributeDataService extends AppComponentBase {
         return  _extraAttributes
     }
 
-    getExtraAttributeLookupData(code:string,reference:LookupLabelDto[],extraAttr?:FilteredExtraAttribute,setSelectedValuesasCodes?:boolean) {
+    getExtraAttributeLookupData(code:string,reference:LookupLabelDto[],extraAttr?:FilteredExtraAttribute,setSelectedValuesasCodes?:boolean): Observable<any> {
        return this._appEntitiesServiceProxy.getAllEntitiesByTypeCode(code)
-        .subscribe((res)=>{
+       .pipe(
+        tap((res) => {
             // empty the array whithout changing reference
             let count = reference.length
             for (let i = count; i > 0; i--) {
@@ -88,7 +89,7 @@ export class ExtraAttributeDataService extends AppComponentBase {
                 const defaultValue = reference.filter(item=>item.value == Number(extraAttr.defaultValue))
                 if(defaultValue[0]) extraAttr.selectedValues = [ setSelectedValuesasCodes? defaultValue[0].code : defaultValue[0].value]
             }
-        })
+        }))
     }
     sortBy: string = 'name'
     getExtraAttributeLookupDataWithPaging(code:string, skipCount:number, maxResultCount:number) {

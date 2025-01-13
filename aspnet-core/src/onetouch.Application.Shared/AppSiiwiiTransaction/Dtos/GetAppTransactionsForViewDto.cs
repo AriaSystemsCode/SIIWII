@@ -21,11 +21,30 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public virtual bool LastRecord { set; get; } = false;
         public virtual bool FirstRecord { set; get; } = false;
-        public virtual DateTime EnteredDate { set; get; }
+       // public virtual DateTime EnteredDate { set; get; }
         public long CreatorUserId { set; get; }
         public byte[] OrderConfirmationFile { set; get; }
         public virtual List<ContactInformationOutputDto> SharedWithUsers{set; get;}
         public virtual bool IsOwnedByMe { set; get; }
+        public virtual string? CreatorTenantName{ set; get; }
+        //MMT - Performance[Start]
+        public virtual bool IsOrderInformationValid { set; get; }
+        public virtual bool IsBuyerContactInformationValid { set; get; }
+        public virtual bool IsSellerContactInformationValid { set; get; }
+        public virtual bool IsSalesRepInformationValid { set; get; }
+        public virtual bool IsShippingInformationValid { set; get; }
+        public virtual bool IsBillingInformationValid { set; get; }
+        //MMT - Performance[End]
+        //start
+        public virtual PagedResultDto<string> EntityCategoriesNames { get; set; }
+        public virtual PagedResultDto<string> EntityClassificationsNames { get; set; }
+        //End
+        //Iteration45[Start]
+        public virtual bool ShowSync { set; get; } = false;
+        public virtual DateTime LastModifiedDate { set; get; }
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { get; set; }
+        //Iteration45[End]
     }
 
     //xx
@@ -213,4 +232,36 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string SharedUserTenantName { get; set; }
 
     }
+    public class GetAppTransactionAttributesInput : PagedAndSortedResultRequestDto
+    {
+
+    }
+    public class GetAppTransactionAttributesWithPagingInput : GetAppTransactionAttributesInput
+    {
+        public long TransactionId { get; set; }
+    }
+    //I45[start]
+    public class TransactionDetailView
+    {
+        public TransactionType TransactionType { set; get; }
+        public string TransactionNumber { get; set; }
+        public string code { get; set; }
+        public string ManufacturerCode { set; get; }
+        public string name { get; set; }
+        public double Qty { get; set; }
+        public decimal Price { get; set; }
+        public decimal Amount { get; set; }
+        public string Image { get; set; }
+        public long ParentId { get; set; }
+        public int LineNo { get; set; }
+
+    }
+    //I45[end]
+    //MMT-OC
+    public class TenantContactRole
+    {
+        public string ContactRole { set; get; }  
+        public string ContactName { set; get; }
+    }
+    //MMT-OC
 }

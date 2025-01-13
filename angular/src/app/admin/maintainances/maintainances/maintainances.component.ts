@@ -60,6 +60,7 @@ export class MaintainancesComponent extends AppComponentBase {
 
     getMaintainances(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             if (this.primengTableHelper.records &&
                 this.primengTableHelper.records.length > 0) {

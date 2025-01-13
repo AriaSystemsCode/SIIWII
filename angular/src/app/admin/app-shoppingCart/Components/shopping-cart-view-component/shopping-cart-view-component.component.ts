@@ -1,9 +1,10 @@
 import {
   Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild
   , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AddVariationToInputDto, AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -17,6 +18,8 @@ import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
+import { AppConsts } from '@shared/AppConsts';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -29,6 +32,7 @@ export class ShoppingCartViewComponentComponent
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
   @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("refreshReport") refreshReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   orderInfoValid: boolean = false;
   buyerContactInfoValid = false;
@@ -65,7 +69,7 @@ export class ShoppingCartViewComponentComponent
   appTransactionsForViewDto: GetAppTransactionsForViewDto;
   showCarousel: boolean = false;
   transactionPosition = TransactionPosition;
-  activeIndex = 0;
+  activeIndex ;
   showSaveBtn: boolean = false;
   currencySymbol: string = "";
   transactionCode:string="";
@@ -82,33 +86,439 @@ export class ShoppingCartViewComponentComponent
   companeyNames:GetAccountInformationOutputDto[];
   currentTab:number
   shareDone:boolean=false;
+  openActions:boolean =false
+  temp: TreeNode<any>[] = null;
+  addLine:boolean=true;
+  visible:boolean = false
+  allVariations: GetAppMarketItemForViewDto[] = [];
+  displayedVariations: any[] = [];
+  incrementCount: number = 10;
+totalVariationsCount: number = 0;
+
+  selectedVariation: string = '';
+  selectedPrice: number = 0; // Holds the selected price
+selectedQuantity: number = 0; // Holds the entered quantity
+selectedImg: number = 0; // Holds the entered quantity
+amount: number = 0; // Holds the calculated amount
+showAddLine : boolean = false
+newData:any
+showSaveCancel : boolean = false
+// visibleD: boolean = false;
+cancelBtn: boolean = false;
+saveBtn: boolean = false;
+SuccessMsg: boolean = false;
+addNewLinebtn : boolean = true;
+filterForm: FormGroup;
+comNew : boolean
+conNew : boolean
+TempComp : boolean = false
+currentFilter: string = '';
+regenrate : boolean = false
+syncMsg : boolean = false
+mainLoad : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private userClickService: UserClickService,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private _formBuilder: FormBuilder,
   ) {
     super(injector);
 
   }
   ngOnInit(): void {
-   
+    this.initFilterForm()
+  
+ let value = localStorage.getItem("comNew"); 
+
+ if (value) {
+  this.comNew = Boolean((value));
+ }else {
+  this.comNew = false
+ }
+ let value2 = localStorage.getItem("conNew");
+ if (value2) {
+  this.conNew = Boolean((value2));
+}  else {
+  this.conNew = false;
+
+}
+const button = document.getElementById("stickyButton");
+  const rightCol = document.getElementById("rightCol");
+
+  window.addEventListener("scroll", () => {
+    const rect = rightCol.getBoundingClientRect();
+    if (rect.top < 20 && rect.bottom > window.innerHeight) {
+      button.style.position = "fixed";
+      button.style.bottom = "20px";
+      button.style.right = rect.left + "px"; // Adjust based on the right column's position
+    } else {
+      button.style.position = "absolute";
+      button.style.bottom = "20px";
+    }
+  });
+ console.log(this.comNew,'this.comNew')
+ console.log(this.conNew,'this.conNew')
   }
-  loadCommentsList() {
-    // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
-    this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+  ngOnChanges() {
+   
+
   }
 
-  show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
+ 
+initFilterForm() {  
+
+
+  // if (this.showHeader) {
+      this.filterForm = this._formBuilder.group({
+        selectedVariation: ['', Validators.required],
+        selectedQuantity: [null, [Validators.required, Validators.min(1)]],
+        selectedPrice: [null, [Validators.required, Validators.min(1)]]
+
+      });
+ 
+
+}
+
+addNewLine() {
+  console.log(this.newData, 'newData'); // Log new data for debugging
+  const filters = this.filterForm.value;
+
+  // Get the item data from the selected line (newData)
+  const appItem = this.newData?.value?.appItem;
+
+  // Initialize the new parent node without using itself within the definition
+  const newParentNode: any = {
+   
+    data: {}, // We’ll fill this data field after initializing the node
+    children: [], // Children will be added afterward
+    expanded: true // Expand the new node by default
+  };
+
+  // Fill the parent node's data to match the required structure
+  newParentNode.data = {
+    code: appItem?.code,
+    manufacturerCode: appItem?.manufacturerCode,
+    name: appItem?.name,
+    qty: filters.selectedQuantity,
+    price: filters.selectedPrice,
+    amount: filters.selectedQuantity * filters.selectedPrice,
+    image: appItem?.imageUrl,
+    parentId: 0, // Top-level node
+    // lineId: new Date().getTime(), // Unique identifier for lineId
+    colorId: 0,
+    colorCode: "", // Empty if not applicable
+    sizeId: 0,
+    sizeCode: "", // Empty if not applicable
+    editQty: true,
+    noOfPrePacks: 0,
+    prePackQty: 0,
+    added:true
+  };
+
+  // Define a child node that references the parent node's lineId
+  // const childNode = {
+  //   // key: 'new-child-' + new Date().getTime(), // Unique key for child
+  //   data: {
+  //     code: appItem?.code + '-child', // Custom code for the child
+  //     manufacturerCode: appItem?.manufacturerCode,
+  //     name: appItem?.name,
+  //     qty: this.selectedQuantity,
+  //     price: appItem?.price,
+  //     amount: this.selectedQuantity * appItem?.price,
+  //     image: appItem?.imageUrl,
+  //     parentId: newParentNode.data.lineId, // Link to parent
+  //     // lineId: new Date().getTime() + 1, // Unique lineId for child
+  //     colorId: 0,
+  //     colorCode: "", // Empty if not applicable
+  //     sizeId: 0,
+  //     sizeCode: "", // Empty if not applicable
+  //     editQty: true,
+  //     noOfPrePacks: 0,
+  //     prePackQty: 0
+  //   },
+  //   children: null // No further children for this level
+  // };
+
+  // Add the child node to the parent's children array
+  // newParentNode.children.push(childNode);
+
+  // Add the new parent node to the shopping cart tree
+  this.shoppingCartTreeNodes.push(newParentNode);
+
+  // Update the tree structure in the UI
+  this.cdr.detectChanges();
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  console.log(this.shoppingCartTreeNodes, 'Updated shopping cart tree nodes');
+
+  // Reset variables
+  this.showSaveCancel = false;
+  this.addLine = true
+  // this.selectedVariation = '';
+  // this.selectedQuantity = 0;
+  // this.selectedPrice = 0
+  // this.amount = 0;
+  // this.getSellerVariations()
+  this.addLine = false
+}
+handleVarSearch(event: any, dropdown?: any) {
+  const filterText = event.filter?.trim();
+  this.currentFilter = filterText; // Store the current filter text
+  this.allVariations = []; // Reset all variations for new filter
+  this.displayedVariations = []; // Clear displayed variations
+
+  // Load initial set of items matching the filter
+  this.loadMore(new MouseEvent('click'), dropdown, filterText);
+}
+
+getSellerVariations(
+  skipCount: number = 0,
+  maxResultCount: number = this.incrementCount,
+  filter: string = ''
+) {
+  this._AppTransactionServiceProxy
+    .getAllSellerVariations(
+      this.appTransactionsForViewDto?.sellerCompanySSIN,
+      filter, // Pass filter to the backend
+      this.appTransactionsForViewDto?.buyerContactSSIN,
+      'USD',
+      undefined,
+      skipCount,
+      maxResultCount
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((res) => {
+      this.totalVariationsCount = res.totalCount;
+
+      if (filter && skipCount === 0) {
+        // Replace variations on new filter
+        this.allVariations = res.items;
+      } else {
+        // Append new items otherwise
+        this.allVariations = [...this.allVariations, ...res.items];
+      }
+
+      // Update displayed variations
+      this.displayedVariations = [...this.allVariations];
+    });
+}
+
+
+loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
+  // Prevent dropdown from closing
+  event.stopPropagation();
+
+  // Determine the next `skipCount` based on the filter and loaded variations
+  const nextSkipCount = this.allVariations.length;
+
+  // Check if there are more items to load or if filtering is applied
+  if (this.displayedVariations.length < this.totalVariationsCount || filter) {
+    this.getSellerVariations(nextSkipCount, this.incrementCount, filter);
+
+    // Keep the dropdown open after fetching more items
+    setTimeout(() => {
+      dropdown.overlayVisible = true;
+    }, 0);
+  }
+}
+
+
+onVariationSelect(event: any) {
+  // Reset quantity and price when a new variation is selected  
+  console.log(event,'mmmmmmevv')
+// this.filterForm.reset();
+  // filters.reset()
+  this.filterForm.controls['selectedQuantity']?.setValue(0);
+  this.selectedQuantity = 0;
+  // this.selectedPrice = 0;
+  this.newData = event;
+
+  if ( event.value.appItem.price) {
+    this.selectedImg = event.value.appItem.image
+   
+     this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
+    //  this.selectedPrice = filters.selectedPrice
+    this.updateAmount(); // Recalculate the amount when a new price is selected
+  }
+}
+
+updateAmount() {
+  const filters = this.filterForm.value;
+  
+ this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
+  // Calculate the amount based on the quantity and selected price
+  this.amount = this.selectedQuantity * this.selectedPrice;
+}
+
+updatePrice() {
+  const filters = this.filterForm.value;
+  this.selectedQuantity = filters.selectedQuantity
+
+  // Calculate the amount based on the quantity and selected price
+  this.amount = filters.selectedQuantity * this.selectedPrice;
+}
+
+saveVariations() {
+  const body = new AddVariationToInputDto();
+  const filters = this.filterForm.value;
+  
+ this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
+  // Assign each property to the DTO object
+  body.variationSSIN = this.newData?.value?.appItem?.ssin;
+  body.qty = this.selectedQuantity;
+  body.price = this.selectedPrice;
+  body.transactionId = this.orderId;
+  body.transactionType = this.appTransactionsForViewDto?.transactionType;
+
+  this._AppTransactionServiceProxy.addVariationToTransaction(body)
+    .pipe(finalize(() =>  {
+        this.selectedVariation = '';
+  this.selectedQuantity = 0;
+  this.selectedPrice = 0
+  this.amount = 0;
+  // this.filterForm.value.reset()
+  // this.hideMainSpinner()
+  this.getShoppingCartData();
+  this.showSaveCancel = false
+
+    }))
+    .subscribe((res) => {
+      console.log(this.displayedVariations, 'displayedVariations');
+      // Handle post-save logic here
+    });
+    this.addNewLinebtn = true
+}
+
+cancelAddLine() {
+  this.addLine = true
+  this.showAddLine = false;
+  this.showSaveCancel = false;
+ 
+  this.addNewLinebtn = true
+ 
+    this.selectedVariation = '';
+    this.filterForm.controls['selectedQuantity']?.setValue(0);
+    this.filterForm.controls['selectedPrice']?.setValue(0);
+
+    this.selectedQuantity = 0;
+
+  this.selectedPrice = 0
+  this.amount = 0;
+  this.shoppingCartTreeNodes.pop(); // Removes the last item
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  // Reset selections as needed
+}
+
+cancelsaveLine() {
+  this.addLine = true
+  this.showAddLine = false;
+  this.showSaveCancel = false;
+ 
+  this.addNewLinebtn = true
+ 
+    this.selectedVariation = '';
+    this.filterForm.controls['selectedQuantity']?.setValue(0);
+    this.filterForm.controls['selectedPrice']?.setValue(0);
+
+    this.selectedQuantity = 0;
+
+  this.selectedPrice = 0
+  this.amount = 0;
+  
+}
+
+  
+  // loadCommentsList() {
+  //   const screenWidth = window.innerWidth;
+  //   const tabletWidth = 768; // iPads and tablets
+  //   // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
+  //  //if(screenWidth <= tabletWidth)
+  //   this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    
+  //   //else 
+  //     this.commentParentComponent?.last?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+      
+  // }
+
+// ensureCommentsComponentReady(): Promise<void> {
+//     return new Promise((resolve) => {
+//         const checkInterval = setInterval(() => {
+//             if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+//                 clearInterval(checkInterval);
+//                 resolve();
+//             }
+//         }, 10);
+//     });
+// }
+
+getCommentsRefreshed (event){
+  if(event){
+    this.loadCommentsList()
+  }
+}
+loadCommentsList() {
+  setTimeout(() => {
+      if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+          this.commentParentComponent?.first?.show(
+              this.appTransactionsForViewDto.creatorUserId,
+              this.orderId
+          );
+          this.commentParentComponent?.last?.show(
+              this.appTransactionsForViewDto.creatorUserId,
+              this.orderId
+          );
+      }
+  }, 200);
+}
+
+
+  show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode= ShoppingCartMode.createOrEdit) {
+
+    this.showMainSpinner();
+    if( ! (this.companeyNames && this.companeyNames?.length>0)){
+    this._AppTransactionServiceProxy
+    .getRelatedAccounts(
+        "",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        0,
+        undefined,false, null
+    )
+    .subscribe((res2: PagedResultDtoOfGetAccountInformationOutputDto) => {
+      this.companeyNames= [...res2.items];
+    });
+  }
+
+
     this.resetData();
     this.orderId = orderId;
     this.loadNotesComp = true;
     this.showCarousel = showCarousel;
     this.validateOrder = validateOrder;
-    this.shoppingCartMode = shoppingCartMode;
+    this.shoppingCartMode = 0;
+
     this.onshare = false;
+
 
     if (shoppingCartMode == ShoppingCartMode.createOrEdit) {
       this.showTabs = false;
@@ -136,7 +546,7 @@ export class ShoppingCartViewComponentComponent
  /*  resetTabValidation() {
     var valid: boolean = false;
 
-    if (this.shoppingCartDetails?.entityStatusCode?.toUpperCase() == 'OPEN')
+    if (this.shoppingCartDetails?.entityStatusCode?.toUpperCase() == 'OPEN')tabs
       valid = true;
 
     this.orderInfoValid = valid;
@@ -149,7 +559,8 @@ export class ShoppingCartViewComponentComponent
 
   resetData() {
    // this.resetTabValidation();
-    this.activeIndex = 0;
+    this.activeIndex = -1;
+ this.currentTab=-1;
     this.transactionNum = 0;
     this.productCode = undefined;
     this.colorFilter = undefined;
@@ -182,148 +593,167 @@ export class ShoppingCartViewComponentComponent
   }
 
   getShoppingCartData(temp: TreeNode<any>[] = null) {
-
+this.temp=temp;
+    this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
-      .subscribe((res: GetAppTransactionsForViewDto) => {
-        this._AppTransactionServiceProxy
-        .getRelatedAccounts(
-            "",
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            0,
-            30,false
-        )
-        .subscribe((res2: PagedResultDtoOfGetAccountInformationOutputDto) => {
-          this.companeyNames= [...res2.items];
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
+    .pipe(finalize(() => {
+this.hideMainSpinner();
+    }))
+    .subscribe((res: GetAppTransactionsForViewDto) => {
          res.companeyNames=this.companeyNames;
           this.appTransactionsForViewDto = res;
+
+          /// set validations 
+          this.orderInfoValid = this.appTransactionsForViewDto.isOrderInformationValid;
+          this.buyerContactInfoValid = this.appTransactionsForViewDto.isBuyerContactInformationValid;
+          this.SellerContactInfoValid = this.appTransactionsForViewDto.isSellerContactInformationValid;
+          this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : this.appTransactionsForViewDto.isSalesRepInformationValid ;
+          this.shippingInfOValid = this.appTransactionsForViewDto.isShippingInformationValid;
+          this.BillingInfoValid = this.appTransactionsForViewDto.isBillingInformationValid;
+          ///
           this.isOwnedByMe= res.isOwnedByMe;
           this.canChange= this.isOwnedByMe
            this.transactionCode=res?.code;
-          
-           this.loadCommentsList()
+           if (res?.entityAttachments?.length > 0)
+            this._transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
+             this.loadCommentsList()
+
+              //Currency
+    this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+    .subscribe((res: CurrencyInfoDto) => {
+        this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+    });
    
-           //lines
-           this._AppTransactionServiceProxy
-             .getOrderDetailsForView(
-               this.orderId,
-               this.showVariations,
-               this.colorFilter,
-               this.sizeFilter,
-               this.productCode
-             )
-             .pipe(finalize(() => {
-              if (res?.entityAttachments?.length > 0)
-             this._transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
-   
-          
-              this.modal.hide();
-              this.modal.show();
-              this.hideMainSpinner();
-             }))
-             .subscribe((res) => {
-               this.shoppingCartDetails = res;
-              // this.resetTabValidation();
-   
-               this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
-   
-               this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-               if (res.transactionType == TransactionType.PurchaseOrder)
-                 this.transactionType = "Purchase Order";
-   
-               if (res.transactionType == TransactionType.SalesOrder)
-                 this.transactionType = "Sales Order";
-   
-                 this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
-   
-   
-               if (!temp) this.shoppingCartTreeNodes = res.detailsView;
-               else this.shoppingCartTreeNodes = temp;
-   
-               this.colors = res.colors;
-               this.sizes = res.sizes;
-   
-             });
-   
-   
-             //Currency
-               this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
-                   .subscribe((res: CurrencyInfoDto) => {
-                       this.currencySymbol = res.symbol ? res.symbol : res.code  ;
-                   });
+    //
+
+    this.appTransactionsForViewDto?.totalAmount % 1 == 0 ? this.appTransactionsForViewDto.totalAmount = parseFloat(Math.round(this.appTransactionsForViewDto.totalAmount * 100 / 100).toFixed(2)) : null;
+
+    if (res.transactionType == TransactionType.PurchaseOrder)
+      this.transactionType = "Purchase Order";
+
+    if (res.transactionType == TransactionType.SalesOrder)
+      this.transactionType = "Sales Order";
+
+    this.getLinesData()
+    this.modal.hide();
+    this.modal.show();
         });
           
-    
-      });
   }
 
-  expandCollapseRecursive(node: TreeNode, isExpand: boolean) {
-    node.expanded = isExpand;
-    if (node.children) {
-      for (let i = 0; i < node.children.length; i++) {
-        this.expandCollapseRecursive(node.children[i], isExpand);
-      }
-    }
+  getLinesData(){
+     //lines
+   if  ((this.showTabs && this.activeIndex==6 ) || (!this.showTabs && this.activeIndex==0 )){
+     this._AppTransactionServiceProxy
+     .getOrderDetailsForView(
+       this.orderId,
+       this.showVariations,
+       this.colorFilter,
+       this.sizeFilter,
+       this.productCode
+     )
+     .subscribe((res) => {
+       this.shoppingCartDetails = res;
+        console.log(this.shoppingCartTreeNodes,'llll')
+       this?.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
+
+       this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+       if (res.transactionType == TransactionType.PurchaseOrder)
+         this.transactionType = "Purchase Order";
+
+       if (res.transactionType == TransactionType.SalesOrder)
+         this.transactionType = "Sales Order";
+
+         this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
+
+
+       if (!this.temp) this.shoppingCartTreeNodes = res.detailsView;
+       else this.shoppingCartTreeNodes = this.temp;
+
+       this.colors = res.colors;
+       this.sizes = res.sizes;
+     });
+  }
+}
+
+   // Recursive function to extract only third-level nodes (variations)
+getThirdLevelVariations(node: any, level: number = 1): any[] {
+  let variations: any[] = [];
+
+  // If the current node is a third-level node and has no children, add it to the variations
+  if (level === 3 && node.children === null) {
+    variations.push(node);
   }
 
-  onShowVariations($event) {
-    const temp = cloneDeep(this.shoppingCartTreeNodes);
-    temp.forEach((node) => {
-      this.expandCollapseRecursive(node, this.showVariations);
+  // If the node has children, process them recursively
+  if (node.children && node.children.length > 0) {
+    node.children.forEach((child) => {
+      variations = variations.concat(this.getThirdLevelVariations(child, level + 1));
     });
-
-    if (this.oldShowVariations != this.showVariations)
-      this.getShoppingCartData(temp);
-
-    this.oldShowVariations = this.showVariations;
   }
+
+  return variations;
+}
+
+onShowVariations(event) {
+  // Check if shoppingCartTreeNodes is an array
+ 
+   if (event?.target?.checked) {
+    if (Array.isArray(this.shoppingCartTreeNodes)) {
+      // Get the third-level variations from the shoppingCartTreeNodes
+      const thirdLevelVariations = this.shoppingCartTreeNodes.map((rootNode) => {
+        return this.getThirdLevelVariations(rootNode);
+      }).flat(); // Flatten the array to get a single list of third-level variations
+  
+      console.log('Third-Level Variations:', thirdLevelVariations); 
+      this.shoppingCartTreeNodes = thirdLevelVariations
+  
+      // Now, you can use `thirdLevelVariations` to display the variations or process them
+    } 
+   } else {
+    this.getShoppingCartData();
+   }
+
+}
+
 
   onContinueShopping() {
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
-    if (this.shoppingCartDetails?.sellerCompanySSIN) {
+    if (this.appTransactionsForViewDto?.sellerCompanySSIN) {
       localStorage.setItem(
         "SellerSSIN",
-        JSON.stringify(this.shoppingCartDetails.sellerCompanySSIN)
+        JSON.stringify(this.appTransactionsForViewDto?.sellerCompanySSIN)
       );
       localStorage.setItem(
         "contactSSIN",
-        JSON.stringify(this.shoppingCartDetails.buyerContactSSIN)
+        JSON.stringify(this.appTransactionsForViewDto?.buyerContactSSIN)
       );
       localStorage.setItem(
         "currencyCode",
-        JSON.stringify(this.appTransactionsForViewDto.currencyCode)
+        JSON.stringify(this.appTransactionsForViewDto?.currencyCode)
       );
 
       localStorage.setItem(
         "transNO",
-        this.shoppingCartDetails.code
+        this.appTransactionsForViewDto.code
       );
-      this.router.navigateByUrl("app/main/marketplace/products");
+     // this.router.navigateByUrl("app/main/marketplace/products");
+
+      if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
+                        location.reload();
+                    else
+                        this.router.navigateByUrl("app/main/marketplace/products");
     }
+    
     this.hide();
   }
 
   validateShoppingCart() {
     this.showMainSpinner();
 
-    this._AppTransactionServiceProxy.validateBuyerSellerTransaction(this.shoppingCartDetails.sellerSSIN, this.shoppingCartDetails.buyerSSIN, this.shoppingCartDetails.transactionType).subscribe((res) => {
+    this._AppTransactionServiceProxy.validateBuyerSellerTransaction(this.appTransactionsForViewDto?.sellerCompanySSIN, this.appTransactionsForViewDto?.buyerCompanySSIN, this.appTransactionsForViewDto?.transactionType).subscribe((res) => {
       switch (res.validateOrder) {
         case ValidateTransaction.FoundShoppingCart:
           // this.show(res.shoppingCartId, this.validateOrder);
@@ -416,6 +846,43 @@ export class ShoppingCartViewComponentComponent
     });
   }
   onDelete(rowNode) {
+    console.log(rowNode,'rowNode')
+    if(rowNode?.node?.data?.added) {
+      Swal.fire({
+        title: "Remove",
+        text: "Are you sure you want to permanently remove this ?",
+        showCancelButton: true,
+        cancelButtonText: "No",
+        imageUrl: "../../../assets/posts/deletePost.svg",
+        imageWidth: 70,
+        imageHeight: 70,
+        confirmButtonText: "Yes",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        backdrop: true,
+        customClass: {
+          confirmButton: "swal-btn swal-confirm bgPurple",
+          cancelButton: "swal-btn",
+          title: "swal-title purpleColor",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+      this.addLine = true
+      this.showAddLine = false;
+      this.showSaveCancel = false;
+     
+     
+        this.selectedVariation = '';
+      this.selectedQuantity = 0;
+      this.selectedPrice = 0
+      this.amount = 0;
+      this.shoppingCartTreeNodes.pop(); // Removes the last item
+      this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  this.addNewLinebtn = true
+
+    }
+  });
+    } else {
     Swal.fire({
       title: "Remove",
       text: "Are you sure you want to permanently remove this ?",
@@ -446,7 +913,10 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -461,7 +931,10 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -474,7 +947,10 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -484,13 +960,29 @@ export class ShoppingCartViewComponentComponent
       }
     });
   }
+}
   onEditQty(rowNode) {
+
+
+    if(rowNode.node.data.added) { 
+
+
+      this.selectedQuantity =     rowNode.node.data.updatedQty
+      this.updateAmount()
+
+      rowNode.node.data.amount =  this.amount
+      rowNode.node.data.qty =  this.selectedQuantity 
+      rowNode.node.data.showEditQty = false;
+
+    }else {
+
+    
     rowNode.node.data.invalidUpdatedQty = "";
+    this.showMainSpinner();
 
     switch (rowNode.level) {
       case 0:
       case 2:
-        this.showMainSpinner();
         this._AppTransactionServiceProxy
           .updateByProductLineId(
             this.orderId,
@@ -499,19 +991,26 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
-            this.onGeneratOrderReport(true,undefined,false,true);
+            // this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
+            this.getShoppingCartData();
+            this.hideMainSpinner();
           });
         break;
 
       case 1:
         this.showMainSpinner();
+        // let moduleQty =
+        //   rowNode.node.data.updatedQty %
+        //   rowNode.node.data.noOfPrePacks;
+
         let moduleQty =
-          rowNode.node.data.updatedQty %
-          rowNode.node.data.noOfPrePacks;
-        let qty =
-          rowNode.node.data.updatedQty /
-          rowNode.node.data.noOfPrePacks;
+        rowNode.node.data.updatedQty % (
+        rowNode.node.data.qty/  rowNode.node.data.noOfPrePacks);
+        // let qty =
+        //   rowNode.node.data.updatedQty /
+        //   rowNode.node.data.noOfPrePacks 
+        let qty=rowNode.node.data.updatedQty ;
         if (moduleQty == 0) {
           this._AppTransactionServiceProxy
             .updateByProductSSINColor(
@@ -523,15 +1022,17 @@ export class ShoppingCartViewComponentComponent
             )
             .subscribe((res) => {
               if (res) this.notify.info("Successfully Updated.");
+              // this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
-              rowNode.node.data.showEditQty = false;
+              // rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
             });
         } else {
-          rowNode.node.data.invalidUpdatedQty =
-            "The quantity must be divisible by the prepack (" +
-            rowNode.node.data.noOfPrePacks +
-            ")";
+          // rowNode.node.data.invalidUpdatedQty =
+          //   "The quantity must be divisible by the prepack (" +
+          //   rowNode.node.data.noOfPrePacks +
+          //   ")";
+          rowNode.node.data.invalidUpdatedQty = "The quantity must be divisible by the prepack qty";
           this.hideMainSpinner();
         }
 
@@ -543,28 +1044,30 @@ export class ShoppingCartViewComponentComponent
 
     }
   }
+}
   hide() {
     this.resetData();
     this.modal.hide();
     let indx = -1;
-    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails?.orderId);
+    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.appTransactionsForViewDto?.id);
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
     this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-    if (this.shoppingCartMode == ShoppingCartMode.view)
+    // if (this.shoppingCartMode == ShoppingCartMode.view)
       this.hideShoppingCartModal.emit(true);
+    
   }
 
   minimizedOrders: any[] = [];
   minimizeScreen() {
     let indx = -1;
-    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails.orderId);
+    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.appTransactionsForViewDto?.id);
     if (indx >= 0) {
     }
     else {
       this.minimizedOrders.push({
-        orderId: this.shoppingCartDetails.orderId,
-        name: this.shoppingCartDetails.name,
+        orderId: this.appTransactionsForViewDto?.id,
+        name: this.appTransactionsForViewDto?.name,
       });
     }
     //  this.minimize = true;
@@ -577,16 +1080,20 @@ export class ShoppingCartViewComponentComponent
     indx = this.minimizedOrders?.findIndex(x => x.orderId == orderId);
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
-    this.show(orderId, this.showCarousel, this.validateOrder, this.shoppingCartMode);
+    if(this.appTransactionsForViewDto?.entityStatusCode =="DRAFT") {
+      this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.createOrEdit);
+    } else {
+        this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.view);
+}
   }
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
-        this.onGeneratOrderReport(true,undefined,false,true);
+        // this.onGeneratOrderReport(true,undefined,false,true);
         this.hideMainSpinner();
         this.showTabs = true;
       });
@@ -617,8 +1124,11 @@ export class ShoppingCartViewComponentComponent
         this._AppTransactionServiceProxy.discardTransaction(this.orderId)
           .subscribe(() => {
             this.hideMainSpinner();
+            localStorage.removeItem("comNew");
+            localStorage.removeItem("conNew");
             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
             this.hide();
+
           });
       }
     });
@@ -628,6 +1138,8 @@ export class ShoppingCartViewComponentComponent
     this.showMainSpinner();
     this._AppTransactionServiceProxy.cancelTransaction(this.orderId)
       .subscribe(() => {
+        localStorage.removeItem("comNew");
+        localStorage.removeItem("conNew");
         this.hideMainSpinner();
         this.getShoppingCartData();
       });
@@ -642,69 +1154,154 @@ export class ShoppingCartViewComponentComponent
         this.getShoppingCartData();
       });
   }
+  isOrderConfirmationNeedsReprint(): void {
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+        .subscribe((res) => {
+            if (res == true) {
+                this.regenrate = true;
+              this.mainLoad = false
 
+                // this.toGenerate();
+      this.onGeneratOrderReport(true,undefined,true,true)
+                this.getOrderConfirmation();
+            }  else {
+              this.regenrate = false;
+
+              this.mainLoad = true
+            }
+        });
+}
+stopReport(event) {
+
+  if (event) {
+  this.regenrate = false
+    }
+
+  
+}
   PlaceOrder() {
-    Swal.fire({
-      title: "",
-      text: "Are you sure that you want to place the order?",
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      backdrop: true,
-      customClass: {
-        popup: 'popup-class',
-        icon: 'icon-class',
-        content: 'content-class',
-        actions: 'actions-class',
-        confirmButton: 'confirm-button-class2',
+    // Swal.fire({
+    //   title: "",
+    //   text: "Are you sure that you want to place the order?",
+    //   icon: "info",
+    //   showCancelButton: true,
+    //   confirmButtonText: "Yes",
+    //   cancelButtonText: "No",
+    //   allowOutsideClick: false,
+    //   allowEscapeKey: false,
+    //   backdrop: true,
+    //   customClass: {
+    //     popup: 'popup-class',
+    //     icon: 'icon-class',
+    //     content: 'content-class',
+    //     actions: 'actions-class',
+    //     confirmButton: 'confirm-button-class2',
 
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
+    //   },
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
         this.showMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
+        this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
+
             this.onGeneratOrderReport(true,undefined,true,true);
-            this.hideMainSpinner();
+         
+            localStorage.removeItem("comNew");
+            localStorage.removeItem("conNew");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+         this.getShoppingCartData()
+
+
         }
           ))
           .subscribe((res) => {
+
             if (res) {
-              Swal.fire({
-                title: "",
-                text: "Order #" + this.transactionCode + " has been placed successfully",
-                icon: "success",
-                showCancelButton: false,
-                confirmButtonText: "OK",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                backdrop: true,
-                customClass: {
-                  popup: 'popup-class',
-                  icon: 'icon-class',
-                  content: 'content-class',
-                  actions: 'actions-class',
-                  confirmButton: 'confirm-button-class2',
-                },
-              }).then((result) => {
-                if (result.isConfirmed) {
-                }
-              });
+            this.getShoppingCartData()
+
+            this.hideMainSpinner();
+
+              this.visible = false
+              this.SuccessMsg = true
+
+            //   Swal.fire({
+            //     title: "",
+            //     text: "Order #" + this.transactionCode + " has been placed successfully",
+            //     icon: "success",
+            //     showCancelButton: false,
+            //     confirmButtonText: "OK",
+            //     allowOutsideClick: false,
+            //     allowEscapeKey: false,
+            //     backdrop: true,
+            //     customClass: {
+            //       popup: 'popup-class',
+            //       icon: 'icon-class',
+            //       content: 'content-class',
+            //       actions: 'actions-class',
+            //       confirmButton: 'confirm-button-class2',
+            //     },
+            //   }).then((result) => {
+            //     if (result.isConfirmed) {
+            //     }
+            //   });
             }
           });
-      }
+    //   }
+    // });
+  }
+  toGenerate(){
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    .pipe(finalize(() => {
+      // this.getOrderConfirmation()
+  }
+    ))
+    .subscribe((res) => {
+
+      // if (res) {
+      // }
     });
   }
+  sync(){
+    this.showMainSpinner();
+    this._AppTransactionServiceProxy.syncTransaction(this.orderId)
+      .pipe(finalize(() => {
+        this.hideMainSpinner()
+        this.getShoppingCartData();
+        this.syncMsg = true
 
+      } ))
+      .subscribe((res) => {
+        // if (res) {
+        //   Swal.fire({
+        //     title: "",
+        //     text:  "Transaction has been sync successfully",
+        //     icon: "success",
+        //     showCancelButton: false,
+        //     confirmButtonText: "OK",
+        //     allowOutsideClick: false,
+        //     allowEscapeKey: false,
+        //     backdrop: true,
+        //     customClass: {
+        //       popup: 'popup-class',
+        //       icon: 'icon-class',
+        //       content: 'content-class',
+        //       actions: 'actions-class',
+        //       confirmButton: 'confirm-button-class2',
+        //     },
+        //   }).then((result) => {
+        //     if (result.isConfirmed) {
+        //     }
+        //   });
+        // }
+      });
+    
+  }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
         this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
@@ -712,12 +1309,14 @@ export class ShoppingCartViewComponentComponent
   }
 
   ontabInfoValid(activetab) {
+    
     switch (activetab) {
       case ShoppingCartoccordionTabs.orderInfo:
         this.orderInfoValid = true;
         break;
 
       case ShoppingCartoccordionTabs.BuyerContactInfo:
+      
         this.buyerContactInfoValid = true;
         break;
 
@@ -745,11 +1344,29 @@ export class ShoppingCartViewComponentComponent
   }
   ontabChange($event) {
     this.activeIndex = $event + 1;
+    this.currentTab= this.activeIndex ;
   }
 
+  refreshShoppingCart(event) {
+    if (this.appTransactionsForViewDto?.entityStatusCode?.toUpperCase() == 'OPEN') {
+
+    if (event) {
+    this.getShoppingCartData()
+      }
+  
+    }
+  }
+  
   onChangeAppTransactionsForViewDto($event) {
     $event.companeyNames=this.companeyNames;
     this.appTransactionsForViewDto = $event;
+  }
+
+  TempCompValid($event) {
+   if($event && this.appTransactionsForViewDto?.buyerCompanySSIN == '') {
+    this.TempComp = $event;
+    
+   }
   }
 
   printTransaction() {
@@ -763,50 +1380,74 @@ export class ShoppingCartViewComponentComponent
   offShareTransaction() {
     this.onshare = false;
   }
-  async onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean,refreshData:boolean=true) {
-    if (($event && this.shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT') || ($event && FromPlaceOrder)) {
-      this.reportUrl="";
-      if(printInfoParam)
-      this.printInfoParam=printInfoParam;
-    else{
-      this.printInfoParam= new ProductCatalogueReportParams();
-      this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
-      this.printInfoParam.TransactionId = this.orderId.toString();
-      //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
-      this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
-      this.printInfoParam.saveToPDF = true;
-      this.printInfoParam.tenantId = this.appSession?.tenantId
-      this.printInfoParam.userId = this.appSession?.userId
-    }
-     this.reportUrl = this.printInfoParam.getReportUrl()
+  async onGeneratOrderReport($event, printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?: boolean, refreshData: boolean = true) {
+    if (($event && this.appTransactionsForViewDto?.entityStatusCode?.toUpperCase() != 'DRAFT') || ($event && FromPlaceOrder)) {
+        this.reportUrl = "";
+        if (printInfoParam) {
+            this.printInfoParam = printInfoParam;
+        } else {
+            this.printInfoParam = new ProductCatalogueReportParams();
+            this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+            this.printInfoParam.TransactionId = this.orderId.toString();
 
-     if(refreshData)
-        this.getShoppingCartData();
+            this.printInfoParam.saveToPDF = true;
+            this.printInfoParam.tenantId = this.appSession?.tenantId;
+            this.printInfoParam.userId = this.appSession?.userId;
 
-      this.createReportViewer();
+            // Asynchronous handling for setting orderConfirmationRole
+            this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId,this.appTransactionsForViewDto.tenantId).subscribe((res) => {
+                this.printInfoParam.orderConfirmationRole = res.contactRole;
+                this.printInfoParam.contactName = res.contactName;
+           
+ 
+                
+                // Ensure dependent logic is executed after the async operation
+                this.reportUrl = this.printInfoParam.getReportUrl();
+                this.createReportViewer();
+
+                if (refreshData) {
+                    this.getShoppingCartData();
+                }
+            });
+
+            // Any logic dependent on the above call must be moved here
+        }
     }
-  }
+}
 
   getOrderConfirmation(){
     this.transactionFormPath="";
      this.transactionFormPath=this._transactionFormPath;
    }
 
-  onShareTransactionByMessage($event:TenantTransactionInfo[])
-  {
-    let printInfoParam= new ProductCatalogueReportParams();
-    //printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
-    printInfoParam.reportTemplateName = this.transactionReportTemplateName;
-    printInfoParam.saveToPDF = true;
-    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
-    printInfoParam.userId = this.appSession?.userId
+   onShareTransactionByMessage($event: { tenantTransactionInfo: TenantTransactionInfo[], appTransactionsForViewDto: GetAppTransactionsForViewDto }) {
+    // Assign the incoming data
+    this.appTransactionsForViewDto = $event.appTransactionsForViewDto;
 
-    for (let i = 0; i < $event.length; i++) {
-      printInfoParam.TransactionId = $event[i].transactionId.toString();
-      printInfoParam.tenantId =$event[i].tenantId;
-      this.onGeneratOrderReport(true,printInfoParam,false,false);
-    }
-  }
+    // Iterate through tenantTransactionInfo to fetch tenant roles and generate reports
+    $event.tenantTransactionInfo.forEach((tenantInfo) => {
+        this._AppTransactionServiceProxy.getTenantRoleInTransaction(tenantInfo.transactionId, tenantInfo.tenantId)
+            .subscribe((res) => {
+                const printInfoParam = new ProductCatalogueReportParams();
+
+                // Set fetched data
+                printInfoParam.orderConfirmationRole = res.contactRole;
+                printInfoParam.contactName = res.contactName;
+                printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+                printInfoParam.saveToPDF = true;
+                printInfoParam.userId = this.appSession?.userId;
+
+                // Set transaction-specific data
+                printInfoParam.TransactionId = tenantInfo.transactionId.toString();
+                printInfoParam.tenantId = tenantInfo.tenantId;
+
+                // Pass the updated params to onGeneratOrderReport
+                this.onGeneratOrderReport(true, printInfoParam, false, false);
+            });
+    });
+}
+
+
   createReportViewer() {
     // Resolve the factory for ReportViewerComponent
     const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
@@ -833,4 +1474,6 @@ export class ShoppingCartViewComponentComponent
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
+
+
 }

@@ -9,13 +9,14 @@
             <i class="fa-regular far fa-envelope"></i>       
          </label>
     </div>
-    <div *ngFor="let comment of comments" [ngClass]="cartStyle?'mt-2  comment-inner':'mt-4 ml-3'">
+    <div *ngFor="let comment of comments" [ngClass]="cartStyle?'mt-2  comment-inner':'mt-4 ml-3'" >
         <div class="mb-2">
-            <app-comment [comment]="comment"></app-comment>
+            <app-comment [comment]="comment" ></app-comment>
         </div>
         <div class="ml-5" *ngIf="comment.messages">
             <app-interactions
             [cartStyle]="cartStyle"
+             [comment]="comment"
                 [entityId]="comment.messages.entityId"
                 [relatedEntityId]="entityId"
                 [parentId]="comment.messages.id"
@@ -23,6 +24,7 @@
                 [postCreatorUserId]="creatorUserId"
                 (refreshStats)="newCommentAddedHandler()"
                 [commentType]="comment.messages.entityObjectTypeCode"
+                (toName)="getName($event)"
             ></app-interactions>
         </div>
     </div>
@@ -39,8 +41,7 @@
 </app-add-comment>
 
 <SendMessageModal [entityId]="entityId" 
-[parentId]="parentId"
-*ngIf="!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp"  
-#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()"></SendMessageModal>
-
+[parentId]="parentId" [toName]="toName"
+*ngIf="(!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp) "  
+#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()" (refresh)="refreshAfterSave($event)"></SendMessageModal>
 </div>

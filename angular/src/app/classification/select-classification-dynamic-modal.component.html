@@ -112,7 +112,8 @@
             [title]="'AddNewClassification' | localize"
             type="button"
             class="btn btn-icon btn-primary btn-circle create-edit-btn"
-            (click)="openCreateOrEditModal()"
+            (click)="openCreateOrEditModal()" style="background-color: #4A0D4A !important;
+            border: #4A0D4A !important;color: white;"
         >
             <i class="flaticon2-plus"></i>
         </button>
@@ -121,7 +122,9 @@
                 type="button"
                 class="btn btn-default btn-gray"
                 (click)="close()"
-            >
+                style="border-radius: 5px;
+                background-color: white !important;
+                border: white !important;color: #4A0D4A !important;" >
                 {{ l("Cancel") }}
             </button>
             <button
@@ -129,7 +132,9 @@
                 [disabled]="!selectedRecords?.length"
                 (click)="submitSelection()"
                 class="btn btn-primary blue btn-blue"
-            >
+                style="border-radius: 5px;
+                background-color: #4A0D4A !important;
+                border: #4A0D4A !important;color: white;" >
                 <span>{{ l("Add") }}</span>
             </button>
         </div>

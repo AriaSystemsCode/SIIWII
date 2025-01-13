@@ -77,7 +77,16 @@ namespace onetouch.AppItems.Dtos
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set;}
         public string OriginalCode { get; set; }
         public long? SycIdentifierId { get; set; }
+        public string? SSIN { set; get; }
         //MMT
+        //MMT-IT41[Start]
+        public IList<LookupLabelDto> NonLookupValues { set; get; }
+        //MMT-IT41[End]
+        //I45[Start]
+        public string ManufacturerCode { set; get; }
+        public long? TenantId { set; get; }
+        public long? TenantOwner { set; get; }
+        //I45[End]
     }
     //MMT
     public class AppItemPriceInfo : EntityDto<long>
@@ -245,11 +254,16 @@ namespace onetouch.AppItems.Dtos
     //MMT
     public class ExtraDataSelectedValues 
     {
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
+        public string Code { get; set; }
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
         public string value { get; set; }
         public int TotalCount { get; set; }
         public virtual List<AppEntityAttachmentDto> EntityAttachments { get; set; }
         public virtual AppEntityAttachmentDto DefaultEntityAttachment { get; set; }
         public virtual List<EDRestAttributes> EDRestAttributes { get; set; }
+        public virtual string ColorImage { set; get; }
+        public virtual string ColorHexaCode { set; get; }
     }
 
     public class ExtraDataFirstAttributeValuesDto
@@ -325,6 +339,9 @@ namespace onetouch.AppItems.Dtos
         //MMT30
         public string SSIN { set; get; }
         //MMT30
+        //I45
+        public string? ManufacturerCode { set; get; } 
+        //I45
     }
 
     //public class AttributeInfo
@@ -406,4 +423,11 @@ namespace onetouch.AppItems.Dtos
         public bool SyncProductList { set; get; } = false;
     }
     //mmt33-2
+    //MMT-41
+    public class VariationListToDeleteDto
+    {
+        public IList<VariationItemDto> VariationsInUse { get; set; }
+        public IList<VariationItemDto> VariationCanBeDeleted { get; set; }
+    }
+    //MMT-41
 }

@@ -31,6 +31,9 @@ using onetouch.AppEntities.Dtos;
 using DevExpress.Xpo;
 using onetouch.SystemObjects;
 using Tweetinvi.Core.Extensions;
+using onetouch.AppSiiwiiTransaction;
+using System.Security.Cryptography;
+using Microsoft.CodeAnalysis;
 
 namespace onetouch.Web.Services
 {
@@ -46,12 +49,15 @@ namespace onetouch.Web.Services
         private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
         private readonly IRepository<SycAttachmentCategory, long> _sycAttachmentCategoryRepository;
-
+        //Iteration45[Start]
+        private readonly IRepository<AppTransactionHeaders, long> _appTransactionHeadersRepository;
+        //Iteration45[End]
         public CustomReportStorageWebExtension(IWebHostEnvironment env,
             IUserEmailer userEmailer
             , IRepository<AppAttachment, long> appAttachmentRepository
             , IRepository<AppEntityAttachment, long> appEntityAttachmentRepository
-            , IRepository<SycAttachmentCategory, long> sycAttachmentCategoryRepository
+            , IRepository<SycAttachmentCategory, long> sycAttachmentCategoryRepository,
+            IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository
              )
         {
             ReportDirectory = Path.Combine(env.ContentRootPath, "Reports");
@@ -65,6 +71,7 @@ namespace onetouch.Web.Services
             _appAttachmentRepository = appAttachmentRepository;
             _appEntityAttachmentRepository = appEntityAttachmentRepository;
             _sycAttachmentCategoryRepository = sycAttachmentCategoryRepository;
+            _appTransactionHeadersRepository = appTransactionHeadersRepository;
         }
 
         private bool IsWithinReportsFolder(string url, string folder)
@@ -151,21 +158,41 @@ namespace onetouch.Web.Services
                             if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null
                                 
                                 || (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE" &&
-                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "roleType") != null))
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "roleType") != null)
+                                || (parameterName.ToUpper() == "LANGUAGENAME" &&
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name.ToUpper() == "MUSERCOUNTRY") != null)
+                                
+                                )
                             {
-
-                                if (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE")
+                                switch (parameterName.ToUpper())
                                 {
-                                    report.Parameters["roleType"].Value = Convert.ChangeType(
-                                    parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
+                                    case "ORDERCONFIRMATIONROLE":
+                                      report.Parameters["roleType"].Value = Convert.ChangeType(
+                                      parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
 
+                                        break;
+                                    case "LANGUAGENAME":
+                                        report.Parameters["muserCountry"].Value = Convert.ChangeType(
+                                      parameters.Get("languageName").ToUpper(), report.Parameters["muserCountry"].Type);
+                                        break;
+                                    default:
+                                        report.Parameters[parameterName].Value = Convert.ChangeType(
+                                    parameters.Get(parameterName), report.Parameters[parameterName].Type);
+                                        break;
                                 }
-                                else
-                                {
-                                    report.Parameters[parameterName].Value = Convert.ChangeType(
-                                  parameters.Get(parameterName), report.Parameters[parameterName].Type);
 
-                                }
+                                //if (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE")
+                                //{
+                                //    report.Parameters["roleType"].Value = Convert.ChangeType(
+                                //    parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
+
+                                //}
+                                //else
+                                //{
+                                //  report.Parameters[parameterName].Value = Convert.ChangeType(
+                                //  parameters.Get(parameterName), report.Parameters[parameterName].Type);
+
+                                //}
 
                                 if (parameterName.ToUpper() == "TRANSACTIONID")
                                 {
@@ -214,7 +241,14 @@ namespace onetouch.Web.Services
 
                             });
                         }
-
+                        //Iteration45[Start]
+                        var transactionHeader = _appTransactionHeadersRepository.GetAll().Where(z => z.Id == long.Parse(transactionId)).FirstOrDefault();
+                        if (transactionHeader!=null)
+                        {
+                            transactionHeader.OrderConfirmationTimeStamp = DateTime.UtcNow;
+                            _appTransactionHeadersRepository.Update(transactionHeader);
+                        }
+                        //Iterqtion45[End]
 
                     }
 

@@ -348,7 +348,7 @@ export abstract class AppComponentBase {
         config.class = "img-viewer";
         config.initialState = {
             imgSrc: attachment,
-            aspectRatio: sycAttachmentCategory.aspectRatio
+            aspectRatio: sycAttachmentCategory?.aspectRatio
         };
         this.bsModalService.show(ImageViewerComponent, config);
     }

@@ -25,6 +25,7 @@ import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/
 import { MembersListComponent } from '@app/main/members-list/components/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
+import { Console, log } from 'console';
 
 @Component({
     selector:'app-account-info',
@@ -362,6 +363,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     loadInitData(){
+        if(this.accountInfoTemp)
+        this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+
         this.defineAccountTypes();
         this.getLanguages();
         this.getCurrencies();
@@ -482,7 +486,21 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         if(!this.accountInfoTemp.contactPaymentMethods) this.accountInfoTemp.contactPaymentMethods = []
         if(!this.accountInfoTemp.branches) this.accountInfoTemp.branches = []
 
-        if(!this.accountInfoTemp.id)  this.changeTab(this.accountInfoPageTabsEnum.ProfileCreateOrEdit)
+        if(!this.accountInfoTemp.id) 
+            {
+               this.changeTab(this.accountInfoPageTabsEnum.ProfileCreateOrEdit)
+               if(!this.accountInfoTemp.languageId){
+
+                this._AccountsServiceProxy.getMyAccountForEdit().subscribe(result=>{
+                    if(result){
+                        this.languageIdName=result.languageName;
+                        this.accountInfoTemp.languageId=result.accountInfo.languageId;
+
+                    }
+
+                })
+               }
+            }
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
         this.setDefaultPhoneTypes();
@@ -594,6 +612,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 break;
             }
         }
+         
         let currentTabName : string
         currentTabName = this.accountInfoPageTabsEnum[number]
         if (!params)  params = {}
@@ -616,6 +635,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
               queryParamsHandling: 'merge', // remove to replace all query params by provided
             }
         );
+        
     }
     triggerProfile($event?){
         if($event) $event.stopPropagation() //prevent event bubbling
@@ -703,7 +723,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         let  sequance="";
         let tenancyName = this.appSession.tenancyName;
 
-        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise()
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,this.appSession.tenantId).toPromise()
         if(getNextEntityCodeRes)
             sequance=getNextEntityCodeRes;
 
@@ -1041,7 +1061,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connect(this.accountDataForView.partnerId)
+        this._AccountsServiceProxy.connect(this.accountDataForView.partnerId,null)
         .subscribe(() => {
             this.notify.success(this.l('SuccessfullyConnected'));
             this.accountDataForView.status = true

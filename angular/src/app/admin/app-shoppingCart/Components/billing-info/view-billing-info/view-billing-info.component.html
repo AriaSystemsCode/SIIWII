@@ -1,6 +1,6 @@
-<div class="tab-cont thin-scroll">
-<div class="container-fluid pt-1 mb-3 ">
-    <div class="header p-2 my-2 d-flex  justify-content-between">
+<div class="">
+<div class="container-fluid pt-1 mb-3  thin-scroll">
+    <div class="header p-2 my-2 d-flex  justify-content-between align-items-center">
         <h6><span  class="headertxt"> {{l("APContact")}} : </span></h6>   
         <div >
             <button
@@ -8,8 +8,10 @@
             (click)="showEditMode()"
             class="previewbtn text-center btn float-right"
         >
-            Change
-            <i class="pi pi-pencil"></i>
+        <img src="../../../../../assets/shoppingCart/edit.png"
+        class="imgIcon" />
+        <span class="mx-1 text-white"> Edit</span>
+            
         </button>
         </div>
     </div>
@@ -35,6 +37,7 @@
     [selectedAddressDetails]="selectedAddressDetailsAp"
     [showAddressType]="false"
     [canChange]="canChange"
+    [currentTab]="currentTab"
     ></app-address>
     
 </div>
@@ -64,6 +67,7 @@
     [selectedAddressDetails]="selectedAddressDetailsAr"
     [showAddressType]="false"
     [canChange]="canChange"
+    [currentTab]="currentTab"
     ></app-address>
 
 </div>
@@ -72,9 +76,9 @@
         <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
     </div>
     <div class="row view-mode mt-2 mb-2">
-        <div class="col-6" *ngIf="appTransactionsForViewDto?.paymentTermsCode">
+        <div class="col-md-6 col-12" style="margin-left: 7px;" *ngIf="appTransactionsForViewDto?.paymentTermsCode">
             <label class="label mt-1 mb-1  w-50">{{l("PaymentTerms")}}</label>
-            <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto?.paymentTermsCode}}</label>
+            <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto?.paymentTermsName}}</label>
     
         </div>
 

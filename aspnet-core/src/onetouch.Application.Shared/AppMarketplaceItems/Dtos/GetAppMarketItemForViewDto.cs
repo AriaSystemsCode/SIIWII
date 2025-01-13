@@ -62,6 +62,7 @@ namespace onetouch.AppMarketplaceItems.Dtos
         //look to be removed if could handle performance
         public List<ExtraAttribute> extraAttributesVar { get; set; }
         public virtual bool OrderByPrePack { set; get; }
+        public virtual bool HasPriceLevel { get; set; }
         
     }
     public class MarketplaceExtraDataAttrDto
@@ -77,6 +78,9 @@ namespace onetouch.AppMarketplaceItems.Dtos
     }
     public class MarketplaceExtraDataSelectedValues
     {
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
+        public string Code { get; set; }
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
         public string value { get; set; }
         public int TotalCount { get; set; }
         public virtual List<AppEntityAttachmentDto> EntityAttachments { get; set; }

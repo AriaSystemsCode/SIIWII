@@ -9,7 +9,7 @@ import {
     Input,
     ViewChild,
 } from "@angular/core";
-import { MenuItem } from "primeng/api";
+import { MenuItem, SelectItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
@@ -31,6 +31,10 @@ import {
     TransactionType,
     ValidateTransaction,
     AppMarketplaceItemsServiceProxy,
+    LookupLabelDto,
+    CurrencyInfoDto,
+    AppEntitiesServiceProxy,
+    CreateOrEditAccountInfoDto,
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
@@ -43,6 +47,7 @@ import { AppConsts } from "@shared/AppConsts";
 import { get } from "http";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 import * as moment from "moment";
+import { Calendar } from "primeng/calendar";
 
 @Component({
     templateUrl: "./createTransactionModal.component.html",
@@ -65,8 +70,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     searchTimeout: any;
     buyerComapnyId: number = 0;
     sellerCompanyId: number = 0;
-    sellerCompanySSIN: number = 0;
-    buyerCompanySSIN: number = 0;
+    sellerCompanySSIN: string = ""
+    buyerCompanySSIN:string = ""
     sellerContactId: number = 0;
     buyerContactId: number = 0;
     buyerContactSSIN!: string | undefined;
@@ -96,7 +101,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     invalidSellerContactEMailAddress = "";
     sellerPhoneLabel: string = "Phone Number";
     buyerPhoneLabel: string = "Phone Number";
-
+    showAdd:boolean = false
 
     body: any;
     setCurrentUserActiveTransaction: boolean = false;
@@ -105,8 +110,32 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
     minCompleteDate:Date;
     minStartDate:Date;
+    minSEnteredDate:Date;
     sellerCurrencyCode;
-
+    emptyMessage: string = 'No results found';
+    searchTerm: string = undefined;
+    searchTermSeller: string = undefined;
+    filteredBuyerContacts: any[] ; 
+    selectedBuyerContact: any | string = '';
+    filteredSellerContacts: any[] ; 
+    selectedSellerContact: any | string = '';
+    today: Date ;
+    startDateMsg:boolean = false
+    comtDateMsg:boolean = false
+    avalabletDateMsg:boolean = false
+    showAddTextBtn:boolean = false
+    showAddSellBtn:boolean = false
+    showAddBuyBtn:boolean = false
+    isFocused: boolean = false;
+    @ViewChild('calendar1') calendar1: Calendar;
+    @ViewChild('calendar2') calendar2: Calendar;
+    @ViewChild('calendar3') calendar3: Calendar;
+    @ViewChild('calendar4') calendar4: Calendar;
+    @ViewChild('autoComplete') autoComplete: any; 
+    allCurrencies: LookupLabelDto[];
+    allCurrenciesDto: CurrencyInfoDto[];
+    allPriceLevel: SelectItem[] = [];
+    accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -114,10 +143,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy,
         private userClickService: UserClickService,
-        private router: Router
+        private router: Router,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     ) {
         super(injector);
         this.orderForm = this.fb.group({
+            enteredDate: [new Date()],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -126,20 +157,58 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             sellerContactEMailAddress: ["", [Validators.email]],
             sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
             buyerCompanyName: ["", [Validators.required]],
-            buyerContactName: [""],
+            buyerContactName: [''],
             buyerContactEMailAddress: ["", [Validators.email]],
             buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            buyerBranchName:[""],
+            reference:[""],
+            priceLevel:['MSRP'],
+            currencyId:[438],
+ 
+
         });
         this.orderForm.reset();
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
+
+       
     }
+
+
+
+      updateControlState() {
+        const control = this.orderForm.get('buyerContactName');
+        if (this.buyerComapnyId === 0) {
+          control.disable();
+        } else {
+          control.enable();
+        }
+      }
+    openCalendar(calendar: Calendar) {
+        calendar.inputfieldViewChild.nativeElement.click();
+      }
+      onFocus() {
+        this.isFocused = true;
+      }
+      
+      onBlur() {
+        this.isFocused = false;
+      }
+      
     ngOnChanges(){
+        // this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+                this.getCurrencies();
+        this.getCurrenciesDto();
+        this.allPriceLevel= this.getPriceLevel();
+        // this.loadInitialContacts();
+       this.updateControlState()
         this.orderForm = this.fb.group({
+            enteredDate: [Date],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -148,19 +217,35 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             sellerContactEMailAddress: ["", [Validators.email]],
             sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
             buyerCompanyName: ["", [Validators.required]],
-            buyerContactName: [""],
+            buyerContactName: [''],
             buyerContactEMailAddress: ["", [Validators.email]],
             buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            buyerBranchName:[""],
+            reference:[""],
+            priceLevel:['MSRP'],
+            currencyId:[438],
+   
+
+            
         });
         this.orderForm.reset();
         this.orderForm.controls['startDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
 
     }
+    // minDateValidator(minDate: Date) {
+    //     return (control: any) => {
+    //       const selectedDate = new Date(control.value);
+    //       return selectedDate && selectedDate < minDate
+    //         ? { minDate: true }
+    //         : null;
+    //     };
+    //   }
     getUserDefultRole(){
        /* var transactionType: TransactionType;
         if (this.formType.toUpperCase() == "SO")
@@ -169,14 +254,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             transactionType = TransactionType.PurchaseOrder;*/
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result=>{
             if (this.formType?.toUpperCase() == "SO"){
-                if(result.toLowerCase().includes('seller')){
+                if(result?.toLowerCase().includes('seller')){
                   this.roleDdval=this.roles.filter(role=>role.code==1)[0];
 
                 }else{
                     this.roleDdval=this.roles.filter(role=>role.code!==1)[0];
                 }
             }else if (this.formType?.toUpperCase() == "PO"){
-                if(result.toLowerCase().includes('buyer')){
+                if(result?.toLowerCase().includes('buyer')){
                     this.roleDdval=this.roles.filter(role=>role.code==2)[0];
 
                 }else{
@@ -225,7 +310,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 undefined,
                 undefined,
                 undefined,
-                undefined,true
+                undefined,
+                true,
+                this.formType?.toUpperCase()
             )
             .subscribe((res: any) => {
                 this.buyerCompanies = [...res.items];
@@ -241,12 +328,33 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = !this.isBuyerTempAccount;
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
+            this.orderForm.controls["buyerCompanyBranch"].clearValidators();
+            this.orderForm.controls["buyerCompanyBranch"].reset();
             this.orderForm.controls["buyerCompanyName"].reset();
-            
         }
+
+        else
+            this.orderForm.controls["buyerCompanyBranch"].setValidators([Validators.required]);
+        
+
+            this.orderForm.controls["buyerCompanyBranch"].updateValueAndValidity();
+
     }
     selectTempSeller() {
         this.isSellerTempAccount = !this.isSellerTempAccount;
+
+        if (this.isSellerTempAccount) {
+            this.orderForm.controls["sellerCompanyBranch"].clearValidators();
+            this.orderForm.controls["sellerCompanyBranch"].reset();
+            this.orderForm.controls["sellerCompanyName"].reset();
+        }
+
+        else 
+        this.orderForm.controls["sellerCompanyBranch"].setValidators([Validators.required]);
+
+
+        this.orderForm.controls["buyerCompanyBranch"].updateValueAndValidity();
+
     }
     handleRoleChange(data: any) {
         
@@ -266,7 +374,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.isCompantIdExist = false;
                     this.handleSellerNameSearch("");
                     // add seller values
-                    this.orderForm.get("sellerContactName").setValue(res.name);
+                    // this.orderForm.get("sellerContactName").setValue(res.name);
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
                     this.orderForm.get('sellerContactPhoneNumber').setValue(res.phone)
                     this.orderForm.get('sellerContactEMailAddress').setValue(res.email)
@@ -294,7 +402,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.buyerComapnyId = res.id;
                     this.buyerCompanySSIN = res.accountSSIN;
                     this.handleBuyerNameSearch("");
-                    this.orderForm.get("buyerContactName").setValue(res.name);
+                    // this.orderForm.get("buyerContactName").setValue(res.name);
                     this.orderForm.get("buyerCompanyName").setValue(res.name);
                     this.orderForm.get('buyerContactPhoneNumber').setValue(res.phone)
                     this.orderForm.get('buyerContactEMailAddress').setValue(res.email)
@@ -323,6 +431,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             // this.buyerContacts = []
             //this.orderForm.reset();
         }
+
+       // if (this.formType?.toUpperCase() == "PO")
+        this.getAllCompanies();
     }
 
     handleBuyerCompanySearch(event: any) {
@@ -349,7 +460,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true
+                    undefined,true,this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
@@ -382,7 +493,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true
+                    undefined,true,this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
@@ -392,6 +503,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
     handleBuyerCompanyChange(event: any) {
+        console.log(event,'nooowwwee')
+        this.searchTerm = ''
+        this.selectedBuyerContact = ''
         this.buyerComapnyId = event.value.id;
         this.buyerCompanySSIN = event.value.accountSSIN;
         this.currencyCode = event.value.currencyCode;
@@ -401,10 +515,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
         this.handleBuyerNameSearch("");
         this.buyerBranches=[];
-        this.getBranches(event.value.accountSSIN,'buyer')
+         this.getBranches(this.buyerCompanySSIN ,'buyer')
     }
 
     handleSellerCompanyChange(event: any) {
+        this.selectedSellerContact = ''
+
         this.sellerCompanyId = event.value.id;
         this.sellerCompanySSIN = event.value.accountSSIN;
         this.sellerCurrencyCode=event.value.currencyCode;
@@ -413,57 +529,139 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.get('sellerContactEMailAddress').setValue(event.value.email)
         this.handleSellerNameSearch("");
         this.sellerBranches=[];
-        this.getBranches(event.value.accountSSIN,'seller')
+        this.getBranches(this.sellerCompanySSIN ,'seller')
     }
+    loadInitialContacts() {
+        this._AppTransactionServiceProxy
+          .getAccountRelatedContacts(this.buyerComapnyId, '')
+          .subscribe((res: any) => {
+            this.buyerContacts = res;
+            this.filteredBuyerContacts = res; // Show all contacts initially
+          });
+      }
+
+      loadInitialSellerContacts() {
+        this._AppTransactionServiceProxy
+          .getAccountRelatedContacts(this.sellerCompanyId, '')
+          .subscribe((res: any) => {
+            this.sellerContacts = res;
+            this.filteredSellerContacts = res; // Show all contacts initially
+          });
+      }
+
 
     handleBuyerNameSearch(event: any) {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-            this._AppTransactionServiceProxy
-                .getAccountRelatedContacts(this.buyerComapnyId, event.filter)
-                .subscribe((res: any) => {
-                    this.buyerContacts = [...res];
+        if (this.buyerContacts && this.buyerContacts.length > 0) {
+            // Filtering logic
+            const query = event?.query?.toLowerCase();
+            this.filteredBuyerContacts = this.buyerContacts.filter(contact =>
+                contact?.name?.toLowerCase().includes(query)
+            );
+        } else {
+ 
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this._AppTransactionServiceProxy
+                    .getAccountRelatedContacts(this.buyerComapnyId, this.selectedBuyerContact)
+                    .subscribe((res: any) => {
+                        this.buyerContacts = [...res];
+                        // Apply filtering after fetching data
+                        this.filteredBuyerContacts = this.buyerContacts.filter(contact =>
+                            contact?.name?.toLowerCase().includes(event?.query?.toLowerCase())
+                        );
+                    });
+            }, 300);
+        }
+    }
+    
 
-                });
-        }, 500);
-    }
+
     handleSellerNameSearch(event: any) {
+        // if (event.filter != '' || event.filter != undefined){
+        //     this.searchTermSeller = event.filter;
+        //     this.showAddSellBtn = true
+
+        
+        // }else {
+        //     this.searchTermSeller =undefined;
+        
+        // }
+        if (this.sellerContacts && this.sellerContacts.length > 0) {
+            // Filtering logic
+            const query = event?.query?.toLowerCase();
+            this.filteredSellerContacts = this.sellerContacts.filter(contact =>
+                contact?.name?.toLowerCase().includes(query)
+            );
+        } else {
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
-            console.log(this.buyerComapnyId);
+           
             this._AppTransactionServiceProxy
-                .getAccountRelatedContacts(this.sellerCompanyId, event.filter)
+                .getAccountRelatedContacts(this.sellerCompanyId,this.selectedSellerContact)
                 .subscribe((res: any) => {
+                    // if(this.sellerContacts?.length == 0  && event.filter != undefined) {
+                    //     // this.emptyMessage = ` Click to add "${this.searchTerm}".`;
+                    //     // // this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+                    //     // this.showAddTextBtn = true
+                     
+                    // }
+                    // else {
+                    //     this.sellerContacts = [...res];
+
+                    // }
+
                     this.sellerContacts = [...res];
+                    // Apply filtering after fetching data
+                    this.filteredSellerContacts = this.sellerContacts.filter(contact =>
+                        contact?.name?.toLowerCase().includes(event?.query?.toLowerCase())
+                    );
+                  
                 });
         }, 500);
     }
+    }
+
+    
     handleBuyerNameChange(event: any) {
-        this.buyerContactId = event.value.id;
-        this.buyerContactSSIN = event.value.ssin;
-        this.orderForm
+        
+    
+        this.buyerContactId = event?.id;
+        this.buyerContactSSIN = event?.ssin;
+        if(event?.email != null){
+            this.orderForm
             .get("buyerContactEMailAddress")
-            .setValue(event.value.email);
-        this.orderForm
+            .setValue(event?.email);
+        }
+         if(event?.phone != null){
+            this.orderForm
             .get("buyerContactPhoneNumber")
-            .setValue(event.value.phone);
+            .setValue(event?.phone);
+         }
+
 
         this.invalidBuyerPhoneNumber = "";
-        this.buyerPhoneLabel = event?.value?.phoneTypeName ?   event?.value?.phoneTypeName + " Number" : this.buyerPhoneLabel;
+        this.buyerPhoneLabel = event?.phoneTypeName ?   event?.phoneTypeName + " Number" : this.buyerPhoneLabel;
+ 
+
 
     }
     handleSellerNameChange(event: any) {
-        console.log(">>", event.value);
-        this.sellerContactId = event.value.id;
-        this.sellerContactSSIN = event.value.ssin;
-        this.orderForm
+    
+        this.sellerContactId = event?.id;
+        this.sellerContactSSIN = event?.ssin;
+        if(event?.email != null) {
+            this.orderForm
             .get("sellerContactEMailAddress")
-            .setValue(event.value.email);
-        this.orderForm
+            .setValue(event?.email);
+        } 
+        if(event?.phone != null) {
+            this.orderForm
             .get("sellerContactPhoneNumber")
-            .setValue(event.value.phone);
+            .setValue(event?.phone);
+        }
 
-        this.sellerPhoneLabel = event?.value?.phoneTypeName ?  event?.value?.phoneTypeName + " Number" : this.sellerPhoneLabel;
+
+        this.sellerPhoneLabel = event?.phoneTypeName ?  event?.phoneTypeName + " Number" : this.sellerPhoneLabel;
 
     }
 
@@ -471,9 +669,20 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     async getStarted() {
 
         if(this.isBuyerTempAccount){
-        this.orderForm = this.fb.group({
-            buyerCompanyBranch:["", null]
-        }) 
+            this.orderForm.patchValue({
+                buyerContactName: this.orderForm.controls['buyerContactName']?.value,
+                buyerCompanyName: this.orderForm.controls['buyerCompanyName']?.value,
+            });
+
+          
+    }
+
+
+    if(this.isSellerTempAccount){
+        this.orderForm.patchValue({
+            sellerContactName: this.orderForm.controls['sellerContactName']?.value,
+            sellerCompanyName: this.orderForm.controls['sellerCompanyName']?.value,
+        });
     }
 
         if ((!this.sellerCompanyId || !this.buyerComapnyId)  || (this.sellerCompanyId !== this.buyerComapnyId)) {
@@ -533,7 +742,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 Object.keys(this.orderForm.controls).forEach(key => {
                     const control = this.orderForm.get(key);
                     if (control.invalid) {
-                        console.log('Invalid control:', key, 'Value:', control.value);
+                        // console.log('Invalid control:', key, 'Value:', control.value);
                     }
                 });
                 return;
@@ -545,18 +754,25 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     let formValue = this.orderForm
                         .value as ICreateOrEditAppTransactionsDto;
                     this.body = {
-                        sellerContactName:
-                            this.orderForm.value?.sellerContactName?.name &&
+                       /*  sellerContactName:
+                        this.orderForm.controls['sellerContactName']?.value ? this.orderForm.controls['sellerContactName']?.value : this.orderForm.value?.sellerContactName?.name &&
                                 this.orderForm.value?.sellerContactName?.name !==
                                 null
                                 ? this.orderForm.value?.sellerContactName?.name
-                                : null,
+                                :   null, */
+                                sellerContactName: this.isSellerTempAccount
+                                ? this.orderForm.value?.sellerContactName
+                                : this.orderForm.value?.sellerContactName?.name &&
+                                    this.orderForm.value?.sellerContactName !== null
+                                    ? this.orderForm.value?.sellerContactName?.name
+                                    :  this.orderForm.controls['sellerContactName']?.value ? this.orderForm.controls['sellerContactName']?.value :null,
+                                
                         buyerContactName: this.isBuyerTempAccount
-                            ? this.orderForm.value?.buyerContactName
+                            ? this.orderForm.controls['buyerContactName']?.value 
                             : this.orderForm.value?.buyerContactName?.name &&
                                 this.orderForm.value?.buyerContactName !== null
                                 ? this.orderForm.value?.buyerContactName?.name
-                                : null,
+                                :  this.orderForm.controls['buyerContactName']?.value ? this.orderForm.controls['buyerContactName']?.value :null,
                         sellerContactId:
                             this.sellerContactId === 0
                                 ? null
@@ -595,13 +811,30 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         sellerCompanySSIN: this.sellerCompanySSIN,
                         buyerCompanySSIN: this.buyerCompanySSIN,
                         buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch']?.value?.ssin,
-                        buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
+                        // buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
+                        buyerBranchName: this.isBuyerTempAccount ?   this.orderForm.controls['buyerBranchName']?.setValue('Main') : this.orderForm.controls['buyerCompanyBranch']?.value?.name ,
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
-                        completeDate: moment.utc(this.orderForm.controls['completeDate']?.value?.toLocaleString()),
-                        startDate: moment.utc(this.orderForm.controls['startDate']?.value?.toLocaleString()),
-                        availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString())
-                    };
+                            completeDate: moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
+                            enteredDate: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
+                            startDate: moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
+                            availableDate: moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
+                        //     completeDate: moment(this.orderForm.controls['completeDate']?.value).toISOString().slice(0, 19),
+                        // enteredDate: moment(this.orderForm.controls['enteredDate']?.value).toISOString().slice(0, 19),
+                        // startDate: moment(this.orderForm.controls['startDate']?.value).toISOString().slice(0, 19),
+                        // availableDate: moment(this.orderForm.controls['availableDate']?.value).toISOString().slice(0, 19),
+
+
+
+
+                    
+
+                        reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
+                        priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "MSRP",
+                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : 438
+                    }; 
+
+         
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,
                     //     sellerId: this.sellerCompanyId,
@@ -636,7 +869,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         } else {
             this.areSame = true
         }
+
+
     }
+
     changeStartDate(date){
 
         const newDate = new Date();
@@ -653,6 +889,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minDate.setFullYear(yearVal);
         const completeDateControl = this.orderForm.controls['completeDate'];
         const availableDateControl = this.orderForm.controls['availableDate'];
+       const startDateControl = this.orderForm.controls['startDate'];
+       const EnteredDateControl = this.orderForm.controls['enteredDate'];
+        
     
 
 
@@ -666,24 +905,79 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
         this.minCompleteDate = this.orderForm.get('completeDate')?.value;
         this.minStartDate = this.orderForm.get('startDate')?.value;
+        this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
        //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
-    
-   
+       
+       const selectedStartDate = new Date(startDateControl.value);
+       if (selectedStartDate <  this.minSEnteredDate) {
+         this.startDateMsg = true
+         startDateControl.setErrors({ minDate: true });
+       } else {
 
+        this.startDateMsg = false
+         startDateControl.setErrors(null); 
+       }
+
+
+
+
+    //    const selectedavailableDate = new Date(availableDateControl.value);
+    //    if (selectedavailableDate < selectedCompliteDate) {
+    //      this.avalabletDateMsg = true
+    //      availableDateControl.setErrors({ minDate: true });
+    //    } else {
+
+    //     this.avalabletDateMsg = false
+    //     availableDateControl.setErrors(null); 
+    //    }
+
+       
     }
 
+
+    changeEnteredDate(date) {
+        let day = date?.value?.getDate();
+        let month = date?.value?.getMonth();
+        let year = date?.value?.getFullYear();
+    
+        // Use local time
+        this.minDate = new Date(year, month, day);
+        this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
+        this.orderForm.controls['startDate'].setValue(this.orderForm.get('enteredDate')?.value);
+    }
+    
     changeCompleteDate(event) {
-        const newDate = event.value;
+        const newDate = new Date(event.value);
     
         this.orderForm.controls['availableDate'].setValue(newDate);
-        this.minCompleteDate = newDate;
+        this.minCompleteDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
         this.minStartDate = this.orderForm.get('startDate')?.value;
-
-        // Check if the new date is different from the current value to prevent infinite loops
-        if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) 
+    
+        if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) {
             this.orderForm.controls['completeDate'].setValue(newDate);
+        }
+    
+        const selectedCompleteDate = new Date(this.orderForm.controls['completeDate']?.value);
+        if (selectedCompleteDate < this.orderForm.get('startDate')?.value) {
+            this.comtDateMsg = true;
+            this.orderForm.controls['completeDate']?.setErrors({ minDate: true });
+        } else {
+            this.comtDateMsg = false;
+            this.orderForm.controls['completeDate']?.setErrors(null);
+        }
     }
-
+    
+    changeAvailbeDate(event) {
+        const selectedAvailableDate = new Date(this.orderForm.controls['availableDate']?.value);
+        if (selectedAvailableDate < this.orderForm.get('completeDate')?.value) {
+            this.avalabletDateMsg = true;
+            this.orderForm.controls['availableDate']?.setErrors({ minDate: true });
+        } else {
+            this.avalabletDateMsg = false;
+            this.orderForm.controls['availableDate']?.setErrors(null);
+        }
+    }
+    
 
    
 
@@ -761,10 +1055,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         this.hideMainSpinner();
                         break;
                 }
-                console.log(
-                    ">> before calling add addTransaction function 1 ",
-                    this.orderNo
-                );
+                // console.log(
+                //     ">> before calling add addTransaction function 1 ",
+                //     this.orderNo
+                // );
                 this.addTransaction();
             });
     }
@@ -772,15 +1066,19 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
 
     addTransaction() {
-        console.log(">> before add new condition", this.orderNo);
+        // console.log(">> before add new condition", this.orderNo);
 
         if (this.addNew) {
-            console.log(">> after add new condition", this.orderNo);
+            // console.log(">> after add new condition", this.orderNo);
             this.showMainSpinner();
             this.btnLoader = true;
             this._AppTransactionServiceProxy
                 .createOrEdit(this.body)
-                .pipe(finalize(() => (this.btnLoader = false)))
+                .pipe(finalize(() =>  {
+                    this.btnLoader = false
+                    localStorage.removeItem("comNew");
+                    localStorage.removeItem("conNew");
+                } ))
                 .subscribe((response: any) => {
                     if (this.setCurrentUserActiveTransaction) {
                         this._AppTransactionServiceProxy
@@ -806,7 +1104,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.printInfoParam.userId = this.appSession?.userId
                     this.reportUrl = this.printInfoParam.getReportUrl()
                     ///////
-                    console.log(response);
+                   
                     this.display = false;
                     this.modalClose.emit(false);
                     this.reset();
@@ -814,10 +1112,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         "SellerId",
                         JSON.stringify(this.sellerCompanyId)
                     );
-                    console.log(
-                        ">> after seting transaction number to localstorage ",
-                        this.orderNo
-                    );
+                    // console.log(
+                    //     ">> after seting transaction number to localstorage ",
+                    //     this.orderNo
+                    // );
                     localStorage.setItem("transNO", this.orderNo);
                     localStorage.setItem(
                         "contactSSIN",
@@ -852,6 +1150,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
 
                      ////////////////////////////
+
+                     if(this.currencyCode){
                     this._AppMarketplaceItemsServiceProxy
                      .checkCurrencyExchangeRate(this.currencyCode)
                      .subscribe((res: boolean) => {
@@ -883,10 +1183,20 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                              );
                          }
                          }); 
+                        }
+
+                        else{
+                            this.currencyCode=  this.sellerCurrencyCode ? this.sellerCurrencyCode :this.appSession.tenant.currencyInfoDto ;
+                            localStorage.setItem(
+                                "currencyCode",
+                                JSON.stringify(this.currencyCode)
+                            );
+                        }
                              //////////////////////////
 
                              
-                    if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
+
+                             if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
                         location.reload();
                     else
                         this.router.navigateByUrl("app/main/marketplace/products");
@@ -939,8 +1249,59 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
     }
 
+    changeTouchState(event){
+        this.orderForm.controls['currencyId'].setValue(event.value)
+        
+        console.log(event.value,'cuuuuur')
+    
+    }
+
+    changePrice(event){
+        this.orderForm.controls['priceLevel'].setValue(event.value)
+        
+        console.log(event,'cuuuuur')
+    }
+    getCurrencies(){
+        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
+            this.allCurrencies = result;
+        });
+    }
+
+    getCurrenciesDto(){
+        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
+            this.allCurrenciesDto = result;
+        });
+    }
+
     ngOnInit(): void {
-        console.log(">> oninit", this.orderNo);
+
+        this.today = new Date()
+        this.updateControlState()
+        this.orderForm = this.fb.group({
+            enteredDate: [ Date],
+            startDate: [ Date, [Validators.required]],
+            completeDate: ["", [Validators.required]],
+            availableDate: ["", [Validators.required]],
+            sellerCompanyName: ["", [Validators.required]],
+            sellerContactName: [""],
+            sellerContactEMailAddress: ["", [Validators.email]],
+            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyName: ["", [Validators.required]],
+            buyerContactName: [''],
+            buyerContactEMailAddress: ["", [Validators.email]],
+            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyBranch:["", [Validators.required]],
+            sellerCompanyBranch:["", [Validators.required]],
+            istemp: [false],
+            buyerBranchName:[""],
+            reference:[""],
+            priceLevel:[""],
+            currencyId:[""],
+     
+
+            
+        });
+       
         let today = new Date();
         let month = today.getMonth();
         let year = today.getFullYear();
@@ -951,5 +1312,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minDate = new Date();
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
+        this.orderForm.controls['enteredDate'].setValue(new Date());
+
+
     }
 }

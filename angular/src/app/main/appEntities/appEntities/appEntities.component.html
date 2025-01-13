@@ -49,7 +49,8 @@
                                                     <div class="input-group">
                                                         <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input aria-input-text" [placeholder]="l('SearchWithThreeDot')" type="text">
                                                         <span class="input-group-btn input-search">
-                                                            <button (click)="getAppEntities()" class="btn btn-primary btn-search" type="submit"><i class="flaticon-search-1 icon-search"></i></button>
+                                                            <button (click)="getAppEntities()" class="btn btn-primary btn-search" type="submit"><i class="flaticon-search-1 icon-search" style="background-color: #4A0D4A !important;
+                                                                border: #4A0D4A !important;"></i></button>
                                                         </span>
                                                     </div>
                                                 </div>
@@ -209,8 +210,13 @@
                                     top: -51px;">
                                         <div class="kt-subheader__wrapper" *ngIf="currTab && currTab.id == item.id ">
                                             <button (click)="exportToExcel()"
-                                                class="btn btn-outline-success btn-white">{{l("ExportToExcel")}}</button>
-                                            <button *ngIf="currTab && currTab.id == item.id && isGranted('Pages.AppEntities.Create')" (click)="createOrEditAppEntity($event)"
+                                                class="btn btn-outline-success btn-white" style="border-radius: 5px;
+                                                background-color: white !important;
+                                                border: 1px solid #4A0D4A !important;
+                                                color: #4A0D4A !important;">{{l("ExportToExcel")}}</button>
+                                            <button  style="border-radius: 5px;
+                                            background-color: #4A0D4A !important;
+                                            border: #4A0D4A !important;color: white;" *ngIf="currTab && currTab.id == item.id && isGranted('Pages.AppEntities.Create')" (click)="createOrEditAppEntity($event)"
                                                 class="btn btn-primary  btn-blue-create btn-p-21"> {{l("CreateNew")}}
                                                 {{ currTab.label}}</button>
                                         </div>
@@ -223,7 +229,8 @@
                                                         <div class="input-group">
                                                             <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input aria-input-text" [placeholder]="l('SearchWithThreeDot')" type="text">
                                                             <span class="input-group-btn input-search">
-                                                                <button (click)="getAppEntities()" class="btn btn-primary btn-search" type="submit"><i class="flaticon-search-1 icon-search"></i></button>
+                                                                <button (click)="getAppEntities()" class="btn btn-primary btn-search" type="submit" style="background-color: #4A0D4A !important;
+                                                                border: #4A0D4A !important;"><i class="flaticon-search-1 icon-search"></i></button>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -384,6 +391,7 @@
             <app-create-or-edit-app-entity-dynamic-modal
                 #createOreEditAppEntityModal
                 (saveDone)="createOrEditDoneHandler()"
+                [enableAddToLookup]="false"
             >
             </app-create-or-edit-app-entity-dynamic-modal>
 

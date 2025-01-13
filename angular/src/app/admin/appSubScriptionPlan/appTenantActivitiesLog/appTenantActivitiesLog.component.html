@@ -16,8 +16,8 @@
                     <div class="kt-subheader__toolbar">
                         <div class="kt-subheader__wrapper">
             				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
-                <button (click)="createAppTenantActivityLog()" 
-            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantActivityLog")}}</button>
+               <!--  <button (click)="createAppTenantActivityLog()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantActivityLog")}}</button> -->
                         </div>
                     </div>
                   </div>
@@ -248,96 +248,258 @@
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="width: 130px">{{l('Actions')}}</th>
-                                    <th style="width: 150px" pSortableColumn="tenantId">
-                                        {{l('TenantId')}}
-                                        <p-sortIcon field="appTenantActivityLog.tenantId"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="tenantName">
-                                        {{l('TenantName')}}
-                                        <p-sortIcon field="appTenantActivityLog.tenantName"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="userId">
-                                        {{l('UserId')}}
-                                        <p-sortIcon field="appTenantActivityLog.userId"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="activityType">
-                                        {{l('ActivityType')}}
-                                        <p-sortIcon field="appTenantActivityLog.activityType"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderId">
-                                        {{l('AppSubscriptionPlanHeaderId')}}
-                                        <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanHeaderId"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanCode">
-                                        {{l('AppSubscriptionPlanCode')}}
-                                        <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanCode"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="activityDateTime">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="activityDateTime">
                                         {{l('ActivityDateTime')}}
                                         <p-sortIcon field="appTenantActivityLog.activityDateTime"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="userName">
-                                        {{l('UserName')}}
-                                        <p-sortIcon field="appTenantActivityLog.userName"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="featureCode">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="featureCode">
                                         {{l('FeatureCode')}}
                                         <p-sortIcon field="appTenantActivityLog.featureCode"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="featureName">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="featureName">
                                         {{l('FeatureName')}}
                                         <p-sortIcon field="appTenantActivityLog.featureName"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="billable">
-                                        {{l('Billable')}}
-                                        <p-sortIcon field="appTenantActivityLog.billable"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="invoiced">
-                                        {{l('Invoiced')}}
-                                        <p-sortIcon field="appTenantActivityLog.invoiced"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="reference">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="reference">
                                         {{l('Reference')}}
                                         <p-sortIcon field="appTenantActivityLog.reference"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="qty">
-                                        {{l('Qty')}}
-                                        <p-sortIcon field="appTenantActivityLog.qty"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="consumedQty">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="consumedQty">
                                         {{l('ConsumedQty')}}
                                         <p-sortIcon field="appTenantActivityLog.consumedQty"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="remainingQty">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="remainingQty">
                                         {{l('RemainingQty')}}
                                         <p-sortIcon field="appTenantActivityLog.remainingQty"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="price">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="billable">
+                                        {{l('Billable')}}
+                                        <p-sortIcon field="appTenantActivityLog.billable"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="price">
                                         {{l('Price')}}
                                         <p-sortIcon field="appTenantActivityLog.price"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="amount">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="amount">
                                         {{l('Amount')}}
                                         <p-sortIcon field="appTenantActivityLog.amount"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="invoiceDate">
-                                        {{l('InvoiceDate')}}
-                                        <p-sortIcon field="appTenantActivityLog.invoiceDate"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="invoiceNumber">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="invoiceNumber">
                                         {{l('InvoiceNumber')}}
                                         <p-sortIcon field="appTenantActivityLog.invoiceNumber"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="creditOrUsage">
+                                    
+                                    
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="invoiceDate">
+                                        {{l('InvoiceDate')}}
+                                        <p-sortIcon field="appTenantActivityLog.invoiceDate"></p-sortIcon>
+                                    </th>
+                                    <!-- <th style="width: 130px">{{l('Actions')}}</th>  -->
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="tenantId" *ngIf="isHostLogged">
+                                        {{l('TenantId')}}
+                                        <p-sortIcon field="appTenantActivityLog.tenantId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="tenantName" *ngIf="isHostLogged">
+                                        {{l('TenantName')}}
+                                        <p-sortIcon field="appTenantActivityLog.tenantName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="userId" *ngIf="isHostLogged">
+                                        {{l('UserId')}}
+                                        <p-sortIcon field="appTenantActivityLog.userId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="activityType" *ngIf="isHostLogged">
+                                        {{l('ActivityType')}}
+                                        <p-sortIcon field="appTenantActivityLog.activityType"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="appSubscriptionPlanHeaderId" *ngIf="isHostLogged">
+                                        {{l('AppSubscriptionPlanHeaderId')}}
+                                        <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanHeaderId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="appSubscriptionPlanCode" *ngIf="isHostLogged">
+                                        {{l('AppSubscriptionPlanCode')}}
+                                        <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanCode"></p-sortIcon>
+                                    </th>
+                                    
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="userName">
+                                        {{l('UserName')}}
+                                        <p-sortIcon field="appTenantActivityLog.userName"></p-sortIcon>
+                                    </th>
+                                    
+                                    
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="invoiced" *ngIf="isHostLogged">
+                                        {{l('Invoiced')}}
+                                        <p-sortIcon field="appTenantActivityLog.invoiced"></p-sortIcon>
+                                    </th>
+                                    
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="qty" *ngIf="isHostLogged">
+                                        {{l('Qty')}}
+                                        <p-sortIcon field="appTenantActivityLog.qty"></p-sortIcon>
+                                    </th>
+                                   
+                                   
+                                    <th style="width: 150px" pSortableColumn="creditOrUsage" *ngIf="isHostLogged">
                                         {{l('CreditOrUsage')}}
                                         <p-sortIcon field="appTenantActivityLog.creditOrUsage"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="month">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="month" *ngIf="isHostLogged">
                                         {{l('Month')}}
                                         <p-sortIcon field="appTenantActivityLog.month"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="year">
+                                    <th style="width: 150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;
+                                    color:#1B101B;" pSortableColumn="year" *ngIf="isHostLogged">
                                         {{l('Year')}}
                                         <p-sortIcon field="appTenantActivityLog.year"></p-sortIcon>
                                     </th>
@@ -345,8 +507,8 @@
                                 </tr>
                             </ng-template>                           
 							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
-                                <tr>
-                                    <td style="width: 130px">
+                                <tr>  
+                                  <!--  <td style="width: 130px">
                                        <div class="btn-group dropdown" dropdown container="body">
                                             <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
                                                 <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
@@ -374,105 +536,258 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                    </td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('TenantId')}}</span>
-											{{record.appTenantActivityLog.tenantId}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('TenantName')}}</span>
-											{{record.appTenantActivityLog.tenantName}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('UserId')}}</span>
-											{{record.appTenantActivityLog.userId}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('ActivityType')}}</span>
-											{{record.appTenantActivityLog.activityType}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('AppSubscriptionPlanHeaderId')}}</span>
-											{{record.appTenantActivityLog.appSubscriptionPlanHeaderId}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('AppSubscriptionPlanCode')}}</span>
-											{{record.appTenantActivityLog.appSubscriptionPlanCode}}
-										</td>
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('ActivityDateTime')}}</span>
-                                        <span *ngIf="record.appTenantActivityLog.activityDateTime">
-											{{record.appTenantActivityLog.activityDateTime |  momentFormat:'L' }}
+                                    </td>!-->
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+										<!-- <span class="ui-column-title"> {{l('ActivityDateTime')}}</span> -->
+                                        <span *ngIf="record.appTenantActivityLog.activityDateTime" style="width:150px;font-family: Poppins;
+                                        font-size: 12px;
+                                        font-weight: 500;
+                                        line-height: 18px;
+                                        text-align: left;
+                                        text-underline-position: from-font;
+                                        text-decoration-skip-ink: none;color:#595959;" >
+										{{formatDate(record.appTenantActivityLog.activityDateTime)}}
                                         </span>
                                         <span *ngIf="!record.appTenantActivityLog.activityDateTime">-</span>
                                     </td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('UserName')}}</span>
-											{{record.appTenantActivityLog.userName}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('FeatureCode')}}</span>
-											{{record.appTenantActivityLog.featureCode}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('FeatureName')}}</span>
-											{{record.appTenantActivityLog.featureName}}
-										</td>
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('Billable')}}</span>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('FeatureCode')}}</span> -->
+                                        {{record.appTenantActivityLog.featureCode}}
+                                    </td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('FeatureName')}}</span> -->
+                                        {{record.appTenantActivityLog.featureName}}
+                                    </td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('Reference')}}</span> -->
+                                        {{record.appTenantActivityLog.reference}}
+                                    </td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('ConsumedQty')}}</span> -->
+                                        {{record.appTenantActivityLog.consumedQty}}
+                                    </td>
+                                <td style="width:150px;font-family: Poppins;
+                                font-size: 12px;
+                                font-weight: 500;
+                                line-height: 18px;
+                                text-align: left;
+                                text-underline-position: from-font;
+                                text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('RemainingQty')}}</span> -->
+                                        {{record.appTenantActivityLog.remainingQty}}
+                                    </td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+										<!-- <span class="ui-column-title"> {{l('Billable')}}</span> -->
                                         <div *ngIf="record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('Invoiced')}}</span>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('Price')}}</span> -->
+                                        {{record.appTenantActivityLog.price}}
+                                    </td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('Amount')}}</span> -->
+                                        {{record.appTenantActivityLog.amount}}
+                                    </td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+                                        <!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
+                                        {{record.appTenantActivityLog.invoiceNumber}}
+                                    </td>
+                                <td style="width:150px;font-family: Poppins;
+                                font-size: 12px;
+                                font-weight: 500;
+                                line-height: 18px;
+                                text-align: left;
+                                text-underline-position: from-font;
+                                text-decoration-skip-ink: none;color:#595959;" >
+                                    <!-- <span class="ui-column-title"> {{l('InvoiceDate')}}</span> -->
+                                    <span *ngIf="record.appTenantActivityLog.invoiceDate">
+                                        {{record.appTenantActivityLog.invoiceDate |  momentFormat:'L' }}
+                                    </span>
+                                    <span *ngIf="!record.appTenantActivityLog.invoiceDate">-</span>
+                                </td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('TenantId')}}</span> -->
+											 {{record.appTenantActivityLog.tenantId}}
+                                     
+										</td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('TenantName')}}</span> -->
+											{{record.appTenantActivityLog.tenantName}}
+										</td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('UserId')}}</span> -->
+											{{record.appTenantActivityLog.userId}}
+										</td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('ActivityType')}}</span> -->
+											{{record.appTenantActivityLog.activityType}}
+										</td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('AppSubscriptionPlanHeaderId')}}</span> -->
+											{{record.appTenantActivityLog.appSubscriptionPlanHeaderId}}
+										</td>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('AppSubscriptionPlanCode')}}</span> -->
+											{{record.appTenantActivityLog.appSubscriptionPlanCode}}
+										</td>
+                                   
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" >
+											<!-- <span class="ui-column-title"> {{l('UserName')}}</span> -->
+											{{record.appTenantActivityLog.userName}}
+										</td>
+                                    
+                                    
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+										<!-- <span class="ui-column-title"> {{l('Invoiced')}}</span> -->
                                         <div *ngIf="record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Reference')}}</span>
-											{{record.appTenantActivityLog.reference}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Qty')}}</span>
+                                    
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('Qty')}}</span> -->
 											{{record.appTenantActivityLog.qty}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('ConsumedQty')}}</span>
-											{{record.appTenantActivityLog.consumedQty}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('RemainingQty')}}</span>
-											{{record.appTenantActivityLog.remainingQty}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Price')}}</span>
-											{{record.appTenantActivityLog.price}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Amount')}}</span>
-											{{record.appTenantActivityLog.amount}}
-										</td>
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('InvoiceDate')}}</span>
-                                        <span *ngIf="record.appTenantActivityLog.invoiceDate">
-											{{record.appTenantActivityLog.invoiceDate |  momentFormat:'L' }}
-                                        </span>
-                                        <span *ngIf="!record.appTenantActivityLog.invoiceDate">-</span>
-                                    </td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('InvoiceNumber')}}</span>
-											{{record.appTenantActivityLog.invoiceNumber}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('CreditOrUsage')}}</span>
+                                    
+                                   
+                                     
+                                    
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('CreditOrUsage')}}</span> -->
 											{{record.appTenantActivityLog.creditOrUsage}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Month')}}</span>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('Month')}}</span> -->
 											{{record.appTenantActivityLog.month}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Year')}}</span>
+                                    <td style="width:150px;font-family: Poppins;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    line-height: 18px;
+                                    text-align: left;
+                                    text-underline-position: from-font;
+                                    text-decoration-skip-ink: none;color:#595959;" *ngIf="isHostLogged">
+											<!-- <span class="ui-column-title"> {{l('Year')}}</span> -->
 											{{record.appTenantActivityLog.year}}
 										</td>
 
@@ -484,7 +799,7 @@
                             {{l('NoData')}}
                         </div>
                         <div class="primeng-paging-container">
-                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                            <!-- <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
                                          #paginator
                                          (onPageChange)="getAppTenantActivitiesLog($event)"
                                          [totalRecords]="primengTableHelper.totalRecordsCount"
@@ -492,7 +807,16 @@
                                          [showCurrentPageReport]="true"
                                          [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
                             >
+                            </p-paginator> -->
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getAppTenantActivitiesLog($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
                             </p-paginator>
+                            <span class="total-records-count">
+                                {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
+                            </span>
                         </div>
                     </div>
                     <!--<Primeng-Datatable-End>-->

@@ -30,7 +30,19 @@
         <div class="kt-portlet kt-portlet--mobile">
             <div class="kt-portlet__body">              
                 
-                
+                <div class="form-group">
+					<label for="AppTenantInvoice_TenantId">{{l("TenantName")}}</label>
+					<p-dropdown [options]="TenantList"
+					optionLabel="name"
+					placeholder="Select Tenant" 
+					(onChange)="onChange($event)"
+					optionLabel="name"
+					optionValue="id"
+					[(ngModel)]="appTenantInvoice.tenantId"
+					name="tenantSelection" >
+		</p-dropdown>
+					
+				</div>
 								<div class="form-group">
 									<label for="AppTenantInvoice_InvoiceNumber">{{l("InvoiceNumber")}} *</label>
 									<input type="text" #AppTenantInvoice_InvoiceNumber="ngModel" id="AppTenantInvoice_InvoiceNumber" class="form-control" [(ngModel)]="appTenantInvoice.invoiceNumber" name="InvoiceNumber"   minlength="0"  maxlength="12"  required/>
@@ -62,16 +74,101 @@
 								</div>
 					
             </div>
+			<!--start-->
+			<div class="col-12 item-photos-body pt-4 pb-5 ml-5 pl-5">
+				<div class="row pt-3 pb-3 pl-3">
+					<div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ;
+border-radius: 12px !important;" [ngClass]="{'upload':!attachment}"
+						*ngFor="let attachment of attachmentsSrcs; index as i">
+						<label *ngIf="!attachment"
+							class="d-flex flex-column justify-content-center h-100 align-items-center"
+							for="file_{{i}}">
+							<div
+								class="align-items-end d-flex justify-content-center upload-image-icons mt-3">
+							   <!--  <div class="left-icon">
+									<i class="fa-photo-video fas "></i>
+								</div>
+								<div class="middle-icon">
+									<i class="fa-clipboard-list fas "></i>
+								</div>
+								<div class="right-icon">
+									<i class="fas fa-file-video "></i>
+								</div> -->
+								<div class="middle-icon">
+									<i class="fas " > <img src="../../../assets/placeholders/cloud-add.png" /> </i>
+								</div>
+							</div>
+							<div class="text-center">
+								<p  style="font-weight: bold; color: black;
+white-space: nowrap;">
+									Choose a file or drag & drop it here
+									<p >
+								<!-- <a class="btn        btn-sm mb-3 upload-btn">
+									{{ 'AddAttachedFile' | localize}}
+								</a> -->
+								<p>
+									<!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
+									{{ 'File can be PDf format, up to 25 MB' | localize}}.   
+								</p>
+								<!-- <p style="color: #F6851D !important;">*Image Aspect-Ratio is 16:9 </p> -->
+
+								<a class="btn btn-primary btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
+									<!-- {{ 'AddAttachedFile' | localize}} -->
+									{{ 'Browse File' | localize}}
+								</a>
+							</div>
+						</label>
+						<a *ngIf="attachment"
+							class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar">
+							<div
+								class="d-flex flex-column justify-content-center h-100 w-100 position-absolute view-img-overlay">
+								<div class="text-center mb-3">
+									<i class="fa-photo-video fas bg-transparent text-white fa-3x"></i>
+								</div>
+								<div class="text-center">
+									<button type="button"
+										class="btn btn-dark text-white border-lg border-white"
+										(click)="openImageViewer(attachment)">
+										{{ 'ImagePreview' | localize}}
+									</button>
+								</div>
+								<div class="bg-white kt-avatar__upload" for="file"
+									>
+									<!-- <i class="fa fa-times text-danger"></i> -->
+									<img  class="mr-2"  src="../../../../../assets/Items/Frame 1707478667.png"/>
+								</div>
+							</div>
+							<!-- <img *ngIf="!appItem.entityAttachments && !appItem.entityAttachments.length" src="../../../../../assets/img/Untitled.png"/> -->
+							<img *ngIf="attachment" [src]="attachment" />
+							<a class="select-default-image p-2"
+							style="    border: 1px solid #EEEEEEEE !important;
+border-radius: 12px;"
+								
+								>
+								<i class="fa fa-check-square mr-2"
+									> </i>
+							 <!-- <label class="text-purple">  {{ 'Default Image' | localize}}</label>  -->
+							</a>
+						</a>
+						<input type="file" id="file_{{i}}" class="d-none" #file
+							(change)="fileChange($event,imageCategory,i,undefined,true)"
+							style="background-color: #EEEEEE !important;
+							border: none !important">
+					</div>
+
+				</div>
+					<!--End-->
+			
               <div class="kt-portlet__foot">
 				<div class="col-lg-12">
 					<button (click)="save()" class="btn btn-primary blue float-right"
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("Save")}}</span>
                     </button>
-                    <button *ngIf="!this.appTenantInvoice.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
+                    <!-- <button *ngIf="!this.appTenantInvoice.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("SaveAndNew")}}</span>
-                    </button>
+                    </button> -->
 				</div>
 		    </div>
         </div>

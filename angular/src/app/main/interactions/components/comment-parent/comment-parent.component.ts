@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Output, ViewChild ,Input,AfterViewInit} from '@angular/core';
+import { Component, EventEmitter, Injector, Output, ViewChild ,Input,AfterViewInit, ChangeDetectorRef} from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
@@ -16,9 +16,12 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @ViewChild("SendMessageModalComponent") SendMessageModalComponent: SendMessageModalComponent
 
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
+    @Output() refreshComments : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
     @Input() commentType:any;
+    
+    @Input() toName:string = '';
 
     active : boolean = true;
     showDirectMessageComp:boolean=false;
@@ -33,9 +36,11 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     creatorUserId : number;
     displayDeleteMessage:boolean=false;
     showRegularComment:boolean=true;
+
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
-        private _injector : Injector
+        private _injector : Injector,
+        private cdr: ChangeDetectorRef
         ) {
             super(_injector)
          }
@@ -74,6 +79,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.maxResultCount= 5
         }
         
+ 
     show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
      this.reset()
         this.creatorUserId = creatorUserId
@@ -125,6 +131,8 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.skipCount += this.maxResultCount
             this.totalCount = res.totalCount
             this.comments.push(...res.items)
+
+
         })
     }
     newCommentAddedHandler($event?:GetMessagesForViewDto){
@@ -137,4 +145,18 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         this.showDirectMessageComp=false;
 
     }
+    getName(event){
+      
+ this.toName = event
+ this.cdr.detectChanges();
+//  this.setToName(event)
+    }
+  
+    refreshAfterSave(event){
+      
+        if(event){
+            this.refreshComments.emit(true)
+        }
+           }
+         
 }

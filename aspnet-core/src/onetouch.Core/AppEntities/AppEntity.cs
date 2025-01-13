@@ -75,5 +75,8 @@ namespace onetouch.AppEntities
 
         [StringLength(AppEntityConsts.SSINLength, MinimumLength = AppEntityConsts.SSINLength)]
         public virtual string SSIN { get; set; }
+        //I45
+        public virtual DateTime TimeStamp { get; set; }
+        //I45
     }
 }

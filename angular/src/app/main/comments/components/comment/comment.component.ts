@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AppPostsServiceProxy, GetMessagesForViewDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
@@ -8,12 +8,17 @@ import { AppPostsServiceProxy, GetMessagesForViewDto } from '@shared/service-pro
 })
 export class CommentComponent implements OnChanges {
     @Input() comment : GetMessagesForViewDto
+    @Output("toName") toName: EventEmitter<string> = new EventEmitter<string>()
+
     constructor(private _postService:AppPostsServiceProxy) { }
     ngOnChanges(changes: SimpleChanges,): void {
         this.getProfilePictureById(this.comment.messages.profilePictureId);
+        this.toName.emit(this.comment?.messages?.toName)
 
     }
-
+    ngOnInit(): void {
+        console.log(this.comment?.messages?.toName,'this.comment?.messages?.toName')
+    }
     getProfilePictureById(id: string) {
         const subs = this._postService
             .getProfilePictureAllByID(id)

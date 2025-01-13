@@ -1,46 +1,76 @@
-
-<div class="modal-content-wrapper" *ngIf="active"  >
+<div class="modal-content-wrapper" *ngIf="active">
     <div class="modal-header">
-        <h4 class="modal-title" >
-            <p class="desc-menu-item">{{l(entityObjectType.name)}}   {{l("values")}} </p>
+        <h4 class="modal-title">
+            <p class="desc-menu-item">{{l(entityObjectType.name)}} {{l("values")}} </p>
         </h4>
-        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close">
+        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
+            aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body p-0 thin-scroll mr-2">
-        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded">
+        <div class="row">
+        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded col-5">
             <span class="mr-3">
                 <i class="fas fa-search"></i>
             </span>
-            <input type="text" name="search" id="search" placeholder="Search" (input)="onFilter()" [(ngModel)]="searchQuery" class="form-control bg-white border-0">
+            <input type="text" name="search" id="search" placeholder="Search" (input)="onFilter()"
+                [(ngModel)]="searchQuery" class="form-control bg-white border-0">
         </div>
+
+        <button style="background-color: white  !important;border: 1px solid #EBEBEB !important;color: #4A0D4A !important; height: 55px;" 
+          *ngIf="showAddAction" title="{{ 'AddNewValue' | localize }}" type="button"
+            class="btn btn-icon btn-primary col-5 mt-3" (click)="openCreateOrEditModal()">
+            <i class="flaticon2-plus" style="color: #4A0D4A !important;"> Add New  {{l(entityObjectType.name)}}</i>
+        </button>
+</div>
         <div class="d-flex flex-column mb-3" *ngIf="displayedRecords.length">
-            <div class="align-items-center border-dashed-bottom d-flex justify-content-between p-3" *ngFor="let item of displayedRecords;index as i">
-                    <div class="d-flex" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
-                        <label class="mr-4" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'" [for]="item.value">
-                            <p-checkbox
-                                *ngIf="acceptMultiValues"
-                                [value]="item.value"
-                                [id]="item.value"
-                                [(ngModel)]="selectedRecords"
-                                [name]="entityObjectType.name"
-                            ></p-checkbox>
-                            <input type="radio" *ngIf="!acceptMultiValues" [value]="item.value" [id]="item.value" [(ngModel)]="selectedRecords" [name]="entityObjectType.name"  />
-                        </label>
-                        {{item.label}}
-                    </div>
+            <div class="align-items-center border-dashed-bottom d-flex justify-content-between p-3"
+                *ngFor="let item of displayedRecords;index as i">
+                <div class="d-flex" style="align-items: center;" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
+                    <label class="pl-3 pt-3 pr-2" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'"
+                    [for]="!isNonLookupValue(item.code) ? item.value : item.code">
+                    <p-checkbox *ngIf="acceptMultiValues" [value]="!isNonLookupValue(item.code) ? item.value : item.code" [id]="!isNonLookupValue(item.code) ? item.value : item.code"
+                        [(ngModel)]="selectedRecords" [name]="entityObjectType.name"></p-checkbox>
+                    <input type="radio" *ngIf="!acceptMultiValues" [value]="!isNonLookupValue(item.code) ? item.value : item.code" [id]="!isNonLookupValue(item.code) ? item.value : item.code"
+                        [(ngModel)]="selectedRecords" [name]="entityObjectType.name" />
+                </label>
+
+                    <div style="
+    width: 50px;
+    height: 50px;
+" *ngIf="item?.hexaCode"  [ngStyle]="{'background-color': item?.hexaCode}"></div>
+                    <img *ngIf="!item?.hexaCode && item?.image" style="
+    width: 50px;
+    height: 50px;
+" [src]="attachmentBaseUrl + '/' + item?.image" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+
+<img *ngIf="!item?.hexaCode && !item?.image" style="
+    width: 50px;
+    height: 50px;
+" src="../../../../../assets/placeholders/appitem-placeholder.png" />
+
+                  
+                    <div class="d-flex flex-column pl-3">
+                        <span class="pt-1  font-weight-bold"> {{item.code}}</span>
+                    <span class="pt-1"> {{item.label}}</span>
+                </div>
+                </div>
+                <div class="row" *ngIf="showActions && !item.isHostRecord && item.value">
+                    *Added to lookup
+                </div> 
+               
                 <div *ngIf="showActions && !item.isHostRecord">
-                    <div class="btn-group dropdown" dropdown container="body" placement='bottom right' >
-                        <button class="dropdown-toggle btn btn-sm btn-action"
-                            dropdownToggle>
+                    <div class="btn-group dropdown" dropdown container="body" placement='bottom right'>
+                        <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
                         </button>
-                        <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"  *dropdownMenu>
+                        <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                            *dropdownMenu>
                             <li>
                                 <a (click)="openCreateOrEditModal(item)">{{'Edit' | localize}}</a>
                             </li>
                             <li>
-                                <a  (click)="deleteSycEntityObject(item.value,i)" >{{'Delete' | localize}}</a>
+                                <a (click)="deleteSycEntityObject(item,i)">{{'Delete' | localize}}</a>
                             </li>
                         </ul>
                     </div>
@@ -48,11 +78,8 @@
 
             </div>
             <div *ngIf="displayedRecords?.length">
-                <button
-                    class="btn btn-font-hover-brand ml-3"
-                    (click)="showMoreListData()"
-                    *ngIf="showMoreListDataButton"
-                >
+                <button class="btn btn-font-hover-brand ml-3" (click)="showMoreListData()"
+                    *ngIf="showMoreListDataButton">
                     {{ 'showmore' | localize }} ...
                 </button>
             </div>
@@ -60,23 +87,27 @@
                 {{ 'NoRecordsFound...' | localize }}
             </div>
         </div>
-        <button *ngIf="showAddAction"  title="{{ 'AddNewValue' | localize }}" type="button" class="btn btn-icon btn-primary btn-circle create-edit-btn" (click)="openCreateOrEditModal()">
+        <!-- <button style="background-color: #4A0D4A !important;
+        border: #4A0D4A !important;
+        color: white !important;" *ngIf="showAddAction" title="{{ 'AddNewValue' | localize }}" type="button"
+            class="btn btn-icon btn-primary btn-circle create-edit-btn" (click)="openCreateOrEditModal()">
             <i class="flaticon2-plus"></i>
-        </button>
+        </button> -->
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="submitSelection()">
+
+        <button type="button" class="btn btn-default btn-gray" (click)="close()" style="border-radius: 5px;
+        background-color: white !important;
+        border: white !important;color: #4A0D4A !important;">{{l("Cancel")}}</button>
+        <button type="button" class="btn btn-primary" (click)="submitSelection()" style="border-radius: 5px;
+        background-color: #4A0D4A !important;
+        border: #4A0D4A !important;color: white;">
             {{l("Add")}}
         </button>
-        <button type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Close")}}</button>
     </div>
 </div>
 
 
-
-<app-create-or-edit-app-entity-dynamic-modal
-    #createOreEditAppEntityModal
-    (cancel)="onCanceledHandler()"
-    (saveDone)="onCreateOrEditDoneHandler()"
->
+<app-create-or-edit-app-entity-dynamic-modal #createOreEditAppEntityModal (cancel)="onCanceledHandler()"
+    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="entityObjectType.name.toUpperCase()== 'COLOR'  || entityObjectType.name.toUpperCase()=='CLOSURE'" (addNonLookupValues)="onAddNonLookupValues($event)">
 </app-create-or-edit-app-entity-dynamic-modal>

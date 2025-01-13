@@ -1,6 +1,6 @@
 <!-- dialog to start new sales order or purchase order -->
 <p-dialog
-    [style]="{ width: '40vw' }"
+    [style]="{ width: '656px',padding:'10px !important' }"
     [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
     [baseZIndex]="10000"
     [modal]="true"
@@ -9,6 +9,7 @@
     [draggable]="false"
     [closable]="true"
     (onHide)="cancel()"
+    class="transM"
 >
     <div class="wrapper">
 
@@ -26,78 +27,170 @@
                 Please Select Role
             </small>
         </div>
-<div class="orderInfo seller">
+<div class="orderInfo seller mobile">
 
-    <div class="user d-flex align-items-center justify-content-between">
+    <div class="user d-flex align-items-center justify-content-between ">
         <div class="sellerHeader">
             <span>Order Information</span>
         </div>
     </div>
-    <form  [formGroup]="orderForm" class="form mt-3">
+    <form  [formGroup]="orderForm" class="form mt-3  calendar-form">
         <div class="row">
-            <div class="col-md-6 pt-4">
+            <div class="col-12 col-md-6 pt-4">
                 <div class="mb-3 pt-2">
                     <div
                     class="enter d-flex align-items-center justify-content-start gap-2"
                 >
-                    <span class="mr-2">Entered By :</span>
-                    <a href="http://" target="_blank" rel="noopener noreferrer">{{
+                    <span class="mr-2 spEnterd">Entered By :</span>
+                    <a  class="enteredBy"  rel="noopener noreferrer">{{
                         fullName
                     }}</a>
                 </div>
                 <span class="date">{{ dt }}</span>
                 </div>
                 </div>
-           
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <div class="mb-3">
-                        <label class="form-label">Start Date*</label>
+                        <label for="" class="form-label"
+                            >Reference  #
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Enter Transaction Reference #"
+                            formControlName="reference"
+                           
+                        />
+                    
+                 
+                    
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 ">
+                    <div class="mb-3 ">
+                        <label class="form-label">Entered Date*</label>
+                        <div class="position-relative">
+                        
                         <p-calendar
+                        #calendar1
                         [appendTo]="'body'"
+                            formControlName="enteredDate"
+                            [showIcon]="true"
+                            [readonlyInput]="false"
+                            (focus)="onFocus()" (blur)="onBlur()"
+                            (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
+                            [ngClass]="isFocused ? 'focused-calendar' : ''"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
+                         
+                        ></p-calendar>
+                        <img  src="../../../../../assets/icons/calendar.png"  (click)="openCalendar(calendar1)"  alt="" srcset="">
+                           </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="mb-3 ">
+                        <label class="form-label">Start Date*</label>
+                        <div class="position-relative">
+                        <p-calendar
+                        #calendar2
+                        [appendTo]="'body'"
+                        #calendar
                             formControlName="startDate"
                             [showIcon]="true"
                             (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
                             [readonlyInput]="false"
+                          [minDate]="minSEnteredDate"
+                          [showOtherMonths]="true"
+                          [selectOtherMonths]="true"
                         ></p-calendar>
+                        <img (click)="openCalendar(calendar2)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                       
+                        
+                    </div>
+                
+                        <small
+                        class="text-danger"
+                        *ngIf="
+                           
+                        submitted &&  startDateMsg
+                        "
+                    >
+                    start date Can’t be befor the Entered date 
+                    </small>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="mb-3 relative">
                         <label class="form-label">Complete Date*</label>
+                        <div class="position-relative">
+
                         <p-calendar
+                        #calendar3
+
                         [appendTo]="'body'"
                             formControlName="completeDate"
                             [showIcon]="true"
                             [minDate]="minStartDate"
                             [readonlyInput]="false"
                             (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                         ></p-calendar>
+                        <img (click)="openCalendar(calendar3)" src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
+                        </div>
+                        <small
+                        class="text-danger"
+                        *ngIf="
+                           
+                        submitted &&  comtDateMsg
+                        "
+                    >
+                    Complete date Can’t be before the Start date 
+                    </small>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="mb-3 ">
                         <label class="form-label">Available Date*</label>
+                        <div class="position-relative">
+
                         <p-calendar
+                        #calendar4
                         [appendTo]="'body'"
                             formControlName="availableDate"
                             [showIcon]="true"
                             [readonlyInput]="false"
+                            (ngModelChange)="changeAvailbeDate(orderForm.get('availableDate'))"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                             [minDate]="minCompleteDate"
                         ></p-calendar>
+                        <img (click)="openCalendar(calendar4)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                       </div>
                     </div>
+                    <small
+                    class="text-danger"
+                    *ngIf="
+                       
+                    submitted &&  avalabletDateMsg
+                    "
+                >
+                Available date Can’t be before the complete date 
+                </small>
                 </div>
                 
                 </div>
     </form>
 </div>
-        <div class="seller">
+        <div class="seller mobile">
             <div class="sellerHeader">
                 <span>Buyer Information</span>
             </div>
-            <form [formGroup]="orderForm" class="form mt-3">
+            <form [formGroup]="orderForm" class="form ">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="flex align-items-center gap-1 my-2" *ngIf="formType?.toUpperCase() != 'PO'">
+                        <div class="flex align-items-center gap-1 temm" *ngIf="formType?.toUpperCase() != 'PO'">
                             <!-- <p-checkbox
                                 value="Buyer"
                                 [disabled]="isBuyer"
@@ -137,7 +230,7 @@
 
                             <div *ngIf="!isCompantIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                           
                                     *ngIf="!isBuyerTempAccount"
                                     [options]="buyerCompanies"
                                     formControlName="buyerCompanyName"
@@ -183,17 +276,88 @@
                                 formControlName="buyerContactName"
                                 *ngIf="isBuyerTempAccount"
                             />
-                            <p-dropdown
-                                *ngIf="!isBuyerTempAccount"
+                        
+                            <!-- <p-dropdown
+                            *ngIf="!isBuyerTempAccount"
+                            [options]="buyerContacts"
+                            formControlName="buyerContactName"
+                            [filter]="true"
+                            optionLabel="name"
+                            filterBy="name"
+                            [disabled]="buyerComapnyId === 0"
+                            placeholder="Please Select Buyer Name"
+                            (onFilter)="handleBuyerNameSearch($event)"
+                            (onChange)="handleBuyerNameChange($event)"
+                            emptyMessage="  add new."
+                            (onClick)="addNewBuyer()">
+                        </p-dropdown> -->
+                        <div>
+
+
+                       
+                   <p-autoComplete
+    #autoComplete
+    [dropdown]="true"
+    *ngIf="!isBuyerTempAccount"
+    [suggestions]="filteredBuyerContacts"
+    formControlName="buyerContactName"
+    [(ngModel)]="selectedBuyerContact"
+    (completeMethod)="handleBuyerNameSearch($event)"
+    (ngModelChange)="handleBuyerNameChange($event)"
+     (click)="loadInitialContacts()"
+   
+    [placeholder]=" 'Please Select Buyer Name'"
+    field="name"
+    [forceSelection]="false">
+    
+    <ng-template pTemplate="empty">
+        <div *ngIf="buyerContacts.length === 0" class="no-data">
+            No data found
+        </div>
+    </ng-template>
+</p-autoComplete>
+
+                        
+                        
+                            
+                            <!-- <p-dropdown
+                            *ngIf="!isBuyerTempAccount"
                                 [options]="buyerContacts"
                                 formControlName="buyerContactName"
                                 [filter]="true"
                                 optionLabel="name"
+                                filterBy="name"
                                 [disabled]="buyerComapnyId === 0"
-                                placeholder="Please Select Buyer Name"
+                                [placeholder]="orderForm.controls['buyerContactName']?.value ? orderForm.controls['buyerContactName']?.value : 'Please Select Buyer Name'"
                                 (onFilter)="handleBuyerNameSearch($event)"
+                               
                                 (onChange)="handleBuyerNameChange($event)"
-                            ></p-dropdown>
+                            >
+                                
+                                <ng-template let-item pTemplate="item">
+                                    {{ item.name }}
+                                </ng-template>
+                        
+                                <ng-template pTemplate="empty">
+                                
+                                    <div *ngIf="buyerContacts.length === 0 && searchTerm == undefined" class="no-data">
+                                        No data found
+                                    </div>
+                                </ng-template>
+
+
+                                <ng-template class="" pTemplate="footer">
+                                 
+                                    <div *ngIf="searchTerm != undefined && showAddBuyBtn" class="d-flex justify-content-between tem-footer">
+                                        <span>{{searchTerm}} </span>
+                                        <button  pButton type="button" class="addTextBtn" label="Add As Text" (click)="addNewBuyer()"></button>
+                                    </div>
+                                </ng-template>
+                            </p-dropdown> -->
+                        </div>
+                        
+                 
+                     
                             <small
                                 class="text-danger"
                                 *ngIf="
@@ -222,6 +386,9 @@
                                 formControlName="buyerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['buyerContactPhoneNumber'].invalid && orderForm.controls['buyerContactPhoneNumber'].touched
+                                  }"
                             />
                             <small
                                 class="text-danger"
@@ -272,6 +439,9 @@
                                 formControlName="buyerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['buyerContactEMailAddress'].invalid && orderForm.controls['buyerContactEMailAddress'].touched
+                                  }"
                             />
                             
                             <small
@@ -299,14 +469,15 @@
                     </div>
                     <!-- buyer email -->
                     <!-- buyer company branch -->
-                <div class="col-md-6"  *ngIf="!isBuyerTempAccount">
+
+                <div class="col-md-6" >
                     <div class="mb-3">
                         <label for="" class="form-label"
                             >Branch*</label
                         >
                             <div>
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                                *ngIf="!isBuyerTempAccount" 
                                     [options]="buyerBranches"
                                     formControlName="buyerCompanyBranch"
                                     [filter]="true"
@@ -315,25 +486,106 @@
                                     [required]="!isBuyerTempAccount"
                                 ></p-dropdown>
                             </div>
+                            <input
+                            type="text"
+                            name=""
+                            id=""
+                            
+                            [value]="'Main'"
+                            readonly
+                            class="form-control"
+                            placeholder="Main"
+                            formControlName="buyerBranchName"
+                            *ngIf="isBuyerTempAccount"    />
             
-                                        <small
+                                        <!-- <small
                                             class="text-danger"
                                             *ngIf="
                                                 submitted &&
                                                 orderForm
-                                                    .get('buyerCompanyBranch')
+                                                    .get('buyerBranchName')
                                                     ?.hasError('required')
                                             "
                                         >
                                              Branch is required
-                                        </small>
+                                        </small> -->
                                     </div>
                                 </div>
                   <!-- buyer company branch -->
+
+                  <!--price level and currency  -->
+
+                  <div class="col-md-6 d-flex price-sec"      *ngIf="isBuyerTempAccount" >
+              
+                       
+
+
+
+                                <div class="mb-3 w-100">
+                                    <label for="" class="form-label"
+                                        >  {{l("Currency")}}</label
+                                    >
+                                        <div>
+                                            <p-dropdown [options]="allCurrencies"  
+                                            (onChange)="changeTouchState($event)"
+                                        [(ngModel)]="accountInfoTemp.currencyId" 
+                                        formControlName="currencyId"
+
+                                            placeholder="USD"             ></p-dropdown>
+                                        
+                                        </div>
+                                       
+                                                    <small
+                                                        class="text-danger"
+                                                        *ngIf="
+                                                            submitted &&
+                                                            orderForm
+                                                                .get('currencyId')
+                                                                ?.hasError('required')
+                                                        "
+                                                    >
+                                                    Currency is required
+                                                    </small>
+                                                </div>
+                                       
+
+                                                <div class="mb-3 w-100">
+                                                    <label for="" class="form-label"
+                                                        >{{l("PriceLevel")}}</label
+                                                    >
+                                                        <div>
+                                                            <p-dropdown
+                                                       
+                                                       
+                                                            [options]="allPriceLevel" 
+                                                          [(ngModel)]="accountInfoTemp.priceLevel"
+                                                                formControlName="priceLevel"
+                                                                (change)="changePrice($event)"
+                                                                placeholder="MSRP"
+                                                             
+                                                            ></p-dropdown>
+                                                        </div>
+                                                       
+                                                                    <small
+                                                                        class="text-danger"
+                                                                        *ngIf="
+                                                                            submitted &&
+                                                                            orderForm
+                                                                                .get('priceLevel')
+                                                                                ?.hasError('required')
+                                                                        "
+                                                                    >
+                                                                    Price Level is required
+                                                                    </small>
+                                                 </div>
+                  <!-- price level and currency -->
+                </div>
+
+                  <!-- price level and currency -->
                 </div>
             </form>
         </div>
-        <div class="seller">
+        <div class="seller mobile">
             <div class="sellerHeader">
                 <span>Seller Information</span>
             </div>
@@ -363,7 +615,7 @@
                             </div>
                             <div *ngIf="!isSellerCompanyIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                           
                                     [options]="sellerCompanies"
                                     formControlName="sellerCompanyName"
                                     [filter]="true"
@@ -400,15 +652,57 @@
                             <label for="" class="form-label"
                                 >Seller Contact Name</label
                             >
-                            <p-dropdown
+                            <!-- <p-dropdown
                                 [options]="sellerContacts"
                                 formControlName="sellerContactName"
                                 [filter]="true"
                                 optionLabel="name"
-                                placeholder="Please Select Seller Contact Name"
+                                filterBy="name"
+                                [placeholder]="orderForm.controls['sellerContactName'].value? orderForm.controls['sellerContactName'].value : 'Please Select Seller Contact Name'"
                                 (onFilter)="handleSellerNameSearch($event)"
                                 (onChange)="handleSellerNameChange($event)"
-                            ></p-dropdown>
+                            >
+                               <ng-template let-itemS pTemplate="itemS">
+                                {{ itemS.name }}
+                            </ng-template>
+                    
+                            <ng-template pTemplate="empty">
+                            
+                                <div *ngIf="sellerContacts.length === 0 && searchTermSeller == undefined" class="no-data">
+                                    No data found
+                                </div>
+                            </ng-template>
+
+
+                            <ng-template class="" pTemplate="footer">
+                             
+                                <div *ngIf="searchTermSeller != undefined && showAddSellBtn" class="d-flex justify-content-between tem-footer">
+                                    <span>{{searchTermSeller}} </span>
+                                    <button  pButton type="button" class="addTextBtn" label="Add As Text" (click)="addNewSeller();"></button>
+                                </div>
+                            </ng-template>
+
+                        </p-dropdown> -->
+
+
+                        <p-autoComplete
+                        #autoComplete
+                        [dropdown]="true"
+                      
+                        [suggestions]="filteredSellerContacts"
+                        formControlName="sellerContactName"
+                        [(ngModel)]="selectedSellerContact"
+                        (completeMethod)="handleSellerNameSearch($event)"
+                        (ngModelChange)="handleSellerNameChange($event)"
+                         (click)="loadInitialSellerContacts()"
+                       
+                        [placeholder]=" 'Please Select Seller Contact Name'"
+                        field="name"
+                        [forceSelection]="false" 
+                        >
+                        
+                      
+                    </p-autoComplete>
 
                             <small
                                 class="text-danger"
@@ -439,6 +733,9 @@
                                 formControlName="sellerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['sellerContactPhoneNumber'].invalid && orderForm.controls['sellerContactPhoneNumber'].touched
+                                  }"
                             />
                             <!-- <small
                                 class="text-danger"
@@ -488,6 +785,9 @@
                                 formControlName="sellerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['sellerContactEMailAddress'].invalid && orderForm.controls['sellerContactEMailAddress'].touched
+                                  }"
                             />
                             <small
                             class="text-danger"
@@ -520,7 +820,7 @@
                             >
                                 <div >
                                     <p-dropdown
-                                    [virtualScroll]="true" [itemSize]="30"
+                                
                                         [options]="sellerBranches"
                                         formControlName="sellerCompanyBranch"
                                         [filter]="true"
@@ -563,7 +863,7 @@
             pButton
             [loading]="btnLoader"
             (click)="getStarted()"
-            class="btn"
+            class=" btn-c"
         >
         Start Shopping
         </button>

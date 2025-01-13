@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Abp.Application.Services.Dto;
 using onetouch.AppEntities.Dtos;
 using onetouch.Sessions.Dto;
+using System.Net;
+using System.Security.Policy;
 
 namespace onetouch.AppSiiwiiTransaction.Dtos
 {
@@ -45,17 +47,17 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string? SellerContactPhoneNumber { get; set; }
 
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string BuyerContactName { get; set; }
+        public virtual string? BuyerContactName { get; set; }
 
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string SellerContactName { get; set; }
+        public virtual string? SellerContactName { get; set; }
         public virtual string PriceLevel { get; set; }
         public virtual string? BuyerContactSSIN { set; get; }
         
-        public virtual string BuyerBranchSSIN { set; get; }
-        public virtual string BuyerBranchName { set; get; }
-        public virtual string SellerBranchSSIN { set; get; }
-        public virtual string SellerBranchName { set; get; }
+        public virtual string? BuyerBranchSSIN { set; get; }
+        public virtual string? BuyerBranchName { set; get; }
+        public virtual string? SellerBranchSSIN { set; get; }
+        public virtual string? SellerBranchName { set; get; }
         public virtual string? SellerContactSSIN { set; get; }
         public virtual TransactionType TransactionType { set; get; }
         public string EntityStatusCode { set; get; }
@@ -86,6 +88,12 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual bool lFromPlaceOrder { set; get; } = false;
        
         public virtual decimal CurrencyExchangeRate { get; set; }
+        //Iteration#42[Start]
+        public virtual string? Reference { set; get; }
+        public virtual DateTime EnteredDate { set; get; }
+        //Iteration#42[End]
+        public virtual bool CreateManualAccount { set; get; } = false;
+        public virtual bool CreateManualContact { set; get; } = false;
     }
     public enum OrderCreatorRole
     { 
@@ -126,4 +134,40 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long? PhoneTypeId { get; set; }
         public string PhoneTypeName { set; get; }
     }
+    //Iteration#45
+    public class VariationInputDto : PagedAndSortedResultRequestDto
+    {
+       public string? VariationCodeFilter { set; get; }
+       public TransactionType? TransactionTypeFilter { set; get; }
+       public string? NameFilter{ set; get; }
+       
+       public string? TransactionNumberFilter { set; get; }
+       public decimal? MinPrice { set; get; }
+       public decimal? MaxPrice { set; get; }
+       public decimal? MinAmount{ set; get; }
+       public decimal? MaxAmount{ set; get; }
+
+    }
+    public class SellerVariationInputDto : PagedAndSortedResultRequestDto
+    { 
+        public string SellerSSIN { set; get; }
+        public string Filter { set; get; }
+        public string ContactSSIN { set; get; }
+        public string CurrencyCode { set; get; }
+    }
+    public class AddVariationToInputDto
+    { 
+        public string VariationSSIN { set; get; }
+        public int Qty { set; get; }
+        public decimal Price { set; get; }
+        public long TransactionId { set; get; }
+        public TransactionType TransactionType { set; get; }
+    }
+    public class AccountDefaultAddressDto
+    {
+        public string AddressType { set; get; }
+        public long AddressId { set; get; }
+
+    }
+    //Iteration45
 }

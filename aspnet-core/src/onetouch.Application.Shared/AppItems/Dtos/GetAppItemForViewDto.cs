@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using onetouch.AppEntities.Dtos;
+using System.Collections.Generic;
 
 namespace onetouch.AppItems.Dtos
 {
@@ -15,7 +16,9 @@ namespace onetouch.AppItems.Dtos
     public class GetAppItemDetailForViewDto
     {
         public AppItemForViewDto AppItem { get; set; }
-       
+        //MMT-IT41[Start]
+        public IList<LookupLabelDto> NonLookupValues { set; get; }
+        //MMT-IT41[End]
 
     }
     //MMT30[Start]

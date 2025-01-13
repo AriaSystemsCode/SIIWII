@@ -35,6 +35,8 @@ import { Observable } from "rxjs";
 import { ImageUploadComponentOutput } from "@app/shared/common/image-upload/image-upload.component";
 /* import { GoogleMapComponent } from "@app/shared/common/GoogleMap/google-map/google-map.component";
  */
+import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+
 @Component({
     selector: "app-create-or-edit-event",
     templateUrl: "./create-or-edit-event.component.html",
@@ -95,6 +97,7 @@ export class CreateOrEditEventComponent
     coverFile : File
     sycAttachmentCategoryLogo:SycAttachmentCategoryDto
     sycAttachmentCategoryBanner:SycAttachmentCategoryDto
+    bsConfig: BsDatepickerConfig; 
 
     constructor(
         private _timeZoneInfoServiceProxy: TimeZoneInfoServiceProxy,
@@ -103,6 +106,10 @@ export class CreateOrEditEventComponent
         injector: Injector
     ) {
         super(injector);
+this.bsConfig = {
+      showWeekNumbers: false
+    } as BsDatepickerConfig;
+       
     }
     ngOnInit(): void {
         this.initData();
