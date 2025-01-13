@@ -2669,13 +2669,26 @@ namespace onetouch.Accounts
             return retId;
         }
 
-            public async Task<string> ApplyRelationOnProfile(long input)
+            public async Task<string> ApplyRelationOnProfile(long input, string ssin)
         {
             string ret = "";
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                if (!string.IsNullOrEmpty(ssin) && input == 0)
+                {
+                    var marketPlaceAccount = _appMarketplaceContactRepository.GetAll()
+                        .Where(e => e.SSIN == ssin &&
+                        e.IsProfileData && 
+                        (e.ParentId == null || e.ParentId <= 0))
+                        .FirstOrDefault();
+                    if(marketPlaceAccount != null)
+                    {
+                        input = marketPlaceAccount.Id;
+                    }
+                }
+
                 var marketplaceContact = await _appMarketplaceContactRepository.GetAll()
                     .AsNoTracking()
                     .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
