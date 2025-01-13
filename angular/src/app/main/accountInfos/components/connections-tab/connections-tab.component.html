@@ -28,12 +28,13 @@
     <label for="all" (click)="setConnectionType(0)">All</label> <span
         style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
 
-        <div *ngFor="let accountsType of accountsTypes">
-            <input type="radio" id="{{accountsType.code}}" name="option"  *ngIf="accountsType?.code?.toUpperCase()!= 'GROUP'"/>
-            <label for="{{accountsType.code}}" (click)="setConnectionType(accountsType.value)"  *ngIf="accountsType?.code?.toUpperCase()!= 'GROUP'">{{accountsType.code}}</label>
-            <span style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"  *ngIf="accountsType?.code?.toUpperCase()!= 'GROUP'"> | </span>
+        <div *ngFor="let accountsType of accountsTypes; let i = index; let last = last">
+            <div *ngIf=" (accountsType.code?.toUpperCase() != 'GROUP') || (accountsType.code?.toUpperCase() == 'GROUP'  && accountDataForView?.accountType?.toUpperCase()!= 'GROUP' &&  loginAccoutType?.toUpperCase()!= 'GROUP') ">
+            <input type="radio" id="{{accountsType.code}}" name="option"  />
+            <label for="{{accountsType.code}}" (click)="setConnectionType(accountsType.value)"  > {{accountsType.code?.toUpperCase() == 'BUSINESS'  ? 'Businesses'  :  accountsType.code?.toUpperCase() == 'GROUP' ? 'Groups' : accountsType.code?.toUpperCase() == 'PERSONAL' ? 'People' : accountsType.code  }}</label>
+            <span *ngIf="!last" style="color:rgba(238, 238, 238, 1); width: 2px; height: 42px;"> | </span>
         </div>
-    
+        </div>
 </div>
 
                             

@@ -43,6 +43,7 @@ currentPage: number = 1; // Current page
 totalItems: number = 0; // Total items (retrieved from API)
 isModalOpen = false; // Controls modal visibility
 selectedIndex = 0; // Index of the currently selected image
+loginAccoutType:string="";
 
   constructor(private activatedRoute:ActivatedRoute,
      injector: Injector,
@@ -75,7 +76,15 @@ ngOnChanges(changes: SimpleChanges) {
     await this.getAccountDataForView();
     this.createRelation();
     this.updateMediaItems();
+    this.getLoginAccoutType();
   }
+  getLoginAccoutType(){
+  this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId,5).subscribe((res)=>{
+   this.loginAccoutType=res.account.accountType;
+  }
+ 
+  )
+}
 
 
   private updateMediaItems(): void {
