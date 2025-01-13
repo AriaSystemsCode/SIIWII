@@ -418,7 +418,8 @@ namespace onetouch.AppMarketplaceAccounts
                     accountDto.ZipCode = firstAddress.AddressFk.PostalCode;
                     accountDto.State = firstAddress.AddressFk.State;
                 }
-
+                if(account.OwnerId!=null)
+                accountDto.TenantId = ((int)account.OwnerId);
 
                 var branch = ObjectMapper.Map<BranchDto>(account);
                 BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
