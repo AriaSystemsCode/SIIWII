@@ -14,7 +14,7 @@ import { finalize } from 'rxjs';
   styleUrls: ['./marketplace-account-profile.component.scss'],
   providers:[MarketplaceAccountsServiceProxy,AppMarketplaceItemsServiceProxy]
 })
-export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit  {
+export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit , OnChanges  {
   accountId:number;
   accountType:string = "";
   defaultMainFilter : AccountMainFilterEnum= AccountMainFilterEnum.AllAccounts
@@ -62,6 +62,14 @@ ngOnInit(): void {
   });
 
 }
+
+ngOnChanges(changes: SimpleChanges) {
+  this.paramsSubscription = this.route.params.subscribe(async (params) => {
+    this.accountId = params['id'];
+    await this.getData();
+  });
+}
+
 
   async getData(): Promise<void> {
     await this.getAccountDataForView();
