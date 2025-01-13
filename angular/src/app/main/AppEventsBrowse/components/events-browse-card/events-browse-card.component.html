@@ -1,19 +1,87 @@
-<div class="single-item row align-items-center">
-    <div class="single-item-photo mr-1" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+<div class="single-item row align-items-center h-100"      [ngClass]="{ 'marketplaceAccountProfileCard': fromMarketPlaceProfile }">
+    <div class="single-item-photo mr-1 h-100" (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
+    [ngStyle]="{'width.px':fromMarketPlaceProfile ? 232 :  116 ,
+    'height':fromMarketPlaceProfile ? 'fit-content' : 120  }">
         <img
-            class="w-100"
+            class="w-100 h-100" 
             [src]="attachmentBaseUrl + '/' + item.appEvent.logoURL"
             alt=""
             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
         />
     </div>
     <div
-        class="single-item-body col"
+        class="single-item-body col m-4"
         [ngClass]="{ singleItemPerRowMode: 'd-flex flex-row' }"
     >
         <div class="row">
             <div
-                class="pt-3 col"
+            class="pt-3 col"
+            *ngIf="!fromMarketPlaceProfile"
+        >
+            <h3
+                class="m-0 mb-2 text-dark cursor-pointer"
+                (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
+            >
+                {{ item.appEvent.name | textSubstring: 65 }}
+            </h3>
+            <p class="text-primary mb-2 product-name">
+                {{ item.appEvent.fromDate?.toString() | date : 'fullDate'  }},
+                {{ item.appEvent.fromTime?.toString() | date : 'shortTime' }}
+                {{ item.appEvent.timeZone }}
+            </p>
+            <p
+                class="text-dark mb-2"
+            >
+                <span *ngIf="item?.appEvent?.isOnLine">
+                    <i class="fas fa-video"></i>
+                    {{ "Online" | localize }}
+                </span>
+                <span *ngIf="!item?.appEvent?.isOnLine">
+                    <i class="fas fa-users-rectangle"></i>
+                    {{ "InPerson" | localize }}
+                </span>
+            </p>
+            <p
+                class="text-dark mb-2"
+                [ngClass]="{ 'd-none': !singleItemPerRowMode }"
+            >
+                {{ item?.appEvent?.description | textSubstring: 230 }}
+            </p>
+            <p
+                class="text-dark mb-2"
+                *ngIf="item.appEvent.guestsCount > 0"
+            >
+                <span >
+                    <i class="fas fa-users"></i>
+                    <span>
+                        {{item.appEvent.guestsCount}}
+                    </span>
+                    <span>
+                        {{"attendees"}}
+                    </span>
+                </span>
+            </p>
+            <p
+                class="text-dark mb-2"
+                *ngIf="
+                    mainFilterCtrl?.value?.value == EventsFilterTypesEnum.MyEvents &&
+                     statusesFlags?.publicityStatus
+                "
+                [ngClass]="item?.appEvent?.isPublished ? 'text-success':'text-warn'"
+            >
+                {{ ( item?.appEvent?.isPublished ? "Published" : "NotPublished") | localize }}
+                <span class="ml-2">
+                    <i
+                        class="d-inline-flex flaticon2-information rounded-circle text-white bg-primary"
+                        [ngClass]="item?.appEvent?.isPublished ? 'bg-success':'bg-warn bg-warning'"
+                    ></i>
+                </span>
+            </p>
+        </div>
+
+            <div
+                class="col"
+                *ngIf="fromMarketPlaceProfile"
             >
                 <h3
                     class="m-0 mb-2 text-dark cursor-pointer"
@@ -21,61 +89,82 @@
                 >
                     {{ item.appEvent.name | textSubstring: 65 }}
                 </h3>
-                <p class="text-primary mb-2 product-name">
-                    {{ item.appEvent.fromDate?.toString() | date : 'fullDate'  }},
-                    {{ item.appEvent.fromTime?.toString() | date : 'shortTime' }}
-                    {{ item.appEvent.timeZone }}
+
+                <div class="row mb-3">
+                <img src="../../../../../assets/events/tabler_calendar-stats.png" style="width: 19px;
+    height: 19px;"/> 
+                <p class="pl-3 product-name border-right pr-3 font-weight-bold">
+                    {{ "Start date : " | localize }}
+                    <span style="color: #9E9E9E;">
+                    {{ item.appEvent.fromDate?.toString()  | date: 'dd MMMM, yyyy' }}, {{ item.appEvent.fromTime?.toString()  | date: 'h:mm a' }}
+
+                </span>
                 </p>
-                <p
-                    class="text-dark mb-2"
-                >
-                    <span *ngIf="item?.appEvent?.isOnLine">
-                        <i class="fas fa-video"></i>
-                        {{ "Online" | localize }}
-                    </span>
-                    <span *ngIf="!item?.appEvent?.isOnLine">
-                        <i class="fas fa-users-rectangle"></i>
-                        {{ "InPerson" | localize }}
-                    </span>
-                </p>
-                <p
-                    class="text-dark mb-2"
-                    [ngClass]="{ 'd-none': !singleItemPerRowMode }"
-                >
-                    {{ item?.appEvent?.description | textSubstring: 230 }}
-                </p>
-                <p
-                    class="text-dark mb-2"
-                    *ngIf="item.appEvent.guestsCount > 0"
-                >
-                    <span >
-                        <i class="fas fa-users"></i>
-                        <span>
-                            {{item.appEvent.guestsCount}}
-                        </span>
-                        <span>
-                            {{"attendees"}}
-                        </span>
-                    </span>
-                </p>
-                <p
-                    class="text-dark mb-2"
-                    *ngIf="
-                        mainFilterCtrl?.value?.value == EventsFilterTypesEnum.MyEvents &&
-                         statusesFlags?.publicityStatus
-                    "
-                    [ngClass]="item?.appEvent?.isPublished ? 'text-success':'text-warn'"
-                >
-                    {{ ( item?.appEvent?.isPublished ? "Published" : "NotPublished") | localize }}
-                    <span class="ml-2">
-                        <i
-                            class="d-inline-flex flaticon2-information rounded-circle text-white bg-primary"
-                            [ngClass]="item?.appEvent?.isPublished ? 'bg-success':'bg-warn bg-warning'"
-                        ></i>
+
+                <p class="pl-3 product-name font-weight-bold"> 
+                    {{ "End date : " | localize }}
+                    <span style="color: #9E9E9E;">
+                    {{ item.appEvent.toDate?.toString()  | date: 'dd MMMM, yyyy' }}, {{ item.appEvent.toTime?.toString()  | date: 'h:mm a' }}
                     </span>
                 </p>
             </div>
-            <div>
+
+            <div class="row mb-3">
+                <img src="../../../../../assets/events/streamline_interface-presentation-podium-work-desk-notes-company-presentation-office-podium-microphone.png" 
+                     style="width: 19px; height: 19px;" />
+                <div class="pl-4 product-name pr-3 font-weight-bold row">
+                    {{ "Created by : " | localize }}
+                    <div class="p-2 ml-2" style="border: 1px solid #EEEEEE; border-radius: 4px;    color: #4A0D4A;
+                    position: relative;
+                    top: -5px;">
+                        <img    [src]="profilePicture
+                        ? profilePicture
+                        : '../../../../../assets/placeholders/appitem-placeholder.png'"
+                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" 
+                             style="width: 19px; height: 19px;" />
+                        {{ item.appEvent.userName }}
+                    </div>
+                </div>
+            </div>
+
+
+                
+            <div class="row mb-3">
+                <div class="product-name p-4 font-weight-bold row col-6"  style="border: 1px solid #EEEEEE; border-radius: 4px;">
+                    <img src="../../../../../assets/events/fluent_guest-add-24-filled.png" 
+                    style="width: 19px; height: 19px;"  class="mr-2"/>   {{ "Attendees :  " | localize }}
+                    <span style="color: #9E9E9E;" class="ml-2">
+                        {{ item.appEvent.guestsCount }}   {{ " attendees" | localize }}
+                        </span>
+                </div>
+
+               
+           <div class="product-name p-4 font-weight-bold row border-left-0 pl-5 col-6"  style="border: 1px solid #EEEEEE; border-radius: 4px;">
+            <img src="../../../../../assets/events/carbon_location-company.png" 
+            style="width: 19px; height: 19px;"   class="mr-2" />  {{ "Location :   " | localize }}
+            <span *ngIf="eventAddress?.includes('online')" style="color: #9E9E9E;" class="ml-2">
+                {{ eventAddress }} 
+              </span>
+
+                   <span *ngIf="!eventAddress?.includes('online')" style="color: #9E9E9E;" class="ml-2">
+                    {{ eventAddress | textSubstring: 20 }} 
+                  </span>
+           </div>
+         
+
+            </div>
+            <div class="row d-flex  justify-content-end">
+                <button 
+                    style="width: 83px;
+    height: 29px;color: white; border: 1px solid #4A0D4A; background-color: #4A0D4A; border-radius: 6px;" 
+                    (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+                    {{ "Details" | localize }}
+                </button>
+            </div>
+            </div>
+
+
+            <div *ngIf="!fromMarketPlaceProfile">
                 <app-events-browse-actions-menu
                         #appEventsActionsMenuComponent
                         [item]="item.appEvent"

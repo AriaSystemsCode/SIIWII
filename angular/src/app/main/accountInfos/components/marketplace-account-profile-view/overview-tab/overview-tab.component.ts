@@ -33,7 +33,7 @@ mediaItems : AppEntityAttachmentDto[]
 
 
 reviewText: string = '';
-  // selectedRating: number = 0;
+  
   selectedMedia: { url: string; type: string; file?: File }[] = [];
   showEmojiPicker: boolean = false;
       messages: CreateMessageInput = new CreateMessageInput();

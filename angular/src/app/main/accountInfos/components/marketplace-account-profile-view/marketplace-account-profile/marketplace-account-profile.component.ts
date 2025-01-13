@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { AccountMainFilterEnum } from '@app/main/accounts/account-shared/models/accounts-main-filter.enum';
+import { SelectItem } from 'primeng/api';
+import { Component, EventEmitter, Injector, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -12,59 +14,98 @@ import { finalize } from 'rxjs';
   styleUrls: ['./marketplace-account-profile.component.scss'],
   providers:[MarketplaceAccountsServiceProxy,AppMarketplaceItemsServiceProxy]
 })
-export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit {
-
+export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit , OnChanges  {
+  accountId:number;
+  accountType:string = "";
+  defaultMainFilter : AccountMainFilterEnum= AccountMainFilterEnum.AllAccounts
+  pageMainFilters : SelectItem [] = [{ label:'AllAccounts', value:AccountMainFilterEnum.AllAccounts }]
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
   accountDataForView : AccountDto
   id:string
-  accountId:any;
   companyLogo: any;
   coverPhoto: any;
   marketPlaceData:any
   activeTabIndex: number = 0; 
+  mediaItems = [
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    { "type": "video", "thumbnail": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg", "url": "https://app.testing.siiwii.net:4001/ATTACHMENTS/2491/750f337c-5970-6d19-8282-4ee7682abd47.mp4" },
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    { "type": "video", "thumbnail": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg", "url": "https://app.testing.siiwii.net:4001/ATTACHMENTS/2491/750f337c-5970-6d19-8282-4ee7682abd47.mp4" },
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
+    { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
 
-  constructor(
-    injector: Injector,
+  ];
+media:any
+itemsPerPage: number = 10; // Number of items per page
+currentPage: number = 1; // Current page
+totalItems: number = 0; // Total items (retrieved from API)
+isModalOpen = false; // Controls modal visibility
+selectedIndex = 0; // Index of the currently selected image
+
+  constructor(private activatedRoute:ActivatedRoute,
+     injector: Injector,
     private route: ActivatedRoute,
     private _AccountsServiceProxy: AccountsServiceProxy,
     private sanitizer: DomSanitizer,
     private  _marketplaceAccountsServiceProxy : MarketplaceAccountsServiceProxy,
-    
-  
 ) {
   super(injector);
-  }
+}
 
-  ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.accountId = params['id'];
-      console.log('accountId:', this.accountId);
-
+paramsSubscription;
+ngOnInit(): void {
+  this.paramsSubscription = this.route.params.subscribe(async (params) => {
+    this.accountId = params['id'];
+    await this.getData();
   });
-    // this.route.paramMap.subscribe((params) => {
-    //   this.id = params.get('id');
-    //   console.log('ID:', this.id);
-    // });
-    // this.isHost = !this._abpSessionService.tenantId;
- this.getAccountDataForView()
-
- this.createRelation()
-
-
 
 }
+
+ngOnChanges(changes: SimpleChanges) {
+  this.paramsSubscription = this.route.params.subscribe(async (params) => {
+    this.accountId = params['id'];
+    await this.getData();
+  });
+}
+
+
+  async getData(): Promise<void> {
+    await this.getAccountDataForView();
+    this.createRelation();
+    this.updateMediaItems();
+  }
+
+
+  private updateMediaItems(): void {
+    this.mediaItems = this.mediaItems.map((item) =>
+      item.type === 'video'
+        ? { ...item, safeUrl: this.sanitizeUrl(item.url) }
+        : item
+    );
+  }
+
+
 sanitizeUrl(url: string): SafeResourceUrl {
   return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 }
 
+ngOnDestroy(): void {
+  // Clean up the subscription to avoid memory leaks
+  if (this.paramsSubscription) {
+    this.paramsSubscription.unsubscribe();
+  }
+}
 
-   getAccountDataForView() {
+
+   async getAccountDataForView(): Promise<void> {
 
     this.showMainSpinner();
 
   
 
-  this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5).pipe(
+  await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5).pipe(
     finalize(
         ()=>this.hideMainSpinner()
     )

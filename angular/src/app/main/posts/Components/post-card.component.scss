@@ -33,13 +33,15 @@ a{
 
 .three-dots:after {
     cursor: pointer;
-    color: white;
+    color: #777777;
     content: "\2807";
     font-size: 20px;
     padding: 0 5px;
 }
 #dropdownMenuButton{
-    background-color: #700066 !important;
+   // background-color: #700066 !important;
+    background-color: white !important;
+    border: none !important;
 }
 
 .dropdown-menu{
@@ -59,7 +61,7 @@ a{
     outline: none;
     background: #3599ff 0% 0% no-repeat padding-box;
     .three-dots:after {
-        color: #ffffff;
+        color: #777777;
         content: "\2026";
     }
 }

@@ -44,6 +44,8 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     categoriesFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
     classificationsFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>
 
+    @Input("fromMarketplace") fromMarketplace :boolean=false;
+
     constructor(
         injector:Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -258,8 +260,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             undefined,
             this.sortBy,
             this.accountTypeFilterMetaData.listSkipCount,
-            this.accountTypeFilterMetaData.listMaxResultCount,
-            undefined, 
+            this.accountTypeFilterMetaData.listMaxResultCount,!this.fromMarketplace
         )
         .subscribe(result => {
             componentRef.onListLoadCallback(result)

@@ -132,7 +132,7 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     showPost(notification) {
         this.showMainSpinner();
         this._postService
-            .getAll("", "", "", undefined, undefined, undefined, "", "", notification.entityId, undefined,  undefined,  "", 0, 1)
+            .getAll("", "", "", undefined, undefined, undefined, "", "", notification.entityId,undefined,undefined, "", 0, 1)
             .subscribe((res) => {
                 if (res.items.length > 0) {
                     this.hideMainSpinner();

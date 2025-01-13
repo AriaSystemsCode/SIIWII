@@ -81,6 +81,8 @@ export class AccountsComponent
     mailbody: string;
     filterForm: FormGroup;
     @Input() fromMarketplace;
+    @Input() accountType:string;
+    connectionType:string="All"
     
     get mainFilterCtrl(): AbstractControl {
         return this.filterForm?.get("mainFilterType");
@@ -110,15 +112,16 @@ export class AccountsComponent
         this.initFilterForm();
     }
     ngOnChanges(changes: SimpleChanges) {
-        if (changes.defaultMainFilter.firstChange) {
+        if (changes?.defaultMainFilter?.firstChange) {
             this.initFilterForm();
             this.setMainPageFilter(this.defaultMainFilter);
             debugger
             this.getAccounts({
                 rows: this.primengTableHelper.defaultRecordsCountPerPage,
             });
-            this.applyFiltersOnChange();
         }
+
+        this.applyFiltersOnChange();
     }
 
       toggleFilter(): void {
@@ -227,7 +230,7 @@ export class AccountsComponent
                 filters.postalCode || undefined,
                 filters?.ssin || undefined,
                 filters?.accountTypeId || undefined,
-                filters?.accountType || undefined,
+                filters?.accountType  || undefined,
                 filters.accountTypes || undefined,
                 filters.statuses || undefined,
                 filters.languages || undefined,
@@ -425,12 +428,12 @@ export class AccountsComponent
                         this.hideMainSpinner();
                     })
                 )
-                .subscribe((/*result:string*/) => {
+                .subscribe((result:string) => {
                     let accountIndx = this.accounts.findIndex(x=>x.account.id == account.account.id);
                     if(accountIndx >=0){
                         this.accounts[accountIndx]=account;
                         this.accounts[accountIndx].avaliableConnectionName="";
-                        this.accounts[accountIndx].connectionName=this.l(""/*result*/);
+                        this.accounts[accountIndx].connectionName=this.l(result);
                     }
                 });
     }

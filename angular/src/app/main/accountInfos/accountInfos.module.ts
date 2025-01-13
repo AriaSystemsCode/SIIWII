@@ -57,6 +57,12 @@ import { AccountBillingComponent } from './components/accountBilling/accountBill
 import { OverviewTabComponent } from './components/marketplace-account-profile-view/overview-tab/overview-tab.component';
 import { PostsModule } from '../posts/posts.module';
 import { InteractionsModule } from '../interactions/interactions.module';
+import { EventsBrowseModule } from '../AppEventsBrowse/events-browse.module';
+import { AccountSharedModule } from '../accounts/account-shared/account-shared.module';
+import { ConnectionsTabComponent } from './components/connections-tab/connections-tab.component';
+import { EventsTabComponent } from './components/events-tab/events-tab.component';
+import { PostsTabComponent } from './components/posts-tab/posts-tab.component';
+import { ConnectionsCardComponent } from './components/connections-card/connections-card.component';
 import { MarketplaceProductsComponent } from '../marketplace/marketplace-products/components/marketplace-products.component';
 import { MarketplaceProductsModule } from '../marketplace/marketplace-products/marketplace-products.module';
 import { MediaTabComponent } from './components/marketplace-account-profile-view/Media-tab/media-tab.component';
@@ -80,7 +86,7 @@ import { MediaTabComponent } from './components/marketplace-account-profile-view
         TenantInvoicesComponent,
         PlansComponent,
         MarketplaceAccountProfileComponent,
-        OverviewTabComponent,
+        OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent, ConnectionsCardComponent,
         MediaTabComponent
     ],
     imports: [
@@ -121,7 +127,7 @@ import { MediaTabComponent } from './components/marketplace-account-profile-view
         DialogModule,
         TabViewModule,
         PostsModule,
-        InteractionsModule,
+        InteractionsModule,EventsBrowseModule,AccountSharedModule,
         MarketplaceProductsModule,
         
         

@@ -69092,6 +69092,7 @@ export class AppEventDto implements IAppEventDto {
     registrationLink!: string | undefined;
     attachments!: AppEntityAttachmentDto[] | undefined;
     address!: AppEntityAddressDto;
+    profilePictureId!: string;
     id!: number;
 
     [key: string]: any;
@@ -69145,6 +69146,7 @@ export class AppEventDto implements IAppEventDto {
                     this.attachments!.push(AppEntityAttachmentDto.fromJS(item));
             }
             this.address = _data["address"] ? AppEntityAddressDto.fromJS(_data["address"]) : <any>undefined;
+            this.profilePictureId = _data["profilePictureId"];
             this.id = _data["id"];
         }
     }
@@ -69196,6 +69198,7 @@ export class AppEventDto implements IAppEventDto {
                 data["attachments"].push(item.toJSON());
         }
         data["address"] = this.address ? this.address.toJSON() : <any>undefined;
+        data["profilePictureId"] = this.profilePictureId;
         data["id"] = this.id;
         return data;
     }
@@ -69232,6 +69235,7 @@ export interface IAppEventDto {
     registrationLink: string | undefined;
     attachments: AppEntityAttachmentDto[] | undefined;
     address: AppEntityAddressDto;
+    profilePictureId: string;
     id: number;
 
     [key: string]: any;

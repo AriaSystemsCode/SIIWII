@@ -1,4 +1,4 @@
- <hr *ngIf="!parentId" [ngClass]="{'visibility-hidden': !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount}">
+ <!-- <hr *ngIf="!parentId" [ngClass]="{'visibility-hidden': !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount}"> -->
 <div *ngIf="!parentId" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
     <app-reactions-stats
         [entityId]="entityId"
@@ -23,7 +23,7 @@
 </div>
 
 
-<hr class="mb-4" *ngIf="!parentId">
+<!-- <hr class="mb-4" *ngIf="!parentId">-->
 <div *ngIf="!showFirstBarOnly" class="d-flex" [ngClass]="parentId ? 'flex-column-reverse' : 'flex-column'">
     <div [ngStyle]="{'margin-left': parentId ? '25px' : ''}" class="d-flex justify-content-between align-items-center pr-4" [ngClass]="{'visibility-hidden':!entityId}">
         <div class="d-flex justify-content-between" [ngStyle]="{'gap': parentId ? '5px':'40px'}" style="white-space: nowrap;" [ngClass]="{'pr-5 w-100': parentId}">
@@ -45,7 +45,8 @@
                 </div>
                 <a (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
                     <span>
-                        <i class="far fa-comments"></i>
+                        <!-- <i class="far fa-comments"></i> -->
+                         <img src="../../../../assets/reactions/commentIcon.png"/>
                     </span>
                     {{ parentId ? 'Reply' : 'Comment' | localize}}
                 </a>

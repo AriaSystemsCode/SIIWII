@@ -95,3 +95,29 @@
 margin-top: 25px;
     }
   }
+
+
+  input[type="radio"] {
+    display: none;
+  }
+  
+  label {
+    display: inline-block;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    color:rgba(158, 158, 158, 1);
+  }
+
+  label:hover {
+    background-color: rgba(74, 13, 74, 0.1); /* Light hover effect */
+    transform: scale(1.05);
+  }
+
+  input[type="radio"]:checked + label {
+    background-color: rgba(74, 13, 74, 1);
+    color: white;
+    border-radius: 6px;
+  }
