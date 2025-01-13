@@ -275,7 +275,7 @@
                 </Item2>
                 <Item3 Ref="145" ControlType="XRTableCell" Name="xrTableCell12" Weight="0.831349222111627" Multiline="true" Text="xrTableCell12" Dpi="254" BackColor="White">
                   <ExpressionBindings>
-                    <Item1 Ref="146" EventName="BeforePrint" PropertyName="Text" Expression="[PaymentTermsName]" />
+                    <Item1 Ref="146" EventName="BeforePrint" PropertyName="Text" Expression="Iif([PaymentTermsId]!=null And [PaymentTermsId]!=0,[PaymentTermsName] , [PaymentTermsCode]) " />
                   </ExpressionBindings>
                   <StylePriority Ref="147" UseBackColor="false" />
                 </Item3>
