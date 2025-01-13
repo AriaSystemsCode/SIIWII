@@ -15,6 +15,7 @@ import {  finalize, Observable } from 'rxjs';
 })
 export class ConnectionsTabComponent extends AppComponentBase {
   @Input() accountDataForView :AccountDto;
+  @Input() loginAccoutType:string;
   singleItemPerRowMode: boolean = false;
   accounts: GetAccountForViewDto[] = [];
   sortingOptions: SelectItem[];
@@ -25,9 +26,6 @@ export class ConnectionsTabComponent extends AppComponentBase {
   connectionTypeId: number = 0;
   accountsTypes:LookupLabelDto[]=[];
   filterForm: FormGroup;
-
-  
-
   get sortingCtrl(): AbstractControl {
     return this.filterForm?.get("sorting");
   }
@@ -53,15 +51,9 @@ export class ConnectionsTabComponent extends AppComponentBase {
 
   ngOnChanges(changes: SimpleChanges) {
     this.singleItemPerRowMode = false;
-    if (this.showData) {
-      this.getConnections({
-        rows: this.primengTableHelper.defaultRecordsCountPerPage,
-      });
 
-      this.getAllAccountTypesForTableDropdownWithPaging();
-    }
-    else
-      this.accounts = [];
+    this.GetSettingValue();
+   
   }
 
   getAllAccountTypesForTableDropdownWithPaging(){
@@ -77,7 +69,8 @@ export class ConnectionsTabComponent extends AppComponentBase {
     undefined,
     undefined,
     0,
-    undefined,true
+    3,
+    false
 )
 .subscribe(result => {
 this.accountsTypes=result.items;
@@ -94,6 +87,16 @@ this.accountsTypes=result.items;
       }))
       .subscribe((result) => {
         this.showData = result;
+
+        if (this.showData) {
+          this.getConnections({
+            rows: this.primengTableHelper.defaultRecordsCountPerPage,
+          });
+    
+          this.getAllAccountTypesForTableDropdownWithPaging();
+        }
+        else
+          this.accounts = [];
       });
   }
 
@@ -121,6 +124,7 @@ this.accountsTypes=result.items;
   }
 
   getConnections(event?: LazyLoadEvent) {
+    this.showMainSpinner();
     if (this.primengTableHelper.shouldResetPaging(event)) {
       this.paginator.totalRecords = 10;
       this.paginator.changePage(0);
