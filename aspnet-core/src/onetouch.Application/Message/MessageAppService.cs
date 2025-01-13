@@ -32,6 +32,7 @@ using onetouch.Message.Dto;
 using onetouch.Migrations;
 using onetouch.MultiTenancy;
 using onetouch.SystemObjects;
+using PayPalCheckoutSdk.Orders;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -1427,6 +1428,7 @@ namespace onetouch.Message
                                    .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                             //Iteration37-MMT[Start]
                             //.WhereIf(input.MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
                             //.Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) ==  input.MessageCategoryFilter.ToString()).Count() > 0)
@@ -1468,6 +1470,7 @@ namespace onetouch.Message
                                           ReceiveDate = o.CreationTime,
                                           EntityCode = o.EntityCode,
                                           Id = o.Id,
+                                          EntityAttachments = ObjectMapper.Map<IList<AppEntityAttachmentDto>>(o.EntityFk.EntityAttachments),
                                           SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
                                        + " " + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString(),
                                       //  + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
@@ -1606,6 +1609,15 @@ namespace onetouch.Message
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 foreach (var x in results)
                 {
+                    //
+                    if(x.Messages.EntityAttachments!=null && x.Messages.EntityAttachments.Count>0)
+                    {
+                        foreach(var at in x.Messages.EntityAttachments)
+                        {
+                            at.Url = @"attachments\" +"-1" + @"\" + at.FileName;
+                        }
+                    }
+                    //
                     bool llAdminUser = false;
                     long? userTeanantId = null;
                     string userCompanySSIN = "";
