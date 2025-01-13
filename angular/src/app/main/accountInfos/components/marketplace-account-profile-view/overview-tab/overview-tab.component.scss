@@ -591,7 +591,7 @@ color: #fff;
 
 
   .addReview {
-    background-color: #f9f9f9;
+    // background-color: #f9f9f9;
     border-radius: 8px;
     padding: 1rem;
   }
@@ -638,16 +638,18 @@ color: #fff;
   
   .media-preview-image,
   .media-preview-video {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 150px;
+    max-height: 150px;
     border-radius: 5px;
   }
   
   .remove-media {
     position: absolute;
-    background: red;
+    background: grey;
     color: white;
     border: none;
     cursor: pointer;
   }
+  
+
   

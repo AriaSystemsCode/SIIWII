@@ -1,7 +1,8 @@
 import { Component, ElementRef, EventEmitter, Injector, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Reactions } from '@app/main/reactions/models/Reactions.enum';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AccountDto, AppEntityAttachmentDto, AppPostDto, AppPostsServiceProxy, CreateMessageInput, GetAppPostForViewDto, GetMessagesForViewDto, MesasgeObjectType, MessagePagedResultDto, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppPostDto, AppPostsServiceProxy, CreateMessageInput, GetAppPostForViewDto, GetMessagesForViewDto, MesasgeObjectType, MessagePagedResultDto, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
 import * as moment from 'moment';
 import { finalize } from 'rxjs';
 
@@ -28,7 +29,7 @@ selectedRating: number = 0; // Initialize with no rating
 value: number;
 overRating : OverAllRatingDto
 
-
+mediaItems : AppEntityAttachmentDto[]
 
 
 reviewText: string = '';
@@ -37,7 +38,8 @@ reviewText: string = '';
   showEmojiPicker: boolean = false;
       messages: CreateMessageInput = new CreateMessageInput();
    attachmentsUploader: FileUploaderCustom;
-  constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy) {
+  constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+  ) {
     super(injector);
 
 }
@@ -45,16 +47,34 @@ reviewText: string = '';
 ngOnInit() {
 
   // this.rating = 3.4
-
+  this.getAllPosts()
+  this.getAllReviws()
+  this.getOverAllRatings()
+  this.getAllMedia()
 }
 
 
 ngOnChanges(){
 
-  this.getAllPosts()
-  this.getAllReviws()
-  this.getOverAllRatings()
+
 }
+  getAllMedia(){
+    // this.showMainSpinner()
+    this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,9, 9).pipe(
+      finalize(
+          ()=>
+            this.hideMainSpinner()
+      )
+  ).subscribe((res)=>{
+  
+      this.mediaItems = res.items
+      // this.totalItems = res.totalCount; // Update total items for pagination
+      // this.totalItems = this.mediaItems.length; // Update total items for pagination
+    //   this.marketPlaceData = res
+      console.log(' this.media :',  res );
+  
+  })
+  }
 
 // rating: number = 3.4; // Rating out of 5
 getAllPosts() {
@@ -333,18 +353,9 @@ onUploadAttachments() {
 
     postReview() {
 
-      // const reviewData = {
-      //   text: this.reviewText,
-      //   rating: this.selectedRating,
-      //   media: this.selectedMedia,
-      // };
-      // console.log('Review posted:', reviewData);
-      //   this.showMainSpinner();
+        this.showMainSpinner();
         if(this.selectedMedia?.length>0)
-          // this.onUploadAttachmets();
- 
-
-
+  
    
         this.onUploadAttachments()
       
@@ -365,24 +376,46 @@ onUploadAttachments() {
         this.messageServiceProxy
             .createMessage(this.messages)
             .pipe(finalize(() => { this.hideMainSpinner()  ;  this.notify.info(this.l("SendSuccessfully"));
-  
+              this.getAllReviws()
               this.messages.entityAttachments = [];
            
               this.messages=new CreateMessageInput();
-              this.selectedMedia=[] ;this.selectedRating =0;this.reviewText ='';this.getAllReviws()}))
+              this.selectedMedia=[] ;}))
             .subscribe(() => {
       console.log('Review posted:', this.messages);
       this.messageServiceProxy
       .createUserEntityRating(this.selectedRating ,449928)
   
       .subscribe(() => {
-
+        this.selectedRating =0;this.reviewText ='';
+        this.getAllReviws()
       });
             
             });
     }
 
+ createReaction() {
 
+  const subs = this._appEntitiesServiceProxy.createOrUpdateReaction(
+    this.accountDataForView?.entityId,
+    6,
+)
+  .pipe(
+      finalize(() => {
+      
+      })
+  )
+    .subscribe(
+    (result) => {
+     console.log(result,'resultresultresult')
+   
+
+    },
+   
+  );
+this.subscriptions.push(subs);
+         
+    }
 
 ngOnDestroy() {
   this.unsubscribeToAllSubscriptions();

@@ -1103,21 +1103,198 @@ export class AccountsServiceProxy {
     }
 
     /**
-     * @param accountTypeCode (optional) 
-     * @param currentTenantAccount (optional) 
-     * @param neeedAction (optional) 
+     * @param filter (optional) 
+     * @param filterType (optional) 
+     * @param name (optional) 
+     * @param address (optional) 
+     * @param city (optional) 
+     * @param state (optional) 
+     * @param postal (optional) 
+     * @param sSIN (optional) 
+     * @param accountTypeId (optional) 
+     * @param accountType (optional) 
+     * @param accountTypes (optional) 
+     * @param status (optional) 
+     * @param languages (optional) 
+     * @param countries (optional) 
+     * @param classifications (optional) 
+     * @param categories (optional) 
+     * @param curruncies (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
      * @return Success
      */
-    getAction(accountTypeCode: string | null | undefined, currentTenantAccount: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
+    getAllMyConnections(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/GetAllMyConnections?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (filterType === null)
+            throw new Error("The parameter 'filterType' cannot be null.");
+        else if (filterType !== undefined)
+            url_ += "FilterType=" + encodeURIComponent("" + filterType) + "&";
+        if (name !== undefined && name !== null)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
+        if (address !== undefined && address !== null)
+            url_ += "Address=" + encodeURIComponent("" + address) + "&";
+        if (city !== undefined && city !== null)
+            url_ += "City=" + encodeURIComponent("" + city) + "&";
+        if (state !== undefined && state !== null)
+            url_ += "State=" + encodeURIComponent("" + state) + "&";
+        if (postal !== undefined && postal !== null)
+            url_ += "Postal=" + encodeURIComponent("" + postal) + "&";
+        if (sSIN !== undefined && sSIN !== null)
+            url_ += "SSIN=" + encodeURIComponent("" + sSIN) + "&";
+        if (accountTypeId === null)
+            throw new Error("The parameter 'accountTypeId' cannot be null.");
+        else if (accountTypeId !== undefined)
+            url_ += "AccountTypeId=" + encodeURIComponent("" + accountTypeId) + "&";
+        if (accountType !== undefined && accountType !== null)
+            url_ += "AccountType=" + encodeURIComponent("" + accountType) + "&";
+        if (accountTypes !== undefined && accountTypes !== null)
+            accountTypes && accountTypes.forEach(item => { url_ += "AccountTypes=" + encodeURIComponent("" + item) + "&"; });
+        if (status !== undefined && status !== null)
+            status && status.forEach(item => { url_ += "Status=" + encodeURIComponent("" + item) + "&"; });
+        if (languages !== undefined && languages !== null)
+            languages && languages.forEach(item => { url_ += "Languages=" + encodeURIComponent("" + item) + "&"; });
+        if (countries !== undefined && countries !== null)
+            countries && countries.forEach(item => { url_ += "Countries=" + encodeURIComponent("" + item) + "&"; });
+        if (classifications !== undefined && classifications !== null)
+            classifications && classifications.forEach(item => { url_ += "Classifications=" + encodeURIComponent("" + item) + "&"; });
+        if (categories !== undefined && categories !== null)
+            categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
+        if (curruncies !== undefined && curruncies !== null)
+            curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllMyConnections(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllMyConnections(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAccountForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAccountForViewDto>;
+        }));
+    }
+
+    protected processGetAllMyConnections(response: HttpResponseBase): Observable<PagedResultDtoOfGetAccountForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAccountForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param settingName (optional) 
+     * @param ssin (optional) 
+     * @return Success
+     */
+    getSettingValue(settingName: string | null | undefined, ssin: string | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/GetSettingValue?";
+        if (settingName !== undefined && settingName !== null)
+            url_ += "settingName=" + encodeURIComponent("" + settingName) + "&";
+        if (ssin !== undefined && ssin !== null)
+            url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSettingValue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSettingValue(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processGetSettingValue(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param accountTypeCode (optional) 
+     * @param currentTenantEdition (optional) 
+     * @param needAction (optional) 
+     * @return Success
+     */
+    getAction(accountTypeCode: string | null | undefined, currentTenantEdition: string | null | undefined, needAction: boolean | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAction?";
         if (accountTypeCode !== undefined && accountTypeCode !== null)
             url_ += "accountTypeCode=" + encodeURIComponent("" + accountTypeCode) + "&";
-        if (currentTenantAccount !== undefined && currentTenantAccount !== null)
-            url_ += "currentTenantAccount=" + encodeURIComponent("" + currentTenantAccount) + "&";
-        if (neeedAction === null)
-            throw new Error("The parameter 'neeedAction' cannot be null.");
-        else if (neeedAction !== undefined)
-            url_ += "neeedAction=" + encodeURIComponent("" + neeedAction) + "&";
+        if (currentTenantEdition !== undefined && currentTenantEdition !== null)
+            url_ += "currentTenantEdition=" + encodeURIComponent("" + currentTenantEdition) + "&";
+        if (needAction === null)
+            throw new Error("The parameter 'needAction' cannot be null.");
+        else if (needAction !== undefined)
+            url_ += "needAction=" + encodeURIComponent("" + needAction) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2143,6 +2320,73 @@ export class AccountsServiceProxy {
     }
 
     protected processDoPublishProfile(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param entityId (optional) 
+     * @param relatedEntityId (optional) 
+     * @param ownerTenantId (optional) 
+     * @return Success
+     */
+    addRelation(entityId: number | undefined, relatedEntityId: number | undefined, ownerTenantId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/AddRelation?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        if (relatedEntityId === null)
+            throw new Error("The parameter 'relatedEntityId' cannot be null.");
+        else if (relatedEntityId !== undefined)
+            url_ += "relatedEntityId=" + encodeURIComponent("" + relatedEntityId) + "&";
+        if (ownerTenantId === null)
+            throw new Error("The parameter 'ownerTenantId' cannot be null.");
+        else if (ownerTenantId !== undefined)
+            url_ += "OwnerTenantId=" + encodeURIComponent("" + ownerTenantId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddRelation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddRelation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processAddRelation(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -10255,12 +10499,14 @@ export class AppEventsServiceProxy {
      * @param cityFilter (optional) 
      * @param stateFilter (optional) 
      * @param postalFilter (optional) 
+     * @param tenantId (optional) 
+     * @param noOfEventsToReturn (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
+    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEvents/GetAll?";
         if (filterType === undefined || filterType === null)
             throw new Error("The parameter 'filterType' must be defined and cannot be null.");
@@ -10314,6 +10560,10 @@ export class AppEventsServiceProxy {
             url_ += "StateFilter=" + encodeURIComponent("" + stateFilter) + "&";
         if (postalFilter !== undefined && postalFilter !== null)
             url_ += "PostalFilter=" + encodeURIComponent("" + postalFilter) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (noOfEventsToReturn !== undefined && noOfEventsToReturn !== null)
+            url_ += "NoOfEventsToReturn=" + encodeURIComponent("" + noOfEventsToReturn) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -58907,6 +59157,7 @@ export interface IPagedResultDtoOfAppEntityAttachmentDto {
 export class AccountDto implements IAccountDto {
     name!: string | undefined;
     showSync!: boolean;
+    tenantId!: number;
     description!: string | undefined;
     connections!: number;
     website!: string | undefined;
@@ -58958,6 +59209,7 @@ export class AccountDto implements IAccountDto {
             }
             this.name = _data["name"];
             this.showSync = _data["showSync"];
+            this.tenantId = _data["tenantId"];
             this.description = _data["description"];
             this.connections = _data["connections"];
             this.website = _data["website"];
@@ -59023,6 +59275,7 @@ export class AccountDto implements IAccountDto {
         }
         data["name"] = this.name;
         data["showSync"] = this.showSync;
+        data["tenantId"] = this.tenantId;
         data["description"] = this.description;
         data["connections"] = this.connections;
         data["website"] = this.website;
@@ -59077,6 +59330,7 @@ export class AccountDto implements IAccountDto {
 export interface IAccountDto {
     name: string | undefined;
     showSync: boolean;
+    tenantId: number;
     description: string | undefined;
     connections: number;
     website: string | undefined;
@@ -59112,8 +59366,265 @@ export interface IAccountDto {
     [key: string]: any;
 }
 
+export class ContactDto implements IContactDto {
+    code!: string | undefined;
+    entityObjectType!: string | undefined;
+    name!: string | undefined;
+    firstName!: string | undefined;
+    lastName!: string | undefined;
+    titleId!: number | undefined;
+    tradeName!: string | undefined;
+    parentId!: number | undefined;
+    website!: string | undefined;
+    phone1CountryKey!: string | undefined;
+    phone1Number!: string | undefined;
+    phone1Ext!: string | undefined;
+    phone2CountryKey!: string | undefined;
+    phone2Number!: string | undefined;
+    phone2Ext!: string | undefined;
+    phone3CountryKey!: string | undefined;
+    phone3Number!: string | undefined;
+    phone3Ext!: string | undefined;
+    eMailAddress!: string | undefined;
+    phone1TypeId!: number | undefined;
+    phone1TypeName!: string | undefined;
+    phone2TypeId!: number | undefined;
+    phone2TypeName!: string | undefined;
+    phone3TypeId!: number | undefined;
+    phone3TypeName!: string | undefined;
+    currencyId!: number | undefined;
+    currencyName!: string | undefined;
+    languageId!: number | undefined;
+    languageName!: string | undefined;
+    contactAddresses!: AppContactAddressDto[] | undefined;
+    userId!: number | undefined;
+    accountId!: number;
+    jobTitle!: string | undefined;
+    joinDate!: moment.Moment;
+    languageIsPublic!: boolean;
+    emailAddressIsPublic!: boolean;
+    phone1IsPublic!: boolean;
+    phone2IsPublic!: boolean;
+    phone3IsPublic!: boolean;
+    joinDateIsPublic!: boolean;
+    userName!: string | undefined;
+    userNameIsPublic!: boolean;
+    notes!: string | undefined;
+    entityAttachments!: AppEntityAttachmentDto[] | undefined;
+    tenantId!: number | undefined;
+    attachmentSourceTenantId!: number | undefined;
+    useDTOTenant!: boolean;
+    ssin!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IContactDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.code = _data["code"];
+            this.entityObjectType = _data["entityObjectType"];
+            this.name = _data["name"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.titleId = _data["titleId"];
+            this.tradeName = _data["tradeName"];
+            this.parentId = _data["parentId"];
+            this.website = _data["website"];
+            this.phone1CountryKey = _data["phone1CountryKey"];
+            this.phone1Number = _data["phone1Number"];
+            this.phone1Ext = _data["phone1Ext"];
+            this.phone2CountryKey = _data["phone2CountryKey"];
+            this.phone2Number = _data["phone2Number"];
+            this.phone2Ext = _data["phone2Ext"];
+            this.phone3CountryKey = _data["phone3CountryKey"];
+            this.phone3Number = _data["phone3Number"];
+            this.phone3Ext = _data["phone3Ext"];
+            this.eMailAddress = _data["eMailAddress"];
+            this.phone1TypeId = _data["phone1TypeId"];
+            this.phone1TypeName = _data["phone1TypeName"];
+            this.phone2TypeId = _data["phone2TypeId"];
+            this.phone2TypeName = _data["phone2TypeName"];
+            this.phone3TypeId = _data["phone3TypeId"];
+            this.phone3TypeName = _data["phone3TypeName"];
+            this.currencyId = _data["currencyId"];
+            this.currencyName = _data["currencyName"];
+            this.languageId = _data["languageId"];
+            this.languageName = _data["languageName"];
+            if (Array.isArray(_data["contactAddresses"])) {
+                this.contactAddresses = [] as any;
+                for (let item of _data["contactAddresses"])
+                    this.contactAddresses!.push(AppContactAddressDto.fromJS(item));
+            }
+            this.userId = _data["userId"];
+            this.accountId = _data["accountId"];
+            this.jobTitle = _data["jobTitle"];
+            this.joinDate = _data["joinDate"] ? moment(_data["joinDate"].toString()) : <any>undefined;
+            this.languageIsPublic = _data["languageIsPublic"];
+            this.emailAddressIsPublic = _data["emailAddressIsPublic"];
+            this.phone1IsPublic = _data["phone1IsPublic"];
+            this.phone2IsPublic = _data["phone2IsPublic"];
+            this.phone3IsPublic = _data["phone3IsPublic"];
+            this.joinDateIsPublic = _data["joinDateIsPublic"];
+            this.userName = _data["userName"];
+            this.userNameIsPublic = _data["userNameIsPublic"];
+            this.notes = _data["notes"];
+            if (Array.isArray(_data["entityAttachments"])) {
+                this.entityAttachments = [] as any;
+                for (let item of _data["entityAttachments"])
+                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
+            }
+            this.tenantId = _data["tenantId"];
+            this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
+            this.useDTOTenant = _data["useDTOTenant"];
+            this.ssin = _data["ssin"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): ContactDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["code"] = this.code;
+        data["entityObjectType"] = this.entityObjectType;
+        data["name"] = this.name;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["titleId"] = this.titleId;
+        data["tradeName"] = this.tradeName;
+        data["parentId"] = this.parentId;
+        data["website"] = this.website;
+        data["phone1CountryKey"] = this.phone1CountryKey;
+        data["phone1Number"] = this.phone1Number;
+        data["phone1Ext"] = this.phone1Ext;
+        data["phone2CountryKey"] = this.phone2CountryKey;
+        data["phone2Number"] = this.phone2Number;
+        data["phone2Ext"] = this.phone2Ext;
+        data["phone3CountryKey"] = this.phone3CountryKey;
+        data["phone3Number"] = this.phone3Number;
+        data["phone3Ext"] = this.phone3Ext;
+        data["eMailAddress"] = this.eMailAddress;
+        data["phone1TypeId"] = this.phone1TypeId;
+        data["phone1TypeName"] = this.phone1TypeName;
+        data["phone2TypeId"] = this.phone2TypeId;
+        data["phone2TypeName"] = this.phone2TypeName;
+        data["phone3TypeId"] = this.phone3TypeId;
+        data["phone3TypeName"] = this.phone3TypeName;
+        data["currencyId"] = this.currencyId;
+        data["currencyName"] = this.currencyName;
+        data["languageId"] = this.languageId;
+        data["languageName"] = this.languageName;
+        if (Array.isArray(this.contactAddresses)) {
+            data["contactAddresses"] = [];
+            for (let item of this.contactAddresses)
+                data["contactAddresses"].push(item.toJSON());
+        }
+        data["userId"] = this.userId;
+        data["accountId"] = this.accountId;
+        data["jobTitle"] = this.jobTitle;
+        data["joinDate"] = this.joinDate ? this.joinDate.toISOString() : <any>undefined;
+        data["languageIsPublic"] = this.languageIsPublic;
+        data["emailAddressIsPublic"] = this.emailAddressIsPublic;
+        data["phone1IsPublic"] = this.phone1IsPublic;
+        data["phone2IsPublic"] = this.phone2IsPublic;
+        data["phone3IsPublic"] = this.phone3IsPublic;
+        data["joinDateIsPublic"] = this.joinDateIsPublic;
+        data["userName"] = this.userName;
+        data["userNameIsPublic"] = this.userNameIsPublic;
+        data["notes"] = this.notes;
+        if (Array.isArray(this.entityAttachments)) {
+            data["entityAttachments"] = [];
+            for (let item of this.entityAttachments)
+                data["entityAttachments"].push(item.toJSON());
+        }
+        data["tenantId"] = this.tenantId;
+        data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
+        data["useDTOTenant"] = this.useDTOTenant;
+        data["ssin"] = this.ssin;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IContactDto {
+    code: string | undefined;
+    entityObjectType: string | undefined;
+    name: string | undefined;
+    firstName: string | undefined;
+    lastName: string | undefined;
+    titleId: number | undefined;
+    tradeName: string | undefined;
+    parentId: number | undefined;
+    website: string | undefined;
+    phone1CountryKey: string | undefined;
+    phone1Number: string | undefined;
+    phone1Ext: string | undefined;
+    phone2CountryKey: string | undefined;
+    phone2Number: string | undefined;
+    phone2Ext: string | undefined;
+    phone3CountryKey: string | undefined;
+    phone3Number: string | undefined;
+    phone3Ext: string | undefined;
+    eMailAddress: string | undefined;
+    phone1TypeId: number | undefined;
+    phone1TypeName: string | undefined;
+    phone2TypeId: number | undefined;
+    phone2TypeName: string | undefined;
+    phone3TypeId: number | undefined;
+    phone3TypeName: string | undefined;
+    currencyId: number | undefined;
+    currencyName: string | undefined;
+    languageId: number | undefined;
+    languageName: string | undefined;
+    contactAddresses: AppContactAddressDto[] | undefined;
+    userId: number | undefined;
+    accountId: number;
+    jobTitle: string | undefined;
+    joinDate: moment.Moment;
+    languageIsPublic: boolean;
+    emailAddressIsPublic: boolean;
+    phone1IsPublic: boolean;
+    phone2IsPublic: boolean;
+    phone3IsPublic: boolean;
+    joinDateIsPublic: boolean;
+    userName: string | undefined;
+    userNameIsPublic: boolean;
+    notes: string | undefined;
+    entityAttachments: AppEntityAttachmentDto[] | undefined;
+    tenantId: number | undefined;
+    attachmentSourceTenantId: number | undefined;
+    useDTOTenant: boolean;
+    ssin: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
 export class GetAccountForViewDto implements IGetAccountForViewDto {
     account!: AccountDto;
+    contact!: ContactDto;
     connectionName!: string | undefined;
     connectionCount!: number;
     avaliableConnectionName!: string | undefined;
@@ -59139,6 +59650,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                     this[property] = _data[property];
             }
             this.account = _data["account"] ? AccountDto.fromJS(_data["account"]) : <any>undefined;
+            this.contact = _data["contact"] ? ContactDto.fromJS(_data["contact"]) : <any>undefined;
             this.connectionName = _data["connectionName"];
             this.connectionCount = _data["connectionCount"];
             this.avaliableConnectionName = _data["avaliableConnectionName"];
@@ -59162,6 +59674,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                 data[property] = this[property];
         }
         data["account"] = this.account ? this.account.toJSON() : <any>undefined;
+        data["contact"] = this.contact ? this.contact.toJSON() : <any>undefined;
         data["connectionName"] = this.connectionName;
         data["connectionCount"] = this.connectionCount;
         data["avaliableConnectionName"] = this.avaliableConnectionName;
@@ -59174,6 +59687,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
 
 export interface IGetAccountForViewDto {
     account: AccountDto;
+    contact: ContactDto;
     connectionName: string | undefined;
     connectionCount: number;
     avaliableConnectionName: string | undefined;
@@ -63552,262 +64066,6 @@ export class EntityDto implements IEntityDto {
 }
 
 export interface IEntityDto {
-    id: number;
-
-    [key: string]: any;
-}
-
-export class ContactDto implements IContactDto {
-    code!: string | undefined;
-    entityObjectType!: string | undefined;
-    name!: string | undefined;
-    firstName!: string | undefined;
-    lastName!: string | undefined;
-    titleId!: number | undefined;
-    tradeName!: string | undefined;
-    parentId!: number | undefined;
-    website!: string | undefined;
-    phone1CountryKey!: string | undefined;
-    phone1Number!: string | undefined;
-    phone1Ext!: string | undefined;
-    phone2CountryKey!: string | undefined;
-    phone2Number!: string | undefined;
-    phone2Ext!: string | undefined;
-    phone3CountryKey!: string | undefined;
-    phone3Number!: string | undefined;
-    phone3Ext!: string | undefined;
-    eMailAddress!: string | undefined;
-    phone1TypeId!: number | undefined;
-    phone1TypeName!: string | undefined;
-    phone2TypeId!: number | undefined;
-    phone2TypeName!: string | undefined;
-    phone3TypeId!: number | undefined;
-    phone3TypeName!: string | undefined;
-    currencyId!: number | undefined;
-    currencyName!: string | undefined;
-    languageId!: number | undefined;
-    languageName!: string | undefined;
-    contactAddresses!: AppContactAddressDto[] | undefined;
-    userId!: number | undefined;
-    accountId!: number;
-    jobTitle!: string | undefined;
-    joinDate!: moment.Moment;
-    languageIsPublic!: boolean;
-    emailAddressIsPublic!: boolean;
-    phone1IsPublic!: boolean;
-    phone2IsPublic!: boolean;
-    phone3IsPublic!: boolean;
-    joinDateIsPublic!: boolean;
-    userName!: string | undefined;
-    userNameIsPublic!: boolean;
-    notes!: string | undefined;
-    entityAttachments!: AppEntityAttachmentDto[] | undefined;
-    tenantId!: number | undefined;
-    attachmentSourceTenantId!: number | undefined;
-    useDTOTenant!: boolean;
-    ssin!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IContactDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.code = _data["code"];
-            this.entityObjectType = _data["entityObjectType"];
-            this.name = _data["name"];
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.titleId = _data["titleId"];
-            this.tradeName = _data["tradeName"];
-            this.parentId = _data["parentId"];
-            this.website = _data["website"];
-            this.phone1CountryKey = _data["phone1CountryKey"];
-            this.phone1Number = _data["phone1Number"];
-            this.phone1Ext = _data["phone1Ext"];
-            this.phone2CountryKey = _data["phone2CountryKey"];
-            this.phone2Number = _data["phone2Number"];
-            this.phone2Ext = _data["phone2Ext"];
-            this.phone3CountryKey = _data["phone3CountryKey"];
-            this.phone3Number = _data["phone3Number"];
-            this.phone3Ext = _data["phone3Ext"];
-            this.eMailAddress = _data["eMailAddress"];
-            this.phone1TypeId = _data["phone1TypeId"];
-            this.phone1TypeName = _data["phone1TypeName"];
-            this.phone2TypeId = _data["phone2TypeId"];
-            this.phone2TypeName = _data["phone2TypeName"];
-            this.phone3TypeId = _data["phone3TypeId"];
-            this.phone3TypeName = _data["phone3TypeName"];
-            this.currencyId = _data["currencyId"];
-            this.currencyName = _data["currencyName"];
-            this.languageId = _data["languageId"];
-            this.languageName = _data["languageName"];
-            if (Array.isArray(_data["contactAddresses"])) {
-                this.contactAddresses = [] as any;
-                for (let item of _data["contactAddresses"])
-                    this.contactAddresses!.push(AppContactAddressDto.fromJS(item));
-            }
-            this.userId = _data["userId"];
-            this.accountId = _data["accountId"];
-            this.jobTitle = _data["jobTitle"];
-            this.joinDate = _data["joinDate"] ? moment(_data["joinDate"].toString()) : <any>undefined;
-            this.languageIsPublic = _data["languageIsPublic"];
-            this.emailAddressIsPublic = _data["emailAddressIsPublic"];
-            this.phone1IsPublic = _data["phone1IsPublic"];
-            this.phone2IsPublic = _data["phone2IsPublic"];
-            this.phone3IsPublic = _data["phone3IsPublic"];
-            this.joinDateIsPublic = _data["joinDateIsPublic"];
-            this.userName = _data["userName"];
-            this.userNameIsPublic = _data["userNameIsPublic"];
-            this.notes = _data["notes"];
-            if (Array.isArray(_data["entityAttachments"])) {
-                this.entityAttachments = [] as any;
-                for (let item of _data["entityAttachments"])
-                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
-            }
-            this.tenantId = _data["tenantId"];
-            this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
-            this.useDTOTenant = _data["useDTOTenant"];
-            this.ssin = _data["ssin"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): ContactDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ContactDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["code"] = this.code;
-        data["entityObjectType"] = this.entityObjectType;
-        data["name"] = this.name;
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["titleId"] = this.titleId;
-        data["tradeName"] = this.tradeName;
-        data["parentId"] = this.parentId;
-        data["website"] = this.website;
-        data["phone1CountryKey"] = this.phone1CountryKey;
-        data["phone1Number"] = this.phone1Number;
-        data["phone1Ext"] = this.phone1Ext;
-        data["phone2CountryKey"] = this.phone2CountryKey;
-        data["phone2Number"] = this.phone2Number;
-        data["phone2Ext"] = this.phone2Ext;
-        data["phone3CountryKey"] = this.phone3CountryKey;
-        data["phone3Number"] = this.phone3Number;
-        data["phone3Ext"] = this.phone3Ext;
-        data["eMailAddress"] = this.eMailAddress;
-        data["phone1TypeId"] = this.phone1TypeId;
-        data["phone1TypeName"] = this.phone1TypeName;
-        data["phone2TypeId"] = this.phone2TypeId;
-        data["phone2TypeName"] = this.phone2TypeName;
-        data["phone3TypeId"] = this.phone3TypeId;
-        data["phone3TypeName"] = this.phone3TypeName;
-        data["currencyId"] = this.currencyId;
-        data["currencyName"] = this.currencyName;
-        data["languageId"] = this.languageId;
-        data["languageName"] = this.languageName;
-        if (Array.isArray(this.contactAddresses)) {
-            data["contactAddresses"] = [];
-            for (let item of this.contactAddresses)
-                data["contactAddresses"].push(item.toJSON());
-        }
-        data["userId"] = this.userId;
-        data["accountId"] = this.accountId;
-        data["jobTitle"] = this.jobTitle;
-        data["joinDate"] = this.joinDate ? this.joinDate.toISOString() : <any>undefined;
-        data["languageIsPublic"] = this.languageIsPublic;
-        data["emailAddressIsPublic"] = this.emailAddressIsPublic;
-        data["phone1IsPublic"] = this.phone1IsPublic;
-        data["phone2IsPublic"] = this.phone2IsPublic;
-        data["phone3IsPublic"] = this.phone3IsPublic;
-        data["joinDateIsPublic"] = this.joinDateIsPublic;
-        data["userName"] = this.userName;
-        data["userNameIsPublic"] = this.userNameIsPublic;
-        data["notes"] = this.notes;
-        if (Array.isArray(this.entityAttachments)) {
-            data["entityAttachments"] = [];
-            for (let item of this.entityAttachments)
-                data["entityAttachments"].push(item.toJSON());
-        }
-        data["tenantId"] = this.tenantId;
-        data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
-        data["useDTOTenant"] = this.useDTOTenant;
-        data["ssin"] = this.ssin;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IContactDto {
-    code: string | undefined;
-    entityObjectType: string | undefined;
-    name: string | undefined;
-    firstName: string | undefined;
-    lastName: string | undefined;
-    titleId: number | undefined;
-    tradeName: string | undefined;
-    parentId: number | undefined;
-    website: string | undefined;
-    phone1CountryKey: string | undefined;
-    phone1Number: string | undefined;
-    phone1Ext: string | undefined;
-    phone2CountryKey: string | undefined;
-    phone2Number: string | undefined;
-    phone2Ext: string | undefined;
-    phone3CountryKey: string | undefined;
-    phone3Number: string | undefined;
-    phone3Ext: string | undefined;
-    eMailAddress: string | undefined;
-    phone1TypeId: number | undefined;
-    phone1TypeName: string | undefined;
-    phone2TypeId: number | undefined;
-    phone2TypeName: string | undefined;
-    phone3TypeId: number | undefined;
-    phone3TypeName: string | undefined;
-    currencyId: number | undefined;
-    currencyName: string | undefined;
-    languageId: number | undefined;
-    languageName: string | undefined;
-    contactAddresses: AppContactAddressDto[] | undefined;
-    userId: number | undefined;
-    accountId: number;
-    jobTitle: string | undefined;
-    joinDate: moment.Moment;
-    languageIsPublic: boolean;
-    emailAddressIsPublic: boolean;
-    phone1IsPublic: boolean;
-    phone2IsPublic: boolean;
-    phone3IsPublic: boolean;
-    joinDateIsPublic: boolean;
-    userName: string | undefined;
-    userNameIsPublic: boolean;
-    notes: string | undefined;
-    entityAttachments: AppEntityAttachmentDto[] | undefined;
-    tenantId: number | undefined;
-    attachmentSourceTenantId: number | undefined;
-    useDTOTenant: boolean;
-    ssin: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -92336,6 +92594,8 @@ export class GetMessagesForViewDto implements IGetMessagesForViewDto {
     messages!: MessagesDto;
     rating!: number | undefined;
     isUserVerifiedPurchaser!: boolean;
+    isProfileOwner!: boolean;
+    isAccountAdmin!: boolean;
 
     [key: string]: any;
 
@@ -92357,6 +92617,8 @@ export class GetMessagesForViewDto implements IGetMessagesForViewDto {
             this.messages = _data["messages"] ? MessagesDto.fromJS(_data["messages"]) : <any>undefined;
             this.rating = _data["rating"];
             this.isUserVerifiedPurchaser = _data["isUserVerifiedPurchaser"];
+            this.isProfileOwner = _data["isProfileOwner"];
+            this.isAccountAdmin = _data["isAccountAdmin"];
         }
     }
 
@@ -92376,6 +92638,8 @@ export class GetMessagesForViewDto implements IGetMessagesForViewDto {
         data["messages"] = this.messages ? this.messages.toJSON() : <any>undefined;
         data["rating"] = this.rating;
         data["isUserVerifiedPurchaser"] = this.isUserVerifiedPurchaser;
+        data["isProfileOwner"] = this.isProfileOwner;
+        data["isAccountAdmin"] = this.isAccountAdmin;
         return data;
     }
 }
@@ -92384,6 +92648,8 @@ export interface IGetMessagesForViewDto {
     messages: MessagesDto;
     rating: number | undefined;
     isUserVerifiedPurchaser: boolean;
+    isProfileOwner: boolean;
+    isAccountAdmin: boolean;
 
     [key: string]: any;
 }

@@ -12,7 +12,7 @@
 
     
           controls
-          [attr.src]=" item?.url "
+          [attr.src]=" item?.safeUrl "
           class="vSec"
       ></video>
         </div>
@@ -49,6 +49,7 @@
     <ng-container *ngIf="mediaItems[selectedIndex]?.attachmentCategoryId === 3; else videoTemplate">
       <!-- Display image -->
       <img 
+      onerror="this.src='../../assets/placeholders/appitem-placeholder.png'" 
         [src]="mediaItems[selectedIndex]?.url" 
         alt="Selected Media" 
         class="modal-image" 

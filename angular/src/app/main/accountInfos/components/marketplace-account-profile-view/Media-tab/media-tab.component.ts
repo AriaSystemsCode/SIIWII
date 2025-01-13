@@ -54,15 +54,19 @@ export class MediaTabComponent    extends AppComponentBase implements OnInit  {
 
         this.getAllMedia()
  
-    //    this.mediaItems = this.mediaItems.map((item) => {
-    //      if (item.attachmentCategoryId != 3) {
-    //        return {
-    //          ...item,
-    //          safeUrl: this.sanitizeUrl(item.url), // Add sanitized URL
-    //        };
-    //      }
-    //      return item;
-    //    });
+        this.mediaItems = this.mediaItems.map((item) => {
+            if (item.attachmentCategoryId !== 3) {
+              // Explicitly create a new AppEntityAttachmentDto object
+              return {
+                ...item, // Spread existing properties
+                safeUrl: this.sanitizeUrl(item.url), // Add sanitized URL
+                init: item.init, // Ensure init method exists
+                toJSON: item.toJSON // Ensure toJSON method exists
+              } as AppEntityAttachmentDto;
+            }
+            return item;
+          });
+          
     }
 
 
