@@ -2411,14 +2411,17 @@ export class AccountsServiceProxy {
 
     /**
      * @param input (optional) 
+     * @param ssin (optional) 
      * @return Success
      */
-    applyRelationOnProfile(input: number | undefined): Observable<string> {
+    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ApplyRelationOnProfile?";
         if (input === null)
             throw new Error("The parameter 'input' cannot be null.");
         else if (input !== undefined)
             url_ += "input=" + encodeURIComponent("" + input) + "&";
+        if (ssin !== undefined && ssin !== null)
+            url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

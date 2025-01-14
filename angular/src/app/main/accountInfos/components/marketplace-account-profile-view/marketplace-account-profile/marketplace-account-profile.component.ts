@@ -1,7 +1,7 @@
 import { ActivatedRoute } from '@angular/router';
 import { AccountMainFilterEnum } from '@app/main/accounts/account-shared/models/accounts-main-filter.enum';
 import { SelectItem } from 'primeng/api';
-import { Component, EventEmitter, Injector, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Injector, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -14,7 +14,7 @@ import { finalize } from 'rxjs';
   styleUrls: ['./marketplace-account-profile.component.scss'],
   providers:[MarketplaceAccountsServiceProxy,AppMarketplaceItemsServiceProxy]
 })
-export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit , OnChanges  {
+export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit , AfterViewInit, OnChanges  {
   accountId:number;
   accountType:string = "";
   defaultMainFilter : AccountMainFilterEnum= AccountMainFilterEnum.AllAccounts
@@ -56,7 +56,9 @@ loginAccoutType:string="";
 }
 
 paramsSubscription;
-ngOnInit(): void {
+ngOnInit(): void {}
+
+ngAfterViewInit(): void {
   this.paramsSubscription = this.route.params.subscribe(async (params) => {
     this.accountId = params['id'];
     await this.getData();
@@ -65,16 +67,15 @@ ngOnInit(): void {
 }
 
 ngOnChanges(changes: SimpleChanges) {
-  this.paramsSubscription = this.route.params.subscribe(async (params) => {
-    this.accountId = params['id'];
-    await this.getData();
-  });
+  // this.paramsSubscription = this.route.params.subscribe(async (params) => {
+  //   this.accountId = params['id'];
+  //   await this.getData();
+  // });
 }
 
 
   async getData(): Promise<void> {
     await this.getAccountDataForView();
-    this.createRelation();
     this.updateMediaItems();
     this.getLoginAccoutType();
   }
@@ -109,21 +110,14 @@ ngOnDestroy(): void {
 
 
    async getAccountDataForView(): Promise<void> {
-
     this.showMainSpinner();
-
-  
-
   await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5).pipe(
     finalize(
         ()=>this.hideMainSpinner()
     )
 ).subscribe((res)=>{
-
     this.accountDataForView = res.account
     this.marketPlaceData = res
-    console.log(' this.accountDataForView :',  res );
-
     // this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
     // if(this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
     // if(this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
@@ -139,17 +133,4 @@ ngOnDestroy(): void {
 
 
 
-
-  createRelation() {
-    this._AccountsServiceProxy
-            .applyRelationOnProfile(this.accountId)
-            .pipe(
-                finalize(() => {;
-                    this.hideMainSpinner();
-                })
-            )
-            .subscribe((res) => {
-             console.log(res)
-            });
-}
 }
