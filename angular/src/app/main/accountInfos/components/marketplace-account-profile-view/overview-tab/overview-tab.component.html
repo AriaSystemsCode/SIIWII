@@ -265,7 +265,9 @@
            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
             <span>There is no data</span>
             </p> -->
-            <div class="d-flex p-2 ">
+            <app-connections-tab [fromOverview]="true"  [accountDataForView]="accountDataForView" [loginAccoutType]="loginAccoutType"></app-connections-tab>
+
+            <!-- <div class="d-flex p-2 ">
                 <img src="../../assets/placeholders/appitem-placeholder.png" class="event-img" alt="" srcset="">
                 <div class="event-info p-2" >
                     <p class="event-title m-0 ">title</p>
@@ -314,7 +316,7 @@
                     </div>                       
                     </div>
 
-                </div>
+                </div> -->
             </div>
     </div>
     <div class="col-lg-9 col-md-7 col-12  ">
@@ -327,20 +329,20 @@
          </div>
         <hr class="hr">
 
-         <p *ngIf="posts?.length == 0" class="">
+         <!-- <p *ngIf="posts?.length == 0" class="">
             <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
 
              <span>There is no data</span>
              </p>
              <div *ngIf="posts?.length > 0" >
              <div *ngFor="let postData of posts; let i = index">
-             <!-- <app-post-card
+             <app-post-card
              [post]="postData"
          
          >
-         </app-post-card> -->
+         </app-post-card>
          </div>
-        </div>
+        </div> -->
         <app-posts-tab  [accountDataForView]="accountDataForView" ></app-posts-tab>
      </div>
      <div class="mb-2 right-sec p-3" #reviewsSection>
@@ -366,6 +368,7 @@
             />
         
             <input
+            style="height: 100px;"
               class="flex-grow-0 col-lg-9 border-0"
               placeholder="Add your review"
               [(ngModel)]="reviewText"
@@ -511,7 +514,7 @@
             <div class="d-flex mb-3 align-items-center">
                 <!-- Dynamic Rating Stars -->
   
-            <div class="position-relative " style="height: 32px;width: 122px;">
+            <div *ngIf="review?.rating != 0" class="position-relative " style="height: 32px;width: 122px;">
                 <span class="stars-container  " style="color: #D4D4D4;">★★★★★</span>
                 <span
                     [style]="
@@ -524,13 +527,25 @@
               </div>
               </div>
               <p class="subjectTxt">{{review?.messages?.subject}}</p>
-              <div class="" [ngClass]="review?.messages?.entityAttachments?.length ? 'd-flex justify-content-between':''">
-              <p class="review-comment txtBody">
-                {{review?.messages?.body}}
+              <div class="" [ngClass]="review?.messages?.entityAttachments?.length != 0 ? 'd-flex justify-content-between':''">
+                <p 
+                class="review-comment txtBody" 
+                [ngStyle]="{
+                  'width': review?.messages?.entityAttachments?.length !== 0 ? '80%' : '100%',
+                }"
+              >
+                {{ isExpanded || (review?.messages?.body?.length || 0) <= 900 
+                  ? review?.messages?.body 
+                  : (review?.messages?.body | slice:0:900) + '...'
+                }}
+                <a *ngIf="(review?.messages?.body?.length || 0) > 900" (click)="toggleExpand()" class="expand-toggle">
+                  {{ isExpanded ? 'Show less' : 'Read more' }}
+                </a>
               </p>
+              
               <div *ngIf="review?.messages?.entityAttachments?.length">
               <div *ngFor="let attach of review?.messages?.entityAttachments">
-                <img  *ngIf="attach?.attachmentCategoryId == 3"    style="width: 100px;height: 125px;border-radius: 6px;" [src]="attachmentBaseUrl + '/' + attach?.url" onerror="this.src='../../assets/common/images/default-profile-picture.png'" class="mr-2 rounded-circle" style="height: 32px;width: 32px;" alt="" srcset="">
+                <img  *ngIf="attach?.attachmentCategoryId == 3"    style="width: 100px;height: 125px;border-radius: 6px;" [src]="attachmentBaseUrl + '/' + attach?.url" onerror="this.src='../../assets/common/images/default-profile-picture.png'" class="mr-2 " style="height: 125px;width: 100px;border-radius: 6px;" alt="" srcset="">
                 <video
               
                 style="width: 200px;height: 125px;"
@@ -542,14 +557,14 @@
               </div>
             </div>
             </div>
-              <div class="position-relative d-flex justify-content-between">
-                <!-- <app-interactions
+              <div class="position-relative d-flex justify-content-between mt-4">
+                <app-interactions
                 [relatedEntityId]="accountDataForView?.entityId"
-                [entityId]="accountDataForView?.entityId"
-                [postCreatorUserId]="accountDataForView?.id"
+                [entityId]="review?.messages?.entityId"
+                [fromOverview]="true"
             
-            ></app-interactions> -->
-            <p> {{review?.likeCount}} ikes</p>
+            ></app-interactions>
+            <!-- <p> {{review?.likeCount}} ikes</p>
                     <button *ngIf="review?.likeCount == 0" (click)="createReaction(review?.messages?.entityId);getAllRectsCount(review?.messages?.entityId)" class="help-btn">
 
                       <svg   width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -565,7 +580,7 @@
           
                               
                                   <p class="m-0">Helpful</p>
-                                  </button>
+                                  </button> -->
               </div>
             </div>
           

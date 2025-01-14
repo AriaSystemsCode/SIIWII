@@ -4,7 +4,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
 import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityUserReactionsCountDto, AppPostDto, AppPostsServiceProxy, CreateMessageInput, GetAppPostForViewDto, GetMessagesForViewDto, MesasgeObjectType, MessagePagedResultDto, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
 import * as moment from 'moment';
-import { finalize, forkJoin, map } from 'rxjs';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-overview-tab',
@@ -39,6 +39,8 @@ isHelpful:any
   showEmojiPicker: boolean = false;
       messages: CreateMessageInput = new CreateMessageInput();
    attachmentsUploader: FileUploaderCustom;
+   loginAccoutType:string =''
+   isExpanded = false;
   constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
   ) {
     super(injector);
@@ -59,6 +61,9 @@ ngOnInit() {
 ngOnChanges(){
 
 
+}
+toggleExpand(): void {
+  this.isExpanded = !this.isExpanded;
 }
   getAllMedia(){
     // this.showMainSpinner()
@@ -116,82 +121,50 @@ goReviews() {
 }
 
 getAllReviws() {
-  // this.loading = true;
   const subs = this.messageServiceProxy
-      .getAllReviews(
-         undefined,
-          undefined,
-          undefined,
-          undefined,
-          416177,
-          // this.accountDataForView.entityId,
-          undefined,
-          undefined,
-          "REVIEW",
-          "",
-         0,
-          this.maxResultCount
-      )
-      .pipe(
-          finalize(() => {
-              // this.loading = false;
-          })
-      )
-        .subscribe(
-        (result) => {
-          // Append new reviews to the existing list
-          this.reviews = result.items;
-          this.totalCount = result.totalCount; // Update total count of reviews
-    
-        // Iterate over the reviews and call the methods
-        const observables = this.reviews.map((review) => {
-          return forkJoin({
-            likeCount: this._appEntitiesServiceProxy
-              .getUsersReactionsCount(review?.messages?.entityId)
-              .pipe(map((res) => res.likeCount || 0)),
-              reactId: this._appEntitiesServiceProxy
-              .getUsersReactionsCount(review?.messages?.entityId)
-              .pipe(map((res) => res.id )),
-            // isHelpful: this._appEntitiesServiceProxy
-            //   .getCurrentUserReaction(review?.messages?.entityId)
-            //   .pipe(map((res) => {
-            //     res.reactionSelected ==1 || false
-            //   } )),
-          }).pipe(
-            map((data) => ({
-              entityId: review?.messages?.entityId,
-              likeCount: data.likeCount,
-              reactId: data.reactId,
-              // isHelpful: data.isHelpful,
-            }))
-          );
-        });
-  
-        // Update the reviews list with the new data
-        forkJoin(observables).subscribe((results) => {
-          results.forEach((data) => {
-            const review = this.reviews.find((r) => r?.messages?.entityId === data.entityId);
-            if (review) {
-              review.likeCount = data.likeCount;
-              review.reactId = data.reactId;
-              // review.isHelpful = data.isHelpful;
-            }
-          });
-        });
-        },
-       
-      );
+    .getAllReviews(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      416177,
+      undefined,
+      undefined,
+      "REVIEW",
+      "",
+      this.skipCount,
+      this.maxResultCount
+    )
+    .pipe(
+      finalize(() => {
+        // Handle loading state here if needed
+      })
+    )
+    .subscribe((result) => {
+      // Append new reviews to the existing list
+      if (this.skipCount === 0) {
+        // Initial load or refresh
+        this.reviews = result.items;
+      } else {
+        // Append to the existing list
+        this.reviews = [...this.reviews, ...result.items];
+      }
+
+      this.totalCount = result.totalCount; // Update the total count of reviews
+    });
+
   this.subscriptions.push(subs);
 }
 
 
 
 loadMoreReviews(): void {
-  if (this.reviews.length < this.totalCount ) {
+  if (this.reviews.length < this.totalCount) {
     this.skipCount += this.maxResultCount; // Increment the offset
     this.getAllReviws(); // Fetch more reviews
   }
 }
+
 
 
 
@@ -258,13 +231,82 @@ onVideoSelected(event: any): void {
   }
 }
 
+// Function to map selected media to the required format
+// prepareAttachments(): AppEntityAttachmentDto[] {
+//   return this.selectedMedia.map((media, index) => {
+//     const fileName = media.file?.name || 'default-name';
+//     return {
+//       attachmentCategoryId: media.type === 'image' ? 4 : 2, // Use appropriate category IDs
+//       attachmentCategoryEnum: 0,
+//       fileName: fileName,
+//       displayName: fileName,
+//       url: media.url, // Use media.url here
+//       guid: null,
+//       attributes: null,
+//       index: index,
+//       isDefault: index === 0, // Optional logic to mark the first as default
+//       id: 0,
+
+//       // Methods required by AppEntityAttachmentDto
+//       init: function (data: Partial<AppEntityAttachmentDto>) {
+//         Object.assign(this, data);
+//       },
+//       toJSON: function () {
+//         return {
+//           attachmentCategoryId: this.attachmentCategoryId,
+//           attachmentCategoryEnum: this.attachmentCategoryEnum,
+//           fileName: this.fileName,
+//           displayName: this.displayName,
+//           url: this.url,
+//           guid: this.guid,
+//           attributes: this.attributes,
+//           index: this.index,
+//           isDefault: this.isDefault,
+//           id: this.id,
+//         };
+//       },
+//     };
+//   });
+// }
 
 
+// Example function to send the data
+// sendAttachments(): void {
+//   const attachments = this.prepareAttachments();
+
+//   // Send the attachments array to the server (e.g., via HTTP POST)
+//   console.log('Sending attachments:', attachments);
+
+//   // Example API call (replace with your service logic)
+//   // this.http.post('/api/attachments', { entityAttachments: attachments }).subscribe((response) => {
+//   //   console.log('Attachments uploaded successfully', response);
+//   // });
+// }
+
+
+
+toggleEmojiPicker(): void {
+  this.showEmojiPicker = !this.showEmojiPicker;
+}
+
+addEmoji(event: any): void {
+  this.reviewText += event.emoji.native; // Assuming emoji-mart emits an emoji object
+}
 
 removeMedia(index: number): void {
   this.selectedMedia.splice(index, 1);
 }
 
+// postReview(): void {
+//   const reviewData = {
+//     text: this.reviewText,
+//     rating: this.selectedRating,
+//     media: this.selectedMedia,
+//   };
+//   console.log('Review posted:', reviewData);
+//   // Add logic to send the review data to a server or API
+//   this.resetForm();
+// }
 
 resetForm(): void {
   this.reviewText = '';
@@ -346,20 +388,23 @@ onUploadAttachments() {
   
         this.messageServiceProxy
             .createMessage(this.messages)
-            .pipe(finalize(() => { this.hideMainSpinner()  ;  this.notify.info(this.l("SendSuccessfully"));
+            .pipe(finalize(() => {
+               this.hideMainSpinner()  ; 
+               this.notify.info(this.l("SendSuccessfully"));
               this.getAllReviws()
               this.messages.entityAttachments = [];
            
               this.messages=new CreateMessageInput();
-              this.selectedMedia=[] ;}))
+              this.resetForm()
+            }))
             .subscribe(() => {
       console.log('Review posted:', this.messages);
       this.messageServiceProxy
       .createUserEntityRating(this.selectedRating ,416177)
   
       .subscribe(() => {
-        this.selectedRating =0;this.reviewText ='';
-        this.getAllReviws()
+        // this.selectedRating =0;this.reviewText ='';
+        // this.getAllReviws()
       });
             
             });
@@ -374,7 +419,7 @@ onUploadAttachments() {
   .pipe(
       finalize(() => {
         this.getAllRectsCount(entityId)
-  // this.getuserreact(entityId)
+  this.getuserreact(entityId)
       })
   )
     .subscribe(
@@ -395,34 +440,27 @@ this.subscriptions.push(subs);
       this._appEntitiesServiceProxy.getUsersReactionsCount(entityId)
       .subscribe((result) => {
           
-          // this.usersReactionsStats.likeCount = result.likeCount || 0
+          this.usersReactionsStats.likeCount = result.likeCount || 0
 
       })
     }
 
 
-    // getuserreact(entityId:number){
-    //   this._appEntitiesServiceProxy.getCurrentUserReaction(entityId)
-    //   .subscribe((result) => {
-    //     console.log(result,'kkkkkssssllll')
-          
-    //       this.isHelpful = result
-
-    //   })
-    // }
-
-
-    deleteReaction(id:number,entityId:number){
-      this._appEntitiesServiceProxy.deleteUserReaction(id)     .pipe(finalize(() => { 
-        // this.getuserreact(entityId)
-        this.getAllRectsCount(entityId)
-      }))
+    getuserreact(entityId:number){
+      this._appEntitiesServiceProxy.getCurrentUserReaction(entityId)
       .subscribe((result) => {
-
+        console.log(result,'kkkkkssssllll')
+          
+          this.isHelpful = result
 
       })
     }
 
+    getLoginAccoutType(){
+      this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId,5).subscribe((res)=>{
+       this.loginAccoutType=res.account.accountType;
+      })
+    }
 
 ngOnDestroy() {
   this.unsubscribeToAllSubscriptions();

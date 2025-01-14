@@ -11,3 +11,25 @@
 .icon-reaction {
     height: 20px;
 }
+
+
+.help-btn{
+ 
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    gap: 10px;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    
+    height: 35px;
+    
+    border: 1px solid rgba(238, 238, 238, 0.933333);
+    filter: drop-shadow(2px 2px 10px rgba(22, 22, 22, 0.1));
+    border-radius: 6px;
+    
+          }
+    

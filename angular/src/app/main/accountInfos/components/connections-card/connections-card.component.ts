@@ -19,7 +19,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
     @Output() connectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() _createRelation : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
-
+    @Input('fromOverview') fromOverview : boolean = false
+    
     
     constructor(
         injector:Injector,

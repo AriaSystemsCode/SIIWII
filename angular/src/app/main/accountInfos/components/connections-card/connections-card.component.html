@@ -1,12 +1,12 @@
 <div class="single-item mr-1 row   memberCard_container shadowContainer"
-[ngClass]="singleItemPerRowMode?'p-0 no-padding-bottom' :'p-4 extra-padding-bottom'"
+[ngClass]="singleItemPerRowMode || fromOverview ?'p-0 no-padding-bottom' :'p-4 extra-padding-bottom'"
 >
     <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
         'background-image':
         account.account.logoUrl ?
         'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
         '' , 
-    'height': singleItemPerRowMode ? 'auto' : '100px', 
+    'height': singleItemPerRowMode ? 'auto'  :  '100px', 
     'width':  singleItemPerRowMode  ? '200px' : '100px'
 }"
     (click)="clickCardHandler()"
@@ -15,7 +15,7 @@
     </div>
     <div class="single-item-body col pr-0" style="width: 176px;" [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
         <div >
-            <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" class="p-0">
+            <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" class="" [ngClass]="fromOverview ? 'p-1' :'p-0'">
                 <h3 (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">{{account?.account?.name}}</h3>
                 <div class="info-container d-flex flex-column">
                     <!-- Categories Section -->
@@ -62,11 +62,11 @@
                 <div [ngClass]="singleItemPerRowMode?'pt-0 pt-3' : ''">
                     <!-- Account Type -->
                     <b class="accountType_label" [ngStyle]="{
-                      'color': singleItemPerRowMode ? 'black' : '#595959'
+                      'color': singleItemPerRowMode ? 'black' : '#595959','font-size': fromOverview ? '11px':''
                     }" style="min-width: 115px;">
                       {{ "AccountType" | localize }}:
                     </b>
-                    <span class="accountType_value  mt-2 ml-2">
+                    <span class="accountType_value  mt-2 ml-2" [ngClass]="fromOverview ? 'p-2' :''">
                       {{ account.account.accountType || ('NotSpecified' | localize) }}
                     </span>
                   </div>
@@ -90,7 +90,9 @@
   
 
                   <div>
-                  <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1">
+                  <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" [ngStyle]="{
+                    'font-size': fromOverview ? '11px' : ''
+                  }">
                    <img  src="../../../../../assets/accounts/followers.png" />
                     <span style="color: rgba(158, 158, 158, 1);">
                       {{ account?.account?.connectioncount   ? account.account?.connectioncount   : '0' }}   {{ ' Followers' }}
@@ -176,7 +178,9 @@
                             <button
                                 class="btn relation_button"
                                 [ngStyle]="{
-                                'bottom':  singleItemPerRowMode  ? '5px' : 'auto'
+                                'bottom':  singleItemPerRowMode || fromOverview  ? '5px' : 'auto',
+                                'padding': fromOverview ? '7px':'',
+                                'font-size' : fromOverview ? '11px':''
                             }"
                                 (click)="createRelation()" style="    white-space: nowrap;
                                 position: absolute;
