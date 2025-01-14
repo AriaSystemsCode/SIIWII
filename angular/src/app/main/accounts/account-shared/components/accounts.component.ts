@@ -422,7 +422,7 @@ export class AccountsComponent
 
     createRelation(account) {
         this._accountsServiceProxy
-                .applyRelationOnProfile(account.account.id)
+                .applyRelationOnProfile(account.account.id,undefined)
                 .pipe(
                     finalize(() => {;
                         this.hideMainSpinner();

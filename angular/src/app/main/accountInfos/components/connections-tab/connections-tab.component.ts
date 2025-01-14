@@ -44,6 +44,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
   showData:boolean =true;
   ngOnInit() {
     this.isHost = !this._abpSessionService.tenantId;
+    this.singleItemPerRowMode = false;
     this.defineSortingOptions();
     this.initFilterForm();
     this.GetSettingValue();
@@ -52,12 +53,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
   }
   
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.singleItemPerRowMode = false;
-
-    this.GetSettingValue();
-   
-  }
+  ngOnChanges(changes: SimpleChanges) {}
 
   getAllAccountTypesForTableDropdownWithPaging(){
   this._appEntitiesServiceProxy.getAllAccountTypesForTableDropdownWithPaging(
@@ -235,7 +231,7 @@ disconnect(account: AccountDto): void {
 
   createRelation(account) {
     this._accountsServiceProxy
-      .applyRelationOnProfile(account.account.id)
+      .applyRelationOnProfile(undefined,account.account.ssin)
       .pipe(
         finalize(() => {
           ;
