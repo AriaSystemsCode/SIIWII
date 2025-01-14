@@ -25,6 +25,7 @@ import * as moment from "moment";
 import { forEach } from "lodash";
 import { TreeSelect } from "primeng/treeselect";
 import { TreeNode } from "primeng/api";
+import { Calendar } from "primeng/calendar";
 
 @Component({
     selector: "app-sales-order",
@@ -112,6 +113,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     cancelBtn: boolean = false;
     saveBtn: boolean = false;
     SuccessMsg: boolean = false;
+    @ViewChild('calendar1') calendar1: Calendar;
+    @ViewChild('calendar2') calendar2: Calendar;
+    @ViewChild('calendar3') calendar3: Calendar;
+    @ViewChild('calendar4') calendar4: Calendar;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -203,6 +208,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
 
     }
+
+    openCalendar(calendar: Calendar) {
+        calendar.inputfieldViewChild.nativeElement.click();
+      }
     toggleDropDown (){
         this.openDropDown  = !this.openDropDown
     }
