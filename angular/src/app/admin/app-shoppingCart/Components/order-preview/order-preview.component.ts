@@ -37,9 +37,11 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
             this.loadPdf();
         }
+    // this.isOrderConfirmationNeedsReprint()
+        }
    
 
-    }
+    
     ngAfterViewInit() {
      
     }

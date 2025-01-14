@@ -52,7 +52,7 @@
           
           <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'" class="text-col">{{ plan?.appSubscriptionPlanHeader?.description }}</td>
           <td class="plan-header">
-            For More Inquiries and Custom Pricing , Please email <a href="mailto:customercare@siiwii.net" style="overflow-wrap: break-word; font-size: 12px;">customercare.siiwii.net</a>
+            For More Inquiries and Custom Pricing , Please email <a href="mailto:customercare@siiwii.net" style="overflow-wrap: break-word; font-size: 12px;">customercare@siiwii.net</a>
           </td>
 
         </tr>
@@ -85,7 +85,7 @@
                 <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails" >
                   <!-- Display the feature limit if the feature matches -->
                   <span *ngIf="detail?.featureName === feature?.featureName">
-                    {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}  {{ detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'MONTHLY' ? '/ '+ detail?.featurePeriodLimit : detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'YEARLY' ? '/ '+ detail?.featurePeriodLimit: ''  }}
+                    {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}  {{ detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'MONTHLY' ? '/ '+ 'Month'  : detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'YEARLY' ? '/ '+ 'Year': ''  }}
                   </span>
                 </ng-container>
               </ng-container>
@@ -130,8 +130,13 @@
   </div>
 
 
-  <ng-template pTemplate="footer">
-    <p-button  (click)="visible = false;confirm()" label="Yes" class="p-button-text" ></p-button>
-    <p-button  (click)="visible = false" label="Cancel" Class="p-button-no"></p-button>
-</ng-template>
+      
+  <div  class="d-flex justify-content-center btns" style="gap: 15px;">
+                                            
+    <button  (click)="confirm();visible = false" label="Yes" class="p-button-text" >Yes</button>
+    <button  (click)="visible = false ;"  label="Cancel" Class="p-button-no">Cancel</button>
+
+  </div>
+
+
 </p-dialog>

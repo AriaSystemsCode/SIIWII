@@ -146,7 +146,22 @@ mainLoad : boolean = false
   this.conNew = false;
 
 }
+const button = document.getElementById("stickyButton");
+  const rightCol = document.getElementById("rightCol");
 
+  window.addEventListener("scroll", () => {
+    const rect = rightCol.getBoundingClientRect();
+    if (rect.top < 20 && rect.bottom > window.innerHeight) {
+      button.style.position = "fixed";
+      button.style.bottom = "20px";
+      button.style.right = rect.left + "px"; // Adjust based on the right column's position
+    } else {
+      button.style.position = "absolute";
+      button.style.bottom = "20px";
+    }
+  });
+ console.log(this.comNew,'this.comNew')
+ console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
    
@@ -430,6 +445,22 @@ cancelsaveLine() {
       
   // }
 
+// ensureCommentsComponentReady(): Promise<void> {
+//     return new Promise((resolve) => {
+//         const checkInterval = setInterval(() => {
+//             if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
+//                 clearInterval(checkInterval);
+//                 resolve();
+//             }
+//         }, 10);
+//     });
+// }
+
+getCommentsRefreshed (event){
+  if(event){
+    this.loadCommentsList()
+  }
+}
 loadCommentsList() {
   setTimeout(() => {
       if (this.commentParentComponent?.first && this.commentParentComponent?.last) {

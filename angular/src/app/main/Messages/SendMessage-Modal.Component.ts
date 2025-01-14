@@ -72,6 +72,7 @@ export class SendMessageModalComponent
     demoUiEditor: DemoUiEditorComponent;
     public uploader: FileUploader;
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
+    @Output() refresh: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() modalView:boolean;
     @Input() parentId:any;
     @Input() entityId:any;
@@ -111,11 +112,7 @@ export class SendMessageModalComponent
     ngOnChanges(changes: SimpleChanges): void {
       
     }
-    updateSubjectValue(newValue): void {
-        console.log(newValue,'newValuenewValuenewValue')
-        this.subject = newValue;
-        this.cdr.detectChanges();  // Manually trigger change detection
-      }
+  
     mesasgeObjectType: MesasgeObjectType = MesasgeObjectType.Message
     show(id?: number, threadId?: number, forward?: boolean,mesasgeObjectType?: MesasgeObjectType) {
         this.showMainSpinner();
@@ -144,7 +141,7 @@ export class SendMessageModalComponent
                     else this.subject = result[0].messages.subject;
                     for (let i = 0; i < result.length; i++) {
                         this.htmlEditorInput +=
-                            "--------- Reply message ---------" + "<br>";
+                            "--------- Reply ---------" + "<br>";
                         this.htmlEditorInput +=
                             "From: " +
                             result[i].messages.senderName +
@@ -530,7 +527,7 @@ export class SendMessageModalComponent
         this.saving = true;
         this._MessageServiceProxy
             .createMessage(this.messages)
-            .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();}))
+            .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();this.refresh.emit(true)}))
             .subscribe(() => {
                 this.notify.info(this.l("SendSuccessfully"));
                 if(this.SendMessageModal)this.SendMessageModal.hide();
