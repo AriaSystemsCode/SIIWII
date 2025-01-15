@@ -92,8 +92,15 @@ a.btn {
 
 .divHight {
     min-height: 130px !important;
+    border-top-left-radius:6px !important;
+    border-bottom-left-radius:6px !important
 }
 
 .hidePagnating {
     display: none !important;
+}
+
+.applyM {
+    margin-left: 1px !important;
+    margin-right: 1px !important;
 }

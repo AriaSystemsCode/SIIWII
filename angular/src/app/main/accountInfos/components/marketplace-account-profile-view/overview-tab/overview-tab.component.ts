@@ -41,6 +41,7 @@ isHelpful:any
    attachmentsUploader: FileUploaderCustom;
    loginAccoutType:string =''
    isExpanded = false;
+   isUserReviewdBefore : boolean = false
   constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
   ) {
     super(injector);
@@ -49,7 +50,8 @@ isHelpful:any
 
 ngOnInit() {
 
-  // this.rating = 3.4
+this.isUserReviewedEntityBefore()
+  
   this.getAllPosts()
   this.getAllReviws()
   this.getOverAllRatings()
@@ -59,7 +61,6 @@ ngOnInit() {
 
 
 ngOnChanges(){
-
 
 }
 
@@ -127,6 +128,30 @@ getAllPosts() {
 goReviews() {
   this.reviewsSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
 }
+
+
+isUserReviewedEntityBefore() {
+  this.showMainSpinner()
+  const subs = this.messageServiceProxy
+    .isUserReviewedEntityBefore(
+      this.accountDataForView?.entityId
+  
+    )
+    .pipe(
+      finalize(() => {
+        // Handle loading state here if needed
+        this.hideMainSpinner()
+      })
+    )
+    .subscribe((result) => {
+    console.log(result,'isuuuuuser')
+   this.isUserReviewdBefore = result
+    });
+
+  this.subscriptions.push(subs);
+}
+
+
 
 getAllReviws() {
   this.showMainSpinner()

@@ -111,7 +111,7 @@ ngOnDestroy(): void {
 
    async getAccountDataForView(): Promise<void> {
     this.showMainSpinner();
-  await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5).pipe(
+  await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,undefined).pipe(
     finalize(
         ()=>this.hideMainSpinner()
     )
@@ -131,6 +131,21 @@ ngOnDestroy(): void {
   }
 
 
-
+   createRelation() {
+        this._AccountsServiceProxy
+                .applyRelationOnProfile(this.accountId,undefined)
+                .pipe(
+                    finalize(() => {;
+                        this.hideMainSpinner();
+                    })
+                )
+                .subscribe((result:string) => {
+                  
+                  
+                        this.accountDataForView.avaliableConnectionName="";
+                  
+                    
+                });
+    }
 
 }

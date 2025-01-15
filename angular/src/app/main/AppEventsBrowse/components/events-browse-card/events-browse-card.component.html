@@ -1,7 +1,8 @@
-<div class="single-item row align-items-center h-100"      [ngClass]="{ 'marketplaceAccountProfileCard': fromMarketPlaceProfile,'mr-2':fromOverviewMarketPlaceProfile }">
+<div class="single-item row align-items-center h-100"      [ngClass]="{ 'marketplaceAccountProfileCard': fromMarketPlaceProfile,'applyM':fromOverviewMarketPlaceProfile }">
     <div class="single-item-photo mr-1 h-100" (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
-    [ngStyle]="{'width.px':fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile ? 232 :  116 ,
+    [ngStyle]="{'width.px':fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile ? 232 :  100 ,
     'height':fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile  ? 'fit-content' : '120px ' ,
+
   
  }
     "

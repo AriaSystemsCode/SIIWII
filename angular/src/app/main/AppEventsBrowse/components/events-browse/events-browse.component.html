@@ -107,7 +107,7 @@
                             </div>
                             <div  class="col d-flex flex-column justify-content-between app-items-container thin-scroll" >
                                 <div class="row " [ngClass]="fromOverviewMarketPlaceProfile ? '':'pt-3 pl-5 pr-2'">
-                                    <div *ngFor="let item of items;index as i" class="col-12 mb-5 " [ngClass]="singleItemPerRowMode || fromMarketPlaceProfile ?'col-md-12 single-item-per-row-layout' : 'col-md-6'">
+                                    <div *ngFor="let item of items;index as i" class="col-12  " [ngClass]="singleItemPerRowMode || fromMarketPlaceProfile ?'col-md-12 single-item-per-row-layout mb-2' : 'col-md-6 mb-5'">
                                         <app-events-browse-card
                                             [item]="item"
                                             [filterForm]="filterForm"

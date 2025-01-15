@@ -363,7 +363,7 @@
        
         >
         </app-create-post-entry> -->
-        <div class="addReview mb-4 pb-2">
+        <div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
           <div class="topSec w-100 d-flex align-items-start">
             <img
               style="height: 30px;"
