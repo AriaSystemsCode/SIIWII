@@ -1761,6 +1761,25 @@ namespace onetouch.Message
             }
             return returnValue;
         }
+        //Iteation40-X527,1 MMT 01/15/2025 Add API to check if the user reviewed this entity before or not[Start]
+        public async Task<bool> IsUserReviewedEntityBefore(long entityId)
+        {
+            bool returnVal = false;
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var entityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeReview();
+                var objectId = await _helper.SystemTables.GetsydObjectMessageID();
+                var entityReview = _appEntityRepository.GetAll().Include(z => z.EntitiesRelationships).FirstOrDefaultAsync(z => z.CreatorUserId == AbpSession.UserId && z.TenantId == null &&
+                z.ObjectId == objectId && z.EntityObjectTypeId == entityObjectTypeId &&
+                z.RelatedEntitiesRelationships.Where(x => x.EntityId == entityId || x.RelatedEntityId == entityId).Count() > 0);
+               // var entityReview = await entityReviewQ.FirstOrDefaultAsync();
+                //string xx = "hello";
+                if (entityReview != null) { return true; }
+
+            }
+            return returnVal;
+        }
+        //Iteation40-X527,1 MMT 01/15/2025 Add API to check if the user reviewed this entity before or not[End]
         public async Task<bool> CreateUserEntityRating(int ratingNumber, long entityId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
