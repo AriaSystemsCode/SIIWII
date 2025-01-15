@@ -1,7 +1,9 @@
-<div class="single-item row align-items-center h-100"      [ngClass]="{ 'marketplaceAccountProfileCard': fromMarketPlaceProfile }">
+<div class="single-item row align-items-center h-100"      [ngClass]="{ 'marketplaceAccountProfileCard': fromMarketPlaceProfile,'mr-2':fromOverviewMarketPlaceProfile }">
     <div class="single-item-photo mr-1 h-100" (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
     [ngStyle]="{'width.px':fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile ? 232 :  116 ,
-    'height':fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile  ? 'fit-content' : '120px '  }
+    'height':fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile  ? 'fit-content' : '120px ' ,
+  
+ }
     "
     [ngClass]="fromOverviewMarketPlaceProfile ? 'divHight':''"
     >
@@ -13,8 +15,11 @@
         />
     </div>
     <div
-        class="single-item-body col m-4"
+        class="single-item-body col "
         [ngClass]="{ singleItemPerRowMode: 'd-flex flex-row' }"
+        [ngStyle]="{
+        'margin':fromOverviewMarketPlaceProfile  ? '' : '16px '  }
+        "
     >
         <div class="row">
             <div
@@ -22,6 +27,9 @@
             *ngIf="!fromMarketPlaceProfile"
         >
             <h3
+            [ngStyle]="{
+                'font-size':fromOverviewMarketPlaceProfile  ? '10px' : ' '  }
+                "
                 class="m-0 mb-2 text-dark cursor-pointer"
                 (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
             >
@@ -85,18 +93,27 @@
             <div
                 class="col"
                 *ngIf="fromMarketPlaceProfile"
+                [ngStyle]="{
+                    'font-size':fromOverviewMarketPlaceProfile  ? '10px' : ' '
+                  }
+                    "
             >
                 <h3
-                    class="m-0 mb-2 text-dark cursor-pointer"
+                    class="m-0 text-dark cursor-pointer"
+                    [ngClass]="fromOverviewMarketPlaceProfile ? 'mb-1':'mb-2 '"
                     (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
+                    [ngStyle]="{
+                        'font-size':fromOverviewMarketPlaceProfile  ? '14px' : ' '
+                      }
+                        "
                 >
                     {{ item.appEvent.name | textSubstring: 65 }}
                 </h3>
 
-                <div class="row mb-3">
+                <div class="row "  [ngClass]="fromOverviewMarketPlaceProfile ? '':'mb-3'">
                 <img src="../../../../../assets/events/tabler_calendar-stats.png" style="width: 19px;
     height: 19px;"/> 
-                <p class="pl-3 product-name border-right pr-3 font-weight-bold">
+                <p class=" product-name border-right  font-weight-bold" [ngClass]="fromOverviewMarketPlaceProfile ? 'mb-1':'pl-3 pr-3'">
                     {{ "Start date : " | localize }}
                     <span style="color: #9E9E9E;">
                     {{ item.appEvent.fromDate?.toString()  | date: 'dd MMMM, yyyy' }}, {{ item.appEvent.fromTime?.toString()  | date: 'h:mm a' }}
@@ -104,7 +121,7 @@
                 </span>
                 </p>
 
-                <p class="pl-3 product-name font-weight-bold"> 
+                <p class=" product-name font-weight-bold"  [ngClass]="fromOverviewMarketPlaceProfile ? 'mb-1':'pl-3 '"> 
                     {{ "End date : " | localize }}
                     <span style="color: #9E9E9E;">
                     {{ item.appEvent.toDate?.toString()  | date: 'dd MMMM, yyyy' }}, {{ item.appEvent.toTime?.toString()  | date: 'h:mm a' }}
@@ -112,7 +129,7 @@
                 </p>
             </div>
 
-            <div class="row mb-3">
+            <div class="row "  [ngClass]="fromOverviewMarketPlaceProfile ? '':'mb-3'">
                 <img src="../../../../../assets/events/streamline_interface-presentation-podium-work-desk-notes-company-presentation-office-podium-microphone.png" 
                      style="width: 19px; height: 19px;" />
                 <div class="pl-4 product-name pr-3 font-weight-bold row">
@@ -132,8 +149,8 @@
 
 
                 
-            <div class="row mb-3">
-                <div class="product-name p-4 font-weight-bold row col-6"  style="border: 1px solid #EEEEEE; border-radius: 4px;">
+            <div class="row mb-3"  [ngClass]="fromOverviewMarketPlaceProfile ? 'hidePagnating':''">
+                <div class="product-name  font-weight-bold row "  style="border: 1px solid #EEEEEE; border-radius: 4px;" [ngClass]="fromOverviewMarketPlaceProfile ? 'col-12 p-1':'col-6 p-4'">
                     <img src="../../../../../assets/events/fluent_guest-add-24-filled.png" 
                     style="width: 19px; height: 19px;"  class="mr-2"/>   {{ "Attendees :  " | localize }}
                     <span style="color: #9E9E9E;" class="ml-2">
@@ -142,7 +159,7 @@
                 </div>
 
                
-           <div class="product-name p-4 font-weight-bold row border-left-0 pl-5 col-6"  style="border: 1px solid #EEEEEE; border-radius: 4px;">
+           <div class="product-name  font-weight-bold row border-left-0 pl-5 "  style="border: 1px solid #EEEEEE; border-radius: 4px;"  [ngClass]="fromOverviewMarketPlaceProfile ? 'col-12 p-1':'col-6 p-4'">
             <img src="../../../../../assets/events/carbon_location-company.png" 
             style="width: 19px; height: 19px;"   class="mr-2" />  {{ "Location :   " | localize }}
             <span *ngIf="eventAddress?.includes('online')" style="color: #9E9E9E;" class="ml-2">

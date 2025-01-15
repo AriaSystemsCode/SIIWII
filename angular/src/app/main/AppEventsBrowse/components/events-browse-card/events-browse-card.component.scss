@@ -91,5 +91,9 @@ a.btn {
 
 
 .divHight {
-    height: 100px !important;
+    min-height: 130px !important;
+}
+
+.hidePagnating {
+    display: none !important;
 }

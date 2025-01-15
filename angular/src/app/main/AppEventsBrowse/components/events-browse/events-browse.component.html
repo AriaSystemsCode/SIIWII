@@ -124,10 +124,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" [ngClass]="fromOverviewMarketPlaceProfile ? 'd-none' :''">
                             <div class="left-aside-filters">
                             </div>
-                            <div [ngClass]="fromOverviewMarketPlaceProfile ? 'd-none' :''" class="col d-flex flex-column justify-content-between">
+                            <div  class="col d-flex flex-column justify-content-between">
                                 <div class="primeng-paging-container custom-paginator">
                                     <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
                                                 #paginator
