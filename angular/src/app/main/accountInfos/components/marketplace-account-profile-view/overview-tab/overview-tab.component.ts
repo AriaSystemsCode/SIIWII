@@ -62,8 +62,16 @@ ngOnChanges(){
 
 
 }
-toggleExpand(): void {
-  this.isExpanded = !this.isExpanded;
+
+
+adjustTextareaHeight(event: Event): void {
+  const textarea = event.target as HTMLTextAreaElement;
+  textarea.style.height = 'auto'; // Reset the height to auto to recalculate
+  textarea.style.height = textarea.scrollHeight + 'px'; // Set the height to the scrollHeight
+}
+
+toggleExpand(review: any): void {
+  review.isExpanded = !review.isExpanded; // Toggle the `isExpanded` property for the specific review
 }
   getAllMedia(){
     // this.showMainSpinner()
@@ -121,6 +129,7 @@ goReviews() {
 }
 
 getAllReviws() {
+  this.showMainSpinner()
   const subs = this.messageServiceProxy
     .getAllReviews(
       undefined,
@@ -138,6 +147,7 @@ getAllReviws() {
     .pipe(
       finalize(() => {
         // Handle loading state here if needed
+        this.hideMainSpinner()
       })
     )
     .subscribe((result) => {
@@ -145,9 +155,17 @@ getAllReviws() {
       if (this.skipCount === 0) {
         // Initial load or refresh
         this.reviews = result.items;
+        this.reviews = result.items.map((review) => ({
+          ...review,
+          isExpanded: false, // Add `isExpanded` property for tracking
+        }));
       } else {
         // Append to the existing list
         this.reviews = [...this.reviews, ...result.items];
+        this.reviews = result.items.map((review) => ({
+          ...review,
+          isExpanded: false, // Add `isExpanded` property for tracking
+        }));
       }
 
       this.totalCount = result.totalCount; // Update the total count of reviews
@@ -285,13 +303,7 @@ onVideoSelected(event: any): void {
 
 
 
-toggleEmojiPicker(): void {
-  this.showEmojiPicker = !this.showEmojiPicker;
-}
 
-addEmoji(event: any): void {
-  this.reviewText += event.emoji.native; // Assuming emoji-mart emits an emoji object
-}
 
 removeMedia(index: number): void {
   this.selectedMedia.splice(index, 1);

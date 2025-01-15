@@ -45,28 +45,30 @@
             Head Quarter : </div>
           <div class="col-md-7 row-item-desc">
             
-            <p class="title-account" >
+            <p class="title-account mb-0 ml-5" >
             
               <span *ngIf=" accountDataForView?.addressLine1">
                   {{ accountDataForView.addressLine1 + ', '}}
               </span>
-              <span *ngIf="accountDataForView?.addressLine2">
-                  {{ accountDataForView?.addressLine2 + ', '}}
-              </span>
-              <span *ngIf="accountDataForView?.city">
-                  {{ accountDataForView?.city + ', '}}
-              </span>
-              <span *ngIf="accountDataForView?.state">
-                  {{ accountDataForView?.state + ', ' }}
-              </span>
-              <span *ngIf="accountDataForView?.zipCode">
-                  {{accountDataForView?.zipCode }}{{accountDataForView?.countryName ? ', ' : '' }}
-              </span>
-              <span *ngIf="accountDataForView?.countryName">
-                  {{ accountDataForView?.countryName }} .
-              </span>
+            
+         
           </p>
           </div>
+          <span *ngIf="accountDataForView?.addressLine2" class="row-item-desc">
+            {{ accountDataForView?.addressLine2 + ', '}}
+        </span>
+          <span *ngIf="accountDataForView?.city" class="row-item-desc">
+            {{ accountDataForView?.city + ', '}}
+        </span>
+        <span *ngIf="accountDataForView?.state" class="row-item-desc">
+            {{ accountDataForView?.state + ', ' }}
+        </span>
+        <span *ngIf="accountDataForView?.zipCode" class="row-item-desc">
+            {{accountDataForView?.zipCode }}{{accountDataForView?.countryName ? ', ' : '' }}
+        </span>
+        <span *ngIf="accountDataForView?.countryName" class="row-item-desc">
+            {{ accountDataForView?.countryName }} .
+        </span>
         </div>
          <div *ngIf="accountDataForView?.accountType == 'BUSINESS'" class="mb-3">
             <div class="row-item-title">
@@ -360,19 +362,21 @@
         >
         </app-create-post-entry> -->
         <div class="addReview mb-4 pb-2">
-          <div class="topSec w-100 d-flex align-items-center">
+          <div class="topSec w-100 d-flex align-items-start">
             <img
               style="height: 30px;"
               src="assets/common/images/default-profile-picture.png"
               class="rounded-circle logo"
             />
         
-            <input
-            style="height: 100px;"
-              class="flex-grow-0 col-lg-9 border-0"
-              placeholder="Add your review"
-              [(ngModel)]="reviewText"
-            />
+            <textarea
+            class="form-control flex-grow-0 col-lg-9 border-0"
+            placeholder="Add your review"
+            [(ngModel)]="reviewText"
+            style="height: auto; min-height: 100px; resize: none; overflow: hidden;"
+            (input)="adjustTextareaHeight($event)"
+          ></textarea>
+          
         
             <div class="rating">
               <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
@@ -534,14 +538,19 @@
                   'width': review?.messages?.entityAttachments?.length !== 0 ? '80%' : '100%',
                 }"
               >
-                {{ isExpanded || (review?.messages?.body?.length || 0) <= 900 
+                {{ review.isExpanded || (review?.messages?.body?.length || 0) <= 900 
                   ? review?.messages?.body 
-                  : (review?.messages?.body | slice:0:900) + '...'
+                  : (review?.messages?.body | slice:0:900) + '...' 
                 }}
-                <a *ngIf="(review?.messages?.body?.length || 0) > 900" (click)="toggleExpand()" class="expand-toggle">
-                  {{ isExpanded ? 'Show less' : 'Read more' }}
+                <a 
+                  *ngIf="(review?.messages?.body?.length || 0) > 900" 
+                  (click)="toggleExpand(review)" 
+                  class="expand-toggle"
+                >
+                  {{ review.isExpanded ? 'Show less' : 'Read more' }}
                 </a>
               </p>
+              
               
               <div *ngIf="review?.messages?.entityAttachments?.length">
               <div *ngFor="let attach of review?.messages?.entityAttachments">
@@ -559,11 +568,12 @@
             </div>
               <div class="position-relative d-flex justify-content-between mt-4">
                 <app-interactions
-                [relatedEntityId]="accountDataForView?.entityId"
+                [relatedEntityId]="review?.messages?.entityId"
                 [entityId]="review?.messages?.entityId"
                 [fromOverview]="true"
             
             ></app-interactions>
+                 <!-- [postCreatorUserId]="review?.messages?.senderId" -->
             <!-- <p> {{review?.likeCount}} ikes</p>
                     <button *ngIf="review?.likeCount == 0" (click)="createReaction(review?.messages?.entityId);getAllRectsCount(review?.messages?.entityId)" class="help-btn">
 
