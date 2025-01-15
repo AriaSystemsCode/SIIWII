@@ -15,7 +15,7 @@ namespace onetouch.AppMarketplaceAccounts
     public interface IMarketplaceAccountsAppService //: IApplicationService 
     {   
         Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input);
-        Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10);
+        Task<GetAccountForViewDto> GetAccountForView(long id, string ssin, int resultCount = 10);
 
 
     }

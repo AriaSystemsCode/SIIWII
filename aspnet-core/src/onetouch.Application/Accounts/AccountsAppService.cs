@@ -2669,7 +2669,7 @@ namespace onetouch.Accounts
             return retId;
         }
 
-            public async Task<string> ApplyRelationOnProfile(long input, string ssin)
+        public async Task<string> ApplyRelationOnProfile(long input, string ssin)
         {
             string ret = "";
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();

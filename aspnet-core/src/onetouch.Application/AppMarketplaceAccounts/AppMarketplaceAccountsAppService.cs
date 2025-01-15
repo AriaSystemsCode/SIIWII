@@ -363,10 +363,23 @@ namespace onetouch.AppMarketplaceAccounts
         }
 
 
-        public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
+        public async Task<GetAccountForViewDto> GetAccountForView(long id, string ssin, int resultCount = 10)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //ssin = "Business-000000004124-Avatar-M1";
+                if (!string.IsNullOrEmpty(ssin) && id == 0)
+                {
+                    var marketPlaceAccount = _appMarketplaceContactRepository.GetAll()
+                        .Where(e => e.SSIN == ssin &&
+                        e.IsProfileData &&
+                        (e.ParentId == null || e.ParentId <= 0))
+                        .FirstOrDefault();
+                    if (marketPlaceAccount != null)
+                    {
+                        id = marketPlaceAccount.Id;
+                    }
+                }
                 var account = await _appMarketplaceContactRepository.GetAll()
                 .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
