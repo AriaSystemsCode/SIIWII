@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -35,7 +35,8 @@ export class MediaTabComponent    extends AppComponentBase implements OnInit  {
     totalItems: number = 0; // Total items (retrieved from API)
     isModalOpen = false; // Controls modal visibility
     selectedIndex = 0; // Index of the currently selected image
-
+    
+@Input('fromOverviewTab') fromOverviewTab :boolean = false
 
   constructor(
     injector: Injector,
@@ -85,7 +86,9 @@ sanitizeUrl(url: string): SafeResourceUrl {
 
   getAllMedia(){
     // this.showMainSpinner()
-    this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,5,  this.itemsPerPage).pipe(
+    let itemsforpage ;
+    this.fromOverviewTab ? itemsforpage = 9 : itemsforpage = this.itemsPerPage
+    this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,5,  itemsforpage).pipe(
       finalize(
           ()=>
             this.hideMainSpinner()

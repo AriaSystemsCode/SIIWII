@@ -7,7 +7,9 @@
         'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
         '' , 
     'height': singleItemPerRowMode ? 'auto'  :  '100px', 
-    'width':  singleItemPerRowMode  ? '200px' : '100px'
+    'width':  singleItemPerRowMode  ? '200px' : '100px',
+    'border-top-right-radius': fromOverview   ? '0px' : '',
+    'border-bottom-right-radius': fromOverview   ? '0px' : '',
 }"
     (click)="clickCardHandler()"
     >

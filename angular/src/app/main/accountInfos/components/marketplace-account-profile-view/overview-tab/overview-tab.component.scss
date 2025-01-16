@@ -97,17 +97,7 @@ color: #1B101B;
 
       }
 
-      .media-data {
-        // gap: 5px;
-        .media-img {
-            width: 95px;
-            height: 95px;
-            border-radius: 14px;
-            padding: 4px;
-            object-fit: cover; /* Maintains aspect ratio and fills the container */
-            object-position: center; /* Centers the image inside the container */
-        }
-      }
+   
 
       .event-img {
    
@@ -653,3 +643,41 @@ color: #fff;
   
 
   
+
+
+
+
+
+  .img-hd {
+    position: inherit !important;
+    width: 100px !important;
+height: 100px !important;
+}
+
+.msg-text {
+    font-weight: 700 !important;
+    font-size: 22px !important;
+    line-height: 36px !important;
+    color: #1B101B !important;
+        }
+
+.btns {
+    gap: 24px !important;
+}
+
+.p-button-text {
+        // button {
+            background-color: #4A0D4A !important;
+            color: #FFF !important;
+            border:  none !important;
+            border-radius: 6px !important;
+            padding: 8px 32px;
+        // }
+    }
+
+    ::ng-deep {
+      .p-dialog .p-dialog-header {
+        background-color: #fff !important;
+        border:  none !important;
+      }
+    }

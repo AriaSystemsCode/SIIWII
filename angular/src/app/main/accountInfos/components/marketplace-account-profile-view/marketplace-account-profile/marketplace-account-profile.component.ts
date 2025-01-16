@@ -61,6 +61,7 @@ ngOnInit(): void {}
 ngAfterViewInit(): void {
   this.paramsSubscription = this.route.params.subscribe(async (params) => {
     this.accountId = params['id'];
+    
     await this.getData();
   });
 

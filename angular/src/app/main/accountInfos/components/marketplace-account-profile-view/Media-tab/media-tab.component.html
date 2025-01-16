@@ -1,4 +1,4 @@
-<div  class="d-flex flex-wrap justify-content-center">
+<div *ngIf="!fromOverviewTab && mediaItems?.length !=0"  class="d-flex flex-wrap justify-content-center">
     <div *ngFor="let item of mediaItems; let i = index" class="media-item m-1" >
       <ng-container *ngIf="item?.attachmentCategoryId === 3; else videoTemplate">
         <img [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class="media-image imgSec" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"   (click)="openModal(i)"/>
@@ -21,6 +21,7 @@
   </div>
 
   <p-paginator
+  [ngClass]="fromOverviewTab ? 'd-none':''"
   [rows]="itemsPerPage"
   [totalRecords]="totalItems"
   [(first)]="(currentPage - 1) * itemsPerPage"
@@ -36,7 +37,7 @@
 
 
 
-<p-dialog
+<p-dialog 
   [(visible)]="isModalOpen"
   [modal]="true"
   [style]="{ width: '656px' }"
@@ -50,10 +51,10 @@
       <!-- Display image -->
       <img 
       onerror="this.src='../../assets/placeholders/appitem-placeholder.png'" 
-        [src]="mediaItems[selectedIndex]?.url" 
+        [src]="attachmentBaseUrl + '/' +  mediaItems[selectedIndex]?.url" 
         alt="Selected Media" 
         class="modal-image" 
-        style="max-width: 100%; max-height:100%; border-radius: 8px;" 
+        style="max-width: 100%; max-height:100%; border-radius: 8px;    min-height: 350px;" 
       />
     </ng-container>
 
@@ -73,3 +74,14 @@
     <button *ngIf="selectedIndex < mediaItems.length - 1" class="nav-button next" (click)="nextMedia()">&#10095;</button>
   </div>
 </p-dialog>
+
+
+<div *ngIf="fromOverviewTab">
+    <img  *ngFor="let item of mediaItems; let i = index" [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class=" w-100 media-img col-4"  (click)="openModal(i)" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"  />
+</div>
+
+
+<p *ngIf="mediaItems?.length ==0" class="">
+    <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+      <span>There is no data</span>
+      </p>

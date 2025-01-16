@@ -38,7 +38,6 @@ export class ConnectionsTabComponent extends AppComponentBase {
     private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
     private _formBuilder: FormBuilder) {
     super(injector);
-    this.overridePrimeTableSetting();
 
   }
 
@@ -50,6 +49,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
     this.defineSortingOptions();
     this.initFilterForm();
     this.GetSettingValue();
+    this.overridePrimeTableSetting();
 
   }
   
@@ -108,7 +108,7 @@ this.accountsTypes=result.items;
   }
 
   overridePrimeTableSetting(countPerPage: number =  30) {
-    // this.fromOverview ? countPerPage = 4 : countPerPage
+    this.fromOverview ? countPerPage = 4 : countPerPage
     this.primengTableHelper.defaultRecordsCountPerPage = countPerPage;
     this.primengTableHelper.predefinedRecordsCountPerPage = [
       countPerPage,

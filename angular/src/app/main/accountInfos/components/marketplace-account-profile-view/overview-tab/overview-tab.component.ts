@@ -42,7 +42,9 @@ isHelpful:any
    loginAccoutType:string="";
    isExpanded = false;
    isUserReviewdBefore : boolean = false
+   SuccessMsg :boolean = false
   constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+    
   ) {
     super(injector);
 
@@ -55,15 +57,15 @@ ngOnInit() {
   // this.getAllPosts()
   this.getAllReviws()
   this.getOverAllRatings()
-  this.getAllMedia()
+  // this.getAllMedia()
 
 }
 
 
 ngOnChanges(){
-  if(this.accountDataForView){
-    this.isUserReviewedEntityBefore()
-  }
+  // if(this.accountDataForView){
+  //   this.isUserReviewedEntityBefore()
+  // }
 
 }
 
@@ -77,23 +79,23 @@ adjustTextareaHeight(event: Event): void {
 toggleExpand(review: any): void {
   review.isExpanded = !review.isExpanded; // Toggle the `isExpanded` property for the specific review
 }
-  getAllMedia(){
-    this.showMainSpinner()
-    this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,9, 9).pipe(
-      finalize(
-          ()=>
-            this.hideMainSpinner()
-      )
-  ).subscribe((res)=>{
+  // getAllMedia(){
+  //   this.showMainSpinner()
+  //   this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,9, 9).pipe(
+  //     finalize(
+  //         ()=>
+  //           this.hideMainSpinner()
+  //     )
+  // ).subscribe((res)=>{
   
-      this.mediaItems = res.items
-      // this.mediaItems = this.mediaItems.filter(item => item.categoryid === 3);
-      // this.totalItems = res.totalCount; // Update total items for pagination
+  //     this.mediaItems = res.items
+  //     // this.mediaItems = this.mediaItems.filter(item => item.categoryid === 3);
+  //     // this.totalItems = res.totalCount; // Update total items for pagination
 
-      console.log(' this.media :',  res );
+  //     console.log(' this.media :',  res );
   
-  })
-  }
+  // })
+  // }
 
 // rating: number = 3.4; // Rating out of 5
 // getAllPosts() {
@@ -148,7 +150,13 @@ isUserReviewedEntityBefore() {
     )
     .subscribe((result) => {
     console.log(result,'isuuuuuser')
-   this.isUserReviewdBefore = result
+    if(result){
+  this.SuccessMsg = true
+      
+    }else{
+this.postReview()
+    }
+  //  this.isUserReviewdBefore = result
     });
 
   this.subscriptions.push(subs);
@@ -164,7 +172,7 @@ getAllReviws() {
       undefined,
       undefined,
       undefined,
-      416177,
+      this.accountDataForView?.entityId,
       undefined,
       undefined,
       "REVIEW",
@@ -218,8 +226,8 @@ getOverAllRatings() {
 
   const subs = this.messageServiceProxy
       .getOverAllRatings(
-        416177,
-          // this.accountDataForView.entityId,
+        // 416177,
+          this.accountDataForView.entityId,
       )
       .pipe(
           finalize(() => {
@@ -417,10 +425,10 @@ onUploadAttachments() {
         this.messages.bodyFormat = this.reviewText;
         this.messages.body = this.reviewText;
         this.messages.mesasgeObjectType = MesasgeObjectType.Review
-        this.messages.relatedEntityId = 416177
+        // this.messages.relatedEntityId = 416177
 
 
-        // this.messages.relatedEntityId = this.accountDataForView?.entityId
+        this.messages.relatedEntityId = this.accountDataForView?.entityId
         this.messages.subject = ''
 
         // this.messages.entityAttachments=this.prepareAttachments();
@@ -440,7 +448,7 @@ onUploadAttachments() {
             .subscribe(() => {
       console.log('Review posted:', this.messages);
       this.messageServiceProxy
-      .createUserEntityRating(this.selectedRating ,416177)
+      .createUserEntityRating(this.selectedRating ,   this.accountDataForView?.entityId)
   
       .subscribe(() => {
         // this.selectedRating =0;this.reviewText ='';
@@ -450,51 +458,51 @@ onUploadAttachments() {
             });
     }
 
- createReaction(entityId:number) {
+//  createReaction(entityId:number) {
 
-  const subs = this._appEntitiesServiceProxy.createOrUpdateReaction(
-    entityId,
-    1,
-)
-  .pipe(
-      finalize(() => {
-        this.getAllRectsCount(entityId)
-  this.getuserreact(entityId)
-      })
-  )
-    .subscribe(
-    (result) => {
-     console.log(result,'resultresultresult')
+//   const subs = this._appEntitiesServiceProxy.createOrUpdateReaction(
+//     entityId,
+//     1,
+// )
+//   .pipe(
+//       finalize(() => {
+//         this.getAllRectsCount(entityId)
+//   this.getuserreact(entityId)
+//       })
+//   )
+//     .subscribe(
+//     (result) => {
+//      console.log(result,'resultresultresult')
    
 
-    },
+//     },
    
-  );
-this.subscriptions.push(subs);
+//   );
+// this.subscriptions.push(subs);
          
-    }
+//     }
 
 
 
-    getAllRectsCount(entityId:number){
-      this._appEntitiesServiceProxy.getUsersReactionsCount(entityId)
-      .subscribe((result) => {
+    // getAllRectsCount(entityId:number){
+    //   this._appEntitiesServiceProxy.getUsersReactionsCount(entityId)
+    //   .subscribe((result) => {
           
-          this.usersReactionsStats.likeCount = result.likeCount || 0
+    //       this.usersReactionsStats.likeCount = result.likeCount || 0
 
-      })
-    }
+    //   })
+    // }
 
 
-    getuserreact(entityId:number){
-      this._appEntitiesServiceProxy.getCurrentUserReaction(entityId)
-      .subscribe((result) => {
-        console.log(result,'kkkkkssssllll')
+    // getuserreact(entityId:number){
+    //   this._appEntitiesServiceProxy.getCurrentUserReaction(entityId)
+    //   .subscribe((result) => {
+    //     console.log(result,'kkkkkssssllll')
           
-          this.isHelpful = result
+    //       this.isHelpful = result
 
-      })
-    }
+    //   })
+    // }
 
     getLoginAccoutType(){
       this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId,5).subscribe((res)=>{

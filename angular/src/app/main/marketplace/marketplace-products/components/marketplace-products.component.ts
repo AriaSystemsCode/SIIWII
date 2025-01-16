@@ -76,6 +76,7 @@ export class MarketplaceProductsComponent
     buyerSSIN: any;
     contactSSIN:any;
     @Input() fromMarketAcoount: boolean;
+    @Input() fromOverView: boolean = false
 
     constructor(
         injector: Injector,
@@ -182,7 +183,7 @@ export class MarketplaceProductsComponent
     }
     
     ngOnChanges(changes: SimpleChanges) {
-        debugger
+        // debugger
       //  alert("change")
         document.getElementById("_searchInput").focus();
       }
