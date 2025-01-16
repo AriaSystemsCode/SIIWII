@@ -107,7 +107,7 @@ this.accountsTypes=result.items;
   }
 
   overridePrimeTableSetting(countPerPage: number =  30) {
-    this.fromOverview ? countPerPage = 4 : countPerPage
+    // this.fromOverview ? countPerPage = 4 : countPerPage
     this.primengTableHelper.defaultRecordsCountPerPage = countPerPage;
     this.primengTableHelper.predefinedRecordsCountPerPage = [
       countPerPage,

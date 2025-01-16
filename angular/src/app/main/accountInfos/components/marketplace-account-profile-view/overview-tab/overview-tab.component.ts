@@ -50,9 +50,12 @@ isHelpful:any
 
 ngOnInit() {
 
-this.isUserReviewedEntityBefore()
-  
-  this.getAllPosts()
+  if(this.accountDataForView){
+    this.isUserReviewedEntityBefore()
+  }
+
+
+  // this.getAllPosts()
   this.getAllReviws()
   this.getOverAllRatings()
   this.getAllMedia()
@@ -75,7 +78,7 @@ toggleExpand(review: any): void {
   review.isExpanded = !review.isExpanded; // Toggle the `isExpanded` property for the specific review
 }
   getAllMedia(){
-    // this.showMainSpinner()
+    this.showMainSpinner()
     this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,9, 9).pipe(
       finalize(
           ()=>
@@ -84,9 +87,9 @@ toggleExpand(review: any): void {
   ).subscribe((res)=>{
   
       this.mediaItems = res.items
+      // this.mediaItems = this.mediaItems.filter(item => item.categoryid === 3);
       // this.totalItems = res.totalCount; // Update total items for pagination
-      // this.totalItems = this.mediaItems.length; // Update total items for pagination
-    //   this.marketPlaceData = res
+
       console.log(' this.media :',  res );
   
   })

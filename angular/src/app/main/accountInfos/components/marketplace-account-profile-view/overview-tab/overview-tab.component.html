@@ -189,16 +189,15 @@
             
         </div>
         <hr class="hr">
-        <!-- <p class="">
-           <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
-            <span>There is no data</span>
-            </p> -->
+          <p *ngIf="mediaItems?.length ==0" class="">
+            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+              <span>There is no data</span>
+              </p>
          
-              <div class="d-flex media-data row p-2" >
+              <div *ngIf="mediaItems?.length > 0" class="d-flex media-data row p-2" >
+                
                   <img  *ngFor="let item of mediaItems; let i = index" [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class=" w-100 media-img col-4" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"  />
-                <!-- <img  class="  w-100 media-img col-4" src="../../assets/placeholders/appitem-placeholder.png"/>
-                <img  class="  w-100 media-img col-4" src="../../assets/placeholders/appitem-placeholder.png"/>
-                <img  class="  w-100 media-img col-4" src="../../assets/placeholders/appitem-placeholder.png"/> -->
+               
               
               
 
