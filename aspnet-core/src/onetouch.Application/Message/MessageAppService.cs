@@ -1767,12 +1767,13 @@ namespace onetouch.Message
             bool returnVal = false;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+
                 var entityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeReview();
                 var objectId = await _helper.SystemTables.GetsydObjectMessageID();
-                var entityReview =await _appEntityRepository.GetAll().Include(z => z.EntitiesRelationships).FirstOrDefaultAsync(z => z.CreatorUserId == AbpSession.UserId && z.TenantId == null &&
+                var entityReview=await _appEntityRepository.GetAll().Include(z => z.EntitiesRelationships).Where(z => z.CreatorUserId == AbpSession.UserId && z.TenantId == null &&
                 z.ObjectId == objectId && z.EntityObjectTypeId == entityObjectTypeId &&
-                z.RelatedEntitiesRelationships.Where(x => x.EntityId == entityId || x.RelatedEntityId == entityId).Count() > 0);
-               // var entityReview = await entityReviewQ.FirstOrDefaultAsync();
+                z.EntitiesRelationships.Count(x => x.EntityId == entityId || x.RelatedEntityId == entityId) > 0).FirstOrDefaultAsync(); 
+               // var entityReview = await entityReviewQ.ToListAsync();
                 //string xx = "hello";
                 if (entityReview != null) { return true; }
 
