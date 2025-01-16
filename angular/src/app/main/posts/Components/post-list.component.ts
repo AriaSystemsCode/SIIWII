@@ -84,6 +84,7 @@ export class PostListComponent
     ProgressModal: ProgressComponent;
 
     @Input() fromMarketplaceProfile: boolean = false;
+    @Input() fromOverviewTab: boolean = false;
     @Input() accountDataForView :AccountDto;
 
     public constructor(
@@ -367,7 +368,9 @@ export class PostListComponent
             this.maxResultCount = this.itemsToLoad;
             this.skipCount = this.noOfItemsToShowInitially;
             this.noOfItemsToShowInitially += this.itemsToLoad;
+            if(!this.fromOverviewTab){           
             this.getAllPosts();
+            }
         } else {
             this.isFullListDisplayed = true;
         }

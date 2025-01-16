@@ -10,6 +10,7 @@ import { AccountDto } from '@shared/service-proxies/service-proxies';
 
 export class PostsTabComponent {
   @Input() accountDataForView :AccountDto;
-
+  @Input() fromOverviewTab :boolean = false
+  
 
 }

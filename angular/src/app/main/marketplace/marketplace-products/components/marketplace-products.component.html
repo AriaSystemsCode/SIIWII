@@ -3,6 +3,10 @@
     style="margin-top: -50px"
     class="wrapper kt-container web"
     [ngClass]="fromMarketAcoount ? 'addPadding' : ''"
+    [ngClass]="[
+    fromMarketAcoount ? 'addPadding' : '',
+  fromOverView ? 'p-0 mt-2' : ''
+]"
 >
     <div
         class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
@@ -114,8 +118,10 @@
                 </div>
 
                 <div
-                    [ngClass]="!isFilterHidden ? 'col-lg-9 col-7' : 'col-md-12'"
-                    class="my-3"
+                [ngClass]="[
+                !isFilterHidden ? 'col-lg-9 col-7' : 'col-md-12',
+                fromOverView ? 'col-lg-9 col-12' : ''
+              ]"
                     
                 >
                     <div class="row" [ngClass]="   fromOverView ? 'addMargin':  ''">
@@ -155,9 +161,9 @@
 
 <!-- mobile ui design -->
 <div class="mobile">
-    <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
+    <app-seller-data *ngIf="isSellerIdExists && !fromOverView"></app-seller-data>
     <div class="container-fluid">
-        <div class="quickFilters">
+        <div class="quickFilters" *ngIf="!fromOverView">
         
             <span class="p-input-icon-right " style="width: 40%;">
                 <i class="pi pi-search"></i>
@@ -177,7 +183,7 @@
             Shared With Me and Public
         </button>
         </div>
-        <div class="btn-filters">
+        <div class="btn-filters" *ngIf="!fromOverView">
             <button
                 (click)="openFiltersDialog('Select Currency')"
                 class="filter-btn w-25"
@@ -222,7 +228,7 @@
                     [buyerSSIN]="buyerSSIN"
                 ></app-prodcut-card>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-12" [ngClass]="fromOverView ? 'd-none':''">
                 <div class="">
                     <p-paginator
                         (onPageChange)="onPageChange($event)"

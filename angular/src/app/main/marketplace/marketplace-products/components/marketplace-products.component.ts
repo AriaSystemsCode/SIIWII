@@ -137,6 +137,9 @@ export class MarketplaceProductsComponent
         //         ? this.tenantDefaultCurrency.code
         //         : JSON.parse(localStorage.getItem("currencyCode")).code;
 
+      
+    }
+    ngOnInit(){
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
         // init get products on screen initalization
@@ -165,7 +168,7 @@ export class MarketplaceProductsComponent
                 this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
                 this.selectedSort.value,
                 this.skipCount,
-                this.maxResultCount
+               this.fromOverView ? 8 : this.maxResultCount
             )
             .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe((result) => {
@@ -176,7 +179,7 @@ export class MarketplaceProductsComponent
         // this.getCurrencyCurrent();
 
         this.checkMediaQuery();
-    }
+}
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
 

@@ -371,7 +371,7 @@
       </app-post-card>
       </div>
      </div> -->
-     <app-posts-tab  [accountDataForView]="accountDataForView" ></app-posts-tab>
+     <app-posts-tab [fromOverviewTab]=true  [accountDataForView]="accountDataForView" ></app-posts-tab>
   </div>
      <div class="mb-2 right-sec p-3" #reviewsSection>
         <div class="d-flex justify-content-between">
@@ -625,6 +625,6 @@
               </p>
               </div>
               <div class="d-flex justify-content-center btns mb-3" >
-                <button  (click)="SuccessMsg = false;" label="Ok" class="p-button-text" >Ok</button>
+                <button  (click)="SuccessMsg = false;resetForm()" label="Ok" class="p-button-text" >Ok</button>
               </div>
             </p-dialog>
