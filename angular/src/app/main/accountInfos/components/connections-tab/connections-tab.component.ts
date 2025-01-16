@@ -38,6 +38,8 @@ export class ConnectionsTabComponent extends AppComponentBase {
     private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
     private _formBuilder: FormBuilder) {
     super(injector);
+    this.overridePrimeTableSetting();
+
   }
 
   isHost: boolean;
@@ -48,7 +50,6 @@ export class ConnectionsTabComponent extends AppComponentBase {
     this.defineSortingOptions();
     this.initFilterForm();
     this.GetSettingValue();
-    this.overridePrimeTableSetting();
 
   }
   

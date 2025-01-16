@@ -13,7 +13,7 @@
         >
         </app-views-stats>
     </div>
-    <div (click)="triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0" class="pr-5 pr-md-0">
+    <div (click)="triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0 && !fromOverview" class="pr-5 pr-md-0">
         <app-comments-stats
             [commentsCount]="usersReactionsStats.commentsCount"
             [parentId]="parentId"
@@ -42,7 +42,7 @@
                         >
                         </app-views-stats>
                     </div>
-                    <div (click)="triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0" class="pr-5 pr-md-0">
+                    <div (click)="triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0 && !fromOverview" class="pr-5 pr-md-0">
                         <app-comments-stats
                             [commentsCount]="usersReactionsStats.commentsCount"
                             [parentId]="parentId"
@@ -67,7 +67,7 @@
                     >
                     </app-reactions-stats>
                 </div>
-                <a (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
+                <a *ngIf="!fromOverview" (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
                     <span>
                         <!-- <i class="far fa-comments"></i> -->
                          <img src="../../../../assets/reactions/commentIcon.png"/>
@@ -75,7 +75,7 @@
                     {{ parentId ? 'Reply' : 'Comment' | localize}}
                 </a>
             </div>
-            <div *ngIf="parentId && usersReactionsStats?.commentsCount > 0" (click)="triggerCommentsList()"  class="pr-5 pr-md-0">
+            <div *ngIf="parentId && usersReactionsStats?.commentsCount > 0 && !fromOverview" (click)="triggerCommentsList()"  class="pr-5 pr-md-0">
                 <app-comments-stats
                     [commentsCount]="usersReactionsStats.commentsCount"
                     [parentId]="parentId"

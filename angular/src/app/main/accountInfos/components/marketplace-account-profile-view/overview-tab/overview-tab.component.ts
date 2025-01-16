@@ -39,7 +39,7 @@ isHelpful:any
   showEmojiPicker: boolean = false;
       messages: CreateMessageInput = new CreateMessageInput();
    attachmentsUploader: FileUploaderCustom;
-   loginAccoutType:string =''
+   loginAccoutType:string="";
    isExpanded = false;
    isUserReviewdBefore : boolean = false
   constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -50,11 +50,8 @@ isHelpful:any
 
 ngOnInit() {
 
-  if(this.accountDataForView){
-    this.isUserReviewedEntityBefore()
-  }
 
-
+  this.getLoginAccoutType()
   // this.getAllPosts()
   this.getAllReviws()
   this.getOverAllRatings()
@@ -64,6 +61,9 @@ ngOnInit() {
 
 
 ngOnChanges(){
+  if(this.accountDataForView){
+    this.isUserReviewedEntityBefore()
+  }
 
 }
 
@@ -96,38 +96,38 @@ toggleExpand(review: any): void {
   }
 
 // rating: number = 3.4; // Rating out of 5
-getAllPosts() {
-  // this.loading = true;
-  const subs = this._postService
-      .getAll(
-         undefined,
-         undefined,
-        undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-         undefined,
-          0,
-          2486,
-          2,
-          "",
-         0,
-         5
-      )
-      .pipe(
-          finalize(() => {
-              // this.loading = false;
-          })
-      )
-      .subscribe((result) => {
-          // this.totalCount = result.totalCount;
+// getAllPosts() {
+//   // this.loading = true;
+//   const subs = this._postService
+//       .getAll(
+//          undefined,
+//          undefined,
+//         undefined,
+//           undefined,
+//           undefined,
+//           undefined,
+//           undefined,
+//          undefined,
+//           0,
+//           2486,
+//           2,
+//           "",
+//          0,
+//          5
+//       )
+//       .pipe(
+//           finalize(() => {
+//               // this.loading = false;
+//           })
+//       )
+//       .subscribe((result) => {
+//           // this.totalCount = result.totalCount;
       
-      this.posts = result.items
+//       this.posts = result.items
 
-      });
-  this.subscriptions.push(subs);
-}
+//       });
+//   this.subscriptions.push(subs);
+// }
 goReviews() {
   this.reviewsSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
 }
@@ -499,8 +499,11 @@ this.subscriptions.push(subs);
     getLoginAccoutType(){
       this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId,5).subscribe((res)=>{
        this.loginAccoutType=res.account.accountType;
-      })
+      }
+     
+      )
     }
+    
 
 ngOnDestroy() {
   this.unsubscribeToAllSubscriptions();
