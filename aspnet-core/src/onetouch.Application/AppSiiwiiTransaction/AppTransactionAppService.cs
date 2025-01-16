@@ -4197,6 +4197,9 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                         //MMT
+                        //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[Start]
+                        viewTrans.CreationDate = transOrg.CreationTime;
+                        //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
 
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
                         viewTrans.TotalQuantity = transOrg.TotalQuantity;
@@ -4336,6 +4339,9 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var retTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
                 retTrans.EnteredDate = trans.EnteredDate;
+                //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[Start]
+                retTrans.CreationDate = trans.CreationTime;
+                //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
                 if (retTrans.AppTransactionContacts != null && retTrans.AppTransactionContacts.Count > 0)
                 {
                     foreach (var cont in retTrans.AppTransactionContacts)
