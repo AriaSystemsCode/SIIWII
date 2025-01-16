@@ -1769,7 +1769,7 @@ namespace onetouch.Message
             {
                 var entityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeReview();
                 var objectId = await _helper.SystemTables.GetsydObjectMessageID();
-                var entityReview = _appEntityRepository.GetAll().Include(z => z.EntitiesRelationships).FirstOrDefaultAsync(z => z.CreatorUserId == AbpSession.UserId && z.TenantId == null &&
+                var entityReview =await _appEntityRepository.GetAll().Include(z => z.EntitiesRelationships).FirstOrDefaultAsync(z => z.CreatorUserId == AbpSession.UserId && z.TenantId == null &&
                 z.ObjectId == objectId && z.EntityObjectTypeId == entityObjectTypeId &&
                 z.RelatedEntitiesRelationships.Where(x => x.EntityId == entityId || x.RelatedEntityId == entityId).Count() > 0);
                // var entityReview = await entityReviewQ.FirstOrDefaultAsync();
