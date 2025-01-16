@@ -51,6 +51,10 @@ export class PostCardComponent
     InteractionsComponent: InteractionsComponent;
     getAppEntityForViewDto: AppEntitiesRelationshipDto = null;
     appEntityTypes = AppEntityTypes;
+    @Input() fromMarketplaceProfile: boolean;
+
+    
+   
 
     constructor(
         private _postService: AppPostsServiceProxy,
@@ -67,7 +71,6 @@ export class PostCardComponent
     }
 
     ngOnChanges(changes: SimpleChanges) {
-       
         if (this.post) {
             //Get ProfilePicture
             this.getProfilePictureById(this.post.appPost.profilePictureId);

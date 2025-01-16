@@ -183,7 +183,7 @@ export class MarketplaceProductsComponent
     
     ngOnChanges(changes: SimpleChanges) {
         debugger
-        alert("change")
+      //  alert("change")
         document.getElementById("_searchInput").focus();
       }
     checkMediaQuery() {

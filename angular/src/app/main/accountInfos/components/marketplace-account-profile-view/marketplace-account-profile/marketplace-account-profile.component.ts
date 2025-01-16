@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Injector, OnInit, Output } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { AccountMainFilterEnum } from '@app/main/accounts/account-shared/models/accounts-main-filter.enum';
+import { SelectItem } from 'primeng/api';
+import { AfterViewInit, Component, EventEmitter, Injector, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -12,12 +14,14 @@ import { finalize } from 'rxjs';
   styleUrls: ['./marketplace-account-profile.component.scss'],
   providers:[MarketplaceAccountsServiceProxy,AppMarketplaceItemsServiceProxy]
 })
-export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit {
-
+export class MarketplaceAccountProfileComponent  extends AppComponentBase   implements OnInit , AfterViewInit, OnChanges  {
+  accountId:number;
+  accountType:string = "";
+  defaultMainFilter : AccountMainFilterEnum= AccountMainFilterEnum.AllAccounts
+  pageMainFilters : SelectItem [] = [{ label:'AllAccounts', value:AccountMainFilterEnum.AllAccounts }]
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
   accountDataForView : AccountDto
   id:string
-  accountId:any;
   companyLogo: any;
   coverPhoto: any;
   marketPlaceData:any
@@ -39,65 +43,81 @@ currentPage: number = 1; // Current page
 totalItems: number = 0; // Total items (retrieved from API)
 isModalOpen = false; // Controls modal visibility
 selectedIndex = 0; // Index of the currently selected image
-  constructor(
-    injector: Injector,
+loginAccoutType:string="";
+
+  constructor(private activatedRoute:ActivatedRoute,
+     injector: Injector,
     private route: ActivatedRoute,
     private _AccountsServiceProxy: AccountsServiceProxy,
     private sanitizer: DomSanitizer,
     private  _marketplaceAccountsServiceProxy : MarketplaceAccountsServiceProxy,
-    
-  
 ) {
   super(injector);
-  }
+}
 
-  ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.accountId = params['id'];
-      console.log('accountId:', this.accountId);
+paramsSubscription;
+ngOnInit(): void {}
 
+ngAfterViewInit(): void {
+  this.paramsSubscription = this.route.params.subscribe(async (params) => {
+    this.accountId = params['id'];
+    await this.getData();
   });
-    // this.route.paramMap.subscribe((params) => {
-    //   this.id = params.get('id');
-    //   console.log('ID:', this.id);
-    // });
-    // this.isHost = !this._abpSessionService.tenantId;
- this.getAccountDataForView()
-//  this.getAllMedia()
- this.createRelation()
-this.mediaItems = this.mediaItems.map((item) => {
-  if (item.type === 'video') {
-    return {
-      ...item,
-      safeUrl: this.sanitizeUrl(item.url), // Add sanitized URL
-    };
-  }
-  return item;
-});
-
 
 }
+
+ngOnChanges(changes: SimpleChanges) {
+  // this.paramsSubscription = this.route.params.subscribe(async (params) => {
+  //   this.accountId = params['id'];
+  //   await this.getData();
+  // });
+}
+
+
+  async getData(): Promise<void> {
+    await this.getAccountDataForView();
+    this.updateMediaItems();
+    this.getLoginAccoutType();
+  }
+  getLoginAccoutType(){
+  this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId,5).subscribe((res)=>{
+   this.loginAccoutType=res.account.accountType;
+  }
+ 
+  )
+}
+
+
+  private updateMediaItems(): void {
+    this.mediaItems = this.mediaItems.map((item) =>
+      item.type === 'video'
+        ? { ...item, safeUrl: this.sanitizeUrl(item.url) }
+        : item
+    );
+  }
+
+
 sanitizeUrl(url: string): SafeResourceUrl {
   return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 }
 
+ngOnDestroy(): void {
+  // Clean up the subscription to avoid memory leaks
+  if (this.paramsSubscription) {
+    this.paramsSubscription.unsubscribe();
+  }
+}
 
-   getAccountDataForView() {
 
+   async getAccountDataForView(): Promise<void> {
     this.showMainSpinner();
-
-  
-
-  this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5).pipe(
+  await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,undefined).pipe(
     finalize(
         ()=>this.hideMainSpinner()
     )
 ).subscribe((res)=>{
-
     this.accountDataForView = res.account
     this.marketPlaceData = res
-    console.log(' this.accountDataForView :',  res );
-
     // this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
     // if(this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
     // if(this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
@@ -111,71 +131,21 @@ sanitizeUrl(url: string): SafeResourceUrl {
   }
 
 
-
-
-  playVideo(videoUrl: string, event) {
-      let videoPrams={
-          value:event.target,
-          url :videoUrl
-      }
-      // this.videoClicked.emit(videoPrams);
-  }
-
-  getAllMedia(){
-    // this.showMainSpinner()
-    this._AccountsServiceProxy.getAllAccountMediaAttachment('449928',undefined,5,  this.itemsPerPage).pipe(
-      finalize(
-          ()=>
-            this.hideMainSpinner()
-      )
-  ).subscribe((res)=>{
-  
-      this.media = res.items
-      // this.totalItems = res.totalCount; // Update total items for pagination
-      this.totalItems = this.mediaItems.length; // Update total items for pagination
-      // this.marketPlaceData = res
-      console.log(' this.media :',  res );
-  
-  })
-  }
-
-  changePage(pageNumber: number): void {
-    this.currentPage = pageNumber;
-    this.getAllMedia(); // Fetch new page data
-  }
-  openModal(index: number): void {
-    this.selectedIndex = index;
-    this.isModalOpen = true;
-  }
-
-  closeModal(): void {
-    this.isModalOpen = false;
-  }
-
-  prevMedia(): void {
-    if (this.selectedIndex > 0) {
-      this.selectedIndex--;
+   createRelation() {
+        this._AccountsServiceProxy
+                .applyRelationOnProfile(this.accountId,undefined)
+                .pipe(
+                    finalize(() => {;
+                        this.hideMainSpinner();
+                    })
+                )
+                .subscribe((result:string) => {
+                  
+                  
+                        this.accountDataForView.avaliableConnectionName="";
+                  
+                    
+                });
     }
-  }
-  
-  nextMedia(): void {
-    if (this.selectedIndex < this.mediaItems.length - 1) {
-      this.selectedIndex++;
-    }
-  }
-  
 
-
-  createRelation() {
-    this._AccountsServiceProxy
-            .applyRelationOnProfile(this.accountId)
-            .pipe(
-                finalize(() => {;
-                    this.hideMainSpinner();
-                })
-            )
-            .subscribe((res) => {
-             console.log(res)
-            });
-}
 }

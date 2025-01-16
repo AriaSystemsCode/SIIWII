@@ -15,6 +15,8 @@ export class ReactionsActionComponent extends AppComponentBase {
     showReactionsPopup: boolean = false
     defaultReactionType : Reactions = Reactions.Like
     Reactions = Reactions
+    @Input() fromOverview : boolean = false
+
     constructor(
         private injector:Injector,
         ) {

@@ -73,6 +73,18 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     sycAttachmentCategoryBanner: SycAttachmentCategoryDto
     sycAttachmentCategoryImage: SycAttachmentCategoryDto
     btnLoader: boolean = false;
+    @Input() personalAccount = false;
+    editInfo = true;
+    NoteditInfo = false;
+    editFirstNameValue: string = '';
+    editLastNameValue: string = '';
+    editJobTitleValue: string = '';
+    editEMailAddressValue: string = '';
+    editLanguageNameValue: string = '';
+    editPhoneNumberValue: string = '';
+    Editting:boolean =false;
+    editPersonal:boolean =false;
+
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -130,7 +142,25 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
-        this.edit.emit()
+        if (this.personalAccount  && !this.editPersonal) {
+            this.Editting=true;
+            this.editInfo = false;
+            this.NoteditInfo = true;
+            this.editFirstNameValue = this.accountData.firstName;
+            this.editLastNameValue= this.accountData.lastName;
+            this.editJobTitleValue= this.accountData.jobTitle;
+            this.editEMailAddressValue= this.accountData.eMailAddress;
+            this.editLanguageNameValue= this.accountData.languageName;
+            this.editPhoneNumberValue= this.accountData.phoneNumber;
+
+
+        }
+        else{
+            this.editInfo = true;
+            this.NoteditInfo = false;
+            this.Editting = false;
+            this.edit.emit();
+        }
     }
 
     deleteAccount() {
@@ -391,5 +421,17 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     isNotManualLevel(): boolean {
         return this.accountLevel !== AccountLevelEnum.Manual;
+      }
+
+
+      isChangePersonalData() : boolean{
+      if(!this.editFirstNameValue || !this.editLastNameValue || !this.editJobTitleValue || !this.editEMailAddressValue || !this.editLanguageNameValue || !this.editPhoneNumberValue)
+        return false;
+
+      
+      if(this.editFirstNameValue == this.accountData.firstName && this.editLastNameValue == this.accountData.lastName && this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue== this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue== this.accountData.phoneNumber )
+        return false;
+
+      return true;
       }
 }
