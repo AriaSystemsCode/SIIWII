@@ -855,7 +855,8 @@ this.hideMainSpinner();
             this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId).subscribe((res) => {
                 this.printInfoParam.orderConfirmationRole = res.contactRole;
                 this.printInfoParam.contactName = res.contactName;
-                console.log(this.printInfoParam.orderConfirmationRole, 'OrderConfirmationRole set');
+           
+ 
                 
                 // Ensure dependent logic is executed after the async operation
                 this.reportUrl = this.printInfoParam.getReportUrl();
