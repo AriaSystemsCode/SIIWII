@@ -694,3 +694,73 @@ height: 100px !important;
         border:  none !important;
       }
     }
+
+
+
+
+
+    /* Main Container */
+.emoji-container {
+    position: relative;
+    width: 300px;
+    margin: 20px auto;
+  }
+  
+  /* Input Box */
+  .input-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 5px 10px;
+    background-color: #fff;
+  }
+  
+  .input-box input {
+    border: none;
+    outline: none;
+    flex-grow: 1;
+    font-size: 1rem;
+    padding: 5px;
+  }
+  
+  .emoji-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  /* Emoji Picker Popup */
+  .emoji-picker {
+    position: absolute;
+    top: 50px; /* Adjust as needed */
+    left: 0;
+    right: 0;
+    width: 320px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+  }
+  
+  /* Emoji Grid */
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr); /* 8 emojis per row */
+    gap: 10px;
+  }
+  
+  .emoji-item {
+    font-size: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .emoji-item:hover {
+    background-color: #f0f0f0;
+    border-radius: 50%;
+  }
+  

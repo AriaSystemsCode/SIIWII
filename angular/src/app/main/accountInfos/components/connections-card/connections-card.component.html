@@ -15,7 +15,9 @@
     >
         <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
     </div>
-    <div class="single-item-body col pr-0" style="width: 176px;" [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
+    <div class="single-item-body col pr-0" style="width: 176px;" [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}"  [ngStyle]="{
+        'padding-left': fromOverview ? '0px' : ''
+      }">
         <div >
             <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" class="" [ngClass]="fromOverview ? 'p-1' :'p-0'">
                 <h3 (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">{{account?.account?.name}}</h3>
@@ -95,7 +97,9 @@
                   <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" [ngStyle]="{
                     'font-size': fromOverview ? '11px' : ''
                   }">
-                   <img  src="../../../../../assets/accounts/followers.png" />
+                   <img  src="../../../../../assets/accounts/followers.png"  [ngStyle]="{
+                    'width': fromOverview ? '15px' : ''
+                  }" />
                     <span style="color: rgba(158, 158, 158, 1);">
                       {{ account?.account?.connectioncount   ? account.account?.connectioncount   : '0' }}   {{ ' Followers' }}
                     </span>

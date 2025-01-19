@@ -48,7 +48,7 @@
 >
   <div class="modal-content d-flex justify-content-center align-items-center">
     <ng-container *ngIf="mediaItems[selectedIndex]?.attachmentCategoryId === 3; else videoTemplate">
-      <!-- Display image -->
+  
       <img 
       onerror="this.src='../../assets/placeholders/appitem-placeholder.png'" 
         [src]="attachmentBaseUrl + '/' +  mediaItems[selectedIndex]?.url" 
@@ -61,7 +61,7 @@
     <ng-template #videoTemplate>
       <!-- Display video -->
       <video 
-        [src]="mediaItems[selectedIndex]?.url" 
+        [src]="mediaItems[selectedIndex]?.safeUrl" 
         controls 
          
         class="modal-video" 

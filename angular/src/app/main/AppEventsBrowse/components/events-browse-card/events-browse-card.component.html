@@ -111,7 +111,7 @@
                     {{ item.appEvent.name | textSubstring: 65 }}
                 </h3>
 
-                <div class="row "  [ngClass]="fromOverviewMarketPlaceProfile ? '':'mb-3'">
+                <div class="row "  [ngClass]="fromOverviewMarketPlaceProfile ? 'addFont':'mb-3'">
                 <img src="../../../../../assets/events/tabler_calendar-stats.png" style="width: 19px;
     height: 19px;"/> 
                 <p class=" product-name border-right  font-weight-bold" [ngClass]="fromOverviewMarketPlaceProfile ? 'mb-1':'pl-3 pr-3'">
@@ -122,7 +122,7 @@
                 </span>
                 </p>
 
-                <p class=" product-name font-weight-bold"  [ngClass]="fromOverviewMarketPlaceProfile ? 'mb-1':'pl-3 '"> 
+                <p class=" product-name font-weight-bold"  [ngClass]="fromOverviewMarketPlaceProfile ? 'mb-1 ml-4':'pl-3 '"> 
                     {{ "End date : " | localize }}
                     <span style="color: #9E9E9E;">
                     {{ item.appEvent.toDate?.toString()  | date: 'dd MMMM, yyyy' }}, {{ item.appEvent.toTime?.toString()  | date: 'h:mm a' }}
@@ -130,7 +130,7 @@
                 </p>
             </div>
 
-            <div class="row "  [ngClass]="fromOverviewMarketPlaceProfile ? '':'mb-3'">
+            <div class="row "  [ngClass]="fromOverviewMarketPlaceProfile ? 'addFontS':'mb-3'">
                 <img src="../../../../../assets/events/streamline_interface-presentation-podium-work-desk-notes-company-presentation-office-podium-microphone.png" 
                      style="width: 19px; height: 19px;" />
                 <div class="pl-4 product-name pr-3 font-weight-bold row">

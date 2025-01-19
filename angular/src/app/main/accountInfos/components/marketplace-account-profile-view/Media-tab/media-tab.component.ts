@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, Input, OnInit, Output } from '@angul
 import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountsServiceProxy, AppEntityAttachmentDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
 
 
@@ -14,6 +14,7 @@ import { AppConsts } from '@shared/AppConsts';
 })
 export class MediaTabComponent    extends AppComponentBase implements OnInit  {
 
+@Input('accountDataForView') accountDataForView :AccountDto;
 
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
 
@@ -88,7 +89,7 @@ sanitizeUrl(url: string): SafeResourceUrl {
     // this.showMainSpinner()
     let itemsforpage ;
     this.fromOverviewTab ? itemsforpage = 9 : itemsforpage = this.itemsPerPage
-    this._AccountsServiceProxy.getAllAccountMediaAttachment('Business-000000000014',undefined,5,  itemsforpage).pipe(
+    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,5,  itemsforpage).pipe(
       finalize(
           ()=>
             this.hideMainSpinner()
