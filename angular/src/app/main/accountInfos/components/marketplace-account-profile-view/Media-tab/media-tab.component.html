@@ -76,9 +76,24 @@
 </p-dialog>
 
 
-<div *ngIf="fromOverviewTab">
-    <img  *ngFor="let item of mediaItems; let i = index" [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class=" w-100 media-img col-4"  (click)="openModal(i)" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"  />
-</div>
+<div *ngIf="fromOverviewTab" class="position-relative">
+    <ng-container *ngFor="let item of mediaItems; let i = index">
+
+      <img 
+        [src]="attachmentBaseUrl + '/' + item?.url" 
+        alt="Media Image" 
+        class="w-100 media-img col-4" 
+        (click)="openModal(i)" 
+        onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"
+      />
+ 
+      <div *ngIf="i === 8 " class="more-overlay">
+   
+        <span>+{{ mediaItems.length - 8 }}</span>
+      </div>
+    </ng-container>
+  </div>
+  
 
 
 <p *ngIf="mediaItems?.length ==0" class="">

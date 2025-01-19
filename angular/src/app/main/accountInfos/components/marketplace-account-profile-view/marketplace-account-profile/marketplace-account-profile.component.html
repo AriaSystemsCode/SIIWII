@@ -75,7 +75,7 @@
                 <app-overview-tab [accountDataForView]="accountDataForView" (activeTabIndexBtn)="navigateToTab($event)"></app-overview-tab>
         </p-tabPanel>
         <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" header="Products">
-           <app-marketplace-products [fromMarketAcoount]="true"></app-marketplace-products>
+           <app-marketplace-products [fromMarketAcoount]="true" [accountDataForView]="accountDataForView" ></app-marketplace-products>
         </p-tabPanel>
      
         <p-tabPanel header="Connections"   *ngIf="accountDataForView">

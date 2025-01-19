@@ -81,10 +81,25 @@ align-items: center;
 text-transform: capitalize;
 
 color: #4A0D4A;
+z-index: 99;
 
 
       }
+.vist-btn {
 
+  border: none;
+  border-radius: 6px;
+// width: 66px;
+height: 32px;
+font-weight: 600;
+font-size: 12px;
+line-height: 21px;
+display: flex;
+align-items: center;
+text-transform: capitalize;
+background-color: #4A0D4A;
+color: #FFFFFF;
+}
       .row-item-title {
 
 font-weight: 600;

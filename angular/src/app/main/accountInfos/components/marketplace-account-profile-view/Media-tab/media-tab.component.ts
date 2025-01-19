@@ -36,9 +36,9 @@ export class MediaTabComponent    extends AppComponentBase implements OnInit  {
     totalItems: number = 0; // Total items (retrieved from API)
     isModalOpen = false; // Controls modal visibility
     selectedIndex = 0; // Index of the currently selected image
-    
+    lastImageIndex: number = 0;
 @Input('fromOverviewTab') fromOverviewTab :boolean = false
-
+isLoading: boolean = false; // Prevent duplicate API calls
   constructor(
     injector: Injector,
 
@@ -69,6 +69,7 @@ export class MediaTabComponent    extends AppComponentBase implements OnInit  {
             return item;
           });
           
+          this.lastImageIndex = Math.min(this.mediaItems.length - 1, 8);
     }
 
 
@@ -85,8 +86,10 @@ sanitizeUrl(url: string): SafeResourceUrl {
   return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 }
 
+
+
   getAllMedia(){
-    // this.showMainSpinner()
+    this.showMainSpinner()
     let itemsforpage ;
     this.fromOverviewTab ? itemsforpage = 9 : itemsforpage = this.itemsPerPage
     this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,5,  itemsforpage).pipe(

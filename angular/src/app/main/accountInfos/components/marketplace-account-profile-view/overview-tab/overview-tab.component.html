@@ -336,8 +336,13 @@
              
          </div>
         <hr class="hr">
-        
-        <app-marketplace-products  [fromOverView]="true"></app-marketplace-products>
+        <div class="d-flex justify-content-between">
+          <h4 class="" style="font-size: 14px;">For full viewing of {{ "''"+ accountDataForView?.name + "''"}}</h4>
+          <button  (click)="activeTabIndexBtn.emit(1) " class="vist-btn d-flex">  
+              <p class="m-auto">Visit Virtual Showroom</p></button>
+          
+      </div>
+        <app-marketplace-products  [accountDataForView]="accountDataForView"  [fromOverView]="true"></app-marketplace-products>
 
      </div>
 

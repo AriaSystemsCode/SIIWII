@@ -77,7 +77,7 @@ export class MarketplaceProductsComponent
     contactSSIN:any;
     @Input() fromMarketAcoount: boolean;
     @Input() fromOverView: boolean = false
-
+    @Input() accountDataForView :any
     constructor(
         injector: Injector,
         private _router: Router,
@@ -147,8 +147,8 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
-                null, // tenant id
+               this.fromMarketAcoount || this.fromOverView ? this.accountDataForView ?.ssin : localStorage.getItem("SellerSSIN"),
+                 null, // tenant id
                 null,
                 false, // false
                 this.searchInput, // search text
