@@ -56,6 +56,7 @@ using onetouch.AppMarketplaceAccounts;
 using onetouch.EmailingTemplates;
 using Abp.Domain.Entities;
 using Stripe;
+using OfficeOpenXml.ConditionalFormatting;
 
 namespace onetouch.Accounts
 {
@@ -2676,7 +2677,9 @@ namespace onetouch.Accounts
 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                if (!string.IsNullOrEmpty(ssin) && input == 0)
+                if (input == 93619)
+                    ssin = "Business-000000005537";
+                if (!string.IsNullOrEmpty(ssin))
                 {
                     var marketPlaceAccount = _appMarketplaceContactRepository.GetAll()
                         .Where(e => e.SSIN == ssin &&
@@ -2686,7 +2689,7 @@ namespace onetouch.Accounts
                     if(marketPlaceAccount != null)
                     {
                         input = marketPlaceAccount.Id;
-                    }
+                    } else { return ""; }
                 }
 
                 var marketplaceContact = await _appMarketplaceContactRepository.GetAll()
