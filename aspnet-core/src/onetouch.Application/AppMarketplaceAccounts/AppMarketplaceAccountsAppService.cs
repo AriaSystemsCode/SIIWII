@@ -158,9 +158,10 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
-                           .Where(e => (e.SSIN != currentTenantAccountSSIN && e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
-                           
-                           //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
+                           //.Where(e => (e.SSIN != currentTenantAccountSSIN && e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
+                           .Where(e => ((e.IsHidden != true)));
+
+                    //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 
                     var pagedAndFilteredAccounts = filteredAccounts
                     .OrderBy(input.Sorting ?? "name asc")
@@ -367,8 +368,10 @@ namespace onetouch.AppMarketplaceAccounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                //ssin = "Business-000000004124-Avatar-M1";
-                if (!string.IsNullOrEmpty(ssin) && id == 0)
+                if(id==93619)
+                ssin = "Business-000000005537";
+
+                if (!string.IsNullOrEmpty(ssin))
                 {
                     var marketPlaceAccount = _appMarketplaceContactRepository.GetAll()
                         .Where(e => e.SSIN == ssin &&
@@ -378,128 +381,149 @@ namespace onetouch.AppMarketplaceAccounts
                     if (marketPlaceAccount != null)
                     {
                         id = marketPlaceAccount.Id;
-                    }
+                    } else { return new GetAccountForViewDto(); }
                 }
                 var account = await _appMarketplaceContactRepository.GetAll()
                 .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
+                var output = new GetAccountForViewDto();
 
-                var entity = await _appEntityRepository.GetAll()
+                if (account != null)
+                {
+                    var entity = await _appEntityRepository.GetAll()
                     .Include(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk)
                     .Include(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
                     .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     .FirstOrDefaultAsync(x => x.Id == account.Id);
 
-                var accountDto = ObjectMapper.Map<AccountDto>(account);
+                    var accountDto = ObjectMapper.Map<AccountDto>(account);
 
-                #region prepare account types
-                //List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
-                //accountDto.AccountType = GetLookUPLabels(account.AccountType, tmpAccountType);
-                #endregion prepare account ypes
+                    #region prepare account types
+                    //List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
+                    //accountDto.AccountType = GetLookUPLabels(account.AccountType, tmpAccountType);
+                    #endregion prepare account ypes
 
-                #region I31 fill account type from entity type in AppEntities 
-                accountDto.SSIN = account.SSIN;
-                accountDto.PriceLevel = "";
-                accountDto.AccountTypeId = entity.EntityObjectTypeId;
-                accountDto.AccountType = entity.EntityObjectTypeCode;
-                accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData && account.ParentId == null && account.Id == null);
-                accountDto.IsConnected = (account.TenantId == null && !account.IsProfileData && account.ParentId == null);
-                #endregion I31 fill account type from entity type in AppEntities 
+                    #region I31 fill account type from entity type in AppEntities 
+                    accountDto.SSIN = account.SSIN;
+                    accountDto.PriceLevel = "";
+                    accountDto.AccountTypeId = entity.EntityObjectTypeId;
+                    accountDto.AccountType = entity.EntityObjectTypeCode;
+                    accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData && account.ParentId == null && account.Id == null);
+                    accountDto.IsConnected = (account.TenantId == null && !account.IsProfileData && account.ParentId == null);
+                    #endregion I31 fill account type from entity type in AppEntities 
 
 
-                accountDto.Description = entity.Notes;
+                    accountDto.Description = entity.Notes;
 
-                accountDto.Categories = entity.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(resultCount).ToArray();
-                accountDto.CategoriesTotalCount = entity.EntityCategories.Count();
+                    accountDto.Categories = entity.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(resultCount).ToArray();
+                    accountDto.CategoriesTotalCount = entity.EntityCategories.Count();
 
-                accountDto.Classfications = entity.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(resultCount).ToArray();
-                accountDto.ClassificationsTotalCount = entity.EntityClassifications.Count();
+                    accountDto.Classfications = entity.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(resultCount).ToArray();
+                    accountDto.ClassificationsTotalCount = entity.EntityClassifications.Count();
 
-                accountDto.Status = (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == account.Id) > 0 || _appContactRepository.GetAll().Count(x => x.Id == account.Id && x.TenantId == null) > 0);
+                    accountDto.Status = (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == account.Id) > 0 || _appContactRepository.GetAll().Count(x => x.Id == account.Id && x.TenantId == null) > 0);
 
-                accountDto.Connections = _appContactRepository.GetAll().Count(c => c.TenantId == entity.TenantId && c.PartnerId == id);
-                int ConnectionCount = _appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
-                accountDto.EntityId = entity.Id;
-                var firstAddress = account.ContactAddresses.FirstOrDefault();
-                if (account.ContactAddresses.Count() > 0 && firstAddress.AddressFk != null)
-                {
-                    accountDto.AddressLine1 = firstAddress.AddressFk.AddressLine1;
-                    accountDto.AddressLine2 = firstAddress.AddressFk.AddressLine2;
-                    accountDto.City = firstAddress.AddressFk.City;
-                    accountDto.CountryId = firstAddress.AddressFk.CountryId;
-                    accountDto.CountryName = firstAddress.AddressFk.CountryFk.Name;
-                    accountDto.ZipCode = firstAddress.AddressFk.PostalCode;
-                    accountDto.State = firstAddress.AddressFk.State;
-                }
-                if(account.OwnerId!=null)
-                accountDto.TenantId = ((int)account.OwnerId);
+                    accountDto.Connections = _appContactRepository.GetAll().Count(c => c.TenantId == entity.TenantId && c.PartnerId == id);
+                    int ConnectionCount = _appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
+                    accountDto.EntityId = entity.Id;
+                    var firstAddress = account.ContactAddresses.FirstOrDefault();
+                    if (account.ContactAddresses.Count() > 0 && firstAddress.AddressFk != null)
+                    {
+                        accountDto.AddressLine1 = firstAddress.AddressFk.AddressLine1;
+                        accountDto.AddressLine2 = firstAddress.AddressFk.AddressLine2;
+                        accountDto.City = firstAddress.AddressFk.City;
+                        accountDto.CountryId = firstAddress.AddressFk.CountryId;
+                        accountDto.CountryName = firstAddress.AddressFk.CountryFk.Name;
+                        accountDto.ZipCode = firstAddress.AddressFk.PostalCode;
+                        accountDto.State = firstAddress.AddressFk.State;
+                    }
+                    if (account.OwnerId != null)
+                        accountDto.TenantId = ((int)account.OwnerId);
 
-                var branch = ObjectMapper.Map<BranchDto>(account);
-                BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var mainBranchSubtotal = _appContactRepository.GetAll()
-                            .Include(e => e.ParentFk)
-                            .Include(e => e.ParentFkList)
-                            //  .Where(x => x.IsProfileData)
-                            .Where(e => e.ParentId != null && e.ParentId == branch.Id && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).Count();
-                branchForViewDto.SubTotal = mainBranchSubtotal;
-                List<TreeNode<BranchForViewDto>> branches = new List<TreeNode<BranchForViewDto>>
+                    var branch = ObjectMapper.Map<BranchDto>(account);
+                    BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
+                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    var mainBranchSubtotal = _appContactRepository.GetAll()
+                                .Include(e => e.ParentFk)
+                                .Include(e => e.ParentFkList)
+                                //  .Where(x => x.IsProfileData)
+                                .Where(e => e.ParentId != null && e.ParentId == branch.Id && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).Count();
+                    branchForViewDto.SubTotal = mainBranchSubtotal;
+                    List<TreeNode<BranchForViewDto>> branches = new List<TreeNode<BranchForViewDto>>
                 {
                     new TreeNode<BranchForViewDto>() { label = branch.Name, Data = branchForViewDto}
                 };
-                accountDto.Branches = branches;
+                    accountDto.Branches = branches;
 
-                if (entity.EntityAttachments.Count() > 0)
-                {
-                    var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
-                    var logo = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
-                    accountDto.LogoUrl = logo == null ? null : logo.AttachmentFk.Attachment;
-
-                    var attCoverId = await _helper.SystemTables.GetAttachmentCategoryCoverId();
-                    var cover = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCoverId);
-                    accountDto.CoverUrl = cover == null ? null : cover.AttachmentFk.Attachment;
-
-                    accountDto.ImagesUrls = entity.EntityAttachments
-                        //.Where(x => x.AttachmentCategoryId != (logo == null ? 0 : logo.AttachmentCategoryId))
-                        .WhereIf(logo != null, x => x.AttachmentCategoryId != (logo == null ? 0 : logo.AttachmentCategoryId))
-                        .WhereIf(cover != null, x => x.AttachmentCategoryId != (cover == null ? 0 : cover.AttachmentCategoryId))
-                        .Select(x => x.AttachmentFk.Attachment).ToArray();
-                }
-
-                var output = new GetAccountForViewDto { Account = accountDto, ConnectionCount = ConnectionCount };
-
-                if (output.Account.CountryId != null && output.Account.CountryId != 0)
-                {
-                    var _lookupAppEntity = await _appEntityRepository.FirstOrDefaultAsync((long)output.Account.CountryId);
-                    output.AppEntityName = _lookupAppEntity?.Name?.ToString();
-                }
-
-                if (output.Account.ImagesUrls != null && output.Account.ImagesUrls.Length > 0)
-                {
-                    for (int i = 0; i < output.Account.ImagesUrls.Length; i++)
+                    if (entity.EntityAttachments.Count() > 0)
                     {
-                        output.Account.ImagesUrls[i] = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.ImagesUrls[i];
+                        var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+                        var logo = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
+                        accountDto.LogoUrl = logo == null ? null : logo.AttachmentFk.Attachment;
+
+                        var attCoverId = await _helper.SystemTables.GetAttachmentCategoryCoverId();
+                        var cover = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCoverId);
+                        accountDto.CoverUrl = cover == null ? null : cover.AttachmentFk.Attachment;
+
+                        accountDto.ImagesUrls = entity.EntityAttachments
+                            //.Where(x => x.AttachmentCategoryId != (logo == null ? 0 : logo.AttachmentCategoryId))
+                            .WhereIf(logo != null, x => x.AttachmentCategoryId != (logo == null ? 0 : logo.AttachmentCategoryId))
+                            .WhereIf(cover != null, x => x.AttachmentCategoryId != (cover == null ? 0 : cover.AttachmentCategoryId))
+                            .Select(x => x.AttachmentFk.Attachment).ToArray();
                     }
-                }
-                if (output.Account.LogoUrl != null) output.Account.LogoUrl = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.LogoUrl;
-                if (output.Account.CoverUrl != null) output.Account.CoverUrl = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.CoverUrl;
-                //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
-                long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                //var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
-                //!x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
-                var publishedRecord = await _appMarketplaceContactRepository.GetAll()
-                                  .AsNoTracking()
-                                  .FirstOrDefaultAsync(x => x.TenantId == null
-                                  && x.IsProfileData == true
-                                  && x.IsHidden == false
-                                  && x.OwnerId == account.TenantId
-                                  && x.SSIN == account.SSIN);
-                output.IsSync = false;
-                output.IsPublished = false;
-                if (publishedRecord != null)
-                {
-                    output.IsSync = (publishedRecord.LastModificationTime != entity.LastModificationTime);
-                    output.IsPublished = true;
+
+                    output = new GetAccountForViewDto { Account = accountDto, ConnectionCount = ConnectionCount };
+
+                    if (output.Account.CountryId != null && output.Account.CountryId != 0)
+                    {
+                        var _lookupAppEntity = await _appEntityRepository.FirstOrDefaultAsync((long)output.Account.CountryId);
+                        output.AppEntityName = _lookupAppEntity?.Name?.ToString();
+                    }
+
+                    if (output.Account.ImagesUrls != null && output.Account.ImagesUrls.Length > 0)
+                    {
+                        for (int i = 0; i < output.Account.ImagesUrls.Length; i++)
+                        {
+                            output.Account.ImagesUrls[i] = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.ImagesUrls[i];
+                        }
+                    }
+                    if (output.Account.LogoUrl != null) output.Account.LogoUrl = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.LogoUrl;
+                    if (output.Account.CoverUrl != null) output.Account.CoverUrl = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.CoverUrl;
+                    //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
+                    long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                    //var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
+                    //!x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
+                    var publishedRecord = await _appMarketplaceContactRepository.GetAll()
+                                      .AsNoTracking()
+                                      .FirstOrDefaultAsync(x => x.TenantId == null
+                                      && x.IsProfileData == true
+                                      && x.IsHidden == false
+                                      && x.OwnerId == account.TenantId
+                                      && x.SSIN == account.SSIN);
+                    output.IsSync = false;
+                    output.IsPublished = false;
+                    if (publishedRecord != null)
+                    {
+                        output.IsSync = (publishedRecord.LastModificationTime != entity.LastModificationTime);
+                        output.IsPublished = true;
+                    }
+
+                    //fill connection attrs
+                    var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                            .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
+                    var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == output.Account.SSIN);
+                    if (accountConnection != null && accountConnection.Id > 0)
+                    {
+                        output.ConnectionName = GetAction(output.Account.AccountType, currentTenantAccount, false);
+                        output.AvaliableConnectionName = "";
+                    }
+                    else
+                    {
+                        //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                        output.AvaliableConnectionName = GetAction(output.Account.AccountType, currentTenantAccount, true);
+                        output.ConnectionName = "";
+                    }
                 }
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
                 return output;
