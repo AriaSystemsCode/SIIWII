@@ -175,20 +175,52 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                         console.log( this.savedAddressesList,' this.savedAddressesList')
                         this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
                             // console.log(result,'defauulllt')
+
                             if (result){
-                                const addressIds = result.map(address => address.addressId);
-                                // console.log(addressIds,'addressIds')
-                                   
-                                const matchedAddress = this.savedAddressesList.find(savedAddress => 
-                                    addressIds.includes(savedAddress.id)
-                                );
-                                // console.log(matchedAddress,'matchedAddress')
-                           
-                                if (matchedAddress ) {
-                                    this.selectedAddress = matchedAddress
-                    
+                                if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo) {
+                                    // Filter the result to find the address with addressType 'Shipping'
+                                    const shippingAddress = result.find(address => address.addressType === 'Shipping');
+                                    
+                                    console.log(shippingAddress, 'shippingAddress');
+                                    
+                                    if (shippingAddress) {
+                                        // Check if the shipping address exists in the savedAddressesList
+                                        const matchedAddress = this.savedAddressesList.find(savedAddress => 
+                                            savedAddress.id === shippingAddress.addressId
+                                        );
+                                        
+                                        console.log(matchedAddress, 'matchedAddress');
+                                        
+                                        // If a matching address is found, set it as the selected address
+                                        if (matchedAddress) {
+                                            this.selectedAddress = matchedAddress;
+                                            this.addAddressDataToDto(2)
+                                        }
                                     }
-            
+                                }   else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo) {
+                                    // Filter the result to find the address with addressType 'Billing'
+                                    const billingAddress = result.find(address => address.addressType === 'Billing');
+                                    
+                                    console.log(billingAddress, 'billingAddress');
+                                    
+                                    if (billingAddress) {
+                                        // Check if the billing address exists in the savedAddressesList
+                                        const matchedAddress = this.savedAddressesList.find(savedAddress => 
+                                            savedAddress.id === billingAddress.addressId
+                                        );
+                                        
+                                        console.log(matchedAddress, 'matchedAddress');
+                                        
+                                        // If a matching address is found, set it as the selected address
+                                        if (matchedAddress) {
+                                            this.selectedAddress = matchedAddress;
+                                            this.addAddressDataToDto(1)
+
+                                        }
+                                    }
+                                }
+                                
+                            
                             }
                            
                         
