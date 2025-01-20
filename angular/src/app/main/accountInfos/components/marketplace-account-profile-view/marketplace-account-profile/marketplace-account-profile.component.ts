@@ -143,8 +143,8 @@ ngOnDestroy(): void {
                 .subscribe((result:string) => {
                   
                   
-                        this.accountDataForView.avaliableConnectionName="";
-                  
+                        this.marketPlaceData.avaliableConnectionName="";
+                        this.marketPlaceData.connectionName=this.l(result);
                     
                 });
     }
