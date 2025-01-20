@@ -2166,6 +2166,7 @@ namespace onetouch.AppSiiwiiTransaction
                     y.NetDueDays = x.Trans.PaymentTermsFk != null && x.Trans.PaymentTermsFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 34) != null ? int.Parse(x.Trans.PaymentTermsFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 34).AttributeValue) : 0;
                     // y.AppTransactionContacts.ForEach(z => z.ContactAddressDetail.ContactEmail = z.ContactEmail);
                     // y.AppTransactionContacts.ForEach(z => z.ContactAddressDetail.ContactPhone = z.ContactPhoneNumber);
+                    y.BuyerBranchCode = "";
                     if (x.Trans.AppTransactionContacts != null)
                     {
                         foreach (var cnt in y.AppTransactionContacts)
@@ -2176,6 +2177,17 @@ namespace onetouch.AppSiiwiiTransaction
                                 //             cnt.ContactAddressDetail = ObjectMapper.Map<ContactAppAddressDto>(d.ContactAddressFk);
                                 cnt.ContactAddressDetail.ContactEmail = cnt.ContactEmail;
                                 cnt.ContactAddressDetail.ContactPhone = cnt.ContactPhoneNumber;
+                            }
+                            if (cnt.ContactRole == ContactRoleEnum.Buyer && cnt.BranchSSIN!=null && cnt.BranchName !="*Main*")
+                            {
+                                var branch = _appContactRepository.GetAll().Where(z => z.SSIN == cnt.BranchSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
+                                if (branch != null)
+                                {
+                                    y.BuyerBranchCode =branch.Code;
+                                    y.BuyerBranchName = cnt.BranchName;
+                                    y.BuyerBranchSSIN = cnt.BranchSSIN;
+
+                                }
                             }
                         }
                     }
