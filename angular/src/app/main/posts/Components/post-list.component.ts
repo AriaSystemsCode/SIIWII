@@ -1,5 +1,5 @@
 import { formatDate } from "@angular/common";
-import { Injector, Input, OnDestroy } from "@angular/core";
+import { Injector, Input, OnChanges, OnDestroy, SimpleChanges } from "@angular/core";
 import { ViewChild } from "@angular/core";
 import { Component, OnInit, AfterViewInit } from "@angular/core";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
@@ -38,7 +38,7 @@ import { ViewPostComponent } from "./view-post.component";
 })
 export class PostListComponent
     extends AppComponentBase
-    implements OnInit, AfterViewInit, OnDestroy
+    implements OnInit, AfterViewInit, OnChanges,OnDestroy
 {
     @ViewChild("createOrEditModal", { static: true })
     createOrEditModal: CreateorEditPostComponent;
@@ -122,6 +122,11 @@ export class PostListComponent
             this.bodyElement[0].scrollTop = 0;
             this.bodyElement[0].classList.add("thin-scroll");
         }
+    }
+    ngOnChanges(changes: SimpleChanges) {
+    if (changes['accountDataForView']) {
+        this.refreshData();
+      }
     }
 
     ngOnDestroy() {
