@@ -48,13 +48,15 @@ export class ConnectionsTabComponent extends AppComponentBase {
     this.singleItemPerRowMode = false;
     this.defineSortingOptions();
     this.initFilterForm();
-    this.GetSettingValue();
     this.overridePrimeTableSetting();
-
   }
   
 
-  ngOnChanges(changes: SimpleChanges) {}
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['accountDataForView'] &&  (changes['accountDataForView']?.currentValue != changes['accountDataForView']?.previousValue )) {
+    this.GetSettingValue();
+    }
+  }
 
   getAllAccountTypesForTableDropdownWithPaging(){
   this._appEntitiesServiceProxy.getAllAccountTypesForTableDropdownWithPaging(

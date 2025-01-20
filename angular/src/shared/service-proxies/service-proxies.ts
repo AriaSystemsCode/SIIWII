@@ -31228,15 +31228,18 @@ export class MarketplaceAccountsServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param ssin (optional) 
      * @param resultCount (optional) 
      * @return Success
      */
-    getAccountForView(id: number | undefined, resultCount: number | undefined): Observable<GetAccountForViewDto> {
+    getAccountForView(id: number | undefined, ssin: string | null | undefined, resultCount: number | undefined): Observable<GetAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/MarketplaceAccounts/GetAccountForView?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (ssin !== undefined && ssin !== null)
+            url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
         if (resultCount === null)
             throw new Error("The parameter 'resultCount' cannot be null.");
         else if (resultCount !== undefined)

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { AccountDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
@@ -11,6 +11,5 @@ import { AccountDto } from '@shared/service-proxies/service-proxies';
 export class PostsTabComponent {
   @Input() accountDataForView :AccountDto;
   @Input() fromOverviewTab :boolean = false
-  
-
+ 
 }

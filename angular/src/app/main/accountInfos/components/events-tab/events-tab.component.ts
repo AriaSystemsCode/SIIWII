@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, SimpleChanges, ViewChild } from '@angular/core';
 import { EventsBrowseComponent } from '@app/main/AppEventsBrowse/components/events-browse/events-browse.component';
 import { EventsBrowseInputs } from '@app/main/AppEventsBrowse/models/Events-browse-inputs';
 import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
@@ -19,35 +19,40 @@ export class EventsTabComponent  implements AfterViewInit{
   @Input() fromOverviewMarketPlaceProfile :boolean;
   
 ngAfterViewInit(): void {
-    const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"
-    const showMainFiltersOptions: boolean = true
-    const pageMainFilters: SelectItem[] = [
-        { label: "AllEvents", value: EventsFilterTypesEnum.AllEvents },
-        { label: "UpcomingEvents", value: EventsFilterTypesEnum.UpcommingEvents },
-        { label: "PriorEvents", value: EventsFilterTypesEnum.PriorEvents },
-        { label: "MyEvents", value: EventsFilterTypesEnum.MyEvents }
-    ]
-    const filtersFlags :EventsBrowseComponentFiltersDisplayFlags = new EventsBrowseComponentFiltersDisplayFlags()
-    const statusesFlags :EventsBrowseComponentStatusesFlags = new EventsBrowseComponentStatusesFlags()
-    const actionsMenuFlags :EventsBrowseComponentActionsMenuFlags = new EventsBrowseComponentActionsMenuFlags()
-    filtersFlags.showAll()
-    statusesFlags.showAll()
-    actionsMenuFlags.showAll()
+}
 
-    const title:string = ""
-    const canView:boolean = true
-    const canAdd:boolean = false
-    const inputs : EventsBrowseInputs = {
-        canAdd,
-        canView,
-        title,
-        statusesFlags,
-        filtersFlags,
-        actionsMenuFlags,
-        defaultMainFilter,
-        showMainFiltersOptions,
-        pageMainFilters
-    }
-    this.eventBrowseComponent.show(inputs)
+ngOnChanges(changes: SimpleChanges) {
+  if (changes['accountDataForView'] && (changes['accountDataForView']?.currentValue != changes['accountDataForView']?.previousValue )) {
+  const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"
+  const showMainFiltersOptions: boolean = true
+  const pageMainFilters: SelectItem[] = [
+      { label: "AllEvents", value: EventsFilterTypesEnum.AllEvents },
+      { label: "UpcomingEvents", value: EventsFilterTypesEnum.UpcommingEvents },
+      { label: "PriorEvents", value: EventsFilterTypesEnum.PriorEvents },
+      { label: "MyEvents", value: EventsFilterTypesEnum.MyEvents }
+  ]
+  const filtersFlags :EventsBrowseComponentFiltersDisplayFlags = new EventsBrowseComponentFiltersDisplayFlags()
+  const statusesFlags :EventsBrowseComponentStatusesFlags = new EventsBrowseComponentStatusesFlags()
+  const actionsMenuFlags :EventsBrowseComponentActionsMenuFlags = new EventsBrowseComponentActionsMenuFlags()
+  filtersFlags.showAll()
+  statusesFlags.showAll()
+  actionsMenuFlags.showAll()
+
+  const title:string = ""
+  const canView:boolean = true
+  const canAdd:boolean = false
+  const inputs : EventsBrowseInputs = {
+      canAdd,
+      canView,
+      title,
+      statusesFlags,
+      filtersFlags,
+      actionsMenuFlags,
+      defaultMainFilter,
+      showMainFiltersOptions,
+      pageMainFilters
+  }
+  this.eventBrowseComponent.show(inputs)
+  }
 }
 }

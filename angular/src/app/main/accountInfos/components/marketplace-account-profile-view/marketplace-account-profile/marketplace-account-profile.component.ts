@@ -112,7 +112,12 @@ ngOnDestroy(): void {
 
    async getAccountDataForView(): Promise<void> {
     this.showMainSpinner();
-  await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,undefined).pipe(
+    const navigation = this.__router.getCurrentNavigation();
+    let accountssin;
+    if (navigation?.extras?.state) 
+       accountssin = navigation.extras.state['ssin'];
+
+  await this._marketplaceAccountsServiceProxy.getAccountForView( accountssin ? undefined : this.accountId , accountssin ?accountssin : undefined,undefined).pipe(
     finalize(
         ()=>this.hideMainSpinner()
     )

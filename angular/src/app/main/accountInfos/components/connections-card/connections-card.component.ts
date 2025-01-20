@@ -1,5 +1,6 @@
 import { Component, Input, Output , EventEmitter, Injector, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
+import { saveAsInt } from '@devexpress/analytics-core/analytics-utils';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
@@ -54,8 +55,9 @@ export class ConnectionsCardComponent extends AppComponentBase {
     viewProfile(): void {
             if(!this.id) return
  this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
-                  queryParams: {
-                    accountType: this.account.account.accountType
+    state: {
+                   accountType: this.account.account.accountType,
+                    ssin:this.account.account.ssin
                   }});
     }
     clickCardHandler(){

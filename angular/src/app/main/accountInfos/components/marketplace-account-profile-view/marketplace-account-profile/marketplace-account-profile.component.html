@@ -96,7 +96,7 @@
     </section>
     
 <div class="card marketplaceAccountProfile">
-    <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex">
+    <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex" *ngIf="accountDataForView">
         <p-tabPanel header="Overview">
                 <app-overview-tab [accountDataForView]="accountDataForView" (activeTabIndexBtn)="navigateToTab($event)"></app-overview-tab>
         </p-tabPanel>
