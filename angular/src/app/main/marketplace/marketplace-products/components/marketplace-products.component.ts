@@ -240,7 +240,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
+                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView ?.ssin : localStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 this.appItemListId,
                 false, // false
@@ -430,7 +430,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
+                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView ?.ssin : localStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 null,
                 false, // false

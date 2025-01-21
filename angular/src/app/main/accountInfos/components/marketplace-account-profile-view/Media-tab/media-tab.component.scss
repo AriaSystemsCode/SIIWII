@@ -186,7 +186,11 @@ media-grid {
         overflow-y: auto;
       }
       
-
+.noDataSec {
+    display: flex;
+    justify-content: center;
+    min-height: 200px;
+}
 
       .noDataTxt {
 

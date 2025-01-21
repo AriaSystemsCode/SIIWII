@@ -64,7 +64,7 @@ ngOnInit() {
   // this.getAllReviws()
   this.getOverAllRatings()
   this.getAllMedia()
-  this.lastImageIndex = Math.min(this.mediaItems.length - 1, 8);
+  this.lastImageIndex = Math.min(this.mediaItems?.length - 1, 8);
 
 }
 
@@ -84,9 +84,9 @@ ngOnChanges(){
       )
   ).subscribe((res)=>{
   
-      this.mediaItems = res.items
+      this.mediaItems = res?.items
       // this.totalItems = res.totalCount; // Update total items for pagination
-      this.totalmediaItems = this.mediaItems.length; // Update total items for pagination
+      this.totalmediaItems = this.mediaItems?.length; // Update total items for pagination
     //   this.marketPlaceData = res
       console.log(' this.media :',  res );
   

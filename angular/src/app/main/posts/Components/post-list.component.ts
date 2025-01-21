@@ -343,12 +343,12 @@ export class PostListComponent
 
                 this.postsToShow = this.posts.slice(
                     0,
-                    this.noOfItemsToShowInitially
+                   this.fromOverviewTab ? 3 :  this.noOfItemsToShowInitially
                 );
 
                 if (
                     this.bodyElement &&
-                    this.noOfItemsToShowInitially == 5 &&
+                    (this.fromOverviewTab ? 3 :  this.noOfItemsToShowInitially == 5) &&
                     this.skipCount == 0
                 ) {
                     this.bodyElement[0].scrollTop = 0;

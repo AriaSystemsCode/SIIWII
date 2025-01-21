@@ -1,7 +1,7 @@
 <div *ngIf="!fromOverviewTab && mediaItems?.length !=0"  class="d-flex flex-wrap justify-content-center">
     <div *ngFor="let item of mediaItems; let i = index" class="media-item m-1" >
       <ng-container *ngIf="item?.attachmentCategoryId === 3; else videoTemplate">
-        <img [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class="media-image imgSec" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"   (click)="openModal(i)"/>
+        <img [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" loading="lazy" class="media-image imgSec" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"   (click)="openModal(i)"/>
       </ng-container>
       <ng-template #videoTemplate>
         <div class="video-container">
@@ -53,12 +53,13 @@
         alt="Selected Media" 
         class="modal-image" 
         style="max-width: 100%; max-height: 100%; border-radius: 8px; min-height: 350px;" 
+        loading="lazy"
       />
     </ng-container>
 
     <ng-template #videoTemplate>
       <video 
-        [src]="mediaItems?.[selectedIndex]?.safeUrl" 
+        [src]="attachmentBaseUrl + '/' + mediaItems?.[selectedIndex]?.safeUrl" 
         controls 
         class="modal-video" 
         style="max-width: 100%; max-height: 70vh; border-radius: 8px;"
@@ -91,9 +92,13 @@
     </ng-container>
   </div> -->
   
+<div class="noDataSec">
 
-
-<p *ngIf="mediaItems?.length ==0" class="">
+<p *ngIf="mediaItems?.length ==0" class="text-center m-auto">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
       <span class="noDataTxt">There is no data to show ....</span>
       </p>
+
+
+
+    </div>

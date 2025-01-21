@@ -56,7 +56,7 @@ isLoading: boolean = false; // Prevent duplicate API calls
       
         this.getAllMedia()
  
-        this.mediaItems = this.mediaItems.map((item) => {
+        this.mediaItems = this.mediaItems?.map((item) => {
             if (item.attachmentCategoryId !== 3) {
               // Explicitly create a new AppEntityAttachmentDto object
               return {
@@ -69,7 +69,7 @@ isLoading: boolean = false; // Prevent duplicate API calls
             return item;
           });
           
-          this.lastImageIndex = Math.min(this.mediaItems.length - 1, 8);
+          this.lastImageIndex = Math.min(this.mediaItems?.length - 1, 8);
     }
 
 
