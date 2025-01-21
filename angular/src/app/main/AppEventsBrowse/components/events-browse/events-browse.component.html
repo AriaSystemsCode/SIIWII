@@ -4,7 +4,7 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  [ngClass]="fromOverviewMarketPlaceProfile ? 'p-0':''">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="" [ngClass]="fromOverviewMarketPlaceProfile ? '':'kt-portlet__body'">
-                        <div class="row pt-5" *ngIf="active">
+                        <div class="row pt-5" *ngIf="active && items?.length > 0 ">
                             <div class="col-12 list-toolbar" 
                             [ngClass]="{ 'border-dashed-bottom pb-4': !fromMarketPlaceProfile }">
 
@@ -64,7 +64,7 @@
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between" *ngIf="!fromOverviewMarketPlaceProfile">
+                                <div class="d-flex justify-content-between" *ngIf="!fromOverviewMarketPlaceProfile && items?.length>0">
                                     <div class="font-weight-normal list-toolbar-data-summary" *ngIf="active">
                                         {{ (paginator.getPage()) * primengTableHelper.defaultRecordsCountPerPage  }}-{{ (paginator.getPage() ) * primengTableHelper.defaultRecordsCountPerPage + items.length  }}
                                         {{ "over" | localize}}
@@ -119,12 +119,16 @@
                                                    [fromOverviewMarketPlaceProfile]="fromOverviewMarketPlaceProfile"
                                         ></app-events-browse-card>
                                     </div>
-                                    <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="items.length == 0 && !loading">{{'NoDataFound' | localize}}</div>
+                                    <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="items?.length == 0 && !loading">
+                                        <!-- {{'NoDataFound' | localize}} -->
+                                        <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+                                        {{ "There is no data to show......" | localize }}
+                                    </div>
                                     <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="loading">{{'Loading' | localize}}...</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row" [ngClass]="fromOverviewMarketPlaceProfile ? 'd-none' :''">
+                        <div class="row" [ngClass]="fromOverviewMarketPlaceProfile  || items?.length == 0 ? 'd-none' :''">
                             <div class="left-aside-filters">
                             </div>
                             <div  class="col d-flex flex-column justify-content-between">
@@ -141,6 +145,12 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="items?.length == 0 && !loading">
+                            <!-- {{'NoDataFound' | localize}} -->
+                            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+                            {{ "There is no data to show......" | localize }}
                         </div>
                     </div>
                 </div>

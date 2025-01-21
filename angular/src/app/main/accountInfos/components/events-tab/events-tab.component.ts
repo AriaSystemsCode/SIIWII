@@ -18,11 +18,9 @@ export class EventsTabComponent  implements AfterViewInit{
   @Input() accountDataForView :AccountDto;
   @Input() fromOverviewMarketPlaceProfile :boolean;
   
-ngAfterViewInit(): void {
-}
 
-ngOnChanges(changes: SimpleChanges) {
-  if (changes['accountDataForView'] && (changes['accountDataForView']?.currentValue != changes['accountDataForView']?.previousValue )) {
+
+ngAfterViewInit(): void {
   const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"
   const showMainFiltersOptions: boolean = true
   const pageMainFilters: SelectItem[] = [
@@ -54,5 +52,4 @@ ngOnChanges(changes: SimpleChanges) {
   }
   this.eventBrowseComponent.show(inputs)
   }
-}
 }

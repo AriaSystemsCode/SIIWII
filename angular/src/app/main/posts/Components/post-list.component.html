@@ -39,11 +39,13 @@
             </div>
         </div>
     </div>
-    <div class="  mt-5 p-5 text-center w-100"
+     <div class="  mt-5 p-5 text-center w-100"
     *ngIf="postsToShow?.length == 0">
-    {{ "NoDataFound" | localize }}
-</div>
-
+    <!-- {{ "NoDataFound" | localize }} -->
+    <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+    {{ "There is no data to show......" | localize }}
+</div> 
+     
     <app-createor-edit-post
         #createOrEditModal
         [profilePicture]="profilePicture"
