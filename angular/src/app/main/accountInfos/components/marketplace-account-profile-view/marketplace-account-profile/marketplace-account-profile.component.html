@@ -43,9 +43,14 @@
                     <svg *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('JOIN')" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M16.9 10.2V6M14.8 8.1H19M14.8 17.9V17.06C14.8 15.8839 14.8 15.2958 14.5711 14.8466C14.3698 14.4515 14.0485 14.1302 13.6534 13.9289C13.2042 13.7 12.6161 13.7 11.44 13.7H8.36C7.18389 13.7 6.59583 13.7 6.14662 13.9289C5.75148 14.1302 5.43022 14.4515 5.22889 14.8466C5 15.2958 5 15.8839 5 17.06V17.9M12.35 8.45C12.35 9.8031 11.2531 10.9 9.9 10.9C8.5469 10.9 7.45 9.8031 7.45 8.45C7.45 7.0969 8.5469 6 9.9 6C11.2531 6 12.35 7.0969 12.35 8.45Z" stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
+
+
+                      <svg  *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('EMPLOYEE')" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.7277 7.57652L9.88447 17.4198C9.79874 17.5058 9.69687 17.574 9.5847 17.6206C9.47253 17.6672 9.35227 17.6912 9.23082 17.6912C9.10937 17.6912 8.98911 17.6672 8.87694 17.6206C8.76477 17.574 8.6629 17.5058 8.57717 17.4198L4.27075 13.1133C4.18491 13.0275 4.11682 12.9256 4.07037 12.8134C4.02391 12.7013 4 12.5811 4 12.4597C4 12.3383 4.02391 12.2181 4.07037 12.1059C4.11682 11.9938 4.18491 11.8919 4.27075 11.806C4.35659 11.7202 4.4585 11.6521 4.57065 11.6056C4.6828 11.5592 4.80301 11.5353 4.9244 11.5353C5.0458 11.5353 5.166 11.5592 5.27816 11.6056C5.39031 11.6521 5.49222 11.7202 5.57806 11.806L9.23159 15.4596L18.4219 6.27075C18.5953 6.09739 18.8304 6 19.0756 6C19.3208 6 19.5559 6.09739 19.7292 6.27075C19.9026 6.44411 20 6.67924 20 6.9244C20 7.16957 19.9026 7.4047 19.7292 7.57806L19.7277 7.57652Z" fill="#4A0D4A"/>
+                        </svg>
                   <img  class="pb-1" style="width: 20px;"  *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('FOLLOW')" src="../../assets/accounts/FOLLOW.png"/>
                   <!-- <img class="pb-1"   *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('CONNECT')" src="../../assets/accounts/CONNECT.png"/> -->
-                  <img class="pb-1"   *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('EMPLOYEE')" src="../../assets/accounts/EMPLOYEE.png"/>
+                  <!-- <img class="pb-1"   *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('EMPLOYEE')" src="../../assets/accounts/EMPLOYEE.png"/> -->
                   <!-- <img class="pb-1" style="width: 20px;"  *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('JOIN')" src="../../assets/accounts/JOIN.png"/>   
                       -->
                       {{ marketPlaceData?.avaliableConnectionName?.trim() | localize }}

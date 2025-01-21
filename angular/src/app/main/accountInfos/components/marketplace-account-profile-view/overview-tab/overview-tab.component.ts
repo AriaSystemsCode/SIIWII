@@ -31,7 +31,7 @@ overRating : OverAllRatingDto
     usersReactionsStats: AppEntityUserReactionsCountDto = new AppEntityUserReactionsCountDto()
 
 mediaItems : AppEntityAttachmentDto[]
-
+totalmediaItems :number = 0
 
 reviewText: string = '';
 isHelpful:any
@@ -43,7 +43,13 @@ isHelpful:any
    isExpanded = false;
    isUserReviewdBefore : boolean = false
    SuccessMsg :boolean = false
-  constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+   lastImageIndex: number = 0;
+   currentPage: number = 1; // Current page
+   totalItems: number = 0; // Total items (retrieved from API)
+   isModalOpen = false; // Controls modal visibility
+   selectedIndex = 0; // Index of the currently selected image
+
+   constructor(        injector: Injector, private _postService: AppPostsServiceProxy,private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
     
   ) {
     super(injector);
@@ -57,7 +63,8 @@ ngOnInit() {
   // this.getAllPosts()
   // this.getAllReviws()
   this.getOverAllRatings()
-  // this.getAllMedia()
+  this.getAllMedia()
+  this.lastImageIndex = Math.min(this.mediaItems.length - 1, 8);
 
 }
 
@@ -67,7 +74,45 @@ ngOnChanges(){
 
 }
 
+  getAllMedia(){
+    this.showMainSpinner()
+ 
+    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,5,  9).pipe(
+      finalize(
+          ()=>
+            this.hideMainSpinner()
+      )
+  ).subscribe((res)=>{
+  
+      this.mediaItems = res.items
+      // this.totalItems = res.totalCount; // Update total items for pagination
+      this.totalmediaItems = this.mediaItems.length; // Update total items for pagination
+    //   this.marketPlaceData = res
+      console.log(' this.media :',  res );
+  
+  })
+  }
+  openModal(index: number): void {
+    this.selectedIndex = index;
+    this.isModalOpen = true;
+  }
 
+  closeModal(): void {
+    this.isModalOpen = false;
+  }
+
+  prevMedia(): void {
+    if (this.selectedIndex > 0) {
+      this.selectedIndex--;
+    }
+  }
+  
+  nextMedia(): void {
+    if (this.selectedIndex < this.mediaItems.length - 1) {
+      this.selectedIndex++;
+    }
+  }
+  
 
 goReviews() {
   this.reviewsSection.nativeElement.scrollIntoView({ behavior: 'smooth' });

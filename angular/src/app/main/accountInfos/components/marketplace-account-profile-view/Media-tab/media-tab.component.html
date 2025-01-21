@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <p-paginator
+  <p-paginator *ngIf=" mediaItems?.length !=0"
   [ngClass]="fromOverviewTab ? 'd-none':''"
   [rows]="itemsPerPage"
   [totalRecords]="totalItems"
@@ -35,9 +35,8 @@
 
 
 
-
-
-<p-dialog 
+<p-dialog
+  *ngIf="mediaItems?.length > 0"
   [(visible)]="isModalOpen"
   [modal]="true"
   [style]="{ width: '656px' }"
@@ -47,36 +46,34 @@
   (onHide)="closeModal()"
 >
   <div class="modal-content d-flex justify-content-center align-items-center">
-    <ng-container *ngIf="mediaItems[selectedIndex]?.attachmentCategoryId === 3; else videoTemplate">
-  
+    <ng-container *ngIf="mediaItems?.[selectedIndex]?.attachmentCategoryId === 3; else videoTemplate">
       <img 
-      onerror="this.src='../../assets/placeholders/appitem-placeholder.png'" 
-        [src]="attachmentBaseUrl + '/' +  mediaItems[selectedIndex]?.url" 
+        onerror="this.src='../../assets/placeholders/appitem-placeholder.png'" 
+        [src]="attachmentBaseUrl + '/' + mediaItems?.[selectedIndex]?.url" 
         alt="Selected Media" 
         class="modal-image" 
-        style="max-width: 100%; max-height:100%; border-radius: 8px;    min-height: 350px;" 
+        style="max-width: 100%; max-height: 100%; border-radius: 8px; min-height: 350px;" 
       />
     </ng-container>
 
     <ng-template #videoTemplate>
-      <!-- Display video -->
       <video 
-        [src]="mediaItems[selectedIndex]?.safeUrl" 
+        [src]="mediaItems?.[selectedIndex]?.safeUrl" 
         controls 
-         
         class="modal-video" 
         style="max-width: 100%; max-height: 70vh; border-radius: 8px;"
       ></video>
     </ng-template>
 
     <!-- Navigation Buttons -->
-    <button *ngIf="selectedIndex > 0" class="nav-button prev" (click)="prevMedia()">&#10094;</button>
-    <button *ngIf="selectedIndex < mediaItems.length - 1" class="nav-button next" (click)="nextMedia()">&#10095;</button>
+    <button *ngIf="mediaItems?.length > 0 && selectedIndex > 0" class="nav-button prev" (click)="prevMedia()">&#10094;</button>
+    <button *ngIf="mediaItems?.length > 0 && selectedIndex < mediaItems.length - 1" class="nav-button next" (click)="nextMedia()">&#10095;</button>
   </div>
 </p-dialog>
 
 
-<div *ngIf="fromOverviewTab" class="position-relative">
+
+<!-- <div *ngIf="fromOverviewTab" class="position-relative">
     <ng-container *ngFor="let item of mediaItems; let i = index">
 
       <img 
@@ -92,11 +89,11 @@
         <span>+{{ mediaItems.length - 8 }}</span>
       </div>
     </ng-container>
-  </div>
+  </div> -->
   
 
 
 <p *ngIf="mediaItems?.length ==0" class="">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
-      <span>There is no data</span>
+      <span class="noDataTxt">There is no data to show ....</span>
       </p>

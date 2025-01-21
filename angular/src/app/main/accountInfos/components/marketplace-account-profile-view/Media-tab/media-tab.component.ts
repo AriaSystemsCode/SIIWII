@@ -30,7 +30,7 @@ export class MediaTabComponent    extends AppComponentBase implements OnInit  {
     //     { "type": "image", "url": "https://images.pexels.com/photos/29632548/pexels-photo-29632548/free-photo-of-artistic-portrait-with-mirror-reflection.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1.jpeg" },
     
     //   ];
-    media:any
+    // media:any
     itemsPerPage: number = 10; // Number of items per page
     currentPage: number = 1; // Current page
     totalItems: number = 0; // Total items (retrieved from API)
@@ -50,10 +50,10 @@ isLoading: boolean = false; // Prevent duplicate API calls
 ) {
   super(injector);
   }
-
-    ngOnInit(): void {
+  ngOnInit(): void { }
+    ngOnChanges(): void {
    
-
+      
         this.getAllMedia()
  
         this.mediaItems = this.mediaItems.map((item) => {
@@ -91,8 +91,8 @@ sanitizeUrl(url: string): SafeResourceUrl {
   getAllMedia(){
     this.showMainSpinner()
     let itemsforpage ;
-    this.fromOverviewTab ? itemsforpage = 9 : itemsforpage = this.itemsPerPage
-    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,5,  itemsforpage).pipe(
+    // this.fromOverviewTab ? itemsforpage = 9 : itemsforpage = this.itemsPerPage
+    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,5,  this.itemsPerPage).pipe(
       finalize(
           ()=>
             this.hideMainSpinner()

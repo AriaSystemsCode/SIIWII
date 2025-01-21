@@ -119,8 +119,8 @@
 
                 <div
                 [ngClass]="[
-                !isFilterHidden ? 'col-lg-9 col-7' : 'col-md-12',
-                fromOverView ? 'col-lg-9 col-12' : ''
+                !isFilterHidden && !fromOverView ? 'col-lg-9 col-7' : 'col-md-12',
+                fromOverView ? 'col-xl-9 col-12' : ''
               ]"
                     
                 >
