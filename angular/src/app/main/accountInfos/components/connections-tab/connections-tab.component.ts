@@ -256,4 +256,10 @@ disconnect(account: AccountDto): void {
     this.getConnections();
   }
 
+  get noDataMessage(): string {
+    return `There is no Connections to show  “${
+      this.accountDataForView?.name || ''
+    }’s connections list is private.“`;
+  }
+
 }

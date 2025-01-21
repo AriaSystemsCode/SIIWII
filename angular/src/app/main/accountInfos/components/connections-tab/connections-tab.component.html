@@ -39,7 +39,7 @@
 
                             
                             <div class="col-12" [ngClass]="fromOverview ? 'pr-0':''">
-                                <div *ngIf="!fromOverview" class="d-flex justify-content-between align-items-center mb-4">
+                                <div *ngIf="!fromOverview&&accounts?.length>0" class="d-flex justify-content-between align-items-center mb-4">
                                     <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
                                         {{
                                         paginator.getPage() *
@@ -140,11 +140,21 @@
                                              ></app-connections-card>
                                         </div>
                                         <div class="  mt-5 p-5 text-center w-100"
-                                            *ngIf="accounts.length == 0 && !loading">
-                                            {{ "NoDataFound" | localize }}
+                                            *ngIf="showData && accounts.length == 0 && !loading">
+                                            <!-- {{ "NoDataFound" | localize }} -->
+                                            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+                                            {{ "There is no data to show......" | localize }}
                                         </div>
+
+                                        <div class="  mt-5 p-5 text-center w-100"
+                                        *ngIf="!showData&& accounts.length == 0 && !loading">
+                                        <!-- {{ "NoDataFound" | localize }} -->
+                                        <img src="../../../../../assets/placeholders/Vector.png" class="mr-2" alt="" srcset="">
+                                        {{ noDataMessage }}
                                     </div>
-                                    <div [ngClass]="fromOverview ? 'd-none':''"  class="primeng-paging-container custom-paginator">
+
+                                    </div>
+                                    <div [ngClass]="fromOverview || accounts?.length==0 ? 'd-none':''"   class="primeng-paging-container custom-paginator">
                                         <p-paginator [rows]="
                                                 primengTableHelper.defaultRecordsCountPerPage
                                             " #paginator (onPageChange)="getConnections($event)" [totalRecords]="

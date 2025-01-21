@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Injector, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CreateOrEditEventComponent } from '@app/main/AppEvent/Components/create-or-edit-event.component';
@@ -25,7 +25,7 @@ import { Table } from 'primeng/table';
   styleUrls: ['./events-browse.component.scss'],
   animations: [appModuleAnimation()],
 })
-export class EventsBrowseComponent extends AppComponentBase {
+export class EventsBrowseComponent extends AppComponentBase  implements OnInit,OnChanges{
     singleItemPerRowMode: boolean = false;
     @ViewChild("createOrEditModal", { static: true }) createOrEditModal: CreateorEditPostComponent;
     @ViewChild("createOrEditEventModal", { static: true }) createOrEditEventModal: CreateOrEditEventComponent;
@@ -142,6 +142,11 @@ export class EventsBrowseComponent extends AppComponentBase {
         this.userName =
             this.appSession.user.name + " " + this.appSession.user.surname;
     }
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['accountDataForView']) {
+            this.getFreshData();
+          }
+        }
     getProfilePicture(): void {
         const subs = this._profileService
             .getProfilePicture()
