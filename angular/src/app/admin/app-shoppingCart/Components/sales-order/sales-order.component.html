@@ -29,14 +29,15 @@
 
             </button>
             </div>
-            <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12 pl-md-0 pl-3">
+            <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12 pl-md-0 pl-3" style="padding-right: 13px;">
                 <label class="label">Reference #</label>
                 <input
                 
                     type="text"
                     placeholder="Reference Number"
                     class="form-control "
-                    style="width: 95% !important;"
+                    style="    width: 95% !important;
+    margin-left: 3px;"
                     [(ngModel)]="reference"
                 />
              
