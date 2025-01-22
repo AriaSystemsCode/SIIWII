@@ -480,7 +480,7 @@
                                         <td style="width:150px;text-align: right !important" >
                                             <span class="p-column-title" style="text-align: right !important"> {{l('TotalQuantity')}}</span>
                                             <span >
-                                                {{record.totalQuantity | number: '1.2-2' }}
+                                                {{record.totalQuantity  }}
                                             </span>
                                             <!-- <span *ngIf="!record.totalQuantity">-</span> -->
                                         </td>
@@ -547,7 +547,7 @@
                                     <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
                                     <td>{{ product?.manufacturerCode }}</td>
                                     <td>{{ product.name }}</td>
-                                    <td style="text-align: right !important;">{{ product.qty | number: '1.2-2' }}</td>
+                                    <td style="text-align: right !important;">{{ product.qty  }}</td>
                                     <td style="text-align: right !important;">{{ product.price | number: '1.2-2'  }}</td>
                                     <td style="text-align: right !important;">{{ product.amount | number: '1.2-2'  }}</td>
                                 </tr>
