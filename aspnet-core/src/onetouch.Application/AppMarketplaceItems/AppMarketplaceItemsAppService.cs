@@ -786,7 +786,7 @@ namespace onetouch.AppMarketplaceItems
                                 //var secondAttributeValuesFor1st1 =
                                 //secondAttributeValuesFor1st11.Where(z=>z.AttributeValue!=null).Select(a => a.AttributeValue.ToString() + "," + (a.AttributeValueId != null ? a.AttributeValueId.ToString():"")).ToList();
                                 var secondAttributeValuesFor1st1 =
-                                                 secondAttributeValuesFor1st11.Where(z => z.AttributeCode != null).Select(a => a.AttributeCode.ToString()).ToList();
+                                                 secondAttributeValuesFor1st11.Where(z => z.AttributeCode != null).Select(a => a.AttributeValue+","+a.AttributeCode.ToString()).ToList();
                                 //MMT202402
                                 //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
                                 //.ToList();
