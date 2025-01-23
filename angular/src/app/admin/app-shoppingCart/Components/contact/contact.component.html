@@ -118,7 +118,7 @@
                             (change)="onChangePhoneNumber($event)"
                                 [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber"
                                 #phoneNumberInput="ngModel"  name="phoneNumber" minlength="5" maxlength="20"
-                                pattern="[0-9]*" 
+                                pattern="^(0\d{8,14}|\+?[1-9]\d{0,2}(\s?\d+)+)$" 
                                 />
                         </div>
                     </div>
