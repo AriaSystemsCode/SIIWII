@@ -113,7 +113,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public int EomDays { set; get; }
         public bool Eom { set; get; }
         public int NetDueDays { set; get; }
-       public string BuyerBranchCode { set; get; }
 
     }
 

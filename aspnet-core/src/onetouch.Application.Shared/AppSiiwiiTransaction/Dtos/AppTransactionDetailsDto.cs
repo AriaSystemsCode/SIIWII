@@ -105,6 +105,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
         public virtual string ContactAddressCountryCode { get; set; }
         //Iteration37-MMT[End]
+        public virtual string BranchCode { get; set; }
 
     }
     public class ContactAppAddressDto : AppAddressDto
