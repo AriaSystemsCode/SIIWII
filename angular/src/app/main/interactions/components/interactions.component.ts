@@ -13,6 +13,7 @@ import { ReactionsService } from '../services/reactions.service';
 })
 export class InteractionsComponent extends AppComponentBase implements OnInit, OnChanges {
     @Output() refreshStats : EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output() reply : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() toName : EventEmitter<string> = new EventEmitter<string>()
     @Input() entityId: number
     @Input() relatedEntityId: number
@@ -36,7 +37,7 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     getCurrentUserReactionSubs:Subscription
     showComments:boolean = false
     @ViewChild('commentParentComponent',{ static:true }) commentParentComponent : CommentParentComponent
-
+    isFlipped = false;
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -164,5 +165,16 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
         this.triggerCommentsList(true)
         this.toName.emit(this.comment.messages.toName)
         if(this.showComments) this.commentParentComponent.focusAddComment()
+    }
+
+    openReplyScreen(comment: any): void {
+        // Trigger the method in the commentParent component
+        this.triggerCommentsList(true)
+        if(this.showComments) this.commentParentComponent.focusAddComment()
+
+        this.isFlipped = !this.isFlipped;
+         this.reply.emit(true)
+        this.commentParentComponent.openReplyScreen(comment);
+
     }
 }

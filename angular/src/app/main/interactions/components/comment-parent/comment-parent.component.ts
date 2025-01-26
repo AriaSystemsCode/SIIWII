@@ -5,11 +5,12 @@ import { AddCommentComponent } from '../../../comments/components/add-comment/ad
 import { BlockList } from 'net';
 import { SendMessageModalComponent } from '@app/main/Messages/SendMessage-Modal.Component';
 import * as moment from "moment";
+import { finalize } from '@node_modules/rxjs/dist/types';
 
 @Component({
     selector: 'app-comment-parent',
     templateUrl: './comment-parent.component.html',
-    styleUrls: ['./comment-parent.component.scss']
+    styleUrls: ['./comment-parent.component.scss'],
 })
 export class CommentParentComponent extends AppComponentBase implements AfterViewInit{
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
@@ -36,7 +37,8 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     creatorUserId : number;
     displayDeleteMessage:boolean=false;
     showRegularComment:boolean=true;
-
+  addReplyScreen: boolean ;
+    currentComment: any;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector,
@@ -152,12 +154,47 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
  this.cdr.detectChanges();
 //  this.setToName(event)
     }
-  
+    getReply(event){
+        this.addReplyScreen = event
+        this.cdr.detectChanges();
+    }
     refreshAfterSave(event){
       
         if(event){
             this.refreshComments.emit(true)
         }
+        
            }
+
+
+
+
+           // Toggle reply input visibility for a specific comment
+toggleReplyInput(commentId: number): void {
+    const comment = this.comments.find((c) => c.id === commentId);
+    if (comment) {
+        comment.showReplyInput = !comment.showReplyInput;
+        if (!comment.showReplyInput) {
+            comment.replyText = ''; // Clear the reply text if input is hidden
+        }
+    }
+}
+
+openReplyScreen(comment: any): void {
+    // this.addReplyScreen = true;
+        this._messageServiceProxy
+                .getMessagesForView(comment.id)
+                // .pipe(finalize(() => { }))
+                .subscribe((result) => {
+                    this.currentComment = result; // Pass the current comment to be replied to
+                    console.log(comment,'rep cooooommmm')
+                    console.log(this.currentComment,'this.currentComment')
+                    }
+    
+
+                );
+
+}
+
          
 }
