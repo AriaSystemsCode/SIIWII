@@ -4137,6 +4137,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (FilteredAppTransaction != null)
                 {
                     var viewTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(FilteredAppTransaction);
+                    viewTrans.EntityStatusCode = FilteredAppTransaction.EntityObjectStatusCode;
                     viewTrans.EnteredDate = FilteredAppTransaction.EnteredDate;
                     viewTrans.EnteredByUserRole = FilteredAppTransaction.EnteredUserByRole;
                     if (viewTrans.EntityAttachments != null && viewTrans.EntityAttachments.Count > 0)
@@ -4202,7 +4203,7 @@ namespace onetouch.AppSiiwiiTransaction
                         viewTrans.TotalQuantity = transOrg.TotalQuantity;
                         viewTrans.TotalAmount = transOrg.TotalAmount;
                         viewTrans.TransactionType = transOrg.EntityObjectTypeCode == "SALESORDER" ? TransactionType.SalesOrder : TransactionType.PurchaseOrder;
-                        viewTrans.EntityStatusCode = transOrg.EntityObjectStatusCode;
+                        //viewTrans.EntityStatusCode = transOrg.EntityObjectStatusCode;
                         if (viewTrans.AppTransactionContacts != null && viewTrans.AppTransactionContacts.Count > 0)
                         {
                             foreach (var cont in viewTrans.AppTransactionContacts)
