@@ -19,3 +19,54 @@ hr{
 .subject-title{
     font-size: 0.9rem;
 }
+
+
+
+p.bodyP {
+    margin: 0;
+    padding: 8px;
+    // background-color: #f9f9f9;
+    // border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    line-height: 1.6;
+    overflow: hidden; /* Hides extra content */
+    transition: max-height 0.3s ease;
+  }
+ a {
+    color: #4A0D4A !important; /* Adjust for the desired color */
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+   .see-more {
+    color: #4A0D4A; /* Adjust the color to your design */
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  p.collapsed {
+    max-height: 60px; /* Adjust as needed */
+  }
+  
+  p.expanded {
+    max-height: 1000px; /* Large enough to show full content */
+  }
+  
+  .toggle-btn {
+    display: inline-block;
+    margin-top: 8px;
+    background-color: transparent;
+    border: none;
+    color: #4A0D4A;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .toggle-btn:hover {
+    text-decoration: underline;
+  }
+  
+ .senderN {
+    font-size: 14px;
+ }

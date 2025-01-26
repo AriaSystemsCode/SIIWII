@@ -20,7 +20,7 @@
     }
     .toggle-replay-cont:not(.comment-inner .toggle-replay-cont){
         position: absolute;
-        bottom: 5px;
+        bottom: 8px;
         right: 40px;
     }
 
@@ -61,7 +61,7 @@
     margin-left: 5px;
     position:relative;
     background: #FFFFFF;
-    min-height: 130px;
+    min-height: 140px;
     border: 1px solid #EEEEEE;
     box-shadow: 1px 1px 4px rgba(22, 22, 22, 0.25);
 
@@ -120,6 +120,14 @@
   
     }
 
+    .addParSec {
+        max-height: unset;
+        // overflow-y: scroll;
+        // scrollbar-width: thin; /* Firefox: Makes the scrollbar thin */
+        // scrollbar-color:  #ffff #EEEEEEEE; /* Firefox: Handle color, track color */
+  
+    }
+
 
     /* Target the entire webpage scrollbars */
 
@@ -153,4 +161,22 @@
     padding: 16px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    height: 500px;
+    overflow-y: scroll;
+}
+
+.treadTxt{
+ 
+font-weight: 700;
+font-size: 20px;
+line-height: 30px;
+
+color: #1B101B;
+
+
+
+}
+
+.svgC{
+    cursor: pointer;
 }

@@ -12,15 +12,21 @@
     <div class="w-80" *ngIf="comment?.messages?.entityObjectTypeCode!=='MESSAGE'">
         <div class="w-100 text-wrapper p-3">
             <div class="d-flex justify-content-between">
-                <h5>{{comment?.messages?.senderName}}</h5>
+                <h5 class="senderN">{{comment?.messages?.senderName}}</h5>
                 <div>
               <p style="font-size: 12px; color: #999999;white-space: nowrap;margin: 0;">{{comment?.messages?.receiveDate?.toString() | date: 'MMM d y' }}</p>
               <p style="font-size: 12px; color: #999999;white-space: nowrap;">{{comment?.messages?.receiveDate?.toString() | date: 'h:mm a' }}</p>
             </div>
             </div>
-            <p [innerHTML]="comment?.messages?.bodyFormat">
-                <!-- {{comment?.messages?.body}} -->
-            </p>
+            <p
+            #content
+            [innerHTML]="displayedContent"
+            style="word-wrap: break-word;"
+            class="bodyP"
+            (click)="toggleExpand()"
+          ></p>
+          
+          
         </div>
     </div>
     <div class="w-80" *ngIf="comment?.messages?.entityObjectTypeCode=='MESSAGE'">
@@ -33,11 +39,15 @@
              <br />
              <small *ngIf="comment?.messages?.bccUsers">BCC : {{comment?.messages?.bccUsers}}</small>
 
-            <h6 class="subject-title mt-2">Subject : {{comment?.messages?.subject}}</h6>
+            <h6 class="subject-title mt-1 ,b-0">Subject : {{comment?.messages?.subject}}</h6>
             <!-- <hr/> -->
-            <p class="message-body" [innerHTML]="comment?.messages?.bodyFormat">
-                <!-- {{comment?.messages?.body?comment?.messages?.body:comment?.messages?.bodyFormat}} -->
-            </p>
+            <p
+            #content
+            [innerHTML]="displayedContent"
+            style="word-wrap: break-word;"
+            class="bodyP mb-0"
+            (click)="toggleExpand()"
+          ></p>
         </div>
     </div>
 </div>

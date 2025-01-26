@@ -45,6 +45,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         private cdr: ChangeDetectorRef
         ) {
             super(_injector)
+
          }
          ngAfterViewInit(): void {
             this.toggleMessageType(this.commentType=='MESSAGE'?2:1)
@@ -155,8 +156,19 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
 //  this.setToName(event)
     }
     getReply(event){
-        this.addReplyScreen = event
+        // this.addReplyScreen = event
         this.cdr.detectChanges();
+    }
+    getMyCom(event){
+      
+        this.addReplyScreen = true
+        if(event){
+            this.addCommentComponent.focusCommentTextArea()
+          
+            this.currentComment = event
+            this.cdr.detectChanges();
+        }
+    
     }
     refreshAfterSave(event){
       
@@ -169,32 +181,10 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
 
 
 
-           // Toggle reply input visibility for a specific comment
-toggleReplyInput(commentId: number): void {
-    const comment = this.comments.find((c) => c.id === commentId);
-    if (comment) {
-        comment.showReplyInput = !comment.showReplyInput;
-        if (!comment.showReplyInput) {
-            comment.replyText = ''; // Clear the reply text if input is hidden
-        }
-    }
-}
-
 openReplyScreen(comment: any): void {
-    // this.addReplyScreen = true;
-        this._messageServiceProxy
-                .getMessagesForView(comment.id)
-                // .pipe(finalize(() => { }))
-                .subscribe((result) => {
-                    this.currentComment = result; // Pass the current comment to be replied to
-                    console.log(comment,'rep cooooommmm')
-                    console.log(this.currentComment,'this.currentComment')
-                    }
-    
 
-                );
-
+                    this.currentComment = comment
+   
 }
 
-         
 }
