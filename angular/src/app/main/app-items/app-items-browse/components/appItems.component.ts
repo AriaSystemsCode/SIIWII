@@ -51,7 +51,7 @@ import { MainImportService } from "@shared/components/import-steps/services/main
 export class AppItemsComponent extends AppComponentBase {
     appItemListId:number;
     @Output() eventTriggered :EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>> = new EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>>()
-
+    @Input() fromCta: boolean;
     singleItemPerRowMode: boolean = false;
     @ViewChild("entityTypeHistoryModal", { static: true })  entityTypeHistoryModal: EntityTypeHistoryModalComponent;
 

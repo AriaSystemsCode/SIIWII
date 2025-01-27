@@ -111,8 +111,37 @@ button{
     .logo-profile {
         top: -52px;
     }
+    .addPad {
+        padding-top: 140px !important;
+    }
+    .leesTop {
+        top: 70% !important;
+    }
+    .list-toolbar .list-toolbar-search {
+        width: 178px !important;
+        margin-left: 0 !important;
+      
+    }
+    .handlWM {
+        
+            border: 1px solid #D9D9D9 !important;
+            color: #D9D9D9 !important;
+            border-radius: 5px;
+      
+            width: 250px !important;
+            margin-left: 84px !important;
+            height: 46px !important;
+            background-color: #FFFFFF;
+        
+    }
 }
-
+::ng-deep {
+    @media (max-width: 768px) {
+        .view-profile-wrapper .logo-profile {
+            top: 0 !important;
+        }
+    }
+}
 
 .ml-43{
     margin-left: 43px !important;

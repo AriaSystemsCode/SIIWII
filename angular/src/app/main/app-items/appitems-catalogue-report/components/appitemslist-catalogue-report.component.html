@@ -1,12 +1,9 @@
-<div [@routerTransition] [ngStyle]="{'margin-top': isModal ? '0!important':'-90px!important'}" class="wrapper">
+<div [@routerTransition] [ngStyle]="{'margin-top': isModal ? '0!important':'-90px!important'}" class="wrapper pr-lg-4" style="padding-top: 40px;">
     <div
         class="
-            kt-content
-            kt-grid__item kt-grid__item--fluid
-            kt-grid kt-grid--hor
-            align-items-center
+            
         "
-        [ngClass]="{'pt-0':isModal}"
+     
     >
         <div class="kt-subheader kt-grid__item" *ngIf="!isModal">
             <div [class]="containerClass">
@@ -68,12 +65,10 @@
                             <div class="col-12 d-flex align-items-center mt-3">
                                 <div
                                     class="
-                                        step
-                                        d-flex
-                                        align-items-center
-                                        mr-4
+                                     
+                                     
                                     "
-                                    *ngFor="let step of steps; last as last"
+                                    *ngFor="let step of steps; last as last; let i = index"
                                     [ngClass]="{
                                         'current-step':
                                             currentStep ==
@@ -83,14 +78,49 @@
                                             step.printCatalogueStepsEnum
                                     }"
                                 >
-                                    <span class="fake-circle mr-2 d-flex align-items-center justify-content-center">
-                                        <i [ngClass]="currentStep == step.printCatalogueStepsEnum ? step.icon : (currentStep > step.printCatalogueStepsEnum ? 'fas fa-check' : '' )  "></i>
+                                    <p class="stpTitle">{{ step.title }}</p>
+                                   <div class="d-flex align-items-center">
+                                    
+                                    <span class="fake-circle  d-flex align-items-center justify-content-center position-relative">
+                                        <i [ngClass]="currentStep == step.printCatalogueStepsEnum ? step.icon : (currentStep > step.printCatalogueStepsEnum ? 'step.icon' : '' )  "></i>
+                                        <p  style="color: white !important;position: absolute;    right: 45%;
+                                            top: 20%;
+                                            font-size: 14px;">{{ (i == 1 || i ==0) ? step.printCatalogueStepsEnum + 1 :  step.printCatalogueStepsEnum }}</p>
                                     </span>
-                                    {{ step.title }}
-                                    <span class="ml-2" *ngIf="!last">
-                                        . . . . 
-                                    </span>
+                                      <div *ngIf="currentStep == step.printCatalogueStepsEnum">
+                                        <svg  class="addW" height="12" viewBox="0 0 124 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="0.5" width="123" height="12" rx="4" fill="#4A0D4A"/>
+                                            </svg>
+                                            
+                                        <span class="" *ngIf="!last">
+                                            <svg class="addW" height="12" viewBox="0 0 233 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect x="0.5" width="232" height="12" rx="4" fill="#EEEEEE"/>
+                                                </svg>
+                                                
+                                        </span>
+                                      </div>
+
+                                      <div *ngIf="currentStep > step.printCatalogueStepsEnum">
+                                        <svg  class="addFW" height="12" viewBox="0 0 124 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="0.5" width="123" height="12" rx="4" fill="#4A0D4A"/>
+                                            </svg>
+                                            
+                                    
+                                      </div>
+
+                                      <div *ngIf="currentStep < step.printCatalogueStepsEnum">
+                                      
+                                            
+                                        <span class="" *ngIf="!last">
+                                            <svg class="addFW" height="12" viewBox="0 0 233 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect x="0.5" width="232" height="12" rx="4" fill="#EEEEEE"/>
+                                                </svg>
+                                                
+                                        </span>
+                                      </div>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                         <div class="d-flex flex-column flex-grow-1 pt-5 pb-1">

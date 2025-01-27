@@ -25,7 +25,7 @@
 
 
 .fake-circle {
-    background-color: #aaaa;
+    background-color: #DDDDDD;
     width: 25px;
     height: 25px;
     display: block;
@@ -38,16 +38,96 @@
 .current-step {
     color: $primary-color;
     .fake-circle {
-        background-color: $primary-color;
+        background-color: #4A0D4A;
     }
 }
 .done-step {
     color: $success-color;
     .fake-circle {
-        background-color: $success-color;
+        background-color:  #4A0D4A;
     }
 }
 input:focus
 {
     border: 1px solid black !important;
 }
+
+
+
+@media (min-width: 768px) {
+    .fake-circle {
+        background-color: #DDDDDD;
+        width: 50px;
+        height: 50px;
+        display: block;
+        border-radius: 50%;
+        i {
+            color: $white-color;
+        }
+    }
+
+    .addW {
+        max-width: 120px !important;
+    }
+    .addFW {
+        max-width: 220px !important;
+    }
+  }
+  
+  
+  @media (max-width: 768px) {
+    .fake-circle {
+        background-color: #DDDDDD;
+        width: 25px;
+        height: 25px;
+        display: block;
+        border-radius: 50%;
+        i {
+            color: $white-color;
+        }
+    }
+
+    .addW {
+        max-width: 70px !important;
+    }
+    .addFW {
+        max-width: 140px !important;
+    }
+    }
+    ::ng-deep {
+        @media only screen and (max-width: 575px) {
+            .addW {
+                max-width: 35px !important;
+            }
+            .addFW {
+                max-width: 45px !important;
+            }
+            .rout-c {
+                 padding-left: 0 !important; 
+                 padding-right: 0 !important; 
+                // overflow-x: hidden;
+                // padding-top: 70px;
+            }
+        }
+        
+
+        @media only screen and (min-width: 575px) and (max-width: 1024px) {
+            .rout-c {
+                padding-left: 75px !important;
+                padding-right: 0px !important;
+            
+            }
+        }
+    }
+
+    @media only screen and (max-width: 575px) {
+        .addW {
+            max-width: 35px !important;
+        }
+        .addFW {
+            max-width: 70px !important;
+        }
+    .stpTitle {
+        font-size: 10px;
+    }
+    }

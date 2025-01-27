@@ -22,10 +22,11 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body p-0  mr-2 big-scroll">
+            <div class="modal-body p-0  mr-2 big-scroll " style="overflow-x: hidden;">
                 <app-app-items
                     #AppItemsBrowseComponent
                     (eventTriggered)="eventHandler($event)"
+                    [fromCta]="true"
                 >
                 </app-app-items>
             </div>
