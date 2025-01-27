@@ -34,7 +34,7 @@ namespace onetouch.AppContacts
 		public virtual string City { get; set; }
 
 		[StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
-		public virtual string State { get; set; }
+		public virtual string? State { get; set; }
 
 		[StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
 		public virtual string PostalCode { get; set; }
