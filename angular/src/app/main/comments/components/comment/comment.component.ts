@@ -26,8 +26,8 @@ export class CommentComponent implements OnChanges {
 
     ngAfterViewInit() {
         // Check if the content height exceeds the collapsed height (e.g., 60px)
-        const element = this.contentRef.nativeElement;
-        this.isLongContent = element.scrollHeight > 60; // Adjust based on your CSS collapsed height
+        // const element = this.contentRef.nativeElement;
+        // this.isLongContent = element.scrollHeight > 60; // Adjust based on your CSS collapsed height
       }
     getProfilePictureById(id: string) {
         const subs = this._postService
@@ -49,19 +49,21 @@ export class CommentComponent implements OnChanges {
           this.isLongContent = true;
           this.displayedContent = this.getTruncatedContent(bodyFormat);
         } else {
+          this.isLongContent = false;
           this.displayedContent = bodyFormat;
         }
       }
-    
+      
       toggleExpand() {
         const bodyFormat = this.comment?.messages?.bodyFormat || '';
         this.isExpanded = !this.isExpanded;
         this.displayedContent = this.isExpanded
-          ? `${bodyFormat} <span class="see-more" (click)="toggleExpand()">See Less</span>`
+          ? bodyFormat
           : this.getTruncatedContent(bodyFormat);
       }
-    
+      
       getTruncatedContent(content: string): string {
-        return `${content.substring(0, this.charLimit)}... <span class="see-more" (click)="toggleExpand()">See More</span>`;
+        return content.substring(0, this.charLimit) + '...';
       }
+      
 }

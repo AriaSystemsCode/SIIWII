@@ -20,11 +20,19 @@
             </div>
             <p
             #content
-            [innerHTML]="displayedContent"
             style="word-wrap: break-word;"
             class="bodyP"
-            (click)="toggleExpand()"
-          ></p>
+          >
+            {{ displayedContent }}
+            <span
+              class="see-more"
+              *ngIf="isLongContent"
+              (click)="toggleExpand()"
+            >
+              {{ isExpanded ? 'See Less' : 'See More' }}
+            </span>
+          </p>
+          
           
           
         </div>
@@ -43,11 +51,18 @@
             <!-- <hr/> -->
             <p
             #content
-            [innerHTML]="displayedContent"
             style="word-wrap: break-word;"
-            class="bodyP mb-0"
-            (click)="toggleExpand()"
-          ></p>
+            class="bodyP"
+          >
+            {{ displayedContent }}
+            <span
+              class="see-more"
+              *ngIf="isLongContent"
+              (click)="toggleExpand()"
+            >
+              {{ isExpanded ? 'See Less' : 'See More' }}
+            </span>
+          </p>
         </div>
     </div>
 </div>
