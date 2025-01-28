@@ -479,13 +479,15 @@ namespace onetouch.Accounts
 
                     var accountsList = await _accounts.ToListAsync();
                     var totalCount = await filteredAccounts.CountAsync();
+                    //var currentTenantAccountTypeCode = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                      //    .FirstOrDefault(e => e.TenantId == tenant.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
                     var currentTenantAccountTypeCode = _appContactRepository.GetAll().Include(e => e.EntityFk)
-                          .FirstOrDefault(e => e.TenantId == tenant.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
+                          .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
 
                     foreach (var account in accountsList)
                     {
                         var accountConnection = _appContactRepository.GetAll()
-                        .FirstOrDefault(e => e.TenantId == tenant.Id && e.SSIN == account.Account.SSIN && !e.IsProfileData && e.ParentId == null);
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN && !e.IsProfileData && e.ParentId == null);
 
                         if (accountConnection != null && accountConnection.Id > 0)
                         {
