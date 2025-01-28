@@ -202,7 +202,7 @@ namespace onetouch.Accounts
                                    from j1 in j
                                    select new AppEntityAttachmentDto()
                                    {
-                                       Url = "attachments/" + "-1" + "/" + t.AttachmentFk.Attachment,
+                                       Url = "attachments/" + ((j1.ObjectId == postObjectId || j1.ObjectId == eventObjectId) ? j1.TenantId.ToString() : "-1") + "/" + t.AttachmentFk.Attachment,
                                        DisplayName = t.AttachmentFk.Name,
                                        AttachmentCategoryId = t.AttachmentCategoryId,
                                        Id = t.Id,
