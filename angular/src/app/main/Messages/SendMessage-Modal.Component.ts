@@ -590,14 +590,17 @@ export class SendMessageModalComponent
                         }
             
                         // Normalize names in toNameArray to match filteredUsers
-                        // const toNameArray: string[] = this.toName
-                        //     .split(',')
-                        //     .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
+                        const toNameArray: string[] = this.toName
+                            .split(',')
+                            .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
             
                         // // Set default selected users
-                        // this.toUsers = this.filteredUsers.filter((user) =>
-                        //     toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
-                        // );
+                        if(this.parentId){
+                            this.toUsers = this.filteredUsers.filter((user) =>
+                                toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
+                            );
+                        }
+                   
             
                         // Debugging logs
                         // console.log('Filtered Users:', this.filteredUsers);

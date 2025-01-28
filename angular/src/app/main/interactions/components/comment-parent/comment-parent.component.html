@@ -1,31 +1,25 @@
-<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ]" class="parSec">
-   
+<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ,parentId ? 'addParSec': 'parSec' ]"
+    *ngIf="!addReplyScreen">
+
 
     <div *ngIf="addNewThread&&cartStyle" class="toggle-replay-cont">
-        <label [class]="showRegularComment?'comment focused':'comment'"  (click)="toggleMessageType(1)">
+        <label [class]="showRegularComment?'comment focused':'comment'" (click)="toggleMessageType(1)">
             <i class="fa-regular far fa-comment"></i>
         </label>
         <label [class]="showRegularComment?'direct-message':'direct-message focused'" (click)="toggleMessageType(2)">
-            <i class="fa-regular far fa-envelope"></i>       
-         </label>
+            <i class="fa-regular far fa-envelope"></i>
+        </label>
     </div>
-    <div *ngFor="let comment of comments" [ngClass]="cartStyle?'mt-2  comment-inner':'mt-4 ml-3'" >
+    <div *ngFor="let comment of comments" [ngClass]="cartStyle?'mt-2  comment-inner':'mt-4 ml-3'">
         <div class="mb-2">
-            <app-comment [comment]="comment" ></app-comment>
+            <app-comment [comment]="comment"></app-comment>
         </div>
         <div class="ml-5" *ngIf="comment.messages">
-            <app-interactions
-            [cartStyle]="cartStyle"
-             [comment]="comment"
-                [entityId]="comment.messages.entityId"
-                [relatedEntityId]="entityId"
-                [parentId]="comment.messages.id"
-                [threadId]="comment.messages.threadId"
-                [postCreatorUserId]="creatorUserId"
-                (refreshStats)="newCommentAddedHandler()"
-                [commentType]="comment.messages.entityObjectTypeCode"
-                (toName)="getName($event)"
-            ></app-interactions>
+            <app-interactions [cartStyle]="cartStyle" [comment]="comment" [entityId]="comment.messages.entityId"
+                [relatedEntityId]="entityId" [parentId]="comment.messages.id" [threadId]="comment.messages.threadId"
+                [postCreatorUserId]="creatorUserId" (refreshStats)="newCommentAddedHandler()"
+                [commentType]="comment.messages.entityObjectTypeCode" (toName)="getName($event)"
+                (reply)="getReply($event)" (mycom)="getMyCom($event)"></app-interactions>
         </div>
     </div>
     <div style="margin-left: 50px;" *ngIf="totalCount > comments?.length" (click)="getAllComments()">
@@ -33,15 +27,42 @@
     </div>
 </div>
 
-<div>
-    <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'" [cartStyle]="cartStyle"
-    (saveDone)="newCommentAddedHandler($event)"
-    [relatedEntityId]="entityId"
-    #AddCommentComponent>
-</app-add-comment>
+<div *ngIf="!addReplyScreen" class="pb-3">
+    <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'"
+        [cartStyle]="cartStyle" (saveDone)="newCommentAddedHandler($event)" [relatedEntityId]="entityId"
+        #AddCommentComponent>
+    </app-add-comment>
 
-<SendMessageModal [entityId]="entityId" 
-[parentId]="parentId" [toName]="toName"
-*ngIf="(!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp) "  
-#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()" (refresh)="refreshAfterSave($event)"></SendMessageModal>
+    <SendMessageModal [entityId]="entityId" [parentId]="parentId" [toName]="toName"
+        *ngIf="(!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp) "
+        #SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()" (refresh)="refreshAfterSave($event)">
+    </SendMessageModal>
+</div>
+
+
+<div *ngIf="addReplyScreen" class="reply-screen">
+    <div class="d-flex mb-2">
+        <svg (click)="addReplyScreen = false" class="svgC" width="36" height="28" viewBox="0 0 36 28" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="35" height="27" rx="5.5" fill="#4A0D4A" />
+            <rect x="0.5" y="0.5" width="35" height="27" rx="5.5" stroke="#4A0D4A" />
+            <path
+                d="M11.3331 12.3335L10.744 12.9226L10.1548 12.3335L10.744 11.7443L11.3331 12.3335ZM25.4998 19.0001C25.4998 19.2212 25.412 19.4331 25.2557 19.5894C25.0994 19.7457 24.8875 19.8335 24.6665 19.8335C24.4454 19.8335 24.2335 19.7457 24.0772 19.5894C23.9209 19.4331 23.8331 19.2212 23.8331 19.0001H25.4998ZM14.9106 17.0893L10.744 12.9226L11.9223 11.7443L16.089 15.911L14.9106 17.0893ZM10.744 11.7443L14.9106 7.57764L16.089 8.75597L11.9223 12.9226L10.744 11.7443ZM11.3331 11.5001H19.6665V13.1668H11.3331V11.5001ZM25.4998 17.3335V19.0001H23.8331V17.3335H25.4998ZM19.6665 11.5001C21.2135 11.5001 22.6973 12.1147 23.7912 13.2087C24.8852 14.3026 25.4998 15.7864 25.4998 17.3335H23.8331C23.8331 16.2284 23.3941 15.1686 22.6127 14.3872C21.8313 13.6058 20.7715 13.1668 19.6665 13.1668V11.5001Z"
+                fill="white" />
+        </svg>
+        <p class="ml-3 treadTxt">Thread</p>
+    </div>
+    <div class="mt-3">
+        <app-comment [comment]="currentComment"></app-comment>
+    </div>
+    <div class="ml-5" *ngIf="currentComment?.messages">
+        <app-interactions [cartStyle]="cartStyle" [comment]="currentComment"
+            [entityId]="currentComment?.messages?.entityId" [relatedEntityId]="entityId"
+            [parentId]="currentComment?.messages?.id" [threadId]="currentComment?.messages?.threadId"
+            [postCreatorUserId]="creatorUserId" (refreshStats)="newCommentAddedHandler()"
+            [commentType]="currentComment?.messages?.entityObjectTypeCode"></app-interactions>
+    </div>
+    <app-add-comment [cartStyle]="cartStyle" [relatedEntityId]="currentComment.messages.entityId"
+        (saveDone)="newCommentAddedHandler($event)">
+    </app-add-comment>
 </div>

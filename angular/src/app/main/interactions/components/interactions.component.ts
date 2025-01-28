@@ -13,7 +13,9 @@ import { ReactionsService } from '../services/reactions.service';
 })
 export class InteractionsComponent extends AppComponentBase implements OnInit, OnChanges {
     @Output() refreshStats : EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output() reply : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() toName : EventEmitter<string> = new EventEmitter<string>()
+    @Output() mycom : EventEmitter<any> = new EventEmitter<any>()
     @Input() entityId: number
     @Input() relatedEntityId: number
     @Input() postCreatorUserId: number
@@ -36,7 +38,7 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     getCurrentUserReactionSubs:Subscription
     showComments:boolean = false
     @ViewChild('commentParentComponent',{ static:true }) commentParentComponent : CommentParentComponent
-
+    isFlipped = false;
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -157,12 +159,31 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
         this.getUsersReactionsCount()
     }
     triggerCommentsList(value?:boolean){
-        this.showComments = value == undefined ? !this.showComments : value
-        this.commentParentComponent.show(this.postCreatorUserId,this.relatedEntityId,this.parentId,this.threadId)
+        // this.showComments = value == undefined ? !this.showComments : value
+        // this.commentParentComponent.show(this.postCreatorUserId,this.relatedEntityId,this.parentId,this.threadId)
+        this.reply.emit(true)
+        this.mycom.emit(this.comment)
+       this.commentParentComponent.openReplyScreen(this.comment);
+       // this.triggerCommentsList(true)
+       this.showComments = value == undefined ? !this.showComments : value
+       this.commentParentComponent.show(this.postCreatorUserId,this.relatedEntityId,this.parentId,this.threadId)
     }
     showAddComment(){
         this.triggerCommentsList(true)
         this.toName.emit(this.comment.messages.toName)
         if(this.showComments) this.commentParentComponent.focusAddComment()
+    }
+
+    openReplyScreen(comment: any): void {
+        // Trigger the method in the commentParent component
+        this.showAddComment()
+       
+
+        // this.isFlipped = !this.isFlipped;
+         this.reply.emit(true)
+         this.mycom.emit(comment)
+        this.commentParentComponent.openReplyScreen(comment);
+    
+
     }
 }
