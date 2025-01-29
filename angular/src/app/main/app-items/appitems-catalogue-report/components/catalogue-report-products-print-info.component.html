@@ -1,16 +1,16 @@
 <form class="h-100" #printInfoForm="ngForm" novalidate (ngSubmit)="printAndFinish(printInfoForm)" autocomplete="off">
     
-    <div class="d-flex flex-column justify-content-between thin-scroll _scroll wizard-wrapper">
+    <div class="d-flex flex-column justify-content-between thin-scroll _scroll wizard-wrapper parSec">
         <div class="d-flex flex-column justify-content-between " >
             <div class="row justify-content-between">
                 <div class="align-items-center col-6 d-flex" style="gap:5px;">
                     <input type="radio" id="EmailLinesheet" name="EmailorPrint" value="true"  (change)="onEmailLinesheetChange($event.target.value)" [checked]="printInfoParam.EmailLinesheet"
                         >
-                    <label for="EmailLinesheet" class="font-weight-bolder text-black mb-0">{{"EmailLinesheet" | localize}}</label>
+                    <label for="EmailLinesheet" [ngClass]="printInfoParam.EmailLinesheet ? 'selected':'notS'" class=" mb-0">{{"EmailLinesheet" | localize}}</label>
                 </div>
                 <div class="align-items-center col-6 d-flex" style="gap:5px;">
                     <input type="radio" id="PrintLinesheet" name="EmailorPrint" value="true" (change)="onPrintLinesheetChange($event.target.value)" [checked]="printInfoParam.PrintLinesheet">
-                    <label for="PrintLinesheet" class="font-weight-bolder text-black mb-0">{{"PrintLinesheet"| localize}}</label>
+                    <label for="PrintLinesheet" class=" mb-0" [ngClass]="printInfoParam.PrintLinesheet ? 'selected':'notS'">{{"PrintLinesheet"| localize}}</label>
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
                             href="javascript:;"
                             (click)="showCC()"
                             *ngIf="!displayCC"
-                            ><span class="text-input-label">{{
+                            ><span [ngClass]="displayCC ? 'text-input-label':'defInp'" class="">{{
                                 "CC" | localize
                             }}</span></a
                         >
@@ -72,7 +72,7 @@
                             href="javascript:;"
                             (click)="showBCC()"
                             *ngIf="!displayBCC"
-                            ><span class="text-input-label">
+                            ><span class="" [ngClass]="displayBCC ? 'text-input-label':'defInp'" >
                                 {{ "BCC" | localize }}</span
                             ></a
                         >
@@ -102,7 +102,7 @@
                         class="
                             InputText
                             email-autocomplete
-                            sendMessageInputs
+                            sendMessageInputs w-100
                         "
                         [(ngModel)]="printInfoParam.ccUsers"
                         [suggestions]="filteredUsers"
@@ -152,11 +152,11 @@
             </div>
             <div class="form-group group-input subject-label mb-0">
                 <div
-                    class="InputText"
-                    style="padding-top: 4px !important; display: flex"
+                    class="InputText d-md-flex"
+                    style="padding-top: 4px !important; "
                 >
                     <span
-                        class="text-input-label subject-label pr-4 mb-0"
+                        class="text-input-label subject-label pr-4 mb-0" 
                         >{{ "subject" | localize }}:</span
                     >
                     <input
@@ -172,25 +172,26 @@
             </div>
             <div class="form-group editor-text mb-0">
                 <textarea
-                class="col-11"
+                class="col-11 p-3 ml-lg-5"
                     [(ngModel)]="printInfoParam.body"
                     name="HtmlEditorInput"
-                    style="height: 180px ; margin-left: 10%  "
+                    style="height: 180px ;border: 1px solid #D5D4DC !important; border-radius: 8px;"
+                    placeholder="Write Somthing ...."
                 >
                 </textarea>
             </div>
         </div>
         <div class="d-flex flex-row justify-content-between pr-5 w-100" >
-            <button class="btn btn-primary" type="button" (click)="previousStep()">
+            <button class="btn btnPrev" type="button" (click)="previousStep()">
                 <i class="fa-arrow-left fas ml-3"></i>
                 {{ "Previous" | localize }}
             </button>
-            <button class="btn btn-primary" type="submit" *ngIf="printInfoParam.PrintLinesheet">
+            <button class="btn btnCont" type="submit" *ngIf="printInfoParam.PrintLinesheet">
             <span>{{ "PrintAndFinish" | localize  }}</span>  
                 <i class="fa-arrow-right fas ml-3"></i>
             </button> 
             <button
-                class="btn btn-primary" 
+                class="btn btnCont" 
                 type="submit" 
                 *ngIf="printInfoParam.EmailLinesheet" 
                 [disabled]="printInfoParam?.toUsers?.length == 0 || printInfoParam?.subject == ''"

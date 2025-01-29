@@ -205,6 +205,13 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
   }
   onAppItemListSelectionChange($event:AppItemsListDto){
   }
+  clearMyProductsName() {
+    let body :GetAllAppItemsInput 
+    this.selectedAppItemList = null;  // Clear selected item
+    this.myProductsName = '';  
+ 
+   
+  }
   onSelectItem($event){
     if(this?.oldSelectedAppItemList?.id == this.selectedAppItemList?.id) return
     // remove old itemlist temp data

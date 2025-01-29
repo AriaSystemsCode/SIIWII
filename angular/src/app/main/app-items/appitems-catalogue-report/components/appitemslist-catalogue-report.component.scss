@@ -25,11 +25,12 @@
 
 
 .fake-circle {
-    background-color: #DDDDDD;
+    background-color: #EEEEEE;
     width: 25px;
     height: 25px;
     display: block;
     border-radius: 50%;
+    border: 2px solid #DDDDDD;
     i {
         color: $white-color;
     }
@@ -49,7 +50,7 @@
 }
 input:focus
 {
-    border: 1px solid black !important;
+    border: 1px solid #D5D4DC !important;
 }
 
 
@@ -72,6 +73,9 @@ input:focus
     .addFW {
         max-width: 220px !important;
     }
+    .svgW {
+        width: 25px !important;
+       }
   }
   
   
@@ -85,13 +89,16 @@ input:focus
         i {
             color: $white-color;
         }
-    }
 
+    }
+   .svgW {
+    width: 15px !important;
+   }
     .addW {
-        max-width: 70px !important;
+        max-width: 55px !important;
     }
     .addFW {
-        max-width: 140px !important;
+        max-width: 135px !important;
     }
     .stpTitle {
         font-size: 14px !important;
@@ -142,14 +149,17 @@ input:focus
     }
 
     @media only screen and (max-width: 575px) {
+        .svgW {
+            width: 15px !important;
+           }
         .addW {
             max-width: 35px !important;
         }
         .addFW {
-            max-width: 70px !important;
+            max-width: 50px !important;
         }
     .stpTitle {
-        font-size: 10px;
+        font-size: 8px;
     }
     .currStp {
         color: #1B101B;

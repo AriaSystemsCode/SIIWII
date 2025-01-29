@@ -1,7 +1,7 @@
 @import '../../../../../assets/styles/base/variables';
 input:focus
 {
-    border: 1px solid black !important;
+    border: 1px solid #D5D4DC !important;
 }
 
 .bgImg {
@@ -79,6 +79,16 @@ border-radius: 12px;
     font-weight: 700;
     border-radius: 6px;
     transition: background-color 0.2s, box-shadow 0.2s;
+
+    .form-control{
+      border: 1px solid #E5E5E4 !important;
+    }
+}
+
+
+.kt-checkbox > input:checked ~ span {
+
+  background: #4A0D4A !important;
 }
 }
 
@@ -118,4 +128,11 @@ h6 {
   color: #A49FB1;
   font-weight: 700;
   font-size: 16px;
+}
+
+.titlsSty {
+  color: #1B101B;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
 }

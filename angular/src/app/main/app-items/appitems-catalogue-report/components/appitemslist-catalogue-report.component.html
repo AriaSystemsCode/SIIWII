@@ -5,7 +5,7 @@
         "
      
     >
-        <div class="kt-subheader kt-grid__item" *ngIf="!isModal">
+        <div class="kt-subheader kt-grid__item" style="height: 80px !important;    border-bottom-right-radius: 12px !important;" *ngIf="!isModal">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
@@ -44,7 +44,7 @@
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
             <div class="kt-portlet kt-portlet--mobile h-100" [ngClass]="{ 'isModal': isModal }">
                 <div class="kt-portlet__body d-flex flex-column h-100" [ngClass]="{ 'wizar h-100d' : currentStep != printCatalogueStepsEnum.ReportViewer,'pt-0 pb-0':isModal }">
-                    <ng-template #elseTemplate>
+                 
                         <div class="row">
                             <div class="addBrdr w-100 d-flex justify-content-between pb-2">
                             <div class="col-6 linshW">
@@ -71,24 +71,33 @@
                                      
                                     "
                                     *ngFor="let step of steps; last as last; let i = index"
+                        
                                     [ngClass]="{
                                         'current-step':
                                             currentStep ==
                                             step.printCatalogueStepsEnum,
                                         'done-step':
-                                            currentStep >
-                                            step.printCatalogueStepsEnum
+                                            (currentStep >
+                                            step.printCatalogueStepsEnum  && 
+                                             i != 4 ) || (currentStep >4 && 
+                                             i==4 )
+                                          
                                     }"
                                 >
-                                    <p class="stpTitle" [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp':'defStp'">{{ step.title }}</p>
+                            
+                                    <p class="stpTitle ml-md-5 ml-2" style="white-space: nowrap;" [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp':'defStp'">{{ step.title }}</p>
                                    <div class="d-flex align-items-center">
                                     
-                                    <span class="fake-circle  d-flex align-items-center justify-content-center position-relative">
+                                    <span class="fake-circle  d-flex align-items-center justify-content-center position-relative" [ngClass]="{   'mt-lg-4 mt-4' : i ==4}">
                                         <i [ngClass]="currentStep == step.printCatalogueStepsEnum ? step.icon : (currentStep > step.printCatalogueStepsEnum ? 'step.icon' : '' )  "></i>
-                                        <p [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp handlPos':'defStp defPos'"  style="color: white !important;position: absolute;   
+                                        <p *ngIf="i != 4" [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp handlPos':'defStp defPos'"  style="color: white !important;position: absolute;   
                                            ">{{ (i == 1 || i ==0) ? step.printCatalogueStepsEnum + 1 :  step.printCatalogueStepsEnum }}</p>
+                                           <svg  *ngIf="i == 4" style="position: absolute; right:24%" class="svgW" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6 17.6L11.7143 24L26 8" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            
                                     </span>
-                                      <div *ngIf="currentStep == step.printCatalogueStepsEnum">
+                                      <div *ngIf="currentStep == step.printCatalogueStepsEnum && i != 4">
                                         <svg  class="addW" height="12" viewBox="0 0 124 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <rect x="0.5" width="123" height="12" rx="4" fill="#4A0D4A"/>
                                             </svg>
@@ -101,15 +110,16 @@
                                         </span>
                                       </div>
 
-                                      <div *ngIf="currentStep > step.printCatalogueStepsEnum">
-                                        <svg  class="addFW" height="12" viewBox="0 0 124 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect x="0.5" width="123" height="12" rx="4" fill="#4A0D4A"/>
-                                            </svg>
-                                            
+                                      <div *ngIf="currentStep > step.printCatalogueStepsEnum && i != 4">
+                                        
+                                            <svg class="addFW" height="12" viewBox="0 0 232 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="232" height="12" rx="4" fill="#4A0D4A"/>
+                                                </svg>
+                                                
                                     
                                       </div>
 
-                                      <div *ngIf="currentStep < step.printCatalogueStepsEnum">
+                                      <div *ngIf="currentStep < step.printCatalogueStepsEnum && i != 4">
                                       
                                             
                                         <span class="" *ngIf="!last">
@@ -210,23 +220,23 @@
                                     </app-catalogue-report-products-print-info>
                                 </div>
                             </ng-container>
-
+                            <ng-container
+                            *ngIf="
+                                currentStep == printCatalogueStepsEnum.ReportViewer;
+                            "
+                        >
+                            <div [ngClass]="{'visibility-hidden' : printInfoParam.EmailLinesheet}">
+                                <report-viewer
+                                    [reportUrl]="reportUrl"
+                                    [invokeAction]="invokeAction"
+                                    (documentReady)="reportDocumentReadyHandler($event)"
+                                >
+                                </report-viewer>
+                            </div>
+                        </ng-container>
                         </div>
-                    </ng-template>
-                    <ng-container
-                        *ngIf="
-                            currentStep == printCatalogueStepsEnum.ReportViewer;else elseTemplate
-                        "
-                    >
-                        <div [ngClass]="{'visibility-hidden' : printInfoParam.EmailLinesheet}">
-                            <report-viewer
-                                [reportUrl]="reportUrl"
-                                [invokeAction]="invokeAction"
-                                (documentReady)="reportDocumentReadyHandler($event)"
-                            >
-                            </report-viewer>
-                        </div>
-                    </ng-container>
+                 
+               
                 </div>
             </div>
         </div>

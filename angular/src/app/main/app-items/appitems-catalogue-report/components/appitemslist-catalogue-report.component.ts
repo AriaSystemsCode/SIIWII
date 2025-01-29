@@ -47,7 +47,8 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
        // const step3 = new PrintCatalogueStep({ title: this.l("CoverPageinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.CoverPage, icon: "" });
         const step3 = new PrintCatalogueStep({ title: this.l("Detailsinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.DetailInfo, icon: "" });
         const step4 = new PrintCatalogueStep({ title: this.l("Deliveryoptions"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.PrintInfo, icon: "" });
-        this.steps.push(step1, step2, step3, step4);
+        const step5 = new PrintCatalogueStep({ title: this.l(""), printCatalogueStepsEnum: PrintCatalogueStepsEnum.CoverPage, icon: "" });
+        this.steps.push(step1, step2, step3, step4,step5);
     }
     title:string
     active:boolean = false

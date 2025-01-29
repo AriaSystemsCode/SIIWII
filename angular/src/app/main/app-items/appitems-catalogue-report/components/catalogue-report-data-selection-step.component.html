@@ -1,6 +1,6 @@
 <div class="h-100 wizard-wrapper">
     <div class="d-flex">
-    <img src="../../../../../assets/common/images/alarm.png" />   <h5 class=" ml-2 plzTx"> {{ "Please select the data that you will add to the linesheet" | localize }}</h5>
+    <img src="../../../../../assets/common/images/alarm.png" />   <h5 class=" ml-2 plzTx mb-0 mt-2"> {{ "Please select the data that you will add to the linesheet" | localize }}</h5>
 </div>
     <div class="d-flex flex-column h-100 justify-content-between thin-scroll _scroll">
         <div class="d-flex flex-column flex-wrap">
@@ -12,6 +12,7 @@
                         </h6>
                         
                         <div class="">
+                         
                             <div class="wide-drop-down handleW" style="position: relative;">
                                 <p-autoComplete [styleClass]="'w-100'" class="position-relative" 
                                     [inputStyleClass]="'w-100 form-control pl-3 bg-white'" name="itemList"
@@ -19,7 +20,7 @@
                                     [placeholder]="'EnterProductList' | localize"
                                     (completeMethod)="searchAppItemLists($event?.query)" [(ngModel)]="selectedAppItemList"
                                     (onSelect)="onSelectItem($event)" [field]="'name'" [dataKey]="'id'"
-                                    [forceSelection]="true" [disabled]="disableAppItemsList">
+                                    [forceSelection]="true"  [disabled]="disableAppItemsList || (myProductsName != '' && !selectedAppItemList?.id)">
                                     <ng-template let-itemList pTemplate="selectedItem">
                                         <span>{{itemList.appItemsList.name}}</span>
                                     </ng-template>
@@ -42,7 +43,7 @@
                                 Input
                             " #reportMyProductsNameInput="ngModel" />
                             <div class=" text-right">
-                                <button class="p-0" [disabled]="printInfoParam.itemsListId && !isValid"
+                                <button class="p-0" [disabled]="printInfoParam.itemsListId && !isValid || selectedAppItemList?.id "
                                     (click)="showProductsModal()" style="border: none;" [ngStyle]="{
                                     'cursor': printInfoParam.itemsListId && !isValid ? 'not-allowed': 'pointer'
                                 }">
@@ -61,7 +62,7 @@
            
                 <div class="align-items-baseline mt-12 row">
                     <div class="col-lg-6">
-                        <div class="align-items-center mt-8 row">
+                        <div class="align-items-center mt-8 row mt-md-4">
                             <div class="col-lg-6 col-8 mt-2 onlyTxt">
                                 {{ "OnlyInStockColors" | localize }}
                             </div>
@@ -110,5 +111,5 @@
 </div>
 
 
-<app-items-browse-modal #appItemsBrowseModal (apply)="applyHandler($event)" (cancel)="cancelHandler()">
+<app-items-browse-modal #appItemsBrowseModal (apply)="applyHandler($event)"  (cancel)="cancelHandler()">
 </app-items-browse-modal>

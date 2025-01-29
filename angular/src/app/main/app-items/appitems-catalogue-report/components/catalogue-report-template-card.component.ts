@@ -12,8 +12,12 @@ export class CatalogueReportTemplateCardComponent extends AppComponentBase {
     @Input() index:number
     @Input() template : GetSycReportForViewDto
     @Input() printInfoParam : ProductCatalogueReportParams
-
+    formattedDescription: string[];
     constructor(private injector:Injector){
         super(injector)
     }
+    ngOnInit(){
+        this.formattedDescription = this.formatDescription(this.template.sycReport.description);
+    }
+    formatDescription(description: string): string[] { return description .split(/,| - /).map(item => item.trim()).filter(item => item) ; }
 }
