@@ -92,7 +92,7 @@ sanitizeUrl(url: string): SafeResourceUrl {
     this.showMainSpinner()
     let itemsforpage ;
     // this.fromOverviewTab ? itemsforpage = 9 : itemsforpage = this.itemsPerPage
-    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,5,  this.itemsPerPage).pipe(
+    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,0,  this.itemsPerPage).pipe(
       finalize(
           ()=>
             this.hideMainSpinner()

@@ -77,7 +77,7 @@ ngOnChanges(){
   getAllMedia(){
     this.showMainSpinner()
  
-    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,5,  9).pipe(
+    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin,undefined,0,  9).pipe(
       finalize(
           ()=>
             this.hideMainSpinner()
