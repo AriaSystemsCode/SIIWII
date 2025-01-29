@@ -44,6 +44,7 @@
                                 [image]="coverPhoto"
                                 [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                 [staticWidth]="viewProfileCover?.offsetWidth"
+                                [classList]="fromCta ? 'handleImg':''"
                                 >
                             </app-image-display>
                             <div class="row w-100" style="position: absolute;
@@ -85,14 +86,13 @@ transform: translateY(-50%);">
                         </div>
                          <div class="row ">
                         <div class="col-12 list-toolbar  pb-4">
-                            <div class="row mb-3 justify-content-between pt-2" [ngClass]="fromCta ? 'ml-4':''">
+                            <div class="row mb-3 justify-content-between pt-2" [ngClass]="fromCta ? 'ml-2':''">
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0 d-flex justify-content-center align-items-center mb-4 mb-md-0 mr-5 pr-5">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
-                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0" [ngClass]="fromCta ?'handlWM':''"  style="border: 1px solid #D9D9D9 !important;
+                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0" [ngClass]="fromCta ?'handlWM':'defaultW'"  style="border: 1px solid #D9D9D9 !important;
                                         color: #D9D9D9 !important;
                                         border-radius: 5px;
-                                        /* padding: 10px 300px 10px 10px !important; */
-                                        
+                                    
                                         height: 46px !important;background-color: #FFFFFF;"
                                         type="button"
                                             dropdownToggle>
@@ -161,6 +161,11 @@ transform: translateY(-50%);">
                                     <!-- <div class="list-toolbar-divider"></div> -->
 
                                 <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0" style="margin-right: 15px;" >
+                                    <a *ngIf="fromCta" style="padding-right: 4px;padding-left: 10px;" [title]="'Filter' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" [ngClass]="fromCta ? 'd-md-none d-block':''" (click)="toggleFilterOverlay()">
+                                        <i  class="fas fa-filter p-0" style="color: #4A0D4A !important;width: 24px !important;
+                                        height: 24px !important;
+                                        align-content: center;"></i>
+                                    </a>
                                     <a style="padding-right: 4px;padding-left: 10px;" [title]="'ResetData' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
                                         <i  class="flaticon2-reload" style="color: #4A0D4A !important;width: 24px !important;
                                         height: 24px !important;
@@ -177,19 +182,21 @@ transform: translateY(-50%);">
     align-content: center;   
      color: white !important;"></i>
                                     </a>
+
+                                  
                                 </div>
 
                             </div>
                            
                         </div>
-                        <div class="col-6  col-sm-4  left-aside-filters pt-4 mt-2" [ngClass]="fromCta ? 'col-md-5':'col-md-3'">
+                        <div class="col-6  col-sm-4  left-aside-filters  mt-2" [ngClass]="fromCta ? 'col-lg-3 col-md-5 px-0 addBorder d-md-block d-none':'col-md-3'">
                             <app-items-filters
                                 [filterForm]="filterForm"
                                 [filtersFlags]="filtersFlags"
                             ></app-items-filters>
                         </div>
                         <div  class="col d-flex flex-column  app-items-container thin-scroll"   >
-                            <div class="d-flex justify-content-between pl-5" >
+                            <div class="d-flex justify-content-between " [ngClass]="fromCta ? '':'pl-5'">
                                 <div class="font-weight-normal list-toolbar-data-summary" [ngStyle]="{ visibility : loading ? 'hidden' : 'visible' }" style="border: 1px solid #D9D9D9 !important;
                                 color: #D9D9D9 !important;
                                 border-radius: 5px;
@@ -227,11 +234,11 @@ transform: translateY(-50%);">
                                     </div>
                                 </div>
                             </div>
-                            <div class="row  pl-5 pr-2">
+                            <div class="row  pl-2 pr-2">
                                 <div *ngFor="let item of items;index as i" class="col-12 mb-5 p-0 "
                                 [ngClass]="{ 'col-md-12 single-item-per-row-layout': singleItemPerRowMode  ,
                                 'col-md-3': !singleItemPerRowMode && !fromCta,
-                                'col-md-6': fromCta
+                                'col-lg-3 col-md-6 p-0': fromCta
                             }">
                                     <app-item-card
                                         [item]="item"
@@ -289,8 +296,16 @@ transform: translateY(-50%);">
             <MainImportModal #ImportProductsModal (finishImport)="onFinishImport($event)"></MainImportModal>
         </div>
     </div>
+
+  
 </form>
 
 
 
-
+<div class="filter-overlay" *ngIf="showOverlay && fromCta">
+      
+    <app-items-filters
+      [filterForm]="filterForm"
+      [filtersFlags]="filtersFlags"
+    ></app-items-filters>
+  </div>

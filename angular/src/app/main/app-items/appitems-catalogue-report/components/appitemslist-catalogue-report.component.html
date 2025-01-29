@@ -46,7 +46,8 @@
                 <div class="kt-portlet__body d-flex flex-column h-100" [ngClass]="{ 'wizar h-100d' : currentStep != printCatalogueStepsEnum.ReportViewer,'pt-0 pb-0':isModal }">
                     <ng-template #elseTemplate>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="addBrdr w-100 d-flex justify-content-between pb-2">
+                            <div class="col-6 linshW">
                                 <h3>{{"Linesheet" | localize }}</h3>
                             </div>
                             <div class="col text-left">
@@ -62,6 +63,7 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
+                        </div>
                             <div class="col-12 d-flex align-items-center mt-3">
                                 <div
                                     class="
@@ -78,14 +80,13 @@
                                             step.printCatalogueStepsEnum
                                     }"
                                 >
-                                    <p class="stpTitle">{{ step.title }}</p>
+                                    <p class="stpTitle" [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp':'defStp'">{{ step.title }}</p>
                                    <div class="d-flex align-items-center">
                                     
                                     <span class="fake-circle  d-flex align-items-center justify-content-center position-relative">
                                         <i [ngClass]="currentStep == step.printCatalogueStepsEnum ? step.icon : (currentStep > step.printCatalogueStepsEnum ? 'step.icon' : '' )  "></i>
-                                        <p  style="color: white !important;position: absolute;    right: 45%;
-                                            top: 20%;
-                                            font-size: 14px;">{{ (i == 1 || i ==0) ? step.printCatalogueStepsEnum + 1 :  step.printCatalogueStepsEnum }}</p>
+                                        <p [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp handlPos':'defStp defPos'"  style="color: white !important;position: absolute;   
+                                           ">{{ (i == 1 || i ==0) ? step.printCatalogueStepsEnum + 1 :  step.printCatalogueStepsEnum }}</p>
                                     </span>
                                       <div *ngIf="currentStep == step.printCatalogueStepsEnum">
                                         <svg  class="addW" height="12" viewBox="0 0 124 12" fill="none" xmlns="http://www.w3.org/2000/svg">

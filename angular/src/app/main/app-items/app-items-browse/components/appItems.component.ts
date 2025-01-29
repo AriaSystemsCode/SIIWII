@@ -111,6 +111,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
     acceptedAspectRatio:number=0;
+    showOverlay: boolean = false; // To toggle the overlay
     constructor(
         injector: Injector,
         private _importService: MainImportService,
@@ -186,7 +187,9 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         this.initFilterForm()
         this.getAllForAccountInfo()
     }
-
+    toggleFilterOverlay() {
+        this.showOverlay = !this.showOverlay;
+      }
    async getAllForAccountInfo() {
         this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER","IMAGE"]).subscribe((result)=>{
             result.forEach(item=>{
@@ -407,6 +410,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
             )
             .pipe(
                 finalize(() => {
+                    this.showOverlay = false
                     this.primengTableHelper.hideLoadingIndicator();
                     this.hideMainSpinner();
                     this.loading = false;

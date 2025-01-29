@@ -1,16 +1,20 @@
 <form #coverPageForm="ngForm" >
     <div class="d-flex flex-column h-100" >
-        <h5 class="col-12">{{ "Please fill the required linesheet information" | localize }}</h5>
+        <div class="d-flex align-items-center">
+            <img src="../../../../../assets/common/images/alarm.png" /> 
+        <h5 class="col-12 ml-2 plzTxt pl-0">{{ "Please fill the required linesheet information" | localize }}</h5>
+
+        </div>
         <div class="row">
-            <div class="col-12">
-                <div class="align-items-baseline mt-4 pb-5 row">
-                    <label class="col-6 col-lg-3 col-md-3 col-sm-4" for="reportTitle">
+            <div class="col-12 row">
+                <div class="align-items-baseline mt-4 col-lg-6 col-md-10">
+                    <label class="col-8 col-lg-6 " for="reportTitle">
                         <h6>
                             <span class="text-danger">*</span
                             > {{ "LinesheetName" | localize }}
                         </h6>
                     </label>
-                    <div class="col">
+                    <div class="col-md-10 col-lg-12">
                         <input
                             type="text"
                             [required]="true"
@@ -30,9 +34,9 @@
                         />
                     </div>
 
-                    <div class="col-6 col-lg-2 col-md-2 col-sm-4">
+                    <div class="col-8 col-lg-6 mt-2 ml-1">
                         <span class="text-muted">
-                            250 {{ "digits" | localize }}
+                            250 {{ "digits" | localize }} <span style="color: #F6851D;" class="ml-2">* Mandatory</span>
                         </span>
                         <validation-messages
                             [formCtrl]="reportTitleInput"
@@ -40,14 +44,14 @@
                         </validation-messages>
                     </div>
                 </div>
-                <div class="align-items-baseline mt-5 row">
-                    <label class="col-6 col-lg-3 col-md-3 col-sm-4" for="account">
+                <div class="align-items-baseline mt-4 col-lg-6 col-md-10">
+                    <label class="col-8 col-lg-6 " for="account">
                         <h6>
                             {{ "PreparedForAccount" | localize }}
                         </h6>
                     </label>
-                    <div class="col-md-7 col">
-                        <div class="wide-drop-down" >
+                    <div class="col-md-10 col-lg-12">
+                        <div class="wide-drop-down position-relative" >
                             <p-autoComplete
                                 [styleClass]="'w-100'"
                                 [inputStyleClass]="'w-100 form-control pl-3 bg-white'"
@@ -66,6 +70,7 @@
                                     <span >{{account.name}}</span>
                                 </ng-template>
                             </p-autoComplete>
+                            <img src="../../../../../assets/common/images/Icon2.png" class="frndImg" /> 
                         </div>
                     </div>
                 </div>

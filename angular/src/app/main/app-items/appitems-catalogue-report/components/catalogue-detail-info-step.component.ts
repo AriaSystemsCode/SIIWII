@@ -111,7 +111,7 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
   }
   setBgImageSrc() {
     if (this.bgImgSrc == '')
-      this.bgImgSrc = "../../../../../assets/placeholders/BGPreview.png";
+      this.bgImgSrc = "../../../../../assets/placeholders/label-text.png";
   }
 
   onChangeShowCoverPage($event) {

@@ -54,7 +54,7 @@ input:focus
 
 
 
-@media (min-width: 768px) {
+@media (min-width: 1210px) {
     .fake-circle {
         background-color: #DDDDDD;
         width: 50px;
@@ -75,7 +75,7 @@ input:focus
   }
   
   
-  @media (max-width: 768px) {
+  @media (max-width: 1210px) {
     .fake-circle {
         background-color: #DDDDDD;
         width: 25px;
@@ -92,6 +92,27 @@ input:focus
     }
     .addFW {
         max-width: 140px !important;
+    }
+    .stpTitle {
+        font-size: 14px !important;
+    }
+    .currStp {
+      
+        font-size: 14px !important;
+    }
+
+    .defStp {
+    
+        font-size: 14px !important;
+
+    }
+    .handlPos {
+        right: 40% !important;
+        top: 10% !important;
+    }
+    .defPos {
+        right: 35% !important;
+        top: 10% !important;
     }
     }
     ::ng-deep {
@@ -130,4 +151,58 @@ input:focus
     .stpTitle {
         font-size: 10px;
     }
+    .currStp {
+        color: #1B101B;
+        font-weight: 500;
+        // line-height: 22px;
+        font-size: 10px !important;
     }
+
+    .defStp {
+        color: #D3D3D3;
+        font-weight: 500;
+        font-size: 10px !important;
+
+    }
+    .handlPos {
+    
+        top: 5% !important;
+    }
+    .defPos {
+        right: 40% !important;
+        top: 20% !important;
+    }
+    }
+
+
+    .currStp {
+        color: #1B101B;
+        font-weight: 600;
+        line-height: 22px;
+        font-size: 20px;
+    }
+
+    .defStp {
+        color: #D3D3D3;
+        font-weight: 500;
+        font-size: 20px;
+
+    }
+
+    .linshW {
+        color: #1B101B;
+        font-weight: 700;
+    }
+
+.addBrdr {
+    border-bottom: 1px solid #EEEEEEEE;
+}
+.handlPos {
+    right: 43%;
+    top: 25%;
+}
+
+.defPos {
+    right: 40%;
+    top: 20%;
+}

@@ -33,10 +33,10 @@ border-radius: 12px;
 }
 ::ng-deep {
     .p-inputswitch.p-inputswitch-checked:not(.p-disabled):hover .p-inputswitch-slider {
-        background: $success-color !important;
+        background: #2DC74F!important;
     }
     .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
-        background: $success-color  !important;
+        background: #2DC74F !important;
 
     }
 }
