@@ -49,19 +49,8 @@
 
             <h6 class="subject-title mt-1 ,b-0">Subject : {{comment?.messages?.subject}}</h6>
             <!-- <hr/> -->
-            <p
-            #content
-            style="word-wrap: break-word;"
-            class="bodyP"
-          >
-            {{ displayedContent }}
-            <span
-              class="see-more"
-              *ngIf="isLongContent"
-              (click)="toggleExpand()"
-            >
-              {{ isExpanded ? 'See Less' : 'See More' }}
-            </span>
+            <p class="message-body" [innerHTML]="comment?.messages?.bodyFormat">
+              <!-- {{comment?.messages?.body?comment?.messages?.body:comment?.messages?.bodyFormat}} -->
           </p>
         </div>
     </div>

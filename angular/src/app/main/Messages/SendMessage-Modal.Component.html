@@ -613,9 +613,10 @@
             </div>
     </div>    
 </div>
-<form class="reply-w-direct-message" *ngIf="!modalView" #MessageForm="ngForm" novalidate style="position: relative;">
-    <div class="modal-body">
-        <div class="row">
+<form class="reply-w-direct-message p-0" *ngIf="!modalView" #MessageForm="ngForm" novalidate style="position: relative;">
+    <div class="threadDiv">Direct Message</div>
+    <div class="modal-body p-2">
+        <div class="row px-2">
             <a
                 href="javascript:;"
                 (click)="showCC()"
@@ -752,16 +753,16 @@
 
         <div class="form-group group-input subject-label">
             <div
-                class="InputText row"
+                class="InputText "
                 *ngIf="replyMessageId == 0"
-                style="padding-top: 4px !important; display: flex"
+                style="padding-top: 4px !important;"
             >
                 <span
-                    class="text-input-label subject-label col-md-2"
+                    class="text-input-label subject-label "
                     *ngIf="replyMessageId == 0"
                     >{{ "subject" | localize }}:</span
                 >
-                <div class="col-md-10">
+                <div class="">
                                     <input
                     *ngIf="replyMessageId == 0"
                     class="form-control Input bg-white"
@@ -814,7 +815,7 @@
         </form>
     </div>
 
-    <div class="attachments-files">
+    <div class="attachments-files p-2">
         <div *ngFor="let item of attachments">
             <div *ngIf="item.type.includes('image')">
                 <img
