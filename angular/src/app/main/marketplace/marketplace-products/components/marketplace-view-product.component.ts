@@ -366,6 +366,16 @@ export class MarketplaceViewProductComponent
             let price = 0;
             orders.map((order: any) => {
                 order.color.sizes.map((size,index) => {
+
+if(!this.productDetails?.orderByPrePack ){
+    if (!size.orderedQty)
+        size.orderedQty = 0
+    let priceMultibly = size.orderedQty * size.price;
+    qty = qty + size.orderedQty;
+    price = price + priceMultibly;
+}
+                  else
+                  {
                     if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[order.colorIndex])){ 
                         let multiby =
                             size.sizeRatio * order.color.sizes[index].orderedPrePacks;
@@ -379,6 +389,7 @@ export class MarketplaceViewProductComponent
                         qty = qty + size.orderedPrePacks;
                         price = price + priceMultibly;
                     }
+                }
     
                     this.totalOrderQTY = qty;
                     this.totlaOrderPrices = price;
@@ -386,10 +397,10 @@ export class MarketplaceViewProductComponent
             });
         }
 
-    removeColor(color, i: number) {
+   /*  removeColor(color, i: number) {
         this.currentIndex =
             this.orderSummary.length === 0 ? 0 : color.colorIndex;
-        if (!this.productDetails?.orderByPrePack) {
+            if (!this.productDetails?.orderByPrePack) {
             // this.totalOrderQTY  = this.totalOrderQTY - this.cal
             let qty = 0;
             let price = 0;
@@ -419,9 +430,64 @@ export class MarketplaceViewProductComponent
             this.colorsData[color.colorIndex].sizes[0].orderedPrePacks = 0;
         }
         this.orderSummary.splice(i, 1);
+    } */
+
+
+    removeColor(color, i: number) {
+        this.currentIndex =
+            this.orderSummary.length === 0 ? 0 : color.colorIndex;
+
+          if(!this.productDetails?.orderByPrePack)  {
+                let qty = 0;
+                let price = 0;
+                this.orderSummary[i].color.sizes.map((size) => {
+                    let priceMultibly = size.orderedQty * size.price;
+                    qty = qty + size.orderedQty;
+                    price = price + priceMultibly;
+                });
+                this.totlaOrderPrices = this.totlaOrderPrices - price;
+                this.totalOrderQTY = this.totalOrderQTY - qty;
+                this.colorsData[color.colorIndex].sizes.forEach((element) => {
+                    element.orderedQty = 0;
+                });
+            }
+
+            else{
+            if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[color.colorIndex])){ 
+                // this.totalOrderQTY  = this.totalOrderQTY - this.cal
+            let qty = 0;
+            let price = 0;
+            this.orderSummary[i].color.sizes.map((size) => {
+                let priceMultibly = size.orderedPrePacks * size.price;
+                qty = qty + size.orderedPrePacks;
+                price = price + priceMultibly;
+            });
+            this.totlaOrderPrices = this.totlaOrderPrices - price;
+            this.totalOrderQTY = this.totalOrderQTY - qty;
+            this.colorsData[color.colorIndex].sizes.forEach((element) => {
+                element.orderedPrePacks = 0;
+            });
+        } else {
+            let qty = 0;
+            let price = 0;
+            this.orderSummary[i].color.sizes.map((size,index) => {
+                let multiby =
+                    size.sizeRatio *
+                    this.orderSummary[i].color.sizes[index].orderedPrePacks;
+                let priceMultibly = multiby * size.price;
+                qty = qty + multiby;
+                price = price + priceMultibly;
+            });
+        
+            this.totlaOrderPrices = this.totlaOrderPrices - price;
+            this.totalOrderQTY = this.totalOrderQTY - qty;
+            this.colorsData[color.colorIndex].sizes[0].orderedPrePacks = 0;
+        }
+    }
+        this.orderSummary.splice(i, 1);
     }
 
-    removeSize(sizeIndex: number, size, color, orderIndex: number) {
+/*     removeSize(sizeIndex: number, size, color, orderIndex: number) {
         this.currentIndex = color.colorIndex;
         let amount=0;
 
@@ -456,6 +522,53 @@ export class MarketplaceViewProductComponent
                     sizes.unshift(preorderItem);
             }
     }
+} */
+
+removeSize(sizeIndex: number, size, color, orderIndex: number) {
+    this.currentIndex = color.colorIndex;
+    let amount=0;
+
+    if(!this.productDetails?.orderByPrePack)  {
+        this.totalOrderQTY =
+        this.totalOrderQTY -
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty;
+     amount =
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty *
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
+    }
+
+    else{
+    if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[color.colorIndex])){ 
+        this.totalOrderQTY =
+        this.totalOrderQTY -
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks;
+     amount =
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks *
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
+    }
+    else{
+        this.totalOrderQTY =
+        this.totalOrderQTY -
+        (this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks);
+
+     amount =
+       this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks *
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
+    }
+    }
+    this.totlaOrderPrices = this.totlaOrderPrices - amount;
+    this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty = 0;
+    this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks=0;
+
+    if (sizeIndex == 0 && this.orderSummary[orderIndex].color.sizes?.length > 0) {
+        const sizes = this.colorsData[this.currentIndex].sizes;
+        const preorderIndex = (this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) ? sizes.findIndex(size => size.orderedQty) : sizes.findIndex(size => size.orderedPrePacks)  ;
+    
+        if (preorderIndex > 0) {
+            const [preorderItem] = sizes.splice(preorderIndex, 1);
+                sizes.unshift(preorderItem);
+        }
+}
 }
 
     // total ordered QTY in order by size
