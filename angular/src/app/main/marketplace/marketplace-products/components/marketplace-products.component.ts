@@ -74,6 +74,7 @@ export class MarketplaceProductsComponent
     sellerSSIN: any;
     buyerSSIN: any;
     contactSSIN:any;
+    acceptedAspectRatio;
 
     constructor(
         injector: Injector,
@@ -173,6 +174,22 @@ export class MarketplaceProductsComponent
         // this.getCurrencyCurrent();
 
         this.checkMediaQuery();
+        this.getAspectatio();
+       
+    }
+
+    getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.acceptedAspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
     }
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();

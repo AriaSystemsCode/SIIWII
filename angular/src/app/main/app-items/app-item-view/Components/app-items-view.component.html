@@ -61,7 +61,7 @@
                                             : 'hidden'
                                 }"
                             >
-                                <div class="leftImage pr-2">
+                                <div class="leftImage pr-2" #leftImage>
                                     <img
                                         *ngFor="
                                             let img of appItemForViewDto?.entityAttachments;
@@ -81,6 +81,7 @@
                                             imageSelectedIndex = i;
                                             showImageAtCenter(img)
                                         "
+                                        [ngStyle]="{'height.px':  (leftImage.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
@@ -99,7 +100,7 @@
                                             : 'hidden'
                                 }"
                             >
-                                <div class="leftImage pr-2">
+                                <div class="leftImage pr-2" #leftImage>
                                     <img
                                         *ngFor="
                                             let img of appItemForViewDto
@@ -122,12 +123,13 @@
                                             imageSelectedIndex = i;
                                             showImageAtCenter(img)
                                         "
+                                        [ngStyle]="{'height.px':  (leftImage.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
 
                             <div class="p-2 ml-2 center-dev">
-                                <div class="centerContatiner">
+                                <div class="centerContatiner"  #centerContatiner>
                                     <img
                                         *ngIf="centerImage"
                                         [src]="
@@ -138,6 +140,7 @@
                                         alt="defaultImage"
                                         (error)="handleFailedImage($event)"
                                         class="imageContainer"
+                                        [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
