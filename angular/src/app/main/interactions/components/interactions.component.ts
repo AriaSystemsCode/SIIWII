@@ -165,6 +165,7 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     }
     showAddComment(type?:string){
         if(this.fromTrans && type != 'replies'){
+            this.triggerCommentsList(true)
             this.commentParentComponent.showAddComment()
             this.commentParentComponent.focusAddComment()
         }else {
