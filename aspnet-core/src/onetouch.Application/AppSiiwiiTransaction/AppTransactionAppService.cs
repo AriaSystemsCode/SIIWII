@@ -2740,6 +2740,12 @@ namespace onetouch.AppSiiwiiTransaction
                                                             : "attachments/" + (line.TenantId.HasValue ? line.TenantId : -1) + "/" +
                                                             lineAttachmentDefault.AttachmentFk.Attachment);
                                             }
+                                            //MMT
+                                            if (string.IsNullOrEmpty(sizeColorDetailView.Data.Image))
+                                            {
+                                                sizeColorDetailView.Data.Image = majorDetailView.Data.Image;
+                                            }
+                                            //MMT
                                             //I45
                                             if (!string.IsNullOrEmpty(sizeColorDetailView.Data.Image))
                                             {
