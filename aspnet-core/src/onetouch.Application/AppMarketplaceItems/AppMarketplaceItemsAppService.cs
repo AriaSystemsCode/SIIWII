@@ -756,59 +756,59 @@ namespace onetouch.AppMarketplaceItems
                                 if (frstAttId != null & frstAttId.Count() > 0)
                                     firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
-                                var firstItem = varAppItems.FirstOrDefault();
-                                List<string> attributeValues = firstItem.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.EntityObjectTypeCode).Distinct().ToList();
-                                List<string> attributeIDs = firstItem.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.AttributeId.ToString()).Distinct().ToList();
-                                var firstAttributeID = firstItem.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId),
-                                    a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
-                                    .FirstOrDefault().ToString();
-                                var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
-                                var firstAttributeValue = firstItem.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
-                                //var firstattributeValues1 = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID1)).Select (z=> z.AttributeValue)).Distinct().ToList ();
-                                var firstattributeValues = varAppItems.Select(x => x.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
-                                                           .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();//.ToList().FirstOrDefault().Distinct().ToList();
-                                int firstattributeValuesCount = firstattributeValues.Count();
-                                var firstattributeDefaultImages1 = varAppItems.Select(x => x.EntityAttachments.Where(z => z.Attributes.Contains(firstAttributeID) & z.IsDefault).Select(z => new { z.AttachmentFk.Attachment, z.Attributes })).ToList().Distinct().ToList().Distinct().ToList();
-                                var firstattributeDefaultImages = firstattributeDefaultImages1.Select(x => x.FirstOrDefault()).Distinct().ToList();
-                                var secondAttributeValuesFor1st = new List<string>();
-                                //xx
-                                var firstattributeCodes = varAppItems.Select(x => x.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID)).Select(z => new { z.AttributeCode, z.AttributeValue, z.AttributeValueId })).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
-                                //xx
-                                //var secondAttributeValuesFor1st11 = varAppItems.Select(x => 
-                                //    x.EntityFk.EntityExtraData.Where(z=> z.AttributeId != long.Parse(firstAttributeID)).Select(z=>z.EntityFk.EntityExtraData)).ToList();
-                                var firstAttributeIdLong = long.Parse(firstAttributeID);
-                                List<AppEntityExtraData> secondAttributeValuesFor1st11 = null;
-                                if (secondAttId != null) secondAttributeValuesFor1st11 = varAppItems.Select(z => z.EntityExtraData.FirstOrDefault(z => z.AttributeId == long.Parse(secondAttId))).ToList();
-                                if (secondAttributeValuesFor1st11 != null)
+                            var firstItem = varAppItems.FirstOrDefault();
+                            List<string> attributeValues = firstItem.EntityExtraData.OrderBy(z=>z.AttributeId).Select(x => x.EntityObjectTypeCode).Distinct().ToList();
+                            List<string> attributeIDs = firstItem.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.AttributeId.ToString()).Distinct().ToList();
+                            var firstAttributeID = firstItem.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId),
+                                a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
+                                .FirstOrDefault().ToString();
+                            var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
+                            var firstAttributeValue = firstItem.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
+                            //var firstattributeValues1 = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID1)).Select (z=> z.AttributeValue)).Distinct().ToList ();
+                            var firstattributeValues = varAppItems.Select(x => x.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
+                                                       .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();//.ToList().FirstOrDefault().Distinct().ToList();
+                            int firstattributeValuesCount = firstattributeValues.Count();
+                            var firstattributeDefaultImages1 = varAppItems.Select(x => x.EntityAttachments.Where(z => z.Attributes.Contains(firstAttributeID) & z.IsDefault).Select(z => new { z.AttachmentFk.Attachment, z.Attributes })).ToList().Distinct().ToList().Distinct().ToList();
+                            var firstattributeDefaultImages = firstattributeDefaultImages1.Select(x => x.FirstOrDefault()).Distinct().ToList();
+                            var secondAttributeValuesFor1st = new List<string>();
+                            //xx
+                            var firstattributeCodes = varAppItems.Select(x => x.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID)).Select(z => new { z.AttributeCode, z.AttributeValue, z.AttributeValueId })).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
+                            //xx
+                            //var secondAttributeValuesFor1st11 = varAppItems.Select(x => 
+                            //    x.EntityFk.EntityExtraData.Where(z=> z.AttributeId != long.Parse(firstAttributeID)).Select(z=>z.EntityFk.EntityExtraData)).ToList();
+                            var firstAttributeIdLong = long.Parse(firstAttributeID);
+                            List<AppEntityExtraData> secondAttributeValuesFor1st11 = null;
+                            if (secondAttId != null) secondAttributeValuesFor1st11 = varAppItems.Select(z => z.EntityExtraData.FirstOrDefault(z => z.AttributeId == long.Parse(secondAttId))).ToList();
+                            if (secondAttributeValuesFor1st11 != null)
+                            {
+                                //var secondAttributeValuesFor1st1 =
+                                //    secondAttributeValuesFor1st11.Select(a => a..FirstOrDefault ().AttributeValue.ToString() + "," + 
+                                //    (a.FirstOrDefault().AttributeCode.ToString() == null ? a.FirstOrDefault().AttributeValueId.ToString() : a.FirstOrDefault().AttributeCode.ToString()))
+                                //    .ToList().Distinct().ToList().Distinct().ToList();
+                                //MMT202402
+                                //var secondAttributeValuesFor1st1 =
+                                //secondAttributeValuesFor1st11.Where(z=>z.AttributeValue!=null).Select(a => a.AttributeValue.ToString() + "," + (a.AttributeValueId != null ? a.AttributeValueId.ToString():"")).ToList();
+                                var secondAttributeValuesFor1st1 =
+                                                 secondAttributeValuesFor1st11.Where(z => z.AttributeCode != null).Select(a => a.AttributeValue+","+a.AttributeCode.ToString()).ToList();
+                                //MMT202402
+                                //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
+                                //.ToList();
+                                if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
                                 {
-                                    //var secondAttributeValuesFor1st1 =
-                                    //    secondAttributeValuesFor1st11.Select(a => a..FirstOrDefault ().AttributeValue.ToString() + "," + 
-                                    //    (a.FirstOrDefault().AttributeCode.ToString() == null ? a.FirstOrDefault().AttributeValueId.ToString() : a.FirstOrDefault().AttributeCode.ToString()))
-                                    //    .ToList().Distinct().ToList().Distinct().ToList();
-                                    //MMT202402
-                                    //var secondAttributeValuesFor1st1 =
-                                    //secondAttributeValuesFor1st11.Where(z=>z.AttributeValue!=null).Select(a => a.AttributeValue.ToString() + "," + (a.AttributeValueId != null ? a.AttributeValueId.ToString():"")).ToList();
-                                    var secondAttributeValuesFor1st1 =
-                                                     secondAttributeValuesFor1st11.Where(z => z.AttributeCode != null).Select(a => a.AttributeValue.ToString() + "," + a.AttributeCode.ToString()).ToList();
-                                    //MMT202402
-                                    //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
-                                    //.ToList();
-                                    if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
+                                    var attribName = firstItem.EntityExtraData.FirstOrDefault(a => a.AttributeId == long.Parse(secondAttId)).EntityObjectTypeCode;
+                                    if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
                                     {
-                                        var attribName = firstItem.EntityExtraData.FirstOrDefault(a => a.AttributeId == long.Parse(secondAttId)).EntityObjectTypeCode;
-                                        if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
+                                        var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
+                                        var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd()).ToList();
+                                        var ss = secondAttributeValuesFor1st1.Distinct().ToList();
+                                        secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
+                                        foreach (var t in zz)
                                         {
-                                            var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                                            var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd()).ToList();
-                                            var ss = secondAttributeValuesFor1st1.Distinct().ToList();
-                                            secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
-                                            foreach (var t in zz)
-                                            {
-                                                // if (!ss.Contains(t.ToString()) && (!ss.Contains(t.Substring(0,t.IndexOf(',')+1).ToString())))
-                                                if (!ss.Contains(t.ToString()))
-                                                    secondAttributeValuesFor1st.Remove(t.ToString());
-                                            }
-                                            //secondAttributeValuesFor1st = zz;
+                                            // if (!ss.Contains(t.ToString()) && (!ss.Contains(t.Substring(0,t.IndexOf(',')+1).ToString())))
+                                            if (!ss.Contains(t.ToString()))
+                                                secondAttributeValuesFor1st.Remove(t.ToString());
+                                        }
+                                        //secondAttributeValuesFor1st = zz;
 
                                         }
                                         else
