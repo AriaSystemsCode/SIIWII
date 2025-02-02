@@ -598,7 +598,16 @@ export class SendMessageModalComponent
                         if(this.parentId){
                             this.toUsers = this.filteredUsers.filter((user) =>
                                 toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
+
                             );
+
+
+                            this._MessageServiceProxy
+                            .getMessagesForView(this.parentId)
+                            .subscribe((result) => {
+                           
+                                this.subject = result[0].messages.subject;
+                            });
                         }
                    
             

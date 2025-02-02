@@ -73,6 +73,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     highlightFirstMsg: boolean;
     displayMessageDetails: boolean = false;
     messageCategoryFilter: string = "MESSAGE";
+    showAllMessages: boolean = false;
+    maxVisibleMessages: number = 2;
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -109,6 +111,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.containerdetails.nativeElement.scrollHeight;
         } catch (err) {}
     } */
+        toggleMessages() {
+            this.showAllMessages = !this.showAllMessages;
+        }
+    
+        get visibleMessages() {
+            return this.showAllMessages ? this.messagesDetails : this.messagesDetails.slice(0, this.maxVisibleMessages);
+        }
     newCommentAddedHandler(event){
         this.selectMessage(this.messagesDetails[0].messages)
     }
@@ -266,6 +275,28 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             element.classList.remove("active-tab");
         });
     }
+    prevPage(): void {
+        if (this.skipCount > 0) {
+            this.skipCount -= this.itemsToLoad;
+            this.noOfItemsToShowInitially -= this.itemsToLoad;
+            this.getMesssage();
+            this.itemsToShow = this.messages;
+            this.isFullListDisplayed = false;
+        }
+    }
+    
+    nextPage(): void {
+        if (this.noOfItemsToShowInitially < this.totalCount) {
+            this.maxResultCount = this.itemsToLoad;
+            this.skipCount = this.noOfItemsToShowInitially;
+            this.noOfItemsToShowInitially += this.itemsToLoad;
+            this.getMesssage();
+            this.itemsToShow = this.messages;
+        } else {
+            this.isFullListDisplayed = true;
+        }
+    }
+    
 
     onScroll(): void {
         if (this.noOfItemsToShowInitially < this.totalCount) {

@@ -36,6 +36,7 @@ import { NgImageSliderModule } from 'ng-image-slider';
 import { TreeviewModule } from 'ngx-treeview';
 import { TreeModule } from 'primeng/tree';
 import { CommentsModule } from '../comments/comments.module';
+import { TabViewModule } from 'primeng/tabview';
 
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 @NgModule({
@@ -76,7 +77,8 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
     BsDatepickerModule.forRoot(),
     BsDropdownModule.forRoot(),
     PopoverModule.forRoot(),
-    SelectAddressModule
+    SelectAddressModule,
+    TabViewModule 
   ],
   exports:[MessagesComponent,
     //SendMessageModalComponent,

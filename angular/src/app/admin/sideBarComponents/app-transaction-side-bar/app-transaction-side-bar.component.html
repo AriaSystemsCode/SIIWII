@@ -1,6 +1,6 @@
-<div class="p-4">
+<div class="p-2">
     <div class="row">
-        <div class="d-flex flex-row w-100">
+        <div class="d-lg-flex d-none flex-row w-100">
             <h4 class="purpleColor font-weight-bold col-12 pb-4 mb-4" style="border-bottom: 2px solid #e7e8ef;color: black !important;">
                 {{"Details"}} </h4>
             <div (click)="onhideSideBar()" class="pointer w-100"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="14"
@@ -19,15 +19,15 @@
         </div>
 
         <h4 class="purpleColor font-weight-bold col-12" style="color: black !important;"> {{"Order Summary"}} </h4>
-        <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor">
+        <div class="row summarySection w-100 p-2 ml-2 mt-3 purpleColor">
             <div class="row w-100">
-                <div class="col-6 font-weight-bold" style="color: black !important;">{{"TotalAmount"}}</div>
-                <div class="font-weight-bold" style="color: #9E9E9E !important;"> {{currencySymbol}} {{shoppingCartDetails?.totalAmount ?
+                <div class="col-6 font-weight-bold " style="color: black !important;">{{"TotalAmount"}}</div>
+                <div class="font-weight-bold col-6" style="color: #9E9E9E !important;"> {{currencySymbol}} {{shoppingCartDetails?.totalAmount ?
                     shoppingCartDetails?.totalAmount : '0.00' }}</div>
             </div>
             <div class="row w-100 mt-4 mb-4">
-                <div class="col-6 font-weight-bold" style="color: black !important;">{{"TotalQuantity"}}</div>
-                <div class="font-weight-bold" style="color: #9E9E9E !important;">{{shoppingCartDetails?.totalQty ?
+                <div class="col-6 font-weight-bold " style="color: black !important;">{{"TotalQuantity"}}</div>
+                <div class="font-weight-bold col-6" style="color: #9E9E9E !important;">{{shoppingCartDetails?.totalQty ?
                     shoppingCartDetails?.totalQty : 0 }}</div>
             </div>
 
