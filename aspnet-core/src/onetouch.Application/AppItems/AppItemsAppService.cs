@@ -5403,6 +5403,13 @@ namespace onetouch.AppItems
             // ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
             return itemExcelResultsDTO;
         }
+        //Iteation#46[Start]
+        public async Task<List<AppItemtExcelInputDTO>> ValidateItemData(List<AppItemtExcelInputDTO> input)
+        {
+            List<AppItemtExcelInputDTO> returnList = new List<AppItemtExcelInputDTO>();
+            return returnList;
+        }
+        //Iteration#46[End]
         public async Task<long> GetCategoryId(string categoryName, PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categoryIds)
         {
             long value = 0;

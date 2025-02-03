@@ -148,4 +148,12 @@ namespace onetouch.AppItems.Dtos
         public decimal Price { set; get; }
     }
     //MMT
+    //Iteration#46[Start]
+    public class AppItemtExcelInputDTO: AppItemExcelDto
+    {
+        
+        public List<AppItemExcelDto> Variations{ get; set; }
+
+    }
+    //Iteration#46[End]
 }
