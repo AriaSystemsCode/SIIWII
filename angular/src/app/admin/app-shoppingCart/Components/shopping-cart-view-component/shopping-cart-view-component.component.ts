@@ -1103,7 +1103,7 @@ onShowVariations(event) {
   onDiscardShopping() {
     Swal.fire({
       title: "",
-      text: "Do you need to discared shopping cart permanently?",
+      text: "Do you need to discard shopping cart permanently?",
       icon: "info",
       showCancelButton: true,
       confirmButtonText:
