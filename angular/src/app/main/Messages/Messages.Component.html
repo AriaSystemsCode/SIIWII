@@ -757,7 +757,7 @@ appRootUrl() +
                 </p></h4> 
                   </div>
                             <div class="wrapper-dev mx-3 mb-2">
-                                <div class="active-msg mr-2" (click)="selectMessage(message)" [ngClass]="{
+                                <div class="active-msg mr-2"  [ngClass]="{
                                             SelectedMessage: isActive(message, i)
                                         }">
                                     <img [src]="
@@ -768,7 +768,7 @@ appRootUrl() +
                                                 width: 50px;
                                                 height: 50px;
                                                 object-fit: cover;
-                                            " />
+                                            " (click)="selectMessage(message)" />
                                     <ul class="msg-content row">
                                         <li class="Messages col-12 mb-0 col-md mr-5 mr-md-0 d-flex justify-content-between">
                                             <!-- I2-10  -->
@@ -813,7 +813,7 @@ appRootUrl() +
                                                     }}</span>
                                                 </a> -->
                                             <!-- I2-10  -->
-                                            <a>
+                                            <a (click)="selectMessage(message)">
                                                 <span [ngClass]="{
                                                             'msg-sender':
                                                                 message.entityObjectStatusCode ==
@@ -903,7 +903,7 @@ appRootUrl() +
                                             {{message.receiveDate  | date:'hh:mm a, MM/dd/yyyy'}}
                                         </div> -->
                                     </ul>
-                                    <div class="body-msg row">
+                                    <div class="body-msg row" (click)="selectMessage(message)">
                                         <div class="col-1 mr-5"></div>
                                         <div class="ml-3 w-75 ml-0 defaulTxt">
                                             <p class="" [ngClass]="{
