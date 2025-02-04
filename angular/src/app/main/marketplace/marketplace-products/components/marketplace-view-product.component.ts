@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AppItemViewInput } from "@app/main/app-items/app-item-view/models/app-item-view-input";
+import { animate, style, transition, trigger } from "@node_modules/@angular/animations";
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
@@ -28,7 +29,18 @@ import Swal from "sweetalert2";
     selector: "app-marketplace-view-product",
     templateUrl: "./marketplace-view-product.component.html",
     styleUrls: ["./marketplace-view-product.component.scss"],
-    providers: [ConfirmationService, MessageService]
+    providers: [ConfirmationService, MessageService],
+    animations: [
+        trigger('routerTransition', [
+          transition(':enter', [
+            style({ opacity: 0 }),
+            animate('0.5s ease-in', style({ opacity: 1 })),
+          ]),
+          transition(':leave', [
+            animate('0.5s ease-out', style({ opacity: 0 })),
+          ]),
+        ]),
+      ],
 })
 export class MarketplaceViewProductComponent
     extends AppComponentBase
