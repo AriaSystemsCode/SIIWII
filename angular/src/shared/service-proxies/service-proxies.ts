@@ -79450,6 +79450,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactAddressPostalCode!: string | undefined;
     contactAddressCountryId!: number;
     contactAddressCountryCode!: string | undefined;
+    branchCode!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -79498,6 +79499,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactAddressPostalCode = _data["contactAddressPostalCode"];
             this.contactAddressCountryId = _data["contactAddressCountryId"];
             this.contactAddressCountryCode = _data["contactAddressCountryCode"];
+            this.branchCode = _data["branchCode"];
             this.id = _data["id"];
         }
     }
@@ -79544,6 +79546,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["contactAddressPostalCode"] = this.contactAddressPostalCode;
         data["contactAddressCountryId"] = this.contactAddressCountryId;
         data["contactAddressCountryCode"] = this.contactAddressCountryCode;
+        data["branchCode"] = this.branchCode;
         data["id"] = this.id;
         return data;
     }
@@ -79579,6 +79582,7 @@ export interface IAppTransactionContactDto {
     contactAddressPostalCode: string | undefined;
     contactAddressCountryId: number;
     contactAddressCountryCode: string | undefined;
+    branchCode: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
