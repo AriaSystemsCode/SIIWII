@@ -4207,6 +4207,7 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                         //MMT
+                       
 
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
                         viewTrans.TotalQuantity = transOrg.TotalQuantity;
@@ -4312,6 +4313,12 @@ namespace onetouch.AppSiiwiiTransaction
                             var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(viewTrans.LastModifiedDate, currentTimeZone);
                             viewTrans.LastModifiedDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
                         }
+                        if (transOrg.CreationTime != null && input != null && !string.IsNullOrEmpty(input.TimeZoneValue))
+                        {
+                            var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                            var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(transOrg.CreationTime, currentTimeZone);
+                            viewTrans.CreationDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                        }
                         //
                         var marketplaceTransaction = await _appMarketplaceTransactionHeadersRepository.GetAll().AsNoTracking().Where(z => z.SSIN == transOrg.SSIN && z.TenantId == null).FirstOrDefaultAsync();
                         if (marketplaceTransaction == null)
@@ -4346,6 +4353,23 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var retTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
                 retTrans.EnteredDate = trans.EnteredDate;
+                //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[Start]
+               
+                retTrans.CreationDate = trans.CreationTime;
+                if (retTrans.CreationDate != null && input != null && !string.IsNullOrEmpty(input.TimeZoneValue))
+                {
+                    var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                    var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(trans.CreationTime, currentTimeZone);
+                    retTrans.CreationDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                }
+                retTrans.LastModifiedDate = (trans.LastModificationTime == null ? trans.CreationTime : DateTime.Parse(trans.LastModificationTime.ToString()));
+                if (retTrans.LastModifiedDate != null && input != null && !string.IsNullOrEmpty(input.TimeZoneValue))
+                {
+                    var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                    var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(retTrans.LastModifiedDate, currentTimeZone);
+                    retTrans.LastModifiedDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                }
+                //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
                 if (retTrans.AppTransactionContacts != null && retTrans.AppTransactionContacts.Count > 0)
                 {
                     foreach (var cont in retTrans.AppTransactionContacts)
