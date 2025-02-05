@@ -541,7 +541,7 @@ addAddressDataToDto(index: number) {
         // Set additional address properties if they exist
         roleContact.contactAddressLine1 = this.selectedAddress.addressLine1 || roleContact.contactAddressLine1;
         roleContact.contactAddressLine2 = this.selectedAddress.addressLine2 || roleContact.contactAddressLine2;
-        // roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
+        roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
 
         roleContact.contactAddressState = this.selectedAddress.state || roleContact.contactAddressState;
     }
