@@ -61,6 +61,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     ngOnInit(): void {
+        this.onClearText()
         this.resetSelectedData(); 
         this.setSelectedData();
      //   this.getAllCompaniesData();
