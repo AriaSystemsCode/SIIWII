@@ -403,15 +403,32 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             }
     
         }
+   
+        
+
+        onClearText() {
+            this._AppTransactionServiceProxy.getAccountRelatedContactsList(
+                this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, 
+                null
+            ).subscribe((res: any) => {
+           
+                this.allContacts = [...res];
+               
+        
+                
+            });
+        }
+        
         handleContactSearch(event) {
+            const query = event?.query?.toLowerCase();
             if (!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact?.name) {
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = new GetContactInformationDto();
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = event?.query;
             }
             if (this.allContacts && this.allContacts.length > 0) {
                 // Filtering logic
-                const query = event?.query?.toLowerCase();
-                this.filteredContacts = this.allContacts.filter(contact =>
+              
+                this.allContacts = this.allContacts.filter(contact =>
                     contact?.name?.toLowerCase().includes(query)
                 );
             } else {
@@ -420,8 +437,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, 
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName
             ).subscribe((res: any) => {
+             
                 this.allContacts = [...res];
-                this.filteredContacts = this.allContacts.filter(contact =>
+                this.allContacts = this.allContacts.filter(contact =>
                     contact.name.toLowerCase().includes(event?.query?.toLowerCase())
                 );
         
