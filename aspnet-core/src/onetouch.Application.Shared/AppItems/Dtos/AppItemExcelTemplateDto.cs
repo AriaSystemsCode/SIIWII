@@ -149,7 +149,7 @@ namespace onetouch.AppItems.Dtos
     }
     //MMT
     //Iteration#46[Start]
-    public class AppItemtExcelInputDTO: AppItemExcelDto
+    public class AppItemValidationInputDTO: AppItemExcelDto
     {
         
         public List<AppItemExcelDto> Variations{ get; set; }

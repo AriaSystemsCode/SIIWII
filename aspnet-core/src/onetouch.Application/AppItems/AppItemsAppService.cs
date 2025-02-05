@@ -5404,9 +5404,9 @@ namespace onetouch.AppItems
             return itemExcelResultsDTO;
         }
         //Iteation#46[Start]
-        public async Task<List<AppItemtExcelInputDTO>> ValidateItemData(List<AppItemtExcelInputDTO> input)
+        public async Task<List<AppItemValidationInputDTO>> ValidateItemData(List<AppItemValidationInputDTO> input)
         {
-            List<AppItemtExcelInputDTO> returnList = new List<AppItemtExcelInputDTO>();
+            List<AppItemValidationInputDTO> returnList = new List<AppItemValidationInputDTO>();
             return returnList;
         }
         //Iteration#46[End]
