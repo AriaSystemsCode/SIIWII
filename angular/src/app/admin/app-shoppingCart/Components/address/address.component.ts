@@ -514,7 +514,7 @@ addAddressDataToDto(index: number) {
         roleContact.contactAddressCountryCode = this.selectedAddress.countryCode || roleContact.contactAddressCountryCode;
         roleContact.contactAddressCountryId = this.selectedAddress.countryId || roleContact.contactAddressCountryId;
         roleContact.contactAddressName = this.selectedAddress.name || roleContact.contactAddressName;
-
+        roleContact.contactAddressCode = this.selectedAddress.code || roleContact.contactAddressCode
         
         // Ensure contactAddressDetail is updated with address-related values but leave others unchanged
         roleContact.contactAddressDetail = new ContactAppAddressDto({
@@ -542,7 +542,7 @@ addAddressDataToDto(index: number) {
         roleContact.contactAddressLine1 = this.selectedAddress.addressLine1 || roleContact.contactAddressLine1;
         roleContact.contactAddressLine2 = this.selectedAddress.addressLine2 || roleContact.contactAddressLine2;
         // roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
-        debugger;
+
         roleContact.contactAddressState = this.selectedAddress.state || roleContact.contactAddressState;
     }
 
