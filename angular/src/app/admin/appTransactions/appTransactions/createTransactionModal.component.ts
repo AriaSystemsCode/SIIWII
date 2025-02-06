@@ -673,7 +673,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 buyerContactName: this.orderForm.controls['buyerContactName']?.value,
                 buyerCompanyName: this.orderForm.controls['buyerCompanyName']?.value,
             });
-
+        localStorage.setItem('tempPriceLevel',this.orderForm.controls['priceLevel']?.value)
           
     }
 
