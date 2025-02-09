@@ -81,7 +81,7 @@
                       name="selectedAdd"  [id]="address.id"/> 
                  <label> {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}{{ address?.addressLine2 ? address?.addressLine2+' ,' : ''}}{{address?.city ? address?.city+' ,' : ''}}{{ address?.state ? address?.state+' ,' : ''}}{{ address?.countryName ? address?.countryName +',' : address?.countryCode ?  address?.countryCode +' ,' : ''}}{{address?.postalCode ? address?.postalCode : ''}}</label>
                 </div>
-                 <div class="p mt-2 d-flex"  *ngIf="showAddBtn">
+                 <div class="p mt-2 d-flex"  *ngIf="showAddBtn && showEditDelBtn">
                     <button (click)="editAddress(address.id)" class="acBtn">
                         <img class="mx-1" src="../../../../../assets/icons/edit-icon.png">
 
