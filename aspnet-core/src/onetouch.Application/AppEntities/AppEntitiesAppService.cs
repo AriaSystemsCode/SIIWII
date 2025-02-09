@@ -897,7 +897,8 @@ namespace onetouch.AppEntities
                     //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[End]   
                     entity = new AppEntity();
                 }
-
+               
+                
                 //temp solution to test 
                 if (string.IsNullOrEmpty(input.Code))
                     input.Code = System.Guid.NewGuid().ToString();
@@ -933,8 +934,21 @@ namespace onetouch.AppEntities
                 //input.TenantID==-1 means not set and the backend must set it by the current seesion.TenantId
                 entity.TenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
                 //entity.TenantId = GetCurrentTenant().Id;
+                //I46[Start]
+                if (input.IsDefault)
+                {
+                    var oldDefaultList = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId
+                    && z.ObjectId == input.ObjectId && z.TenantId == entity.TenantId && z.IsDefault == true)
+                        .WhereIf(input.Id !=0, z=>z.Id!=input.Id)
+                        .ToListAsync();
+                    if (oldDefaultList != null && oldDefaultList.Count > 0)
+                    {
+                        oldDefaultList.ForEach(z=>z.IsDefault=false);
+                    }
 
-
+                }
+                entity.IsDefault = input.IsDefault;
+                //I46[End]
                 if (entity.EntityAttachments == null)
                     entity.EntityAttachments = new List<AppEntityAttachment>();
                 if (entity.EntityAddresses == null)
