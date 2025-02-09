@@ -71,6 +71,7 @@ using System.Drawing.Imaging;
 using Abp.AutoMapper;
 using Namotion.Reflection;
 using onetouch.Globals;
+using onetouch.AppSubScriptionPlan;
 
 
 //using NUglify.Helpers;
@@ -125,6 +126,9 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRateRepository;
         private readonly TimeZoneInfoAppService _timeZoneInfoAppService;
         //MMT45
+        //I46[Start]
+        private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
+        //I46[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
@@ -147,7 +151,7 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
-             TimeZoneInfoAppService timeZoneInfoAppService
+             TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
@@ -193,6 +197,9 @@ namespace onetouch.AppSiiwiiTransaction
             _appContactAddressRepository = appContactAddressRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
             _timeZoneInfoAppService = timeZoneInfoAppService;
+            //I46[Start]
+            _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
+            //I46{End}
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -1551,14 +1558,26 @@ namespace onetouch.AppSiiwiiTransaction
                 
                 //XX
                 if (input.lFromPlaceOrder)
-                {
+{
 
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
-                 //   if (buyerTenantId != null)
+                    //I46{Start}
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("PLACE-ORDER", 
+                        appTrans.Name, appTrans.Id, appTrans.EntityObjectTypeId, appTrans.EntityObjectTypeCode,
+                        "Seller:"+ appTrans.SellerCompanyName.Trim() +",Buyer:" + appTrans.BuyerCompanyName.Trim(), 1);
+                    //I46{End}
+                    //   if (buyerTenantId != null)
                     {
                         appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking().Where(z => z.TransactionId == appTrans.Id && z.ParentId == null).ToList();
                         foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
+                        {
                             await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
+                            //I46[Start]
+                            await _appTenantActivitiesLogAppService.AddUsageActivityLog("PLACE-ORDER-LINE",
+                            appTrans.Name.Trim() + ", Line#" + det.LineNo.ToString().Trim(), det.Id, appTrans.EntityObjectTypeId, appTrans.EntityObjectTypeCode,
+                            det.ManufacturerCode.Trim(), 1);
+                            //I46[End]
+                        }
                     }
                 }
                 foreach (var con in appTrans.AppTransactionContacts)
