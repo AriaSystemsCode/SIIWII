@@ -200,7 +200,7 @@ appRootUrl() +
             </div>
           
             <div class="d-flex">
-                <div class=" align-items-center d-lg-flex d-none align-items-center">
+                <!-- <div class=" align-items-center d-lg-flex d-none align-items-center">
                     <i 
                     class="pi pi-angle-left mr-2" 
                     style="cursor: pointer; color: #1B101B;" 
@@ -221,9 +221,9 @@ appRootUrl() +
                 
      
                  
-                </div>
+                </div> -->
                 
-                <button (click)="SendMessageModal.show()" class="composeBtn btn d-md-block d-none align-items-center">
+                <button (click)="SendMessageModal.show()" class="composeBtn btn d-lg-block d-none align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none"
                         class="mr-2 mb-1">
                         <path fill-rule="evenodd" clip-rule="evenodd"
@@ -239,7 +239,7 @@ appRootUrl() +
             <div>
             <button class="active-tab btn  btn-sm ng-tns-c357-9 pb-0 m-0  clickBtn" style="cursor: pointer;
             border-radius: 6px 0px 0px 6px;
-            padding: 1px 16px 1px 16px;
+            padding: 1px 10px 1px 10px;
             border: 1px solid #eee !important;
             box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
             color: #9E9E9E ;
@@ -263,7 +263,7 @@ appRootUrl() +
 
             <button class="btn  btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
             border-radius: 0px;
-            padding: 1px 16px 1px 16px;
+            padding: 1px 10px 1px 10px;
             border: 1px solid #eee !important;
             box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
             color: #9E9E9E ;
@@ -285,7 +285,7 @@ appRootUrl() +
             </button>
             <button class="btn  btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
             border-radius:0px 6px 6px 0px;
-            padding: 1px 16px 1px 16px;
+            padding: 1px 10px 1px 10px;
             border: 1px solid #eee !important;
             box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
             color: #9E9E9E ;
@@ -306,7 +306,7 @@ appRootUrl() +
                 </label>
                 </button>
             </div>
-            <div class="align-items-center d-lg-none d-md-flex d-none">
+            <!-- <div class="align-items-center d-lg-none d-md-flex d-none">
                 <i 
                 class="pi pi-angle-left mr-2" 
                 style="cursor: pointer; color: #1B101B;" 
@@ -327,8 +327,8 @@ appRootUrl() +
             
  
              
-            </div>
-                <!-- <div class=" d-lg-none d-md-block d-none" >
+            </div> -->
+                <div class=" d-lg-none d-md-block d-none" >
                     
                     <button (click)="SendMessageModal.show()" class="composeBtn btn " style="   background-color: #4A0D4A !important;
                     color: #fff !important;
@@ -341,11 +341,11 @@ appRootUrl() +
                         </svg>
                         {{ "Compose" | localize }}
                     </button>
-                </div> -->
+                </div>
                 
         </div>
         <div class="row mt-3">
-            <div class="col-md-5 pt-2 pl-0 pr-0 borderdCont">
+            <div class="col-md-5 pt-2 pl-0 pr-0 borderdCont" [ngClass]="showSideBar ? 'd-none':''">
                 <div class="pt-4 pb-4 searchBarCont d-none d-md-block">
                     <!-- <h4>{{ messageType }}</h4> -->
                     <div class="search" style="width: 100%; padding-right: 17px">
@@ -355,7 +355,7 @@ appRootUrl() +
                 </div>
 
                 <div class="d-md-none d-flex flex-row pt-4 pr-2 justify-content-between align-items-center" *ngIf="!displayMessageDetails">
-                    <div class="d-flex align-items-center">
+                    <!-- <div class="d-flex align-items-center">
                         <i 
                         class="pi pi-angle-left mr-2" 
                         style="cursor: pointer; color: #1B101B;" 
@@ -376,7 +376,7 @@ appRootUrl() +
                     
          
                      
-                    </div>
+                    </div> -->
 
                     <!-- <div class="mt-2 pl-4 mr-5">
                         <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
@@ -474,7 +474,7 @@ appRootUrl() +
 
                     </div> -->
                     <div class="p-2">
-                        <button (click)="SendMessageModal.show()" class=" btn " style="background-color: #4A0D4A;color: #fff;">
+                        <button (click)="SendMessageModal.show()" class=" btn " style="background-color: #4A0D4A;color: #fff !important;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none"
                                 class="mr-2 mb-1">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -497,11 +497,11 @@ appRootUrl() +
             [infiniteScrollDistance]="3"
             [infiniteScrollThrottle]="100" [infiniteScrollDisabled]="isFullListDisplayed" (scroll)="onScroll()">
          -->
-                <div #container class="messages-inbox m-0 d-none d-md-block" >
+                <div #container class="messages-inbox m-0 d-none d-md-block"  (scroll)="onScroll()">
                     <div class="row">
 
                      
-                        <div class="col-md-12 mb-2" *ngFor="let message of itemsToShow; let i = index" style="border-bottom: 1px solid #EEEEEE;">
+                        <div class="col-md-12 mb-2" *ngFor="let message of itemsToShow; let i = index" style="border-bottom: 1px solid #EEEEEE;" >
                             <div *ngIf="messageCategoryFilter=='MESSAGE'" class="mx-3 mt-2">
                                 <h4 class="d-flex">  <p *ngIf="message.relatedEntityObjectTypeDescription " class="ml-1">
                                     <img class="pr-1 " *ngIf="messageTypeIndex == 1" [src]="
@@ -701,7 +701,7 @@ appRootUrl() +
                     </div>
                 </div>
                 <div class="d-flex justify-content-end">
-                <button *ngIf="noOfItemsToShowInitially < totalCount" class="btn expandBtn btn-sm d-md-block d-none my-2 ng-tns-c357-9  m-0" style="cursor: pointer;
+                <!-- <button *ngIf="noOfItemsToShowInitially < totalCount" class="btn expandBtn btn-sm d-md-block d-none my-2 ng-tns-c357-9  m-0" style="cursor: pointer;
                            
                 " (click)="onScroll()">
 
@@ -715,7 +715,7 @@ appRootUrl() +
 <path d="M18 2L10 10L2 2" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 </span>
-                   </button>
+                   </button> -->
                 </div>
                 <div #container class="messages-inbox m-0 d-block d-md-none" (scroll)="onScroll()"
                     *ngIf="!displayMessageDetails">
@@ -925,24 +925,24 @@ appRootUrl() +
                     </div>
                 </div>
             </div>
-            <div [ngClass]="{ 'col-md-7 borderdCont': !showSideBar, 'col-md-5': showSideBar }"
+            <div [ngClass]="{ 'col-md-7 borderdCont': !showSideBar, 'col-lg-5 col-md-7': showSideBar }"
              class="col d-none  d-md-block p-0 m-5 m-md-0" style="padding: 0">
                 <div *ngIf="messagesDetails" class="">
-                    <div class="pt-5 pb-5 pl-3 messageTitleCont" style="padding-bottom: 50px !important;">
-                    <span class="subject-msg">{{ messagesDetails[0].messages.subject }}
+                    <div class="pt-5 pb-5 pl-3 messageTitleCont d-flex" style="padding-bottom: 50px !important;">
+                    <span class="subject-msg " style="width: 50%;">{{ messagesDetails[0].messages.subject }}
                     </span>
-                    <div class="actions-message pr-4 " >
+                    <div class="actions-message pr-4  " >
                         <div class="row">
-                            <div class="mr-3">
-                                <button class="btn detalsBtn btn-sm d-lg-block d-none show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
+                            <div class="mr-1">
+                                <button class="btn detalsBtn btn-sm d-block  show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
                            
                              " (click)="onShowSideBar(!showSideBar)">
 <i class="fa fa-eye fa-2x" aria-hidden="true" style="margin-top: -3px;
 margin-right: 6px;"></i>
 
-                                    <span class="pr-3" style="
+                                    <span class="spBtnDe"  style="
                              font-family: Poppins;
-                             font-size: 16px;
+                       
                              font-style: normal;
                              font-weight: 600;
                              line-height: normal;">{{showHideSideBarTitle}}</span>
@@ -1096,24 +1096,6 @@ margin-right: 6px;"></i>
 
                 </div>
                 
-                <p-tabView class="d-lg-none d-md-block d-sm-none" styleClass="tabview-custom" style="min-height: 70vh;">
-                 
-                    <p-tabPanel header="Header II">
-                        <ng-template pTemplate="header">
-                            <div class="tab-header">
-            
-                            <svg xmlns="http://www.w3.org/2000/svg" width="45" height="44" viewBox="0 0 45 44" >
-                                <path d="M11.5 10.9993C11.5 10.5131 11.6932 10.0468 12.037 9.70299C12.3808 9.35917 12.8471 9.16602 13.3333 9.16602H31.6667C32.1529 9.16602 32.6192 9.35917 32.963 9.70299C33.3068 10.0468 33.5 10.5131 33.5 10.9993C33.5 11.4856 33.3068 11.9519 32.963 12.2957C32.6192 12.6395 32.1529 12.8327 31.6667 12.8327H13.3333C12.8471 12.8327 12.3808 12.6395 12.037 12.2957C11.6932 11.9519 11.5 11.4856 11.5 10.9993ZM11.5 18.3327C11.5 17.8465 11.6932 17.3801 12.037 17.0363C12.3808 16.6925 12.8471 16.4993 13.3333 16.4993H31.6667C32.1529 16.4993 32.6192 16.6925 32.963 17.0363C33.3068 17.3801 33.5 17.8465 33.5 18.3327C33.5 18.8189 33.3068 19.2852 32.963 19.629C32.6192 19.9729 32.1529 20.166 31.6667 20.166H13.3333C12.8471 20.166 12.3808 19.9729 12.037 19.629C11.6932 19.2852 11.5 18.8189 11.5 18.3327ZM13.3333 23.8327C12.8471 23.8327 12.3808 24.0258 12.037 24.3697C11.6932 24.7135 11.5 25.1798 11.5 25.666C11.5 26.1522 11.6932 26.6186 12.037 26.9624C12.3808 27.3062 12.8471 27.4993 13.3333 27.4993H31.6667C32.1529 27.4993 32.6192 27.3062 32.963 26.9624C33.3068 26.6186 33.5 26.1522 33.5 25.666C33.5 25.1798 33.3068 24.7135 32.963 24.3697C32.6192 24.0258 32.1529 23.8327 31.6667 23.8327H13.3333ZM11.5 32.9993C11.5 32.5131 11.6932 32.0468 12.037 31.703C12.3808 31.3592 12.8471 31.166 13.3333 31.166H20.6667C21.1529 31.166 21.6192 31.3592 21.963 31.703C22.3068 32.0468 22.5 32.5131 22.5 32.9993C22.5 33.4856 22.3068 33.9519 21.963 34.2957C21.6192 34.6395 21.1529 34.8327 20.6667 34.8327H13.3333C12.8471 34.8327 12.3808 34.6395 12.037 34.2957C11.6932 33.9519 11.5 33.4856 11.5 32.9993Z" />
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M4.16797 7.33301C4.16797 5.87432 4.74743 4.47537 5.77888 3.44392C6.81033 2.41247 8.20928 1.83301 9.66797 1.83301H35.3346C36.7933 1.83301 38.1923 2.41247 39.2237 3.44392C40.2552 4.47537 40.8346 5.87432 40.8346 7.33301V36.6663C40.8346 38.125 40.2552 39.524 39.2237 40.5554C38.1923 41.5869 36.7933 42.1663 35.3346 42.1663H9.66797C8.20928 42.1663 6.81033 41.5869 5.77888 40.5554C4.74743 39.524 4.16797 38.125 4.16797 36.6663V7.33301ZM9.66797 5.49967H35.3346C35.8209 5.49967 36.2872 5.69283 36.631 6.03664C36.9748 6.38046 37.168 6.84678 37.168 7.33301V36.6663C37.168 37.1526 36.9748 37.6189 36.631 37.9627C36.2872 38.3065 35.8209 38.4997 35.3346 38.4997H9.66797C9.18174 38.4997 8.71542 38.3065 8.37161 37.9627C8.02779 37.6189 7.83464 37.1526 7.83464 36.6663V7.33301C7.83464 6.84678 8.02779 6.38046 8.37161 6.03664C8.71542 5.69283 9.18174 5.49967 9.66797 5.49967Z" />
-                                </svg>
-                            <span>Summary</span>
-                            </div>
-                        </ng-template>
-                  
-                         
-                       
-                        <div class="">
-                            
                 <div #messageEl id="contentmsg"  class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
                     [scrollTop]="scrolltop">
                     <div style="position: relative" *ngFor="
@@ -1298,41 +1280,29 @@ margin-right: 6px;"></i>
                 </app-add-comment>
                 </div>
 
-            
-            
-            
-                        </div>
-                            
-                     
-                   
-            
-                    </p-tabPanel>
-              
-                    <p-tabPanel>
-                        <ng-template pTemplate="header">
-                            <div class="tab-header pt-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="20" viewBox="0 0 38 20" class="mt-1">
-                                <path d="M0.667969 2.66634C0.667969 2.18011 0.861123 1.7138 1.20494 1.36998C1.54876 1.02616 2.01507 0.833008 2.5013 0.833008H35.5013C35.9875 0.833008 36.4538 1.02616 36.7977 1.36998C37.1415 1.7138 37.3346 2.18011 37.3346 2.66634C37.3346 3.15257 37.1415 3.61889 36.7977 3.9627C36.4538 4.30652 35.9875 4.49967 35.5013 4.49967H2.5013C2.01507 4.49967 1.54876 4.30652 1.20494 3.9627C0.861123 3.61889 0.667969 3.15257 0.667969 2.66634ZM0.667969 9.99967C0.667969 9.51344 0.861123 9.04713 1.20494 8.70331C1.54876 8.3595 2.01507 8.16634 2.5013 8.16634H35.5013C35.9875 8.16634 36.4538 8.3595 36.7977 8.70331C37.1415 9.04713 37.3346 9.51344 37.3346 9.99967C37.3346 10.4859 37.1415 10.9522 36.7977 11.296C36.4538 11.6399 35.9875 11.833 35.5013 11.833H2.5013C2.01507 11.833 1.54876 11.6399 1.20494 11.296C0.861123 10.9522 0.667969 10.4859 0.667969 9.99967ZM2.5013 15.4997C2.01507 15.4997 1.54876 15.6928 1.20494 16.0366C0.861123 16.3805 0.667969 16.8468 0.667969 17.333C0.667969 17.8192 0.861123 18.2856 1.20494 18.6294C1.54876 18.9732 2.01507 19.1663 2.5013 19.1663H24.5013C24.9875 19.1663 25.4538 18.9732 25.7977 18.6294C26.1415 18.2856 26.3346 17.8192 26.3346 17.333C26.3346 16.8468 26.1415 16.3805 25.7977 16.0366C25.4538 15.6928 24.9875 15.4997 24.5013 15.4997H2.5013Z" />
-                                </svg>
-                            <p class="mb-0 mt-md-4 mt-2"> Details</p>
-                        </div>
-                        </ng-template>
-                        <app-app-side-bar [entityTypeName]="messages[selectedMessageIndx]?.relatedEntityObjectTypeCode" [id]="messages[selectedMessageIndx]?.relatedEntityId" [fromMsgs]="true"></app-app-side-bar> 
-                    </p-tabPanel>
-                
-            
-                </p-tabView>
-         
             </div>
 
-            <div class="col-md-5 col d-block  d-md-none pr-2  m-md-0" style="padding: 0"
-                *ngIf="displayMessageDetails && messagesDetails">
+            <div class="col-md-5 col d-md-none d-block   pr-2  m-md-0" style="padding: 0"
+                *ngIf="displayMessageDetails && messagesDetails ">
                 <div class=" row ml-3 mt-2">
                     <img src="../../../assets/message/Header_arrow-back_Btn.svg" class="pointer"
                         (click)="messageDetailsGoback()" />
                     <div class="mt-1"><span class="pl-3 subject-msg">{{ messagesDetails[0].messages.subject }} </span>
                     </div>
-                    <div class="actions-message pr-4">
+                    <div class="actions-message w-100 pr-4 d-flex justify-content-end">
+                        <button class="btn detalsBtn btn-sm d-block  show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
+                           
+                        " (click)="onShowSideBar(!showSideBar)">
+<i class="fa fa-eye fa-2x" aria-hidden="true" style="margin-top: -3px;
+margin-right: 6px;"></i>
+
+                               <span class="spBtnDe"  style="
+                        font-family: Poppins;
+                  
+                        font-style: normal;
+                        font-weight: 600;
+                        line-height: normal;">{{showHideSideBarTitle}}</span>
+                           </button>
                         <div class="row">
                             <!-- <div class="mr-3">
                                 <button class="btn  btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
@@ -1349,7 +1319,7 @@ margin-right: 6px;"></i>
                              line-height: normal;">{{showHideSideBarTitle}}</span>
                                 </button>
                             </div> -->
-                            <div *ngIf="!messagesDetails[0].messages.isFavorite" (click)="
+                            <!-- <div *ngIf="!messagesDetails[0].messages.isFavorite" (click)="
                                         favoriteMessage(messagesDetails[0].messages)
                                     " title="UnFavorite">
                                 <img src="assets/message/Messaging_Favorite_icon.svg" style="width: 20px"
@@ -1361,13 +1331,13 @@ margin-right: 6px;"></i>
                                     " title="Favorite" class="mr-3 mt-2">
                                 <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
                                     style="width: 20px" />
-                            </div>
+                            </div> -->
                             <!-- <span class="mr-10">
                                     <img src="assets/message/replay.svg" style="width:13px;">
     
                                 </span> -->
 
-                            <div title="Archive" class="mr-2 mt-2">
+                            <!-- <div title="Archive" class="mr-2 mt-2">
                                 <img src="{{
                                             appRootUrl()
                                         }}assets/message/Messaging_Archiving_icon.svg" style="width: 20px" (click)="
@@ -1375,7 +1345,7 @@ margin-right: 6px;"></i>
                                                 messagesDetails[0].messages
                                             )
                                         " />
-                            </div>
+                            </div> -->
                             <div class="btn-group dropdown actionDropdown mr-3 mt-2" dropdown container="body">
                                 <button class="dropdown-toggle btn btn-sm  btn-action" dropdownToggle
                                     style="cursor: pointer"></button>
@@ -1413,240 +1383,211 @@ margin-right: 6px;"></i>
                                                     )
                                                 " class="link-action">{{ l("DeleteMessage") }}</a>
                                     </li>
+
+
+                                    <li>
+                                        <a *ngIf="!messagesDetails[0].messages.isFavorite" (click)="
+                                        favoriteMessage(messagesDetails[0].messages)
+                                    " class="link-action">{{ l("Add To Favorite") }}</a>
+                                    </li>
+
+                                    <li>
+                                        <a *ngIf="messagesDetails[0].messages.isFavorite" (click)="
+                                        favoriteMessage(messagesDetails[0].messages)
+                                    "  class="link-action">{{ l("Remove From Favorite") }}</a>
+                                    </li>
+
+
+                                    <li>
+                                        <a (click)="
+                                        archiveMessage(
+                                            messagesDetails[0].messages
+                                        )
+                                    "  class="link-action">{{ l("Archive") }}</a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-                <p-tabView styleClass="tabview-custom" style="min-height: 70vh;">
-                 
-                    <p-tabPanel header="Header II">
-                        <ng-template pTemplate="header">
-                            <div class="tab-header">
-            
-                            <svg xmlns="http://www.w3.org/2000/svg" width="45" height="44" viewBox="0 0 45 44" >
-                                <path d="M11.5 10.9993C11.5 10.5131 11.6932 10.0468 12.037 9.70299C12.3808 9.35917 12.8471 9.16602 13.3333 9.16602H31.6667C32.1529 9.16602 32.6192 9.35917 32.963 9.70299C33.3068 10.0468 33.5 10.5131 33.5 10.9993C33.5 11.4856 33.3068 11.9519 32.963 12.2957C32.6192 12.6395 32.1529 12.8327 31.6667 12.8327H13.3333C12.8471 12.8327 12.3808 12.6395 12.037 12.2957C11.6932 11.9519 11.5 11.4856 11.5 10.9993ZM11.5 18.3327C11.5 17.8465 11.6932 17.3801 12.037 17.0363C12.3808 16.6925 12.8471 16.4993 13.3333 16.4993H31.6667C32.1529 16.4993 32.6192 16.6925 32.963 17.0363C33.3068 17.3801 33.5 17.8465 33.5 18.3327C33.5 18.8189 33.3068 19.2852 32.963 19.629C32.6192 19.9729 32.1529 20.166 31.6667 20.166H13.3333C12.8471 20.166 12.3808 19.9729 12.037 19.629C11.6932 19.2852 11.5 18.8189 11.5 18.3327ZM13.3333 23.8327C12.8471 23.8327 12.3808 24.0258 12.037 24.3697C11.6932 24.7135 11.5 25.1798 11.5 25.666C11.5 26.1522 11.6932 26.6186 12.037 26.9624C12.3808 27.3062 12.8471 27.4993 13.3333 27.4993H31.6667C32.1529 27.4993 32.6192 27.3062 32.963 26.9624C33.3068 26.6186 33.5 26.1522 33.5 25.666C33.5 25.1798 33.3068 24.7135 32.963 24.3697C32.6192 24.0258 32.1529 23.8327 31.6667 23.8327H13.3333ZM11.5 32.9993C11.5 32.5131 11.6932 32.0468 12.037 31.703C12.3808 31.3592 12.8471 31.166 13.3333 31.166H20.6667C21.1529 31.166 21.6192 31.3592 21.963 31.703C22.3068 32.0468 22.5 32.5131 22.5 32.9993C22.5 33.4856 22.3068 33.9519 21.963 34.2957C21.6192 34.6395 21.1529 34.8327 20.6667 34.8327H13.3333C12.8471 34.8327 12.3808 34.6395 12.037 34.2957C11.6932 33.9519 11.5 33.4856 11.5 32.9993Z" />
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M4.16797 7.33301C4.16797 5.87432 4.74743 4.47537 5.77888 3.44392C6.81033 2.41247 8.20928 1.83301 9.66797 1.83301H35.3346C36.7933 1.83301 38.1923 2.41247 39.2237 3.44392C40.2552 4.47537 40.8346 5.87432 40.8346 7.33301V36.6663C40.8346 38.125 40.2552 39.524 39.2237 40.5554C38.1923 41.5869 36.7933 42.1663 35.3346 42.1663H9.66797C8.20928 42.1663 6.81033 41.5869 5.77888 40.5554C4.74743 39.524 4.16797 38.125 4.16797 36.6663V7.33301ZM9.66797 5.49967H35.3346C35.8209 5.49967 36.2872 5.69283 36.631 6.03664C36.9748 6.38046 37.168 6.84678 37.168 7.33301V36.6663C37.168 37.1526 36.9748 37.6189 36.631 37.9627C36.2872 38.3065 35.8209 38.4997 35.3346 38.4997H9.66797C9.18174 38.4997 8.71542 38.3065 8.37161 37.9627C8.02779 37.6189 7.83464 37.1526 7.83464 36.6663V7.33301C7.83464 6.84678 8.02779 6.38046 8.37161 6.03664C8.71542 5.69283 9.18174 5.49967 9.66797 5.49967Z" />
-                                </svg>
-                            <span>Summary</span>
-                            </div>
-                        </ng-template>
-                  
-                         
-                       
-                        <div class="">
-                                
-                            <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
-                                [scrollTop]="scrolltop"> 
-                                <div style="position: relative" *ngFor="
-                                            let messagedetail of messagesDetails;
-                                            let i = index
-                                        ">
-                                
-                                    <img [src]="
-                                                messagedetail.messages.profilePictureUrl
-                                                    ? messagedetail.messages
-                                                          .profilePictureUrl
-                                                    : 'assets/chat/user-chat.png'
-                                            " class="rounded-circle mr-3" style="
-                                                width: 60px;
-                                                height: 60px;
-                                                object-fit: cover;
-                                            " />
-                                    <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
-                                    <div class="to-block">
-                                        <span class="to">{{ "To" | localize }} :</span>
-                                        <span >{{ messagedetail.messages.toName }}
-                                        </span>
-                                    </div>
-                                    <br />
-                                    <div class="message-data">
-                                        <span style="
-                                                    font-size: 12px;
-                                                    color: #595959;
-                                                    position: absolute;
-                                                    font-weight: 500;
-                                                    right: 0;
-                                                    top: 20px;
-                                                ">{{
-                                            messagedetail.messages.sendDate
-                                            | date:'hh:mm a'
-                                            }}</span>
-                                    <br />
-        
-                                            <span style="
-                                            font-size: 12px;
-                                            color: #595959;
-                                            position: absolute;
-                                            font-weight: 500;
-                                            right: 0;
-                                            top: 20px;
-                                            margin-top: 18px;
-                                        ">{{
-                                    messagedetail.messages.sendDate
-                                    | date:' MM/dd/yyyy'
-                                    }}</span>
-                                    </div>
-                                    <br />
-                                    <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="'Subject: '+
-                                    messagedetail.messages.subject | safeHtml
-                                " class="msg-bodyformat  pt-2"  [ngClass]="
+                <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                    [scrollTop]="scrolltop"> 
+                    <div style="position: relative" *ngFor="
+                                let messagedetail of messagesDetails;
+                                let i = index
+                            ">
+                    
+                        <img [src]="
+                                    messagedetail.messages.profilePictureUrl
+                                        ? messagedetail.messages
+                                              .profilePictureUrl
+                                        : 'assets/chat/user-chat.png'
+                                " class="rounded-circle mr-3" style="
+                                    width: 60px;
+                                    height: 60px;
+                                    object-fit: cover;
+                                " />
+                        <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
+                        <div class="to-block">
+                            <span class="to">{{ "To" | localize }} :</span>
+                            <span >{{ messagedetail.messages.toName }}
+                            </span>
+                        </div>
+                        <br />
+                        <div class="message-data">
+                            <span style="
+                                        font-size: 12px;
+                                        color: #595959;
+                                        position: absolute;
+                                        font-weight: 500;
+                                        right: 0;
+                                        top: 20px;
+                                    ">{{
+                                messagedetail.messages.sendDate
+                                | date:'hh:mm a'
+                                }}</span>
+                        <br />
+
+                                <span style="
+                                font-size: 12px;
+                                color: #595959;
+                                position: absolute;
+                                font-weight: 500;
+                                right: 0;
+                                top: 20px;
+                                margin-top: 18px;
+                            ">{{
+                        messagedetail.messages.sendDate
+                        | date:' MM/dd/yyyy'
+                        }}</span>
+                        </div>
+                        <br />
+                        <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="'Subject: '+
+                        messagedetail.messages.subject | safeHtml
+                    " class="msg-bodyformat  pt-2"  [ngClass]="
+                        longmsgId == messagedetail.messages.id ||
+                        messagesDetails.length == 1
+                            ? ''
+                            : 'long-msg'
+                    ">
+            </span>
+            <br />
+
+                        <span [innerHTML]="
+                                    messagedetail.messages.bodyFormat | safeHtml
+                                " class="msg-bodyformat " style="word-break: break-word;" [ngClass]="
                                     longmsgId == messagedetail.messages.id ||
                                     messagesDetails.length == 1
                                         ? ''
                                         : 'long-msg'
+                                " (click)="
+                                    clickEventLongMsg(messagedetail.messages.id)
                                 ">
                         </span>
                         <br />
-        
-                                    <span [innerHTML]="
-                                                messagedetail.messages.bodyFormat | safeHtml
-                                            " class="msg-bodyformat " style="word-break: break-word;" [ngClass]="
-                                                longmsgId == messagedetail.messages.id ||
-                                                messagesDetails.length == 1
-                                                    ? ''
-                                                    : 'long-msg'
-                                            " (click)="
-                                                clickEventLongMsg(messagedetail.messages.id)
-                                            ">
-                                    </span>
-                                    <br />
-                                    <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
-                                    <br />
-                                </div>
-                                <div>
-                                    <p *ngIf="
-                                                messagesDetails[0].messages.entityAttachments
-                                                    .length > 0
-                                            " class="title-attach">
-                                        <span>{{
-                                            messagesDetails[0].messages
-                                            .entityAttachments.length
-                                            }}
-                                            {{ "Attachments" | localize }}</span>
-                                    </p>
-            
-                                    <div class="files-uploaded" *ngFor="let item of entityAttachments">
-                                        <div class="uploaded-attchments" *ngIf="
-                                                    item.fileName.includes('.doc') ||
-                                                    item.fileName.includes('.docs')
-                                                ">
-                                            <img src="assets/message/microsoft-word.svg" (click)="
-                                                        downloadFile(item.url, item.displayName)
-                                                    " />
-                                        </div>
-                                        <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
-                                            <img src="assets/message/microsoft-powerpoint.svg" (click)="
-                                                        downloadFile(item.url, item.displayName)
-                                                    " />
-                                        </div>
-                                        <div class="uploaded-attchments" *ngIf="
-                                                    item.fileName.includes('.jpg') ||
-                                                    item.fileName.includes('.png') ||
-                                                    item.fileName.includes('.svg')
-                                                ">
-                                            <img [src]="getImage(item.url)" height="30px" (click)="
-                                                        downloadFile(item.url, item.displayName)
-                                                    " />
-                                        </div>
-                                        <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
-                                            <img src="assets/message/excel.svg" (click)="
-                                                        downloadFile(item.url, item.displayName)
-                                                    " />
-                                        </div>
-                                        <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
-                                            <img src="assets/message/adobe.svg" (click)="
-                                                        downloadFile(item.url, item.displayName)
-                                                    " />
-                                        </div>
-                                        <div class="uploaded-attchments" *ngIf="
-                                                    !item.fileName.includes('.xls') &&
-                                                    !item.fileName.includes('.pdf') &&
-                                                    !item.fileName.includes('.docs') &&
-                                                    !item.fileName.includes('.doc') &&
-                                                    !item.fileName.includes('.ppt') &&
-                                                    !item.fileName.includes('.jpg') &&
-                                                    !item.fileName.includes('.svg') &&
-                                                    !item.fileName.includes('.png')
-                                                ">
-                                            <img src="assets/message/document.png" (click)="
-                                                        downloadFile(item.url, item.displayName)
-                                                    " />
-                                        </div>
-            
-                                        <p class="display-name">
-                                            <span>{{ item.displayName }}</span>
-                                        </p>
-                                    </div>
-                                </div>
-            
-                               
-            
-                                <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION'">
-                                    <button (click)="
-                                                SendMessageModal.show(
-                                                    messagesDetails[0].messages.id,
-                                                    messagesDetails[0].messages.threadId,
-                                                    false,
-                                                    messagesDetails[0].messages
-                                                        .mesasgeObjectType
-                                                )
-                                            " class="ReplyBtn btn ">
-                                            <i class="fa fa-reply"></i>
-                                        <span> {{ "Reply" | localize }}</span>
-                                    </button>
-                                    <button (click)="
-                                                SendMessageModal.show(
-                                                    messagesDetails[0].messages.id,
-                                                    messagesDetails[0].messages.threadId,
-                                                    true
-                                                )
-                                            " class="ForwardBtn btn ">
-                                            <img src="assets/message/forward.svg" style="width: 25px" />
-                                        <span style="padding-right: 5px">{{
-                                            "Forward" | localize
-                                            }}</span>
-                                    </button>
-                                </div>
-                                <app-add-comment   [hidden]="messageCategoryFilter!=='MENTION'" 
-                                [cartStyle]="true"
-                                (saveDone)="newCommentAddedHandler($event)"
-                                [relatedEntityId]="messagesDetails[0].messages.entityId"
-                                #AddCommentComponent>
-                            </app-add-comment>
+                        <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
+                        <br />
+                    </div>
+                    <div>
+                        <p *ngIf="
+                                    messagesDetails[0].messages.entityAttachments
+                                        .length > 0
+                                " class="title-attach">
+                            <span>{{
+                                messagesDetails[0].messages
+                                .entityAttachments.length
+                                }}
+                                {{ "Attachments" | localize }}</span>
+                        </p>
+
+                        <div class="files-uploaded" *ngFor="let item of entityAttachments">
+                            <div class="uploaded-attchments" *ngIf="
+                                        item.fileName.includes('.doc') ||
+                                        item.fileName.includes('.docs')
+                                    ">
+                                <img src="assets/message/microsoft-word.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
                             </div>
-            
-            
-            
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
+                                <img src="assets/message/microsoft-powerpoint.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="
+                                        item.fileName.includes('.jpg') ||
+                                        item.fileName.includes('.png') ||
+                                        item.fileName.includes('.svg')
+                                    ">
+                                <img [src]="getImage(item.url)" height="30px" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
+                                <img src="assets/message/excel.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
+                                <img src="assets/message/adobe.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="
+                                        !item.fileName.includes('.xls') &&
+                                        !item.fileName.includes('.pdf') &&
+                                        !item.fileName.includes('.docs') &&
+                                        !item.fileName.includes('.doc') &&
+                                        !item.fileName.includes('.ppt') &&
+                                        !item.fileName.includes('.jpg') &&
+                                        !item.fileName.includes('.svg') &&
+                                        !item.fileName.includes('.png')
+                                    ">
+                                <img src="assets/message/document.png" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+
+                            <p class="display-name">
+                                <span>{{ item.displayName }}</span>
+                            </p>
                         </div>
-                            
-                     
+                    </div>
+
                    
-            
-                    </p-tabPanel>
-              
-                    <p-tabPanel>
-                        <ng-template pTemplate="header">
-                            <div class="tab-header pt-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="20" viewBox="0 0 38 20" class="mt-1">
-                                <path d="M0.667969 2.66634C0.667969 2.18011 0.861123 1.7138 1.20494 1.36998C1.54876 1.02616 2.01507 0.833008 2.5013 0.833008H35.5013C35.9875 0.833008 36.4538 1.02616 36.7977 1.36998C37.1415 1.7138 37.3346 2.18011 37.3346 2.66634C37.3346 3.15257 37.1415 3.61889 36.7977 3.9627C36.4538 4.30652 35.9875 4.49967 35.5013 4.49967H2.5013C2.01507 4.49967 1.54876 4.30652 1.20494 3.9627C0.861123 3.61889 0.667969 3.15257 0.667969 2.66634ZM0.667969 9.99967C0.667969 9.51344 0.861123 9.04713 1.20494 8.70331C1.54876 8.3595 2.01507 8.16634 2.5013 8.16634H35.5013C35.9875 8.16634 36.4538 8.3595 36.7977 8.70331C37.1415 9.04713 37.3346 9.51344 37.3346 9.99967C37.3346 10.4859 37.1415 10.9522 36.7977 11.296C36.4538 11.6399 35.9875 11.833 35.5013 11.833H2.5013C2.01507 11.833 1.54876 11.6399 1.20494 11.296C0.861123 10.9522 0.667969 10.4859 0.667969 9.99967ZM2.5013 15.4997C2.01507 15.4997 1.54876 15.6928 1.20494 16.0366C0.861123 16.3805 0.667969 16.8468 0.667969 17.333C0.667969 17.8192 0.861123 18.2856 1.20494 18.6294C1.54876 18.9732 2.01507 19.1663 2.5013 19.1663H24.5013C24.9875 19.1663 25.4538 18.9732 25.7977 18.6294C26.1415 18.2856 26.3346 17.8192 26.3346 17.333C26.3346 16.8468 26.1415 16.3805 25.7977 16.0366C25.4538 15.6928 24.9875 15.4997 24.5013 15.4997H2.5013Z" />
-                                </svg>
-                            <p class="mb-0 mt-md-4 mt-2"> Details</p>
-                        </div>
-                        </ng-template>
-                        <app-app-side-bar [entityTypeName]="messages[selectedMessageIndx]?.relatedEntityObjectTypeCode" [id]="messages[selectedMessageIndx]?.relatedEntityId" [fromMsgs]="true"></app-app-side-bar> 
-                    </p-tabPanel>
-                
-            
-                </p-tabView>
-                <div class="">
 
-
-                    <!-- <hr class="mt-5" style="border: 1px solid #e7e8ef; opacity: 1" /> -->
-
-
-                
-
+                    <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION'">
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        false,
+                                        messagesDetails[0].messages
+                                            .mesasgeObjectType
+                                    )
+                                " class="ReplyBtn btn ">
+                                <i class="fa fa-reply"></i>
+                            <span> {{ "Reply" | localize }}</span>
+                        </button>
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        true
+                                    )
+                                " class="ForwardBtn btn ">
+                                <img src="assets/message/forward.svg" style="width: 25px" />
+                            <span style="padding-right: 5px">{{
+                                "Forward" | localize
+                                }}</span>
+                        </button>
+                    </div>
+                    <app-add-comment   [hidden]="messageCategoryFilter!=='MENTION'" 
+                    [cartStyle]="true"
+                    (saveDone)="newCommentAddedHandler($event)"
+                    [relatedEntityId]="messagesDetails[0].messages.entityId"
+                    #AddCommentComponent>
+                </app-add-comment>
                 </div>
             </div>
 

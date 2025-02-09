@@ -174,7 +174,7 @@
     background: white !important;
     color: black !important;
     // margin-left: 40px;
-    padding: 19px;
+    padding: 10px;
     border-radius: 12px;
     // margin-right: 165px;
     // margin-right: 25px;
@@ -417,6 +417,7 @@ width:100% !important;
          margin-left: 62px;
         max-width: 242px;
     } */
+
     .boxes {
         padding-top: 15px;
     }
@@ -465,9 +466,8 @@ width:100% !important;
 
 // Large devices (desktops, 992px and up)
 @media (min-width: 992px) {
-    .boxes {
-        // padding-left: 14%;
-        // padding-left: 5%;
+    .spBtnDe {
+        font-size: 16px;
     }
 }
 
@@ -480,7 +480,7 @@ width:100% !important;
 }
 .actions-message {
     display: inline;
-    position: absolute;
+    // position: absolute;
     right: 0;
 }
 .mr-10 {
@@ -578,7 +578,10 @@ body .btn.btn-action:after {
 
 
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
+    .spBtnDe {
+        font-size: 13px !important;
+    }
     .subject-msg {
         font-size: 19px;
     }
@@ -688,6 +691,10 @@ font-weight: 700;
     }
 
     @media (max-width: 600px) {
+        .spBtnDe {
+            font-size: 13px !important;
+        }
+        
         .tabs-cont button {
             padding: 1px 5px 1px 5px !important;
         }
