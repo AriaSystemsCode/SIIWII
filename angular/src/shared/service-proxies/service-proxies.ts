@@ -16820,6 +16820,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param currencyCode (optional) 
      * @param buyerAccountSSIN (optional) 
      * @param sellerAccountSSIN (optional) 
+     * @param priceLevel (optional) 
      * @param itemId (optional) 
      * @param getAppItemAttributesInputForCategories_Sorting (optional) 
      * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
@@ -16835,7 +16836,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
+    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetMarketplaceAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -16869,6 +16870,8 @@ export class AppMarketplaceItemsServiceProxy {
             url_ += "BuyerAccountSSIN=" + encodeURIComponent("" + buyerAccountSSIN) + "&";
         if (sellerAccountSSIN !== undefined && sellerAccountSSIN !== null)
             url_ += "SellerAccountSSIN=" + encodeURIComponent("" + sellerAccountSSIN) + "&";
+        if (priceLevel !== undefined && priceLevel !== null)
+            url_ += "PriceLevel=" + encodeURIComponent("" + priceLevel) + "&";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
         else if (itemId !== undefined)
@@ -79608,6 +79611,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -79717,6 +79721,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -79860,6 +79865,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -79988,6 +79994,7 @@ export interface IGetAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -80669,6 +80676,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -80787,6 +80795,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -80939,6 +80948,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -81076,6 +81086,7 @@ export interface IGetAllAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
