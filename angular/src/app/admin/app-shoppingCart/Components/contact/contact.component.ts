@@ -61,7 +61,10 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     ngOnInit(): void {
-        this.onClearText()
+        if(  this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN){
+            this.onClearText()
+
+        }
         this.resetSelectedData(); 
         this.setSelectedData();
      //   this.getAllCompaniesData();
@@ -413,7 +416,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 null
             ).subscribe((res: any) => {
            
-                this.allContacts = [...res];
+                this.filteredContacts = [...res];
                
         
                 
@@ -421,15 +424,15 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
         
         handleContactSearch(event) {
-            const query = event?.query?.toLowerCase();
             if (!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact?.name) {
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = new GetContactInformationDto();
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = event?.query;
             }
             if (this.allContacts && this.allContacts.length > 0) {
                 // Filtering logic
+            const query = event?.query?.toLowerCase();
               
-                this.allContacts = this.allContacts.filter(contact =>
+                this.filteredContacts = this.allContacts.filter(contact =>
                     contact?.name?.toLowerCase().includes(query)
                 );
             } else {
@@ -440,7 +443,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             ).subscribe((res: any) => {
              
                 this.allContacts = [...res];
-                this.allContacts = this.allContacts.filter(contact =>
+                this.filteredContacts  = this.allContacts.filter(contact =>
                     contact.name.toLowerCase().includes(event?.query?.toLowerCase())
                 );
         
