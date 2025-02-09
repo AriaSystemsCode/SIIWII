@@ -328,9 +328,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = !this.isBuyerTempAccount;
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
+            this.areSame = false
             this.orderForm.controls["buyerCompanyBranch"].clearValidators();
             this.orderForm.controls["buyerCompanyBranch"].reset();
             this.orderForm.controls["buyerCompanyName"].reset();
+            this.orderForm.controls["buyerContactName"].reset();
+            this.orderForm.controls["buyerContactEMailAddress"].reset();
+            this.orderForm.controls["buyerContactPhoneNumber"].reset();
         }
 
         else
@@ -685,7 +689,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         });
     }
 
-        if ((!this.sellerCompanyId || !this.buyerComapnyId)  || (this.sellerCompanyId !== this.buyerComapnyId)) {
+        if ( (this.sellerCompanyId !== this.buyerComapnyId)) {
             this.areSame = false;
             this.submitted = true;
             this.invalidBuyerPhoneNumber = "";
@@ -866,6 +870,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     // }
                 }
             }
+        } else if( this.orderForm.controls['enteredByUserRole']?.value  == "I'm a Seller" || this.orderForm.controls['enteredByUserRole']?.value  == "I'm a Buyer"){
+            this.areSame = false
         } else {
             this.areSame = true
         }
