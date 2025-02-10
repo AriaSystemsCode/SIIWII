@@ -1,7 +1,7 @@
 <div class="boxes row  mt-md-5 mb-5">
 
 
-    <div class="rightbox col mr-0 mr-md-2 ml-md-4">
+    <div class="rightbox col mr-0 mr-md-2 ml-md-4 pt-4">
         <div class="d-flex flex-row mb-4" style="justify-content: space-between;">
             <div class="btn-group dropdown actionDropdown mr-3" dropdown container="body">
                 <h4 style="color: #1B101B !important;
@@ -239,7 +239,7 @@ appRootUrl() +
             <div>
             <button class="active-tab btn  btn-sm ng-tns-c357-9 pb-0 m-0  clickBtn" style="cursor: pointer;
             border-radius: 6px 0px 0px 6px;
-            padding: 1px 10px 1px 10px;
+            padding: 1px 10px 1px 10px !important;
             border: 1px solid #eee !important;
             box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
             color: #9E9E9E ;
@@ -263,7 +263,7 @@ appRootUrl() +
 
             <button class="btn  btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
             border-radius: 0px;
-            padding: 1px 10px 1px 10px;
+            padding: 1px 10px 1px 10px !important;
             border: 1px solid #eee !important;
             box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
             color: #9E9E9E ;
@@ -285,7 +285,7 @@ appRootUrl() +
             </button>
             <button class="btn  btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
             border-radius:0px 6px 6px 0px;
-            padding: 1px 10px 1px 10px;
+            padding: 1px 10px 1px 10px !important;
             border: 1px solid #eee !important;
             box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
             color: #9E9E9E ;
@@ -345,16 +345,16 @@ appRootUrl() +
                 
         </div>
         <div class="row mt-3">
-            <div class="col-md-5 pt-2 pl-0 pr-0 borderdCont" [ngClass]="showSideBar ? 'd-none':''">
+            <div class="  pl-0 pr-0 borderdCont" [ngClass]="showSideBar ? 'd-md-none d-lg-block col-md-4':'col-md-5'">
                 <div class="pt-4 pb-4 searchBarCont d-none d-md-block">
                     <!-- <h4>{{ messageType }}</h4> -->
-                    <div class="search" style="width: 100%; padding-right: 17px">
+                    <div class="search pt-2" style="width: 100%; padding-right: 17px">
                         <input placeholder="Search for messages" [(ngModel)]="filterText" name="filterText" autoFocus
                             class="icon form-control m-input" type="text" (keyup.enter)="getMesssage(true)" />
                     </div>
                 </div>
 
-                <div class="d-md-none d-flex flex-row pt-4 pr-2 justify-content-between align-items-center" *ngIf="!displayMessageDetails">
+                <div class="d-md-none d-flex flex-row pt-4 pr-2 justify-content-end align-items-center" *ngIf="!displayMessageDetails">
                     <!-- <div class="d-flex align-items-center">
                         <i 
                         class="pi pi-angle-left mr-2" 
@@ -925,18 +925,54 @@ appRootUrl() +
                     </div>
                 </div>
             </div>
-            <div [ngClass]="{ 'col-md-7 borderdCont': !showSideBar, 'col-lg-5 col-md-7': showSideBar }"
+            <div [ngClass]="{ 'col-md-7 borderdCont': !showSideBar, 'col-lg-5 col-md-7 border-right': showSideBar }"
              class="col d-none  d-md-block p-0 m-5 m-md-0" style="padding: 0">
                 <div *ngIf="messagesDetails" class="">
-                    <div class="pt-5 pb-5 pl-3 messageTitleCont d-flex" style="padding-bottom: 50px !important;">
-                    <span class="subject-msg " style="width: 50%;">{{ messagesDetails[0].messages.subject }}
+                    <div class="pt-5  pl-3 messageTitleCont d-flex justify-content-between pb-4">
+                    <span class="subject-msg " style="width: 50%;">
+                        <!-- {{ messagesDetails[0].messages.subject }} -->
+                        <div *ngIf="messageCategoryFilter=='MESSAGE'" class="mx-3 mt-2">
+                            <h4 class="d-flex">  <p *ngIf="messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1">
+                                <img class="pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                                appRootUrl() +
+                                'assets/message/Direct-Message-icon.svg'" border="0" />    Direct Message in {{ messagesDetails[0].messages.relatedEntityObjectTypeDescription  }}
+                        </p>  <p *ngIf="!messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1" >
+                            <img class="pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                            appRootUrl() +
+                            'assets/message/Direct-Message-icon.svg'" border="0" />      Direct Message in {{ messagesDetails[0].messages.subject  }}
+                    </p></h4> 
+                      </div>
+
+                      <div *ngIf="messageCategoryFilter=='THREAD'" class="mx-3 mt-2">
+                        <h4 class="d-flex">  <p *ngIf="messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1">
+                            <img class=" pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                            appRootUrl() +
+                            'assets/message/thread-svg-icon.svg'" border="0" />  Thread in {{ messagesDetails[0].messages.relatedEntityObjectTypeDescription  }}
+                    </p>  <p *ngIf="!messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1" >
+                        <img class=" pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                        appRootUrl() +
+                        'assets/message/thread-svg-icon.svg'" border="0" />   Thread in {{ messagesDetails[0].messages.subject  }}
+                </p></h4> 
+                  </div>
+
+                  <div *ngIf="messageCategoryFilter=='MENTION'" class="mx-3 mt-2">
+                    <h4 class="d-flex">  <p *ngIf="messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1">
+                        <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
+                        appRootUrl() +
+                        'assets/message/mention-square-icon.svg'" border="0" />  Mention in {{ messagesDetails[0].messages.relatedEntityObjectTypeDescription  }}
+                </p>  <p *ngIf="!messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1" >
+                    <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
+                    appRootUrl() +
+                    'assets/message/mention-square-icon.svg'" border="0" />  Mention in {{ messagesDetails[0].messages.subject  }}
+            </p></h4> 
+              </div>
                     </span>
-                    <div class="actions-message pr-4  " >
+                    <div class="actions-message pr-3  " >
                         <div class="row">
-                            <div class="mr-1">
-                                <button class="btn detalsBtn btn-sm d-block  show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
+                            <div class="" >
+                                <button class="btn detalsBtn btn-sm d-block mr-2  show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
                            
-                             " (click)="onShowSideBar(!showSideBar)">
+                             " [ngClass]="showHideSideBarTitle ? 'd-lg-block d-none':'' " (click)="onShowSideBar(!showSideBar)">
 <i class="fa fa-eye fa-2x" aria-hidden="true" style="margin-top: -3px;
 margin-right: 6px;"></i>
 
@@ -1063,23 +1099,32 @@ margin-right: 6px;"></i>
                         </div>
                         <br />
                 
-                        <span [innerHTML]="'Subject: ' + messagedetail.messages.subject | safeHtml"
+                        <span [innerHTML]="'Subject: ' + messagedetail.messages.subject "
                             class="msg-bodyformat pt-2" [ngClass]="longmsgId == messagedetail.messages.id || messagesDetails.length == 1 ? '' : 'long-msg'">
                         </span>
                         <br />
-                
-                        <span [innerHTML]="messagedetail.messages.bodyFormat | safeHtml" class="msg-bodyformat"
-                            style="word-break: break-word;" [ngClass]="longmsgId == messagedetail.messages.id || messagesDetails.length == 1 ? '' : 'long-msg'"
-                            (click)="clickEventLongMsg(messagedetail.messages.id)">
-                        </span>
+                        <span [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)" 
+                        class="msg-bodyformat" 
+                        style="word-break: break-word;">
+                  </span>
+                  
+                  <a href="javascript:void(0)" 
+                  style="color: #4A0D4A;font-weight: 500;"
+                     *ngIf="messagedetail.messages.bodyFormat.length > maxChars || 
+                            messagedetail.messages.bodyFormat.split('<p>').length > maxLines" 
+                     (click)="toggleMessage(messagedetail.messages.id)">
+                     {{ expandedMessageId === messagedetail.messages.id ? 'See Less' : 'See More' }}
+                  </a>
+                  
+                          
                         <br />
-                
+<!--                 
                         <hr *ngIf="i != visibleMessages.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
-                        <br />
+                        <br /> -->
                     </div>
                 
                     <!-- Expand & Collapse Buttons -->
-                    <div *ngIf="messagesDetails.length > 2" class="d-flex justify-content-end">
+                    <!-- <div *ngIf="messagesDetails.length > 2" class="d-flex justify-content-end">
                         <button class="btn expandBtn" (click)="toggleMessages()">
                             {{ showAllMessages ? 'Collapse' : 'Expand' }}  <svg *ngIf="!showAllMessages" width="16" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M18 2L10 10L2 2" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1089,7 +1134,7 @@ margin-right: 6px;"></i>
                                     </svg>
                                     
                         </button>
-                    </div>
+                    </div> -->
                 
                 </div>
                 
@@ -1148,7 +1193,7 @@ margin-right: 6px;"></i>
                         </div>
                         <br />
                         <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="
-                        'Subject: '+messagedetail.messages.subject | safeHtml
+                        'Subject: '+messagedetail.messages.subject 
                     " class="msg-bodyformat   pt-2"  [ngClass]="
                         longmsgId == messagedetail.messages.id ||
                         messagesDetails.length == 1
@@ -1157,17 +1202,19 @@ margin-right: 6px;"></i>
                     ">
             </span>
             <br />
-                        <span [innerHTML]="
-                                    messagedetail.messages.bodyFormat | safeHtml
-                                " class="msg-bodyformat" style="word-break: break-word;" [ngClass]="
-                                    longmsgId == messagedetail.messages.id ||
-                                    messagesDetails.length == 1
-                                        ? ''
-                                        : 'long-msg'
-                                " (click)="
-                                    clickEventLongMsg(messagedetail.messages.id)
-                                ">
-                        </span>
+            <span [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)" 
+            class="msg-bodyformat" 
+            style="word-break: break-word;">
+      </span>
+      
+      <a href="javascript:void(0)" 
+      style="color: #4A0D4A;font-weight: 500;"
+         *ngIf="messagedetail.messages.bodyFormat.length > maxChars || 
+                messagedetail.messages.bodyFormat.split('<p>').length > maxLines" 
+         (click)="toggleMessage(messagedetail.messages.id)">
+         {{ expandedMessageId === messagedetail.messages.id ? 'See Less' : 'See More' }}
+      </a>
+      
                         <br />
                         <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                         <br />
@@ -1282,15 +1329,52 @@ margin-right: 6px;"></i>
 
             </div>
 
-            <div class="col-md-5 col d-md-none d-block   pr-2  m-md-0" style="padding: 0"
+            <div class="col-md-5     pr-2  m-md-0" [ngClass]="showSideBar ? 'd-none':'d-md-none d-block'" style="padding: 0"
                 *ngIf="displayMessageDetails && messagesDetails ">
                 <div class=" row ml-3 mt-2">
                     <img src="../../../assets/message/Header_arrow-back_Btn.svg" class="pointer"
                         (click)="messageDetailsGoback()" />
-                    <div class="mt-1"><span class="pl-3 subject-msg">{{ messagesDetails[0].messages.subject }} </span>
+                    <div class="mt-1"><span class="pl-3 subject-msg">
+                        <!-- {{ messagesDetails[0].messages.subject }}  -->
+                        <div *ngIf="messageCategoryFilter=='MESSAGE'" class="mx-3 mt-2">
+                            <h4 class="d-flex">  <p *ngIf="messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1">
+                                <img class="pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                                appRootUrl() +
+                                'assets/message/Direct-Message-icon.svg'" border="0" />    Direct Message in {{ messagesDetails[0].messages.relatedEntityObjectTypeDescription  }}
+                        </p>  <p *ngIf="!messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1" >
+                            <img class="pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                            appRootUrl() +
+                            'assets/message/Direct-Message-icon.svg'" border="0" />      Direct Message in {{ messagesDetails[0].messages.subject  }}
+                    </p></h4> 
+                      </div>
+
+                      <div *ngIf="messageCategoryFilter=='THREAD'" class="mx-3 mt-2">
+                        <h4 class="d-flex">  <p *ngIf="messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1">
+                            <img class=" pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                            appRootUrl() +
+                            'assets/message/thread-svg-icon.svg'" border="0" />  Thread in {{ messagesDetails[0].messages.relatedEntityObjectTypeDescription  }}
+                    </p>  <p *ngIf="!messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1" >
+                        <img class=" pr-1 " *ngIf="messageTypeIndex == 1" [src]="
+                        appRootUrl() +
+                        'assets/message/thread-svg-icon.svg'" border="0" />   Thread in {{ messagesDetails[0].messages.subject  }}
+                </p></h4> 
+                  </div>
+
+                  <div *ngIf="messageCategoryFilter=='MENTION'" class="mx-3 mt-2">
+                    <h4 class="d-flex">  <p *ngIf="messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1">
+                        <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
+                        appRootUrl() +
+                        'assets/message/mention-square-icon.svg'" border="0" />  Mention in {{ messagesDetails[0].messages.relatedEntityObjectTypeDescription  }}
+                </p>  <p *ngIf="!messagesDetails[0].messages.relatedEntityObjectTypeDescription " class="ml-1" >
+                    <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
+                    appRootUrl() +
+                    'assets/message/mention-square-icon.svg'" border="0" />  Mention in {{ messagesDetails[0].messages.subject  }}
+            </p></h4> 
+              </div>
+                    </span>
                     </div>
                     <div class="actions-message w-100 pr-4 d-flex justify-content-end">
-                        <button class="btn detalsBtn btn-sm d-block  show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
+                        <button class="btn detalsBtn btn-sm d-block  show-detail-btn ng-tns-c357-9  m-0"  style="cursor: pointer;
                            
                         " (click)="onShowSideBar(!showSideBar)">
 <i class="fa fa-eye fa-2x" aria-hidden="true" style="margin-top: -3px;
@@ -1410,7 +1494,7 @@ margin-right: 6px;"></i>
                         </div>
                     </div>
                 </div>
-                <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1,'d-none': showSideBar}"
                     [scrollTop]="scrolltop"> 
                     <div style="position: relative" *ngFor="
                                 let messagedetail of messagesDetails;
@@ -1463,7 +1547,7 @@ margin-right: 6px;"></i>
                         </div>
                         <br />
                         <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="'Subject: '+
-                        messagedetail.messages.subject | safeHtml
+                        messagedetail.messages.subject 
                     " class="msg-bodyformat  pt-2"  [ngClass]="
                         longmsgId == messagedetail.messages.id ||
                         messagesDetails.length == 1
@@ -1473,17 +1557,19 @@ margin-right: 6px;"></i>
             </span>
             <br />
 
-                        <span [innerHTML]="
-                                    messagedetail.messages.bodyFormat | safeHtml
-                                " class="msg-bodyformat " style="word-break: break-word;" [ngClass]="
-                                    longmsgId == messagedetail.messages.id ||
-                                    messagesDetails.length == 1
-                                        ? ''
-                                        : 'long-msg'
-                                " (click)="
-                                    clickEventLongMsg(messagedetail.messages.id)
-                                ">
-                        </span>
+            <span [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)" 
+            class="msg-bodyformat" 
+            style="word-break: break-word;">
+      </span>
+      
+      <a href="javascript:void(0)" 
+      style="color: #4A0D4A;font-weight: 500;"
+         *ngIf="messagedetail.messages.bodyFormat.length > maxChars || 
+                messagedetail.messages.bodyFormat.split('<p>').length > maxLines" 
+         (click)="toggleMessage(messagedetail.messages.id)">
+         {{ expandedMessageId === messagedetail.messages.id ? 'See Less' : 'See More' }}
+      </a>
+      
                         <br />
                         <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                         <br />
@@ -1593,7 +1679,7 @@ margin-right: 6px;"></i>
 
 
 
-            <div class="col p-2 m-5 m-md-0" style="padding: 0;border-left: 4px solid #e7e8ef;" *ngIf="showSideBar">
+            <div class="col p-2 m-5 m-md-0" style="padding: 0;" *ngIf="showSideBar">
                 <app-app-side-bar [entityTypeName]="messages[selectedMessageIndx]?.relatedEntityObjectTypeCode" [id]="messages[selectedMessageIndx]?.relatedEntityId" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
             </div>
         </div>

@@ -111,6 +111,40 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.containerdetails.nativeElement.scrollHeight;
         } catch (err) {}
     } */
+        expandedMessageId: number | null = null;
+        maxChars = 410; // Max characters before truncation
+        maxLines = 3;   // Max rows before truncation
+      
+        toggleMessage(messageId: number) {
+          this.expandedMessageId = this.expandedMessageId === messageId ? null : messageId;
+        }
+      
+        truncateContent(htmlContent: string, messageId: number): string {
+          if (this.expandedMessageId === messageId) {
+            return htmlContent; // Show full message
+          }
+      
+          // Parse HTML content
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlContent, 'text/html');
+          const paragraphs = Array.from(doc.body.querySelectorAll('p'));
+      
+          let truncatedContent = '';
+      
+          // Scenario 1: More than 4 paragraphs (rows)
+          if (paragraphs.length > this.maxLines) {
+            truncatedContent = paragraphs.slice(0, this.maxLines).map(p => p.outerHTML).join('') + '...';
+            return truncatedContent;
+          }
+      
+          // Scenario 2: More than 100 characters
+          const textContent = doc.body.textContent || '';
+          if (textContent.length > this.maxChars) {
+            return textContent.substring(0, this.maxChars) + '...';
+          }
+      
+          return htmlContent; // If neither case applies, return original content
+        }
         toggleMessages() {
             this.showAllMessages = !this.showAllMessages;
         }
@@ -326,7 +360,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
         this.showSideBar=false;
-        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
+        this.showHideSideBarTitle = !this.showSideBar ? "Show Data" : "Hide Data";
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
         this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);
