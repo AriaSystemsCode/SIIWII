@@ -23425,6 +23425,148 @@ export class AppTransactionServiceProxy {
     /**
      * @param orderId (optional) 
      * @param lineId (optional) 
+     * @param price (optional) 
+     * @return Success
+     */
+    updatePriceByProductLineId(orderId: number | undefined, lineId: number | undefined, price: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/UpdatePriceByProductLineId?";
+        if (orderId === null)
+            throw new Error("The parameter 'orderId' cannot be null.");
+        else if (orderId !== undefined)
+            url_ += "orderId=" + encodeURIComponent("" + orderId) + "&";
+        if (lineId === null)
+            throw new Error("The parameter 'lineId' cannot be null.");
+        else if (lineId !== undefined)
+            url_ += "lineId=" + encodeURIComponent("" + lineId) + "&";
+        if (price === null)
+            throw new Error("The parameter 'price' cannot be null.");
+        else if (price !== undefined)
+            url_ += "price=" + encodeURIComponent("" + price) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdatePriceByProductLineId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdatePriceByProductLineId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processUpdatePriceByProductLineId(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param orderId (optional) 
+     * @param parentId (optional) 
+     * @param colorCode (optional) 
+     * @param colorId (optional) 
+     * @param price (optional) 
+     * @return Success
+     */
+    updatePriceByProductSSINColor(orderId: number | undefined, parentId: number | undefined, colorCode: string | null | undefined, colorId: number | undefined, price: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/UpdatePriceByProductSSINColor?";
+        if (orderId === null)
+            throw new Error("The parameter 'orderId' cannot be null.");
+        else if (orderId !== undefined)
+            url_ += "orderId=" + encodeURIComponent("" + orderId) + "&";
+        if (parentId === null)
+            throw new Error("The parameter 'parentId' cannot be null.");
+        else if (parentId !== undefined)
+            url_ += "parentId=" + encodeURIComponent("" + parentId) + "&";
+        if (colorCode !== undefined && colorCode !== null)
+            url_ += "colorCode=" + encodeURIComponent("" + colorCode) + "&";
+        if (colorId === null)
+            throw new Error("The parameter 'colorId' cannot be null.");
+        else if (colorId !== undefined)
+            url_ += "colorId=" + encodeURIComponent("" + colorId) + "&";
+        if (price === null)
+            throw new Error("The parameter 'price' cannot be null.");
+        else if (price !== undefined)
+            url_ += "price=" + encodeURIComponent("" + price) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdatePriceByProductSSINColor(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdatePriceByProductSSINColor(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processUpdatePriceByProductSSINColor(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param orderId (optional) 
+     * @param lineId (optional) 
      * @param qty (optional) 
      * @return Success
      */
