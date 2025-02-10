@@ -138,6 +138,11 @@ export class MembersListComponent extends AppComponentBase {
             this.paginator.changePage(0);
             return;
         }
+        if(!this.primengTableHelper?.predefinedRecordsCountPerPage  || this.primengTableHelper?.predefinedRecordsCountPerPage?.length ==0 ){
+        this.primengTableHelper.predefinedRecordsCountPerPage = [10, 20,30 ,40];
+        this.paginator.rowsPerPageOptions=this.primengTableHelper.predefinedRecordsCountPerPage;
+        }
+        
         const filters = this.filterForm.value
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner()
