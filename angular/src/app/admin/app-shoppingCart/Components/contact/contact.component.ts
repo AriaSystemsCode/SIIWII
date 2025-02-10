@@ -68,6 +68,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.resetSelectedData(); 
         this.setSelectedData();
         this.getContacts()
+       
      //   this.getAllCompaniesData();
     //   this.comNew = JSON.stringify.(localStorage.getItem("comNew"));
 
@@ -116,7 +117,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         else if (type == 'contact'){
             // this.conNew = event?.target?.checked
             localStorage.setItem("conNew",   JSON.stringify( event?.target?.checked));
-            console.log( localStorage.getItem('conNew'))
+         
 
             this.appTransactionsForViewDto.createManualContact = event?.target?.checked
 
@@ -326,7 +327,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     //     }
 
     onchangePhoneType($event) {
-        console.log($event,'num chhhhhh kkkkk')
+
         if ($event?.value) {
         
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.value?.phoneTypeId);
@@ -615,15 +616,17 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     onChangePhoneNumber(event){
-        console.log(event,'num chhhhhh')
+       
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber;
     }
 
     onChangeContact(event:any) {
-        // console.log(event,'eventeventevent')
+      
         if (this.tempContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
             this.tempContact = false
             this.contactFilterValue = "";
+     
+
         }
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
@@ -634,30 +637,35 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         if (event) {
           
             this.allPhoneTypes = event?.phoneList;
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes?.find(x => x.phoneTypeId == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneTypeId);
+
             // this.handlePhoneSearch(event.phoneList)
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
-            // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  event?.phone ;
-            // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail)
+            if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  event?.email ;
         }
 
         else {
+   
+
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes?.find(x => x.phoneTypeId == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneTypeId);
             this.allPhoneTypes = event?.phoneList;
             // this.handlePhoneSearch(event.phoneList)
 
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  event?.phone ;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =     event?.phoneNumber ;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail)
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  event?.emaail ;
         } 
 
-
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes?.find(x => x.phoneTypeId == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneTypeId);
+      
 
         if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType)
            {
+
+
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
             event?.phone == null ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber ;
             event?.email == null ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail ;
@@ -665,6 +673,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
            
 
         else
+      
+
             this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
 
         this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
@@ -714,7 +724,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     handleBranchSearch(event){
     this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
         this.allBranches = result;
-        console.log(this.allBranches,'braaaanchhh')
+     
         this.filteredBranches = this.allBranches.filter(contact =>
             contact.name.toLowerCase().includes(event?.query?.toLowerCase())
         );
