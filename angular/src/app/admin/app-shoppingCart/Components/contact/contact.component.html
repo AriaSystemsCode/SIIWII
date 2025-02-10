@@ -178,13 +178,13 @@
             <p-autoComplete
             #autoComplete
             [dropdown]="!tempAccount"
-            [suggestions]="allContacts"  
+            [suggestions]="filteredContacts "  
             [ngModelOptions]="{standalone: true}"
             *ngIf="activeTab != shoppingCartoccordionTabs.orderInfo"
             [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
             (completeMethod)="handleContactSearch($event);"
             (onSelect)="onChangeContact($event)"
-         
+            (click)="onClearText()"
             (onClear)="onClearText()"
             [placeholder]=" defaultcontactNamePlaceholder"
             field="name" 
