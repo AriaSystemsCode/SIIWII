@@ -137,43 +137,71 @@ export class MarketplaceProductsComponent
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
         // init get products on screen initalization
-        this.showMainSpinner();
-        this._AppMarketplaceItemsServiceProxy
-            .getAll(
-                this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
-                null, // tenant id
-                null,
-                false, // false
-                this.searchInput, // search text
-                null, //null
-                null, //null
-                null, // null
-                [], // depratment
-                null,
-                null,
-                this.seletedOption.value,
-                false,
-                undefined, //'2022-2-2'
-                undefined,
-                undefined,
-                undefined,
-                [], // ids
-                this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
-                this.selectedSort.value,
-                this.skipCount,
-                this.maxResultCount
-            )
-            .pipe(finalize(() => this.hideMainSpinner()))
-            .subscribe((result) => {
-                this.items = result.items;
-                this.pagesNumber = result.totalCount;
-                this.setCurrency();
-            });
+        // this.showMainSpinner();
+        // this._AppMarketplaceItemsServiceProxy
+        //     .getAll(
+        //         this.contactSSIN,
+        //         localStorage.getItem("SellerSSIN"),
+        //         null, // tenant id
+        //         null,
+        //         false, // false
+        //         this.searchInput, // search text
+        //         null, //null
+        //         null, //null
+        //         null, // null
+        //         [], // depratment
+        //         null,
+        //         null,
+        //         this.seletedOption.value,
+        //         false,
+        //         undefined, //'2022-2-2'
+        //         undefined,
+        //         undefined,
+        //         undefined,
+        //         [], // ids
+        //         this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+        //         this.selectedSort.value,
+        //         this.skipCount,
+        //         this.maxResultCount
+        //     )
+        //     .pipe(finalize(() => this.hideMainSpinner()))
+        //     .subscribe((result) => {
+        //         this.items = result.items;
+        //         this.pagesNumber = result.totalCount;
+        //         this.setCurrency();
+        //     });
         // this.getCurrencyCurrent();
 
         this.checkMediaQuery();
     }
+    ngOnInit() {
+        const savedFilters = localStorage.getItem("productFilters");
+        
+        if (savedFilters) {
+            const parsedFilters = JSON.parse(savedFilters);
+    
+          
+            this.appItemListId = parsedFilters.appItemListId ||   this.appItemListId;
+            this.searchInput = parsedFilters.searchText||    this.searchInput;
+            this.selectedDepartments = parsedFilters.selectedDepartments ||  this.selectedDepartments;
+            this.minimumPrice = parsedFilters.minimumPrice ||  this.minimumPrice;
+            this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
+            // this.seletedOption = { value: parsedFilters.selectedOption } 
+            this.onlyAvialbleStock = parsedFilters.onlyAvailableStock || false;
+            this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
+            this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
+            this.startShipData = parsedFilters.startShipData || this.startShipData;
+            this.endShipData = parsedFilters.endShipData || this.endShipData;
+            this.brands = parsedFilters.brands || this.brands ;
+            this.selectedCurrrency = parsedFilters.selectedCurrency ||  this.selectedCurrrency ;
+            this.selectedSort = { value: parsedFilters.selectedSort };
+            this.skipCount = parsedFilters.skipCount ||     this.skipCount;
+            this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
+        }
+    
+        this.getAllProducts(); // Fetch products using restored filters
+    }
+    
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
 
@@ -231,31 +259,57 @@ export class MarketplaceProductsComponent
 
     getAllProducts() {
         this.showMainSpinner();
+    
+        const requestParams = {
+            contactSSIN: this.contactSSIN,
+            sellerSSIN: localStorage.getItem("SellerSSIN"),
+            tenantId: null,
+            appItemListId: this.appItemListId,
+            searchText: this.searchInput,
+            selectedDepartments: this.selectedDepartments,
+            minimumPrice: this.minimumPrice,
+            maximumPrice: this.maximumPrice,
+            // selectedOption: this.seletedOption.value,
+            onlyAvailableStock: this.onlyAvialbleStock,
+            startSoldOutData: this.startSoldOutData,
+            endSoldOutData: this.endSoldOutData,
+            startShipData: this.startShipData,
+            endShipData: this.endShipData,
+            brands: this.brands,
+            selectedCurrency: this.selectedCurrrency?.code || this.selectedCurrrency,
+            selectedSort: this.selectedSort.value,
+            skipCount: this.skipCount,
+            maxResultCount: this.maxResultCount
+        };
+    
+        // Save to localStorage
+        localStorage.setItem("productFilters", JSON.stringify(requestParams));
+    
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
                 localStorage.getItem("SellerSSIN"),
                 null, // tenant id
-                this.appItemListId,
+                requestParams.appItemListId ||  this.appItemListId,
                 false, // false
-                this.searchInput, // search text
+                requestParams.searchText || this.searchInput,
                 null, //null
                 null, //null
                 null, // null
-                this.selectedDepartments, // depratment
-                this.minimumPrice,
-                this.maximumPrice,
-                this.seletedOption.value,
-                this.onlyAvialbleStock,
-                this.startSoldOutData, //'2022-2-2'
-                this.endSoldOutData,
-                this.startShipData,
-                this.endShipData,
-                this.brands, // ids
-                this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
-                this.selectedSort.value,
-                this.skipCount,
-                this.maxResultCount
+                requestParams.selectedDepartments ||     this.selectedDepartments,
+                requestParams.minimumPrice||     this.minimumPrice,
+                requestParams.maximumPrice || this.maximumPrice,
+               this.seletedOption.value,
+                requestParams.onlyAvailableStock ||    this.onlyAvialbleStock,
+                requestParams.startSoldOutData || this.startSoldOutData,
+                requestParams.endSoldOutData ||  this.endSoldOutData,
+                requestParams.startShipData || this.startShipData,
+                requestParams.endShipData ||  this.endShipData,
+                requestParams.brands ||  this.brands, // ids
+                requestParams.selectedCurrency ||  this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                requestParams.selectedSort || this.selectedSort.value,
+                requestParams.skipCount || this.skipCount,
+                requestParams.maxResultCount ||  this.maxResultCount
             )
             .pipe(
                 finalize(() => {
@@ -267,13 +321,16 @@ export class MarketplaceProductsComponent
             .subscribe((result) => {
                 this.items = result.items;
                 this.pagesNumber = result.totalCount;
-                if(result.items.length==1){
-                setTimeout(function() {
-                    this.ProdcutCardComponent.first.viewProduct(this.ProdcutCardComponent.first.product.id)
-                }.bind(this), 500);
-                }
-            });
+                if (result.items.length == 1) {
+                    setTimeout(function() {
+                        this.ProdcutCardComponent.first.viewProduct(this.ProdcutCardComponent.first.product.id)
+                    }.bind(this), 500);
+                    }
+                });
+                
+       
     }
+    
 
     setCurrency() {
         this.selectedCurrrency =
@@ -420,6 +477,7 @@ export class MarketplaceProductsComponent
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
+        localStorage.removeItem("productFilters");
         this.showMainSpinner();
         this._AppMarketplaceItemsServiceProxy
             .getAll(
@@ -453,6 +511,7 @@ export class MarketplaceProductsComponent
                 this.pagesNumber = result.totalCount;
                 this.setCurrency();
             });
+           
     }
 
     ngOnDestroy() {

@@ -1,4 +1,5 @@
 import {
+  
     Component,
     EventEmitter,
     Input,
@@ -55,18 +56,45 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     @Output() handleStockSiwtch: EventEmitter<any> = new EventEmitter();
     @Output() handleBrandsSelection: EventEmitter<any> = new EventEmitter();
     accountSSIN:string;
+    savedFilters :any
+    isSelected: boolean = false
     constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _SycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private _appMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy
+        private _appMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy,
+     
     ) {
 
+        this.savedFilters = localStorage.getItem("productFilters");
+            
+        if (this.savedFilters) {
+            const parsedFilters = JSON.parse(this.savedFilters);
+           
+    
+            this.selectedFile = parsedFilters.selectedDepartments;
+            this.min = parsedFilters.minimumPrice;
+            this.max = parsedFilters.maximumPrice;
+            this.catalogId =  parsedFilters.appItemListId ;
+        
+            this.stockAvailablty = parsedFilters.onlyAvailableStock;
+            this.startSoldout = parsedFilters.startSoldOutData;
+            this.endSoldout = parsedFilters.endSoldOutData;
+            this.startShipDate = parsedFilters.startShipData;
+            this.endShipDate = parsedFilters.endShipData;
+            this.selctedBradns = parsedFilters.brands;
+       
+         
+        }
+        
         this.accountSSIN=localStorage.getItem("SellerSSIN");
         this.getAllProductCAtalogs();
         this.getParentDepartments();
         this.getAllBrands();
+
+   
+        
     }
 
     // get all brands
@@ -271,7 +299,26 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        throw new Error("Method not implemented.");
+        this.savedFilters = localStorage.getItem("productFilters");
+            
+        if (this.savedFilters) {
+            const parsedFilters = JSON.parse(this.savedFilters);
+            console.log(parsedFilters.selectedDepartments,'parsedFilters.selectedDepartments')
+    
+            this.selectedFile = parsedFilters.selectedDepartments;
+            this.min = parsedFilters.minimumPrice;
+            this.max = parsedFilters.maximumPrice;
+            this.catalogId =  parsedFilters.appItemListId ;
+        
+            this.stockAvailablty = parsedFilters.onlyAvailableStock;
+            this.startSoldout = parsedFilters.startSoldOutData;
+            this.endSoldout = parsedFilters.endSoldOutData;
+            this.startShipDate = parsedFilters.startShipData;
+            this.endShipDate = parsedFilters.endShipData;
+            this.selctedBradns = parsedFilters.brands;
+       
+         
+        }
     }
 
     ngOnDestroy(): void {

@@ -30,11 +30,12 @@
                 <div *ngFor="let list of productList">
                     <button
                         (click)="selectCatalog(list)"
-                        [ngClass]="{ selectedCatalog: catalogId === list.id }"
+                        [ngClass]="{ 'selectedCatalog': catalogId == list.id  }"
                         class="btn btn-list w-100 d-flex align-items-center justify-content-lg-start"
                     >
                         <span>{{ list.name }}</span>
                     </button>
+                  
                 </div>
             </p-accordionTab>
             <!-- product list -->
@@ -49,7 +50,9 @@
                         (onNodeSelect)="nodeSelect($event)"
                         (onNodeUnselect)="nodeUnselect($event)"
                         [(selection)]="selectedFile"
+                        [ngClass]="selectedFile > 0 ? 'bgAdd':''"
                     ></p-tree>
+                 
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Brands" [selected]="true" 
@@ -88,6 +91,9 @@
                         (keyup)="handleEndPriceTyping($event)"
                     />
                 </div>
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handleStartPrice.emit('');handleEndPrice.emit('');min = '';max=''" class="clrBtn">    Clear Filter</a>
+                </div>
             </p-accordionTab>
             <p-accordionTab header="Start Ship Date" [selected]="false">
                 <div class="ship-date px-3">
@@ -117,6 +123,9 @@
                             ></p-calendar>
                         </div>
                     </div>
+                </div>
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handleEndShipDate.emit('');handleStartShipDate.emit('');endShipDate = '';startShipDate=''" class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Sold-Out Date" [selected]="false">
