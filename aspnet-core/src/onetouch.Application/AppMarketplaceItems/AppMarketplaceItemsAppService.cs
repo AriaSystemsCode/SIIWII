@@ -1269,6 +1269,14 @@ namespace onetouch.AppMarketplaceItems
                             output.AppItem.EntityDepartmentsNames = new PagedResultDto<string> { Items = (await GetAppItemDepartmentsWithFullNameWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.Id, MaxResultCount = input.GetAppItemAttributesInputForDepartments.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForDepartments.SkipCount, Sorting = input.GetAppItemAttributesInputForDepartments.Sorting })).Items.Select(a => a.EntityObjectCategoryName).ToList() };
                             //MMT30
                         }
+                        //I46[Start]
+                        var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                        var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
+                               && a.TenantId== appItem.TenantOwner
+                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                        if (contactSeller != null)
+                            output.SellerSSIN = contactSeller.SSIN;
+                        //I46[End]
                         //MMT
                         stopwatch.Stop();
                         var elapsed_time = stopwatch.ElapsedMilliseconds;

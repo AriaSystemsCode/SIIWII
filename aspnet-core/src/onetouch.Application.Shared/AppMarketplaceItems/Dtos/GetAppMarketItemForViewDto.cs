@@ -23,7 +23,9 @@ namespace onetouch.AppMarketplaceItems.Dtos
     {
         public AppMarketplaceItemForViewDto AppItem { get; set; }
 
-
+        //I46[Start]
+        public string SellerSSIN { set; get; }
+        //I46[End]
     }
     public class GetAppMarketplaceItemWithPagedAttributesForViewInput : GetAppItemWithPagedAttributesInput
     {
