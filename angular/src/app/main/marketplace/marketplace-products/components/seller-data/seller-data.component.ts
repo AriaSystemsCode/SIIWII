@@ -27,7 +27,7 @@ export class SellerDataComponent  extends AppComponentBase {
     if (localStorage.getItem("SellerId")) {
         this._AppMarketplaceItemsServiceProxy
             //.getAccountImages(Number(localStorage.getItem("SellerId")))
-            .getAccountImages(localStorage.getItem("SellerSSIN"))
+            .getAccountImages(sessionStorage.getItem("SellerSSIN"))
             .subscribe((res) => {
                 console.log(">> sellerData", res);
                 this.sellerData = res;

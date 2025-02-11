@@ -1122,7 +1122,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         JSON.stringify(this.buyerContactSSIN)
                     );
 
-                    localStorage.setItem(
+                    sessionStorage.setItem(
                         "SellerSSIN",
                         JSON.stringify(this.sellerCompanySSIN)
                     );

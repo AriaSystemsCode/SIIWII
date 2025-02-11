@@ -91,21 +91,21 @@ export class MarketplaceProductsComponent
                this.contactSSIN = JSON.parse(localStorage.getItem("contactSSIN"));
         }
 
-        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
-            this.sellerSSIN = JSON.parse(localStorage.getItem("SellerSSIN"));
+        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
+            this.sellerSSIN = JSON.parse(sessionStorage.getItem("SellerSSIN"));
         }
         if (localStorage.getItem("BuyerSSIN") && localStorage.getItem("BuyerSSIN") != "undefined") {
             this.buyerSSIN = JSON.parse(localStorage.getItem("BuyerSSIN"));
         }
 
         // this.getAllProducts()
-        this.isSellerIdExists = localStorage.getItem("SellerSSIN")
+        this.isSellerIdExists = sessionStorage.getItem("SellerSSIN")
             ? true
             : false;
-        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
+        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
             this._AppMarketplaceItemsServiceProxy
                 //.getAccountImages(Number(localStorage.getItem("SellerId")))
-                .getAccountImages(localStorage.getItem("SellerSSIN"))
+                .getAccountImages(sessionStorage.getItem("SellerSSIN"))
                 .subscribe((res) => {
                     console.log(">> sellerData", res);
                     this.sellerData = res;
@@ -141,7 +141,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
+                sessionStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 null,
                 false, // false
@@ -234,7 +234,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
+                sessionStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 this.appItemListId,
                 false, // false
@@ -424,7 +424,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
+                sessionStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 null,
                 false, // false
@@ -456,9 +456,9 @@ export class MarketplaceProductsComponent
     }
 
     ngOnDestroy() {
-        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
+        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
             // localStorage.removeItem("SellerId");
-            localStorage.removeItem("SellerSSIN");
+            sessionStorage.removeItem("SellerSSIN");
             localStorage.removeItem("BuyerSSIN");
         }
         localStorage.setItem("currencyCode", null);
