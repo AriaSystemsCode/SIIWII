@@ -6908,10 +6908,18 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return true;
         }
-
-
-
         //Iteration45[End]
+
+        //I46[Start]
+        public async Task<bool> IsCodeAlreadyExists(string code)
+        {
+            var codeExist = await _appContactRepository.GetAll().FirstOrDefaultAsync(z => z.Code == code && z.TenantId== AbpSession.TenantId);
+            if (codeExist != null)
+                return true;
+            else
+                return false;
+        }
+        //I46{End}
     }
 
 }
