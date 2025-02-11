@@ -161,8 +161,7 @@ const button = document.getElementById("stickyButton");
       button.style.bottom = "20px";
     }
   });
- console.log(this.comNew,'this.comNew')
- console.log(this.conNew,'this.conNew')
+
   }
   ngOnChanges() {
    
