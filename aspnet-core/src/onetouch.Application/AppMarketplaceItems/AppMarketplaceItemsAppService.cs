@@ -287,8 +287,10 @@ namespace onetouch.AppMarketplaceItems
                                         (o.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.TenantId + "/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
                                         : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" + o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
                                    },
-                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false
-
+                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
+                                   //146[Start]
+                                   SellerSSIN = c.SSIN,
+                                   //I46[End]
                                };
                 var orderedItemsFilter = appItems.Where(x => x.AppItem.ShowItem && x.AppItem.Price != null).OrderBy(input.Sorting ?? "AppItem.id asc");
                 var orderedItems = orderedItemsFilter.PageBy(input);
