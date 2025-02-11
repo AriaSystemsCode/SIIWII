@@ -15,7 +15,7 @@
             <app-comment [comment]="comment"></app-comment>
         </div>
         <div class="ml-5" *ngIf="comment.messages">
-            <app-interactions [cartStyle]="cartStyle" [comment]="comment" [entityId]="comment.messages.entityId"
+            <app-interactions [fromTrans]="fromTrans" [cartStyle]="cartStyle" [comment]="comment" [entityId]="comment.messages.entityId"
                 [relatedEntityId]="entityId" [parentId]="comment.messages.id" [threadId]="comment.messages.threadId"
                 [postCreatorUserId]="creatorUserId" (refreshStats)="newCommentAddedHandler()"
                 [commentType]="comment.messages.entityObjectTypeCode" (toName)="getName($event)"
@@ -56,7 +56,7 @@
         <app-comment [comment]="currentComment"></app-comment>
     </div>
     <div class="ml-5" *ngIf="currentComment?.messages">
-        <app-interactions [cartStyle]="cartStyle" [comment]="currentComment"
+        <app-interactions [fromTrans]="fromTrans" [cartStyle]="cartStyle" [comment]="currentComment"
             [entityId]="currentComment?.messages?.entityId" [relatedEntityId]="entityId"
             [parentId]="currentComment?.messages?.id" [threadId]="currentComment?.messages?.threadId"
             [postCreatorUserId]="creatorUserId" (refreshStats)="newCommentAddedHandler()"

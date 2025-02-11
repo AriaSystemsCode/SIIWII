@@ -21,6 +21,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
     @Input() commentType:any;
+    @Input() fromTrans:boolean = false;
     
     @Input() toName:string = '';
 
