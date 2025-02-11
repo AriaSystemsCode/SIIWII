@@ -163,13 +163,22 @@
                                                         </div>
                                                     </div>
                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime' ">
+                                                        <label>
+                                                            {{extraAttr.name}}
+                                                        </label>
                                                         <input type="text" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" name="{{extraAttr.name}}" autocomplete="off" placeholder="{{extraAttr.name}}" class="form-control" bsDatepicker id="extraAttr{{extraAttr.name}}" [(ngModel)]="extraAttr.selectedValues">
                                                     </div>
                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric' ">
+                                                        <label>
+                                                            {{extraAttr.name}}
+                                                        </label>
                                                         <input type="number" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}" [(ngModel)]="extraAttr.selectedValues">
                                                     </div>
                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup && visual.solid">
                                                         <div class="d-flex align-items-baseline justify-content-start ">
+                                                            <label>
+                                                                {{extraAttr.name}}
+                                                            </label>
                                                           <input type="text" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
                                                           name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control"  id="extraAttr{{extraAttr.name}}"
                                                            [(ngModel)]="extraAttr.selectedValues">

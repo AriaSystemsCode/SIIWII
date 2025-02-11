@@ -19,7 +19,7 @@
             </span>
           </div>
           <div class="kt-subheader__toolbar">
-              <div class="kt-subheader__wrapper" *ngIf="!viewMode && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit">
+              <div class="kt-subheader__wrapper" *ngIf="!viewMode && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit) ">
                   <button type="submit" *ngIf="!touched && accountLevel !== accountLevelEnum.Manual && accountInfoTemp.id && !getForEditResult.lastChangesIsPublished" class="btn btn-secondary bg-light" (click)="publishProfile()"
                       [disabled]="accountInfoForm.form.touched && !canPublish" [buttonBusy]="publishing" [busyText]="l('Publishing')">
                       <span >
@@ -299,11 +299,34 @@
                                     </p>
                                 </div>
                             </div>
+
+
+                            
+
+                            <div class="form-group row">
+                                <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger font-weight-bold">*</span>
+                                    {{l("Code")}}
+                                </label>
+                            <div class="col-sm-8">
+                                <app-codes *ngIf="!(accountInfoTemp?.id>0)" [objectType]="entityObjectType" [editMode]=false
+                                    classes="bg-white" [code]="accountInfoTemp?.code"
+                                    placeHolder="{{ 'Account Code' | localize}}" (getCodeValue)="getCodeValue($event)"  [maxlength]="12">
+                                </app-codes>
+                                <app-codes *ngIf="accountInfoTemp?.id>0" [objectType]="entityObjectType" [readonly]="true"
+                                    [editMode]=true classes="bg-white" [code]="accountInfoTemp?.code"
+                                    placeHolder="{{ 'Account Code' | localize}}"
+                                    (getCodeValue)="getCodeValue($event)"
+                                    [maxlength]="12"></app-codes>
+                            </div>
+                            </div>
+
                             <div class="form-group row">
                             <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                 <span class="text-danger font-weight-bold">*</span>
                                 {{l("Name")}}
                             </label>
+
                             <div class="col-sm-8">
 
                                 <input type="text" id="AccountInfoTemp_Name" #nameInput="ngModel"
@@ -315,6 +338,7 @@
                                 <validation-messages [formCtrl]="nameInput"></validation-messages>
                             </div>
                             </div>
+                            
                             <div class="form-group row">
                             <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                 <!-- <span class="text-danger font-weight-bold">*</span> -->
@@ -425,6 +449,47 @@
     
                                 </div>
                                 </div>
+
+                                
+                                <div class="form-group row">
+                                        <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                            <span class="text-danger font-weight-bold">*</span>
+                                            {{l("Ship Via")}}
+                                        </label>
+
+                                    <div class="col-sm-8">
+                                        <p-dropdown
+        id="shipVia"
+        [(ngModel)]="accountInfoTemp.shipViaId"
+        [options]="allShipVia"
+        name="shipVia"
+        styleClass="form-control aria-select"
+        [required]="true"
+        [placeholder]="'PleaseSelect' | localize"
+    >
+    </p-dropdown>
+
+                                    </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                            <span class="text-danger font-weight-bold">*</span>
+                                            {{l("Payment Terms")}}
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <p-dropdown
+                                            id="payTerms"
+                                            [options]="allPaymentTerms"
+                                            name="payTerms"
+                                            styleClass="form-control aria-select"
+                                            [required]="true"
+                                            [placeholder]="'PleaseSelect' | localize"
+                                            [(ngModel)]="accountInfoTemp.paymentTermsId"
+                                        >
+                                        </p-dropdown>
+                                        </div>
+                                        </div>
 
                                 <div class="form-group row">
                                     <label for="colFormLabelSm"

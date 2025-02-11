@@ -7536,6 +7536,68 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
+     * @param entityId (optional) 
+     * @param entityObjectTypeId (optional) 
+     * @return Success
+     */
+    setAsDefault(entityId: number | undefined, entityObjectTypeId: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/SetAsDefault?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        if (entityObjectTypeId === null)
+            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
+        else if (entityObjectTypeId !== undefined)
+            url_ += "entityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetAsDefault(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetAsDefault(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processSetAsDefault(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
@@ -13131,6 +13193,69 @@ export class AppItemsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AppItemExcelResultsDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    validateItemData(body: AppItemValidationInputDTO[] | null | undefined): Observable<AppItemValidationInputDTO[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateItemData";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidateItemData(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidateItemData(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemValidationInputDTO[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemValidationInputDTO[]>;
+        }));
+    }
+
+    protected processValidateItemData(response: HttpResponseBase): Observable<AppItemValidationInputDTO[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AppItemValidationInputDTO.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -25325,6 +25450,61 @@ export class AppTransactionServiceProxy {
             else {
                 result200 = <any>null;
             }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param code (optional) 
+     * @return Success
+     */
+    isCodeAlreadyExists(code: string | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/IsCodeAlreadyExists?";
+        if (code !== undefined && code !== null)
+            url_ += "code=" + encodeURIComponent("" + code) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processIsCodeAlreadyExists(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processIsCodeAlreadyExists(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processIsCodeAlreadyExists(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -63090,6 +63270,7 @@ export class AppEntity implements IAppEntity {
     tenantOwner!: number;
     ssin!: string | undefined;
     timeStamp!: moment.Moment;
+    isDefault!: boolean;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -63168,6 +63349,7 @@ export class AppEntity implements IAppEntity {
             this.tenantOwner = _data["tenantOwner"];
             this.ssin = _data["ssin"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -63244,6 +63426,7 @@ export class AppEntity implements IAppEntity {
         data["tenantOwner"] = this.tenantOwner;
         data["ssin"] = this.ssin;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -63281,6 +63464,7 @@ export interface IAppEntity {
     tenantOwner: number;
     ssin: string | undefined;
     timeStamp: moment.Moment;
+    isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -64877,6 +65061,7 @@ export class AppEntityDto implements IAppEntityDto {
     ssin!: string | undefined;
     tenantOwner!: number;
     timeStamp!: moment.Moment;
+    isDefault!: boolean;
     id!: number;
 
     [key: string]: any;
@@ -64947,6 +65132,7 @@ export class AppEntityDto implements IAppEntityDto {
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
             this.id = _data["id"];
         }
     }
@@ -65015,6 +65201,7 @@ export class AppEntityDto implements IAppEntityDto {
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
         data["id"] = this.id;
         return data;
     }
@@ -65044,6 +65231,7 @@ export interface IAppEntityDto {
     ssin: string | undefined;
     tenantOwner: number;
     timeStamp: moment.Moment;
+    isDefault: boolean;
     id: number;
 
     [key: string]: any;
@@ -72059,6 +72247,246 @@ export interface IAppItemExcelResultsDTO {
     [key: string]: any;
 }
 
+export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
+    variations!: AppItemExcelDto[] | undefined;
+    id!: number;
+    rowNumber!: number;
+    recordType!: string;
+    productType!: string;
+    productClassificationCode!: string | undefined;
+    productClassificationDescription!: string | undefined;
+    productCategoryCode!: string | undefined;
+    productCategoryDescription!: string | undefined;
+    price!: string | undefined;
+    priceA!: string | undefined;
+    priceB!: string | undefined;
+    priceC!: string | undefined;
+    priceD!: string | undefined;
+    currency!: string | undefined;
+    parentCode!: string | undefined;
+    imageType!: string | undefined;
+    imageFolderName!: string | undefined;
+    parentId!: number;
+    extraAttributesValues!: AppItemImpExtrAttributes[] | undefined;
+    extraAttributes!: ExtraAttribute[] | undefined;
+    images!: AppItemImage[] | undefined;
+    code!: string;
+    name!: string;
+    productDescription!: string;
+    entityObjectClassificaionID!: number | undefined;
+    entityObjectCategoryID!: number | undefined;
+    sizeScaleName!: string | undefined;
+    sizeRatioName!: string | undefined;
+    sizeRatioValue!: string | undefined;
+    noOfDim!: string | undefined;
+    d1Name!: string | undefined;
+    d2Name!: string | undefined;
+    d3Name!: string | undefined;
+    d1Sizes!: string | undefined;
+    d2Sizes!: string | undefined;
+    d3Sizes!: string | undefined;
+    d1Pos!: string | undefined;
+    d2Pos!: string | undefined;
+    d3Pos!: string | undefined;
+    sizeCode!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItemValidationInputDTO) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["variations"])) {
+                this.variations = [] as any;
+                for (let item of _data["variations"])
+                    this.variations!.push(AppItemExcelDto.fromJS(item));
+            }
+            this.id = _data["id"];
+            this.rowNumber = _data["rowNumber"];
+            this.recordType = _data["recordType"];
+            this.productType = _data["productType"];
+            this.productClassificationCode = _data["productClassificationCode"];
+            this.productClassificationDescription = _data["productClassificationDescription"];
+            this.productCategoryCode = _data["productCategoryCode"];
+            this.productCategoryDescription = _data["productCategoryDescription"];
+            this.price = _data["price"];
+            this.priceA = _data["priceA"];
+            this.priceB = _data["priceB"];
+            this.priceC = _data["priceC"];
+            this.priceD = _data["priceD"];
+            this.currency = _data["currency"];
+            this.parentCode = _data["parentCode"];
+            this.imageType = _data["imageType"];
+            this.imageFolderName = _data["imageFolderName"];
+            this.parentId = _data["parentId"];
+            if (Array.isArray(_data["extraAttributesValues"])) {
+                this.extraAttributesValues = [] as any;
+                for (let item of _data["extraAttributesValues"])
+                    this.extraAttributesValues!.push(AppItemImpExtrAttributes.fromJS(item));
+            }
+            if (Array.isArray(_data["extraAttributes"])) {
+                this.extraAttributes = [] as any;
+                for (let item of _data["extraAttributes"])
+                    this.extraAttributes!.push(ExtraAttribute.fromJS(item));
+            }
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AppItemImage.fromJS(item));
+            }
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.productDescription = _data["productDescription"];
+            this.entityObjectClassificaionID = _data["entityObjectClassificaionID"];
+            this.entityObjectCategoryID = _data["entityObjectCategoryID"];
+            this.sizeScaleName = _data["sizeScaleName"];
+            this.sizeRatioName = _data["sizeRatioName"];
+            this.sizeRatioValue = _data["sizeRatioValue"];
+            this.noOfDim = _data["noOfDim"];
+            this.d1Name = _data["d1Name"];
+            this.d2Name = _data["d2Name"];
+            this.d3Name = _data["d3Name"];
+            this.d1Sizes = _data["d1Sizes"];
+            this.d2Sizes = _data["d2Sizes"];
+            this.d3Sizes = _data["d3Sizes"];
+            this.d1Pos = _data["d1Pos"];
+            this.d2Pos = _data["d2Pos"];
+            this.d3Pos = _data["d3Pos"];
+            this.sizeCode = _data["sizeCode"];
+        }
+    }
+
+    static fromJS(data: any): AppItemValidationInputDTO {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItemValidationInputDTO();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.variations)) {
+            data["variations"] = [];
+            for (let item of this.variations)
+                data["variations"].push(item.toJSON());
+        }
+        data["id"] = this.id;
+        data["rowNumber"] = this.rowNumber;
+        data["recordType"] = this.recordType;
+        data["productType"] = this.productType;
+        data["productClassificationCode"] = this.productClassificationCode;
+        data["productClassificationDescription"] = this.productClassificationDescription;
+        data["productCategoryCode"] = this.productCategoryCode;
+        data["productCategoryDescription"] = this.productCategoryDescription;
+        data["price"] = this.price;
+        data["priceA"] = this.priceA;
+        data["priceB"] = this.priceB;
+        data["priceC"] = this.priceC;
+        data["priceD"] = this.priceD;
+        data["currency"] = this.currency;
+        data["parentCode"] = this.parentCode;
+        data["imageType"] = this.imageType;
+        data["imageFolderName"] = this.imageFolderName;
+        data["parentId"] = this.parentId;
+        if (Array.isArray(this.extraAttributesValues)) {
+            data["extraAttributesValues"] = [];
+            for (let item of this.extraAttributesValues)
+                data["extraAttributesValues"].push(item.toJSON());
+        }
+        if (Array.isArray(this.extraAttributes)) {
+            data["extraAttributes"] = [];
+            for (let item of this.extraAttributes)
+                data["extraAttributes"].push(item.toJSON());
+        }
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item.toJSON());
+        }
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["productDescription"] = this.productDescription;
+        data["entityObjectClassificaionID"] = this.entityObjectClassificaionID;
+        data["entityObjectCategoryID"] = this.entityObjectCategoryID;
+        data["sizeScaleName"] = this.sizeScaleName;
+        data["sizeRatioName"] = this.sizeRatioName;
+        data["sizeRatioValue"] = this.sizeRatioValue;
+        data["noOfDim"] = this.noOfDim;
+        data["d1Name"] = this.d1Name;
+        data["d2Name"] = this.d2Name;
+        data["d3Name"] = this.d3Name;
+        data["d1Sizes"] = this.d1Sizes;
+        data["d2Sizes"] = this.d2Sizes;
+        data["d3Sizes"] = this.d3Sizes;
+        data["d1Pos"] = this.d1Pos;
+        data["d2Pos"] = this.d2Pos;
+        data["d3Pos"] = this.d3Pos;
+        data["sizeCode"] = this.sizeCode;
+        return data;
+    }
+}
+
+export interface IAppItemValidationInputDTO {
+    variations: AppItemExcelDto[] | undefined;
+    id: number;
+    rowNumber: number;
+    recordType: string;
+    productType: string;
+    productClassificationCode: string | undefined;
+    productClassificationDescription: string | undefined;
+    productCategoryCode: string | undefined;
+    productCategoryDescription: string | undefined;
+    price: string | undefined;
+    priceA: string | undefined;
+    priceB: string | undefined;
+    priceC: string | undefined;
+    priceD: string | undefined;
+    currency: string | undefined;
+    parentCode: string | undefined;
+    imageType: string | undefined;
+    imageFolderName: string | undefined;
+    parentId: number;
+    extraAttributesValues: AppItemImpExtrAttributes[] | undefined;
+    extraAttributes: ExtraAttribute[] | undefined;
+    images: AppItemImage[] | undefined;
+    code: string;
+    name: string;
+    productDescription: string;
+    entityObjectClassificaionID: number | undefined;
+    entityObjectCategoryID: number | undefined;
+    sizeScaleName: string | undefined;
+    sizeRatioName: string | undefined;
+    sizeRatioValue: string | undefined;
+    noOfDim: string | undefined;
+    d1Name: string | undefined;
+    d2Name: string | undefined;
+    d3Name: string | undefined;
+    d1Sizes: string | undefined;
+    d2Sizes: string | undefined;
+    d3Sizes: string | undefined;
+    d1Pos: string | undefined;
+    d2Pos: string | undefined;
+    d3Pos: string | undefined;
+    sizeCode: string | undefined;
+
+    [key: string]: any;
+}
+
 export class VariationAttribute implements IVariationAttribute {
     name!: string | undefined;
     attributeId!: number;
@@ -73698,6 +74126,7 @@ export enum SharingLevels {
 export class GetAppMarketItemForViewDto implements IGetAppMarketItemForViewDto {
     appItem!: AppItemDto;
     selected!: boolean;
+    sellerSSIN!: string | undefined;
 
     [key: string]: any;
 
@@ -73718,6 +74147,7 @@ export class GetAppMarketItemForViewDto implements IGetAppMarketItemForViewDto {
             }
             this.appItem = _data["appItem"] ? AppItemDto.fromJS(_data["appItem"]) : <any>undefined;
             this.selected = _data["selected"];
+            this.sellerSSIN = _data["sellerSSIN"];
         }
     }
 
@@ -73736,6 +74166,7 @@ export class GetAppMarketItemForViewDto implements IGetAppMarketItemForViewDto {
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["selected"] = this.selected;
+        data["sellerSSIN"] = this.sellerSSIN;
         return data;
     }
 }
@@ -73743,6 +74174,7 @@ export class GetAppMarketItemForViewDto implements IGetAppMarketItemForViewDto {
 export interface IGetAppMarketItemForViewDto {
     appItem: AppItemDto;
     selected: boolean;
+    sellerSSIN: string | undefined;
 
     [key: string]: any;
 }
@@ -79450,6 +79882,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactAddressPostalCode!: string | undefined;
     contactAddressCountryId!: number;
     contactAddressCountryCode!: string | undefined;
+    branchCode!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -79498,6 +79931,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactAddressPostalCode = _data["contactAddressPostalCode"];
             this.contactAddressCountryId = _data["contactAddressCountryId"];
             this.contactAddressCountryCode = _data["contactAddressCountryCode"];
+            this.branchCode = _data["branchCode"];
             this.id = _data["id"];
         }
     }
@@ -79544,6 +79978,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["contactAddressPostalCode"] = this.contactAddressPostalCode;
         data["contactAddressCountryId"] = this.contactAddressCountryId;
         data["contactAddressCountryCode"] = this.contactAddressCountryCode;
+        data["branchCode"] = this.branchCode;
         data["id"] = this.id;
         return data;
     }
@@ -79579,6 +80014,7 @@ export interface IAppTransactionContactDto {
     contactAddressPostalCode: string | undefined;
     contactAddressCountryId: number;
     contactAddressCountryCode: string | undefined;
+    branchCode: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -79604,6 +80040,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -79671,6 +80108,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     ssin!: string | undefined;
     tenantOwner!: number;
     timeStamp!: moment.Moment;
+    isDefault!: boolean;
     id!: number;
 
     [key: string]: any;
@@ -79713,6 +80151,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -79816,6 +80255,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
             this.id = _data["id"];
         }
     }
@@ -79856,6 +80296,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -79959,6 +80400,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
         data["id"] = this.id;
         return data;
     }
@@ -79984,6 +80426,7 @@ export interface IGetAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -80051,6 +80494,7 @@ export interface IGetAppTransactionsForViewDto {
     ssin: string | undefined;
     tenantOwner: number;
     timeStamp: moment.Moment;
+    isDefault: boolean;
     id: number;
 
     [key: string]: any;
@@ -80124,6 +80568,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     ssin!: string | undefined;
     tenantOwner!: number;
     timeStamp!: moment.Moment;
+    isDefault!: boolean;
     id!: number;
 
     [key: string]: any;
@@ -80246,6 +80691,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
             this.id = _data["id"];
         }
     }
@@ -80366,6 +80812,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
         data["id"] = this.id;
         return data;
     }
@@ -80439,6 +80886,7 @@ export interface ICreateOrEditAppTransactionsDto {
     ssin: string | undefined;
     tenantOwner: number;
     timeStamp: moment.Moment;
+    isDefault: boolean;
     id: number;
 
     [key: string]: any;
@@ -80665,6 +81113,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -80732,6 +81181,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     ssin!: string | undefined;
     tenantOwner!: number;
     timeStamp!: moment.Moment;
+    isDefault!: boolean;
     id!: number;
 
     [key: string]: any;
@@ -80783,6 +81233,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -80886,6 +81337,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
             this.id = _data["id"];
         }
     }
@@ -80935,6 +81387,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -81038,6 +81491,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
         data["id"] = this.id;
         return data;
     }
@@ -81072,6 +81526,7 @@ export interface IGetAllAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -81139,6 +81594,7 @@ export interface IGetAllAppTransactionsForViewDto {
     ssin: string | undefined;
     tenantOwner: number;
     timeStamp: moment.Moment;
+    isDefault: boolean;
     id: number;
 
     [key: string]: any;
@@ -81547,6 +82003,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     ssin!: string | undefined;
     tenantOwner!: number;
     timeStamp!: moment.Moment;
+    isDefault!: boolean;
     id!: number;
 
     [key: string]: any;
@@ -81688,6 +82145,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
             this.id = _data["id"];
         }
     }
@@ -81827,6 +82285,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
         data["id"] = this.id;
         return data;
     }
@@ -81907,6 +82366,7 @@ export interface IGetOrderDetailsForViewDto {
     ssin: string | undefined;
     tenantOwner: number;
     timeStamp: moment.Moment;
+    isDefault: boolean;
     id: number;
 
     [key: string]: any;

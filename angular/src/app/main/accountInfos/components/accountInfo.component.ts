@@ -73,6 +73,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     allLanguages: LookupLabelDto[];
     allPriceLevel: SelectItem[] = [];
     accountTypes: SelectItem[] = [];
+    allShipVia:LookupLabelDto[];
+    allPaymentTerms :LookupLabelDto[];
 
     logoId:number;
     bannerId:number;
@@ -201,7 +203,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     break;
                 case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ProfileCreateOrEdit] :
                     if(this.isMyAccount) this.getMyAccountDataForEdit()
-                    else if ( this.isManualAccountEdit || this.isExternalAccountEdit) this.getAccountDataForEdit()
+                    else if ( this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView.isConnected) this.getAccountDataForEdit()
                     break;
                 default:
                     break;
@@ -372,7 +374,23 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.getCurrenciesDto();
         this.getPhoneTypes();
        this.allPriceLevel= this.getPriceLevel();
+      this.getShipVia();
+      this.getPaymentTerms();
        this.getAccountTypes();
+    }
+
+    getShipVia() {
+        this._AppEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
+        .subscribe((res) => {
+          this.allShipVia = res;
+        });
+    }
+
+    getPaymentTerms(){
+        this._AppEntitiesServiceProxy.getAllEntitiesByTypeCode('PAYMENT-TERMS')
+        .subscribe((res) => {
+          this.allPaymentTerms = res;
+        });
     }
 
     getAccountTypes(){ 
@@ -1257,5 +1275,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             skipCount,
             maxResultCount + skipCount
         )
+    }
+    getCodeValue(code: string) {
+        this.accountInfoTemp.code = code;
     }
 }

@@ -256,4 +256,18 @@ export class AppEntitiesComponent extends AppComponentBase {
         this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
         // this.active = false
     }
+
+    setAsDefault (_item): void {
+      let recordEntity = _item.appEntity
+        let  id=_item.value ? _item.value :0
+             if(id){
+                 this.showMainSpinner();
+                     this._appEntitiesServiceProxy.setAsDefault(recordEntity.id,recordEntity.entityObjectTypeId)
+             .subscribe(() => {
+                this.notify.success(this.l('Set As Default'));
+                this.hideMainSpinner();
+
+             });
+            }
+ }
 }
