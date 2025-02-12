@@ -76,6 +76,10 @@ export class MarketplaceViewProductComponent
     handleSCreenSelect :number = 0
     chk_Order_by_prepack:boolean [] =[]
     visible: boolean = false;
+    isFromSellerRoom:boolean
+    ismarketPLace:boolean
+    orderNo:any
+    body:any
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -84,9 +88,12 @@ export class MarketplaceViewProductComponent
         private messageService: MessageService,
         private userClickService: UserClickService,
         private router: Router,
+        private _appTransactionServiceProxy: AppTransactionServiceProxy,
         injector: Injector
     ) {
         super(injector);
+        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
+        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace") );
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
@@ -535,6 +542,30 @@ export class MarketplaceViewProductComponent
         }
         
     }
+getBuyerInfoForPO(){
+    this._AppTransactionServiceProxy
+    .getCurrentTenantAccountProfileInformation()
+    .subscribe((res: any) => {
+        // this.buyerComapnyId = res.id;
+        this.body.buyerCompanySSIN = res.accountSSIN;
+        this.body.buyerCompanyName = res.name;
+        this.body.buyerContactPhoneNumber = res.phone;
+        this.body.buyerContactEMailAddress = res.email;
+})
+}
+    getOderNumber(tranType: string, tranName: string) {
+       
+        this._appTransactionServiceProxy
+            .getNextOrderNumber("PO")
+            .pipe(finalize(() => {
+            
+            }))
+            .subscribe((res: any) => {
+                this.orderNo = res;
+              
+            });
+    }
+
 
     addToShoppingCart() {
         // this.confirmationService.confirm({
@@ -563,11 +594,13 @@ export class MarketplaceViewProductComponent
         //     reject: (type: ConfirmEventType) => { },
         // });
 
+if(this.isFromSellerRoom) {
+
 
 
         Swal.fire({
             title: "",
-            text: "Are you sure you want to add ordered quantities to you cart ?",
+            text: "Are you sure your want to add ordered quantities to you cart ?",
             icon: "info",
             showCancelButton: true,
             confirmButtonText:
@@ -640,7 +673,133 @@ export class MarketplaceViewProductComponent
             }
         }
         )
+    }else {
+        // Swal.fire({
+        //     title: "",
+        //     text: "Are you sure your want to start purchase order?",
+        //     icon: "info",
+        //     showCancelButton: true,
+        //     confirmButtonText:
+        //         "Yes",
+        //     cancelButtonText: "No",
+        //     allowOutsideClick: false,
+        //     allowEscapeKey: false,
+        //     backdrop: true,
+        //     customClass: {
+        //         popup: "popup-class",
+        //         icon: "icon-class",
+        //         content: "content-class",
+        //         actions: "actions-class",
+        //         confirmButton: "confirm-button-class2",
+        //     },
+        // }).then((result) => {
+        //     if (result.isConfirmed) {
 
+
+
+
+
+
+
+
+
+       this.body = {
+                    
+                        sellerContactName:null,
+                                                            
+                        buyerContactName: null,
+                        sellerContactId:null,
+                        buyerContactId:this.appSession.user.id,
+                        sellerContactEmailAddress:null,
+                        // buyerContactEmailAddress:this.appSession.user.emailAddress,
+                        buyerContactEmailAddress:  this.body.buyerContactEMailAddress,
+                        buyerContactPhoneNumber: this.body.buyerContactPhoneNumber ,
+                        sellerContactPhoneNumber:null,
+                        buyerCompanyName: this.appSession.tenancyName,
+                        sellerCompanyName: '', // company name condition if dropdown or input
+                        enteredByUserRole: "I'm a Buyer",
+                        code: this.orderNo,
+                        transactionType:  1,
+                        sellerContactSSIN: null,
+                        buyerContactSSIN: null,
+                        sellerCompanySSIN: null,
+                        buyerCompanySSIN:   this.body.buyerCompanySSIN ,
+                        buyerBranchSSIN: '',
+                        buyerBranchName: 'Main' ,
+                        sellerBranchSSIN:  '',
+                        sellerBranchName: 'Main',
+                            completeDate: new Date(),
+                            enteredDate: new Date(),
+                            startDate: new Date(),
+                            availableDate: new Date(),
+                        reference:  "",
+                        priceLevel: "MSRP",
+                        currencyId: this.appSession.tenant.currencyInfoDto.value
+                    }; 
+
+
+
+
+
+
+console.log(this.body,'kkkk booooodddddy')
+
+
+
+            //     /////
+            //     for (let index = 0; index < this.colorsData?.length; index++) {
+            //     if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
+            //         this.productDetails.variations.map((variation: any) => {
+            //             if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+            //                let value= variation?.selectedValues[index];
+            //                     value.edRestAttributes.forEach((attr) => {
+            //                         if (attr.extraAttrName === "SIZE") {
+            //                             attr.values.forEach((sizeValue) => {
+            //                                 sizeValue.orderedQty = sizeValue.orderedPrePacks;
+            //                                 sizeValue.orderedPrePacks = 0;
+            //                             });
+            //                         }
+            //                     });
+            //             }
+            //         });
+            //     }
+            // }
+            //     /////
+
+            //     let bodyRequest: any = {
+            //         appItem: this.productDetails,
+            //     };
+            //     this.showMainSpinner();
+            //     this._AppTransactionServiceProxy
+            //         .addTransactionDetails(
+            //             localStorage.getItem("transNO"), this.orderType,
+            //             bodyRequest
+            //         )
+            //         .pipe(
+            //             finalize(() => {
+            //                 this.hideMainSpinner();
+            //                 localStorage.setItem(
+            //                     "SellerSSIN",
+            //                     JSON.stringify(this.productBodyData.sellerSSIN)
+            //                 );
+            //                 localStorage.setItem(
+            //                     "currencyCode",
+            //                     JSON.stringify(this.productBodyData.currencyCode)
+            //                 );
+
+            //                 this.router.navigateByUrl("app/main/marketplace/products");
+            //             })
+            //         )
+            //         .subscribe(async (res) => {
+            //             console.log(">>", res);
+
+            //             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+
+            //         });
+        //     }
+        // }
+        // )
+    }
     }
 
     goToShowroom() {
@@ -652,7 +811,13 @@ export class MarketplaceViewProductComponent
             "currencyCode",
             JSON.stringify(this.productBodyData.currencyCode)
         );
+        localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+        localStorage.setItem("fromMarketPlace",JSON.stringify(false));
+        this.router.navigateByUrl("app/main/marketplace/products");
+    }
 
+    backToResult() {
+ 
         this.router.navigateByUrl("app/main/marketplace/products");
     }
     
