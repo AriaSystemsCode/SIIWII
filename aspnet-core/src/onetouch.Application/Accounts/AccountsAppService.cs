@@ -1826,6 +1826,32 @@ namespace onetouch.Accounts
             AppContactDto contact = new AppContactDto();
             //var contactSavedId = contact.Id;
             ObjectMapper.Map(input, contact);
+            //I46[Start]
+            if (input.ShipViaId != null)
+            {
+                contact.ShipViaId = input.ShipViaId;
+                var ent = await _appEntityRepository.GetAll().Where(z => z.Id == input.ShipViaId).FirstOrDefaultAsync();
+                if (ent != null)
+                {
+                    contact.ShipViaName = ent.Name;
+                    contact.ShipViaCode = ent.Code;
+                }
+            }
+            if (input.PaymentTermsId != null)
+            {
+                contact.PaymentTermsId = input.PaymentTermsId;
+                var ent = await _appEntityRepository.GetAll().Include(z=>z.EntityExtraData).Where(z => z.Id == input.PaymentTermsId).FirstOrDefaultAsync();
+                if (ent != null)
+                {
+                    contact.PaymentTermsName = ent.Name;
+                    contact.PaymentTermsCode = ent.Code;
+                    if (ent.EntityExtraData != null && ent.EntityExtraData.Count() > 0)
+                    { 
+                       // var disc = ent.EntityExtraData.Where(z=>z.AttributeCode = "")
+                    }
+                }
+            }
+            //I46[End]
             //contact.Id = contactSavedId;
 
             #region stop phone update from here as it overrider by saving in branch update method...

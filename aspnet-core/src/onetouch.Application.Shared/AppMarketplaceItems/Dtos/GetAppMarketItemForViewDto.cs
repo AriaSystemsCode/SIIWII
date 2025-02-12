@@ -15,12 +15,17 @@ namespace onetouch.AppMarketplaceItems.Dtos
     {
         public AppItemDto AppItem { get; set; }
         public bool Selected { get; set; }
+        //I46[Start]
+        public string SellerSSIN { set; get; }
+        //I46[End]
     }
     public class GetAppMarketplaceItemDetailForViewDto
     {
         public AppMarketplaceItemForViewDto AppItem { get; set; }
 
-
+        //I46[Start]
+        public string SellerSSIN { set; get; }
+        //I46[End]
     }
     public class GetAppMarketplaceItemWithPagedAttributesForViewInput : GetAppItemWithPagedAttributesInput
     {
