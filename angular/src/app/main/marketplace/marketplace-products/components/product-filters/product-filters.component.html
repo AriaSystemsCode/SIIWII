@@ -24,7 +24,7 @@
             <!-- product list -->
             <p-accordionTab
                 header="Product List"
-                *ngIf="isSellerIdExists"
+                *ngIf="isSellerIdExists && isFromSellerRoom"
                 [selected]="true"
             >
                 <div *ngFor="let list of productList">
@@ -50,13 +50,11 @@
                         (onNodeSelect)="nodeSelect($event)"
                         (onNodeUnselect)="nodeUnselect($event)"
                         [(selection)]="selectedFile"
-                        [ngClass]="selectedFile > 0 ? 'bgAdd':''"
                     ></p-tree>
-                 
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Brands" [selected]="true" 
-            *ngIf="isSellerIdExists">
+            *ngIf="isSellerIdExists && isFromSellerRoom">
                 <div
                     *ngFor="let brand of brands"
                     class="d-flex align-items-center justify-content-lg-start px-2"
@@ -124,8 +122,9 @@
                         </div>
                     </div>
                 </div>
+                <!--     -->
                 <div class="d-flex justify-content-end my-2 mx-4">
-                    <a        (click)="handleEndShipDate.emit('');handleStartShipDate.emit('');endShipDate = '';startShipDate=''" class="clrBtn">    Clear Filter</a>
+                    <a    (click)="handleEndShipDate.emit(undefined);handleStartShipDate.emit(undefined);endShipDate = undefined;startShipDate=undefined"  class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Sold-Out Date" [selected]="false">
@@ -156,6 +155,10 @@
                             ></p-calendar>
                         </div>
                     </div>
+                </div>
+
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a    (click)="handleEndSoldOutDate.emit(undefined);handleSatrtsoldOutDate.emit(undefined);startSoldout = undefined;endSoldout=undefined"  class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
         </p-accordion>

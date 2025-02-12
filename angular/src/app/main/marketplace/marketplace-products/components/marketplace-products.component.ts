@@ -74,7 +74,8 @@ export class MarketplaceProductsComponent
     sellerSSIN: any;
     buyerSSIN: any;
     contactSSIN:any;
-
+    isFromSellerRoom:boolean
+    ismarketPLace:boolean
     constructor(
         injector: Injector,
         private _router: Router,
@@ -86,7 +87,10 @@ export class MarketplaceProductsComponent
         private eleRef: ElementRef
     ) {
         super(injector);
+        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
+        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace") );
 
+  
         if (localStorage.getItem("contactSSIN") && localStorage.getItem("contactSSIN") != "undefined") {
                this.contactSSIN = JSON.parse(localStorage.getItem("contactSSIN"));
         }
@@ -97,7 +101,7 @@ export class MarketplaceProductsComponent
         if (localStorage.getItem("BuyerSSIN") && localStorage.getItem("BuyerSSIN") != "undefined") {
             this.buyerSSIN = JSON.parse(localStorage.getItem("BuyerSSIN"));
         }
-
+   
         // this.getAllProducts()
         this.isSellerIdExists = localStorage.getItem("SellerSSIN")
             ? true
@@ -190,8 +194,8 @@ export class MarketplaceProductsComponent
             this.onlyAvialbleStock = parsedFilters.onlyAvailableStock || false;
             this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
             this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
-            this.startShipData = parsedFilters.startShipData || this.startShipData;
-            this.endShipData = parsedFilters.endShipData || this.endShipData;
+            this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) :   this.startShipData;
+            this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) :  this.endShipData;
             this.brands = parsedFilters.brands || this.brands ;
             this.selectedCurrrency = parsedFilters.selectedCurrency ||  this.selectedCurrrency ;
             this.selectedSort = { value: parsedFilters.selectedSort };
@@ -477,40 +481,43 @@ export class MarketplaceProductsComponent
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
+        this.skipCount= 0;
+        this.maxResultCount= 12;
         localStorage.removeItem("productFilters");
-        this.showMainSpinner();
-        this._AppMarketplaceItemsServiceProxy
-            .getAll(
-                this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
-                null, // tenant id
-                null,
-                false, // false
-                this.searchInput, // search text
-                null, //null
-                null, //null
-                null, // null
-                [], // depratment
-                null,
-                null,
-                this.seletedOption.value,
-                false,
-                undefined, //'2022-2-2'
-                undefined,
-                undefined,
-                undefined,
-                [], // ids
-                this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
-                this.selectedSort.value,
-                this.skipCount,
-                this.maxResultCount
-            )
-            .pipe(finalize(() => this.hideMainSpinner()))
-            .subscribe((result) => {
-                this.items = result.items;
-                this.pagesNumber = result.totalCount;
-                this.setCurrency();
-            });
+        this.getAllProducts();
+        // this.showMainSpinner();
+        // this._AppMarketplaceItemsServiceProxy
+        //     .getAll(
+        //         this.contactSSIN,
+        //         localStorage.getItem("SellerSSIN"),
+        //         null, // tenant id
+        //         null,
+        //         false, // false
+        //         this.searchInput, // search text
+        //         null, //null
+        //         null, //null
+        //         null, // null
+        //         [], // depratment
+        //         null,
+        //         null,
+        //         this.seletedOption.value,
+        //         false,
+        //         undefined, //'2022-2-2'
+        //         undefined,
+        //         undefined,
+        //         undefined,
+        //         [], // ids
+        //         this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+        //         this.selectedSort.value,
+        //         this.skipCount,
+        //         this.maxResultCount
+        //     )
+        //     .pipe(finalize(() => this.hideMainSpinner()))
+        //     .subscribe((result) => {
+        //         this.items = result.items;
+        //         this.pagesNumber = result.totalCount;
+        //         this.setCurrency();
+        //     });
            
     }
 

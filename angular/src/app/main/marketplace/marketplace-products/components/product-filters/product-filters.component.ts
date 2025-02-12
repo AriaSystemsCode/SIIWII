@@ -32,8 +32,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     files: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
     loading: boolean;
     selectedFile: any;
-    startShipDate: string;
-    endShipDate: string;
+    startShipDate: Date;
+    endShipDate: Date;
     startSoldout: string;
     endSoldout: string;
     timeOut: any;
@@ -58,6 +58,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     accountSSIN:string;
     savedFilters :any
     isSelected: boolean = false
+    isFromSellerRoom:boolean
+    ismarketPLace:boolean
     constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _SycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
@@ -66,27 +68,32 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         private _appMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy,
      
     ) {
-
+        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
+        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace") );
         this.savedFilters = localStorage.getItem("productFilters");
             
         if (this.savedFilters) {
             const parsedFilters = JSON.parse(this.savedFilters);
-           
-    
+        
             this.selectedFile = parsedFilters.selectedDepartments;
             this.min = parsedFilters.minimumPrice;
             this.max = parsedFilters.maximumPrice;
-            this.catalogId =  parsedFilters.appItemListId ;
-        
+            this.catalogId = parsedFilters.appItemListId;
             this.stockAvailablty = parsedFilters.onlyAvailableStock;
+        
+            // Ensure these are Date objects before using them
             this.startSoldout = parsedFilters.startSoldOutData;
             this.endSoldout = parsedFilters.endSoldOutData;
-            this.startShipDate = parsedFilters.startShipData;
-            this.endShipDate = parsedFilters.endShipData;
+        
+            this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
+            this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
+        
             this.selctedBradns = parsedFilters.brands;
-       
-         
+        
+            console.log("Restored startShipDate:", this.startShipDate);
+            console.log("Restored endShipDate:", this.endShipDate);
         }
+        
         
         this.accountSSIN=localStorage.getItem("SellerSSIN");
         this.getAllProductCAtalogs();
@@ -292,10 +299,15 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         this.stockAvailablty = false;
         this.catalogId = null;
         this.collapseAll();
-        this.selectedFile = null;
+        this.selectedFile = []
         this.selctedBradns = [];
         this.min = "";
         this.max = "";
+        this.startShipDate = undefined
+        this.endShipDate = undefined
+        this.endSoldout = undefined
+        this.startSoldout = undefined
+        
     }
 
     ngOnInit(): void {
@@ -313,8 +325,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
             this.stockAvailablty = parsedFilters.onlyAvailableStock;
             this.startSoldout = parsedFilters.startSoldOutData;
             this.endSoldout = parsedFilters.endSoldOutData;
-            this.startShipDate = parsedFilters.startShipData;
-            this.endShipDate = parsedFilters.endShipData;
+            this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
+            this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
             this.selctedBradns = parsedFilters.brands;
        
          
