@@ -186,7 +186,9 @@ namespace onetouch.AppEntities
                                       Name = o.Name,
                                       Code = o.Code,
                                       Notes = o.Notes,
-                                      //ExtraData = o.ExtraData,
+                                      IsDefault = o.IsDefault,
+                                      EntityObjectTypeId = o.EntityObjectTypeId,
+                                      EntityObjectTypeCode = o.EntityObjectTypeCode,
                                       Id = o.Id,
                                       IsHostRecord = o.TenantId == null
                                   },
