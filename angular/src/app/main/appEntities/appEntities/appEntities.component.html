@@ -170,7 +170,7 @@
                                                                         (click)="deleteAppEntity(record.appEntity)">{{l('Delete')}}</a>
                                                                 </li>
                             <li>
-                                <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.isDefault" (click)="setAsDefault(record)">Set as default</a>
+                                <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
                             </li>
                                                                 <li>
                                                                     <a href="javascript:;" *ngIf="entityHistoryEnabled"
@@ -371,7 +371,7 @@
                                                                                 (click)="deleteEntity(record.appEntity)">{{l('Delete')}}</a>
                                                                         </li>
                                                                         <li>
-                                                                            <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.isDefault" (click)="setAsDefault(record)">Set as default</a>
+                                                                            <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
                                                                         </li>
                                                                         <li>
                                                                             <a href="javascript:;"

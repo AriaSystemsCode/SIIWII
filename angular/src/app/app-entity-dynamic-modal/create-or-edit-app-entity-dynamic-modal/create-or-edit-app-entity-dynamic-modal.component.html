@@ -150,6 +150,9 @@
                                                     
                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
                                                         <div class="radio-inline mt-2">
+                                                            <label class="pr-2">
+                                                                {{extraAttr.name}}
+                                                            </label>
                                                             <label class="radio radio-accent radio-primary mr-4" for="extraAttr{{extraAttr.name}}_1" >
                                                                 <input type="radio" (click)="notLookupExtraAttributeOnChange('true',extraAttr)"
                                                                 name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_1" [value]="'true'" [(ngModel)]="extraAttr.selectedValues"/>
@@ -314,7 +317,7 @@
                             </div>
 
                             <div class="form-group d-flex">
-                                <input [disabled]="appEntity.isDefault && appEntity?.id " type="checkbox" id="AppEntity_IsDefault" class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="appEntity.isDefault" name="isDefault"/>
+                                <input  type="checkbox" id="AppEntity_IsDefault" class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="appEntity.isDefault" name="isDefault"/>
                                 <label for="AppEntity_IsDefault" class="pt-2">{{l("Set default value")}} </label>
                             </div>
 

@@ -57850,6 +57850,8 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     branches!: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
     contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
+    shipViaId!: number | undefined;
+    paymentTermsId!: number | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -57927,6 +57929,8 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 for (let item of _data["contactPaymentMethods"])
                     this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
             }
+            this.shipViaId = _data["shipViaId"];
+            this.paymentTermsId = _data["paymentTermsId"];
             this.id = _data["id"];
         }
     }
@@ -58002,6 +58006,8 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             for (let item of this.contactPaymentMethods)
                 data["contactPaymentMethods"].push(item.toJSON());
         }
+        data["shipViaId"] = this.shipViaId;
+        data["paymentTermsId"] = this.paymentTermsId;
         data["id"] = this.id;
         return data;
     }
@@ -58042,6 +58048,8 @@ export interface ICreateOrEditAccountInfoDto {
     branches: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
     contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
+    shipViaId: number | undefined;
+    paymentTermsId: number | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -63744,6 +63752,25 @@ export class AppContact implements IAppContact {
     partnerFkList!: AppContact[] | undefined;
     appContactAddresses!: AppContactAddress[] | undefined;
     appContactPaymentMethods!: AppContactPaymentMethod[] | undefined;
+    shipViaId!: number | undefined;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
+    shipViaCode!: string | undefined;
+    shipViaFk!: AppEntity;
+    paymentTermsId!: number | undefined;
+    paymentTermsCode!: string | undefined;
+    paymentTermsFk!: AppEntity;
+    paymentTermsDiscount!: number;
+    paymentTermsDiscountDays!: number;
+    paymentTermsDiscount2!: number;
+    paymentTermsDiscount2Days!: number;
+    paymentTermsCashOnDelivery!: boolean;
+    paymentTermsUseInstallments!: boolean;
+    paymentTermsNextMonthDay!: number;
+    paymentTermsPaymentType!: string | undefined;
+    paymentTermsEndOfMonth!: boolean;
+    paymentTermsEndOfMonthDays!: number;
+    paymentTermsNetDueDays!: number;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -63836,6 +63863,25 @@ export class AppContact implements IAppContact {
                 for (let item of _data["appContactPaymentMethods"])
                     this.appContactPaymentMethods!.push(AppContactPaymentMethod.fromJS(item));
             }
+            this.shipViaId = _data["shipViaId"];
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
+            this.shipViaCode = _data["shipViaCode"];
+            this.shipViaFk = _data["shipViaFk"] ? AppEntity.fromJS(_data["shipViaFk"]) : <any>undefined;
+            this.paymentTermsId = _data["paymentTermsId"];
+            this.paymentTermsCode = _data["paymentTermsCode"];
+            this.paymentTermsFk = _data["paymentTermsFk"] ? AppEntity.fromJS(_data["paymentTermsFk"]) : <any>undefined;
+            this.paymentTermsDiscount = _data["paymentTermsDiscount"];
+            this.paymentTermsDiscountDays = _data["paymentTermsDiscountDays"];
+            this.paymentTermsDiscount2 = _data["paymentTermsDiscount2"];
+            this.paymentTermsDiscount2Days = _data["paymentTermsDiscount2Days"];
+            this.paymentTermsCashOnDelivery = _data["paymentTermsCashOnDelivery"];
+            this.paymentTermsUseInstallments = _data["paymentTermsUseInstallments"];
+            this.paymentTermsNextMonthDay = _data["paymentTermsNextMonthDay"];
+            this.paymentTermsPaymentType = _data["paymentTermsPaymentType"];
+            this.paymentTermsEndOfMonth = _data["paymentTermsEndOfMonth"];
+            this.paymentTermsEndOfMonthDays = _data["paymentTermsEndOfMonthDays"];
+            this.paymentTermsNetDueDays = _data["paymentTermsNetDueDays"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -63926,6 +63972,25 @@ export class AppContact implements IAppContact {
             for (let item of this.appContactPaymentMethods)
                 data["appContactPaymentMethods"].push(item.toJSON());
         }
+        data["shipViaId"] = this.shipViaId;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
+        data["shipViaCode"] = this.shipViaCode;
+        data["shipViaFk"] = this.shipViaFk ? this.shipViaFk.toJSON() : <any>undefined;
+        data["paymentTermsId"] = this.paymentTermsId;
+        data["paymentTermsCode"] = this.paymentTermsCode;
+        data["paymentTermsFk"] = this.paymentTermsFk ? this.paymentTermsFk.toJSON() : <any>undefined;
+        data["paymentTermsDiscount"] = this.paymentTermsDiscount;
+        data["paymentTermsDiscountDays"] = this.paymentTermsDiscountDays;
+        data["paymentTermsDiscount2"] = this.paymentTermsDiscount2;
+        data["paymentTermsDiscount2Days"] = this.paymentTermsDiscount2Days;
+        data["paymentTermsCashOnDelivery"] = this.paymentTermsCashOnDelivery;
+        data["paymentTermsUseInstallments"] = this.paymentTermsUseInstallments;
+        data["paymentTermsNextMonthDay"] = this.paymentTermsNextMonthDay;
+        data["paymentTermsPaymentType"] = this.paymentTermsPaymentType;
+        data["paymentTermsEndOfMonth"] = this.paymentTermsEndOfMonth;
+        data["paymentTermsEndOfMonthDays"] = this.paymentTermsEndOfMonthDays;
+        data["paymentTermsNetDueDays"] = this.paymentTermsNetDueDays;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -63989,6 +64054,25 @@ export interface IAppContact {
     partnerFkList: AppContact[] | undefined;
     appContactAddresses: AppContactAddress[] | undefined;
     appContactPaymentMethods: AppContactPaymentMethod[] | undefined;
+    shipViaId: number | undefined;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
+    shipViaCode: string | undefined;
+    shipViaFk: AppEntity;
+    paymentTermsId: number | undefined;
+    paymentTermsCode: string | undefined;
+    paymentTermsFk: AppEntity;
+    paymentTermsDiscount: number;
+    paymentTermsDiscountDays: number;
+    paymentTermsDiscount2: number;
+    paymentTermsDiscount2Days: number;
+    paymentTermsCashOnDelivery: boolean;
+    paymentTermsUseInstallments: boolean;
+    paymentTermsNextMonthDay: number;
+    paymentTermsPaymentType: string | undefined;
+    paymentTermsEndOfMonth: boolean;
+    paymentTermsEndOfMonthDays: number;
+    paymentTermsNetDueDays: number;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -66045,6 +66129,23 @@ export class AppContactDto implements IAppContactDto {
     phone3Ext!: string | undefined;
     accountId!: number | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
+    shipViaId!: number | undefined;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
+    shipViaCode!: string | undefined;
+    paymentTermsId!: number | undefined;
+    paymentTermsCode!: string | undefined;
+    paymentTermsDiscount!: number;
+    paymentTermsDiscountDays!: number;
+    paymentTermsDiscount2!: number;
+    paymentTermsDiscount2Days!: number;
+    paymentTermsCashOnDelivery!: boolean;
+    paymentTermsUseInstallments!: boolean;
+    paymentTermsNextMonthDay!: number;
+    paymentTermsPaymentType!: string | undefined;
+    paymentTermsEndOfMonth!: boolean;
+    paymentTermsEndOfMonthDays!: number;
+    paymentTermsNetDueDays!: number;
     id!: number;
 
     [key: string]: any;
@@ -66103,6 +66204,23 @@ export class AppContactDto implements IAppContactDto {
                 for (let item of _data["contactAddresses"])
                     this.contactAddresses!.push(AppContactAddressDto.fromJS(item));
             }
+            this.shipViaId = _data["shipViaId"];
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
+            this.shipViaCode = _data["shipViaCode"];
+            this.paymentTermsId = _data["paymentTermsId"];
+            this.paymentTermsCode = _data["paymentTermsCode"];
+            this.paymentTermsDiscount = _data["paymentTermsDiscount"];
+            this.paymentTermsDiscountDays = _data["paymentTermsDiscountDays"];
+            this.paymentTermsDiscount2 = _data["paymentTermsDiscount2"];
+            this.paymentTermsDiscount2Days = _data["paymentTermsDiscount2Days"];
+            this.paymentTermsCashOnDelivery = _data["paymentTermsCashOnDelivery"];
+            this.paymentTermsUseInstallments = _data["paymentTermsUseInstallments"];
+            this.paymentTermsNextMonthDay = _data["paymentTermsNextMonthDay"];
+            this.paymentTermsPaymentType = _data["paymentTermsPaymentType"];
+            this.paymentTermsEndOfMonth = _data["paymentTermsEndOfMonth"];
+            this.paymentTermsEndOfMonthDays = _data["paymentTermsEndOfMonthDays"];
+            this.paymentTermsNetDueDays = _data["paymentTermsNetDueDays"];
             this.id = _data["id"];
         }
     }
@@ -66159,6 +66277,23 @@ export class AppContactDto implements IAppContactDto {
             for (let item of this.contactAddresses)
                 data["contactAddresses"].push(item.toJSON());
         }
+        data["shipViaId"] = this.shipViaId;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
+        data["shipViaCode"] = this.shipViaCode;
+        data["paymentTermsId"] = this.paymentTermsId;
+        data["paymentTermsCode"] = this.paymentTermsCode;
+        data["paymentTermsDiscount"] = this.paymentTermsDiscount;
+        data["paymentTermsDiscountDays"] = this.paymentTermsDiscountDays;
+        data["paymentTermsDiscount2"] = this.paymentTermsDiscount2;
+        data["paymentTermsDiscount2Days"] = this.paymentTermsDiscount2Days;
+        data["paymentTermsCashOnDelivery"] = this.paymentTermsCashOnDelivery;
+        data["paymentTermsUseInstallments"] = this.paymentTermsUseInstallments;
+        data["paymentTermsNextMonthDay"] = this.paymentTermsNextMonthDay;
+        data["paymentTermsPaymentType"] = this.paymentTermsPaymentType;
+        data["paymentTermsEndOfMonth"] = this.paymentTermsEndOfMonth;
+        data["paymentTermsEndOfMonthDays"] = this.paymentTermsEndOfMonthDays;
+        data["paymentTermsNetDueDays"] = this.paymentTermsNetDueDays;
         data["id"] = this.id;
         return data;
     }
@@ -66200,6 +66335,23 @@ export interface IAppContactDto {
     phone3Ext: string | undefined;
     accountId: number | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
+    shipViaId: number | undefined;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
+    shipViaCode: string | undefined;
+    paymentTermsId: number | undefined;
+    paymentTermsCode: string | undefined;
+    paymentTermsDiscount: number;
+    paymentTermsDiscountDays: number;
+    paymentTermsDiscount2: number;
+    paymentTermsDiscount2Days: number;
+    paymentTermsCashOnDelivery: boolean;
+    paymentTermsUseInstallments: boolean;
+    paymentTermsNextMonthDay: number;
+    paymentTermsPaymentType: string | undefined;
+    paymentTermsEndOfMonth: boolean;
+    paymentTermsEndOfMonthDays: number;
+    paymentTermsNetDueDays: number;
     id: number;
 
     [key: string]: any;
@@ -75141,6 +75293,7 @@ export interface IAppMarketplaceItemForViewDto {
 
 export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplaceItemDetailForViewDto {
     appItem!: AppMarketplaceItemForViewDto;
+    sellerSSIN!: string | undefined;
 
     [key: string]: any;
 
@@ -75160,6 +75313,7 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
                     this[property] = _data[property];
             }
             this.appItem = _data["appItem"] ? AppMarketplaceItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
+            this.sellerSSIN = _data["sellerSSIN"];
         }
     }
 
@@ -75177,12 +75331,14 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
                 data[property] = this[property];
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
+        data["sellerSSIN"] = this.sellerSSIN;
         return data;
     }
 }
 
 export interface IGetAppMarketplaceItemDetailForViewDto {
     appItem: AppMarketplaceItemForViewDto;
+    sellerSSIN: string | undefined;
 
     [key: string]: any;
 }
