@@ -448,7 +448,7 @@
                                                             *ngIf="i === 0"></p-treeTableToggler>
                                                         <label *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                             {{ rowData[col.field] }}</label>
-                                                            <label *ngIf="(col.field=='price')||(col.field=='amount')">
+                                                            <label *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice) || (col.field=='amount')">
                                                                 {{ rowData[col.field] | currency:' ' }}</label>
                                                         <label
                                                             *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
@@ -486,6 +486,26 @@
                                                             </div>
 
                                                         </label>
+
+                                                        <label
+                                                        *ngIf="col.field=='price' && rowNode?.node?.data?.showEditPrice">
+                                                        <div class="editQtyContainer">
+                                                            <div class="fieldset">
+                                                                <input type="number" min="0"
+                                                                    class="form-control inputs form-text"
+                                                                    id="editPrice"
+                                                                    [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                    (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                                <button
+                                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                    (click)="onEditPrice(rowNode);"
+                                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                                    [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                    
                                                     </td>
 
                                                     <td class="p-treeTable text-center"  style="width: 5rem;"  *ngIf="canChange">
@@ -506,7 +526,7 @@
                                                                 aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                                 <div *ngIf="rowNode?.node?.data?.editQty"
                                                                     class="pointer"
-                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty ; rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
                                                                     <a class="link purpleColor p-3">
                                                                         <svg class="ml-3" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
                                                                             <g clip-path="url(#clip0_83_2871)">
@@ -1166,11 +1186,12 @@ height: 48px;"
                                                         *ngIf="i === 0"></p-treeTableToggler>
                                                     <label *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                         {{ rowData[col.field] }}</label>
-                                                        <label *ngIf="(col.field=='price')||(col.field=='amount')">
+                                                        <label *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice)||(col.field=='amount')">
                                                             {{ rowData[col.field] | currency:' ' }}</label>
                                                     <label
                                                         *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
                                                         {{ rowData[col.field] }}</label>
+                                                        
 
                                                     <label *ngIf="col.field=='image'">
                                                         <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
@@ -1204,6 +1225,25 @@ height: 48px;"
                                                         </div>
 
                                                     </label>
+
+                                                    <label
+                                                        *ngIf="col.field=='price'&& rowNode?.node?.data?.showEditPrice">
+                                                        <div class="editQtyContainer">
+                                                            <div class="fieldset">
+                                                                <input type="number" min="0"
+                                                                    class="form-control inputs form-text"
+                                                                    id="editPrice"
+                                                                    [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                    (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                                <button
+                                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                    (click)="onEditPrice(rowNode);"
+                                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                                    [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
+                                                            </div>
+                                                        </div>
+                                                    </label>
                                                 </td>
 
                                                 <td class="p-treeTable"  style="width: 3rem;"  *ngIf="canChange">
@@ -1224,7 +1264,7 @@ height: 48px;"
                                                             aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                             <div *ngIf="rowNode?.node?.data?.editQty"
                                                                 class="pointer"
-                                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty;rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
                                                                 <a class="link purpleColor p-3">
                                                                     <svg class="ml-3" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
                                                                         <g clip-path="url(#clip0_83_2871)">
