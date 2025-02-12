@@ -193,7 +193,7 @@
                                         <tbody
                                             *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                                 order.color.sizes,
-                                                orderIndex
+                                                orderIndex, order.colorIndex
                                             )"
                                         >
                                             <ng-container
@@ -207,7 +207,7 @@
                                                     <td>{{ size.label }}</td>
                                                     <td>
                                                         {{
-                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                                 size.sizeRatio *
                                                                 order?.color?.sizes[0]?.orderedPrePacks
             
@@ -219,7 +219,7 @@
                                                     <td>{{ size.price | currency:' '}}</td>
                                                     <td>
                                                         {{
-                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                            ( size.sizeRatio *
                                                                 order?.color?.sizes[0]?.orderedPrePacks *
                                                                 size.price | currency:' '
@@ -262,7 +262,7 @@
                                                     {{
                                                         calculatePrepackOrderedQTYSum(
                                                             order.color.sizes,
-                                                            orderIndex
+                                                            orderIndex, order.colorIndex
                                                         )
                                                     }}
                                                 </th>
@@ -271,7 +271,7 @@
                                                     {{
                                                         getTotalPrepackSizeAmount(
                                                             order.color.sizes,
-                                                            orderIndex
+                                                            orderIndex,order.colorIndex
                                                         )| currency:' '
                                                     }}
                                                 </th>
@@ -1047,7 +1047,7 @@ top: 4px;">
                             <tbody
                                 *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                     order.color.sizes,
-                                    orderIndex
+                                    orderIndex, order.colorIndex
                                 )"
                             >
                                 <ng-container
@@ -1061,7 +1061,7 @@ top: 4px;">
                                         <td>{{ size.label }}</td>
                                         <td>
                                             {{
-                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                     size.sizeRatio *
                                                     order.color.sizes[0]
                                                         .orderedPrePacks
@@ -1074,7 +1074,7 @@ top: 4px;">
                                         <td>{{ size.price | currency:' '}}</td>
                                         <td>
                                             {{
-                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                ( size.sizeRatio *
                                                     order.color.sizes[0]
                                                         .orderedPrePacks *
@@ -1118,7 +1118,7 @@ top: 4px;">
                                         {{
                                             calculatePrepackOrderedQTYSum(
                                                 order.color.sizes,
-                                                orderIndex
+                                                orderIndex, order.colorIndex
                                             )
                                         }}
                                     </th>
@@ -1127,7 +1127,7 @@ top: 4px;">
                                         {{
                                             getTotalPrepackSizeAmount(
                                                 order.color.sizes,
-                                                orderIndex
+                                                orderIndex,order.colorIndex
                                             )| currency:' '
                                         }}
                                     </th>
@@ -1969,7 +1969,7 @@ top: 4px;">
                                             <tbody
                                                 *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                                     order.color.sizes,
-                                                    orderIndex
+                                                    orderIndex, order.colorIndex
                                                 )"
                                             >
                                                 <ng-container
@@ -1983,7 +1983,7 @@ top: 4px;">
                                                         <td>{{ size.label }}</td>
                                                         <td>
                                                             {{
-                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex]) ? 
+                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex]) ? 
                                                                     size.sizeRatio *
                                                                     order.color.sizes[0]
                                                                         .orderedPrePacks
@@ -1996,7 +1996,7 @@ top: 4px;">
                                                         <td>{{ size.price | currency:' '}}</td>
                                                         <td>
                                                             {{
-                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                                ( size.sizeRatio *
                                                                     order.color.sizes[0]
                                                                         .orderedPrePacks *
@@ -2041,7 +2041,7 @@ top: 4px;">
                                                         {{
                                                             calculatePrepackOrderedQTYSum(
                                                                 order.color.sizes,
-                                                                orderIndex
+                                                                orderIndex, order.colorIndex
                                                             )
                                                         }}
                                                     </th>
@@ -2050,7 +2050,7 @@ top: 4px;">
                                                         {{
                                                             getTotalPrepackSizeAmount(
                                                                 order.color.sizes,
-                                                                orderIndex
+                                                                orderIndex,order.colorIndex
                                                             )| currency:' '
                                                         }}
                                                     </th>
