@@ -771,3 +771,26 @@ padding: 0 !important;
 .orderHeader {
     margin: 8px;
 }
+
+.backBtn {
+
+display: flex;
+
+justify-content: center;
+align-items: center;
+padding: 6px 12px;
+gap: 6px;
+color: #1B101B;
+background: #FFFFFF;
+border: 1px solid #EBEBEB;
+box-shadow: 1px 1px 6px rgba(22, 22, 22, 0.05);
+border-radius: 6px;
+
+}
+.pBtntext {
+    background-color: #4A0D4A !important;
+    border:  none !important;
+    border-radius: 6px !important;
+    padding: 8px 32px !important;
+    color: #fff !important;
+}

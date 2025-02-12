@@ -9,7 +9,7 @@
         <div class="marketplace-products">
             <div class="row">
                 <div class="col-md-12 mb-4 app-seller">
-                    <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
+                    <app-seller-data *ngIf="isSellerIdExists && isFromSellerRoom "></app-seller-data>
                 </div>
                 <div class="col-md-12">
                     <div

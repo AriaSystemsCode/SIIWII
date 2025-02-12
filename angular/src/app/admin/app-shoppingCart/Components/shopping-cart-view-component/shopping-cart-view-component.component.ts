@@ -161,8 +161,7 @@ const button = document.getElementById("stickyButton");
       button.style.bottom = "20px";
     }
   });
- console.log(this.comNew,'this.comNew')
- console.log(this.conNew,'this.conNew')
+
   }
   ngOnChanges() {
    
@@ -740,6 +739,8 @@ onShowVariations(event) {
         "transNO",
         this.appTransactionsForViewDto.code
       );
+      localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+      localStorage.setItem("fromMarketPlace",JSON.stringify(false));
      // this.router.navigateByUrl("app/main/marketplace/products");
 
       if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")

@@ -1108,6 +1108,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.display = false;
                     this.modalClose.emit(false);
                     this.reset();
+                    localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+                    localStorage.setItem("fromMarketPlace",JSON.stringify(false));
                     localStorage.setItem(
                         "SellerId",
                         JSON.stringify(this.sellerCompanyId)
@@ -1148,7 +1150,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         );
                     }
 
-
+                
                      ////////////////////////////
 
                      if(this.currencyCode){
