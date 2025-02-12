@@ -1985,6 +1985,23 @@ namespace onetouch.Accounts
             return await GetAccountForEdit(new EntityDto<long> { Id = newId });
 
         }
+        //I46[Start]
+        public async Task<GetContactDefaultsOutput> GetContactDefaults()
+        {
+            GetContactDefaultsOutput output = new GetContactDefaultsOutput();
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            var account = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
+                   && a.TenantId == AbpSession.TenantId
+                   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+            if (account != null)
+            {
+                output.ShipViaId = account.ShipViaId!=null? long.Parse(account.ShipViaId.ToString()):null;
+                output.PaymentTermsId = account.PaymentTermsId!=null? long.Parse(account.PaymentTermsId.ToString()):null;
+            }
+            return output;
+
+        }
+        //I46[End]
         //MARIAM
         private async Task CreateAdminContact()
         {

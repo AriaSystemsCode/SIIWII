@@ -37,6 +37,11 @@
                     </button>
                   
                 </div>
+
+
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handleCatalogSelections.emit('');catalogId=null" class="clrBtn">    Clear Filter</a>
+                </div>
             </p-accordionTab>
             <!-- product list -->
             <p-accordionTab header="Departments" [selected]="true">
@@ -51,6 +56,9 @@
                         (onNodeUnselect)="nodeUnselect($event)"
                         [(selection)]="selectedFile"
                     ></p-tree>
+                </div>
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handledeDratmentsTreeSelections.emit(null);selectedFile=''" class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Brands" [selected]="true" 
@@ -67,6 +75,10 @@
                         (onChange)="handlebrandsSelction()"
                     ></p-checkbox>
                     <label for="ny">{{ brand.label }}</label>
+                </div>
+
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handleBrandsSelection.emit([]);selctedBradns=[]" class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Price" [selected]="false">

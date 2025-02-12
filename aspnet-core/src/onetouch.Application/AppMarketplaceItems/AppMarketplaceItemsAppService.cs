@@ -1275,7 +1275,22 @@ namespace onetouch.AppMarketplaceItems
                                && a.TenantId== appItem.TenantOwner
                                && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
                         if (contactSeller != null)
+                        {
                             output.SellerSSIN = contactSeller.SSIN;
+                            output.SellerCompanyName = contactSeller.Name;
+                            var contactSellerBranches = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == contactSeller.Id
+                              && a.TenantId == appItem.TenantOwner
+                              && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).OrderBy(z=> z.SSIN).ToListAsync();
+                            if (contactSellerBranches!= null && contactSellerBranches.Count() > 0)
+                            {
+                                var branch = contactSellerBranches.FirstOrDefault();
+                                if (branch != null)
+                                {
+                                   output.SellerBranchSSIN = branch.SSIN;
+                                   output.SellerBranchName = branch.Name;
+                                }
+                            }
+                        }
                         //I46[End]
                         //MMT
                         stopwatch.Stop();

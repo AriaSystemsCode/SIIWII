@@ -481,8 +481,11 @@ export class MarketplaceProductsComponent
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
+        this.selectedDepartments =[]
+        this.brands =[]
         this.skipCount= 0;
         this.maxResultCount= 12;
+
         localStorage.removeItem("productFilters");
         this.getAllProducts();
         // this.showMainSpinner();
