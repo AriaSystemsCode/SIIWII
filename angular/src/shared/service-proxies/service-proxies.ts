@@ -65455,6 +65455,7 @@ export class CreateOrEditAppEntityDto implements ICreateOrEditAppEntityDto {
     entityObjectStatusId!: number | undefined;
     objectId!: number;
     entityObjectTypeCode!: string | undefined;
+    isDefault!: boolean;
     id!: number | undefined;
 
     [key: string]: any;
@@ -65491,6 +65492,7 @@ export class CreateOrEditAppEntityDto implements ICreateOrEditAppEntityDto {
             this.entityObjectStatusId = _data["entityObjectStatusId"];
             this.objectId = _data["objectId"];
             this.entityObjectTypeCode = _data["entityObjectTypeCode"];
+            this.isDefault = _data["isDefault"];
             this.id = _data["id"];
         }
     }
@@ -65525,6 +65527,7 @@ export class CreateOrEditAppEntityDto implements ICreateOrEditAppEntityDto {
         data["entityObjectStatusId"] = this.entityObjectStatusId;
         data["objectId"] = this.objectId;
         data["entityObjectTypeCode"] = this.entityObjectTypeCode;
+        data["isDefault"] = this.isDefault;
         data["id"] = this.id;
         return data;
     }
@@ -65540,6 +65543,7 @@ export interface ICreateOrEditAppEntityDto {
     entityObjectStatusId: number | undefined;
     objectId: number;
     entityObjectTypeCode: string | undefined;
+    isDefault: boolean;
     id: number | undefined;
 
     [key: string]: any;
