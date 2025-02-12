@@ -178,7 +178,7 @@
                                                         <input type="number" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}" [(ngModel)]="extraAttr.selectedValues">
                                                     </div>
                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup && visual.solid">
-                                                        <div class="d-flex align-items-baseline justify-content-start ">
+                                                        <div class="row d-flex align-items-baseline justify-content-start ">
                                                             <label>
                                                                 {{extraAttr.name}}
                                                             </label>
