@@ -1846,8 +1846,50 @@ namespace onetouch.Accounts
                     contact.PaymentTermsName = ent.Name;
                     contact.PaymentTermsCode = ent.Code;
                     if (ent.EntityExtraData != null && ent.EntityExtraData.Count() > 0)
-                    { 
-                       // var disc = ent.EntityExtraData.Where(z=>z.AttributeCode = "")
+                    {
+                        var disc = ent.EntityExtraData.Where(z => z.AttributeId == 30).FirstOrDefault();
+                        if (disc != null && !string.IsNullOrEmpty(disc.AttributeValue))
+                            contact.PaymentTermsDiscount = decimal.Parse(disc.AttributeValue.ToString());
+
+                        var discDays = ent.EntityExtraData.Where(z => z.AttributeId == 31).FirstOrDefault();
+                        if (discDays != null && !string.IsNullOrEmpty(discDays.AttributeValue))
+                            contact.PaymentTermsDiscountDays = int.Parse(discDays.AttributeValue.ToString());
+
+                        var eom = ent.EntityExtraData.Where(z => z.AttributeId == 32).FirstOrDefault();
+                        if (disc != null && !string.IsNullOrEmpty(disc.AttributeValue))
+                            contact.PaymentTermsEndOfMonth = bool.Parse(eom.AttributeValue.ToString());
+
+                        var eomDays = ent.EntityExtraData.Where(z => z.AttributeId == 33).FirstOrDefault();
+                        if (eom != null && !string.IsNullOrEmpty(eomDays.AttributeValue))
+                            contact.PaymentTermsEndOfMonthDays = int.Parse(eomDays.AttributeValue.ToString());
+
+                        var netDueDays = ent.EntityExtraData.Where(z => z.AttributeId == 34).FirstOrDefault();
+                        if (netDueDays != null && !string.IsNullOrEmpty(netDueDays.AttributeValue))
+                            contact.PaymentTermsNetDueDays = int.Parse(netDueDays.AttributeValue.ToString());
+
+                        var disc2 = ent.EntityExtraData.Where(z => z.AttributeId == 35).FirstOrDefault();
+                        if (disc2 != null && !string.IsNullOrEmpty(disc2.AttributeValue))
+                            contact.PaymentTermsDiscount2 = decimal.Parse(disc2.AttributeValue.ToString());
+
+                        var disc2Days = ent.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
+                        if (disc2Days != null && !string.IsNullOrEmpty(disc2Days.AttributeValue))
+                            contact.PaymentTermsDiscount2Days = int.Parse(disc2Days.AttributeValue.ToString());
+
+                        var cod = ent.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
+                        if (cod != null && !string.IsNullOrEmpty(cod.AttributeValue))
+                            contact.PaymentTermsCashOnDelivery = bool.Parse(cod.AttributeValue.ToString());
+
+                        var useInstallment = ent.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
+                        if (useInstallment != null && !string.IsNullOrEmpty(useInstallment.AttributeValue))
+                            contact.PaymentTermsUseInstallments = bool.Parse(useInstallment.AttributeValue.ToString());
+
+                        var nextMonthDays= ent.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
+                        if (nextMonthDays != null && !string.IsNullOrEmpty(nextMonthDays.AttributeValue))
+                            contact.PaymentTermsNextMonthDay = int.Parse(nextMonthDays.AttributeValue.ToString());
+
+                        var payType= ent.EntityExtraData.Where(z => z.AttributeId == 40).FirstOrDefault();
+                        if (payType != null && !string.IsNullOrEmpty(payType.AttributeValue))
+                            contact.PaymentTermsPaymentType = payType.AttributeValue;
                     }
                 }
             }
@@ -1943,6 +1985,23 @@ namespace onetouch.Accounts
             return await GetAccountForEdit(new EntityDto<long> { Id = newId });
 
         }
+        //I46[Start]
+        public async Task<GetContactDefaultsOutput> GetContactDefaults()
+        {
+            GetContactDefaultsOutput output = new GetContactDefaultsOutput();
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            var account = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
+                   && a.TenantId == AbpSession.TenantId
+                   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+            if (account != null)
+            {
+                output.ShipViaId = account.ShipViaId!=null? long.Parse(account.ShipViaId.ToString()):null;
+                output.PaymentTermsId = account.PaymentTermsId!=null? long.Parse(account.PaymentTermsId.ToString()):null;
+            }
+            return output;
+
+        }
+        //I46[End]
         //MARIAM
         private async Task CreateAdminContact()
         {
