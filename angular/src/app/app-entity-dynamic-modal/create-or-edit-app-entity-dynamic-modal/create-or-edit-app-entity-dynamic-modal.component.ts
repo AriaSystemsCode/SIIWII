@@ -709,5 +709,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.visual.solid=value;
         this.visual.image=!value;
     }
+
+    dropdownOptions(validEntries){
+        return validEntries.split('|');
+    }
 }
 
