@@ -6,19 +6,26 @@ using onetouch.AppEntities.Dtos;
 
 namespace onetouch.AccountInfos.Dtos
 {
-    public class GetAccountInfoForEditOutput
-    {
+	public class GetAccountInfoForEditOutput
+	{
 		public CreateOrEditAccountInfoDto AccountInfo { get; set; }
 
-		public string Phone1TypeName { get; set;}
+		public string Phone1TypeName { get; set; }
 
-		public string Phone2TypeName { get; set;}
+		public string Phone2TypeName { get; set; }
 
-		public string Phone3TypeName { get; set;}
+		public string Phone3TypeName { get; set; }
 
-		public string CurrencyName { get; set;}
+		public string CurrencyName { get; set; }
 
-		public string LanguageName { get; set;}
+		public string LanguageName { get; set; }
 		public bool LastChangesIsPublished { get; set; }
 	}
+	//I46[Start]
+	public class GetContactDefaultsOutput
+	{
+		public long? PaymentTermsId { set; get; }
+        public long? ShipViaId { set; get; }
+    }
+    //I46[End]
 }
