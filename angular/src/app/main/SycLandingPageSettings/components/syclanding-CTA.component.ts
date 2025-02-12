@@ -27,6 +27,7 @@ export class CTAComponent extends AppComponentBase implements OnInit {
     addLocal(){
     localStorage.setItem("fromSellerRoom",JSON.stringify(false));
     localStorage.setItem("fromMarketPlace",JSON.stringify(true));
+    localStorage.removeItem("productFilters");
     }
 
 }

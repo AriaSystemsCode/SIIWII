@@ -719,6 +719,7 @@ onShowVariations(event) {
 
 
   onContinueShopping() {
+    localStorage.removeItem("productFilters");
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.appTransactionsForViewDto?.sellerCompanySSIN) {

@@ -1078,6 +1078,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.btnLoader = false
                     localStorage.removeItem("comNew");
                     localStorage.removeItem("conNew");
+                    localStorage.removeItem("productFilters");
                 } ))
                 .subscribe((response: any) => {
                     if (this.setCurrentUserActiveTransaction) {
