@@ -1957,6 +1957,7 @@ namespace onetouch.AppSiiwiiTransaction
             var _accounts = from o in pagedAndFilteredAccounts
                             select new GetContactInformationDto()
                             {
+                                Code= o.Code,
                                 Id = o.Id,
                                 Name = o.Name,
                                 Email = o.EMailAddress,
@@ -3261,6 +3262,7 @@ namespace onetouch.AppSiiwiiTransaction
                 var _accounts = from o in pagedAndFilteredAccounts
                                 select new GetContactInformationDto()
                                 {
+                                    Code = o.Code,
                                     Id = o.Id,
                                     Name = o.Name,
                                     Email = o.EMailAddress,
@@ -4480,7 +4482,8 @@ namespace onetouch.AppSiiwiiTransaction
                                         UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
                                         UserName = user.UserName,
                                         TenantId = int.Parse(user.TenantId.ToString()),
-                                        TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
+                                        TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII",
+                                        Code= con.Code
                                     });
                                 }
                             }

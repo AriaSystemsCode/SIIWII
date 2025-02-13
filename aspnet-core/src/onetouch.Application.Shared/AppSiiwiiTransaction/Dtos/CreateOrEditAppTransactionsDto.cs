@@ -116,9 +116,11 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Phone { set; get; }
         public long? PhoneTypeId { get; set; }
         public string PhoneTypeName { set; get; }
+        public string Code { set; get; }
     }
     public class GetContactInformationDto
     {
+        public string Code { set; get; }
         public long Id { set; get; }
         public string Name{set;get;}
         public string Email { set; get; }

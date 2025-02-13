@@ -185,6 +185,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public int TenantId { set; get; }
         public string TenantName { set; get; }
         public bool CanBeRemoved { set; get; } = true;
+        public string Code { set; get; }
     }
     public class SharingTransactionOptions
     {
