@@ -26,6 +26,10 @@ namespace onetouch.AccountInfos.Dtos
 	{
 		public long? PaymentTermsId { set; get; }
         public long? ShipViaId { set; get; }
+		public string ShipViaCode { set; get; }
+        public string ShipViaName{ set; get; }
+        public string PaymentTermsCode { set; get; }
+        public string PaymentTermsName { set; get; }
     }
     //I46[End]
 }

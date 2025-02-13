@@ -612,18 +612,90 @@ namespace onetouch.AppSiiwiiTransaction
                 input.CurrencyExchangeRate = input.CurrencyExchangeRate == 0 ? 1 : input.CurrencyExchangeRate;
 
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
+                //I46[Start]
+                var accountDefaults =await _accountAppService.GetContactDefaults();
+                //I46[End]
                 //Iteration#37 -MMT [Start]
                 if (appTrans.ShipViaId != null)
                 {
-                    var ent= await _appEntity.GetAll().Where(z => z.Id == appTrans.ShipViaId).FirstOrDefaultAsync();
+                    var ent = await _appEntity.GetAll().Where(z => z.Id == appTrans.ShipViaId).FirstOrDefaultAsync();
                     if (ent != null)
                         appTrans.ShipViaName = ent.Name;
+                }
+                else
+                {
+                    if (input.TransactionType == TransactionType.SalesOrder)
+                    {
+                        var appContact = await _appContactRepository.GetAll().Where(x => x.SSIN == input.BuyerCompanySSIN).FirstOrDefaultAsync();
+                        if (appContact != null && appContact.ShipViaId != 0 && appContact.ShipViaId != null)
+                        {
+                            appTrans.ShipViaId = appContact.ShipViaId;
+                            appTrans.ShipViaCode = appContact.ShipViaCode;
+                            appTrans.ShipViaName = appContact.ShipViaName;
+                        }
+                        else {
+                            appTrans.ShipViaId = accountDefaults.ShipViaId;
+                            appTrans.ShipViaCode = accountDefaults.ShipViaCode;
+                            appTrans.ShipViaName = accountDefaults.ShipViaName;
+                        }
+                    }
+                    else
+                    {
+                        var appContact = await _appContactRepository.GetAll().Where(x => x.SSIN == input.SellerCompanySSIN).FirstOrDefaultAsync();
+                        if (appContact != null && appContact.ShipViaId != 0 && appContact.ShipViaId != null)
+                        {
+                            appTrans.ShipViaId = appContact.ShipViaId;
+                            appTrans.ShipViaCode = appContact.ShipViaCode;
+                            appTrans.ShipViaName = appContact.ShipViaName;
+                        }
+                        else
+                        {
+                            appTrans.ShipViaId = accountDefaults.ShipViaId;
+                            appTrans.ShipViaCode = accountDefaults.ShipViaCode;
+                            appTrans.ShipViaName = accountDefaults.ShipViaName;
+                        }
+                    }
                 }
                 if (appTrans.PaymentTermsId!= null)
                 {
                     var ent = await _appEntity.GetAll().Where(z => z.Id == appTrans.PaymentTermsId).FirstOrDefaultAsync();
                     if (ent != null)
                         appTrans.PaymentTermsName = ent.Name;
+                }
+                else
+                {
+                    if (input.TransactionType == TransactionType.SalesOrder)
+                    {
+                        var appContact = await _appContactRepository.GetAll().Where(x => x.SSIN == input.BuyerCompanySSIN).FirstOrDefaultAsync();
+                        if (appContact != null && appContact.PaymentTermsId != 0 && appContact.PaymentTermsId != null)
+                        {
+                            appTrans.PaymentTermsId = appContact.PaymentTermsId;
+                            appTrans.PaymentTermsCode= appContact.PaymentTermsCode;
+                            appTrans.PaymentTermsName = appContact.PaymentTermsName;
+                        }
+                        else
+                        {
+                            appTrans.PaymentTermsId = accountDefaults.PaymentTermsId;
+                            appTrans.PaymentTermsCode = accountDefaults.PaymentTermsCode;
+                            appTrans.PaymentTermsName = accountDefaults.PaymentTermsName;
+                        }
+                    }
+                    else
+                    {
+                        var appContact = await _appContactRepository.GetAll().Where(x => x.SSIN == input.SellerCompanySSIN).FirstOrDefaultAsync();
+                        if (appContact != null && appContact.PaymentTermsId != 0 && appContact.PaymentTermsId != null)
+                        {
+                            appTrans.PaymentTermsId = appContact.PaymentTermsId;
+                            appTrans.PaymentTermsCode = appContact.PaymentTermsCode;
+                            appTrans.PaymentTermsName = appContact.PaymentTermsName;
+                        }
+                        else
+                        {
+                            appTrans.PaymentTermsId = accountDefaults.PaymentTermsId;
+                            appTrans.PaymentTermsCode = accountDefaults.PaymentTermsCode;
+                            appTrans.PaymentTermsName = accountDefaults.PaymentTermsName;
+                        }
+                    }
                 }
                 //Iteration#37 -MMT [End]
                 if (input.lFromPlaceOrder)

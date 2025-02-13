@@ -77,9 +77,9 @@ namespace onetouch.AppMarketplaceTransactions
         [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
         public virtual string BranchCode { get; set; }
         [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
-        public virtual string CompanyCode { get; }
+        public virtual string CompanyCode { get; set; }
         [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
-        public virtual string ContactCode { get; }
+        public virtual string ContactCode { get; set; }
         //I46[End]
     }
 }

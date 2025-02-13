@@ -1989,14 +1989,25 @@ namespace onetouch.Accounts
         public async Task<GetContactDefaultsOutput> GetContactDefaults()
         {
             GetContactDefaultsOutput output = new GetContactDefaultsOutput();
-            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-            var account = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
-                   && a.TenantId == AbpSession.TenantId
-                   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
-            if (account != null)
+            var paymentTermsId = await _helper.SystemTables.GetEntityObjectTypeId("PAYMENT-TERMS", true);
+            var shipViaId = await _helper.SystemTables.GetEntityObjectTypeId("SHIPVIA", true);
+            var defPaymentTerms = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == paymentTermsId && z.TenantId == AbpSession.TenantId && z.IsDefault==true).FirstOrDefaultAsync();
+            if (defPaymentTerms != null)
             {
-                output.ShipViaId = account.ShipViaId!=null? long.Parse(account.ShipViaId.ToString()):null;
-                output.PaymentTermsId = account.PaymentTermsId!=null? long.Parse(account.PaymentTermsId.ToString()):null;
+                output.PaymentTermsId = defPaymentTerms.Id ;
+                output.PaymentTermsCode = defPaymentTerms.Code;
+                output.PaymentTermsName = defPaymentTerms.Name;
+            }
+            //var account = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
+            //   && a.TenantId == AbpSession.TenantId
+            //   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+            var defShipVia= await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == shipViaId && z.TenantId == AbpSession.TenantId && z.IsDefault == true).FirstOrDefaultAsync();
+            if (defShipVia != null)
+            {
+                output.ShipViaId = defShipVia.Id;
+                output.ShipViaCode = defShipVia.Code;
+                output.ShipViaName = defShipVia.Name;
+
             }
             return output;
 
