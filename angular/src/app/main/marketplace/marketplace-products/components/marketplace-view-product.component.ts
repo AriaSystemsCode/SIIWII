@@ -798,7 +798,7 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
                     .pipe(
                         finalize(() => {
                             this.hideMainSpinner();
-                            localStorage.setItem(
+                            sessionStorage.setItem(
                                 "SellerSSIN",
                                 JSON.stringify(this.productBodyData.sellerSSIN)
                             );
@@ -823,7 +823,7 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
     }
 
     goToShowroom() {
-        localStorage.setItem(
+        sessionStorage.setItem(
             "SellerSSIN",
             JSON.stringify(this.productBodyData.sellerSSIN)
         );
