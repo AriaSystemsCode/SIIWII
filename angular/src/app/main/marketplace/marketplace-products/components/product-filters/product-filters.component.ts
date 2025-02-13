@@ -55,6 +55,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     @Output() handleEndSoldOutDate: EventEmitter<any> = new EventEmitter();
     @Output() handleStockSiwtch: EventEmitter<any> = new EventEmitter();
     @Output() handleBrandsSelection: EventEmitter<any> = new EventEmitter();
+    @Output() clearAll: EventEmitter<any> = new EventEmitter();
     accountSSIN:string;
     savedFilters :any
     isSelected: boolean = false
@@ -332,7 +333,20 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
          
         }
     }
-
+    clearAllFiltrs(){
+        this.resetFilters()
+    this.handleStartPrice.emit('');
+    this.handleEndPrice.emit('');
+    this.handleCatalogSelections.emit('');
+    this.handledeDratmentsTreeSelections.emit(null)
+    this.handleBrandsSelection.emit([]);
+    this.handleEndShipDate.emit(undefined);
+    this.handleStartShipDate.emit(undefined);
+    this.handleEndSoldOutDate.emit(undefined);
+    this.handleSatrtsoldOutDate.emit(undefined);
+    this.clearAll.emit(true);
+    
+}
     ngOnDestroy(): void {
         clearTimeout(this.timeOut);
     }

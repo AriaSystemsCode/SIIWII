@@ -57,6 +57,7 @@
                         class="sortBy"
                         (onChange)="handleSortingChange($event)"
                     ></p-dropdown>
+                 
                     <p-button
                     icon="pi pi-sliders-h"
                     [label]="
@@ -102,6 +103,7 @@
                         (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
                         (handleEndSoldOutDate)="setEndSoldOutDate($event)"
                         (handleBrandsSelection)="selectBrands($event)"
+                        (clearAll)="clearFiltrs($event)"
                         #filters
                     ></app-product-filters>
                 </div>
@@ -316,6 +318,7 @@
             (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
             (handleEndSoldOutDate)="setEndSoldOutDate($event)"
             (handleBrandsSelection)="selectBrands($event)"
+            (clearAll)="clearFiltrs($event)"
             #filters
         ></app-product-filters>
     </div>

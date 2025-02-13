@@ -24,7 +24,7 @@
             <!-- product list -->
             <p-accordionTab
                 header="Product List"
-                *ngIf="isSellerIdExists && isFromSellerRoom"
+                *ngIf="isSellerIdExists || isFromSellerRoom"
                 [selected]="true"
             >
                 <div *ngFor="let list of productList">
@@ -62,7 +62,7 @@
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Brands" [selected]="true" 
-            *ngIf="isSellerIdExists && isFromSellerRoom">
+            *ngIf="isSellerIdExists || isFromSellerRoom">
                 <div
                     *ngFor="let brand of brands"
                     class="d-flex align-items-center justify-content-lg-start px-2"
@@ -173,6 +173,11 @@
                     <a    (click)="handleEndSoldOutDate.emit(undefined);handleSatrtsoldOutDate.emit(undefined);startSoldout = undefined;endSoldout=undefined"  class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
+
+
+            <div class="d-flex justify-content-end my-3 mx-4">
+                <a        (click)="clearAllFiltrs()" class="clrBtn">    Clear All Filters</a>
+            </div>
         </p-accordion>
     </div>
 </div>

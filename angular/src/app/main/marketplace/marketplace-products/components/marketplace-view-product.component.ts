@@ -363,7 +363,7 @@ export class MarketplaceViewProductComponent
     // total of all order qty and price in order by size and prepack
     totalOrderQTY: number = 0;
     totlaOrderPrices: number = 0;
-   /*  calculateTotalOrderPriceAndQty(orders: any) {
+    calculateTotalOrderPriceAndQty(orders: any) {
         let qty = 0;
         let price = 0;
         orders?.map((order: any) => {
@@ -387,54 +387,12 @@ export class MarketplaceViewProductComponent
                 this.totlaOrderPrices = price;
             });
         });
-    } */
+    }
 
-
-        calculateTotalOrderPriceAndQty(orders: any) {
-            let qty = 0;
-            let price = 0;
-            orders.map((order: any) => {
-                order.color.sizes.map((size,index) => {
-
-if(!this.productDetails?.orderByPrePack ){
-    if (!size.orderedQty)
-        size.orderedQty = 0
-    let priceMultibly = size.orderedQty * size.price;
-    qty = qty + size.orderedQty;
-    price = price + priceMultibly;
-}
-                  else
-                  {
-                    if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[order.colorIndex])){ 
-                        let multiby =
-                            size.sizeRatio * order.color.sizes[index].orderedPrePacks;
-                        let priceMultibly = multiby * size.price;
-                        qty = qty + multiby;
-                        price = price + priceMultibly;
-                    } else {
-                        if (!size.orderedPrePacks)
-                            size.orderedPrePacks = 0
-                        let priceMultibly = size.orderedPrePacks * size.price;
-                        qty = qty + size.orderedPrePacks;
-                        price = price + priceMultibly;
-                    }
-                }
-    
-                    this.totalOrderQTY = qty;
-                    this.totlaOrderPrices = price;
-                });
-            });
-        }
-
-   /*  removeColor(color, i: number) {
+    removeColor(color, i: number) {
         this.currentIndex =
-<<<<<<< HEAD
             this.orderSummary?.length === 0 ? 0 : color?.colorIndex;
         if (!this.productDetails?.orderByPrePack) {
-=======
-            this.orderSummary.length === 0 ? 0 : color.colorIndex;
-            if (!this.productDetails?.orderByPrePack) {
->>>>>>> T-SII-20250204.0001
             // this.totalOrderQTY  = this.totalOrderQTY - this.cal
             let qty = 0;
             let price = 0;
@@ -464,64 +422,9 @@ if(!this.productDetails?.orderByPrePack ){
             this.colorsData[color.colorIndex].sizes[0].orderedPrePacks = 0;
         }
         this.orderSummary.splice(i, 1);
-    } */
-
-
-    removeColor(color, i: number) {
-        this.currentIndex =
-            this.orderSummary.length === 0 ? 0 : color.colorIndex;
-
-          if(!this.productDetails?.orderByPrePack)  {
-                let qty = 0;
-                let price = 0;
-                this.orderSummary[i].color.sizes.map((size) => {
-                    let priceMultibly = size.orderedQty * size.price;
-                    qty = qty + size.orderedQty;
-                    price = price + priceMultibly;
-                });
-                this.totlaOrderPrices = this.totlaOrderPrices - price;
-                this.totalOrderQTY = this.totalOrderQTY - qty;
-                this.colorsData[color.colorIndex].sizes.forEach((element) => {
-                    element.orderedQty = 0;
-                });
-            }
-
-            else{
-            if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[color.colorIndex])){ 
-                // this.totalOrderQTY  = this.totalOrderQTY - this.cal
-            let qty = 0;
-            let price = 0;
-            this.orderSummary[i].color.sizes.map((size) => {
-                let priceMultibly = size.orderedPrePacks * size.price;
-                qty = qty + size.orderedPrePacks;
-                price = price + priceMultibly;
-            });
-            this.totlaOrderPrices = this.totlaOrderPrices - price;
-            this.totalOrderQTY = this.totalOrderQTY - qty;
-            this.colorsData[color.colorIndex].sizes.forEach((element) => {
-                element.orderedPrePacks = 0;
-            });
-        } else {
-            let qty = 0;
-            let price = 0;
-            this.orderSummary[i].color.sizes.map((size,index) => {
-                let multiby =
-                    size.sizeRatio *
-                    this.orderSummary[i].color.sizes[index].orderedPrePacks;
-                let priceMultibly = multiby * size.price;
-                qty = qty + multiby;
-                price = price + priceMultibly;
-            });
-        
-            this.totlaOrderPrices = this.totlaOrderPrices - price;
-            this.totalOrderQTY = this.totalOrderQTY - qty;
-            this.colorsData[color.colorIndex].sizes[0].orderedPrePacks = 0;
-        }
-    }
-        this.orderSummary.splice(i, 1);
     }
 
-/*     removeSize(sizeIndex: number, size, color, orderIndex: number) {
+    removeSize(sizeIndex: number, size, color, orderIndex: number) {
         this.currentIndex = color.colorIndex;
         let amount=0;
 
@@ -556,53 +459,6 @@ if(!this.productDetails?.orderByPrePack ){
                     sizes.unshift(preorderItem);
             }
     }
-} */
-
-removeSize(sizeIndex: number, size, color, orderIndex: number) {
-    this.currentIndex = color.colorIndex;
-    let amount=0;
-
-    if(!this.productDetails?.orderByPrePack)  {
-        this.totalOrderQTY =
-        this.totalOrderQTY -
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty;
-     amount =
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty *
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
-    }
-
-    else{
-    if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[color.colorIndex])){ 
-        this.totalOrderQTY =
-        this.totalOrderQTY -
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks;
-     amount =
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks *
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
-    }
-    else{
-        this.totalOrderQTY =
-        this.totalOrderQTY -
-        (this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks);
-
-     amount =
-       this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks *
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
-    }
-    }
-    this.totlaOrderPrices = this.totlaOrderPrices - amount;
-    this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty = 0;
-    this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks=0;
-
-    if (sizeIndex == 0 && this.orderSummary[orderIndex].color.sizes?.length > 0) {
-        const sizes = this.colorsData[this.currentIndex].sizes;
-        const preorderIndex = (this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) ? sizes.findIndex(size => size.orderedQty) : sizes.findIndex(size => size.orderedPrePacks)  ;
-    
-        if (preorderIndex > 0) {
-            const [preorderItem] = sizes.splice(preorderIndex, 1);
-                sizes.unshift(preorderItem);
-        }
-}
 }
 
     // total ordered QTY in order by size
@@ -638,11 +494,11 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
     }
 
     // totla ordered prepack QTY
-    calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number, colorIndex:number) {
+    calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item,index) => {
             let multiby;
-            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[colorIndex])
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item.orderedPrePacks;
 
             else
@@ -656,17 +512,12 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
     }
 
     // totla amount for each size in order by prepack
-    getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number, colorIndex:number) {
+    getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item,index) => {
             let multiby;
-<<<<<<< HEAD
             if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item?.orderedPrePacks;
-=======
-            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[colorIndex])
-                multiby = item.orderedPrePacks;
->>>>>>> T-SII-20250204.0001
 
             else
                 multiby =
@@ -915,9 +766,9 @@ if(this.isFromSellerRoom) {
                                      buyerContactSSIN: this.appSession.user.accountId,
                                      sellerCompanySSIN:  this.productData.sellerSSIN, 
                                      buyerCompanySSIN:   this.buyerDataofPO.buyerCompanySSIN ,
-                                     buyerBranchSSIN: this.buyerbranchPO.buyerBranchSSIN ,
+                                     buyerBranchSSIN: null,
                                      buyerBranchName: '*Main*' ,
-                                     sellerBranchSSIN:           this.sellerbranchPO.sellerBranchSSIN,
+                                     sellerBranchSSIN:  null,
                                      sellerBranchName: '*Main*',
                                          completeDate: moment(new Date).format('YYYY-MM-DD'),
                                          enteredDate: moment(new Date).format('YYYY-MM-DD'),
@@ -1087,7 +938,7 @@ if(this.isFromSellerRoom) {
     }
 
     backToResult() {
- 
+
         this.router.navigateByUrl("app/main/marketplace/products");
     }
     

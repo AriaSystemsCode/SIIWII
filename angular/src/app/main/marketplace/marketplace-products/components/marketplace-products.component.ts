@@ -198,7 +198,8 @@ export class MarketplaceProductsComponent
             this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) :  this.endShipData;
             this.brands = parsedFilters.brands || this.brands ;
             this.selectedCurrrency = parsedFilters.selectedCurrency ||  this.selectedCurrrency ;
-            this.selectedSort = { value: parsedFilters.selectedSort };
+            this.selectedSort = parsedFilters.selectedSort || this.selectedSort;
+            this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
             this.skipCount = parsedFilters.skipCount ||     this.skipCount;
             this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
@@ -273,7 +274,7 @@ export class MarketplaceProductsComponent
             selectedDepartments: this.selectedDepartments,
             minimumPrice: this.minimumPrice,
             maximumPrice: this.maximumPrice,
-            // selectedOption: this.seletedOption.value,
+            selectedOption: this.seletedOption.value, // Add this line
             onlyAvailableStock: this.onlyAvialbleStock,
             startSoldOutData: this.startSoldOutData,
             endSoldOutData: this.endSoldOutData,
@@ -285,7 +286,6 @@ export class MarketplaceProductsComponent
             skipCount: this.skipCount,
             maxResultCount: this.maxResultCount
         };
-    
         // Save to localStorage
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
     
@@ -481,7 +481,8 @@ export class MarketplaceProductsComponent
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
-        this.selectedDepartments =[]
+         this.appItemListId =''
+
         this.brands =[]
         this.skipCount= 0;
         this.maxResultCount= 12;
@@ -549,5 +550,11 @@ export class MarketplaceProductsComponent
         this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
         localStorage.setItem("currencyCode", this.currency);
 
+    }
+    clearFiltrs(value) {
+      if(value){
+        this.resetProducts('')
+      }
+     
     }
 }
