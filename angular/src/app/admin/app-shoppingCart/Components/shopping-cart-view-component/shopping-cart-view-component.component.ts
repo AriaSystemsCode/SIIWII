@@ -917,6 +917,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -935,6 +936,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -951,6 +953,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -974,6 +977,7 @@ onShowVariations(event) {
       rowNode.node.data.amount =  this.amount
       rowNode.node.data.qty =  this.selectedQuantity 
       rowNode.node.data.showEditQty = false;
+      rowNode.node.data.showEditPrice = false;
 
     }else {
 
@@ -994,6 +998,7 @@ onShowVariations(event) {
             if (res) this.notify.info("Successfully Updated.");
             // this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
+            rowNode.node.data.showEditPrice = false;
             this.getShoppingCartData();
             this.hideMainSpinner();
           });
@@ -1026,6 +1031,7 @@ onShowVariations(event) {
               // this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
               // rowNode.node.data.showEditQty = false;
+              //  rowNode.node.data.showEditPrice = false;
               this.hideMainSpinner();
             });
         } else {
@@ -1046,6 +1052,60 @@ onShowVariations(event) {
     }
   }
 }
+
+
+onEditPrice(rowNode) {
+  if(rowNode.node.data.added)
+    rowNode.node.data.showEditPrice = false;
+
+  else {
+  this.showMainSpinner();
+          switch (rowNode.level) {
+            case 0:
+            case 2:
+              this._AppTransactionServiceProxy
+                .updatePriceByProductLineId(
+                  this.orderId,
+                  rowNode.node.data.lineId,
+                  rowNode.node.data.updatedPrice
+                )
+                .subscribe((res) => {
+                  if (res)
+                  this.notify.info("Successfully Updated.");
+                  rowNode.node.data.showEditPrice = false;
+                  rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                  this.getShoppingCartData();
+                  this.hideMainSpinner();
+                });
+              break;
+              case 1:
+                this.showMainSpinner();
+                  this._AppTransactionServiceProxy
+                    .updatePriceByProductSSINColor(
+                      this.orderId,
+                      rowNode.node.data.parentId,
+                      rowNode.node.data.colorCode,
+                      rowNode.node.data.colorId,
+                      rowNode.node.data.updatedPrice
+                    )
+                    .subscribe((res) => {
+                      if (res) this.notify.info("Successfully Updated.");
+                      rowNode.node.data.showEditPrice = false;
+                      rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                      this.getShoppingCartData();
+                      this.hideMainSpinner();
+                    });
+                  break;
+
+     default:
+          break;
+
+                  }
+  }
+    
+  
+}
+
   hide() {
     this.resetData();
     this.modal.hide();
