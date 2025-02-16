@@ -723,7 +723,7 @@ onShowVariations(event) {
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.appTransactionsForViewDto?.sellerCompanySSIN) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         "SellerSSIN",
         JSON.stringify(this.appTransactionsForViewDto?.sellerCompanySSIN)
       );
