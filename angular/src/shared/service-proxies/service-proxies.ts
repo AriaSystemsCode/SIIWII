@@ -1818,6 +1818,57 @@ export class AccountsServiceProxy {
     /**
      * @return Success
      */
+    getContactDefaults(): Observable<GetContactDefaultsOutput> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/GetContactDefaults";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetContactDefaults(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetContactDefaults(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetContactDefaultsOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetContactDefaultsOutput>;
+        }));
+    }
+
+    protected processGetContactDefaults(response: HttpResponseBase): Observable<GetContactDefaultsOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetContactDefaultsOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     unPublishProfile(): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/UnPublishProfile";
         url_ = url_.replace(/[?&]$/, "");
@@ -58717,6 +58768,58 @@ export class PagedResultDtoOfGetMemberForViewDto implements IPagedResultDtoOfGet
 export interface IPagedResultDtoOfGetMemberForViewDto {
     totalCount: number;
     items: GetMemberForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
+    paymentTermsId!: number | undefined;
+    shipViaId!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IGetContactDefaultsOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.paymentTermsId = _data["paymentTermsId"];
+            this.shipViaId = _data["shipViaId"];
+        }
+    }
+
+    static fromJS(data: any): GetContactDefaultsOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetContactDefaultsOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["paymentTermsId"] = this.paymentTermsId;
+        data["shipViaId"] = this.shipViaId;
+        return data;
+    }
+}
+
+export interface IGetContactDefaultsOutput {
+    paymentTermsId: number | undefined;
+    shipViaId: number | undefined;
 
     [key: string]: any;
 }
