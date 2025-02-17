@@ -2076,6 +2076,11 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     input.EntityTypeIdFilter = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
                 }
+                var idList = new List<string>();
+                if (!string.IsNullOrEmpty(input.At_Id))
+                {
+                    idList = input.At_Id.Split(',').ToList();
+                }
 
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
                     .Include(z => z.AppTransactionDetails)
@@ -2095,6 +2100,7 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrEmpty(input.SellerSSIN), e => e.SellerContactSSIN == input.SellerSSIN)
                             .WhereIf(!string.IsNullOrEmpty(input.SellerName), e => e.SellerCompanyName.Contains(input.SellerName))
                             .WhereIf(!string.IsNullOrEmpty(input.BuyerName), e => e.BuyerCompanyName.Contains(input.BuyerName))
+                            .WhereIf(!string.IsNullOrEmpty(input.At_Id), e => idList.Contains(e.Id.ToString()))
                             .WhereIf(input.Since_Id > 0, e => e.Id > input.Since_Id)
                             .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId)
                                         && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
