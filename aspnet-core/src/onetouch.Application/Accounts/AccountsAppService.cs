@@ -660,6 +660,12 @@ namespace onetouch.Accounts
                     output.IsPublished = true;
                 }
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
+                //I46[Start]
+                output.ShipViaId = account.ShipViaId;
+                output.ShipViaName = account.ShipViaName;
+                output.PaymentTermsId = account.PaymentTermsId;
+                output.PaymentTermsName = account.PaymentTermsName;
+                //I46[End]
                 return output;
             }
         }
