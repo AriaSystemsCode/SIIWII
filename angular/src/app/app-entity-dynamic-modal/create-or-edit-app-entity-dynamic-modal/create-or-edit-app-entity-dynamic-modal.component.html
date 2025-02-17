@@ -205,7 +205,8 @@
                                                             [styleClass]="'w-100 custom-dropdown'"
                                                             [(ngModel)]="extraAttr.selectedValues"
                                                             name="extraAttr_{{extraAttr.name}}"
-                                                            [placeholder]="l('Select') + ' ' + extraAttr.name">
+                                                            [placeholder]="l('Select') + ' ' + extraAttr.name"
+                                                            (onChange)="notLookupExtraAttributeOnChange($event.value,extraAttr)">
                                                             </p-dropdown>
                                                         
                                                          </div>

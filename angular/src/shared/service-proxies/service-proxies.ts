@@ -58262,6 +58262,10 @@ export class AccountDto implements IAccountDto {
     entityId!: number | undefined;
     classificationsTotalCount!: number | undefined;
     categoriesTotalCount!: number | undefined;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
+    shipViaId!: number | undefined;
+    paymentTermsId!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -58328,6 +58332,10 @@ export class AccountDto implements IAccountDto {
             this.entityId = _data["entityId"];
             this.classificationsTotalCount = _data["classificationsTotalCount"];
             this.categoriesTotalCount = _data["categoriesTotalCount"];
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
+            this.shipViaId = _data["shipViaId"];
+            this.paymentTermsId = _data["paymentTermsId"];
             this.id = _data["id"];
         }
     }
@@ -58392,6 +58400,10 @@ export class AccountDto implements IAccountDto {
         data["entityId"] = this.entityId;
         data["classificationsTotalCount"] = this.classificationsTotalCount;
         data["categoriesTotalCount"] = this.categoriesTotalCount;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
+        data["shipViaId"] = this.shipViaId;
+        data["paymentTermsId"] = this.paymentTermsId;
         data["id"] = this.id;
         return data;
     }
@@ -58429,6 +58441,10 @@ export interface IAccountDto {
     entityId: number | undefined;
     classificationsTotalCount: number | undefined;
     categoriesTotalCount: number | undefined;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
+    shipViaId: number | undefined;
+    paymentTermsId: number | undefined;
     id: number;
 
     [key: string]: any;
@@ -75421,6 +75437,9 @@ export interface IAppMarketplaceItemForViewDto {
 export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplaceItemDetailForViewDto {
     appItem!: AppMarketplaceItemForViewDto;
     sellerSSIN!: string | undefined;
+    sellerCompanyName!: string | undefined;
+    sellerBranchSSIN!: string | undefined;
+    sellerBranchName!: string | undefined;
 
     [key: string]: any;
 
@@ -75441,6 +75460,9 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
             }
             this.appItem = _data["appItem"] ? AppMarketplaceItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
             this.sellerSSIN = _data["sellerSSIN"];
+            this.sellerCompanyName = _data["sellerCompanyName"];
+            this.sellerBranchSSIN = _data["sellerBranchSSIN"];
+            this.sellerBranchName = _data["sellerBranchName"];
         }
     }
 
@@ -75459,6 +75481,9 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["sellerSSIN"] = this.sellerSSIN;
+        data["sellerCompanyName"] = this.sellerCompanyName;
+        data["sellerBranchSSIN"] = this.sellerBranchSSIN;
+        data["sellerBranchName"] = this.sellerBranchName;
         return data;
     }
 }
@@ -75466,6 +75491,9 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
 export interface IGetAppMarketplaceItemDetailForViewDto {
     appItem: AppMarketplaceItemForViewDto;
     sellerSSIN: string | undefined;
+    sellerCompanyName: string | undefined;
+    sellerBranchSSIN: string | undefined;
+    sellerBranchName: string | undefined;
 
     [key: string]: any;
 }

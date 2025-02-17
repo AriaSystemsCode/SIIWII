@@ -174,11 +174,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
    paymentTermsId; 
    shipViaId;
     GetContactDefaults(){
-        // this._AccountsServiceProxy.getContactDefaults()
-        // .subscribe((res)=>{
-        //     this.paymentTermsId= res.; 
-        //     this.shipViaId=res. ; 
-        // });
+        this._AccountsServiceProxy.getContactDefaults()
+        .subscribe((res)=>{
+            this.paymentTermsId= res.paymentTermsId; 
+            this.shipViaId=res.shipViaId; 
+        });
     }
     handleRoutingChange(){
         this._route.queryParamMap.subscribe(paramsObj => {
@@ -453,9 +453,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 this.accountInfoTemp.tradeName = this.appSession.tenant.name
             }
 
-          
-                this.accountInfoTemp.paymentTermsId= result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
-                this.accountInfoTemp.shipViaId=  result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
+           
+                this.accountInfoTemp.paymentTermsId=  !result?.accountInfo?.id  ?  this.paymentTermsId  :  
+                            result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+                this.accountInfoTemp.shipViaId= 
+                !result?.accountInfo?.id  ?  this.shipViaId  :  
+                   result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
 
         }
     }
@@ -530,9 +533,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     if(result){
                         this.languageIdName=result.languageName;
                         this.accountInfoTemp.languageId=result.accountInfo.languageId;
-                        this.accountInfoTemp.paymentTermsId= result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
-                this.accountInfoTemp.shipViaId=  result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
-
+                        this.accountInfoTemp.paymentTermsId=  !result?.accountInfo?.id  ?  this.paymentTermsId  :  
+                        result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+            this.accountInfoTemp.shipViaId= 
+            !result?.accountInfo?.id  ?  this.shipViaId  :  
+               result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
                     }
 
                 })
@@ -540,8 +545,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             }
 
             else{
-                this.accountInfoTemp.paymentTermsId= result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
-                this.accountInfoTemp.shipViaId=  result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
+                this.accountInfoTemp.paymentTermsId= !result?.accountInfo?.id  ?  this.paymentTermsId  :  
+                result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+    this.accountInfoTemp.shipViaId= 
+    !result?.accountInfo?.id  ?  this.shipViaId  :  
+       result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
             }
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
@@ -796,7 +804,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             return
         }
         this.saving = true;
-        if(this.accountLevel === AccountLevelEnum.Profile) {
+
+     
+        if(this.accountLevel === AccountLevelEnum.Profile && !this.accountDataForView?.isConnected) {
             
         if( this.accountInfoOldCurrencyId   && this.accountInfoTemp.currencyId !=this.accountInfoOldCurrencyId ){
                         //    this.l('The default currency of all prices that you assign to all products will be affected by this change. Do you need to proceed with this change?'),
@@ -820,7 +830,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.saveMyAccount()
             
         } else {
-            this.accountInfoTemp.accountLevel = this.accountLevel
+            this.accountInfoTemp.accountLevel = !this.accountDataForView?.isConnected ?  this.accountLevel  : 1;
             this.saveExternalOrManualAccount()
         }
     }
