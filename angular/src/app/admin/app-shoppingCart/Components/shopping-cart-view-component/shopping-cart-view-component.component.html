@@ -547,8 +547,10 @@
                                         </button>
 
 
-                                        <form [formGroup]="filterForm" *ngIf="!addLine" style="display: flex; justify-content: space-evenly; gap: 30px;">
-                                            <div class="mb-3 w-100">
+                                        <form [formGroup]="filterForm" *ngIf="!addLine" style="">
+                                            <div class="mb-3 w-100 row ">
+                                              <div class="d-flex justify-content-between w-100">
+                                                <div class="col-md-6 col-12">
                                               <label class="form-label" style="white-space: nowrap;">Product Variation Code</label>
                                               <p-dropdown
                                                 [options]="displayedVariations"
@@ -563,7 +565,7 @@
                                               >
                                                 <!-- Custom item template -->
                                                 <ng-template let-option pTemplate="item">
-                                                  <div>{{ option.appItem.manufacturerCode }} - {{ option.appItem.name }}</div>
+                                                  <div>{{ option.appItem.manufacturerCode }} </div>
                                                 </ng-template>
                                           
                                                 <!-- Custom footer template for "Show More" button -->
@@ -574,7 +576,422 @@
                                                 </ng-template>
                                               </p-dropdown>
                                             </div>
+                                            <div class="col-md-6 col-12">
+                                            <label class="form-label" style="white-space: nowrap;">Product Color</label>
+                                              <p-dropdown
+                                           
+                                              [options]="colorsData"
+                                              [filter]="true"
+                                              optionLabel="colorName"
+                                              placeholder="Please Select"
+                                              (onChange)="onColorSelect($event)"
+                                              #dropdown
+                                            >
+                                            <!-- [(ngModel)]="selectedVariation"
+                                            (onFilter)="handleVarSearch($event, dropdown)"
+                                               formControlName="selectedVariation"
+                                          -->
+                                              <!-- Custom item template -->
+                                              <ng-template let-option pTemplate="item">
+                                                <div>{{ option.colorName }} </div>
+                                              </ng-template>
+                                        
+                                         
+                                            </p-dropdown>
+                                        </div>
+
+                                        </div>
+                                            
+                                            </div>
+                                            <div class="d-flex row">
+                                                <div class="col-md-6 col-12 d-flex" *ngIf="displayProductdata">
+                                                    <img
+                                              
+                                              
+                                                    [src]="
+                                                        attachmentBaseUrl + '/' + selectedColorImg
+                                                    "
+                                                    alt="images slides"
+                                                    style="width: 80px;margin-right: 5px; border-radius: 6px;height: 140px;"
+                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                              
+                                                />
+                                                <div class="details  d-flex flex-column ">
+                                                
+                                                <div
+                                                    class="ssin_price align-items-center justify-content-between"
+                                                >
+                                           
+                                                    <div class="d-flex mb-1 align-items-center">
+                                                        <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 4px;white-space: break-space !important;">{{productDetails?.name}}</p>
+                                                        <div class="type ml-3 pt-2 text-center">
+                                                            <p class="mb-0 " style="white-space: nowrap;">  {{
+                                                                productDetails?.orderByPrePack === false
+                                                                    ? "By Size"
+                                                                    : "By Prepack"
+                                                            }}</p>
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="price mb-4">
+                                                        <!-- show msrp price and range in this product has no special pricing -->
+                                                        <div
+                                                            class="msrp d-flex "
+                                                        >
+                                                            <h5 class="mr-2" style="color: black !important;font-size: 16px;">MSRP:  </h5>
+                                                            <h5>
+                                                                <!-- {{
+                                                                    productDetails?.appItemPriceInfos[0]
+                                                                        .currencySymbol
+                                                                }} -->
+                                                                {{
+                                                                   currencySymbol
+                                                                }}
+                                                                {{ productDetails?.minMSRP }}
+                                                            </h5>
+                                                            <span
+                                                                *ngIf="
+                                                                    productDetails?.minMSRP !==
+                                                                    productDetails?.maxMSRP
+                                                                "
+                                                            >
+                                                                -
+                                                            </span>
+                                                            <h5
+                                                                *ngIf="
+                                                                    productDetails?.minMSRP !==
+                                                                    productDetails?.maxMSRP
+                                                                "
+                                                            >
+                                                                <!-- {{
+                                                                    productDetails?.appItemPriceInfos[0]
+                                                                        ?.currencySymbol
+                                                                }} -->
+                                                                {{
+                                                                    currencySymbol
+                                                                 }}
+                                                                {{ productDetails?.maxMSRP }}
+                                                            </h5>
+                                                            <h5> /EAC </h5>
+                                                        </div>
+                                                        <div 
+                                                        class="msrp d-flex justify-content-between align-items-center"
+                                                    >
+                                                    <div>
+                                                        <div class="msrp d-flex align-items-center ">
+                                                        <h5 class="mr-2" style="color: black !important;font-size: 14px;white-space: nowrap;;">Special Price:  </h5>
+                                                          
+                                                     
+                                                        
+                                                        <h5 *ngIf="showEditSpecialPrice"> 
+                                                                
+                                                            {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
+                                                        </h5>
+                            
+                                                        <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="mx-1  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+                            
+                                                    
+                                                    </div>
+                                                    </div>
+                                              
+                                                </div>
+                                               
+                                             <div      class="msrp d-flex justify-content-between"   *ngIf="!showEditSpecialPrice">
+                                                <label class="ml-3"
+                                              >
+                                                <div class="editQtyContainer">
+                                                    <div class="fieldset">
+                                                        <div class="input-group">
+                                                          <input type="number" min="0" class="form-control inputs form-text editQty" id="editQty" style="
+                                                          height: 44px;
+                                                          border-radius: 8px;
+                                                          border: 2px solid #4A0D4A;"
+                                                                   formControlName="updatedSpecialPrice"
+                                                                >
+                                                                 
+                                                                 <div  class="input-group-append position-absolute " style="right: -8px;  z-index: 99;">
+                                                                    <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
+                                                                      <i class="clear-text fa fa-1x fa-times fa-2x" style="color: #777777;"></i>
+                                                                    </button>
+                                                                  </div>
+                                                          <div class="input-group-append position-absolute" style="
+                                                           z-index: 99;     height: 43px;
+                            right: 40px;
+                            top: 4px;">                   
+                      
+                                                            <button class="btn btn-save  mr-0 pr-0" style="background-color: #4A0D4A !important;
+                                                            padding-left: 9px;
+                                                            border-radius: 0px;" (click)=" visibleSP = true ;" 
+                                                                
+                                                                    [disabled]="updatedSpecialPrice < 0  ">
+                                                              <i class="fa fa-check fa-2x" style="color: #777777;"></i>
+                                                              <!-- ||
+                                                                   updatedSpecialPrice == productDetails.maxSpecialPrice -->
+                                                            </button>
+                                                          
+                                                          </div>
+                                                        </div>
+                                                        
+                                                      </div>
+                                                </div>
+                                             
+                                            </label>
+                            
+                                  
+                                             </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+
+                                                </div>
+                                                 <div *ngIf="displayColordata"
+                                      class=" col-md-6 col-12"
+                                                [title]="selectedColorName"
+                                                position="top"
+                                                tooltipPositionStyleClass="custom-tooltip"
+                                            >
+                                      
+                                                <div   style=" margin-right :10px;width: 85px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"  >
+                                            <div
+                                            *ngIf="
+                                            selectedColorName&&
+                                                !selectedColorImg
+                                            "
+                                            class="colorBox"
+                                            [ngStyle]="{'background-color': selectedColorCode}"
+                                           
                                           
+                                        ></div>
+                                        <img
+                                            *ngIf="
+                                                (selectedColorImg === null &&
+                                                selectedColorCode === null) ||
+                                                selectedColorImg !== null
+                                            "
+                                      
+                                            [src]="
+                                                attachmentBaseUrl + '/' + selectedColorImg
+                                            "
+                                            alt="images slides"
+                                            class="imageSlides"
+                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                      
+                                        />
+                                        <div class="" style="font-size: 10px;">
+                                      
+                                           
+                                            <p class="card-text desc fw-bold" >
+                                                {{   selectedColorCode?.slice(0,8)}} <span *ngIf="selectedColorCode?.length > 8">...</span>
+                                            </p>
+                                            <p class="seller" >{{ selectedColorName?.slice(0,13)  }} <span *ngIf="selectedColorName?.length > 13">...</span> </p>  
+                                    
+                                         
+                                        </div>
+                                        </div>
+                                            </div>
+                                            </div>
+
+
+<div *ngIf="displaysizesdata">
+                        <!-- start order by size -->
+                        <h5
+                            *ngIf="!productDetails?.orderByPrePack"
+                            class="my-4"
+                            style="text-decoration: none"
+                        >
+                            Order By Size
+                        </h5>
+                        <table
+                            *ngIf="!productDetails?.orderByPrePack"
+                            class="table text-center table-bordered table-white"
+                        >
+                            <thead>
+                                <tr>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Available QTY</th>
+                                    <th scope="col">Ordered</th>
+                                </tr>
+                            </thead>
+                            <tbody >
+                                <tr
+                                    *ngFor="
+                                        let size of filteredColors[currentIndex]?.sizes;
+                                        let i = index
+                                    "
+                                >
+                                    <td>{{ size.label }}</td>
+                                    <td>{{ size.stockAvailability }}</td>
+                                    <td>
+                                        <p-inputNumber
+                                            [(ngModel)]="size.orderedQty"
+                                            mode="decimal"
+                                            [showButtons]="true"
+                                            inputId="minmax-buttons"
+                                            [min]="0"
+                                            (ngModelChange)="
+                                                onNumberChange(
+                                                    $event,
+                                                    filteredColors[currentIndex],
+                                                    i
+                                                )
+                                            "
+                                        >
+                                        </p-inputNumber>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- end order by size -->
+
+                        <!-- start order by prepack -->
+                        <h5
+                            *ngIf="productDetails?.orderByPrePack"
+                            class="my-4"
+                            style="text-decoration: none;color:black  !important"
+                        >
+                            Prepack Definition
+                        </h5>
+                        <table
+                            *ngIf="productDetails?.orderByPrePack"
+                            class="table text-center table-bordered table-white"
+                        >
+                            <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                                <tr *ngIf="filteredColors?.[currentIndex]?.sizes?.length">
+                                    <th  style="background-color: #F8F8F8;">Size</th>
+                                    <td
+                                        *ngFor="
+                                            let size of filteredColors[currentIndex]?.sizes
+                                        "
+                                    >
+                                        {{ size.label }}
+                                    </td>
+                                    <th  style="background-color: #F8F8F8;">Total Pcs</th>
+                                </tr>
+                                <tr *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                                    <th  style="background-color: #F8F8F8;">Prepack</th>
+                                    <td
+                                        *ngFor="
+                                            let size of filteredColors[currentIndex]?.sizes
+                                        "
+                                    >
+                                        {{ size.sizeRatio }}
+                                    </td>
+                                    <!-- <th>{{ getTotlaPrepackSum()}}</th> -->
+                                </tr>
+                            </tbody>
+                        </table>
+
+                       
+                        <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"   class="p-4 font-weight-bold" style="color:black !important" >Order by prepack</span>
+                          <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack" class="switch switch-container my-4 font-weight-bold" >
+                            <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked (change)="onChangechk_Order_by_prepack()">
+                            <span  class="slider round"></span> 
+                       
+                        </label>
+
+                        <p-tabView *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1">
+                          
+                            <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack[currentIndex]" >
+                                <table
+                                    *ngIf="productDetails?.orderByPrePack"
+                                    class="table text-center table-bordered table-white"
+                                >
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                Available Prepacks
+                                            </th>
+                                            <th scope="col">Ordered</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                                        <tr >
+                                            <td>
+                                                {{
+                                                    filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
+                                                }}
+                                            </td>
+                                            <td>
+                                                <p-inputNumber
+                                                [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
+                                                    [(ngModel)]="
+                                                        filteredColors[currentIndex]?.sizes[0].orderedPrePacks
+                                                    "
+                                                    mode="decimal"
+                                                    [showButtons]="true"
+                                                    inputId="minmax-buttons"
+                                                    [min]="0"
+                                                    (ngModelChange)="
+                                                        onNumberChange(
+                                                            $event,
+                                                            filteredColors[
+                                                                currentIndex
+                                                            ],
+                                                            null
+                                                        )
+                                                    "
+                                                >
+                                                </p-inputNumber>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </p-tabPanel>
+                            <p-tabPanel class="sm-tab" [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
+                                <table
+                                    class="table text-center table-bordered table-white"
+                                >
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Size</th>
+                                            <th scope="col">Available QTY</th>
+                                            <th scope="col">Ordered</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            *ngFor="
+                                                let size of filteredColors[
+                                                    currentIndex
+                                                ]?.sizes;
+                                                let i = index
+                                            "
+                                        >
+                                            <td>{{ size.label }}</td>
+                                            <td>
+                                                {{ size.stockAvailability }}
+                                            </td>
+                                            <td *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                                                
+                                                <p-inputNumber
+                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
+                                                   
+                                                    mode="decimal"
+                                                    [showButtons]="true"
+                                                    inputId="minmax-buttons"
+                                                    [min]="0"
+                                                    [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex])"
+                                                    (ngModelChange)="
+                                                        onNumberChange(
+                                                            $event,
+                                                            filteredColors[
+                                                                currentIndex
+                                                            ],
+                                                            i
+                                                        )
+                                                    "
+                                                >
+                                                </p-inputNumber>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </p-tabPanel>
+                        </p-tabView>
+                        <!-- end order by prepack -->
+                    </div>
+
+<!--                                           
                                             <div class="mb-3 w-100">
                                               <label class="form-label">Quantity</label>
                                               <input
@@ -605,7 +1022,7 @@
                                             <div class="mb-3 w-100">
                                               <label>Amount</label>
                                               <p>{{ amount | currency }}</p>
-                                            </div>
+                                            </div> -->
                                         </form>
                                           
                                         <div *ngIf="showAddLine"  class="d-flex justify-content-end">
@@ -1574,3 +1991,25 @@ height: 48px;"
           <button  (click)="syncMsg = false;" label="Ok" class="p-button-text" >Ok</button>
         </div>
       </p-dialog> 
+
+
+      <p-dialog  [(visible)]="visibleSP" [modal]="true"   [style]="{ 'width': '425px', 'border-radius': '20px' }" [draggable]="false" >
+                     
+        <div class="p-2 con-body">
+          <p>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z" fill="#F6851D"/>
+                </svg>  <span style="font-size: 24px;color: #1B101B; font-weight: 700;">the price assigned to the ordered Items will be updated </span> 
+        </p>
+     
+        </div>
+      
+        <div class="p-2 d-flex justify-content-center">
+            <button
+            type="button"
+      
+            (click)="visibleSP = false; onEditpecialPrice()" label="Yes" class="pBtntext"
+        >Yes</button>
+        </div>
+      
+      </p-dialog>

@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AddVariationToInputDto, AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AddVariationToInputDto, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppMarketplaceItemDetailForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, MarketplaceExtraDataAttrDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -26,6 +26,7 @@ import * as moment from 'moment';
   selector: 'app-shopping-cart-view-component',
   templateUrl: './shopping-cart-view-component.component.html',
   styleUrls: ['./shopping-cart-view-component.component.scss'],
+  providers:[AppMarketplaceItemsServiceProxy]
 })
 export class ShoppingCartViewComponentComponent
   extends AppComponentBase
@@ -117,6 +118,24 @@ currentFilter: string = '';
 regenrate : boolean = false
 syncMsg : boolean = false
 mainLoad : boolean = false
+    productBodyData: any;
+    productImages: AppEntityAttachmentDto[];
+    productDetails: any;
+    colorsData: any[];
+    updatedSpecialPrice: number = 0;
+    filteredColors: any[] = [];
+  productVarImages: MarketplaceExtraDataAttrDto[];
+  showEditSpecialPrice: boolean = true;
+  orderType :any
+  selectedColorName :any
+  selectedColorImg:any
+  selectedColorCode:any
+  chk_Order_by_prepack:boolean [] =[]
+  currentIndex: number = 0;
+  displayProductdata:boolean = false
+  displayColordata:boolean = false
+  displaysizesdata:boolean = false
+  visibleSP:boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -126,6 +145,7 @@ mainLoad : boolean = false
     private router: Router,
     private cdr: ChangeDetectorRef,
     private _formBuilder: FormBuilder,
+    private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
   ) {
     super(injector);
 
@@ -176,7 +196,10 @@ initFilterForm() {
       this.filterForm = this._formBuilder.group({
         selectedVariation: ['', Validators.required],
         selectedQuantity: [null, [Validators.required, Validators.min(1)]],
-        selectedPrice: [null, [Validators.required, Validators.min(1)]]
+        selectedPrice: [null, [Validators.required, Validators.min(1)]],
+        updatedSpecialPrice: [null, [ Validators.min(0)]],
+        
+
 
       });
  
@@ -279,16 +302,43 @@ getSellerVariations(
   maxResultCount: number = this.incrementCount,
   filter: string = ''
 ) {
-  this._AppTransactionServiceProxy
-    .getAllSellerVariations(
-      this.appTransactionsForViewDto?.sellerCompanySSIN,
-      filter, // Pass filter to the backend
-      this.appTransactionsForViewDto?.buyerContactSSIN,
-      'USD',
-      undefined,
-      skipCount,
+  // this._AppTransactionServiceProxy
+  //   .getAllSellerVariations(
+  //     this.appTransactionsForViewDto?.sellerCompanySSIN,
+  //     filter, // Pass filter to the backend
+  //     this.appTransactionsForViewDto?.buyerContactSSIN,
+  //     'USD',
+  //     undefined,
+  //     skipCount,
+  //     maxResultCount
+  //   )
+   this._AppMarketplaceItemsServiceProxy
+            .getAll(
+              this.appTransactionsForViewDto.sellerContactSSIN,
+               this.appTransactionsForViewDto.sellerCompanySSIN,
+                null, // tenant id
+                null,
+                false, // false
+                filter, // search text
+                null, //null
+                null, //null
+                null, // null
+                [], // depratment
+                null,
+                null,
+               2,
+                false,
+                undefined, //'2022-2-2'
+                undefined,
+                undefined,
+                undefined,
+                [], // ids
+                'USD',
+                'name',
+                      skipCount,
       maxResultCount
-    )
+            )
+  
     .pipe(finalize(() => this.hideMainSpinner()))
     .subscribe((res) => {
       this.totalVariationsCount = res.totalCount;
@@ -343,6 +393,8 @@ onVariationSelect(event: any) {
     //  this.selectedPrice = filters.selectedPrice
     this.updateAmount(); // Recalculate the amount when a new price is selected
   }
+  this.getProductDetailsForView( event.value.appItem.id)
+  this.displayProductdata = true
 }
 
 updateAmount() {
@@ -608,7 +660,7 @@ this.hideMainSpinner();
           this.orderInfoValid = this.appTransactionsForViewDto.isOrderInformationValid;
           this.buyerContactInfoValid = this.appTransactionsForViewDto.isBuyerContactInformationValid;
           this.SellerContactInfoValid = this.appTransactionsForViewDto.isSellerContactInformationValid;
-          this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : this.appTransactionsForViewDto.isSalesRepInformationValid ;
+          this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole?.toString()?.includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : this.appTransactionsForViewDto.isSalesRepInformationValid ;
           this.shippingInfOValid = this.appTransactionsForViewDto.isShippingInformationValid;
           this.BillingInfoValid = this.appTransactionsForViewDto.isBillingInformationValid;
           ///
@@ -665,7 +717,7 @@ this.hideMainSpinner();
        if (res.transactionType == TransactionType.SalesOrder)
          this.transactionType = "Sales Order";
 
-         this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
+         this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole?.toString()?.includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
 
 
        if (!this.temp) this.shoppingCartTreeNodes = res.detailsView;
@@ -1542,6 +1594,173 @@ stopReport(event) {
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
+    getProductDetailsForView(id:any) {
+      this.appTransactionsForViewDto.transactionType == 0 ? this.orderType = 'SO' : this.orderType = 'PO'
+        this.showMainSpinner();
+        this.showEditSpecialPrice = true;
+        this._AppMarketplaceItemsServiceProxy
+        .getMarketplaceAppItemForView(
+            undefined,
+            0,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            'USD',
+            this.appTransactionsForViewDto?.buyer,
+            this.appTransactionsForViewDto?.sellerCompanySSIN,
+            // 353338,
+            id,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            0,
+            10
+        )  
+                          .pipe(
+                            finalize(() => {
+                                this.hideMainSpinner();
+                            })
+                        )
+        .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
+            this.productDetails = res?.appItem;
+            // this.productData = res;                    
+            this.productDetails.maxSpecialPrice =  this.productDetails?.maxSpecialPrice ?  this.productDetails?.maxSpecialPrice : 0;
+            // this.updatedSpecialPrice = ;
+            this.filterForm.controls['updatedSpecialPrice']?.setValue(this.productDetails?.maxSpecialPrice);
+            this.productImages = res?.appItem?.entityAttachments;
+            this.productVarImages = res?.appItem?.variations;
+            let colorVariation: any[] = res?.appItem?.variations?.filter(
+                (variation: any) => variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName
+            );
+            let selectedValues = [
+                ...colorVariation.map(
+                    (selected: any) => selected?.selectedValues
+                ),
+            ];
 
+            this.colorsData = selectedValues[0]?.map((variation: any) => {
+                let sizesValue = variation?.edRestAttributes?.map(
+                    (attr: any) => {
+                        if (attr?.extraAttrName === "SIZE") {
+                            return [...attr.values];
+                        }
+                    }
+                );
+                return {
+                    colorName: variation?.value,
+                    sizes: sizesValue[0],
+                    colorImg: variation?.colorImage,
+                    colorCode: variation?.colorHexaCode,
+                    colorCodeSelectedValues:variation?.code
+                };
+            });
+            this.filteredColors = this.colorsData
+             console.log(this.colorsData,'colooors')
+        });
 
+    }
+    onColorSelect(event){
+      this.currentIndex = this.colorsData.findIndex(
+        (option) => option.colorName === event.value.colorName
+    );
+      this.selectedColorName = event.value.colorName
+      this.selectedColorImg = event.value.colorImg
+      this.selectedColorCode = event.value.colorCode
+        console.log(event,'my wwweeeeen')
+        this.displayColordata = true
+        this.displaysizesdata = true
+          }
+
+       // create order by size summary JSON
+       onNumberChange(e: any, color: any, sizeIndex: any) {
+        let orederedMappedData = {
+            color,
+            sizeIndex,
+            colorIndex: this.currentIndex,
+        };
+        let foundColor = false;
+        // this.orderSummary.forEach((summary: any) => {
+        //     if (summary?.color?.colorName === color?.colorName) {
+        //         foundColor = true;
+        //     }
+        // });
+        if (!foundColor) {
+          
+
+            // this.orderSummary.push(orederedMappedData);
+        }
+        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
+            this.productDetails.variations.map((variation: any) => {
+                if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                    variation?.selectedValues?.forEach((value) => {
+                        if (
+                            value?.value ===
+                            this.filteredColors[this.currentIndex]?.colorName
+                        ) {
+                            value?.edRestAttributes?.forEach((attr) => {
+                                if (attr?.extraAttrName === "SIZE") {
+  
+
+                                    attr?.values?.forEach((sizeValue) => {
+                                        sizeValue.orderedPrePacks =
+                                            this.filteredColors[
+                                                this.currentIndex
+                                            ]?.sizes[0]?.orderedPrePacks;
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    
+        // this.calculateTotalOrderPriceAndQty(this.orderSummary);
+    }
+
+    onChangechk_Order_by_prepack() {
+      if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
+          this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
+              item.orderedPrePacks=0;
+          });
+      }
+          else{
+          this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
+              item.orderedPrePacks*=item?.sizeRatio;
+          });
+      }
+  }
+
+  onEditpecialPrice() {
+        
+    this.productDetails.variations.map((variation: any) => {
+        if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+            variation.selectedValues.forEach((value) => {
+                value.edRestAttributes.forEach((attr) => {
+                    if (attr.extraAttrName === "SIZE") {
+                        attr.values.forEach((sizeValue) => {
+                            sizeValue.price =  this.filterForm.controls['updatedSpecialPrice']?.value;
+                        });
+                    }
+                });
+
+            });
+        }
+
+        // this.calculateTotalOrderPriceAndQty(this.orderSummary);
+    });
+
+   // this.productDetails.minSpecialPrice = updatedSpecialPrice;
+    this.productDetails.maxSpecialPrice = this.filterForm.controls['updatedSpecialPrice']?.value;
+    this.showEditSpecialPrice = true
+}
 }
