@@ -42,6 +42,10 @@ namespace onetouch.Accounts
 		//I45
 		Task Connect(long id, int? tenantId = null);
         Task<BranchDto> CreateOrEditBranch(BranchDto input);
-        //I45
+		//I45
+		//I46[Start]
+		Task<GetContactDefaultsOutput> GetContactDefaults();
+		//I46[End]
+
     }
 }
