@@ -65,6 +65,11 @@ namespace onetouch.Accounts.Dtos
 
 		public long? ClassificationsTotalCount { get; set; }
 		public long? CategoriesTotalCount { get; set; }
-
-	}
+        //I46[Start]
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { set; get; }
+        public virtual long? ShipViaId { set; get; }
+        public virtual long? PaymentTermsId { set; get; }
+        //I46[End]
+    }
 }
