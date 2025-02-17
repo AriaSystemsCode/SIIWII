@@ -796,8 +796,8 @@ height: 100px !important;
 }
 
 .imageSlides {
-    width: 85px;
-    height: 57px;
+    // width: 85px;
+    // height: 70px;
     border-radius: 6px 6px 0 0 ;
    
     cursor: pointer;
@@ -1155,4 +1155,37 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+.p-inputnumber-buttons-stacked .p-inputnumber-input {
+    text-align: end !important;
+}
+
+.card-body {
+    padding: 2px  !important;
+    border-bottom-left-radius: 10.82px !important;
+    border-bottom-right-radius: 10.82px !important;
+    height: 40px;
+    text-align: center;
+    width: 85px;
+    border: 1px solid #EEE;
+}
+.seller {
+    font-size: 10px !important;
+    color: #595959;
+    font-weight: 600;
+}
+.card-text {
+    font-size: 10px;
+    color: #1B101B;
+    font-weight: 700;
+    margin-top: 3px;
+    margin-bottom: 0;
+}
+
+
+::ng-deep {
+    .p-inputnumber-buttons-stacked .p-inputnumber-input {
+        text-align: end !important;
+    }
 }

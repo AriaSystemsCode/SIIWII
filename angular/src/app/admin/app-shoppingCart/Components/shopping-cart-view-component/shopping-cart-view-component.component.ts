@@ -130,12 +130,16 @@ mainLoad : boolean = false
   selectedColorName :any
   selectedColorImg:any
   selectedColorCode:any
-  chk_Order_by_prepack:boolean [] =[]
+  chk_Order_by_prepack:boolean = true
   currentIndex: number = 0;
   displayProductdata:boolean = false
   displayColordata:boolean = false
   displaysizesdata:boolean = false
   visibleSP:boolean = false
+  selectedMainImgProduct:any
+  orderSummary: any = [];
+  sycAttachmentCategoryImage:any
+  acceptedAspectRatio:any
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -152,6 +156,7 @@ mainLoad : boolean = false
   }
   ngOnInit(): void {
     this.initFilterForm()
+    this.calcHight()
   
  let value = localStorage.getItem("comNew"); 
 
@@ -208,6 +213,7 @@ initFilterForm() {
 
 addNewLine() {
   console.log(this.newData, 'newData'); // Log new data for debugging
+  console.log(this.orderSummary, 'sssss '); // Log new data for debugging
   const filters = this.filterForm.value;
 
   // Get the item data from the selected line (newData)
@@ -279,12 +285,7 @@ addNewLine() {
 
   // Reset variables
   this.showSaveCancel = false;
-  this.addLine = true
-  // this.selectedVariation = '';
-  // this.selectedQuantity = 0;
-  // this.selectedPrice = 0
-  // this.amount = 0;
-  // this.getSellerVariations()
+
   this.addLine = false
 }
 handleVarSearch(event: any, dropdown?: any) {
@@ -381,20 +382,23 @@ onVariationSelect(event: any) {
   console.log(event,'mmmmmmevv')
 // this.filterForm.reset();
   // filters.reset()
-  this.filterForm.controls['selectedQuantity']?.setValue(0);
-  this.selectedQuantity = 0;
+  // this.filterForm.controls['selectedQuantity']?.setValue(0);
+  // this.selectedQuantity = 0;
   // this.selectedPrice = 0;
-  this.newData = event;
+  // this.newData = event;
 
-  if ( event.value.appItem.price) {
-    this.selectedImg = event.value.appItem.image
+  // if ( event.value.appItem.price) {
+  //   this.selectedImg = event.value.appItem.image
    
-     this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
-    //  this.selectedPrice = filters.selectedPrice
-    this.updateAmount(); // Recalculate the amount when a new price is selected
-  }
+  //    this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
+  //   //  this.selectedPrice = filters.selectedPrice
+  //   this.updateAmount(); // Recalculate the amount when a new price is selected
+  // }
   this.getProductDetailsForView( event.value.appItem.id)
+  this.selectedMainImgProduct =  event.value.appItem.imageUrl
   this.displayProductdata = true
+  this.displayColordata = false
+  this.displaysizesdata = false
 }
 
 updateAmount() {
@@ -415,39 +419,96 @@ updatePrice() {
 }
 
 saveVariations() {
-  const body = new AddVariationToInputDto();
-  const filters = this.filterForm.value;
+    /////
+    for (let index = 0; index < this.colorsData?.length; index++) {
+      if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+          this.productDetails.variations.map((variation: any) => {
+              if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                 let value= variation?.selectedValues[index];
+                      value.edRestAttributes.forEach((attr) => {
+                          if (attr.extraAttrName === "SIZE") {
+                              attr.values.forEach((sizeValue) => {
+                                  sizeValue.orderedQty = sizeValue.orderedPrePacks;
+                                  sizeValue.orderedPrePacks = 0;
+                              });
+                          }
+                      });
+              }
+          });
+      }
+  }
+      /////
+
+      let bodyRequest: any = {
+          appItem: this.productDetails,
+      };
+      console.log(bodyRequest,'boooodddy')
+      this.showMainSpinner();
+      this._AppTransactionServiceProxy
+          .addTransactionDetails(
+           '35', this.appTransactionsForViewDto.transactionType == 0 ? 'SO':'PO',
+            bodyRequest
+          )
+          .pipe(
+              finalize(() => {
+                this.showSaveCancel = false
+                this.displayColordata = false
+                this.displayProductdata = false
+                this.displaysizesdata = false
+                this.addLine = true;
+                this.addNewLinebtn = true ;
+                this.showAddLine = false;
+                this.filterForm.value.reset()
+                this.displayedVariations = []
+                this.getSellerVariations(0,10,'')
+                  this.hideMainSpinner();
+                  this.getShoppingCartData();
+                
+              })
+          )
+          .subscribe(async (res) => {
+              console.log(">>", res);
+
+              this.getShoppingCartData();
+   this.filterForm.controls['selectedVariation'].reset()
+          });
+
+
+
+
+//   const body = new AddVariationToInputDto();
+//   const filters = this.filterForm.value;
   
- this.selectedPrice = filters.selectedPrice
- this.selectedQuantity = filters.selectedQuantity
-  // Assign each property to the DTO object
-  body.variationSSIN = this.newData?.value?.appItem?.ssin;
-  body.qty = this.selectedQuantity;
-  body.price = this.selectedPrice;
-  body.transactionId = this.orderId;
-  body.transactionType = this.appTransactionsForViewDto?.transactionType;
+//  this.selectedPrice = filters.selectedPrice
+//  this.selectedQuantity = filters.selectedQuantity
+//   // Assign each property to the DTO object
+//   body.variationSSIN = this.newData?.value?.appItem?.ssin;
+//   body.qty = this.selectedQuantity;
+//   body.price = this.selectedPrice;
+//   body.transactionId = this.orderId;
+//   body.transactionType = this.appTransactionsForViewDto?.transactionType;
 
-  this._AppTransactionServiceProxy.addVariationToTransaction(body)
-    .pipe(finalize(() =>  {
-        this.selectedVariation = '';
-  this.selectedQuantity = 0;
-  this.selectedPrice = 0
-  this.amount = 0;
-  // this.filterForm.value.reset()
-  // this.hideMainSpinner()
-  this.getShoppingCartData();
-  this.showSaveCancel = false
+//   this._AppTransactionServiceProxy.addVariationToTransaction(body)
+//     .pipe(finalize(() =>  {
+//         this.selectedVariation = '';
+//   this.selectedQuantity = 0;
+//   this.selectedPrice = 0
+//   this.amount = 0;
+//   // this.filterForm.value.reset()
+//   // this.hideMainSpinner()
+//   this.getShoppingCartData();
+//   this.showSaveCancel = false
 
-    }))
-    .subscribe((res) => {
-      console.log(this.displayedVariations, 'displayedVariations');
-      // Handle post-save logic here
-    });
-    this.addNewLinebtn = true
+//     }))
+//     .subscribe((res) => {
+//       console.log(this.displayedVariations, 'displayedVariations');
+//       // Handle post-save logic here
+//     });
+//     this.addNewLinebtn = true
 }
 
 cancelAddLine() {
-  this.addLine = true
+  // this.addLine = true
   this.showAddLine = false;
   this.showSaveCancel = false;
  
@@ -1676,69 +1737,72 @@ stopReport(event) {
       this.selectedColorImg = event.value.colorImg
       this.selectedColorCode = event.value.colorCode
         console.log(event,'my wwweeeeen')
+        console.log( this.selectedColorImg ,' this.selectedColorImg ')
         this.displayColordata = true
         this.displaysizesdata = true
           }
 
        // create order by size summary JSON
-       onNumberChange(e: any, color: any, sizeIndex: any) {
-        let orederedMappedData = {
-            color,
-            sizeIndex,
-            colorIndex: this.currentIndex,
-        };
-        let foundColor = false;
-        // this.orderSummary.forEach((summary: any) => {
-        //     if (summary?.color?.colorName === color?.colorName) {
-        //         foundColor = true;
-        //     }
-        // });
-        if (!foundColor) {
-          
+    // create order by size summary JSON
+    onNumberChange(e: any, color: any, sizeIndex: any) {
+      let orederedMappedData = {
+          color,
+          sizeIndex,
+          colorIndex: this.currentIndex,
+      };
+      let foundColor = false;
+      this.orderSummary.forEach((summary: any) => {
+          if (summary?.color?.colorName === color?.colorName) {
+              foundColor = true;
+          }
+      });
+      if (!foundColor) {
+        
 
-            // this.orderSummary.push(orederedMappedData);
-        }
-        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
-            this.productDetails.variations.map((variation: any) => {
-                if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
-                    variation?.selectedValues?.forEach((value) => {
-                        if (
-                            value?.value ===
-                            this.filteredColors[this.currentIndex]?.colorName
-                        ) {
-                            value?.edRestAttributes?.forEach((attr) => {
-                                if (attr?.extraAttrName === "SIZE") {
-  
-
-                                    attr?.values?.forEach((sizeValue) => {
-                                        sizeValue.orderedPrePacks =
-                                            this.filteredColors[
-                                                this.currentIndex
-                                            ]?.sizes[0]?.orderedPrePacks;
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
-    
-        // this.calculateTotalOrderPriceAndQty(this.orderSummary);
-    }
-
-    onChangechk_Order_by_prepack() {
+          this.orderSummary.push(orederedMappedData);
+      }
       if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
-          this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
-              item.orderedPrePacks=0;
+          this.productDetails.variations.map((variation: any) => {
+              if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                  variation?.selectedValues?.forEach((value) => {
+                      if (
+                          value?.value ===
+                          this.filteredColors[this.currentIndex]?.colorName
+                      ) {
+                          value?.edRestAttributes?.forEach((attr) => {
+                              if (attr?.extraAttrName === "SIZE") {
+
+
+                                  attr?.values?.forEach((sizeValue) => {
+                                      sizeValue.orderedPrePacks =
+                                          this.filteredColors[
+                                              this.currentIndex
+                                          ]?.sizes[0]?.orderedPrePacks;
+                                  });
+                              }
+                          });
+                      }
+                  });
+              }
           });
       }
-          else{
-          this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
-              item.orderedPrePacks*=item?.sizeRatio;
-          });
-      }
+  
+      this.calculateTotalOrderPriceAndQty(this.orderSummary);
   }
+
+
+  onChangechk_Order_by_prepack() {
+    if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
+        this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
+            item.orderedPrePacks=0;
+        });
+    }
+        else{
+        this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
+            item.orderedPrePacks*=item?.sizeRatio;
+        });
+    }
+}
 
   onEditpecialPrice() {
         
@@ -1756,11 +1820,55 @@ stopReport(event) {
             });
         }
 
-        // this.calculateTotalOrderPriceAndQty(this.orderSummary);
+        this.calculateTotalOrderPriceAndQty(this.orderSummary);
     });
 
    // this.productDetails.minSpecialPrice = updatedSpecialPrice;
     this.productDetails.maxSpecialPrice = this.filterForm.controls['updatedSpecialPrice']?.value;
     this.showEditSpecialPrice = true
 }
+
+   // total of all order qty and price in order by size and prepack
+   totalOrderQTY: number = 0;
+   totlaOrderPrices: number = 0;
+   calculateTotalOrderPriceAndQty(orders: any) {
+    let qty = 0;
+    let price = 0;
+    orders?.map((order: any) => {
+        order?.color?.sizes?.map((size,index) => {
+            if (this.productDetails.orderByPrePack) {
+
+                let multiby =
+                    size?.sizeRatio * order?.color?.sizes[index]?.orderedPrePacks;
+                let priceMultibly = multiby * size?.price;
+                qty = qty + multiby;
+                price = price + priceMultibly;
+            } else {
+                if (!size.orderedQty)
+                    size.orderedQty = 0
+                let priceMultibly = size?.orderedQty * size?.price;
+                qty = qty + size?.orderedQty;
+                price = price + priceMultibly;
+            }
+
+            this.totalOrderQTY = qty;
+            this.totlaOrderPrices = price;
+        });
+    });
+}
+
+
+   calcHight(){
+    this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER","IMAGE"]).subscribe((result)=>{
+      result.forEach(item=>{
+         
+      if(item.code == "IMAGE") {
+        this.sycAttachmentCategoryImage = item
+          let [width,height,border] = this.sycAttachmentCategoryImage.aspectRatio.split(':')
+        this.acceptedAspectRatio = Number(width) / Number(height)  ;
+          }
+            })
+            console.log( this.acceptedAspectRatio,' this.acceptedAspectRatio')
+   })
+  }
 }
