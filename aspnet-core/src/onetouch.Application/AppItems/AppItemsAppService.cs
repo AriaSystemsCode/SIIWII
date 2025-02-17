@@ -73,6 +73,7 @@ using FluentValidation;
 using Stripe;
 using Castle.Core.Resource;
 using onetouch.EntityFrameworkCore.Repositories;
+using onetouch.Onetouch.ValidationRules;
 
 namespace onetouch.AppItems
 {
@@ -8391,6 +8392,42 @@ namespace onetouch.AppItems
                 }
             });
             //RuleFor(x => x.Postcode).Must(BeAValidPostcode).WithMessage("Please specify a valid postcode");
+        }
+        public class DynamicValidator<T> : AbstractValidator<T>
+        {
+            //IRepository<ValidationRule> 
+            public DynamicValidator(IRepository<ValidationRule> validationRuleRepository)
+            {
+                
+               var rules = validationRuleRepository.GetAll().ToList();
+                foreach (var rule in rules)
+                {
+                    var property = typeof(T).GetProperty(rule.FieldName);
+                    if (property != null)
+                    {
+                        var expression = CreateValidationExpression(rule);
+                        if (expression != null)
+                        {
+                           //var ret = RuleFor(expression).WithMessage(rule.ErrorMessage);
+                        }
+                    }
+                }
+            }
+            private Func<T, object> CreateValidationExpression(ValidationRule rule)
+            {
+                switch (rule.RuleType)
+                {
+                    case "NotEmpty":
+                        return x => typeof(T).GetProperty(rule.FieldName).GetValue(x, null);
+                    case "MaximumLength":
+                        return x => typeof(T).GetProperty(rule.FieldName).GetValue(x, null) as string;
+                    case "Email":
+                        return x => typeof(T).GetProperty(rule.FieldName).GetValue(x, null) as string;
+                    // Add more cases for other rule types
+                    default:
+                        return null;
+                }
+            }
         }
         //MMT46-POC
     }

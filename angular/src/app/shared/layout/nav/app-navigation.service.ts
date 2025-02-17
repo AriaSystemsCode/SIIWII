@@ -97,6 +97,8 @@ export class AppNavigationService {
             new AppMenuItem('OrganizationUnits', 'Pages.Administration.OrganizationUnits', 'flaticon-map', '/app/admin/organization-units'),
             new AppMenuItem('Roles', 'Pages.Administration.Roles', 'flaticon-suitcase', '/app/admin/roles'),
             new AppMenuItem('Users', 'Pages.Administration.Users', 'flaticon-users', '/app/admin/users'),
+            new AppMenuItem('ValidationRules', 'Pages.Administration.ValidationRules', 'flaticon-more', '/app/admin/validationRules/validationRules'),
+            
             new AppMenuItem('AppSubscriptionPlanDetails', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails'),
             
             new AppMenuItem('SycCurrencyExchangeRates', 'Pages.Administration.SycCurrencyExchangeRates', 'flaticon-more', '/app/admin/sycCurrencyExchangeRates/sycCurrencyExchangeRates'),
