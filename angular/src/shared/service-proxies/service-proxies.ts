@@ -75298,9 +75298,6 @@ export interface IAppMarketplaceItemForViewDto {
 export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplaceItemDetailForViewDto {
     appItem!: AppMarketplaceItemForViewDto;
     sellerSSIN!: string | undefined;
-    sellerCompanyName!: string | undefined;
-    sellerBranchSSIN!: string | undefined;
-    sellerBranchName!: string | undefined;
 
     [key: string]: any;
 
@@ -75321,9 +75318,6 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
             }
             this.appItem = _data["appItem"] ? AppMarketplaceItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
             this.sellerSSIN = _data["sellerSSIN"];
-            this.sellerCompanyName = _data["sellerCompanyName"];
-            this.sellerBranchSSIN = _data["sellerBranchSSIN"];
-            this.sellerBranchName = _data["sellerBranchName"];
         }
     }
 
@@ -75342,9 +75336,6 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["sellerSSIN"] = this.sellerSSIN;
-        data["sellerCompanyName"] = this.sellerCompanyName;
-        data["sellerBranchSSIN"] = this.sellerBranchSSIN;
-        data["sellerBranchName"] = this.sellerBranchName;
         return data;
     }
 }
@@ -75352,9 +75343,6 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
 export interface IGetAppMarketplaceItemDetailForViewDto {
     appItem: AppMarketplaceItemForViewDto;
     sellerSSIN: string | undefined;
-    sellerCompanyName: string | undefined;
-    sellerBranchSSIN: string | undefined;
-    sellerBranchName: string | undefined;
 
     [key: string]: any;
 }

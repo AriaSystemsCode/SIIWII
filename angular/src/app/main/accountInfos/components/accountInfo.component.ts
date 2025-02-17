@@ -168,6 +168,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange()
         this.initUploaders();
+       this.GetContactDefaults();
+    }
+
+   paymentTermsId; 
+   shipViaId;
+    GetContactDefaults(){
+        // this._AccountsServiceProxy.getContactDefaults()
+        // .subscribe((res)=>{
+        //     this.paymentTermsId= res.; 
+        //     this.shipViaId=res. ; 
+        // });
     }
     handleRoutingChange(){
         this._route.queryParamMap.subscribe(paramsObj => {
@@ -365,8 +376,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     loadInitData(){
-        if(this.accountInfoTemp)
+        if(this.accountInfoTemp){
         this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+        }
 
         this.defineAccountTypes();
         this.getLanguages();
@@ -440,6 +452,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 this.accountInfoTemp.name = this.appSession.tenant.name
                 this.accountInfoTemp.tradeName = this.appSession.tenant.name
             }
+
+          
+                this.accountInfoTemp.paymentTermsId= result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+                this.accountInfoTemp.shipViaId=  result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
+
         }
     }
     resetFormData(){
@@ -513,11 +530,18 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     if(result){
                         this.languageIdName=result.languageName;
                         this.accountInfoTemp.languageId=result.accountInfo.languageId;
+                        this.accountInfoTemp.paymentTermsId= result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+                this.accountInfoTemp.shipViaId=  result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
 
                     }
 
                 })
                }
+            }
+
+            else{
+                this.accountInfoTemp.paymentTermsId= result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+                this.accountInfoTemp.shipViaId=  result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
             }
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;

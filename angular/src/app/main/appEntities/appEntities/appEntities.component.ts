@@ -262,7 +262,7 @@ export class AppEntitiesComponent extends AppComponentBase {
                  this.showMainSpinner();
                      this._appEntitiesServiceProxy.setAsDefault(recordEntity.id,recordEntity.entityObjectTypeId)
              .subscribe(() => {
-                this.notify.success(this.l('Set As Default'));
+                this.notify.success(this.l('The value successfully set as default'));
                 this.hideMainSpinner();
                 this.reloadPage();
              });
