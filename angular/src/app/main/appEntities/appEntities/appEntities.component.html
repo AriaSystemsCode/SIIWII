@@ -113,7 +113,7 @@
                                                         <p-sortIcon field="appEntity.notes"></p-sortIcon>
                                                     </th>
                                                     <th style="width: 150px" pSortableColumn="isDefault">
-                                                        {{l('Assign default')}}
+                                                        {{l('Is Default')}}
                                                         <p-sortIcon field="appEntity.isDefault"></p-sortIcon>
                                                     </th>
                                                     <th style="width: 130px"
@@ -142,7 +142,7 @@
                                                         <span>{{record.appEntity.notes}}</span>
                                                     </td>
                                                     <td style="width:150px">
-                                                        <span class="p-column-title"> {{l('Assign default')}}</span>
+                                                        <span class="p-column-title"> {{l('Is Default')}}</span>
 
                                                         <span>{{record.appEntity?.isDefault}}</span>
                                                     </td>
@@ -307,7 +307,7 @@
                                                             <p-sortIcon field="appEntity.notes"></p-sortIcon>
                                                         </th>
                                                         <th style="width: 150px" pSortableColumn="isDefault">
-                                                            {{l('Assign default')}}
+                                                            {{l('Is Default')}}
                                                             <p-sortIcon field="appEntity.isDefault"></p-sortIcon>
                                                         </th>
                                                         <th style="width: 130px"
@@ -336,9 +336,9 @@
 
                                                         </td>
                                                         <td style="width:150px">
-                                                            <span class="p-column-title"> {{l('Assign default')}}</span>
+                                                            <span class="p-column-title"> {{l('Is Default')}}</span>
 
-                                                            <span>{{record.appEntity.isDefault}}</span>
+                                                            <span>{{record.appEntity.isDefault ? 'Yes' : '-'}}</span>
 
                                                         </td>
                                                         <td style="width: 130px"

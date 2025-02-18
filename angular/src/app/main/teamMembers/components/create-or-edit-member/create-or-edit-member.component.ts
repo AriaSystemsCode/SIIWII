@@ -382,5 +382,9 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         this.logoId = undefined
 
     }
+
+    getCodeValue(code: string) {
+        this.memberDto.code = code;
+    }
 }
 

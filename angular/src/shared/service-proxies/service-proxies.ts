@@ -58262,6 +58262,10 @@ export class AccountDto implements IAccountDto {
     entityId!: number | undefined;
     classificationsTotalCount!: number | undefined;
     categoriesTotalCount!: number | undefined;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
+    shipViaId!: number | undefined;
+    paymentTermsId!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -58328,6 +58332,10 @@ export class AccountDto implements IAccountDto {
             this.entityId = _data["entityId"];
             this.classificationsTotalCount = _data["classificationsTotalCount"];
             this.categoriesTotalCount = _data["categoriesTotalCount"];
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
+            this.shipViaId = _data["shipViaId"];
+            this.paymentTermsId = _data["paymentTermsId"];
             this.id = _data["id"];
         }
     }
@@ -58392,6 +58400,10 @@ export class AccountDto implements IAccountDto {
         data["entityId"] = this.entityId;
         data["classificationsTotalCount"] = this.classificationsTotalCount;
         data["categoriesTotalCount"] = this.categoriesTotalCount;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
+        data["shipViaId"] = this.shipViaId;
+        data["paymentTermsId"] = this.paymentTermsId;
         data["id"] = this.id;
         return data;
     }
@@ -58429,6 +58441,10 @@ export interface IAccountDto {
     entityId: number | undefined;
     classificationsTotalCount: number | undefined;
     categoriesTotalCount: number | undefined;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
+    shipViaId: number | undefined;
+    paymentTermsId: number | undefined;
     id: number;
 
     [key: string]: any;
@@ -58775,6 +58791,10 @@ export interface IPagedResultDtoOfGetMemberForViewDto {
 export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
     paymentTermsId!: number | undefined;
     shipViaId!: number | undefined;
+    shipViaCode!: string | undefined;
+    shipViaName!: string | undefined;
+    paymentTermsCode!: string | undefined;
+    paymentTermsName!: string | undefined;
 
     [key: string]: any;
 
@@ -58795,6 +58815,10 @@ export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
             }
             this.paymentTermsId = _data["paymentTermsId"];
             this.shipViaId = _data["shipViaId"];
+            this.shipViaCode = _data["shipViaCode"];
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsCode = _data["paymentTermsCode"];
+            this.paymentTermsName = _data["paymentTermsName"];
         }
     }
 
@@ -58813,6 +58837,10 @@ export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
         }
         data["paymentTermsId"] = this.paymentTermsId;
         data["shipViaId"] = this.shipViaId;
+        data["shipViaCode"] = this.shipViaCode;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsCode"] = this.paymentTermsCode;
+        data["paymentTermsName"] = this.paymentTermsName;
         return data;
     }
 }
@@ -58820,6 +58848,10 @@ export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
 export interface IGetContactDefaultsOutput {
     paymentTermsId: number | undefined;
     shipViaId: number | undefined;
+    shipViaCode: string | undefined;
+    shipViaName: string | undefined;
+    paymentTermsCode: string | undefined;
+    paymentTermsName: string | undefined;
 
     [key: string]: any;
 }
@@ -67482,6 +67514,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
     tenantId!: number;
     tenantName!: string | undefined;
     canBeRemoved!: boolean;
+    code!: string | undefined;
 
     [key: string]: any;
 
@@ -67509,6 +67542,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
             this.tenantId = _data["tenantId"];
             this.tenantName = _data["tenantName"];
             this.canBeRemoved = _data["canBeRemoved"];
+            this.code = _data["code"];
         }
     }
 
@@ -67534,6 +67568,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
         data["tenantId"] = this.tenantId;
         data["tenantName"] = this.tenantName;
         data["canBeRemoved"] = this.canBeRemoved;
+        data["code"] = this.code;
         return data;
     }
 }
@@ -67548,6 +67583,7 @@ export interface IContactInformationOutputDto {
     tenantId: number;
     tenantName: string | undefined;
     canBeRemoved: boolean;
+    code: string | undefined;
 
     [key: string]: any;
 }
@@ -79852,6 +79888,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
     phone!: string | undefined;
     phoneTypeId!: number | undefined;
     phoneTypeName!: string | undefined;
+    code!: string | undefined;
 
     [key: string]: any;
 
@@ -79878,6 +79915,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
             this.phone = _data["phone"];
             this.phoneTypeId = _data["phoneTypeId"];
             this.phoneTypeName = _data["phoneTypeName"];
+            this.code = _data["code"];
         }
     }
 
@@ -79902,6 +79940,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
         data["phone"] = this.phone;
         data["phoneTypeId"] = this.phoneTypeId;
         data["phoneTypeName"] = this.phoneTypeName;
+        data["code"] = this.code;
         return data;
     }
 }
@@ -79915,6 +79954,7 @@ export interface IGetAccountInformationOutputDto {
     phone: string | undefined;
     phoneTypeId: number | undefined;
     phoneTypeName: string | undefined;
+    code: string | undefined;
 
     [key: string]: any;
 }
@@ -79976,6 +80016,7 @@ export interface IPhoneNumberAndtype {
 }
 
 export class GetContactInformationDto implements IGetContactInformationDto {
+    code!: string | undefined;
     id!: number;
     name!: string | undefined;
     email!: string | undefined;
@@ -80002,6 +80043,7 @@ export class GetContactInformationDto implements IGetContactInformationDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.code = _data["code"];
             this.id = _data["id"];
             this.name = _data["name"];
             this.email = _data["email"];
@@ -80030,6 +80072,7 @@ export class GetContactInformationDto implements IGetContactInformationDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["code"] = this.code;
         data["id"] = this.id;
         data["name"] = this.name;
         data["email"] = this.email;
@@ -80047,6 +80090,7 @@ export class GetContactInformationDto implements IGetContactInformationDto {
 }
 
 export interface IGetContactInformationDto {
+    code: string | undefined;
     id: number;
     name: string | undefined;
     email: string | undefined;
@@ -80158,6 +80202,8 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactAddressCountryId!: number;
     contactAddressCountryCode!: string | undefined;
     branchCode!: string | undefined;
+    readonly companyCode!: string | undefined;
+    readonly contactCode!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -80207,6 +80253,8 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactAddressCountryId = _data["contactAddressCountryId"];
             this.contactAddressCountryCode = _data["contactAddressCountryCode"];
             this.branchCode = _data["branchCode"];
+            (<any>this).companyCode = _data["companyCode"];
+            (<any>this).contactCode = _data["contactCode"];
             this.id = _data["id"];
         }
     }
@@ -80254,6 +80302,8 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["contactAddressCountryId"] = this.contactAddressCountryId;
         data["contactAddressCountryCode"] = this.contactAddressCountryCode;
         data["branchCode"] = this.branchCode;
+        data["companyCode"] = this.companyCode;
+        data["contactCode"] = this.contactCode;
         data["id"] = this.id;
         return data;
     }
@@ -80290,6 +80340,8 @@ export interface IAppTransactionContactDto {
     contactAddressCountryId: number;
     contactAddressCountryCode: string | undefined;
     branchCode: string | undefined;
+    companyCode: string | undefined;
+    contactCode: string | undefined;
     id: number | undefined;
 
     [key: string]: any;

@@ -466,6 +466,8 @@
         styleClass="form-control aria-select"
         [required]="true"
         [placeholder]="'PleaseSelect' | localize"
+        optionLabel="label"
+        optionValue="value"
     >
     </p-dropdown>
 
@@ -486,6 +488,8 @@
                                             [required]="true"
                                             [placeholder]="'PleaseSelect' | localize"
                                             [(ngModel)]="accountInfoTemp.paymentTermsId"
+                                            optionLabel="label"
+                                            optionValue="value"
                                         >
                                         </p-dropdown>
                                         </div>

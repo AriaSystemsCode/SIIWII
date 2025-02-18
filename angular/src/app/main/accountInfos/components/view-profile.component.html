@@ -230,11 +230,11 @@
                 <p class="title-dev-slider text-left">{{"Currency" | localize}}</p>
             </div>
 
-            <div class="col-4" *ngIf="accountData && accountData.shipVia">
+            <div class="col-4" *ngIf="accountData && accountData.shipViaName">
                 <p class="title-dev-slider text-left pl-5">{{"Ship Via" | localize}}</p>
             </div>
 
-            <div class="col-4" *ngIf="accountData && accountData.paymentTerm">
+            <div class="col-4" *ngIf="accountData && accountData.paymentTermsName">
                 <p class="title-dev-slider text-left">{{"Payment Terms" | localize}}</p>
             </div>
         </div>        
@@ -246,15 +246,15 @@
                             </div>
                         </div>
 
-                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.shipVia">
+                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.shipViaName">
                             <div class="account-type">
-                                <p class="title-tag">{{accountData.shipVia}}</p>
+                                <p class="title-tag">{{accountData.shipViaName}}</p>
                             </div>
                         </div>
 
-                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.paymentTerm">
+                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.paymentTermsName">
                             <div class="account-type">
-                                <p class="title-tag">{{accountData.paymentTerm}}</p>
+                                <p class="title-tag">{{accountData.paymentTermsName}}</p>
                             </div>
                         </div>
                         </div>
