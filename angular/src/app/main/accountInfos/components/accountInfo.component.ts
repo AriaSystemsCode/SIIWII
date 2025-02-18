@@ -830,7 +830,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.saveMyAccount()
             
         } else {
-            this.accountInfoTemp.accountLevel = !this.accountDataForView?.isConnected ?  this.accountLevel  : 1;
+            this.accountInfoTemp.accountLevel = !this.accountDataForView?.isConnected ?  this.accountLevel  : 2;
             this.saveExternalOrManualAccount()
         }
     }

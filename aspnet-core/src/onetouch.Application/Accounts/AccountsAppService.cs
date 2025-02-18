@@ -1935,7 +1935,20 @@ namespace onetouch.Accounts
             entity.Id = contactOriginal == null ? 0 : contactOriginal.EntityId;
 
             contact.Id = contactOriginal == null ? 0 : contactOriginal.Id;
-
+            //I46[Start]
+            if (input.AccountLevel ==  AccountLevelEnum.External && input.Id!=0)
+            {
+                var externalAcc = await _appContactRepository.GetAll()
+                    .Where(z => z.TenantId == AbpSession.TenantId && z.Id == input.Id).FirstOrDefaultAsync();
+                if (externalAcc != null)
+                {
+                    contact.PartnerId = externalAcc.PartnerId;
+                    contact.PartnerCode = externalAcc.PartnerCode;
+                    contact.ParentId = externalAcc.ParentId;
+                    contact.ParentCode = externalAcc.ParentCode;
+                }
+            }    
+            //I46[End]
 
             var isManual = (contact.TenantId == AbpSession.TenantId && !contact.IsProfileData && contact.ParentId == null && contact.PartnerId == null);
             if (string.IsNullOrEmpty(input.SSIN))

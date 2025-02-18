@@ -70,6 +70,7 @@ namespace onetouch.Accounts.Dtos
         public virtual string PaymentTermsName { set; get; }
         public virtual long? ShipViaId { set; get; }
         public virtual long? PaymentTermsId { set; get; }
+        public virtual string Code { set; get; }
         //I46[End]
     }
 }

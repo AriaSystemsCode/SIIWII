@@ -58266,6 +58266,7 @@ export class AccountDto implements IAccountDto {
     paymentTermsName!: string | undefined;
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
+    code!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -58336,6 +58337,7 @@ export class AccountDto implements IAccountDto {
             this.paymentTermsName = _data["paymentTermsName"];
             this.shipViaId = _data["shipViaId"];
             this.paymentTermsId = _data["paymentTermsId"];
+            this.code = _data["code"];
             this.id = _data["id"];
         }
     }
@@ -58404,6 +58406,7 @@ export class AccountDto implements IAccountDto {
         data["paymentTermsName"] = this.paymentTermsName;
         data["shipViaId"] = this.shipViaId;
         data["paymentTermsId"] = this.paymentTermsId;
+        data["code"] = this.code;
         data["id"] = this.id;
         return data;
     }
@@ -58445,6 +58448,7 @@ export interface IAccountDto {
     paymentTermsName: string | undefined;
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
+    code: string | undefined;
     id: number;
 
     [key: string]: any;

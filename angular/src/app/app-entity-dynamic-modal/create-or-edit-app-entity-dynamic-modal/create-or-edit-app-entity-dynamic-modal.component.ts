@@ -183,7 +183,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             }
             
         });
-        
+        this.getExtrAttributes();
         this.active = true;
         this.modal.show();
     }
