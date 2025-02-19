@@ -74,6 +74,8 @@ using Stripe;
 using Castle.Core.Resource;
 using onetouch.EntityFrameworkCore.Repositories;
 using onetouch.Onetouch.ValidationRules;
+using System.Reflection;
+using MimeKit.Tnef;
 
 namespace onetouch.AppItems
 {
@@ -124,6 +126,7 @@ namespace onetouch.AppItems
         private readonly IRepository<AppMarketplaceItemsListDetails, long> _appMarketplaceItemsListDetails;
 
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
+        private readonly IRepository<ValidationRule> _validationRuleRepo;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
@@ -149,7 +152,7 @@ namespace onetouch.AppItems
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
             IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
             IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
-             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails
+             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails, IRepository<ValidationRule> validationRuleRepo
             )
         {
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
@@ -195,6 +198,7 @@ namespace onetouch.AppItems
             //MMT
             _appItemSelectorRepository = appItemSelectorRepository;
             _sycEntityObjectCategory = sycEntityObjectCategory;
+            _validationRuleRepo = validationRuleRepo;
 
         }
         //mmt
@@ -1815,13 +1819,30 @@ namespace onetouch.AppItems
         //I46-POC
         public FluentValidation.Results.ValidationResult  ValidateItem(CreateOrEditAppItemDto input)
         {
-            var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
-            FluentValidation.Results.ValidationResult results = new FluentValidation.Results.ValidationResult();
-            ItemValidator validator = new ItemValidator(x);
-            results = validator.Validate(input);
+
+            //22
+           // var ruleService = new ValidationRuleService();
+            var validator = new DynamicValidator<CreateOrEditAppItemDto>(_validationRuleRepo);
+
+            //var person = new Person { FirstName = "", Age = -5 };
+            var result = validator.Validate(input);
+            return result;
+            //if (!result.IsValid)
+            //{
+            //    foreach (var error in result.Errors)
+            //    {
+            //        Console.WriteLine(error.ErrorMessage);
+            //    }
+            //}
+            ////22
+
+            //var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+            //FluentValidation.Results.ValidationResult results = new FluentValidation.Results.ValidationResult();
+            //ItemValidator validator = new ItemValidator(x);
+            //results = validator.Validate(input);
 
             
-            return results;
+            //return results;
         }
         //I46-POC
         public async Task<long> CreateOrEdit(CreateOrEditAppItemDto input)
@@ -8393,42 +8414,160 @@ namespace onetouch.AppItems
             });
             //RuleFor(x => x.Postcode).Must(BeAValidPostcode).WithMessage("Please specify a valid postcode");
         }
-        public class DynamicValidator<T> : AbstractValidator<T>
+      //MMT46-POC
+    }
+    //i46-poc
+    public class DynamicValidator<T> : AbstractValidator<T>
+    {
+        public DynamicValidator(IRepository<ValidationRule> validationRuleRepo)
         {
-            //IRepository<ValidationRule> 
-            public DynamicValidator(IRepository<ValidationRule> validationRuleRepository)
+            var entityName = typeof(T).Name;
+            var rules = validationRuleRepo.GetAll().ToList();
+
+            //foreach (var rule in rules)
+            //{
+            //    var property = typeof(T).GetProperty(rule.FieldName.TrimEnd());
+
+            //    if (property == null)
+            //        throw new InvalidOperationException($"Property '{rule.FieldName}' not found on entity ");
+
+            //    var expression = CreateExpression(property);
+            //    ApplyRule(expression, rule, property);
+            //}
+            foreach (var rule in rules)
             {
-                
-               var rules = validationRuleRepository.GetAll().ToList();
-                foreach (var rule in rules)
+                var property = typeof(T).GetProperty(rule.FieldName.TrimEnd());
+                if (property == null)
+                    throw new InvalidOperationException($"Property '{rule.FieldName.TrimEnd()}' not found.");
+
+                if (property.PropertyType == typeof(int))
                 {
-                    var property = typeof(T).GetProperty(rule.FieldName);
-                    if (property != null)
-                    {
-                        var expression = CreateValidationExpression(rule);
-                        if (expression != null)
-                        {
-                           //var ret = RuleFor(expression).WithMessage(rule.ErrorMessage);
-                        }
-                    }
+                    var expression = CreateExpression<int>(property);
+                    ApplyRule(expression, rule);
                 }
-            }
-            private Func<T, object> CreateValidationExpression(ValidationRule rule)
-            {
-                switch (rule.RuleType)
+                else if (property.PropertyType == typeof(string))
                 {
-                    case "NotEmpty":
-                        return x => typeof(T).GetProperty(rule.FieldName).GetValue(x, null);
-                    case "MaximumLength":
-                        return x => typeof(T).GetProperty(rule.FieldName).GetValue(x, null) as string;
-                    case "Email":
-                        return x => typeof(T).GetProperty(rule.FieldName).GetValue(x, null) as string;
-                    // Add more cases for other rule types
-                    default:
-                        return null;
+                    var expression = CreateExpression<string>(property);
+                    ApplyRule(expression, rule);
                 }
+                // Add more type checks as needed
             }
         }
-        //MMT46-POC
+        private void ApplyRule<TProperty>(System.Linq.Expressions.Expression<Func<T, TProperty>> expression, ValidationRule rule)
+        {
+            switch (rule.RuleType)
+            {
+                case "Nullable":
+                    RuleFor<TProperty>(expression).NotNull().WithMessage(rule.ErrorMessage);
+                    break;
+                case "NotEmpty":
+                    RuleFor<TProperty>(expression).NotEmpty().WithMessage(rule.ErrorMessage);
+                    break;
+
+                case "MaxLength":
+                    if (typeof(TProperty) == typeof(string) && int.TryParse(rule.RuleValue, out var maxLength))
+                        RuleFor<TProperty>(expression).Must(x=>x.ToString().Length <= maxLength).WithMessage(rule.ErrorMessage);
+                    break;
+                case "MinLength":
+                    if (typeof(TProperty) == typeof(string) && int.TryParse(rule.RuleValue, out var minLength))
+                        RuleFor<TProperty>(expression).Must(x => x.ToString().Length >= minLength).WithMessage(rule.ErrorMessage);
+                    break;
+                case "GreaterThan":
+                    if (TryConvertValue(rule.RuleValue, typeof(TProperty), out var minValue))
+                    {
+                        var greaterThanMethod = typeof(DefaultValidatorOptions)
+                            .GetMethods()
+                            .First(m => m.Name == "GreaterThan" && m.GetParameters().Length == 1)
+                            .MakeGenericMethod(typeof(TProperty));
+
+                        var ruleBuilder = RuleFor(expression);
+                        greaterThanMethod.Invoke(ruleBuilder, new[] { minValue });
+                       // ruleBuilder;//.WithMessage(rule.ErrorMessage);
+                    }
+                    break;
+                case "Custom":
+                    if (typeof(TProperty) == typeof(string))
+                    {
+                        var rulev = rule.RuleValue.Replace(rule.FieldName.TrimEnd(), "x." + rule.FieldName.TrimEnd());
+                        var expressionv = CreateStringExpression<TProperty>(rulev);
+                        RuleFor<TProperty>(expression).Must(expressionv).WithMessage(rule.ErrorMessage);
+                    }
+                    break;
+
+                default:
+                    throw new NotSupportedException($"Rule type '{rule.RuleType}' is not supported.");
+            }
+        }
+
+        private bool TryConvertValue(string value, Type targetType, out object convertedValue)
+        {
+            convertedValue = null;
+            try
+            {
+                if (targetType == typeof(int))
+                    convertedValue = int.Parse(value);
+                else if (targetType == typeof(double))
+                    convertedValue = double.Parse(value);
+                else if (targetType == typeof(decimal))
+                    convertedValue = decimal.Parse(value);
+                else if (targetType == typeof(DateTime))
+                    convertedValue = DateTime.Parse(value);
+                else
+                    return false;
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        private Func<TProperty, bool> CreateStringExpression<TProperty>(string property)
+        {
+            var parameter = System.Linq.Expressions.Expression.Parameter(typeof(T), "x");
+            var propertyAccess = System.Linq.Expressions.Expression.Property(parameter, property);
+            var lambda = System.Linq.Expressions.Expression.Lambda<Func<TProperty, bool>>(propertyAccess, parameter);
+            return lambda.Compile();
+        }
+        private System.Linq.Expressions.Expression<Func<T, TProperty>> CreateExpression<TProperty>(PropertyInfo property)
+        {
+            var parameter = System.Linq.Expressions.Expression.Parameter(typeof(T), "x");
+            var propertyAccess = System.Linq.Expressions.Expression.Property(parameter, property);
+            var lambda = System.Linq.Expressions.Expression.Lambda<Func<T, TProperty>>(propertyAccess, parameter);
+            return lambda;//.Compile();
+        }
+        //private void ApplyRule(System.Linq.Expressions.Expression<Func<T, T>> expression, ValidationRule rule, PropertyInfo property)
+        //{
+
+        //    switch (rule.RuleType)
+        //    {
+        //        case "NotEmpty":
+        //            RuleFor<T>(expression).NotEmpty().WithMessage(rule.ErrorMessage);
+        //            break;
+        //        case "MaximumLength":
+        //            if (int.TryParse(rule.RuleValue, out var maxLength))
+        //                RuleFor<T>(expression).Must(x => x.ToString().Length<=maxLength).WithMessage(rule.ErrorMessage);
+        //            break;
+        //        case "GreaterThan":
+        //            if (int.TryParse(rule.RuleValue, out var minValue))
+        //                RuleFor<T>(expression).Must(z=>int.Parse(z.ToString()) > minValue).WithMessage(rule.ErrorMessage);
+        //            break;
+        //        default:
+        //            throw new NotSupportedException($"Rule type '{rule.RuleType}' is not supported.");
+        //    }
+        //}
+
+        //private System.Linq.Expressions.Expression<Func<T, T>> CreateExpression(System.Reflection.PropertyInfo property)
+        //{
+
+
+        //    var parameter = System.Linq.Expressions.Expression.Parameter(typeof(T), "x");
+        //    var propertyAccess = System.Linq.Expressions.Expression.Property(parameter, property);
+        //    var conversion = System.Linq.Expressions.Expression.Convert(propertyAccess, typeof(T));
+        //    var lambda = System.Linq.Expressions.Expression.Lambda<Func<T, T>>(conversion, parameter);
+        //    return lambda;
+        //}
     }
+    //46-poc
+
 }
