@@ -50,6 +50,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     conNew:boolean = false
     comNew:boolean = false
     emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+    isCompanyExist : boolean = false
+    isBranchExist : boolean = false
+    isContactExist : boolean = false
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -396,6 +399,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = "";
 
                         }
     
@@ -480,7 +484,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.allBranches = result;
                 if(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.branchName){
                     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch = this.allBranches?.find(x => x.name == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.branchName);
-
+                      this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode
                 }else if (this.allBranches.length==1){
                     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch =this.allBranches[0];
                 }
@@ -604,9 +608,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             if((this.appTransactionsForViewDto?.buyerCompanySSIN == '' || this.appTransactionsForViewDto?.buyerCompanySSIN == null) && this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo && isValid ) {
                 this.validateTempBuyer.emit(true)
                 this.updateAppTransactionsForViewDto.emit(this.appTransactionsForViewDto);
+                  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode =  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code;
 
             }
             else if (isValid ) {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode =  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code;
+
                 this.updateAppTransactionsForViewDto.emit(this.appTransactionsForViewDto);
             }
 
@@ -744,6 +751,28 @@ console.log(event,'ebbbbb')
     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = event?.code
     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode = event?.code
 }
+
+isCodoExist(code: string,filed:string) {
+    if(filed == 'company') {
+        if (!code) return; // Avoid unnecessary API calls if code is empty
+        this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
+            this.isCompanyExist = result; // If true, display the message
+        });
+    } else if (filed == 'contact'){
+        if (!code) return; // Avoid unnecessary API calls if code is empty
+        this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
+            this.isContactExist = result; // If true, display the message
+        });
+    } else {
+        if (!code) return; // Avoid unnecessary API calls if code is empty
+        this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
+            this.isBranchExist = result; // If true, display the message
+        });
+    }
+  
+}
+
+
     ngDoCheck() {
         
         this.isValidForm();
