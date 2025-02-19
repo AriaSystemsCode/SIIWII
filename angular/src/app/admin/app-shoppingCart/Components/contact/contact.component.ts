@@ -646,6 +646,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             // this.handlePhoneSearch(event.phoneList)
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code =  event?.code ;
+            
 
             if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone
