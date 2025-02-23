@@ -76,6 +76,7 @@ export class MarketplaceViewProductComponent
     handleSCreenSelect :number = 0
     chk_Order_by_prepack:boolean [] =[]
     visible: boolean = false;
+    priceLevel :any
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -88,6 +89,7 @@ export class MarketplaceViewProductComponent
     ) {
         super(injector);
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
+        this.priceLevel = localStorage.getItem("tempPriceLevel");
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
     }
@@ -195,6 +197,7 @@ export class MarketplaceViewProductComponent
                         this.productBodyData.currencyCode,
                         this.productBodyData.buyerSSIN,
                         this.productBodyData.sellerSSIN,
+                        this.priceLevel,
                         this.productBodyData.id,
                         undefined,
                         undefined,

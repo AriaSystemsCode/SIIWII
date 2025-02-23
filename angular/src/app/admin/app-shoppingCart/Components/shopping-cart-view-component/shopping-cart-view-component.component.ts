@@ -1280,6 +1280,7 @@ stopReport(event) {
          
             localStorage.removeItem("comNew");
             localStorage.removeItem("conNew");
+            localStorage.removeItem("tempPriceLevel");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
          this.getShoppingCartData()
