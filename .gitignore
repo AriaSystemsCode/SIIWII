@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/angular/src/app/admin/validationRules/validationRules
+/angular/src/app/admin/validationRules/validationRules
+/aspnet-core/src/onetouch.Application/Onetouch/ValidationRules
+/aspnet-core/src/onetouch.Application.Shared/Onetouch/ValidationRules
+/aspnet-core/src/onetouch.Core/Onetouch/ValidationRules
+/aspnet-core/src/onetouch.Core.Shared/Onetouch/ValidationRules
+/.gitignore
+/.gitignore
