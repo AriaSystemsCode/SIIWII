@@ -594,15 +594,27 @@ export class SendMessageModalComponent
                             .split(',')
                             .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
             
-                        // Set default selected users
-                        this.toUsers = this.filteredUsers.filter((user) =>
-                            toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
-                        );
+                        // // Set default selected users
+                        if(this.parentId){
+                            this.toUsers = this.filteredUsers.filter((user) =>
+                                toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
+
+                            );
+
+
+                            this._MessageServiceProxy
+                            .getMessagesForView(this.parentId)
+                            .subscribe((result) => {
+                           
+                                this.subject = result[0].messages.subject;
+                            });
+                        }
+                   
             
                         // Debugging logs
-                        console.log('Filtered Users:', this.filteredUsers);
-                        console.log('toNameArray:', toNameArray);
-                        console.log('Default toUsers:', this.toUsers);
+                        // console.log('Filtered Users:', this.filteredUsers);
+                        // console.log('toNameArray:', toNameArray);
+                        // console.log('Default toUsers:', this.toUsers);
                     });
             }
 }
