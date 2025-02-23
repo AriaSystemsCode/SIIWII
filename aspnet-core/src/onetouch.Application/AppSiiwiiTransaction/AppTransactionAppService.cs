@@ -1777,7 +1777,10 @@ namespace onetouch.AppSiiwiiTransaction
                 if (objectRec != null)
                 {
                     //XX
-                    var header = await _appTransactionsHeaderRepository.GetAll().Where(x => x.EntityObjectTypeId == objectRec.Id && x.EntityObjectStatusId == null && x.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                    var header = await _appTransactionsHeaderRepository.GetAll()
+                        .Where(x => x.EntityObjectTypeId == objectRec.Id && x.EntityObjectStatusId == null && x.TenantId == AbpSession.TenantId &&
+                        (AbpSession.UserId == x.CreatorUserId || (AbpSession.UserId != x.CreatorUserId && x.CreationTime.AddDays(1) <= DateTime.Now))) 
+                        .FirstOrDefaultAsync();
                     if (header != null)
                     {
                         return header.Code;
