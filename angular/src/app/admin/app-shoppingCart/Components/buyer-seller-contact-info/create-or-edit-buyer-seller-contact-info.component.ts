@@ -82,6 +82,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.appTransactionsForViewDto.buyerBranchSSIN = buyerContact.branchSSIN 
     this.appTransactionsForViewDto.buyerContactEMailAddress = buyerContact.contactEmail 
     this.appTransactionsForViewDto.buyerContactPhoneNumber = buyerContact.contactPhoneNumber 
+    // this.appTransactionsForViewDto.contactPhoneTypeId = buyerContact.contactPhoneTypeId 
     // this.appTransactionsForViewDto.buyerContactSSIN = buyerContact.contactSSIN 
     // Log the Buyer contact
     console.log("Buyer Contact before sync:", buyerContact);
