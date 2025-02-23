@@ -75,7 +75,6 @@ namespace onetouch.Web.Startup
             return true; // Allow all types to be resolved
         }
     }
-
     public class Startup
     {
         private const string DefaultCorsPolicyName = "localhost";
@@ -143,12 +142,10 @@ namespace onetouch.Web.Startup
             catch (Exception ex) { }
 
         }
-
         private void ConfigureSwagger(IServiceCollection services)
         {
             services.AddSwaggerGen();
         }
-
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ////DevExpress config
@@ -176,15 +173,6 @@ namespace onetouch.Web.Startup
 
             services.AddSingleton<IServiceProviderIsService, CustomServiceProviderIsService>();
             ConfigureSwagger(services);
-
-            // Register missing service
- 
-            services.AddSingleton<IServiceProviderIsService, CustomServiceProviderIsService>();
-             
-
-            // Other necessary configurations
-            ConfigureSwagger(services);
-
 
 
             services.Configure<FormOptions>(x =>
