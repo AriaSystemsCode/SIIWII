@@ -2115,6 +2115,7 @@ namespace onetouch.AppSiiwiiTransaction
                             select new GetAccountInformationOutputDto()
                             {
                                 Id = o.Id,
+                                Code = o.Code,
                                 Name = o.Name.TrimEnd(),
                                 CurrencyCode = new CurrencyInfoDto
                                 {
