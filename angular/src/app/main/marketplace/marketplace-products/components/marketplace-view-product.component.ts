@@ -76,6 +76,7 @@ export class MarketplaceViewProductComponent
     handleSCreenSelect :number = 0
     chk_Order_by_prepack:boolean [] =[]
     visible: boolean = false;
+    showSpecialPrice: boolean = false;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -92,7 +93,7 @@ export class MarketplaceViewProductComponent
         this.filteredColors = this.colorsData;
     }
     ngOnInit(): void {
-
+        this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
         const screenWidth = window.innerWidth;
         if (screenWidth >= 992) { // lg screen
           this.handleSCreenSelect = 5
