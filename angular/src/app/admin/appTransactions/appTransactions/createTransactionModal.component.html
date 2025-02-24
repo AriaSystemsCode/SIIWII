@@ -477,14 +477,26 @@
                         >
                             <div>
                                 <p-dropdown
+                                class="custom-dropdown"
+                                [ngClass]="{
+                                    'addDanger': submitted && orderForm.get('buyerCompanyBranch')?.hasError('required')
+                                }"
                                 *ngIf="!isBuyerTempAccount" 
-                                    [options]="buyerBranches"
-                                    formControlName="buyerCompanyBranch"
-                                    [filter]="true"
-                                    optionLabel="name"
-                                    placeholder="Please Select Branch"
-                                    [required]="!isBuyerTempAccount"
-                                ></p-dropdown>
+                                [options]="buyerBranches"
+                                formControlName="buyerCompanyBranch"
+                                [filter]="true"
+                                optionLabel="name"
+                                placeholder="Please Select Branch"
+                                [required]="!isBuyerTempAccount"
+                            ></p-dropdown>
+                            
+                            <small
+                                class="text-danger"
+                                *ngIf="submitted && orderForm.get('buyerCompanyBranch')?.hasError('required')"
+                            >
+                                Branch is required
+                            </small>
+                            
                             </div>
                             <input
                             type="text"
@@ -820,7 +832,9 @@
                             >
                                 <div >
                                     <p-dropdown
-                                
+                                    [ngClass]="{
+                                        'addDanger': submitted && orderForm.get('sellerCompanyBranch')?.hasError('required')
+                                    }"
                                         [options]="sellerBranches"
                                         formControlName="sellerCompanyBranch"
                                         [filter]="true"
