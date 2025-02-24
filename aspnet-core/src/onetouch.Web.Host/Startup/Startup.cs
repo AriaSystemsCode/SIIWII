@@ -38,6 +38,8 @@ using onetouch.Configure;
 using onetouch.Schemas;
 using onetouch.Web.HealthCheck;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+
 using Owl.reCAPTCHA;
 using HealthChecksUISettings = HealthChecks.UI.Configuration.Settings;
 using onetouch.ActionFilters;
@@ -60,9 +62,18 @@ using Microsoft.AspNetCore.Http.Features;
 using DevExpress.AspNetCore.Reporting.QueryBuilder;
 using Microsoft.AspNetCore.SignalR;
 using onetouch.Build;
+using k8s.KubeConfigModels;
 
 namespace onetouch.Web.Startup
 {
+    public class CustomServiceProviderIsService : IServiceProviderIsService
+    {
+        public bool IsService(Type serviceType)
+        {
+            return true; // Allow all types to be resolved
+        }
+    }
+
     public class Startup
     {
         private const string DefaultCorsPolicyName = "localhost";
@@ -131,6 +142,11 @@ namespace onetouch.Web.Startup
 
         }
 
+        private void ConfigureSwagger(IServiceCollection services)
+        {
+            services.AddSwaggerGen();
+        }
+
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ////DevExpress config
@@ -155,6 +171,15 @@ namespace onetouch.Web.Startup
             services.AddScoped<ReportStorageWebExtension, CustomReportStorageWebExtension>();
             services.AddSingleton<IWebDocumentViewerExceptionHandler, CustomWebDocumentViewerExceptionHandler>();
             services.AddTransient<onetouch.Web.Host.Controllers.CustomQueryBuilderController>();
+
+
+            // Register missing service
+ 
+            services.AddSingleton<IServiceProviderIsService, CustomServiceProviderIsService>();
+             
+
+            // Other necessary configurations
+            ConfigureSwagger(services);
 
 
 

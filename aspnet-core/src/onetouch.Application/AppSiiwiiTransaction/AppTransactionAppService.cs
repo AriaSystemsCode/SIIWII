@@ -3634,7 +3634,11 @@ namespace onetouch.AppSiiwiiTransaction
 
                         if (item.ParentFkList == null)
                             item.ParentFkList = new List<AppItem>();
-                        item.ParentFkList.Add(varItem);
+                        //MMTM
+                        var variationExist = item.ParentFkList.Where(z => z.Code == varItem.Code).FirstOrDefault();
+                        if (variationExist == null)
+                            //MMTM
+                            item.ParentFkList.Add(varItem);
 
                     }
 

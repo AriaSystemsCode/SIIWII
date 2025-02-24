@@ -284,6 +284,7 @@ export class MarketplaceViewProductComponent
         this.isColorView = true
         this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex]?.colorImg;
         this.setSizes(this.currentIndex)
+        this.scrollIntoView();
     }
 
     slideToPreviousImage(): void {
@@ -293,6 +294,17 @@ export class MarketplaceViewProductComponent
         this.isColorView = true;
         this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex]?.colorImg;
         this.setSizes(this.currentIndex)
+        
+        this.scrollIntoView();
+    }
+
+    scrollIntoView(): void {
+        setTimeout(() => {
+            const activeElement = document.querySelector('.slider .border-primary');
+            if (activeElement) {
+                activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 100); // Small delay to allow rendering
     }
 
     // create order by size summary JSON

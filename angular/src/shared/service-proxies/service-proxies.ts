@@ -80796,6 +80796,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     eomDays!: number;
     eom!: boolean;
     netDueDays!: number;
+    buyerBranchCode!: string | undefined;
     lastRecord!: boolean;
     firstRecord!: boolean;
     creatorUserId!: number;
@@ -80911,6 +80912,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.eomDays = _data["eomDays"];
             this.eom = _data["eom"];
             this.netDueDays = _data["netDueDays"];
+            this.buyerBranchCode = _data["buyerBranchCode"];
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
             this.creatorUserId = _data["creatorUserId"];
@@ -81064,6 +81066,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["eomDays"] = this.eomDays;
         data["eom"] = this.eom;
         data["netDueDays"] = this.netDueDays;
+        data["buyerBranchCode"] = this.buyerBranchCode;
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
         data["creatorUserId"] = this.creatorUserId;
@@ -81206,6 +81209,7 @@ export interface IGetAllAppTransactionsForViewDto {
     eomDays: number;
     eom: boolean;
     netDueDays: number;
+    buyerBranchCode: string | undefined;
     lastRecord: boolean;
     firstRecord: boolean;
     creatorUserId: number;
