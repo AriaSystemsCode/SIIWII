@@ -408,7 +408,7 @@
                         >
                             <div
                                 class="price pt-2"
-                                *ngIf="
+                                *ngIf="appItemForViewDto?.minPrice &&
                                     appItemForViewDto?.minPrice !=
                                     appItemForViewDto?.maxPrice
                                 "
@@ -418,6 +418,18 @@
                                 }}{{ appItemForViewDto?.minPrice }} -
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{ appItemForViewDto?.maxPrice }}
+                            </div>
+                            <div
+                                class="price pt-2"
+                                *ngIf="!appItemForViewDto?.minPrice &&
+                                    appItemForViewDto?.minPrice !=
+                                    appItemForViewDto?.maxPrice
+                                "
+                            >
+                                {{ "MSRP" | localize }}:
+                                {{ tenantDefaultCurrency.symbol
+                                }}
+                                {{ appItemForViewDto?.maxPrice }}
                             </div>
                             <div
                                 class="price pt-2"
