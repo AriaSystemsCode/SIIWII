@@ -195,11 +195,17 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
             if (this.appTransactionsForViewDto?.entityCategories) {
                 this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-                this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
+                if(this.appTransactionsForViewDto.entityCategoriesNames?.items.length > 0){
+                    this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
+
+                }
             }
             if (this.appTransactionsForViewDto?.entityClassifications) {
                 this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-                this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
+                if(this.appTransactionsForViewDto.entityClassificationsNames?.items.length >0){
+                    this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
+
+                }
             }
         }
       
@@ -674,7 +680,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         .pipe(finalize(() =>  {
 
     //  this.SuccessMsg = true
-            // this.generatOrderReport.emit(true)      
+           
         }))
            
         .subscribe((res) => {
@@ -871,7 +877,8 @@ onNodeSelectCat(event: any) {
             });
         });
     
-
+        this.appTransactionsForViewDto.entityCategoriesNames.totalCount = this.selectedCategories.length;
+        this.appTransactionsForViewDto.entityCategoriesNames.items = this.selectedCategories.map(item => item.entityObjectCategoryName || '');
         this.showExistCat = false;
         this.treeSelect.hide();  
         this.getAppTransactionList();  
@@ -1136,6 +1143,10 @@ getParentNode(node: TreeNode): TreeNode | null {
             });
         });
 
+        // this.appTransactionsForViewDto.entityClassificationsNames = new PagedResultDtoOfString();
+        this.appTransactionsForViewDto.entityClassificationsNames.totalCount = this.selectedClassification.length;
+        this.appTransactionsForViewDto.entityClassificationsNames.items = this.selectedClassification.map(item => item.entityObjectClassificationName || '');
+
         // this.showSelectedClass = true;
      
         this.showExistClass = false;
@@ -1289,11 +1300,17 @@ cancelClass(){
 
         if (this.appTransactionsForViewDto?.entityCategories) {
             this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-            this.selectedCategoriesShow = [...this.selectedCategories];
+            if(this.appTransactionsForViewDto.entityCategoriesNames?.items.length > 0){
+                this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
+
+            }
         }
         if (this.appTransactionsForViewDto?.entityClassifications) {
             this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-            this.selectedClassificationsShow= [...this.selectedClassification];
+            if(this.appTransactionsForViewDto.entityClassificationsNames?.items.length >0){
+                this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
+
+            }
         }
     }
     cancel() {
