@@ -1437,6 +1437,10 @@ stopReport(event) {
     this.getShoppingCartData()
       }
   
+    } else if (this.currentTab==0) {
+      if (event) {
+        this.getShoppingCartData()
+          }
     }
   }
   
