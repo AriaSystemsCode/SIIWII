@@ -2010,17 +2010,31 @@ namespace onetouch.Accounts
             GetContactDefaultsOutput output = new GetContactDefaultsOutput();
             var paymentTermsId = await _helper.SystemTables.GetEntityObjectTypeId("PAYMENT-TERMS", true);
             var shipViaId = await _helper.SystemTables.GetEntityObjectTypeId("SHIPVIA", true);
-            var defPaymentTerms = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == paymentTermsId && z.TenantId == AbpSession.TenantId && z.IsDefault==true).FirstOrDefaultAsync();
+            var defPaymentTerms = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == paymentTermsId && (z.TenantId == AbpSession.TenantId || z.TenantId == null) && z.IsDefault==true).FirstOrDefaultAsync();
             if (defPaymentTerms != null)
             {
-                output.PaymentTermsId = defPaymentTerms.Id ;
+                output.PaymentTermsId = defPaymentTerms.Id;
                 output.PaymentTermsCode = defPaymentTerms.Code;
                 output.PaymentTermsName = defPaymentTerms.Name;
+            }
+            else
+            {
+                var firstObject = await _appEntityRepository.GetAll()
+                                    .Where(z => z.EntityObjectTypeId == paymentTermsId && (z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
+                if (firstObject != null)
+                {
+                    firstObject.IsDefault = true;
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    output.PaymentTermsId = firstObject.Id;
+                    output.PaymentTermsCode = firstObject.Code;
+                    output.PaymentTermsName = firstObject.Name;
+                }
+
             }
             //var account = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
             //   && a.TenantId == AbpSession.TenantId
             //   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
-            var defShipVia= await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == shipViaId && z.TenantId == AbpSession.TenantId && z.IsDefault == true).FirstOrDefaultAsync();
+            var defShipVia= await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == shipViaId && (z.TenantId == AbpSession.TenantId || z.TenantId == null) && z.IsDefault == true).FirstOrDefaultAsync();
             if (defShipVia != null)
             {
                 output.ShipViaId = defShipVia.Id;
@@ -2028,8 +2042,22 @@ namespace onetouch.Accounts
                 output.ShipViaName = defShipVia.Name;
 
             }
-            return output;
+            else
+            {
+                var firstObject = await _appEntityRepository.GetAll()
+                                    .Where(z => z.EntityObjectTypeId == shipViaId && (z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
+                if (firstObject != null)
+                {
+                    firstObject.IsDefault = true;
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    output.ShipViaId = firstObject.Id;
+                    output.ShipViaCode = firstObject.Code;
+                    output.ShipViaName = firstObject.Name;
+                }
 
+            }
+            return output;
+            
         }
         //I46[End]
         //MARIAM

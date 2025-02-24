@@ -533,10 +533,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     if(result){
                         this.languageIdName=result.languageName;
                         this.accountInfoTemp.languageId=result.accountInfo.languageId;
-                        this.accountInfoTemp.paymentTermsId=  !result?.accountInfo?.id  ?  this.paymentTermsId  :  
+                        this.accountInfoTemp.paymentTermsId=  ! this.accountInfoTemp?.id  ?  this.paymentTermsId  :  
                         result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
             this.accountInfoTemp.shipViaId= 
-            !result?.accountInfo?.id  ?  this.shipViaId  :  
+            ! this.accountInfoTemp?.id  ?  this.shipViaId  :  
                result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
                     }
 
@@ -545,10 +545,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             }
 
             else{
-                this.accountInfoTemp.paymentTermsId= !result?.accountInfo?.id  ?  this.paymentTermsId  :  
+                this.accountInfoTemp.paymentTermsId= ! this.accountInfoTemp?.id  ?  this.paymentTermsId  :  
                 result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
     this.accountInfoTemp.shipViaId= 
-    !result?.accountInfo?.id  ?  this.shipViaId  :  
+    ! this.accountInfoTemp?.id  ?  this.shipViaId  :  
        result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
             }
         this.getAllForAccountInfo();

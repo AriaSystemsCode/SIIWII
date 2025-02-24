@@ -139,7 +139,7 @@ namespace onetouch.AppEntities
                 if (defaultObject == null)
                 {
                     var firstObject = await _appEntityRepository.GetAll()
-                    .Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+                    .Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId && (z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
                     if (firstObject != null)
                     {
                         firstObject.IsDefault =true;
