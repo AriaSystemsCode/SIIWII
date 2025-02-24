@@ -14,5 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Abp" Version="8.0.0" />
     <PackageReference Include="Abp.Zero.Common" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
   </ItemGroup>
 </Project>
