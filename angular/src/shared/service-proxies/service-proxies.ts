@@ -79604,6 +79604,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -79713,6 +79714,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -79856,6 +79858,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -79984,6 +79987,7 @@ export interface IGetAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -80646,6 +80650,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     eomDays!: number;
     eom!: boolean;
     netDueDays!: number;
+    buyerBranchCode!: string | undefined;
     lastRecord!: boolean;
     firstRecord!: boolean;
     creatorUserId!: number;
@@ -80665,6 +80670,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -80760,6 +80766,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.eomDays = _data["eomDays"];
             this.eom = _data["eom"];
             this.netDueDays = _data["netDueDays"];
+            this.buyerBranchCode = _data["buyerBranchCode"];
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
             this.creatorUserId = _data["creatorUserId"];
@@ -80783,6 +80790,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -80912,6 +80920,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["eomDays"] = this.eomDays;
         data["eom"] = this.eom;
         data["netDueDays"] = this.netDueDays;
+        data["buyerBranchCode"] = this.buyerBranchCode;
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
         data["creatorUserId"] = this.creatorUserId;
@@ -80935,6 +80944,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -81053,6 +81063,7 @@ export interface IGetAllAppTransactionsForViewDto {
     eomDays: number;
     eom: boolean;
     netDueDays: number;
+    buyerBranchCode: string | undefined;
     lastRecord: boolean;
     firstRecord: boolean;
     creatorUserId: number;
@@ -81072,6 +81083,7 @@ export interface IGetAllAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
