@@ -2315,13 +2315,16 @@ namespace onetouch.AppSiiwiiTransaction
                         var appContactSeller = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
                                 .ThenInclude(x => x.AttachmentFk)
                          .Where(e => e.SSIN == TransactionIdFk.SellerCompanySSIN).FirstOrDefault();
-                        objReturn.SellerId = appContactSeller.Id;
-                        var entitySeller = appContactSeller.EntityFk;
-                        if (entitySeller.EntityAttachments.Count() > 0)
+                        if (appContactSeller != null)
                         {
-                            var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
-                            var logo = entitySeller.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
-                            objReturn.SellerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            objReturn.SellerId = appContactSeller.Id;
+                            var entitySeller = appContactSeller.EntityFk;
+                            if (entitySeller.EntityAttachments.Count() > 0)
+                            {
+                                var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+                                var logo = entitySeller.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
+                                objReturn.SellerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            }
                         }
                     }
 
@@ -2808,7 +2811,7 @@ namespace onetouch.AppSiiwiiTransaction
                 var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
 
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails).Where(e => e.TenantId == AbpSession.TenantId
-                && e.CreatorUserId == AbpSession.UserId
+                //&& e.CreatorUserId == AbpSession.UserId
                 && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
                 && e.Id == orderId).FirstOrDefault();
 
@@ -2838,12 +2841,12 @@ namespace onetouch.AppSiiwiiTransaction
 
                 var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
                 var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
-                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
+                var filteredAppTransactions = await _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
                     .ThenInclude(e => e.EntityExtraData)
                     .Where(e => e.TenantId == AbpSession.TenantId
-                && e.CreatorUserId == AbpSession.UserId
+                //&& e.CreatorUserId == AbpSession.UserId
                 && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
-                && e.Id == orderId).FirstOrDefault();
+                && e.Id == orderId).FirstOrDefaultAsync();
 
                 if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
                 {
@@ -2870,6 +2873,7 @@ namespace onetouch.AppSiiwiiTransaction
                 filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
                 filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                 await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                await CurrentUnitOfWork.SaveChangesAsync();
                 return true;
             }
         }
