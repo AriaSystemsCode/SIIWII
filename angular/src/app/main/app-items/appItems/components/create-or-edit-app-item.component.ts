@@ -55,6 +55,7 @@ import { AppEntityDtoWithActions } from "../models/app-entity-dto-with-actions";
 import { PricingHelpersService } from "../../app-item-shared/services/pricing-helpers.service";
 import { ApplyVariationOutput } from "./create-edit-app-item-variations.component";
 import Swal from "sweetalert2";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
     selector: "app-create-or-edit-app-item",
@@ -207,6 +208,10 @@ export class CreateOrEditAppItemComponent
         }
         this.getCurrencies();
         this.getAspectatio();
+
+        let languageSettingName  =AppConsts.languageSettingName;
+        this._pricingHelperService.defaultLevel= languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
+      
     }
 
     aspectRatio;
