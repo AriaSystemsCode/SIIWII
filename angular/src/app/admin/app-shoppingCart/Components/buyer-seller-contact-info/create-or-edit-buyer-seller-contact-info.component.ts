@@ -82,7 +82,9 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.appTransactionsForViewDto.buyerBranchSSIN = buyerContact.branchSSIN 
     this.appTransactionsForViewDto.buyerContactEMailAddress = buyerContact.contactEmail 
     this.appTransactionsForViewDto.buyerContactPhoneNumber = buyerContact.contactPhoneNumber 
-    // this.appTransactionsForViewDto.contactPhoneTypeId = buyerContact.contactPhoneTypeId 
+     this.appTransactionsForViewDto.contactPhoneTypeId = buyerContact.contactPhoneTypeId 
+     this.appTransactionsForViewDto.contactPhoneTypeName = buyerContact.contactPhoneTypeName 
+     this.appTransactionsForViewDto.selectedPhoneType = buyerContact.selectedPhoneType 
     // this.appTransactionsForViewDto.buyerContactSSIN = buyerContact.contactSSIN 
     // Log the Buyer contact
     console.log("Buyer Contact before sync:", buyerContact);
@@ -112,6 +114,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
                 roleContact.contactPhoneNumber = buyerContact.contactPhoneNumber;
                 roleContact.contactPhoneTypeId = buyerContact.contactPhoneTypeId;
                 roleContact.contactPhoneTypeName = buyerContact.contactPhoneTypeName;
+                roleContact.selectedPhoneType = buyerContact.selectedPhoneType;
                 // roleContact.contactAddressCity = buyerContact.contactAddressCity;
                 // roleContact.contactAddressCode = buyerContact.contactAddressCode;
                 // roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
