@@ -1265,7 +1265,9 @@ namespace onetouch.AppEntities
 
             try
             {
-                System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+                if (System.IO.File.Exists(tmpPath))
+                { System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true); }
+
             }
             catch (Exception ex)
             {
