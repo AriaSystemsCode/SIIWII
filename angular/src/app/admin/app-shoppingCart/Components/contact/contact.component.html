@@ -49,7 +49,7 @@
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"
                     (onSelect)="onChangeCompany($event)"
-                   
+                    (change)="appTransactionsForViewDto?.buyerCompanySSIN == '' ? addName($event) : ''"
                     [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" 
                     field="name" 
                     [forceSelection]="false" 
@@ -173,7 +173,7 @@
             -->
 
       
-          
+         
             <p-autoComplete
             #autoComplete
             [dropdown]="!tempAccount"
