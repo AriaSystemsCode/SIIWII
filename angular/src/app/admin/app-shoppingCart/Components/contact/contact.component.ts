@@ -354,6 +354,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         if ($event?.value) {
         
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.value?.phoneTypeId);
+           
         if ($event?.value?.phoneNumber) {
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = $event?.value?.phoneNumber
         }else {
@@ -362,6 +363,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
         else
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.phoneTypeId);
+          
+
         if (indx >= 0)
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes[indx];
 
@@ -759,6 +762,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     ngDoCheck() {
         
         this.isValidForm();
+        this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
         
     }
 
