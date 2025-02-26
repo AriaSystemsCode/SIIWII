@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
 import { ShoppingCartoccordionTabs } from "../../shopping-cart-view-component/ShoppingCartoccordionTabs";
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
@@ -23,8 +23,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
   loadAddresComponentShipFrom: boolean = false;
   loadAddresComponentShipTo: boolean = false;
-  contactIdARContact: string = '';
-  contactIdApContact: string = '';
+  contactIdARContact: string 
+  contactIdApContact: string 
   addressSelected: boolean = false;
   payTermsListList: any = [];
   isArContactsValid: boolean = false;
@@ -47,6 +47,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+    private _AccountsServiceProxy: AccountsServiceProxy,
   ) {
     super(injector);
 
@@ -68,6 +69,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   }
   ngOnInit() {
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
+      this.GetContactDefaults()
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
     apContactObj[0]?.companySSIN  && apContactObj[0]?.contactAddressDetail?.addressLine1 ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
@@ -124,7 +126,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
       apContactObj[0]?.contactAddressDetail  && apContactObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
       arContactObj[0]?.contactAddressDetail  && arContactObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
-debugger
+
       if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) {   
         this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
@@ -320,10 +322,30 @@ debugger
   }
 
   onchangePayment($event) {
+ 
     var indx = this.payTermsListList?.findIndex(x => x.value == $event?.value);
     if (indx >= 0) {
-      this.appTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
+      this.appTransactionsForViewDto.paymentTermsCode =  this.payTermsListList[indx].code;
       this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
     }
   }
+
+ 
+   GetContactDefaults(){
+    if(!this.appTransactionsForViewDto?.paymentTermsCode){
+      this._AccountsServiceProxy.getContactDefaults()
+      .subscribe((res)=>{
+    
+          if(!this.appTransactionsForViewDto.paymentTermsId && res.paymentTermsId){
+            this.appTransactionsForViewDto.paymentTermsId= res.paymentTermsId; 
+            this.appTransactionsForViewDto.paymentTermsCode= res.paymentTermsCode; 
+          } else if (!res.shipViaId){
+            
+            this.appTransactionsForViewDto.paymentTermsCode =  this.payTermsListList[0].code;
+            this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[0].value;
+          }
+      });
+    }
+    
+   }
 }

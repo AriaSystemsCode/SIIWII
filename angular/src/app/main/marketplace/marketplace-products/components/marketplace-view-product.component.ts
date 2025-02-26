@@ -86,6 +86,7 @@ export class MarketplaceViewProductComponent
     buyerbranchPO:any
     sellerbranchPO:any
     isBuyerInfoLoaded :boolean = false
+    alreadyOrderd:boolean = false
     productData: any;
      printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
      reportUrl="";
@@ -98,6 +99,7 @@ export class MarketplaceViewProductComponent
         private userClickService: UserClickService,
         private router: Router,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
+        private appItemsAppservice :AppItemsServiceProxy,
         injector: Injector
     ) {
         super(injector);
@@ -156,7 +158,7 @@ export class MarketplaceViewProductComponent
         // this.subscriptions.push(subs);
         this.filteredColors = this.colorsData;
       
-
+  this.IsVariationOrdered()
     }
  onFilterTextChanged() {
     this.showIconClose = this.filterText.trim() !== '';
@@ -978,6 +980,26 @@ if(this.isFromSellerRoom) {
         }
     }
     
+
+    IsVariationOrdered (){ 
+      
+        
+        this.appItemsAppservice.isVariationOrdered(this.productDetails?.code).pipe(
+                        finalize(() => {
+                            this.hideMainSpinner();
+                            // this.alreadyOrderd = true
+                        })
+                    )
+                    .subscribe( (res) => {
+                        console.log("is orderd", res);
+
+
+                    });
+
+    }
+
+
+
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
