@@ -176,6 +176,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                         console.log( this.savedAddressesList,' this.savedAddressesList')
                         this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
                             // console.log(result,'defauulllt')
+
                             if (result){
                                 if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo) {
                                     // Filter the result to find the address with addressType 'Shipping'
