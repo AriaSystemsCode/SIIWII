@@ -112,8 +112,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         } catch (err) {}
     } */
         expandedMessageId: number | null = null;
-        maxChars = 410; // Max characters before truncation
-        maxLines = 3;   // Max rows before truncation
+        maxChars = 300; // Max characters before truncation
+        maxLines = 2;   // Max rows before truncation
       
         toggleMessage(messageId: number) {
           this.expandedMessageId = this.expandedMessageId === messageId ? null : messageId;

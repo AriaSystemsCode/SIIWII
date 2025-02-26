@@ -109,10 +109,10 @@ appRootUrl() +
                         <!--    <label [ngClass]="{ labels: MessageTypeIndex == 4 }"> </label> -->
                     </li>
 
-                    <li class="link-item">
+                    <li class="link-item p-0">
                         <a href="javascript:;" (click)="selectMessagetype(5, l('Trash'))" [ngClass]="{
                                     activeLink: messageTypeIndex == 5
-                                }">
+                                }" style="display: flex;align-items: center;">
                             <img [src]="
                                         appRootUrl() +
                                         'assets/message/Messaging_Trash_icon.svg'
@@ -1016,7 +1016,7 @@ appRootUrl() +
                     
                     <div #messageEl id="contentmsg"  class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
                         [scrollTop]="scrolltop">
-                        <div style="position: relative" *ngFor="
+                        <div style="position: relative;min-height: 220px;margin-top: 15px;padding-bottom: 5px;" [ngClass]="i != messagesDetails.length - 1 ? 'border-bottom' : ''" *ngFor="
                                     let messagedetail of messagesDetails;
                                     let i = index 
                                 ">
@@ -1112,8 +1112,8 @@ appRootUrl() +
              (click)="toggleMessage(messagedetail.messages.id)">
              {{ expandedMessageId === messagedetail.messages.id ? 'See Less' : 'See More' }}
           </a>
-                            <br />
-                            <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
+                            <!-- <br /> -->
+                            <!-- <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" /> -->
                             <br />
                         </div>
                         <div>

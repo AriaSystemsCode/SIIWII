@@ -557,6 +557,8 @@ body .btn.btn-action:after {
     line-height: 0;
     padding-bottom: 13px;
     padding-top: 13px;
+    display: flex !important;
+    align-items: center !important;
 }
 .title-attach {
     font-size: 13px;
