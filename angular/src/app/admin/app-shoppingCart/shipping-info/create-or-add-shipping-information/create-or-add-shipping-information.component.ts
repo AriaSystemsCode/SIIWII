@@ -351,13 +351,13 @@ SuccessMsg: boolean = false;
    
       this._AccountsServiceProxy.getContactDefaults()
       .subscribe((res)=>{
-        if(!this.appTransactionsForViewDto.shipViaId && res.shipViaId){
+        // if(!this.appTransactionsForViewDto.shipViaId && res.shipViaId){
           this.appTransactionsForViewDto.shipViaId= res.shipViaId; 
           this.appTransactionsForViewDto.shipViaCode= res.shipViaCode; 
-        } else if (!res.shipViaId){
-          this.appTransactionsForViewDto.shipViaId = this.shipViaList[0]?.value ;
-          this.appTransactionsForViewDto.shipViaCode = this.shipViaList[0]?.code ;
-        }
+        // } else if (!res.shipViaId){
+        //   this.appTransactionsForViewDto.shipViaId = this.shipViaList[0]?.value ;
+        //   this.appTransactionsForViewDto.shipViaCode = this.shipViaList[0]?.code ;
+        // }
      
 
       });

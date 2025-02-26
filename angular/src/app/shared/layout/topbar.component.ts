@@ -160,6 +160,8 @@ export class TopBarComponent
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
     currencySymbol: string = "";
     visible:boolean =false;
+    displaneSel :boolean =false;
+    displaneBuy :boolean =false;
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,

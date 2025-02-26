@@ -986,7 +986,7 @@ if(this.isFromSellerRoom) {
         
         this.appItemsAppservice.isVariationOrdered(this.productDetails?.code).pipe(
                         finalize(() => {
-                            this.hideMainSpinner();
+                            // this.hideMainSpinner();
                             // this.alreadyOrderd = true
                         })
                     )

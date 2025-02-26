@@ -332,20 +332,20 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 
  
    GetContactDefaults(){
-    if(!this.appTransactionsForViewDto?.paymentTermsCode){
+
       this._AccountsServiceProxy.getContactDefaults()
       .subscribe((res)=>{
     
-          if(!this.appTransactionsForViewDto.paymentTermsId && res.paymentTermsId){
+          // if(!this.appTransactionsForViewDto.paymentTermsId && res.paymentTermsId){
             this.appTransactionsForViewDto.paymentTermsId= res.paymentTermsId; 
             this.appTransactionsForViewDto.paymentTermsCode= res.paymentTermsCode; 
-          } else if (!res.shipViaId){
+          // } else if (!res.shipViaId){
             
-            this.appTransactionsForViewDto.paymentTermsCode =  this.payTermsListList[0].code;
-            this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[0].value;
-          }
+          //   this.appTransactionsForViewDto.paymentTermsCode =  this.payTermsListList[0].code;
+          //   this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[0].value;
+          // }
       });
     }
     
-   }
+  
 }
