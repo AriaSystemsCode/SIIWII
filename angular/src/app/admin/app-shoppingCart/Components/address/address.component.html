@@ -66,7 +66,7 @@
             type="text"/> 
             <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
         </div>
-            <div class="d-flex justify-content-end" *ngIf="showAddBtn">
+            <div class="d-flex justify-content-end" *ngIf="showAddBtn && showEditDelBtn">
                 <button class="ml-2 add-new-add-btn" (click)="openAddAddressForm()">
                     <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
                 </button>
@@ -83,7 +83,7 @@
                 </div>
                  <div class="p mt-2 d-flex"  *ngIf="showAddBtn && showEditDelBtn">
                     <button (click)="editAddress(address.id)" class="acBtn">
-                        <img class="mx-1" src="../../../../../assets/icons/edit-icon.png">
+                        <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/edit-icon.png">
 
                             
                             
@@ -92,7 +92,7 @@
                         <!-- <i class="fas fa-edit ml-1 mr-1"></i> -->
                     </button>
                     <button (click)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && ((currentTab == 4 && shipInfoIndex == 2) ||  (currentTab == 5 && billingIndexInfo == 1))  ? deleteTempAddress(address.id):  deleteAddress(address.id)" class="acBtn">
-                        <img class="mx-1" src="../../../../../assets/icons/fluent_delete.png">
+                        <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/fluent_delete.png">
 
                             
                         <p class="delText">{{l("Delete")}}</p>
