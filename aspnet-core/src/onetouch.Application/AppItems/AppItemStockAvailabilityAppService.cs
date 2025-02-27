@@ -137,7 +137,7 @@ namespace onetouch.AppItems
             foreach (var excelDto in result)
             {
                 AppItem appItem = new AppItem();
-                appItem = _appItemRepository.GetAll().Include(x=>x.EntityFk).Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                appItem = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
@@ -151,7 +151,6 @@ namespace onetouch.AppItems
                 appItem.StockAvailability = long.Parse(excelDto.StockAvailable);
                 //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[Start]
                 appItem.TimeStamp = timeStamp;
-                appItem.EntityFk.TimeStamp = timeStamp;
                 //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[End]
                 appItemModifyList.Add(appItem);
                
@@ -166,7 +165,7 @@ namespace onetouch.AppItems
                 var parentCodes = result.Select(z => z.ParentCode).Distinct().ToList();
                 foreach (var parent in parentCodes)
                 {
-                    var parentItem = await _appItemRepository.GetAll().Include(x => x.EntityFk)//.Include(z => z.EntityFk)
+                    var parentItem = await _appItemRepository.GetAll()//.Include(z => z.EntityFk)
                         .Include(z => z.ParentFkList.Where(x => string.IsNullOrEmpty(x.Code)))//.ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
                         .Where(z => z.Code == parent && z.ItemType == 0).FirstOrDefaultAsync();
                     if (parentItem != null)
@@ -182,7 +181,7 @@ namespace onetouch.AppItems
                                 //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[Start]
                                 parentItem.TimeStamp = timeStamp;
                                 //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[End]
-                                parentItem.EntityFk.TimeStamp = timeStamp;
+
                                 parentItem.StockAvailability = sumQty;
                                 modifiedItems.Add(parentItem);
                             }
