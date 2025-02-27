@@ -3954,39 +3954,41 @@ namespace onetouch.Accounts
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
         protected async Task UpdateProfilePicture(string inputFileToken, long userId)
         {
-            byte[] byteArray;
+            byte[] byteArray=null ;
             try
             {
                 string fileName = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + inputFileToken;
-
+                if(System.IO.File.Exists(fileName))
                 byteArray = System.IO.File.ReadAllBytes(fileName);
             }
             catch (Exception exp)
             {
                 throw new UserFriendlyException("There is no such image file with the name: " + inputFileToken);
             }
-
-            if (byteArray.Length == 0)
+            if (byteArray != null)
             {
-                throw new UserFriendlyException("There is no such image file with the name: " + inputFileToken);
+                if (byteArray.Length == 0)
+                {
+                    throw new UserFriendlyException("There is no such image file with the name: " + inputFileToken);
+                }
+
+                if (byteArray.Length > MaxProfilPictureBytes)
+                {
+                    throw new UserFriendlyException(L("ResizedProfilePicture_Warn_SizeLimit", AppConsts.ResizedMaxProfilPictureBytesUserFriendlyValue));
+                }
+
+                var user = await UserManager.GetUserByIdAsync(userId);
+
+                if (user.ProfilePictureId.HasValue)
+                {
+                    await _binaryObjectManager.DeleteAsync(user.ProfilePictureId.Value);
+                }
+
+                var storedFile = new BinaryObject(AbpSession.TenantId, byteArray);
+                await _binaryObjectManager.SaveAsync(storedFile);
+
+                user.ProfilePictureId = storedFile.Id;
             }
-
-            if (byteArray.Length > MaxProfilPictureBytes)
-            {
-                throw new UserFriendlyException(L("ResizedProfilePicture_Warn_SizeLimit", AppConsts.ResizedMaxProfilPictureBytesUserFriendlyValue));
-            }
-
-            var user = await UserManager.GetUserByIdAsync(userId);
-
-            if (user.ProfilePictureId.HasValue)
-            {
-                await _binaryObjectManager.DeleteAsync(user.ProfilePictureId.Value);
-            }
-
-            var storedFile = new BinaryObject(AbpSession.TenantId, byteArray);
-            await _binaryObjectManager.SaveAsync(storedFile);
-
-            user.ProfilePictureId = storedFile.Id;
         }
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
 
