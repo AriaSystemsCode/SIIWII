@@ -16820,6 +16820,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param currencyCode (optional) 
      * @param buyerAccountSSIN (optional) 
      * @param sellerAccountSSIN (optional) 
+     * @param priceLevel (optional) 
      * @param itemId (optional) 
      * @param getAppItemAttributesInputForCategories_Sorting (optional) 
      * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
@@ -16835,7 +16836,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
+    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetMarketplaceAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -16869,6 +16870,8 @@ export class AppMarketplaceItemsServiceProxy {
             url_ += "BuyerAccountSSIN=" + encodeURIComponent("" + buyerAccountSSIN) + "&";
         if (sellerAccountSSIN !== undefined && sellerAccountSSIN !== null)
             url_ += "SellerAccountSSIN=" + encodeURIComponent("" + sellerAccountSSIN) + "&";
+        if (priceLevel !== undefined && priceLevel !== null)
+            url_ += "PriceLevel=" + encodeURIComponent("" + priceLevel) + "&";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
         else if (itemId !== undefined)
