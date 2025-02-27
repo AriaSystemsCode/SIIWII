@@ -335,11 +335,7 @@
                                 <div class="row pt-3 pb-3 pl-3">
                                     <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ;
     border-radius: 12px !important;" [ngClass]="{'upload':!attachment}"
-                                        *ngFor="let attachment of attachmentsSrcs; index as i"
-                                        (dragover)="onDragOver($event)"
-     (dragleave)="onDragLeave($event)"
-     (drop)="onDrop($event, i)"
->
+                                        *ngFor="let attachment of attachmentsSrcs; index as i">
                                         <label *ngIf="!attachment"
                                             class="d-flex flex-column justify-content-center h-100 align-items-center"
                                             for="file_{{i}}">

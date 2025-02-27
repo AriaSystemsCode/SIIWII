@@ -712,10 +712,7 @@
 </p-dropdown>
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
-                                            <div class="image-wrapper mb-5"   [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i" (dragover)="onDragOver($event)"
-                                            (dragleave)="onDragLeave($event)"
-                                            (drop)="onDrop($event, i)"
-                                       >
+                                            <div class="image-wrapper mb-5"   [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">
                                                 <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" style="border: 1px dashed #DADADA !important;
     border-radius: 12px !important;" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
                                                     <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons mt-3">
