@@ -4118,6 +4118,10 @@ namespace onetouch.AppItems
                     //}
                     foreach (var child in appItem.ParentFkList)
                     {
+                        //MMT
+                        if (string.IsNullOrEmpty(child.SSIN))
+                            continue;
+                        //MMT
                         child.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == child.Id).ToListAsync();
                         //var child = appItem.ParentFkList[a];
                         //var publishChild = await _appItemRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.PublishedListingItemId == child.Id);
