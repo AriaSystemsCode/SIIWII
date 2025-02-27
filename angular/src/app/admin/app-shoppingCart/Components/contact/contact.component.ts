@@ -747,7 +747,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     });
 }
 onChangeBranch(event){
-console.log(event,'ebbbbb')
     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = event?.code
     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode = event?.code
 }
@@ -772,7 +771,11 @@ isCodoExist(code: string,filed:string) {
   
 }
 
-
+setBranchCode(event){
+    console.log(event,'code bra')
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = event?.target?.value
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode = event?.target?.value
+}
     ngDoCheck() {
         
         this.isValidForm();

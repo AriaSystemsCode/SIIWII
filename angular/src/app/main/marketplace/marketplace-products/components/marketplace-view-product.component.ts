@@ -573,18 +573,18 @@ export class MarketplaceViewProductComponent
         });
     }
     
-    getOderNumber() {
+    // getOderNumber() {
        
-        this._appTransactionServiceProxy
-            .getNextOrderNumber("PO")
-            .pipe(finalize(() => {
+    //     this._appTransactionServiceProxy
+    //         .getNextOrderNumber("PO")
+    //         .pipe(finalize(() => {
             
-            }))
-            .subscribe((res: any) => {
-                this.orderNo = res;
+    //         }))
+    //         .subscribe((res: any) => {
+    //             this.orderNo = res;
               
-            });
-    }
+    //         });
+    // }
   
 
     getBuyerBranche(){
@@ -642,7 +642,7 @@ if(this.isFromSellerRoom) {
 
         Swal.fire({
             title: "",
-            text: "Are you sure your want to add ordered quantities to you cart ?",
+            text: "Are you sure you want to add ordered quantities to you cart ?",
             icon: "info",
             showCancelButton: true,
             confirmButtonText:
@@ -716,211 +716,224 @@ if(this.isFromSellerRoom) {
         }
         )
     }else if(this.ismarketPLace){
-       
+         
         this.getBuyerInfoForPO()
-        this.getOderNumber()
-        Swal.fire({
-            title: "",
-            text: "Are you sure your want to start purchase order?",
-            icon: "info",
-            showCancelButton: true,
-            confirmButtonText:
-                "Yes",
-            cancelButtonText: "No",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            backdrop: true,
-            customClass: {
-                popup: "popup-class",
-                icon: "icon-class",
-                content: "content-class",
-                actions: "actions-class",
-                confirmButton: "confirm-button-class2",
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
 
 
 
-                this.showMainSpinner()
-
-
-                    console.log(this.buyerDataofPO,'buyerDataofPO')
-
-                    this.body = {
-                                 
-                                     sellerContactName:null,
-                                                                         
-                                     buyerContactName: this.appSession.user.name,
-                                     sellerContactId:null,
-                                     buyerContactId:this.appSession.user.id,
-                                     sellerContactEmailAddress:null,
-                                     buyerContactEmailAddress:this.appSession.user.emailAddress,
-                                     // buyerContactEmailAddress:  this.buyerDataofPO.buyerContactEMailAddress,
-                                     buyerContactPhoneNumber: '',
-                                     sellerContactPhoneNumber:null,
-                                     buyerCompanyName: this.appSession.tenancyName,
-                                     sellerCompanyName:  this.productData.sellerCompanyName, 
-                                     enteredByUserRole: "I'm a Buyer",
-                                     code: this.orderNo,
-                                     transactionType:  1,
-                                     sellerContactSSIN: null,
-                                     buyerContactSSIN: this.appSession.user.accountId,
-                                     sellerCompanySSIN:  this.productData.sellerSSIN, 
-                                     buyerCompanySSIN:   this.buyerDataofPO.buyerCompanySSIN ,
-                                     buyerBranchSSIN: null,
-                                     buyerBranchName: '*Main*' ,
-                                     sellerBranchSSIN:  null,
-                                     sellerBranchName: '*Main*',
-                                         completeDate: moment(new Date).format('YYYY-MM-DD'),
-                                         enteredDate: moment(new Date).format('YYYY-MM-DD'),
-                                         startDate: moment(new Date).format('YYYY-MM-DD'),
-                                         availableDate: moment(new Date).format('YYYY-MM-DD'),
-                                     reference:  "",
-                                     priceLevel: "MSRP",
-                                     currencyId: this.appSession.tenant.currencyInfoDto.value
-                                 }; 
-             
-             
-             
-             
-             
-             
-             console.log(this.body,'kkkk booooodddddy')
-
-
-
-
-                this._AppTransactionServiceProxy
-                             .createOrEdit(this.body)
-                             .pipe(finalize(() =>  {
-                               
-
-      //     /////
-                for (let index = 0; index < this.colorsData?.length; index++) {
-                if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
-                    this.productDetails.variations.map((variation: any) => {
-                        if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
-                           let value= variation?.selectedValues[index];
-                                value.edRestAttributes.forEach((attr) => {
-                                    if (attr.extraAttrName === "SIZE") {
-                                        attr.values.forEach((sizeValue) => {
-                                            sizeValue.orderedQty = sizeValue.orderedPrePacks;
-                                            sizeValue.orderedPrePacks = 0;
-                                        });
-                                    }
-                                });
-                        }
-                    });
-                }
-            }
-                /////
-
-                let bodyRequest: any = {
-                    appItem: this.productDetails,
-                };
-                this.showMainSpinner();
-                this._AppTransactionServiceProxy
-                    .addTransactionDetails(
-                        localStorage.getItem("transNO"), 'PO',
-                        bodyRequest
-                    )
-                    .pipe(
-                        finalize(() => {
-                            this.hideMainSpinner();
-                            localStorage.setItem(
-                                "SellerSSIN",
-                                JSON.stringify(this.productBodyData.sellerSSIN)
-                            );
-                            localStorage.setItem(
-                                "currencyCode",
-                                JSON.stringify(this.productBodyData.currencyCode)
-                            );
-
-                            this.router.navigateByUrl("app/main/marketplace/products");
-                        })
-                    )
-                    .subscribe(async (res) => {
-                        console.log(">>", res);
-
-                        this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-
-                    });
-
-
-                             } ))
-                             .subscribe((response: any) => {
-                               
-                                     this._AppTransactionServiceProxy
-                                         .setCurrentUserActiveTransaction(
-                                             response
-                                         )
-                                         .subscribe((res) => {
-                                    
-                                             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-                                          
-                                      
-                                         });
-                                 
-                         
-             
-                                 //////
-                                 this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
-                                 this.printInfoParam.TransactionId=response;
-                             //  this.printInfoParam.orderType=this.formType.toUpperCase();
-                                 this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.body.enteredByUserRole);
-                                 this.printInfoParam.saveToPDF=true;
-                                 this.printInfoParam.tenantId = this.appSession?.tenantId
-                                 this.printInfoParam.userId = this.appSession?.userId
-                                 this.reportUrl = this.printInfoParam.getReportUrl()
-                            
-                                 localStorage.setItem("fromSellerRoom",JSON.stringify(true));
-                                 localStorage.setItem("fromMarketPlace",JSON.stringify(false));
-                                //  localStorage.setItem(
-                                //      "SellerId",
-                                //      JSON.stringify(this.sellerCompanyId)
-                                //  );
-                                
-                                 localStorage.setItem("transNO", this.orderNo);
-                                //  localStorage.setItem(
-                                //      "contactSSIN",
-                                //      JSON.stringify(this.buyerContactSSIN)
-                                //  );
-             
-                                //  localStorage.setItem(
-                                //      "SellerSSIN",
-                                //      JSON.stringify(this.body.sellerCompanySSIN)
-                                //  );
-             
-                          
-                                    //  localStorage.setItem(
-                                    //      "BuyerSSIN",
-                                    //      JSON.stringify(this.buyerCompanySSIN)
-                                    //  );
-             
+        this._appTransactionServiceProxy
+        .getNextOrderNumber("PO")
+        .pipe(finalize(() => {
+            Swal.fire({
+                title: "",
+                text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText:
+                    "Yes",
+                cancelButtonText: "No",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class2",
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+    
+    
+    
+                    this.showMainSpinner()
+    
+    
+                        console.log(this.buyerDataofPO,'buyerDataofPO')
+    
+                        this.body = {
                                      
+                                         sellerContactName:null,
+                                                                             
+                                         buyerContactName: this.appSession.user.name,
+                                         sellerContactId:null,
+                                         buyerContactId:this.appSession.user.id,
+                                         sellerContactEmailAddress:null,
+                                         buyerContactEmailAddress:this.appSession.user.emailAddress,
+                                         // buyerContactEmailAddress:  this.buyerDataofPO.buyerContactEMailAddress,
+                                         buyerContactPhoneNumber: '',
+                                         sellerContactPhoneNumber:null,
+                                         buyerCompanyName: this.appSession.tenancyName,
+                                         sellerCompanyName:  this.productData.sellerCompanyName, 
+                                         enteredByUserRole: "I'm a Buyer",
+                                         code: this.orderNo,
+                                         transactionType:  1,
+                                         sellerContactSSIN: null,
+                                         buyerContactSSIN: this.appSession.user.accountId,
+                                         sellerCompanySSIN:  this.productData.sellerSSIN, 
+                                         buyerCompanySSIN:   this.buyerDataofPO.buyerCompanySSIN ,
+                                         buyerBranchSSIN: null,
+                                         buyerBranchName: '*Main*' ,
+                                         sellerBranchSSIN:  null,
+                                         sellerBranchName: '*Main*',
+                                             completeDate: moment(new Date).format('YYYY-MM-DD'),
+                                             enteredDate: moment(new Date).format('YYYY-MM-DD'),
+                                             startDate: moment(new Date).format('YYYY-MM-DD'),
+                                             availableDate: moment(new Date).format('YYYY-MM-DD'),
+                                         reference:  "",
+                                         priceLevel: "MSRP",
+                                         currencyId: this.appSession.tenant.currencyInfoDto.value
+                                     }; 
+                 
+                 
+                 
+                 
+                 
+                 
+                 console.log(this.body,'kkkk booooodddddy')
+    
+    
+    
+    
+                    this._AppTransactionServiceProxy
+                                 .createOrEdit(this.body)
+                                 .pipe(finalize(() =>  {
                                    
-                                         
-                                     localStorage.setItem(
-                                         "currencyCode",
-                                         JSON.stringify(this.appSession.tenant.currencyInfoDto)
-                                     );
-                                 
-             
-                             
-                          
+    
+          //     /////
+                    for (let index = 0; index < this.colorsData?.length; index++) {
+                    if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
+                        this.productDetails.variations.map((variation: any) => {
+                            if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                               let value= variation?.selectedValues[index];
+                                    value.edRestAttributes.forEach((attr) => {
+                                        if (attr.extraAttrName === "SIZE") {
+                                            attr.values.forEach((sizeValue) => {
+                                                sizeValue.orderedQty = sizeValue.orderedPrePacks;
+                                                sizeValue.orderedPrePacks = 0;
+                                            });
+                                        }
+                                    });
+                            }
+                        });
+                    }
+                }
+                    /////
+    
+                    let bodyRequest: any = {
+                        appItem: this.productDetails,
+                    };
+                    this.showMainSpinner();
+                    this._AppTransactionServiceProxy
+                        .addTransactionDetails(
+                            localStorage.getItem("transNO"), 'PO',
+                            bodyRequest
+                        )
+                        .pipe(
+                            finalize(() => {
+                                this.hideMainSpinner();
+                                localStorage.setItem(
+                                    "SellerSSIN",
+                                    JSON.stringify(this.productBodyData.sellerSSIN)
+                                );
+                                localStorage.setItem(
+                                    "currencyCode",
+                                    JSON.stringify(this.productBodyData.currencyCode)
+                                );
+    
+                              this.goToShowroom()
+                            })
+                        )
+                        .subscribe(async (res) => {
+                            console.log(">>", res);
+    
+                            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+    
+                        });
+    
+    
+                                 } ))
+                                 .subscribe((response: any) => {
+                                   
+                                         this._AppTransactionServiceProxy
+                                             .setCurrentUserActiveTransaction(
+                                                 response
+                                             )
+                                             .subscribe((res) => {
+                                        
+                                                 this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+                                              
                                           
-                             });
-                 }
-
-
-
-
-
-      
-            }
+                                             });
+                                     
+                             
+                 
+                                     //////
+                                     this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
+                                     this.printInfoParam.TransactionId=response;
+                                 //  this.printInfoParam.orderType=this.formType.toUpperCase();
+                                     this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.body.enteredByUserRole);
+                                     this.printInfoParam.saveToPDF=true;
+                                     this.printInfoParam.tenantId = this.appSession?.tenantId
+                                     this.printInfoParam.userId = this.appSession?.userId
+                                     this.reportUrl = this.printInfoParam.getReportUrl()
+                                
+                                     localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+                                     localStorage.setItem("fromMarketPlace",JSON.stringify(false));
+                                    //  localStorage.setItem(
+                                    //      "SellerId",
+                                    //      JSON.stringify(this.sellerCompanyId)
+                                    //  );
+                                    
+                                     localStorage.setItem("transNO", this.orderNo);
+                                    //  localStorage.setItem(
+                                    //      "contactSSIN",
+                                    //      JSON.stringify(this.buyerContactSSIN)
+                                    //  );
+                 
+                                    //  localStorage.setItem(
+                                    //      "SellerSSIN",
+                                    //      JSON.stringify(this.body.sellerCompanySSIN)
+                                    //  );
+                 
+                              
+                                        //  localStorage.setItem(
+                                        //      "BuyerSSIN",
+                                        //      JSON.stringify(this.buyerCompanySSIN)
+                                        //  );
+                 
+                                         
+                                       
+                                             
+                                         localStorage.setItem(
+                                             "currencyCode",
+                                             JSON.stringify(this.appSession.tenant.currencyInfoDto)
+                                         );
+                                     
+                 
+                                 
+                              
+                                              
+                                 });
+                     }
+    
+    
+    
+    
+    
+          
+                }
+            
+            )
         
-        )
+        }))
+        .subscribe((res: any) => {
+            this.orderNo = res;
+          
+        });
+      
+
     }
     }
 
@@ -935,6 +948,7 @@ if(this.isFromSellerRoom) {
             JSON.stringify(this.productBodyData.currencyCode)
         );
         localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+      
         localStorage.setItem("fromMarketPlace",JSON.stringify(false));
         this.router.navigateByUrl("app/main/marketplace/products");
     }

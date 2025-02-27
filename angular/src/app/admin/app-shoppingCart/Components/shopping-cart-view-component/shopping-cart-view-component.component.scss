@@ -65,7 +65,10 @@
 button:disabled,
 button[disabled] {
     cursor: not-allowed !important;
-
+    // background: #B8B8B8 !important;
+    // color: white !important;
+    // font-weight: 700 !important;
+    // opacity: 1 !important;
 }
 
 //---------------------------------------------------------------------------------//
@@ -550,9 +553,11 @@ input.ng-invalid.ng-touched {
         }
     }
     .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-        width: 80px !important;
+        width: 90px !important;
         height: 66px !important;
         padding: 0 !important;
+        font-size: 11px !important;
+
         svg {
             width: 24px !important;
             height: 24px !important;
@@ -561,7 +566,7 @@ input.ng-invalid.ng-touched {
         }
     }
      .p-tabview .p-tabview-nav li {
-        width: 25% !important;
+        // width: 40% !important;
         height: 66px !important;
         border-right:  1px solid #eee !important;
     }
@@ -569,7 +574,7 @@ input.ng-invalid.ng-touched {
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 66px;
+        // width: 66px;
         height: 66px;
         font-size: 12px !important;
     }
@@ -580,8 +585,9 @@ input.ng-invalid.ng-touched {
         // border-bottom: 1px solid #eee !important;
         border-radius: 0 !important;
         padding: 0 !important;
-         width: 66px  !important;
+        //  width: 66px  !important;
          height: 66px !important;
+         max-width: 92px !important;
          .tab-header {
             background-color: #4A0D4A !important;
             border-radius: 6px !important;
@@ -931,7 +937,7 @@ padding: 0 !important;
         padding: 5px !important;
     }
     .p-tabview .p-tabview-nav li {
-        margin-right: 65px !important;
+        margin-right: 17px !important;
     }
     .tabPanel-custom {
     
@@ -1026,7 +1032,7 @@ padding: 0 !important;
         padding: 0 !important;
         //  width: 66px  !important;
          height: 66px !important;
-         margin: auto !important;
+        //  margin: auto !important;
         //  margin-top: 0 !important;
          .tab-header {
             // background-color: #4A0D4A !important;
@@ -1188,4 +1194,18 @@ input:checked + .slider:before {
     .p-inputnumber-buttons-stacked .p-inputnumber-input {
         text-align: end !important;
     }
+}
+
+.pBtntext {
+    background-color: #4A0D4A !important;
+    border:  none !important;
+    border-radius: 6px !important;
+    padding: 8px 32px !important;
+    color: #fff !important;
+}
+
+.form-label{
+    color: #1B101B;
+    font-weight: 600;
+    font-size: 16px;
 }

@@ -91,8 +91,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         
             this.selctedBradns = parsedFilters.brands;
         
-            console.log("Restored startShipDate:", this.startShipDate);
-            console.log("Restored endShipDate:", this.endShipDate);
+         
         }
         
         
@@ -100,7 +99,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         this.getAllProductCAtalogs();
         this.getParentDepartments();
         this.getAllBrands();
-
+        console.log(this.files,">> files" )
+        console.log(this.selectedFile,">> 555" )
    
         
     }
@@ -197,6 +197,10 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
                 totalCount: number;
             }) => {
                 this.files = res.items;
+                if(this.savedFilters){
+                    this.selectedFile = this.findNodeById(this.files, this.selectedFile[0]);
+                }
+                
             }
         );
     }
@@ -248,7 +252,18 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
                 });
         }
     }
-
+    findNodeById(nodes: any[], id: number): any {
+        for (let node of nodes) {
+          if (node.data.sycEntityObjectCategory.id === id) {
+            return node; // Return the node if the ID matches
+          }
+          if (node.children) {
+            const found = this.findNodeById(node.children, id);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
     nodeSelect(value: any) {
         console.log(">>", value);
         this.handledeDratmentsTreeSelections.emit(value);
@@ -312,6 +327,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+ 
         this.savedFilters = localStorage.getItem("productFilters");
             
         if (this.savedFilters) {

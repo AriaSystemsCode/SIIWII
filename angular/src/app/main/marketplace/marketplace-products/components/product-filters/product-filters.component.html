@@ -45,8 +45,11 @@
             </p-accordionTab>
             <!-- product list -->
             <p-accordionTab header="Departments" [selected]="true">
+            
                 <div class="card flex justify-content-start">
                     <p-tree
+                    [styleClass]="selectedFile?.length >0 ? 'bgAdd' : ''"
+                    [ngClass]="selectedFile?.length >0 ? 'bgAdd' : ''"
                         class="w-full md:w-30rem"
                         [value]="files"
                         (onNodeExpand)="nodeExpand($event)"

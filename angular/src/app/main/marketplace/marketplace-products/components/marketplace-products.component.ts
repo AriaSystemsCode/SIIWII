@@ -486,7 +486,8 @@ export class MarketplaceProductsComponent
         this.brands =[]
         this.skipCount= 0;
         this.maxResultCount= 12;
-
+        this.selectedDepartments =[]
+        this.onlyAvialbleStock = false
         localStorage.removeItem("productFilters");
         this.getAllProducts();
         // this.showMainSpinner();
