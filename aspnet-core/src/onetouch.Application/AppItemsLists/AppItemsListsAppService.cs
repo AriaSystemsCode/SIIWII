@@ -362,7 +362,12 @@ namespace onetouch.AppItemsLists
             {
 
                 var appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == id).Include(x => x.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
-
+                //MMT45
+                if (appItemsList == null)
+                {
+                    return await GetAppItemsListFromMarketplace(new EntityDto<long> { Id=id });
+                }
+                //MMT45
                 var output = new GetAppItemsListForEditOutput { AppItemsList = ObjectMapper.Map<CreateOrEditAppItemsListDto>(appItemsList), TenantId = appItemsList.TenantId };
                 output.AppItemsList.AppItemsListItems = await GetDetails(new GetDetailsInput { ItemListId = id, SkipCount = 0, MaxResultCount = 10 });
 

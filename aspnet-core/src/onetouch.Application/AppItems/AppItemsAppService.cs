@@ -2242,7 +2242,7 @@ namespace onetouch.AppItems
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
-            if (input.Id==0 && entity.TenantOwner!=null)
+            if (input.Id==0 && entity.TenantOwner!=null && entity.TenantOwner !=0)
             {
                 entity.AttachmentSourceTenantId = -1;
             }
@@ -2619,7 +2619,7 @@ namespace onetouch.AppItems
                     childEntity.TimeStamp = timeStamp;
                     if(appItemChild.TenantOwner==null)
                         appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
-                    if (input.Id == 0 && childEntity.TenantOwner != null)
+                    if (input.Id == 0 && childEntity.TenantOwner != null && childEntity.TenantOwner != 0)
                     {
                         childEntity.AttachmentSourceTenantId = -1;
                     }
