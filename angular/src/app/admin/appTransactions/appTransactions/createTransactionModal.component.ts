@@ -166,7 +166,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerBranchName:[""],
             reference:[""],
             priceLevel:['MSRP'],
-            currencyId:[438],
+            currencyId:[this.appSession.tenant.currencyInfoDto.value],
  
 
         });
@@ -226,7 +226,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerBranchName:[""],
             reference:[""],
             priceLevel:['MSRP'],
-            currencyId:[438],
+            currencyId:[this.appSession.tenant.currencyInfoDto.value],
    
 
             
@@ -677,7 +677,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 buyerContactName: this.orderForm.controls['buyerContactName']?.value,
                 buyerCompanyName: this.orderForm.controls['buyerCompanyName']?.value,
             });
-
+        localStorage.setItem('tempPriceLevel',this.orderForm.controls['priceLevel']?.value)
           
     }
 
@@ -835,7 +835,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
                         reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
                         priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "MSRP",
-                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : 438
+                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : this.appSession.tenant.currencyInfoDto.value
                     }; 
 
          
@@ -1302,7 +1302,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerBranchName:[""],
             reference:[""],
             priceLevel:[""],
-            currencyId:[""],
+            currencyId:[this.appSession.tenant.currencyInfoDto.value],
      
 
             

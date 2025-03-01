@@ -543,7 +543,7 @@
                                         [(ngModel)]="accountInfoTemp.currencyId" 
                                         formControlName="currencyId"
 
-                                            placeholder="USD"             ></p-dropdown>
+                                            [placeholder]="this.appSession.tenant.currencyInfoDto.label"             ></p-dropdown>
                                         
                                         </div>
                                        
