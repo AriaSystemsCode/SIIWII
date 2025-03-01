@@ -166,7 +166,7 @@
                       
                     </a>
                   </li>
-                  <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile">
+                  <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile && isRecordOwner">
                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)">
                       <img class="sidebar-menu-item-img"  src="assets/accounts/billingoptions.svg">
                       <span>{{l("AccountBilling")}}</span>
