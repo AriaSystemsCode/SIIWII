@@ -17,24 +17,24 @@
   <Bands>
     <Item1 Ref="13" ControlType="TopMarginBand" Name="TopMargin" HeightF="30" Dpi="254" />
     <Item2 Ref="14" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="38.3679733" Dpi="254" />
-    <Item3 Ref="15" ControlType="GroupHeaderBand" Name="groupHeaderBand1" Level="1" HeightF="827.297546" Dpi="254">
+    <Item3 Ref="15" ControlType="GroupHeaderBand" Name="groupHeaderBand1" Level="1" HeightF="931.2787" Dpi="254">
       <GroupFields>
         <Item1 Ref="16" FieldName="Id" />
       </GroupFields>
       <Controls>
-        <Item1 Ref="17" ControlType="XRLabel" Name="label50" Multiline="true" Text="Date:" TextAlignment="TopLeft" SizeF="620.2588,42.89911" LocationFloat="26.48187,550.170166" Dpi="254" Font="Arial, 7pt, style=Bold" Padding="5,5,0,0,254">
+        <Item1 Ref="17" ControlType="XRLabel" Name="label50" Multiline="true" Text="Date:" TextAlignment="TopLeft" SizeF="620.2588,58.77411" LocationFloat="26.48187,625.170166" Dpi="254" Font="Arial, 7pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="18" EventName="BeforePrint" PropertyName="Text" Expression="'Department: '+[BuyerDepartment]" />
           </ExpressionBindings>
           <StylePriority Ref="19" UseFont="false" UseTextAlignment="false" />
         </Item1>
-        <Item2 Ref="20" ControlType="XRLabel" Name="label11" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762177" LocationFloat="18.520834,168.716522" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
+        <Item2 Ref="20" ControlType="XRLabel" Name="label11" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762177" LocationFloat="18.520834,195.716522" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="21" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersTenantAddress].[countryCode]" />
           </ExpressionBindings>
           <StylePriority Ref="22" UseFont="false" UseTextAlignment="false" />
         </Item2>
-        <Item3 Ref="23" ControlType="XRPanel" Name="panel3" SizeF="730.872559,230.965637" LocationFloat="826.868164,5.513714" Dpi="254" Borders="None">
+        <Item3 Ref="23" ControlType="XRPanel" Name="panel3" SizeF="730.872559,230.965637" LocationFloat="826.868164,32.5137138" Dpi="254" Borders="None">
           <Controls>
             <Item1 Ref="24" ControlType="XRLabel" Name="label20" Multiline="true" Text="Seller Information" SizeF="253.999985,33.96167" LocationFloat="34.458313,0" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
               <ExpressionBindings>
@@ -81,7 +81,7 @@
           </Controls>
           <StylePriority Ref="48" UseBorders="false" />
         </Item3>
-        <Item4 Ref="49" ControlType="XRPanel" Name="panel2" SizeF="730.8726,238.903137" LocationFloat="821.4681,299.1137" Dpi="254" Borders="All">
+        <Item4 Ref="49" ControlType="XRPanel" Name="panel2" SizeF="730.8726,238.903137" LocationFloat="821.4681,362.1137" Dpi="254" Borders="All">
           <Controls>
             <Item1 Ref="50" ControlType="XRLabel" Name="label23" Multiline="true" Text="Ship To:" SizeF="253.999985,33.96167" LocationFloat="26.458313,7" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254" Borders="None">
               <StylePriority Ref="51" UseFont="false" UseBorders="false" />
@@ -119,7 +119,7 @@
           </Controls>
           <StylePriority Ref="67" UseBorders="false" />
         </Item4>
-        <Item5 Ref="68" ControlType="XRPanel" Name="panel1" SizeF="730.872559,233.61145" LocationFloat="26.1617584,301.6554" Dpi="254" Borders="All">
+        <Item5 Ref="68" ControlType="XRPanel" Name="panel1" SizeF="730.872559,233.61145" LocationFloat="26.1617584,364.6554" Dpi="254" Borders="All">
           <Controls>
             <Item1 Ref="69" ControlType="XRLabel" Name="label25" Multiline="true" Text="Sold To:" SizeF="253.999985,33.96167" LocationFloat="8.497944,6.98327637" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254" BorderColor="Transparent" Borders="None">
               <ExpressionBindings>
@@ -160,55 +160,55 @@
           </Controls>
           <StylePriority Ref="87" UseBorders="false" />
         </Item5>
-        <Item6 Ref="88" ControlType="XRLabel" Name="label15" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="356.8568,38.57625" LocationFloat="1195.45386,252.720688" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
+        <Item6 Ref="88" ControlType="XRLabel" Name="label15" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="356.8568,57.0970459" LocationFloat="1199.45386,302.7207" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="89" EventName="BeforePrint" PropertyName="Text" Expression="'Phone: '+[AppTransactionHeadersCreator_address].[ContactPhoneNumber]" />
           </ExpressionBindings>
           <StylePriority Ref="90" UseFont="false" UseTextAlignment="false" />
         </Item6>
-        <Item7 Ref="91" ControlType="XRLabel" Name="label14" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="520.898438,38.57625" LocationFloat="597.8922,252.720688" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
+        <Item7 Ref="91" ControlType="XRLabel" Name="label14" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="520.898438,57.0970459" LocationFloat="601.8922,302.7207" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="92" EventName="BeforePrint" PropertyName="Text" Expression="'Email: '+[AppTransactionHeadersCreator_address].[ContactEmail]" />
           </ExpressionBindings>
           <StylePriority Ref="93" UseFont="false" UseTextAlignment="false" />
         </Item7>
-        <Item8 Ref="94" ControlType="XRLabel" Name="label13" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="392.66922,38.57625" LocationFloat="18.520874,252.720688" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
+        <Item8 Ref="94" ControlType="XRLabel" Name="label13" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="392.66922,57.0970459" LocationFloat="22.5208721,302.7207" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="95" EventName="BeforePrint" PropertyName="Text" Expression="'Contact: '+  [AppTransactionHeadersCreator_address].[ContactName]" />
           </ExpressionBindings>
           <StylePriority Ref="96" UseFont="false" UseTextAlignment="false" />
         </Item8>
-        <Item9 Ref="97" ControlType="XRLabel" Name="label12" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="338.3359,38.5762329" LocationFloat="18.520853,211.379562" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
+        <Item9 Ref="97" ControlType="XRLabel" Name="label12" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="338.3359,38.5762329" LocationFloat="18.520853,238.379562" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="98" EventName="BeforePrint" PropertyName="Text" Expression="'Role: '+  iif([TenantOwner]=?tenantId,Trim(Substring([EnteredUserByRole],6 )),[AppTransactionHeadersCreator_address].[ContactRole])" />
           </ExpressionBindings>
           <StylePriority Ref="99" UseFont="false" UseTextAlignment="false" />
         </Item9>
-        <Item10 Ref="100" ControlType="XRLabel" Name="label10" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="18.520834,128.316544" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
+        <Item10 Ref="100" ControlType="XRLabel" Name="label10" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="18.520834,155.316544" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="101" EventName="BeforePrint" PropertyName="Text" Expression=" [AppTransactionHeadersTenantAddress].[city]+','+[AppTransactionHeadersTenantAddress].[state]+','+[AppTransactionHeadersTenantAddress].[postalCode]" />
           </ExpressionBindings>
           <StylePriority Ref="102" UseFont="false" UseTextAlignment="false" />
         </Item10>
-        <Item11 Ref="103" ControlType="XRLabel" Name="label9" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="18.520834,85.31658" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
+        <Item11 Ref="103" ControlType="XRLabel" Name="label9" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="18.520834,112.316582" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="104" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersTenantAddress].[addressLine2]&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="105" UseFont="false" UseTextAlignment="false" />
         </Item11>
-        <Item12 Ref="106" ControlType="XRLabel" Name="label8" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="18.520834,44.91655" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
+        <Item12 Ref="106" ControlType="XRLabel" Name="label8" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="18.520834,71.91655" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="107" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersTenantAddress].[addressLine1]" />
           </ExpressionBindings>
           <StylePriority Ref="108" UseFont="false" UseTextAlignment="false" />
         </Item12>
-        <Item13 Ref="109" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="21.5208359,5.51654053" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
+        <Item13 Ref="109" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="602.9192,38.5762329" LocationFloat="21.5208359,32.51654" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="110" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersTenantAddress].[tenantName]" />
           </ExpressionBindings>
           <StylePriority Ref="111" UseFont="false" UseTextAlignment="false" />
         </Item13>
-        <Item14 Ref="112" ControlType="XRTable" Name="xrTable1" TextAlignment="MiddleCenter" SizeF="1575.64636,219.982056" LocationFloat="20.501379,607.3155" Dpi="254" Font="Arial, 8pt" BackColor="LightGray" Padding="5,5,0,0,254">
+        <Item14 Ref="112" ControlType="XRTable" Name="xrTable1" TextAlignment="MiddleCenter" SizeF="1575.64636,219.982056" LocationFloat="20.501379,692.3155" Dpi="254" Font="Arial, 8pt" BackColor="LightGray" Padding="5,5,0,0,254">
           <Rows>
             <Item1 Ref="113" ControlType="XRTableRow" Name="xrTableRow2" Weight="1" Dpi="254">
               <Cells>
@@ -286,7 +286,7 @@
       </Controls>
     </Item3>
     <Item4 Ref="148" ControlType="GroupHeaderBand" Name="groupHeaderBand2" HeightF="0" Dpi="254" />
-    <Item5 Ref="149" ControlType="PageHeaderBand" Name="PageHeader" HeightF="123.061447" Dpi="254">
+    <Item5 Ref="149" ControlType="PageHeaderBand" Name="PageHeader" HeightF="140.686417" Dpi="254">
       <Controls>
         <Item1 Ref="150" ControlType="XRLabel" Name="label48" Multiline="true" Text="Date:" TextAlignment="TopLeft" SizeF="207.609619,29.3158188" LocationFloat="692.567261,90.1959" Dpi="254" Font="Arial, 7pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
@@ -439,7 +439,7 @@
             </Item4>
           </Controls>
         </Item1>
-        <Item2 Ref="226" ControlType="DetailBand" Name="Detail" HeightF="104.243721" KeepTogether="true" Dpi="254" BackColor="LightGray">
+        <Item2 Ref="226" ControlType="DetailBand" Name="Detail" HeightF="116.669724" KeepTogether="true" Dpi="254" BackColor="LightGray">
           <HierarchyPrintOptions Ref="227" Indent="50.8" />
           <MultiColumn Ref="228" ColumnCount="12" Layout="AcrossThenDown" Mode="UseColumnCount" />
           <SortFields>
@@ -463,7 +463,7 @@
           </Controls>
           <StylePriority Ref="238" UseBackColor="false" />
         </Item2>
-        <Item3 Ref="239" ControlType="ReportFooterBand" Name="ReportFooter" PrintAtBottom="true" HeightF="197.2846" KeepTogether="true" Dpi="254">
+        <Item3 Ref="239" ControlType="ReportFooterBand" Name="ReportFooter" PrintAtBottom="true" Expanded="false" HeightF="197.2846" KeepTogether="true" Dpi="254">
           <Controls>
             <Item1 Ref="240" ControlType="XRLabel" Name="label39" Multiline="true" Text="Order Notes:" SizeF="176.2125,67.89084" LocationFloat="35.337635,5.99995661" Dpi="254" Font="Arial, 7.5pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
               <StylePriority Ref="241" UseFont="false" UseBackColor="false" />
