@@ -18,6 +18,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("showAddressType") showAddressType:boolean=true;
     @Input("showAddBtn") showAddBtn:boolean=true;
     @Input("showEditDelBtn") showEditDelBtn:boolean=true;
+    @Input("fromSalesRep") fromSalesRep:boolean=true;
 
     showAddList:boolean=false;
     addressCode: string;
