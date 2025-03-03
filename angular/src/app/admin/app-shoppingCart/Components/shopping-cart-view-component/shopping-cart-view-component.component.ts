@@ -161,8 +161,7 @@ const button = document.getElementById("stickyButton");
       button.style.bottom = "20px";
     }
   });
- console.log(this.comNew,'this.comNew')
- console.log(this.conNew,'this.conNew')
+
   }
   ngOnChanges() {
    
@@ -723,7 +722,7 @@ onShowVariations(event) {
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.appTransactionsForViewDto?.sellerCompanySSIN) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         "SellerSSIN",
         JSON.stringify(this.appTransactionsForViewDto?.sellerCompanySSIN)
       );
@@ -917,6 +916,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -935,6 +935,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -951,6 +952,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -974,6 +976,7 @@ onShowVariations(event) {
       rowNode.node.data.amount =  this.amount
       rowNode.node.data.qty =  this.selectedQuantity 
       rowNode.node.data.showEditQty = false;
+      rowNode.node.data.showEditPrice = false;
 
     }else {
 
@@ -994,6 +997,7 @@ onShowVariations(event) {
             if (res) this.notify.info("Successfully Updated.");
             // this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
+            rowNode.node.data.showEditPrice = false;
             this.getShoppingCartData();
             this.hideMainSpinner();
           });
@@ -1026,6 +1030,7 @@ onShowVariations(event) {
               // this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
               // rowNode.node.data.showEditQty = false;
+              //  rowNode.node.data.showEditPrice = false;
               this.hideMainSpinner();
             });
         } else {
@@ -1046,6 +1051,60 @@ onShowVariations(event) {
     }
   }
 }
+
+
+onEditPrice(rowNode) {
+  if(rowNode.node.data.added)
+    rowNode.node.data.showEditPrice = false;
+
+  else {
+  this.showMainSpinner();
+          switch (rowNode.level) {
+            case 0:
+            case 2:
+              this._AppTransactionServiceProxy
+                .updatePriceByProductLineId(
+                  this.orderId,
+                  rowNode.node.data.lineId,
+                  rowNode.node.data.updatedPrice
+                )
+                .subscribe((res) => {
+                  if (res)
+                  this.notify.info("Successfully Updated.");
+                  rowNode.node.data.showEditPrice = false;
+                  rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                  this.getShoppingCartData();
+                  this.hideMainSpinner();
+                });
+              break;
+              case 1:
+                this.showMainSpinner();
+                  this._AppTransactionServiceProxy
+                    .updatePriceByProductSSINColor(
+                      this.orderId,
+                      rowNode.node.data.parentId,
+                      rowNode.node.data.colorCode,
+                      rowNode.node.data.colorId,
+                      rowNode.node.data.updatedPrice
+                    )
+                    .subscribe((res) => {
+                      if (res) this.notify.info("Successfully Updated.");
+                      rowNode.node.data.showEditPrice = false;
+                      rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                      this.getShoppingCartData();
+                      this.hideMainSpinner();
+                    });
+                  break;
+
+     default:
+          break;
+
+                  }
+  }
+    
+  
+}
+
   hide() {
     this.resetData();
     this.modal.hide();
@@ -1103,7 +1162,7 @@ onShowVariations(event) {
   onDiscardShopping() {
     Swal.fire({
       title: "",
-      text: "Do you need to discared shopping cart permanently?",
+      text: "Do you need to discard shopping cart permanently?",
       icon: "info",
       showCancelButton: true,
       confirmButtonText:
@@ -1221,6 +1280,7 @@ stopReport(event) {
          
             localStorage.removeItem("comNew");
             localStorage.removeItem("conNew");
+            localStorage.removeItem("tempPriceLevel");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
          this.getShoppingCartData()

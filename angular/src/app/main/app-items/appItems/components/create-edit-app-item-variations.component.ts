@@ -253,7 +253,7 @@ export class CreateEditAppItemVariationsComponent
 
           this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
           this.selectedAttrID?null:this.editVariationsOpend=true;
-
+          this.getAspectatio();
     }
 
     async getSiwiiMarketPlaceColor() {
@@ -978,13 +978,31 @@ this.showMainSpinner();
         }
       }
       
+    aspectRatio;
+    getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.aspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
+    }
+
     fileChange(event) {
         if (event.target.value) {
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
+          
+                let aspectRatio=this.aspectRatio;
+
             let { onCropDone, data } = this.openImageCropper(
                 event,
-                undefined,
+                aspectRatio,
                 true
             );
             let subs = onCropDone.subscribe((res) => {

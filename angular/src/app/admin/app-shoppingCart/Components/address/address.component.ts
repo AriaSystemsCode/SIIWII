@@ -17,6 +17,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("selectedAddressDetails") selectedAddressDetails;
     @Input("showAddressType") showAddressType:boolean=true;
     @Input("showAddBtn") showAddBtn:boolean=true;
+    @Input("showEditDelBtn") showEditDelBtn:boolean=true;
 
     showAddList:boolean=false;
     addressCode: string;
@@ -195,8 +196,10 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                         if (matchedAddress) {
                                             this.selectedAddress = matchedAddress;
                                             this.addAddressDataToDto(2)
+                                            this.selectAddress(this.selectedAddress.id)
                                         }
                                     }
+            
                                 }   else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo) {
                                     // Filter the result to find the address with addressType 'Billing'
                                     const billingAddress = result.find(address => address.addressType === 'Billing');
@@ -215,12 +218,11 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                         if (matchedAddress) {
                                             this.selectedAddress = matchedAddress;
                                             this.addAddressDataToDto(1)
-
+                                            this.selectAddress(this.selectedAddress.id)
                                         }
                                     }
                                 }
-                                
-                            
+            
                             }
                            
                         
@@ -514,7 +516,7 @@ addAddressDataToDto(index: number) {
         roleContact.contactAddressCountryCode = this.selectedAddress.countryCode || roleContact.contactAddressCountryCode;
         roleContact.contactAddressCountryId = this.selectedAddress.countryId || roleContact.contactAddressCountryId;
         roleContact.contactAddressName = this.selectedAddress.name || roleContact.contactAddressName;
-
+        roleContact.contactAddressCode = this.selectedAddress.code || roleContact.contactAddressCode
         
         // Ensure contactAddressDetail is updated with address-related values but leave others unchanged
         roleContact.contactAddressDetail = new ContactAppAddressDto({
@@ -541,8 +543,8 @@ addAddressDataToDto(index: number) {
         // Set additional address properties if they exist
         roleContact.contactAddressLine1 = this.selectedAddress.addressLine1 || roleContact.contactAddressLine1;
         roleContact.contactAddressLine2 = this.selectedAddress.addressLine2 || roleContact.contactAddressLine2;
-        // roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
-        debugger;
+        roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
+
         roleContact.contactAddressState = this.selectedAddress.state || roleContact.contactAddressState;
     }
 

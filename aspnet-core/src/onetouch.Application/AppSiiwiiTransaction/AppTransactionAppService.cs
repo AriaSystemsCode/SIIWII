@@ -1777,7 +1777,10 @@ namespace onetouch.AppSiiwiiTransaction
                 if (objectRec != null)
                 {
                     //XX
-                    var header = await _appTransactionsHeaderRepository.GetAll().Where(x => x.EntityObjectTypeId == objectRec.Id && x.EntityObjectStatusId == null && x.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                    var header = await _appTransactionsHeaderRepository.GetAll()
+                        .Where(x => x.EntityObjectTypeId == objectRec.Id && x.EntityObjectStatusId == null && x.TenantId == AbpSession.TenantId &&
+                        (AbpSession.UserId == x.CreatorUserId || (AbpSession.UserId != x.CreatorUserId && x.CreationTime.AddDays(1) <= DateTime.Now))) 
+                        .FirstOrDefaultAsync();
                     if (header != null)
                     {
                         return header.Code;
@@ -2166,7 +2169,6 @@ namespace onetouch.AppSiiwiiTransaction
                     y.NetDueDays = x.Trans.PaymentTermsFk != null && x.Trans.PaymentTermsFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 34) != null ? int.Parse(x.Trans.PaymentTermsFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 34).AttributeValue) : 0;
                     // y.AppTransactionContacts.ForEach(z => z.ContactAddressDetail.ContactEmail = z.ContactEmail);
                     // y.AppTransactionContacts.ForEach(z => z.ContactAddressDetail.ContactPhone = z.ContactPhoneNumber);
-                    y.BuyerBranchCode = "";
                     if (x.Trans.AppTransactionContacts != null)
                     {
                         foreach (var cnt in y.AppTransactionContacts)
@@ -2178,17 +2180,15 @@ namespace onetouch.AppSiiwiiTransaction
                                 cnt.ContactAddressDetail.ContactEmail = cnt.ContactEmail;
                                 cnt.ContactAddressDetail.ContactPhone = cnt.ContactPhoneNumber;
                             }
-                            if (cnt.ContactRole == ContactRoleEnum.Buyer && cnt.BranchSSIN!=null && cnt.BranchName !="*Main*")
+                            if (cnt.BranchSSIN !=null && cnt.BranchName !="*Main*")
                             {
                                 var branch = _appContactRepository.GetAll().Where(z => z.SSIN == cnt.BranchSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
                                 if (branch != null)
                                 {
-                                    y.BuyerBranchCode =branch.Code;
-                                    y.BuyerBranchName = cnt.BranchName;
-                                    y.BuyerBranchSSIN = cnt.BranchSSIN;
-
+                                    cnt.BranchCode =branch.Code;
                                 }
                             }
+
                         }
                     }
                     return y;
@@ -2798,6 +2798,83 @@ namespace onetouch.AppSiiwiiTransaction
                 return null;
             }
         }
+        //MMT2025[Start]
+        [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
+        public async Task<bool> UpdatePriceByProductLineId(long orderId, long lineId, decimal price)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+                var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+
+                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails).Where(e => e.TenantId == AbpSession.TenantId
+                && e.CreatorUserId == AbpSession.UserId
+                && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
+                && e.Id == orderId).FirstOrDefault();
+
+                if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
+                {
+                    var itemMajor = filteredAppTransactions.AppTransactionDetails.Where(e => e.Id == lineId).FirstOrDefault();
+                    if (itemMajor != null)
+                    {
+                        itemMajor.NetPrice = price;
+                        itemMajor.GrossPrice = price;
+                        itemMajor.Amount = itemMajor.NetPrice * decimal.Parse(itemMajor.Quantity.ToString());
+                        filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                        filteredAppTransactions.TimeStamp = DateTime.UtcNow;
+                        await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                }
+
+                return true;
+            }
+        }
+        [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
+        public async Task<bool> UpdatePriceByProductSSINColor(long orderId, long parentId, string colorCode, long colorId, decimal price)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+
+                var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+                var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
+                    .ThenInclude(e => e.EntityExtraData)
+                    .Where(e => e.TenantId == AbpSession.TenantId
+                && e.CreatorUserId == AbpSession.UserId
+                && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
+                && e.Id == orderId).FirstOrDefault();
+
+                if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
+                {
+                    var itemMajor = filteredAppTransactions.AppTransactionDetails.Where(e => e.Id == parentId).FirstOrDefault();
+                    if (itemMajor != null)
+                    {
+                        var itemsList = filteredAppTransactions.AppTransactionDetails.Where(e => e.ParentId == itemMajor.Id
+                        && e.EntityExtraData.Where(x => x.AttributeId == 101 &&
+                        ((!string.IsNullOrEmpty(colorCode) && x.AttributeValue.ToUpper() == colorCode.ToUpper())
+                        || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
+                            .ToList();
+                        
+                        foreach (var e in itemsList)
+                        {
+                            
+                            e.NetPrice= price;
+                            e.GrossPrice = price;
+                            e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
+                            
+                        };
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                }
+                filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                filteredAppTransactions.TimeStamp = DateTime.UtcNow;
+                await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                return true;
+            }
+        }
+
+        //MMT2025[End]
 
         [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
         public async Task<bool> UpdateByProductLineId(long orderId, long lineId, Int32 qty)
