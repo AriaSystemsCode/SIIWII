@@ -949,6 +949,35 @@ this.showMainSpinner();
         });
     }
 
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      onDragOver(event: DragEvent) {
+        event.preventDefault(); // Required to allow dropping
+        event.stopPropagation();
+      }
+      
+    onDrop(event: DragEvent, index: number) {
+        event.preventDefault();
+        event.stopPropagation();
+      
+        if (event.dataTransfer?.files.length) {
+          const file = event.dataTransfer.files[0];
+      
+          console.log("File dropped:", file);
+      
+          const mockEvent = {
+            target: { files: [file], value: file.name } // Mimicking an input event
+          };
+      
+          this.fileChange(
+            mockEvent as unknown as Event
+          );
+        }
+      }
+      
     aspectRatio;
     getAspectatio() {
         let sycAttachmentCategoryImage;
