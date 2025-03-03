@@ -120,22 +120,22 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "abp-zero-template:build",
+            "buildTarget": "abp-zero-template:build",
             "disableHostCheck": true
           },
           "configurations": {
             "hmr": {
-              "browserTarget": "abp-zero-template:build:hmr"
+              "buildTarget": "abp-zero-template:build:hmr"
             },
             "production": {
-              "browserTarget": "abp-zero-template:build:production"
+              "buildTarget": "abp-zero-template:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "abp-zero-template:build"
+            "buildTarget": "abp-zero-template:build"
           }
         },
         "test": {
