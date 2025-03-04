@@ -334,7 +334,7 @@
                             <div
                                 class="msrp d-flex "
                             >
-                                <h5 class="mr-2" style="color: black !important;font-size: 16px;">MSRP:  </h5>
+                                <h5 class="mr-2" style="color: black !important;font-size: 16px;"> {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }} </h5>
                                 <h5  *ngIf="productDetails?.minMSRP">
                                     <!-- {{
                                         productDetails?.appItemPriceInfos[0]
@@ -347,7 +347,6 @@
                                 </h5>
                                 <span
                                     *ngIf="
-                                    productDetails?.minMSRP && 
                                         productDetails?.minMSRP !==
                                         productDetails?.maxMSRP
                                     "
@@ -1260,7 +1259,7 @@ top: 4px;">
                                         <div
                                             class="msrp d-flex mb-2"
                                         >
-                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">MSRP:  </h5>
+                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;"> {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}  </h5>
                                             <h5  *ngIf="productDetails?.minMSRP">
                                                 <!-- {{
                                                     productDetails?.appItemPriceInfos[0]
@@ -1272,7 +1271,7 @@ top: 4px;">
                                                 {{ productDetails?.minMSRP }}
                                             </h5>
                                             <span
-                                                *ngIf="productDetails?.minMSRP &&
+                                                *ngIf="
                                                     productDetails?.minMSRP !==
                                                     productDetails?.maxMSRP
                                                 "

@@ -434,7 +434,7 @@
                                 <div class="row mr-5 pr-5">
                                     <h6 class="font-weight-bold pt-3 pr-2">
                                         <span class="text-danger">*</span>
-                                        {{ 'MSRP' | localize}}
+                                        {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP" | localize}}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
                                         <span

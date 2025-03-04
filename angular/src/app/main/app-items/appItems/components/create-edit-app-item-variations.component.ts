@@ -48,6 +48,7 @@ import { SelectAppItemTypeComponent } from "@app/app-item-type/select-app-item-t
 import { table } from "console";
 import { CreateOrEditAppEntityDynamicModalComponent } from "@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component";
 import Swal from "sweetalert2";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
     selector: "app-create-edit-app-item-variations",
@@ -1517,9 +1518,10 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
                 this.l("PleaseCompletePricingAllVariationsFirst")
             );
         }
+         let languageSettingName  =AppConsts.languageSettingName;
         this.variationMatrices?.forEach((variation) => {
             variation.appItemPriceInfos = variation.appItemPriceInfos.filter(
-                (priceDto) => priceDto.code == "MSRP" || priceDto?.price > 0
+                (priceDto) => priceDto.code == (languageSettingName!='en-GB' ? 'MSRP'  : 'RRP' ) || priceDto?.price > 0
             );
         });
         this.isListing ? this.selectedVaritaions : this.variationMatrices;

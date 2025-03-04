@@ -76,6 +76,7 @@ export class MarketplaceViewProductComponent
     handleSCreenSelect :number = 0
     chk_Order_by_prepack:boolean [] =[]
     visible: boolean = false;
+    languageSettingName  =AppConsts.languageSettingName;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
