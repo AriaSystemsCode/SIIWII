@@ -374,17 +374,13 @@
                             class="msrp d-flex justify-content-between align-items-center"
                         >
                         <div>
-                            <div class="msrp d-flex align-items-center " *ngIf="showSpecialPrice">
+                            <div class="msrp d-flex align-items-center ">
                             <h5 class="mr-2" style="color: black !important;font-size: 14px;white-space: nowrap;;">Special Price:  </h5>
-                              
-                         
-                            
-                            <h5 *ngIf="showEditSpecialPrice"> 
-                                    
+                            <h5 *ngIf="showEditSpecialPrice">
                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                             </h5>
 
-                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="mx-1  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"  class="mx-1  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
                         
                         </div>
