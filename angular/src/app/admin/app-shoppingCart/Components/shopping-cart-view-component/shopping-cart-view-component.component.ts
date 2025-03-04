@@ -1370,8 +1370,33 @@ stopReport(event) {
   }
 
   printTransaction() {
-    var page = window.open(this._transactionFormPath);
-    page.print();
+    // var page = window.open(this._transactionFormPath);
+    // page.print();
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    .subscribe((res) => {
+        if (res == true) {
+
+          this.showMainSpinner()
+          this.onGeneratOrderReport(true,undefined,true,false,true)
+        
+
+        }  else {
+            this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
+          .pipe(
+              finalize(() => {
+       
+              })
+          )
+          .subscribe((res) => {
+            var page = window.open(res);
+            page.print();
+          }
+           
+          );
+   
+        }
+    });
+
   }
 
   onShareTransaction() {
@@ -1380,7 +1405,7 @@ stopReport(event) {
   offShareTransaction() {
     this.onshare = false;
   }
-  async onGeneratOrderReport($event, printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?: boolean, refreshData: boolean = true) {
+  async onGeneratOrderReport($event, printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?: boolean, refreshData: boolean = true,printTrans:boolean = false) {
     if (($event && this.appTransactionsForViewDto?.entityStatusCode?.toUpperCase() != 'DRAFT') || ($event && FromPlaceOrder)) {
         this.reportUrl = "";
         if (printInfoParam) {
@@ -1407,6 +1432,23 @@ stopReport(event) {
 
                 if (refreshData) {
                     this.getShoppingCartData();
+                }
+                if(printTrans){
+                  setTimeout(() => {
+                    this.hideMainSpinner()
+                    this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
+          .pipe(
+              finalize(() => {
+       
+              })
+          )
+          .subscribe((res) => {
+            var page = window.open(res);
+            page.print();
+          }
+           
+          );
+                  },10000)
                 }
             });
 

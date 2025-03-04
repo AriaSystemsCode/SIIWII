@@ -62,10 +62,12 @@ using Microsoft.AspNetCore.Http.Features;
 using DevExpress.AspNetCore.Reporting.QueryBuilder;
 using Microsoft.AspNetCore.SignalR;
 using onetouch.Build;
-using k8s.KubeConfigModels;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace onetouch.Web.Startup
 {
+
     public class CustomServiceProviderIsService : IServiceProviderIsService
     {
         public bool IsService(Type serviceType)
@@ -73,7 +75,6 @@ namespace onetouch.Web.Startup
             return true; // Allow all types to be resolved
         }
     }
-
     public class Startup
     {
         private const string DefaultCorsPolicyName = "localhost";
@@ -141,12 +142,10 @@ namespace onetouch.Web.Startup
             catch (Exception ex) { }
 
         }
-
         private void ConfigureSwagger(IServiceCollection services)
         {
             services.AddSwaggerGen();
         }
-
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ////DevExpress config
@@ -172,15 +171,8 @@ namespace onetouch.Web.Startup
             services.AddSingleton<IWebDocumentViewerExceptionHandler, CustomWebDocumentViewerExceptionHandler>();
             services.AddTransient<onetouch.Web.Host.Controllers.CustomQueryBuilderController>();
 
-
-            // Register missing service
- 
             services.AddSingleton<IServiceProviderIsService, CustomServiceProviderIsService>();
-             
-
-            // Other necessary configurations
             ConfigureSwagger(services);
-
 
 
             services.Configure<FormOptions>(x =>
