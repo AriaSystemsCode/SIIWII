@@ -65,6 +65,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        console.log(this.selectedAddressDetails,'this.selectedAddressDetails')
         if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo  || this.currentTab == ShoppingCartoccordionTabs.ShippingInfo ){
         if(this.selectedAddressDetails){
         this.selectedAddressDetails.addressLine1=  this.selectedAddressDetails?.addressLine1 ? this.selectedAddressDetails?.addressLine1 : '' ;
@@ -177,11 +178,25 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                             // console.log(result,'defauulllt')
 
                             if (result){
+                                let role;
+                
+                                if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex === 2) {
+                                    role = 6;
+                                } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo && this.billingIndexInfo === 1) {
+                                    role = 4;
+                                }
+                            
+                                const shIPtOroleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                                    contact => contact?.contactRole === 6
+                                );
+                                const apRoleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                                    contact => contact?.contactRole === 4
+                                );
                                 if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo) {
                                     // Filter the result to find the address with addressType 'Shipping'
                                     const shippingAddress = result.find(address => address.addressType === 'Shipping');
                                     
-                                    console.log(shippingAddress, 'shippingAddress');
+                               
                                     
                                     if (shippingAddress) {
                                         // Check if the shipping address exists in the savedAddressesList
@@ -189,13 +204,16 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                             savedAddress.id === shippingAddress.addressId
                                         );
                                         
-                                        console.log(matchedAddress, 'matchedAddress');
+                                      
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
-                                            this.selectedAddress = matchedAddress;
                                             this.addAddressDataToDto(2)
-                                            this.selectAddress(this.selectedAddress.id)
+                                            if(!this.selectedAddressDetails){
+                                                this.selectedAddress = matchedAddress;
+                                                this.selectAddress(this.selectedAddress.id)
+
+                                            }
                                         }
                                     }
             
@@ -203,7 +221,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                     // Filter the result to find the address with addressType 'Billing'
                                     const billingAddress = result.find(address => address.addressType === 'Billing');
                                     
-                                    console.log(billingAddress, 'billingAddress');
+                                   
                                     
                                     if (billingAddress) {
                                         // Check if the billing address exists in the savedAddressesList
@@ -211,13 +229,15 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                             savedAddress.id === billingAddress.addressId
                                         );
                                         
-                                        console.log(matchedAddress, 'matchedAddress');
+                                    
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
-                                            this.selectedAddress = matchedAddress;
                                             this.addAddressDataToDto(1)
+                                            if(!this.selectedAddressDetails){
+                                            this.selectedAddress = matchedAddress;
                                             this.selectAddress(this.selectedAddress.id)
+                                            }
                                         }
                                     }
                                 }
@@ -597,7 +617,7 @@ addAddressDataToDto(index: number) {
         this.selectedAddress = currentAddress[0] as ContactAppAddressDto;
     
         // Set the country name based on the countryId
-      
+        
         this.selectedAddress.countryName = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.label;
         this.selectedAddress.countryCode = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.code;
         this.showAddList = false;
