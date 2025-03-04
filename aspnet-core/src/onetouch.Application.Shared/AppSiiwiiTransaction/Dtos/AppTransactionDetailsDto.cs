@@ -106,8 +106,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string ContactAddressCountryCode { get; set; }
         //Iteration37-MMT[End]
         public virtual string BranchCode { get; set; }
-        public virtual string CompanyCode { get;}
-        public virtual string ContactCode { get; }
+        public virtual string CompanyCode { get; set; }
+        public virtual string ContactCode { get; set; }
 
     }
     public class ContactAppAddressDto : AppAddressDto
