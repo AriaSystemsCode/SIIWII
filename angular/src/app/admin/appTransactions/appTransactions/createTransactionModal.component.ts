@@ -155,11 +155,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             sellerCompanyName: ["", [Validators.required]],
             sellerContactName: [""],
             sellerContactEMailAddress: ["", [Validators.email]],
-            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            sellerContactPhoneNumber: ["", [Validators.pattern(/^(\+?[1-9]\d{0,2}(\s|-)?(\(?\d{1,4}\)?(\s|-)?)+|\d{1,20}|0\d{9,14})$/)]],
             buyerCompanyName: ["", [Validators.required]],
             buyerContactName: [''],
             buyerContactEMailAddress: ["", [Validators.email]],
-            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerContactPhoneNumber: ["", [Validators.pattern(/^(\+?[1-9]\d{0,2}(\s|-)?(\(?\d{1,4}\)?(\s|-)?)+|\d{1,20}|0\d{9,14})$/)]],
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
@@ -215,11 +215,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             sellerCompanyName: ["", [Validators.required]],
             sellerContactName: [""],
             sellerContactEMailAddress: ["", [Validators.email]],
-            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            sellerContactPhoneNumber: ["", [Validators.pattern(/^(\+?[1-9]\d{0,2}(\s|-)?(\(?\d{1,4}\)?(\s|-)?)+|\d{1,20}|0\d{9,14})$/)]],
             buyerCompanyName: ["", [Validators.required]],
             buyerContactName: [''],
             buyerContactEMailAddress: ["", [Validators.email]],
-            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerContactPhoneNumber: ["", [Validators.pattern(/^(\+?[1-9]\d{0,2}(\s|-)?(\(?\d{1,4}\)?(\s|-)?)+|\d{1,20}|0\d{9,14})$/)]],
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
@@ -328,9 +328,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = !this.isBuyerTempAccount;
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
+            this.areSame = false
             this.orderForm.controls["buyerCompanyBranch"].clearValidators();
             this.orderForm.controls["buyerCompanyBranch"].reset();
             this.orderForm.controls["buyerCompanyName"].reset();
+            this.orderForm.controls["buyerContactName"].reset();
+            this.orderForm.controls["buyerContactEMailAddress"].reset();
+            this.orderForm.controls["buyerContactPhoneNumber"].reset();
         }
 
         else
@@ -685,7 +689,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         });
     }
 
-        if ((!this.sellerCompanyId || !this.buyerComapnyId)  || (this.sellerCompanyId !== this.buyerComapnyId)) {
+        if ( (this.sellerCompanyId !== this.buyerComapnyId)) {
             this.areSame = false;
             this.submitted = true;
             this.invalidBuyerPhoneNumber = "";
@@ -866,6 +870,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     // }
                 }
             }
+        } else if( this.orderForm.controls['enteredByUserRole']?.value  == "I'm a Seller" || this.orderForm.controls['enteredByUserRole']?.value  == "I'm a Buyer"){
+            this.areSame = false
         } else {
             this.areSame = true
         }
@@ -1122,7 +1128,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         JSON.stringify(this.buyerContactSSIN)
                     );
 
-                    localStorage.setItem(
+                    sessionStorage.setItem(
                         "SellerSSIN",
                         JSON.stringify(this.sellerCompanySSIN)
                     );
@@ -1285,11 +1291,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             sellerCompanyName: ["", [Validators.required]],
             sellerContactName: [""],
             sellerContactEMailAddress: ["", [Validators.email]],
-            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            sellerContactPhoneNumber: ["", [Validators.pattern(/^(\+?[1-9]\d{0,2}(\s|-)?(\(?\d{1,4}\)?(\s|-)?)+|\d{1,20}|0\d{9,14})$/)]],
             buyerCompanyName: ["", [Validators.required]],
             buyerContactName: [''],
             buyerContactEMailAddress: ["", [Validators.email]],
-            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerContactPhoneNumber: ["", [Validators.pattern(/^(\+?[1-9]\d{0,2}(\s|-)?(\(?\d{1,4}\)?(\s|-)?)+|\d{1,20}|0\d{9,14})$/)]],
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],

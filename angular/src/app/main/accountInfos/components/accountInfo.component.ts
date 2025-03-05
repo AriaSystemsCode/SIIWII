@@ -444,7 +444,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         )
         this.isPublished= result ? result.isPublished : false;
         this.accountDataForView = result ? result.account : undefined
-        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
+        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId  ||  this.accountDataForView?.id == this.appSession.user?.accountId 
         if(this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if(this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }
@@ -460,7 +460,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         )
         this.isPublished= result ? result.isPublished : false;
         this.accountDataForView = result ? result.account : undefined
-        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
+        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId ||  this.accountDataForView?.id == this.appSession.user?.accountId 
         if(this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if(this.accountDataForView.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }

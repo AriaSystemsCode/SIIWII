@@ -10,7 +10,7 @@
 		public const int MaxTradeNameLength = 100;
 						
 						
-		public const int MinWebsiteLength = 5;
+		public const int MinWebsiteLength = 0;
 		public const int MaxWebsiteLength = 100;
 						
 		public const int MinNameLength = 2;
