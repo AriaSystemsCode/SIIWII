@@ -77,6 +77,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
             })
         )
         .subscribe((result)=>{
+            this.totalCount = result.totalCount;
             const isLastPage = this.skipCount + this.maxResultCount > this.totalCount
             const isFirstPage = this.skipCount == 0
 
@@ -85,7 +86,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
             this.nonLookupValues=this.nonLookupValues ? this.nonLookupValues : [] 
             this.allRecords.push(...this.nonLookupValues);
             this.displayedRecords = this.allRecords
-            this.totalCount = result.totalCount;
+           
             this.showMoreListDataButton = !isLastPage
 
         })

@@ -115,6 +115,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         }
     }
     getAllComments(){
+        this.showMainSpinner()
         this._messageServiceProxy.getAllComments(
             undefined,
             undefined,
@@ -131,7 +132,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.skipCount += this.maxResultCount
             this.totalCount = res.totalCount
             this.comments.push(...res.items)
-
+        this.hideMainSpinner()
 
         })
     }

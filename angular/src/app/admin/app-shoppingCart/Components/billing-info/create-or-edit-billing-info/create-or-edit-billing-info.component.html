@@ -40,6 +40,8 @@
         [canChange]="canChange"
         [currentTab]="currentTab"
         [appTransactionsForViewDto]="appTransactionsForViewDto"
+        [showEditDelBtn]="appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual ?false : true"
+        [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' ? false:true"
         ></app-address>
     </div>
     
@@ -82,6 +84,7 @@
     [canChange]="canChange"
     [currentTab]="currentTab"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' ? false:true"
     ></app-address>
 </div>
     <div class="container-fluid pt-1 mb-3 mt-3"  *ngIf="createOrEditBillingInfo">

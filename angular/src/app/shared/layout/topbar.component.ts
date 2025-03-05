@@ -348,7 +348,7 @@ export class TopBarComponent
         this._userLinkServiceProxy
             .getRecentlyUsedLinkedUsers()
             .subscribe((result) => {
-                this.recentlyLinkedUsers = result.items;
+                this.recentlyLinkedUsers = result?.items;
             });
     }
 
@@ -489,7 +489,10 @@ export class TopBarComponent
     }
     getUnreadMessageCount() {
         this._MessageServiceProxy.getUnreadCounts(null).subscribe((result) => {
-            this.unreadMessageCount = result;
+            if(result){
+                this.unreadMessageCount = result;
+
+            }
         });
     }
 
@@ -497,14 +500,14 @@ export class TopBarComponent
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
                 this.shoppingCartSummary = res;
-                if (this.shoppingCartSummary.orderType == this._TransactionType.SalesOrder)
+                if (this.shoppingCartSummary?.orderType == this._TransactionType?.SalesOrder)
                     this.transactionType = "SO";
-                if (this.shoppingCartSummary.orderType == this._TransactionType.PurchaseOrder)
+                if (this.shoppingCartSummary?.orderType == this._TransactionType?.PurchaseOrder)
                     this.transactionType = "PO";
 
-                if (!this.shoppingCartSummary.sellerLogo)
+                if (!this.shoppingCartSummary?.sellerLogo)
                     this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
-                if (!this.shoppingCartSummary.buyerLogo)
+                if (!this.shoppingCartSummary?.buyerLogo)
                     this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
 
 
@@ -515,9 +518,9 @@ export class TopBarComponent
                     this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
 
                      //Currency
-            this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+            this._AppEntitiesServiceProxy.getCurrencyInfo(res?.currencyCode)
             .subscribe((res: CurrencyInfoDto) => {
-                this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+                this.currencySymbol = res?.symbol ? res?.symbol : res?.code  ;
             });
 
             });

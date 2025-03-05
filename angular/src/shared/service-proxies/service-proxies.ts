@@ -23422,6 +23422,148 @@ export class AppTransactionServiceProxy {
     /**
      * @param orderId (optional) 
      * @param lineId (optional) 
+     * @param price (optional) 
+     * @return Success
+     */
+    updatePriceByProductLineId(orderId: number | undefined, lineId: number | undefined, price: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/UpdatePriceByProductLineId?";
+        if (orderId === null)
+            throw new Error("The parameter 'orderId' cannot be null.");
+        else if (orderId !== undefined)
+            url_ += "orderId=" + encodeURIComponent("" + orderId) + "&";
+        if (lineId === null)
+            throw new Error("The parameter 'lineId' cannot be null.");
+        else if (lineId !== undefined)
+            url_ += "lineId=" + encodeURIComponent("" + lineId) + "&";
+        if (price === null)
+            throw new Error("The parameter 'price' cannot be null.");
+        else if (price !== undefined)
+            url_ += "price=" + encodeURIComponent("" + price) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdatePriceByProductLineId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdatePriceByProductLineId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processUpdatePriceByProductLineId(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param orderId (optional) 
+     * @param parentId (optional) 
+     * @param colorCode (optional) 
+     * @param colorId (optional) 
+     * @param price (optional) 
+     * @return Success
+     */
+    updatePriceByProductSSINColor(orderId: number | undefined, parentId: number | undefined, colorCode: string | null | undefined, colorId: number | undefined, price: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/UpdatePriceByProductSSINColor?";
+        if (orderId === null)
+            throw new Error("The parameter 'orderId' cannot be null.");
+        else if (orderId !== undefined)
+            url_ += "orderId=" + encodeURIComponent("" + orderId) + "&";
+        if (parentId === null)
+            throw new Error("The parameter 'parentId' cannot be null.");
+        else if (parentId !== undefined)
+            url_ += "parentId=" + encodeURIComponent("" + parentId) + "&";
+        if (colorCode !== undefined && colorCode !== null)
+            url_ += "colorCode=" + encodeURIComponent("" + colorCode) + "&";
+        if (colorId === null)
+            throw new Error("The parameter 'colorId' cannot be null.");
+        else if (colorId !== undefined)
+            url_ += "colorId=" + encodeURIComponent("" + colorId) + "&";
+        if (price === null)
+            throw new Error("The parameter 'price' cannot be null.");
+        else if (price !== undefined)
+            url_ += "price=" + encodeURIComponent("" + price) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdatePriceByProductSSINColor(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdatePriceByProductSSINColor(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processUpdatePriceByProductSSINColor(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param orderId (optional) 
+     * @param lineId (optional) 
      * @param qty (optional) 
      * @return Success
      */
@@ -79450,6 +79592,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactAddressPostalCode!: string | undefined;
     contactAddressCountryId!: number;
     contactAddressCountryCode!: string | undefined;
+    branchCode!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -79498,6 +79641,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactAddressPostalCode = _data["contactAddressPostalCode"];
             this.contactAddressCountryId = _data["contactAddressCountryId"];
             this.contactAddressCountryCode = _data["contactAddressCountryCode"];
+            this.branchCode = _data["branchCode"];
             this.id = _data["id"];
         }
     }
@@ -79544,6 +79688,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["contactAddressPostalCode"] = this.contactAddressPostalCode;
         data["contactAddressCountryId"] = this.contactAddressCountryId;
         data["contactAddressCountryCode"] = this.contactAddressCountryCode;
+        data["branchCode"] = this.branchCode;
         data["id"] = this.id;
         return data;
     }
@@ -79579,6 +79724,7 @@ export interface IAppTransactionContactDto {
     contactAddressPostalCode: string | undefined;
     contactAddressCountryId: number;
     contactAddressCountryCode: string | undefined;
+    branchCode: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -79604,6 +79750,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -79713,6 +79860,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -79856,6 +80004,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -79984,6 +80133,7 @@ export interface IGetAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -80646,6 +80796,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     eomDays!: number;
     eom!: boolean;
     netDueDays!: number;
+    buyerBranchCode!: string | undefined;
     lastRecord!: boolean;
     firstRecord!: boolean;
     creatorUserId!: number;
@@ -80665,6 +80816,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     lastModifiedDate!: moment.Moment;
     shipViaName!: string | undefined;
     paymentTermsName!: string | undefined;
+    creationDate!: moment.Moment;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -80760,6 +80912,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.eomDays = _data["eomDays"];
             this.eom = _data["eom"];
             this.netDueDays = _data["netDueDays"];
+            this.buyerBranchCode = _data["buyerBranchCode"];
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
             this.creatorUserId = _data["creatorUserId"];
@@ -80783,6 +80936,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.shipViaName = _data["shipViaName"];
             this.paymentTermsName = _data["paymentTermsName"];
+            this.creationDate = _data["creationDate"] ? moment(_data["creationDate"].toString()) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -80912,6 +81066,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["eomDays"] = this.eomDays;
         data["eom"] = this.eom;
         data["netDueDays"] = this.netDueDays;
+        data["buyerBranchCode"] = this.buyerBranchCode;
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
         data["creatorUserId"] = this.creatorUserId;
@@ -80935,6 +81090,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["shipViaName"] = this.shipViaName;
         data["paymentTermsName"] = this.paymentTermsName;
+        data["creationDate"] = this.creationDate ? this.creationDate.toISOString() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -81053,6 +81209,7 @@ export interface IGetAllAppTransactionsForViewDto {
     eomDays: number;
     eom: boolean;
     netDueDays: number;
+    buyerBranchCode: string | undefined;
     lastRecord: boolean;
     firstRecord: boolean;
     creatorUserId: number;
@@ -81072,6 +81229,7 @@ export interface IGetAllAppTransactionsForViewDto {
     lastModifiedDate: moment.Moment;
     shipViaName: string | undefined;
     paymentTermsName: string | undefined;
+    creationDate: moment.Moment;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
