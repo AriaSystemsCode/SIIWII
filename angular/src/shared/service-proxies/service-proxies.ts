@@ -80206,8 +80206,8 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactAddressCountryId!: number;
     contactAddressCountryCode!: string | undefined;
     branchCode!: string | undefined;
-    readonly companyCode!: string | undefined;
-    readonly contactCode!: string | undefined;
+    companyCode!: string | undefined;
+    contactCode!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -80257,8 +80257,8 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactAddressCountryId = _data["contactAddressCountryId"];
             this.contactAddressCountryCode = _data["contactAddressCountryCode"];
             this.branchCode = _data["branchCode"];
-            (<any>this).companyCode = _data["companyCode"];
-            (<any>this).contactCode = _data["contactCode"];
+            this.companyCode = _data["companyCode"];
+            this.contactCode = _data["contactCode"];
             this.id = _data["id"];
         }
     }
