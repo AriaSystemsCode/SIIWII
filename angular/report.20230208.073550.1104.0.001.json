@@ -17,6 +17,7 @@
       "0.0.0.0",
       "--port",
       "4203"
+      "4203"
     ],
     "nodejsVersion": "v12.13.0",
     "wordSize": 64,
@@ -489,6 +490,7 @@
     "npm_execpath": "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
     "npm_lifecycle_event": "start-dev",
     "npm_lifecycle_script": "ng serve --host 0.0.0.0 --port 4203",
+    "npm_lifecycle_script": "ng serve --host 0.0.0.0 --port 4203",
     "npm_node_execpath": "C:\\Program Files\\nodejs\\node.exe",
     "npm_package_dependencies_abp_ng2_module": "^6.0.0",
     "npm_package_dependencies_abp_web_resources": "^5.2.0",
@@ -603,6 +605,8 @@
     "npm_package_scripts_pree2e": "webdriver-manager update --standalone false --gecko false",
     "npm_package_scripts_prepublish": "npm --no-git-tag-version version patch",
     "npm_package_scripts_publish": "gulp build && ng build --prod",
+    "npm_package_scripts_start": "gulp buildDev && ng serve --host 0.0.0.0 --port 4203",
+    "npm_package_scripts_start_dev": "ng serve --host 0.0.0.0 --port 4203",
     "npm_package_scripts_start": "gulp buildDev && ng serve --host 0.0.0.0 --port 4203",
     "npm_package_scripts_start_dev": "ng serve --host 0.0.0.0 --port 4203",
     "npm_package_scripts_test": "gulp buildDev && ng test",
