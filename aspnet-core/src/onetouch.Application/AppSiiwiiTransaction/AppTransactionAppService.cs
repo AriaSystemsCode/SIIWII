@@ -2294,13 +2294,16 @@ namespace onetouch.AppSiiwiiTransaction
                         var appContact = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
                             .ThenInclude(x => x.AttachmentFk)
                         .Where(e => e.SSIN == TransactionIdFk.BuyerCompanySSIN).FirstOrDefault();
-                        var entity = appContact.EntityFk;
-                        if (entity.EntityAttachments.Count() > 0)
+                        if (appContact != null)
                         {
-                            var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
-                            var logo = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
-                            objReturn.BuyerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            var entity = appContact.EntityFk;
+                            if (entity.EntityAttachments.Count() > 0)
+                            {
+                                var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+                                var logo = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
+                                objReturn.BuyerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
 
+                            }
                         }
                     }
 
@@ -2312,13 +2315,16 @@ namespace onetouch.AppSiiwiiTransaction
                         var appContactSeller = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
                                 .ThenInclude(x => x.AttachmentFk)
                          .Where(e => e.SSIN == TransactionIdFk.SellerCompanySSIN).FirstOrDefault();
-                        objReturn.SellerId = appContactSeller.Id;
-                        var entitySeller = appContactSeller.EntityFk;
-                        if (entitySeller.EntityAttachments.Count() > 0)
+                        if (appContactSeller != null)
                         {
-                            var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
-                            var logo = entitySeller.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
-                            objReturn.SellerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            objReturn.SellerId = appContactSeller.Id;
+                            var entitySeller = appContactSeller.EntityFk;
+                            if (entitySeller.EntityAttachments.Count() > 0)
+                            {
+                                var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+                                var logo = entitySeller.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
+                                objReturn.SellerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            }
                         }
                     }
 
