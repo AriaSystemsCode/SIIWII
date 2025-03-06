@@ -403,23 +403,25 @@ namespace onetouch.Authorization.Users
             }
             //Mariam[Start]
             
-            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
+            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x =>x.EntityFk.TenantId== AbpSession.TenantId &&  x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
             if (contactEntityExtraData != null)
             {
 
                 var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
-                ContactForEditDto contactView = await _appAccountsAppService.GetContactForView(contact.Id);
-                ContactDto contactDto = contactView.Contact;//ObjectMapper.Map<ContactDto>(contact);
-                contactDto.FirstName = input.User.Name;
-                contactDto.LastName = input.User.Surname;
-                contactDto.EMailAddress = input.User.EmailAddress;
-                contactDto.UserId = user.Id;
-                contactDto.Name = input.User.Name + " " + input.User.Surname;
-                contactDto.UserName = input.User.UserName;
-                contactDto.TradeName = "";
-                contactDto.Code = input.Code;
-                ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
-
+                if (contact != null)
+                {
+                    ContactForEditDto contactView = await _appAccountsAppService.GetContactForView(contact.Id);
+                    ContactDto contactDto = contactView.Contact;//ObjectMapper.Map<ContactDto>(contact);
+                    contactDto.FirstName = input.User.Name;
+                    contactDto.LastName = input.User.Surname;
+                    contactDto.EMailAddress = input.User.EmailAddress;
+                    contactDto.UserId = user.Id;
+                    contactDto.Name = input.User.Name + " " + input.User.Surname;
+                    contactDto.UserName = input.User.UserName;
+                    contactDto.TradeName = "";
+                    contactDto.Code = input.Code;
+                    ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
+                }
             }
             //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[Start]
             else

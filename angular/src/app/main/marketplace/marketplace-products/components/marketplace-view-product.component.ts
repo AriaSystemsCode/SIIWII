@@ -76,6 +76,8 @@ export class MarketplaceViewProductComponent
     handleSCreenSelect :number = 0
     chk_Order_by_prepack:boolean [] =[]
     visible: boolean = false;
+    priceLevel :any
+    showSpecialPrice: boolean = false;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -88,11 +90,12 @@ export class MarketplaceViewProductComponent
     ) {
         super(injector);
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
+        this.priceLevel = localStorage.getItem("tempPriceLevel");
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
     }
     ngOnInit(): void {
-
+        this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
         const screenWidth = window.innerWidth;
         if (screenWidth >= 992) { // lg screen
           this.handleSCreenSelect = 5
@@ -195,6 +198,7 @@ export class MarketplaceViewProductComponent
                         this.productBodyData.currencyCode,
                         this.productBodyData.buyerSSIN,
                         this.productBodyData.sellerSSIN,
+                        this.priceLevel,
                         this.productBodyData.id,
                         undefined,
                         undefined,
@@ -279,17 +283,17 @@ export class MarketplaceViewProductComponent
     }
 
     slideToNextImage(): void {
-        this.currentIndex = (this.currentIndex + 1) % this.colorsData?.length;
+        this.currentIndex = (this.currentIndex + 1) % this.filteredColors.length;
         this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
         this.isColorView = true
-        this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex]?.colorImg;
+        this.colorAttachmentForMainIamge = this.filteredColors[this.currentIndex].colorImg;
         this.setSizes(this.currentIndex)
         this.scrollIntoView();
     }
 
     slideToPreviousImage(): void {
         // Update currentIndex and translateX
-        this.currentIndex = (this.currentIndex - 1 + this.colorsData?.length) % this.colorsData?.length;
+        this.currentIndex = (this.currentIndex - 1 + this.filteredColors.length) % this.filteredColors.length;
         this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
         this.isColorView = true;
         this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex]?.colorImg;
@@ -422,8 +426,8 @@ if(!this.productDetails?.orderByPrePack ){
 
    /*  removeColor(color, i: number) {
         this.currentIndex =
-            this.orderSummary?.length === 0 ? 0 : color?.colorIndex;
-        if (!this.productDetails?.orderByPrePack) {
+            this.orderSummary.length === 0 ? 0 : color.colorIndex;
+            if (!this.productDetails?.orderByPrePack) {
             // this.totalOrderQTY  = this.totalOrderQTY - this.cal
             let qty = 0;
             let price = 0;
@@ -649,8 +653,8 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item,index) => {
             let multiby;
-            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[colorIndex])
-                multiby = item.orderedPrePacks;
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
+                multiby = item?.orderedPrePacks;
 
             else
                 multiby =

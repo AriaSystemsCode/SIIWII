@@ -2079,6 +2079,11 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     input.EntityTypeIdFilter = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
                 }
+                var idList = new List<string>();
+                if (!string.IsNullOrEmpty(input.At_Id))
+                {
+                    idList = input.At_Id.Split(',').ToList();
+                }
 
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
                     .Include(z => z.AppTransactionDetails)
@@ -2098,6 +2103,7 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrEmpty(input.SellerSSIN), e => e.SellerContactSSIN == input.SellerSSIN)
                             .WhereIf(!string.IsNullOrEmpty(input.SellerName), e => e.SellerCompanyName.Contains(input.SellerName))
                             .WhereIf(!string.IsNullOrEmpty(input.BuyerName), e => e.BuyerCompanyName.Contains(input.BuyerName))
+                            .WhereIf(!string.IsNullOrEmpty(input.At_Id), e => idList.Contains(e.Id.ToString()))
                             .WhereIf(input.Since_Id > 0, e => e.Id > input.Since_Id)
                             .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId)
                                         && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
@@ -2297,13 +2303,16 @@ namespace onetouch.AppSiiwiiTransaction
                         var appContact = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
                             .ThenInclude(x => x.AttachmentFk)
                         .Where(e => e.SSIN == TransactionIdFk.BuyerCompanySSIN).FirstOrDefault();
-                        var entity = appContact.EntityFk;
-                        if (entity.EntityAttachments.Count() > 0)
+                        if (appContact != null)
                         {
-                            var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
-                            var logo = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
-                            objReturn.BuyerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            var entity = appContact.EntityFk;
+                            if (entity.EntityAttachments.Count() > 0)
+                            {
+                                var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+                                var logo = entity.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
+                                objReturn.BuyerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
 
+                            }
                         }
                     }
 
@@ -2315,13 +2324,16 @@ namespace onetouch.AppSiiwiiTransaction
                         var appContactSeller = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
                                 .ThenInclude(x => x.AttachmentFk)
                          .Where(e => e.SSIN == TransactionIdFk.SellerCompanySSIN).FirstOrDefault();
-                        objReturn.SellerId = appContactSeller.Id;
-                        var entitySeller = appContactSeller.EntityFk;
-                        if (entitySeller.EntityAttachments.Count() > 0)
+                        if (appContactSeller != null)
                         {
-                            var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
-                            var logo = entitySeller.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
-                            objReturn.SellerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            objReturn.SellerId = appContactSeller.Id;
+                            var entitySeller = appContactSeller.EntityFk;
+                            if (entitySeller.EntityAttachments.Count() > 0)
+                            {
+                                var attCatId = await _helper.SystemTables.GetAttachmentCategoryLogoId();
+                                var logo = entitySeller.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attCatId);
+                                objReturn.SellerLogo = logo == null ? null : "attachments/" + (logo.AttachmentFk.TenantId.HasValue ? logo.AttachmentFk.TenantId : -1) + "/" + logo.AttachmentFk.Attachment;
+                            }
                         }
                     }
 
@@ -2743,6 +2755,12 @@ namespace onetouch.AppSiiwiiTransaction
                                                             : "attachments/" + (line.TenantId.HasValue ? line.TenantId : -1) + "/" +
                                                             lineAttachmentDefault.AttachmentFk.Attachment);
                                             }
+                                            //MMT
+                                            if (string.IsNullOrEmpty(sizeColorDetailView.Data.Image))
+                                            {
+                                                sizeColorDetailView.Data.Image = majorDetailView.Data.Image;
+                                            }
+                                            //MMT
                                             //I45
                                             if (!string.IsNullOrEmpty(sizeColorDetailView.Data.Image))
                                             {

@@ -463,6 +463,10 @@ namespace onetouch.AppMarketplaceItems
 
                         }
                     }
+                    if (!string.IsNullOrEmpty(input.PriceLevel))
+                    {
+                        level = input.PriceLevel;
+                    }
 
                     string currencyCode = "";
                     if (!string.IsNullOrEmpty(input.CurrencyCode))

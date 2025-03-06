@@ -335,7 +335,7 @@
                                 class="msrp d-flex "
                             >
                                 <h5 class="mr-2" style="color: black !important;font-size: 16px;">MSRP:  </h5>
-                                <h5>
+                                <h5  *ngIf="productDetails?.minMSRP">
                                     <!-- {{
                                         productDetails?.appItemPriceInfos[0]
                                             .currencySymbol
@@ -347,6 +347,7 @@
                                 </h5>
                                 <span
                                     *ngIf="
+                                    productDetails?.minMSRP && 
                                         productDetails?.minMSRP !==
                                         productDetails?.maxMSRP
                                     "
@@ -376,15 +377,11 @@
                         <div>
                             <div class="msrp d-flex align-items-center ">
                             <h5 class="mr-2" style="color: black !important;font-size: 14px;white-space: nowrap;;">Special Price:  </h5>
-                              
-                         
-                            
-                            <h5 *ngIf="showEditSpecialPrice"> 
-                                    
+                            <h5 *ngIf="showEditSpecialPrice">
                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                             </h5>
 
-                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="mx-1  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"  class="mx-1  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
                         
                         </div>
@@ -1260,7 +1257,7 @@ top: 4px;">
                                             class="msrp d-flex mb-2"
                                         >
                                             <h5 class="mr-2" style="color: black !important;font-size: 12px;">MSRP:  </h5>
-                                            <h5 >
+                                            <h5  *ngIf="productDetails?.minMSRP">
                                                 <!-- {{
                                                     productDetails?.appItemPriceInfos[0]
                                                         .currencySymbol
@@ -1271,7 +1268,7 @@ top: 4px;">
                                                 {{ productDetails?.minMSRP }}
                                             </h5>
                                             <span
-                                                *ngIf="
+                                                *ngIf="productDetails?.minMSRP &&
                                                     productDetails?.minMSRP !==
                                                     productDetails?.maxMSRP
                                                 "
@@ -1309,7 +1306,7 @@ top: 4px;">
                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                             </h5>
 
-                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="mx-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice "  class="mx-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
                         
                         </div>

@@ -55,6 +55,7 @@ import { AppEntityDtoWithActions } from "../models/app-entity-dto-with-actions";
 import { PricingHelpersService } from "../../app-item-shared/services/pricing-helpers.service";
 import { ApplyVariationOutput } from "./create-edit-app-item-variations.component";
 import Swal from "sweetalert2";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
     selector: "app-create-or-edit-app-item",
@@ -207,6 +208,10 @@ export class CreateOrEditAppItemComponent
         }
         this.getCurrencies();
         this.getAspectatio();
+
+        let languageSettingName  =AppConsts.languageSettingName;
+        this._pricingHelperService.defaultLevel= languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
+      
     }
 
     aspectRatio;
@@ -1110,6 +1115,40 @@ let x=  this.appItem.nonLookupValues;
         this.formTouched = true;
     }
 
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      onDragOver(event: DragEvent) {
+        event.preventDefault(); // Required to allow dropping
+        event.stopPropagation();
+      }
+      
+    onDrop(event: DragEvent, index: number) {
+        event.preventDefault();
+        event.stopPropagation();
+      
+        if (event.dataTransfer?.files.length) {
+          const file = event.dataTransfer.files[0];
+      
+          console.log("File dropped:", file);
+      
+          const mockEvent = {
+            target: { files: [file], value: file.name } // Mimicking an input event
+          };
+      
+          this.fileChange(
+            mockEvent as unknown as Event,
+            this.productImageCategory,
+            index,
+            undefined,
+            true
+          );
+        }
+      }
+
+      
     fileChange(
         event,
         attachmentCategory: GetSycAttachmentCategoryForViewDto,
