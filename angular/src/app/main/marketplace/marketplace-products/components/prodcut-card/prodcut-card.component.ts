@@ -17,6 +17,8 @@ export class ProdcutCardComponent {
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
     params: any;
     languageSettingName:string  =AppConsts.languageSettingName;
+
+    @Input() acceptedAspectRatio;
     ngOnInit(){
         this.product?.price % 1 ==0?this.product.price=Math.round(this.product.price * 100 / 100).toFixed(2):null; 
     }

@@ -45,6 +45,9 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string ShipViaName { set; get; }
         public virtual string PaymentTermsName { get; set; }
         //Iteration45[End]
+        //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[Start]
+        public virtual DateTime CreationDate { set; get; }
+        //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
     }
 
     //xx

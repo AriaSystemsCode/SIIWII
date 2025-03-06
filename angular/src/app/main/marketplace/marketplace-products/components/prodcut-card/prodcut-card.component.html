@@ -1,9 +1,10 @@
-<div class="card w-100" (click)="viewProduct(product.id)" >
+<div class="card w-100" (click)="viewProduct(product.id)"  #itemCard>
     <img
-        class="img"
+        class="img w-100"
         [src]="attachmentBaseUrl + '/' + product?.imageUrl"
         alt="Card image cap"
         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+        [ngStyle]="{ 'height.px': itemCard.clientWidth / acceptedAspectRatio }"
         />
 
     <div class="card-body">
@@ -13,19 +14,20 @@
             </div>
             <div class="d-flex name-price">
                 <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
-                <p class="price">MSRP :{{ product?.price  | currency:currency:true}}</p>
+                <!-- <p class="price">MSRP :{{ product?.price  | currency:currency:true}}</p> -->
+                <p class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</p>
             </div>
         </div>
         <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
        
         <p class="card-text desc fw-bold" [title]="product?.name">
-            {{ product?.name }}
+            {{ product?.name  | textSubstring: 20 }}
         </p>
 
         <div class="d-flex name-price">
             <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
              <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
-            <h5 class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</h5>
+            <!-- <h5 class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</h5> -->
         </div>
     </div>
 </div>

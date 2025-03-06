@@ -115,7 +115,7 @@
                                         >
                                             <ng-container
                                                 *ngFor="
-                                                    let size of order.color.sizes;
+                                                    let size of order?.color?.sizes;
                                                     let i = index
                                                 "
                                             >
@@ -183,7 +183,7 @@
                                         <tbody
                                             *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                                 order.color.sizes,
-                                                orderIndex
+                                                orderIndex, order.colorIndex
                                             )"
                                         >
                                             <ng-container
@@ -197,10 +197,9 @@
                                                     <td>{{ size.label }}</td>
                                                     <td>
                                                         {{
-                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                                 size.sizeRatio *
-                                                                order.color.sizes[0]
-                                                                    .orderedPrePacks
+                                                                order?.color?.sizes[0]?.orderedPrePacks
             
                                                                     :  order.color.sizes[i]
                                                                     .orderedPrePacks
@@ -210,10 +209,9 @@
                                                     <td>{{ size.price | currency:' '}}</td>
                                                     <td>
                                                         {{
-                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                            ( size.sizeRatio *
-                                                                order.color.sizes[0]
-                                                                    .orderedPrePacks *
+                                                                order?.color?.sizes[0]?.orderedPrePacks *
                                                                 size.price | currency:' '
                                                                 ) 
                                                                 : (order.color.sizes[i]
@@ -254,7 +252,7 @@
                                                     {{
                                                         calculatePrepackOrderedQTYSum(
                                                             order.color.sizes,
-                                                            orderIndex
+                                                            orderIndex, order.colorIndex
                                                         )
                                                     }}
                                                 </th>
@@ -263,7 +261,7 @@
                                                     {{
                                                         getTotalPrepackSizeAmount(
                                                             order.color.sizes,
-                                                            orderIndex
+                                                            orderIndex,order.colorIndex
                                                         )| currency:' '
                                                     }}
                                                 </th>
@@ -467,8 +465,7 @@ top: 4px;">
                         <h5 class="my-2" style="text-decoration: none;color:black  !important">
                             {{
                                 productDetails
-                                    ?.variations[0]
-                                    .extraAttrName
+                                    ?.variations[0]?.extraAttrName
                             }}
                         </h5>
                         <div class="mb-0 ">
@@ -481,7 +478,7 @@ top: 4px;">
                                             </button>
                                     </span>
                                     <input #filterInput [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
-                                        class="form-control m-input" placeholder="search with color"
+                                        class="form-control m-input" placeholder="Search by Color"
                                         type="text" >
                                        
                                         <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText(filterInput)">
@@ -656,11 +653,10 @@ top: 4px;">
                                     <th scope="col">Ordered</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                 <tr
                                     *ngFor="
-                                        let size of filteredColors[currentIndex]
-                                            ?.sizes;
+                                        let size of filteredColors[currentIndex]?.sizes;
                                         let i = index
                                     "
                                 >
@@ -700,25 +696,23 @@ top: 4px;">
                             *ngIf="productDetails?.orderByPrePack"
                             class="table text-center table-bordered table-white"
                         >
-                            <tbody>
-                                <tr>
+                            <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                                <tr *ngIf="filteredColors?.[currentIndex]?.sizes?.length">
                                     <th  style="background-color: #F8F8F8;">Size</th>
                                     <td
                                         *ngFor="
-                                            let size of filteredColors[currentIndex]
-                                                ?.sizes
+                                            let size of filteredColors[currentIndex]?.sizes
                                         "
                                     >
                                         {{ size.label }}
                                     </td>
                                     <th  style="background-color: #F8F8F8;">Total Pcs</th>
                                 </tr>
-                                <tr>
+                                <tr *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                     <th  style="background-color: #F8F8F8;">Prepack</th>
                                     <td
                                         *ngFor="
-                                            let size of filteredColors[currentIndex]
-                                                ?.sizes
+                                            let size of filteredColors[currentIndex]?.sizes
                                         "
                                     >
                                         {{ size.sizeRatio }}
@@ -751,22 +745,18 @@ top: 4px;">
                                             <th scope="col">Ordered</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
+                                    <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                                        <tr >
                                             <td>
                                                 {{
-                                                    filteredColors[currentIndex]
-                                                        ?.sizes[0]
-                                                        ?.noOfAvailablePrepacks
+                                                    filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                 }}
                                             </td>
                                             <td>
                                                 <p-inputNumber
                                                 [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
                                                     [(ngModel)]="
-                                                        filteredColors[currentIndex]
-                                                            ?.sizes[0]
-                                                            .orderedPrePacks
+                                                        filteredColors[currentIndex]?.sizes[0].orderedPrePacks
                                                     "
                                                     mode="decimal"
                                                     [showButtons]="true"
@@ -812,10 +802,10 @@ top: 4px;">
                                             <td>
                                                 {{ size.stockAvailability }}
                                             </td>
-                                            <td>
+                                            <td *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                                 
                                                 <p-inputNumber
-                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex].sizes[0].orderedPrePacks) : filteredColors[currentIndex].sizes[i].orderedPrePacks"
+                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
                                                    
                                                     mode="decimal"
                                                     [showButtons]="true"
@@ -1047,7 +1037,7 @@ top: 4px;">
                             <tbody
                                 *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                     order.color.sizes,
-                                    orderIndex
+                                    orderIndex, order.colorIndex
                                 )"
                             >
                                 <ng-container
@@ -1061,7 +1051,7 @@ top: 4px;">
                                         <td>{{ size.label }}</td>
                                         <td>
                                             {{
-                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                     size.sizeRatio *
                                                     order.color.sizes[0]
                                                         .orderedPrePacks
@@ -1074,7 +1064,7 @@ top: 4px;">
                                         <td>{{ size.price | currency:' '}}</td>
                                         <td>
                                             {{
-                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                ( size.sizeRatio *
                                                     order.color.sizes[0]
                                                         .orderedPrePacks *
@@ -1118,7 +1108,7 @@ top: 4px;">
                                         {{
                                             calculatePrepackOrderedQTYSum(
                                                 order.color.sizes,
-                                                orderIndex
+                                                orderIndex, order.colorIndex
                                             )
                                         }}
                                     </th>
@@ -1127,7 +1117,7 @@ top: 4px;">
                                         {{
                                             getTotalPrepackSizeAmount(
                                                 order.color.sizes,
-                                                orderIndex
+                                                orderIndex,order.colorIndex
                                             )| currency:' '
                                         }}
                                     </th>
@@ -1416,7 +1406,7 @@ top: 4px;">
                                                     </button>
                                             </span>
                                             <input #filterInput [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
-                                                class="form-control m-input" placeholder="search with color"
+                                                class="form-control m-input" placeholder="Search by Color"
                                                 type="text" >
                                                
                                                 <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText(filterInput)">
@@ -1594,11 +1584,10 @@ top: 4px;">
                                                 <th scope="col">Ordered</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                             <tr
                                                 *ngFor="
-                                                    let size of filteredColors[currentIndex]
-                                                        ?.sizes;
+                                                    let size of filteredColors[currentIndex]?.sizes;
                                                     let i = index
                                                 "
                                             >
@@ -1639,25 +1628,23 @@ top: 4px;">
                                         *ngIf="productDetails?.orderByPrePack"
                                         class="table text-center table-bordered table-white"
                                     >
-                                        <tbody>
+                                        <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                             <tr>
                                                 <th  style="background-color: #F8F8F8;">Size</th>
                                                 <td
                                                     *ngFor="
-                                                        let size of filteredColors[currentIndex]
-                                                            ?.sizes
+                                                        let size of filteredColors[currentIndex]?.sizes
                                                     "
                                                 >
                                                     {{ size.label }}
                                                 </td>
                                                 <th  style="background-color: #F8F8F8;">Total Pcs</th>
                                             </tr>
-                                            <tr>
+                                            <tr *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                                 <th  style="background-color: #F8F8F8;">Prepack</th>
                                                 <td
                                                     *ngFor="
-                                                        let size of filteredColors[currentIndex]
-                                                            ?.sizes
+                                                        let size of filteredColors[currentIndex]?.sizes
                                                     "
                                                 >
                                                     {{ size.sizeRatio }}
@@ -1692,17 +1679,14 @@ top: 4px;">
                                                     <tr>
                                                         <td>
                                                             {{
-                                                                filteredColors[currentIndex]
-                                                                    ?.sizes[0]
-                                                                    ?.noOfAvailablePrepacks
+                                                                filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                             }}
                                                         </td>
-                                                        <td>
+                                                        <td *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                                             <p-inputNumber
                                                             [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
                                                                 [(ngModel)]="
-                                                                    filteredColors[currentIndex]
-                                                                        ?.sizes[0]
+                                                                    filteredColors[currentIndex]?.sizes[0]
                                                                         .orderedPrePacks
                                                                 "
                                                                 mode="decimal"
@@ -1750,10 +1734,10 @@ top: 4px;">
                                                         <td>
                                                             {{ size.stockAvailability }}
                                                         </td>
-                                                        <td>
+                                                        <td *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                                             
                                                             <p-inputNumber
-                                                            [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0].orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
+                                                            [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
                                                                class="input-custom"
                                                                 mode="decimal"
                                                                 [showButtons]="true"
@@ -1975,7 +1959,7 @@ top: 4px;">
                                             <tbody
                                                 *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                                     order.color.sizes,
-                                                    orderIndex
+                                                    orderIndex, order.colorIndex
                                                 )"
                                             >
                                                 <ng-container
@@ -1989,7 +1973,7 @@ top: 4px;">
                                                         <td>{{ size.label }}</td>
                                                         <td>
                                                             {{
-                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex]) ? 
+                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex]) ? 
                                                                     size.sizeRatio *
                                                                     order.color.sizes[0]
                                                                         .orderedPrePacks
@@ -2002,7 +1986,7 @@ top: 4px;">
                                                         <td>{{ size.price | currency:' '}}</td>
                                                         <td>
                                                             {{
-                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
+                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[order.colorIndex] ) ? 
                                                                ( size.sizeRatio *
                                                                     order.color.sizes[0]
                                                                         .orderedPrePacks *
@@ -2047,7 +2031,7 @@ top: 4px;">
                                                         {{
                                                             calculatePrepackOrderedQTYSum(
                                                                 order.color.sizes,
-                                                                orderIndex
+                                                                orderIndex, order.colorIndex
                                                             )
                                                         }}
                                                     </th>
@@ -2056,7 +2040,7 @@ top: 4px;">
                                                         {{
                                                             getTotalPrepackSizeAmount(
                                                                 order.color.sizes,
-                                                                orderIndex
+                                                                orderIndex,order.colorIndex
                                                             )| currency:' '
                                                         }}
                                                     </th>
@@ -2180,7 +2164,11 @@ top: 4px;">
     </div>
   
     <div class="p-2 d-flex justify-content-center">
-        <p-button  (click)="visible = false; onEditpecialPrice(updatedSpecialPrice)" label="Yes" class="p-button-text " ></p-button>
+        <button
+        type="button"
+  
+        (click)="visible = false; onEditpecialPrice(updatedSpecialPrice)" label="Yes" class="pBtntext"
+    >Yes</button>
     </div>
   
   </p-dialog>

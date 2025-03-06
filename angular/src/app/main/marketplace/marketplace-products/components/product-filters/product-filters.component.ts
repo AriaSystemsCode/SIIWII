@@ -63,7 +63,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         private _appMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy
     ) {
 
-        this.accountSSIN=localStorage.getItem("SellerSSIN");
+        this.accountSSIN=sessionStorage.getItem("SellerSSIN");
         this.getAllProductCAtalogs();
         this.getParentDepartments();
         this.getAllBrands();

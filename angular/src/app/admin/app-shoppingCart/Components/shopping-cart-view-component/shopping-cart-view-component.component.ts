@@ -20,6 +20,7 @@ import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catal
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
 import { AppConsts } from '@shared/AppConsts';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -160,8 +161,7 @@ const button = document.getElementById("stickyButton");
       button.style.bottom = "20px";
     }
   });
- console.log(this.comNew,'this.comNew')
- console.log(this.conNew,'this.conNew')
+
   }
   ngOnChanges() {
    
@@ -596,7 +596,7 @@ loadCommentsList() {
 this.temp=temp;
     this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, Intl.DateTimeFormat().resolvedOptions().timeZone,undefined, undefined, 0, 10, this.transactionPosition.Current)
     .pipe(finalize(() => {
 this.hideMainSpinner();
     }))
@@ -722,7 +722,7 @@ onShowVariations(event) {
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.appTransactionsForViewDto?.sellerCompanySSIN) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         "SellerSSIN",
         JSON.stringify(this.appTransactionsForViewDto?.sellerCompanySSIN)
       );
@@ -916,6 +916,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -934,6 +935,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -950,6 +952,7 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
+                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -973,6 +976,7 @@ onShowVariations(event) {
       rowNode.node.data.amount =  this.amount
       rowNode.node.data.qty =  this.selectedQuantity 
       rowNode.node.data.showEditQty = false;
+      rowNode.node.data.showEditPrice = false;
 
     }else {
 
@@ -993,6 +997,7 @@ onShowVariations(event) {
             if (res) this.notify.info("Successfully Updated.");
             // this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
+            rowNode.node.data.showEditPrice = false;
             this.getShoppingCartData();
             this.hideMainSpinner();
           });
@@ -1025,6 +1030,7 @@ onShowVariations(event) {
               // this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
               // rowNode.node.data.showEditQty = false;
+              //  rowNode.node.data.showEditPrice = false;
               this.hideMainSpinner();
             });
         } else {
@@ -1045,6 +1051,60 @@ onShowVariations(event) {
     }
   }
 }
+
+
+onEditPrice(rowNode) {
+  if(rowNode.node.data.added)
+    rowNode.node.data.showEditPrice = false;
+
+  else {
+  this.showMainSpinner();
+          switch (rowNode.level) {
+            case 0:
+            case 2:
+              this._AppTransactionServiceProxy
+                .updatePriceByProductLineId(
+                  this.orderId,
+                  rowNode.node.data.lineId,
+                  rowNode.node.data.updatedPrice
+                )
+                .subscribe((res) => {
+                  if (res)
+                  this.notify.info("Successfully Updated.");
+                  rowNode.node.data.showEditPrice = false;
+                  rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                  this.getShoppingCartData();
+                  this.hideMainSpinner();
+                });
+              break;
+              case 1:
+                this.showMainSpinner();
+                  this._AppTransactionServiceProxy
+                    .updatePriceByProductSSINColor(
+                      this.orderId,
+                      rowNode.node.data.parentId,
+                      rowNode.node.data.colorCode,
+                      rowNode.node.data.colorId,
+                      rowNode.node.data.updatedPrice
+                    )
+                    .subscribe((res) => {
+                      if (res) this.notify.info("Successfully Updated.");
+                      rowNode.node.data.showEditPrice = false;
+                      rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                      this.getShoppingCartData();
+                      this.hideMainSpinner();
+                    });
+                  break;
+
+     default:
+          break;
+
+                  }
+  }
+    
+  
+}
+
   hide() {
     this.resetData();
     this.modal.hide();
@@ -1089,7 +1149,7 @@ onShowVariations(event) {
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
@@ -1102,7 +1162,7 @@ onShowVariations(event) {
   onDiscardShopping() {
     Swal.fire({
       title: "",
-      text: "Do you need to discared shopping cart permanently?",
+      text: "Do you need to discard shopping cart permanently?",
       icon: "info",
       showCancelButton: true,
       confirmButtonText:
@@ -1201,6 +1261,16 @@ stopReport(event) {
     // }).then((result) => {
     //   if (result.isConfirmed) {
         this.showMainSpinner();
+              let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+                let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+                let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+                let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+            
+            
+                this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+                this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+                this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+                this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
@@ -1301,10 +1371,23 @@ stopReport(event) {
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10,transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
-        this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
+
+           if(res1){
+          
+            if(res1?.entityStatusCode?.toUpperCase() !="DRAFT") {
+              this.show(res1.id, this.showCarousel, this.validateOrder, ShoppingCartMode.view);
+          
+    
+            } else {
+                this.show(res1.id, this.showCarousel, this.validateOrder, ShoppingCartMode.createOrEdit);
+             
+        }
+           }
+ 
+
       });
   }
 
