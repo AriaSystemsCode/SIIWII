@@ -67,15 +67,15 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     ngOnChanges(changes: SimpleChanges) {
         if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo  || this.currentTab == ShoppingCartoccordionTabs.ShippingInfo ){
         if(this.selectedAddressDetails){
-        this.selectedAddressDetails.addressLine1=  this.selectedAddressDetails?.addressLine1 ? this.selectedAddressDetails?.addressLine1 : '' ;
-        this.selectedAddressDetails.addressLine2=  this.selectedAddressDetails?.addressLine2 ? this.selectedAddressDetails?.addressLine2 : '' ;
-        this.selectedAddressDetails.city=  this.selectedAddressDetails?.city ? this.selectedAddressDetails?.city : '' ;
-        this.selectedAddressDetails.state=  this.selectedAddressDetails?.state ? this.selectedAddressDetails?.state : '' ;
-        this.selectedAddressDetails.countryName=  this.selectedAddressDetails?.countryName ? this.selectedAddressDetails?.countryName : '' ;
-        this.selectedAddressDetails.postalCode=  this.selectedAddressDetails?.postalCode ? this.selectedAddressDetails?.postalCode : '' ;
+        // this.selectedAddressDetails.addressLine1=  this.selectedAddressDetails?.addressLine1 ? this.selectedAddressDetails?.addressLine1 : '' ;
+        // this.selectedAddressDetails.addressLine2=  this.selectedAddressDetails?.addressLine2 ? this.selectedAddressDetails?.addressLine2 : '' ;
+        // this.selectedAddressDetails.city=  this.selectedAddressDetails?.city ? this.selectedAddressDetails?.city : '' ;
+        // this.selectedAddressDetails.state=  this.selectedAddressDetails?.state ? this.selectedAddressDetails?.state : '' ;
+        // this.selectedAddressDetails.countryName=  this.selectedAddressDetails?.countryName ? this.selectedAddressDetails?.countryName : '' ;
+        // this.selectedAddressDetails.postalCode=  this.selectedAddressDetails?.postalCode ? this.selectedAddressDetails?.postalCode : '' ;
 
-        if(!this.selectedAddress && this.selectedAddressDetails)
-        this.selectedAddress=this.selectedAddressDetails;
+        // if(!this.selectedAddress && this.selectedAddressDetails)
+        // this.selectedAddress=this.selectedAddressDetails;
   
         }      else {
             // this.selectedAddress = null;
@@ -166,6 +166,8 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     getAddressList(companySsin,branchSsin){
        
         this.showMainSpinner()
+        console.log(companySsin,'companySsin')
+
                  if(companySsin) {
                     this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
             
@@ -174,7 +176,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                         this.refSavedAddressesList=result;
                         console.log( this.savedAddressesList,' this.savedAddressesList')
                         this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
-                            // console.log(result,'defauulllt')
+                            console.log(result,'defauulllt')
 
                             if (result){
                                 if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo) {
@@ -183,7 +185,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                     
                                     console.log(shippingAddress, 'shippingAddress');
                                     
-                                    if (shippingAddress) {
+                                    if (shippingAddress != undefined) {
                                         // Check if the shipping address exists in the savedAddressesList
                                         const matchedAddress = this.savedAddressesList.find(savedAddress => 
                                             savedAddress.id === shippingAddress.addressId
@@ -194,6 +196,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
                                             this.selectedAddress = matchedAddress;
+                                            this.selectedAddressDetails = matchedAddress
                                             this.addAddressDataToDto(2)
                                             this.selectAddress(this.selectedAddress.id)
                                         }
@@ -692,12 +695,14 @@ showAddressList(){
     this.showAddList=true;
 }
     ngOnInit(): void {
+        console.log( this.selectedAddressDetails,' this.selectedAddressDetails')
+        console.log( this.selectedAddress,' this.selectedAddress')
         this.savedAddressesList=[];
-        if(this.selectedAddressDetails){
-            this.showAddList=false;
-            this.openAddNewAddForm=false;
-            this.selectedAddress=this.selectedAddressDetails;
-        }
+        // if(this.selectedAddressDetails){
+        //     this.showAddList=false;
+        //     this.openAddNewAddForm=false;
+        //     this.selectedAddress=this.selectedAddressDetails;
+        // }
     }
     selectAddressType(){
         this.updateSelectedAddress.emit({id:this.selectedAddress.id,code:this.selectedAddress.code,typeId:this.addType});
