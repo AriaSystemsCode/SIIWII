@@ -67,8 +67,8 @@
 <div>
                 <div class="py-2 px-3 text-right  row  d-lg-flex
                 d-none">
-                <button type="button" class="btn  syncBtn"
-                [disabled]="!appTransactionsForViewDto?.showSync"
+                <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn  syncBtn"
+                [disabled]="!appTransactionsForViewDto?.showSync "
              
                 style="height: 37px; white-space: nowrap;" (click)="sync()">
                 <svg width="16" height="23" viewBox="0 0 16 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -77,7 +77,7 @@
                     
                 {{l("Sync")}}
             </button>
-                    <button type="button" class="btn   border-0  shareBtn"
+                    <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn   border-0  shareBtn"
                         [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
@@ -130,7 +130,7 @@
                                 href="javascript:;">
                            
                                     
-                                <button type="button" class="btn border-0  mx-1"
+                                <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn border-0  mx-1"
                                     [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                                     [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                                     style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
@@ -175,7 +175,7 @@
                             </a>
                        
                     <a class="dropdown-item d-flex" id="syncTransaction">
-                        <button type="button" class="btn  "
+                        <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn  "
                         [disabled]="!appTransactionsForViewDto?.showSync"
                      
                         style="height: 37px; white-space: nowrap;" (click)="sync()">
@@ -770,7 +770,7 @@ height: 48px;"
                     href="javascript:;">
                
                         
-                    <button type="button" class="btn border-0  mx-1"
+                    <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn border-0  mx-1"
                         [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
@@ -852,7 +852,7 @@ height: 48px;"
                 
         </a>
         <a class="dropdown-item d-flex" id="syncTransaction">
-            <button type="button" class="btn  "
+            <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn  "
             [disabled]="!appTransactionsForViewDto?.showSync"
          
             style="height: 37px; white-space: nowrap;" (click)="sync()">
