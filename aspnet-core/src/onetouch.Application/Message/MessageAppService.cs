@@ -217,11 +217,7 @@ namespace onetouch.Message
                                    },
                                };
 
-                string fileName = @"d:\query.txt";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"d:\query.txt"))
-                {
-                    file.Write(filteredMessages.ToQueryString());
-                }
+                
                 
                 //var totalCount = await filteredMessages.GroupBy<AppMessage,long?>(z => z.ThreadId).CountAsync();
                 var totalCount = await filteredMessages.CountAsync();
