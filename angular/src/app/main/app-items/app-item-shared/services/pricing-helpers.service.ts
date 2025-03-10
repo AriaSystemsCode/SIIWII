@@ -11,7 +11,7 @@ import { AppItemPriceInfo, CurrencyInfoDto, IAppItemPriceInfo } from '@shared/se
 })
 export class PricingHelpersService extends AppComponentBase {
   levels: string[] = ['A', 'B', 'C', 'D']
-  defaultLevel:string ;
+  defaultLevel:string="MSRP" ;
   constructor(private injector: Injector) {
     super(injector);
   }

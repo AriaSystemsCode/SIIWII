@@ -7,6 +7,7 @@ import { forkJoin, Observable, tap } from 'rxjs';
 import { EExtraAttributeUsage } from '../../appItems/models/extra-attribute-usage.enum';
 import { FilteredExtraAttribute } from '../models/filtered-extra-attribute';
 import { IsVariationExtraAttribute } from '../models/IsVariationExtraAttribute';
+import { AppConsts } from '@shared/AppConsts';
 export type groupExtraAttributeValuesByExtraAttrIdModel =  {selectedVariations: { [key:string] :  string[] }, priceRange? : { min:number, max:number } }
 @Injectable()
 
@@ -155,7 +156,9 @@ export class ExtraAttributeDataService extends AppComponentBase {
         }
         Variations.forEach((variation,index)=>{
             if(returnPriceRange){
-                const variationMSRPPrice = variation.appItemPriceInfos.filter(item=> item.code =='MSRP' && item.currencyId == this.tenantDefaultCurrency.value )[0]
+                let languageSettingName  =AppConsts.languageSettingName;
+              //  const variationMSRPPrice = variation.appItemPriceInfos.filter(item=> item.code ==(languageSettingName!='en-GB' ? 'MSRP'  : 'RRP' ) && item.currencyId == this.tenantDefaultCurrency.value )[0]
+                const variationMSRPPrice = variation.appItemPriceInfos.filter(item=> item.code =='MSRP'  && item.currencyId == this.tenantDefaultCurrency.value )[0]
                 if( index == 0) {
                     priceRange.min = priceRange.max = variationMSRPPrice?.price
                 }
