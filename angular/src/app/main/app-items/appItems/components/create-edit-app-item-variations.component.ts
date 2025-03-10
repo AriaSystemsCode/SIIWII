@@ -269,9 +269,10 @@ export class CreateEditAppItemVariationsComponent
     test: boolean = true;
 
     initPricingNeededData() {
+        let languageSettingName=AppConsts.languageSettingName;
         this.levels = [
             {
-                label: this._pricingHelpersService.defaultLevel,
+                label: this._pricingHelpersService.defaultLevel=='MSRP' ?( languageSettingName!='en-GB' ? 'MSRP'  : 'RRP' ) : this._pricingHelpersService.defaultLevel,
                 value: this._pricingHelpersService.defaultLevel,
             },
             ...this._pricingHelpersService.levels.map((item) => {
@@ -1519,9 +1520,14 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
             );
         }
          let languageSettingName  =AppConsts.languageSettingName;
-        this.variationMatrices?.forEach((variation) => {
+        /* this.variationMatrices?.forEach((variation) => {
             variation.appItemPriceInfos = variation.appItemPriceInfos.filter(
                 (priceDto) => priceDto.code == (languageSettingName!='en-GB' ? 'MSRP'  : 'RRP' ) || priceDto?.price > 0
+            );
+        }); */
+        this.variationMatrices?.forEach((variation) => {
+            variation.appItemPriceInfos = variation.appItemPriceInfos.filter(
+                (priceDto) => priceDto.code ==  'MSRP'   || priceDto?.price > 0
             );
         });
         this.isListing ? this.selectedVaritaions : this.variationMatrices;

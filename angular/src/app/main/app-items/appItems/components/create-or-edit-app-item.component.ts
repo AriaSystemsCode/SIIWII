@@ -210,7 +210,7 @@ export class CreateOrEditAppItemComponent
         this.getAspectatio();
 
         this.languageSettingName  =AppConsts.languageSettingName;
-        this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
+        //this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
       
     }
     languageSettingName;

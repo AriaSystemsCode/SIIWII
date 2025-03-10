@@ -19,7 +19,7 @@
         {{ 'PriceRangedFrom' | localize }}:
     </div>
     <div class="col text-left font-weight-bold   mb-3    ">
-        {{tenantDefaultCurrency?.symbol}}{{minPrice}} {{'to' | localize}} {{tenantDefaultCurrency?.symbol}}{{maxPrice}}
+        {{tenantDefaultCurrency?.symbol}}{{minPrice  ? minPrice :0}} {{'to' | localize}} {{tenantDefaultCurrency?.symbol}}{{maxPrice?maxPrice:0}}
     </div>
 </div>
 
@@ -28,7 +28,7 @@
         {{ 'Price' | localize }} :
     </div>
     <div class="col text-left font-weight-bold   mb-3    ">
-        {{tenantDefaultCurrency?.symbol}}{{minPrice}}
+        {{tenantDefaultCurrency?.symbol}}{{minPrice ? minPrice: 0 }}
     </div>
 </div>
 <div class="row" *ngIf="stockAvailability">
