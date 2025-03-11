@@ -8450,11 +8450,6 @@ namespace onetouch.AppItems
                     var expression = CreateExpression<string>(property);
                     ApplyRule(expression, rule);
                 }
-                else if (property.PropertyType == typeof(decimal))
-                {
-                    var expression = CreateExpression<decimal>(property);
-                    ApplyRule(expression, rule);
-                }
                 // Add more type checks as needed
             }
         }
@@ -8491,18 +8486,11 @@ namespace onetouch.AppItems
                     }
                     break;
                 case "Custom":
-                   // if (typeof(TProperty) == typeof(string))
+                    if (typeof(TProperty) == typeof(string))
                     {
-                        var rulev = rule.RuleValue;//.Replace(rule.FieldName.TrimEnd(), "x." + rule.FieldName.TrimEnd());
-                        //rulev
-                        //var expressionv = CreateStringExpression<TProperty>(rule.FieldName.TrimEnd());
-                        //string expressionvs = expressionv.ToString();
-                        //expressionvs=expressionvs.Replace("=> x." + rule.FieldName.TrimEnd(), "=> "+ rulev);
-                        var parameter = System.Linq.Expressions.Expression.Parameter(typeof(decimal), rule.FieldName.TrimEnd());
-                        var parsedExpression = DynamicExpressionParser.ParseLambda(new[] { parameter }, typeof(bool), rulev);
-                        // Compile and evaluate the expression
-                        var func = (Func<TProperty, bool>)parsedExpression.Compile();
-                        RuleFor<TProperty>(expression).Must(func).WithMessage(rule.ErrorMessage);
+                        var rulev = rule.RuleValue.Replace(rule.FieldName.TrimEnd(), "x." + rule.FieldName.TrimEnd());
+                        var expressionv = CreateStringExpression<TProperty>(rulev);
+                        RuleFor<TProperty>(expression).Must(expressionv).WithMessage(rule.ErrorMessage);
                     }
                     break;
 
