@@ -5,7 +5,7 @@ namespace onetouch.ApiClient
 {
     public static class ApiUrlConfig
     {
-        private const string DefaultHostUrl = "https://localhost:44303/"; //TODO: Replace with PROD WebAPI URL.
+        private const string DefaultHostUrl = "https://localhost:44300/"; //TODO: Replace with PROD WebAPI URL.
 
         public static string BaseUrl { get; private set; }
 
