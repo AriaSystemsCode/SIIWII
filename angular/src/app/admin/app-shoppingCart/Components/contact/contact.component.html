@@ -39,7 +39,7 @@
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code"
                     #companyCodeInput="ngModel"  
                     name="companyCode"
-                    (change)="setCompanyCode($event)"
+                    (input)="setCompanyCode($event)"
                     (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code,'company')"
                 />
                 
@@ -139,7 +139,7 @@
 
             <input placeholder="contact Code" type="text" class="form-control ml-3 w-100"
             [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''"
-            (change)="setContactCode($event)"
+            (input)="setContactCode($event)"
                 [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code"
                 #contactCodeInput="ngModel"  name="contactCode" 
                 (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code,'contact')"
@@ -330,7 +330,7 @@
             [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''"
                 [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code"
                 #branchCodeInput="ngModel"  name="branchCode" 
-                (change)="setBranchCode($event)"
+                (input)="setBranchCode($event)"
                 (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code,'branch')"
                 />
 

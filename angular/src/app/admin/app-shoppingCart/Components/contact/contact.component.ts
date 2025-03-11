@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { AccountBranchDto, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, PhoneNumberAndtype, TransactionType } from "@shared/service-proxies/service-proxies";
+import { AccountBranchDto, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, PhoneNumberAndtype, SycIdentifierDefinitionsServiceProxy, TransactionType } from "@shared/service-proxies/service-proxies";
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import { stringInsert } from "@devexpress/analytics-core/analytics-internal";
 import { AppComponentBase } from "@shared/common/app-component-base";
@@ -57,7 +57,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+          private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy
     ) {
         super(injector);
         
@@ -68,7 +69,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.onClearText()
 
         }
-      
         this.resetSelectedData(); 
         this.setSelectedData();
         this.getContacts()
@@ -118,18 +118,52 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             // this.comNew = event?.target?.checked
             localStorage.setItem("comNew",   JSON.stringify(event?.target?.checked));
             this.appTransactionsForViewDto.createManualAccount = event?.target?.checked
-
+            this.saveManualAccount()
+            this.saveManualBranch()
         }
         else if (type == 'contact'){
             // this.conNew = event?.target?.checked
             localStorage.setItem("conNew",   JSON.stringify( event?.target?.checked));
-         
+            this.saveManualContact()
 
             this.appTransactionsForViewDto.createManualContact = event?.target?.checked
 
         }
 
     }
+
+
+    async saveManualAccount(){
+         let  sequance="";
+         let tenancyName = this.appSession.tenancyName;
+ 
+         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTCONTACT',this.appSession.tenantId).toPromise()
+         if(getNextEntityCodeRes)
+             sequance=getNextEntityCodeRes;
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code= tenancyName+"-M"+sequance;
+       
+    }
+
+    async saveManualBranch(){
+        let  sequance="";
+        let tenancyName = this.appSession.tenancyName;
+
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTBRANCH',this.appSession.tenantId).toPromise()
+        if(getNextEntityCodeRes)
+            sequance=getNextEntityCodeRes;
+             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code= tenancyName+"-"+sequance;
+      
+   }
+   async saveManualContact(){
+    let  sequance="";
+    let tenancyName = this.appSession.tenancyName;
+
+    const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('MANUALACCOUNTCONTACT',this.appSession.tenantId).toPromise()
+    if(getNextEntityCodeRes)
+        sequance=getNextEntityCodeRes;
+         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code= tenancyName+"-C"+sequance;
+  
+}
     preventTyping(event: KeyboardEvent): void {
         event.preventDefault();
     }
@@ -798,21 +832,21 @@ isCodoExist(code: string,filed:string) {
 
 setBranchCode(event){
     
-    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = event?.target?.value
-    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode = event?.target?.value
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = event?.target?.value.toUpperCase()
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode = event?.target?.value.toUpperCase()
 }
 
 setCompanyCode(event){
    
-    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = event?.target?.value
-    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyCode = event?.target?.value
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = event?.target?.value.toUpperCase()
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyCode = event?.target?.value.toUpperCase()
 }
 
 
 setContactCode(event){
     
-    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = event?.target?.value
-    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactCode = event?.target?.value
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = event?.target?.value.toUpperCase()
+    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactCode = event?.target?.value.toUpperCase()
 }
 ngDoCheck() {
     const currentContact = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex];
