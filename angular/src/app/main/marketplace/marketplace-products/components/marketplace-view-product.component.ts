@@ -267,15 +267,8 @@ export class MarketplaceViewProductComponent
         this.isColorView = value
     }
 
-    slideToNextImage(): void {
-        this.currentIndex = (this.currentIndex + 1) % this.filteredColors.length;
-        this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
-        this.isColorView = true
-        this.colorAttachmentForMainIamge = this.filteredColors[this.currentIndex].colorImg;
-        this.setSizes(this.currentIndex)
-        this.scrollIntoView();
-    }
-
+   
+    
     slideToPreviousImage(): void {
         // Update currentIndex and translateX
         this.currentIndex = (this.currentIndex - 1 + this.filteredColors.length) % this.filteredColors.length;
@@ -285,6 +278,17 @@ export class MarketplaceViewProductComponent
         this.setSizes(this.currentIndex)
         this.scrollIntoView();
     }
+    
+    slideToNextImage(): void {
+        this.currentIndex = (this.currentIndex + 1) % this.filteredColors.length;
+        this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
+        this.isColorView = true
+        this.colorAttachmentForMainIamge = this.filteredColors[this.currentIndex].colorImg;
+        this.setSizes(this.currentIndex)
+        this.scrollIntoView();
+    }
+
+   
 
     scrollIntoView(): void {
         setTimeout(() => {
