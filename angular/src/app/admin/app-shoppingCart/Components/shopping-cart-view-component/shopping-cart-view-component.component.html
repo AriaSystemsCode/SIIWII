@@ -60,7 +60,7 @@
                 <div class="px-4 py-2" style="line-height: 10px;">
                     <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
                     <div class="purpleColor" style="white-space: nowrap;">
-                        {{appTransactionsForViewDto?.enteredDate?.toString() | date: 'MMM d y, h:mm a'}}
+                        {{appTransactionsForViewDto?.creationDate?.toString() | date: 'MMM d y, h:mm a'}}
                     </div>
                 </div>
 </div>
@@ -328,7 +328,7 @@
                                         *ngIf="!shippingInfOValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                     </h6>
-                                    <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')" class="mx-2">*Please select or add ( ship to) address</p>
+                                    <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')" class="mx-2">*Please select or add ( ship to) address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==4">
@@ -352,7 +352,7 @@
                                     <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!BillingInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
-                                    <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')"  class="mx-2">*Please select or add billing address</p>
+                                    <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')"  class="mx-2">*Please select or add billing address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==5">
@@ -448,7 +448,7 @@
                                                             *ngIf="i === 0"></p-treeTableToggler>
                                                         <label *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                             {{ rowData[col.field] }}</label>
-                                                            <label *ngIf="(col.field=='price')||(col.field=='amount')">
+                                                            <label *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice) || (col.field=='amount')">
                                                                 {{ rowData[col.field] | currency:' ' }}</label>
                                                         <label
                                                             *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
@@ -486,6 +486,26 @@
                                                             </div>
 
                                                         </label>
+
+                                                        <label
+                                                        *ngIf="col.field=='price' && rowNode?.node?.data?.showEditPrice">
+                                                        <div class="editQtyContainer">
+                                                            <div class="fieldset">
+                                                                <input type="number" min="0"
+                                                                    class="form-control inputs form-text"
+                                                                    id="editPrice"
+                                                                    [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                    (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                                <button
+                                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                    (click)="onEditPrice(rowNode);"
+                                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                                    [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                    
                                                     </td>
 
                                                     <td class="p-treeTable text-center"  style="width: 5rem;"  *ngIf="canChange">
@@ -506,7 +526,7 @@
                                                                 aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                                 <div *ngIf="rowNode?.node?.data?.editQty"
                                                                     class="pointer"
-                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty ; rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
                                                                     <a class="link purpleColor p-3">
                                                                         <svg class="ml-3" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
                                                                             <g clip-path="url(#clip0_83_2871)">
@@ -705,7 +725,7 @@
                     <div class="row mt-4 ml-3" 
                     [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
-                        <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
+                        <div class="w-100 comment-warper   order-summary p-4  mt-3 purpleColor" >
                             <app-comment-parent [addNewThread]="true"  *ngIf="appTransactionsForViewDto"
                             [cartStyle]="true" #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                             (newCommentAdded)="onGeneratOrderReport(true)">
@@ -905,7 +925,7 @@ height: 48px;"
             </div>
         </div>  -->
     </div>
-    <p-tabView styleClass="tabview-custom" style="min-height: 70vh;">
+    <p-tabView styleClass="tabview-custom" class="tabSSec">
         <p-tabPanel>
             <ng-template pTemplate="header">
                 <div class="tab-header">
@@ -1035,7 +1055,7 @@ height: 48px;"
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                 </h6>
                             </div>
-                                <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')" class="mx-2 mt-1">*Please select or add ( ship to) address</p>
+                                <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')" class="mx-2 mt-1">*Please select or add ( ship to) address</p>
 
                             </div>
                         </ng-template>
@@ -1061,7 +1081,7 @@ height: 48px;"
                                     *ngIf="!BillingInfoValid"></i>
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
                             </div>
-                                <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')"  class="mx-2 mt-1">*Please select or add billing address</p>
+                                <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto?.buyerCompanySSIN == null || appTransactionsForViewDto?.buyerCompanySSIN == '')"  class="mx-2 mt-1">*Please select or add billing address</p>
 
                             </div>
                         </ng-template>
@@ -1166,11 +1186,12 @@ height: 48px;"
                                                         *ngIf="i === 0"></p-treeTableToggler>
                                                     <label *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                         {{ rowData[col.field] }}</label>
-                                                        <label *ngIf="(col.field=='price')||(col.field=='amount')">
+                                                        <label *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice)||(col.field=='amount')">
                                                             {{ rowData[col.field] | currency:' ' }}</label>
                                                     <label
                                                         *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
                                                         {{ rowData[col.field] }}</label>
+                                                        
 
                                                     <label *ngIf="col.field=='image'">
                                                         <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
@@ -1204,6 +1225,25 @@ height: 48px;"
                                                         </div>
 
                                                     </label>
+
+                                                    <label
+                                                        *ngIf="col.field=='price'&& rowNode?.node?.data?.showEditPrice">
+                                                        <div class="editQtyContainer">
+                                                            <div class="fieldset">
+                                                                <input type="number" min="0"
+                                                                    class="form-control inputs form-text"
+                                                                    id="editPrice"
+                                                                    [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                    (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                                <button
+                                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                    (click)="onEditPrice(rowNode);"
+                                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                                    [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
+                                                            </div>
+                                                        </div>
+                                                    </label>
                                                 </td>
 
                                                 <td class="p-treeTable"  style="width: 3rem;"  *ngIf="canChange">
@@ -1224,7 +1264,7 @@ height: 48px;"
                                                             aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                             <div *ngIf="rowNode?.node?.data?.editQty"
                                                                 class="pointer"
-                                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty;rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
                                                                 <a class="link purpleColor p-3">
                                                                     <svg class="ml-3" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
                                                                         <g clip-path="url(#clip0_83_2871)">

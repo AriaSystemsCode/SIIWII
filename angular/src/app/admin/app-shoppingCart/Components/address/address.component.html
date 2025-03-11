@@ -9,7 +9,7 @@
             [options]="AddressTypesList"
             name="Addresstype"
             styleClass="form-control aria-select  "
-            [required]="true"
+           
             [placeholder]="'PleaseSelect' | localize"
             (onChange)="selectAddressType()"
         >
@@ -127,21 +127,9 @@
                         name="addressCode"
                         [(ngModel)]="addressCode"
                         #Code="ngModel"
-                        required
-                        minlength="1"
-                        maxlength="50"
+                     
                     />
-                    <div *ngIf="Code.invalid && Code.touched" class="text-danger">
-                        <!-- <div *ngIf="Code.errors?.required">Address code is required.</div> -->
-                        <div *ngIf="Code.errors?.minlength">
-                          Address code must be at least {{ Code.errors.minlength.requiredLength }}
-                          characters long.
-                        </div>
-                        <div *ngIf="Code.errors?.maxlength">
-                          Address code cannot be more than
-                          {{ Code.errors.maxlength.requiredLength }} characters long.
-                        </div>
-                      </div>
+                
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Name")}}</label>
@@ -152,21 +140,9 @@
                         name="name"
                         [(ngModel)]="name"
                         #Name="ngModel"
-                        required
-                        minlength="2"
-                        maxlength="250"
+                   
                     />
-                    <div *ngIf="Name.invalid && Name.touched" class="text-danger">
-                        <!-- <div *ngIf="Name.errors?.required">Address Name is required.</div> -->
-                        <div *ngIf="Name.errors?.minlength">
-                          Address Name must be at least {{ Name.errors.minlength.requiredLength }}
-                          characters .
-                        </div>
-                        <div *ngIf="Name.errors?.maxlength">
-                          Address Name cannot be more than
-                          {{ Name.errors.maxlength.requiredLength }} characters .
-                        </div>
-                      </div>
+                
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineOne")}}</label>
@@ -177,7 +153,7 @@
                         name="address1"
                         [(ngModel)]="address1"
                         #addressOne="ngModel"
-                        required
+                  
                     />
                 </div>
                 <div class="col-12">
@@ -200,7 +176,7 @@
                         name="cityAddress"
                         [(ngModel)]="city"
                         #cityAddress="ngModel"
-                        required
+                    
                     />
                 </div>
                 <div class="col-12">
@@ -212,33 +188,23 @@
                         name="State"
                         [(ngModel)]="state"
                         #AddState="ngModel"
-                        required
-                        minlength="2"
-                        maxlength="20"
+                       
                     />
-                    <div *ngIf="AddState.invalid && AddState.touched" class="text-danger">
-                        <!-- <div *ngIf="AddState.errors?.required">Address state is required.</div> -->
-                        <div *ngIf="AddState.errors?.minlength">
-                          Address state must be at least {{ AddState.errors.minlength.requiredLength }}
-                          characters .
-                        </div>
-                        <div *ngIf="AddState.errors?.maxlength">
-                          Address state cannot be more than
-                          {{ AddState.errors.maxlength.requiredLength }} characters .
-                        </div>
-                      </div>
+                   
                     
                 </div>
                 <div class="col-md-6">
                     <label class="label mt-2 mb-2">{{l("PostalCode")}} </label>
                     <input
-                        type="number"
+                        type="text"
                         placeholder="Postal Code 1..."
                         class="form-control w-100"
                         name="postalCode"
                         [(ngModel)]="postalCode"
                         #postal_Code="ngModel"
-                        required
+                        pattern="^[a-zA-Z0-9- ]+$"
+                        maxlength="20"
+                        
                     />
                 </div>
                 <div class="col-md-6" *ngIf="countries.length>0">
@@ -249,7 +215,7 @@
                     [(ngModel)]="selectedCountry"
                     name="AddressCountry"
                     styleClass="form-control aria-select"
-                    [required]="true"
+                
                     [placeholder]="'PleaseSelect' | localize"
                 >
                 </p-dropdown>

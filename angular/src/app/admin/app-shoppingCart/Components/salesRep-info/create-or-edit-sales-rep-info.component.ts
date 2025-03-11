@@ -3,6 +3,7 @@ import { AppTransactionServiceProxy, ContactRoleEnum, GetAppTransactionsForViewD
 import { ShoppingCartoccordionTabs } from '../shopping-cart-view-component/ShoppingCartoccordionTabs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-create-or-edit-sales-rep-info',
@@ -79,6 +80,16 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
+      let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+            let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+            let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+            let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+        
+        
+            this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+            this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+            this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+            this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
