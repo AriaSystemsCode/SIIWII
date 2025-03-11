@@ -283,7 +283,6 @@ export class MarketplaceViewProductComponent
         this.isColorView = true;
         this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex].colorImg;
         this.setSizes(this.currentIndex)
-        
         this.scrollIntoView();
     }
 
