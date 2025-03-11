@@ -832,7 +832,7 @@ getBranchDetails(id) {
 
     ngDoCheck() {
         this.isValidForm();
-        // this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+        this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
         
     }
 
