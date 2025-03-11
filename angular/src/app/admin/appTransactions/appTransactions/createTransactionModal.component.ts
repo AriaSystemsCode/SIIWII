@@ -171,7 +171,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
         });
         this.orderForm.reset();
-        this.buyerCompanySSIN = ''
+           this.buyerCompanySSIN = ''
+        this.sellerCompanySSIN = ''
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
@@ -1318,6 +1319,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             
         });
         this.buyerCompanySSIN = ''
+        this.sellerCompanySSIN =''
         let today = new Date();
         let month = today.getMonth();
         let year = today.getFullYear();
