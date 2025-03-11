@@ -795,44 +795,34 @@ getBranchDetails(id) {
   
 
   extractPhoneTypes(response: any) {
-    console.log(response, 'Response in extractPhoneTypes');
-  
-    this.allPhoneTypes = []; // Reset the array
-  
-    // Loop through object keys dynamically
+    let newPhoneTypes: any[] = [];
+
     Object.keys(response).forEach((key) => {
-      if (key.startsWith("phone") && key.endsWith("TypeId")) {
-        const phoneTypeId = response[key];
-        const phoneTypeNameKey = key.replace("TypeId", "TypeName");
-        const phoneTypeName = response[phoneTypeNameKey];
-  
-        // Find the corresponding phone number key
-        const phoneNumberKey = key.replace("TypeId", "Number");
-        const phoneNumber = response[phoneNumberKey];
-  
-        if (phoneTypeId && phoneTypeName && phoneNumber) {
-          const phoneData: PhoneNumberAndtype = {
-            phoneNumber: phoneNumber,
-            phoneTypeId: phoneTypeId,
-            phoneTypeName: phoneTypeName,
-            init: () => {}, // Add any required initialization function
-            toJSON: () => ({ phoneNumber, phoneTypeId, phoneTypeName }) // Define toJSON method
-          };
-  
-          this.allPhoneTypes.push(phoneData);
-        // if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType){
-            this.onchangePhoneType(this.allPhoneTypes[0]);
+        if (key.startsWith("phone") && key.endsWith("TypeId")) {
+            const phoneTypeId = response[key];
+            const phoneTypeNameKey = key.replace("TypeId", "TypeName");
+            const phoneTypeName = response[phoneTypeNameKey];
 
-        // }
+            const phoneNumberKey = key.replace("TypeId", "Number");
+            const phoneNumber = response[phoneNumberKey];
 
+            if (phoneTypeId && phoneTypeName) {
+                newPhoneTypes.push({
+                    phoneNumber,
+                    phoneTypeId,
+                    phoneTypeName
+                });
+            }
         }
-      }
     });
-  
-    console.log(this.allPhoneTypes, 'Extracted Phone Types');
-    console.log(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType, '>>>>>> Extracted Phone Types');
 
-  }
+    this.allPhoneTypes = newPhoneTypes;
+    console.log(this.allPhoneTypes, 'Extracted Phone Types (without init & toJSON)');
+    if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType){
+    this.onchangePhoneType(this.allPhoneTypes[0]);
+        
+    }
+}
   onBranchChange(event){
     console.log(event, 'eventeventevent <<<');
     this.getBranchDetails(event?.id)
@@ -842,7 +832,7 @@ getBranchDetails(id) {
 
     ngDoCheck() {
         this.isValidForm();
-        this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+        // this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
         
     }
 
