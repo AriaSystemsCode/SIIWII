@@ -33,11 +33,13 @@
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
     <PackageReference Include="NPOI" Version="2.6.0" />
     <PackageReference Include="PuppeteerSharp" Version="7.1.0" />
+    <PackageReference Include="Z.Expressions.Eval" Version="6.2.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\onetouch.Application.Shared\onetouch.Application.Shared.csproj" />
     <ProjectReference Include="..\onetouch.Core\onetouch.Core.csproj" />
     <ProjectReference Include="..\onetouch.EntityFrameworkCore\onetouch.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\onetouch.Migrator\onetouch.Migrator.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
