@@ -674,13 +674,13 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         .pipe(finalize(() =>  {
 
     //  this.SuccessMsg = true
-            // this.generatOrderReport.emit(true)      
+    this.refreshShoppingCart.emit(true)     
         }))
            
         .subscribe((res) => {
                 if (res) {
                     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-       this.refreshShoppingCart.emit(true)
+    //    this.refreshShoppingCart.emit(true)
                    
                     // this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
 

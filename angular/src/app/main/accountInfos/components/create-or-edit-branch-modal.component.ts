@@ -131,10 +131,10 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         } else {
             this._AccountsServiceProxy.getBranchForEdit(branchId).subscribe(result => {
                 this.branch = result;
-               var subCode = this.branch.code.indexOf("-");
-               if (subCode>=0)
-                 this.branchCode= this.branch.code.substring(subCode+1,this.branch.code.length); 
-                else
+            //    var subCode = this.branch.code.indexOf("-");
+            //    if (subCode>=0)
+            //      this.branchCode= this.branch.code.substring(subCode+1,this.branch.code.length); 
+            //     else
                 this.branchCode= this.branch.code
 
                 if(this.branch.parentId) this.branch.accountId = accountId
@@ -259,7 +259,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     save(): void {
         this.saving = true;
         let tenancyName =  this.appSession.tenancyName;
-        if (!tenancyName)
+        if (!tenancyName ||  this.branch?.id)
             this.branch.code = this.branchCode;
         else
             this.branch.code = tenancyName + "-" + this.branchCode;
