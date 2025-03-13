@@ -1075,10 +1075,10 @@ margin-right: 6px;"></i>
                     </div>
                     </div>
                     
-                    <div #messageEl id="contentmsg"  class="w-100 d-lg-block d-none"
-                    [ngClass]="{ Scroll: messagesDetails.length > 1 }" [scrollTop]="scrolltop">
+                    <div #messageEl id="contentmsg"  class="w-100 d-lg-block d-none" 
+                    [ngClass]="{ Scroll: messagesDetails?.length > 1 }" [scrollTop]="scrolltop">
                 
-                    <div style="position: relative;min-height: 240px;" *ngFor="let messagedetail of visibleMessages; let i = index">
+                    <div style="position: relative;min-height: 240px;" *ngFor="let messagedetail of messagesDetails; let i = index">
                         <img [src]="
                             messagedetail.messages.profilePictureUrl
                                 ? messagedetail.messages.profilePictureUrl
@@ -1100,7 +1100,7 @@ margin-right: 6px;"></i>
                         <br />
                 
                         <span [innerHTML]="'Subject: ' + messagedetail.messages.subject "
-                            class="msg-bodyformat pt-2" [ngClass]="longmsgId == messagedetail.messages.id || messagesDetails.length == 1 ? '' : 'long-msg'">
+                            class="msg-bodyformat pt-2" [ngClass]="longmsgId == messagedetail.messages.id || messagesDetails?.length == 1 ? '' : 'long-msg'">
                         </span>
                         <br />
                         <span [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)" 
@@ -1141,7 +1141,7 @@ margin-right: 6px;"></i>
 
                 </div>
                 
-                <div #messageEl id="contentmsg"  class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                <div #messageEl id="contentmsg"  class="w-100 d-lg-none d-md-block d-sm-none" [ngClass]="{ Scroll: messagesDetails?.length > 1 }"
                     [scrollTop]="scrolltop">
                     <div style="position: relative;min-height: 240px;" *ngFor="
                                 let messagedetail of messagesDetails;
@@ -1196,7 +1196,7 @@ margin-right: 6px;"></i>
                         'Subject: '+messagedetail.messages.subject 
                     " class="msg-bodyformat   pt-2"  [ngClass]="
                         longmsgId == messagedetail.messages.id ||
-                        messagesDetails.length == 1
+                        messagesDetails?.length == 1
                             ? ''
                             : 'long-msg'
                     ">
@@ -1216,7 +1216,7 @@ margin-right: 6px;"></i>
       </a>
       
                         <br />
-                        <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
+                        <hr *ngIf="i != messagesDetails?.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                         <br />
                     </div>
                     <div>
@@ -1494,7 +1494,7 @@ margin-right: 6px;"></i>
                         </div>
                     </div>
                 </div>
-                <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1,'d-none': showSideBar}"
+                <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails?.length > 1,'d-none': showSideBar}"
                     [scrollTop]="scrolltop"> 
                     <div style="position: relative;min-height: 240px;" *ngFor="
                                 let messagedetail of messagesDetails;
@@ -1550,7 +1550,7 @@ margin-right: 6px;"></i>
                         messagedetail.messages.subject 
                     " class="msg-bodyformat  pt-2"  [ngClass]="
                         longmsgId == messagedetail.messages.id ||
-                        messagesDetails.length == 1
+                        messagesDetails?.length == 1
                             ? ''
                             : 'long-msg'
                     ">
@@ -1571,7 +1571,7 @@ margin-right: 6px;"></i>
       </a>
       
                         <br />
-                        <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
+                        <hr *ngIf="i != messagesDetails?.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                         <br />
                     </div>
                     <div>
