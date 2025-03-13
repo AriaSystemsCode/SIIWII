@@ -140,7 +140,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
          const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTCONTACT',this.appSession.tenantId).toPromise()
          if(getNextEntityCodeRes)
              sequance=getNextEntityCodeRes;
-              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code= tenancyName+"-M"+sequance;
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code= sequance;
        
     }
 
@@ -151,7 +151,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTBRANCH',this.appSession.tenantId).toPromise()
         if(getNextEntityCodeRes)
             sequance=getNextEntityCodeRes;
-             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code= tenancyName+"-"+sequance;
+             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code= sequance;
       
    }
    async saveManualContact(){
@@ -161,7 +161,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('MANUALACCOUNTCONTACT',this.appSession.tenantId).toPromise()
     if(getNextEntityCodeRes)
         sequance=getNextEntityCodeRes;
-         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code= tenancyName+"-C"+sequance;
+         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code= sequance;
   
 }
     preventTyping(event: KeyboardEvent): void {
