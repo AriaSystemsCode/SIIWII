@@ -2129,7 +2129,9 @@ namespace onetouch.AppSiiwiiTransaction
 
 
                 var pagedAndFilteredAppTransactionsRes = from e in pagedAndFilteredAppTransactions.Include(z => z.AppTransactionContacts)
-                                                         .ThenInclude(z => z.ContactAddressFk).Include(z => z.AppTransactionDetails)
+                                                         .ThenInclude(z => z.ContactAddressFk)
+                                                         .Include(z => z.AppTransactionDetails
+                                                         .Where(x => input.hasParentItems == false ? x.ParentId != null : true))
                                                          join
                                                          x in _appContactRepository.GetAll().Where(s => s.TenantId == AbpSession.TenantId) on
                                                          e.SellerCompanySSIN.Trim() equals x.SSIN.Trim()
