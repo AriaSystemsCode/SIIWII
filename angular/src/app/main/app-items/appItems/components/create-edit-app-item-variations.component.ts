@@ -949,21 +949,6 @@ this.showMainSpinner();
         });
     }
 
-    aspectRatio;
-    getAspectatio() {
-        let sycAttachmentCategoryImage;
-        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
-            result.forEach(item => {
-                if (item.code == "IMAGE") {
-                    sycAttachmentCategoryImage = item
-                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
-                    this.aspectRatio = Number(width) / Number(height);
-                    return;
-                }
-            });
-        });
-    }
-
     onDragLeave(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
@@ -993,6 +978,21 @@ this.showMainSpinner();
         }
       }
       
+    aspectRatio;
+    getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.aspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
+    }
+
     fileChange(event) {
         if (event.target.value) {
             // there is a file
