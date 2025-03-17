@@ -237,7 +237,9 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                             this.openAddNewAddForm=false;
                             this.showAddList=false;
             
-                            this.selectedAddress?this.selectedAddress.countryName=this.countries.filter(item=>item.value === this.selectedAddress['countryId'])[0].label:'';
+                            const matchedCountry = this.countries.find(item => item.value === this.selectedAddress[0]?.countryId);
+                            this.selectedAddress.countryName = matchedCountry ? matchedCountry.label : '';
+                            this.selectedAddress.countryCode = matchedCountry ? matchedCountry.code : null;
                             // this.selectedAddress?this.showAddList=false:this.showAddList=true;
                         }
                         this.hideMainSpinner()
