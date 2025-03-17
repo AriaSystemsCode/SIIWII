@@ -103,7 +103,7 @@
                         
                      
                     </p-autoComplete> -->
-                        <p-dropdown [options]="allPhoneTypes"
+                        <p-dropdown *ngIf="allPhoneTypes" [options]="allPhoneTypes"
                         class=" col-6"
                             styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
                             name="selectedPhoneType" optionLabel="phoneTypeName"  [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType" [style]="{'width':'100%'}"
