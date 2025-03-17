@@ -30,6 +30,7 @@ using onetouch.Migrations;
 using NUglify.Helpers;
 using onetouch.Sessions.Dto;
 using Abp.UI;
+using Microsoft.AspNetCore.Authorization;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -438,6 +439,7 @@ namespace onetouch.AppMarketplaceItems
             }
             
         }
+        [AllowAnonymous]
         public async Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input)
         {
             try
