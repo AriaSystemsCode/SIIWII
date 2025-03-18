@@ -41,10 +41,11 @@ using Abp.Domain.Entities;
 using NPOI.SS.Formula.Functions;
 using NPOI.HPSF;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace onetouch.AppEntities
 {
-    [AbpAuthorize(AppPermissions.Pages_AppEntities)]
+    //[AbpAuthorize(AppPermissions.Pages_AppEntities)]
     public class AppEntitiesAppService : onetouchAppServiceBase, IAppEntitiesAppService
     {
         private readonly IRepository<SycEntityObjectStatus, long> _lookup_sycEntityObjectStatusRepository;
@@ -1281,6 +1282,7 @@ namespace onetouch.AppEntities
         }
 
         #region get class/category/depts by page objects/names
+        [AllowAnonymous]
         public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppEntityCategoriesWithPaging(GetAppEntityAttributesInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1298,7 +1300,7 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
-
+        [AllowAnonymous]
         public async Task<PagedResultDto<AppEntityClassificationDto>> GetAppEntityClassificationsWithPaging(GetAppEntityAttributesInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1334,8 +1336,8 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
-       
 
+        [AllowAnonymous]
         public async Task<PagedResultDto<string>> GetAppEntityCategoriesNamesWithPaging(GetAppEntityAttributesInput input)
         {
             var categoriesOrderdPaged = await GetAppEntityCategoriesWithPaging(input);
@@ -1345,7 +1347,7 @@ namespace onetouch.AppEntities
             }
             return new PagedResultDto<string>(0, new List<string>());
         }
-
+        [AllowAnonymous]
         public async Task<PagedResultDto<string>> GetAppEntityClassificationsNamesWithPaging(GetAppEntityAttributesInput input)
         {
             var classificationsOrderdPaged = await GetAppEntityClassificationsWithPaging(input);

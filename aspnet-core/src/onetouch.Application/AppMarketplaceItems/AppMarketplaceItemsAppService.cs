@@ -1304,6 +1304,7 @@ namespace onetouch.AppMarketplaceItems
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
+        [AllowAnonymous]
         public async Task<PagedResultDto<string>> GetAppItemCategoriesNamesWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1321,7 +1322,7 @@ namespace onetouch.AppMarketplaceItems
                 return new PagedResultDto<string>(0, new List<string>());
             }
         }
-
+        [AllowAnonymous]
         public async Task<PagedResultDto<string>> GetAppItemClassificationsNamesWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1339,7 +1340,7 @@ namespace onetouch.AppMarketplaceItems
                 return new PagedResultDto<string>(0, new List<string>());
             }
         }
-
+        [AllowAnonymous]
         public async Task<PagedResultDto<string>> GetAppItemDepartmentsNamesWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
