@@ -1008,8 +1008,19 @@ namespace onetouch
                :null));
             //MMR45
             configuration.CreateMap <GetAllAppTenantActivitiesLogForExcelInput, GetAllAppTenantActivitiesLogInput>();
-
-
+            //I46
+            //configuration.CreateMap<ImportItemInputDto, AppItemExcelDto>()
+            configuration.CreateMap<AppItemExcelDto, ImportItemInputDto>()
+                .ForMember(d => d.NoOfDimensions,s=>s.MapFrom(ss=>ss.NoOfDim))
+                .ForMember(d => d.Dimension1Name , s => s.MapFrom(ss => ss.D1Name))
+                .ForMember(d => d.Dimension2Name, s => s.MapFrom(ss => ss.D2Name))
+                .ForMember(d => d.Dimension3Name, s => s.MapFrom(ss => ss.D3Name))
+                .ForMember(d => d.Dimension1Position, s => s.MapFrom(ss => ss.D1Pos))
+                .ForMember(d => d.Dimension2Position, s => s.MapFrom(ss => ss.D2Pos))
+                .ForMember(d => d.Dimension3Position, s => s.MapFrom(ss => ss.D3Pos))
+                ;
+            configuration.CreateMap<CreateOrEditAppItemDto, AppItemValidationInputDTO>();
+            //I46
         }
     }
 }

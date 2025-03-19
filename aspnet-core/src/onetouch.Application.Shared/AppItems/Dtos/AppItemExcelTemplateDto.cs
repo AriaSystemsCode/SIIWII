@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Abp.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.CompilerServices;
 namespace onetouch.AppItems.Dtos
 {
     public class AppItemExcelDto
@@ -51,18 +53,74 @@ namespace onetouch.AppItems.Dtos
         //mmt
         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
         public string NoOfDim { set; get; }
-        public String D1Name { set; get; }
-        public String D2Name { set; get; }
-        public String D3Name { set; get; }
-        public String D1Sizes { set; get; }
-        public String D2Sizes { set; get; }
-        public String D3Sizes { set; get; }
+        public string D1Name { set; get; }
+        public string D2Name { set; get; }
+        public string D3Name { set; get; }
+        public string D1Sizes { set; get; }
+        public string D2Sizes { set; get; }
+        public string D3Sizes { set; get; }
         public string D1Pos { set; get; }
         public string D2Pos { set; get; }
         public string D3Pos { set; get; }
         public string SizeCode { get; set; }
         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
     }
+    //I46[Start]
+    public class ImportItemReturnDto
+    { 
+       public string RecordKey { set; get; }
+       public string ErrorMessage{ set; get; }
+
+       public string ErrorType { set; get; }
+    }
+    public class ImportItemInputDto
+    {
+        [Required(ErrorMessage = "Product Type must have a value.")]
+        public string ProductType { get; set; }
+        [Required(ErrorMessage = "Record Type must have a value.")]
+        [Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
+        public string RecordType{ set; get; }
+        [Required(ErrorMessage = "Code must have a value.")]
+        public string Code { set; get; }
+        [Required(ErrorMessage = "Name must have a value.")]
+        public string Name { set; get; }
+        [Required(ErrorMessage = "Product Description must have a value.")]
+        public string ProductDescription { set; get; }
+        public string ProductClassificationCode { set; get; }
+        public string ProductCategoryCode { set; get; }
+        public string Price { set; get; }
+        public string PriceCurrencyCode { set; get; }
+        public string ImageType { set; get; }
+        public string ColorCode { set; get; }
+        public string ColorName{ set; get; }
+        public string SizeScaleName { set; get; }
+        public string ScaleSizesOrder { set; get; }
+        public string SizeRatioName { set; get; }
+        public string SizeRatioValue { set; get; }
+        public string MaterialContent { set; get; }
+        public string SoldOutDate { set; get; }
+        public string BrandCode { set; get; }
+        public string BrandName { set; get; }
+        public string StartShipDate { set; get; }
+        public string Dimension1Sizes { set; get; }
+        public string Dimension1Name { set; get; }
+        public string Dimension2Name { set; get; }
+        public string Dimension3Name { set; get; }
+        public string NoOfDimensions { set; get; }
+        public string PriceA { set; get; }
+        public string PriceB { set; get; }
+        public string PriceC { set; get; }
+        public string PriceD { set; get; }
+        public string ParentCode  { set; get; }
+        public string ProductClassificationDescription { set; get; }
+        public string ProductCategoryDescription { set; get; }
+        public string SizeCode{ set; get; }
+        public string SizeName { set; get; }
+        public string Dimension1Position { set; get; }
+        public string Dimension2Position{ set; get; }
+        public string Dimension3Position { set; get; }
+  }
+    //I46[End]
     public class AppItemImage
     {
         public string ImageFileName { get; set; }
@@ -149,10 +207,10 @@ namespace onetouch.AppItems.Dtos
     }
     //MMT
     //Iteration#46[Start]
-    public class AppItemValidationInputDTO: AppItemExcelDto
+    public class AppItemValidationInputDTO: CreateOrEditAppItemDto
     {
         
-        public List<AppItemExcelDto> Variations{ get; set; }
+        public List<string> ErrorMessages{ get; set; }
 
     }
     //Iteration#46[End]

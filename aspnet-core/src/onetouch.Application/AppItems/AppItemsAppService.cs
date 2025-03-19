@@ -69,6 +69,8 @@ using NPOI.POIFS.NIO;
 using System.Dynamic;
 using NPOI.OpenXmlFormats.Vml;
 using onetouch.AppSubScriptionPlan;
+using NUglify.JavaScript;
+using NPOI.HSSF.Record;
 
 namespace onetouch.AppItems
 {
@@ -1807,6 +1809,21 @@ namespace onetouch.AppItems
         }
         public async Task<long> CreateOrEdit(CreateOrEditAppItemDto input)
         {
+            List<AppItemValidationInputDTO> validateInput = new List<AppItemValidationInputDTO>();
+            validateInput.Add(ObjectMapper.Map<AppItemValidationInputDTO>(input));
+            var  returnList =   await ValidateItemData(validateInput);
+            if (returnList!=null && returnList.Count>0)
+            {
+                string errorList = "";
+                foreach (var item in returnList) {
+                    foreach (var err in item.ErrorMessages)
+                    {
+                        errorList += err + "\n";
+                    }
+
+                }
+                throw new UserFriendlyException(errorList);
+            }
             if (input.Id == 0)
             {
                 //MMT30[Start]
@@ -2046,7 +2063,6 @@ namespace onetouch.AppItems
         }
         //MMT30[End]
         private async Task<long> DoCreateOrEdit(CreateOrEditAppItemDto input)
-
         {
 
             ////MMT30[Start]
@@ -5118,12 +5134,17 @@ namespace onetouch.AppItems
                 #region Excel validation rules only.
                 List<string> RecordsCodes = result.Select(r => r.Code).ToList();
                 List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
+
+               
+
                 foreach (AppItemExcelDto itemExcelDto in result)
                 {
                     if (itemExcelDto.ProductType == "Product Type")
                     {
                         continue;
                     }
+                    ImportItemInputDto importList = ObjectMapper.Map<ImportItemInputDto>(itemExcelDto);
+                    var validationList = await ValidateImportItemData(importList);
                     ////if (rowNumber > 2)
                     ////{ itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
                     ////itemExcelResultsDTO.FromList.Add(rowNumber);
@@ -5143,6 +5164,8 @@ namespace onetouch.AppItems
 
                     rowNumber++;
                     itemExcelDto.rowNumber = rowNumber;
+                   
+
                     //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[Start]
                     //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code);
                     var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
@@ -5153,7 +5176,7 @@ namespace onetouch.AppItems
                         //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[Start]
                         //itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
                         //recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
-                        itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
+                      //  itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
                         recordErrorMEssage = "Code :" + itemExcelDto.Code + " already exists!";
                         //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[End]
                         itemExcelResultsDTO.HasDuplication = true;
@@ -5162,45 +5185,45 @@ namespace onetouch.AppItems
 
 
                     itemExcelRecordErrorDTO.ExcelDto = itemExcelDto;
-                    var ValidateResults = new List<ValidationResult>();
+                    //var ValidateResults = new List<ValidationResult>();
 
-                    Validator.TryValidateObject(itemExcelDto, new System.ComponentModel.DataAnnotations.ValidationContext(itemExcelDto), ValidateResults, true);
+                    //Validator.TryValidateObject(itemExcelDto, new System.ComponentModel.DataAnnotations.ValidationContext(itemExcelDto), ValidateResults, true);
 
-                    if (ValidateResults.Count > 0)
-                    {
-                        foreach (var res in ValidateResults)
-                        {
-                            itemExcelRecordErrorDTO.FieldsErrors.Add(res.ErrorMessage);
-                        }
-                    }
+                    //if (ValidateResults.Count > 0)
+                    //{
+                    //    foreach (var res in ValidateResults)
+                    //    {
+                    //        itemExcelRecordErrorDTO.FieldsErrors.Add(res.ErrorMessage);
+                    //    }
+                    //}
                     //MMT
-                    if (itemExcelDto.RecordType == "Item")
-                    {
-                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
-                        //if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & string.IsNullOrEmpty(itemExcelDto.ScaleSizesOrder))
-                        //    itemExcelRecordErrorDTO.FieldsErrors.Add("Size Scale order cannot be empty if size scale name is not empty");
-                        if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 1 & string.IsNullOrEmpty(itemExcelDto.D1Name))
-                            itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
-                        if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 2 &
-                            (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name)))
-                            itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name and Dimension 2 name cannot be empty if size scale number of dimesions is 2");
-                        if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 3 &
-                            (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name) | string.IsNullOrEmpty(itemExcelDto.D3Name)))
-                            itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name, Dimension 2 name, and Dimension 3 name cannot be empty if size scale number of dimesions is 3");
-                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
-                        if (!string.IsNullOrEmpty(itemExcelDto.SizeRatioName) & string.IsNullOrEmpty(itemExcelDto.SizeRatioValue))
-                            itemExcelRecordErrorDTO.FieldsErrors.Add("Size ratio value cannot be empty if size ratio name is not empty");
+                    //if (itemExcelDto.RecordType == "Item")
+                    //{
+                    //    //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+                    //    //if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & string.IsNullOrEmpty(itemExcelDto.ScaleSizesOrder))
+                    //    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Size Scale order cannot be empty if size scale name is not empty");
+                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 1 & string.IsNullOrEmpty(itemExcelDto.D1Name))
+                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
+                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 2 &
+                    //        (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name)))
+                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name and Dimension 2 name cannot be empty if size scale number of dimesions is 2");
+                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 3 &
+                    //        (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name) | string.IsNullOrEmpty(itemExcelDto.D3Name)))
+                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name, Dimension 2 name, and Dimension 3 name cannot be empty if size scale number of dimesions is 3");
+                    //    //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
+                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeRatioName) & string.IsNullOrEmpty(itemExcelDto.SizeRatioValue))
+                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Size ratio value cannot be empty if size ratio name is not empty");
 
-                    }
+                    //}
                     //MMT
                     #region check images
                     bool hasError = false;
-                    if (itemExcelDto.RecordType != "Item" && string.IsNullOrEmpty(itemExcelDto.ParentCode))
-                    {
-                        itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code cannot be empty.");
-                        hasError = true;
+                    //if (itemExcelDto.RecordType != "Item" && string.IsNullOrEmpty(itemExcelDto.ParentCode))
+                    //{
+                    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code cannot be empty.");
+                    //    hasError = true;
 
-                    }
+                    //}
                     if (imagesList != null && imagesList.Count() > 0)
                     {
                         itemExcelDto.Images = new List<AppItemImage>();
@@ -5209,15 +5232,15 @@ namespace onetouch.AppItems
                         //    itemExcelRecordErrorDTO.FieldsErrors.Add("Image Folder Name: Not found.");
                         //    hasError = true;
                         //}
-                        if (!string.IsNullOrEmpty(itemExcelDto.ImageType))
-                        {
-                            var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(itemExcelDto.ImageType.ToUpper().TrimEnd());
-                            if (attCoverId == 0)
-                            {
-                                itemExcelRecordErrorDTO.FieldsErrors.Add("Invalid Image Type.");
-                                hasError = true;
-                            }
-                        }
+                        //if (!string.IsNullOrEmpty(itemExcelDto.ImageType))
+                        //{
+                        //    var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(itemExcelDto.ImageType.ToUpper().TrimEnd());
+                        //    if (attCoverId == 0)
+                        //    {
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Invalid Image Type.");
+                        //        hasError = true;
+                        //    }
+                        //}
                         var productImage = imagesList.Where(x => x.ToUpper().StartsWith((itemExcelDto.RecordType == "Item" ? "I-" : "V-") + itemExcelDto.Code.ToUpper())).ToList();
                         if (productImage.Count == 0)
                         {
@@ -5237,12 +5260,31 @@ namespace onetouch.AppItems
                         }
                     }
                     #endregion check images
-                    #region code, name, email and website validation    
-                    if (RecordsCodes.Where(r => r == itemExcelDto.Code).ToList().Count() > 1)
+                    if (validationList != null && validationList.Count > 0)
                     {
-                        itemExcelRecordErrorDTO.FieldsErrors.Add("Code: must be used Once."); hasError = true;
-                        recordErrorMEssage = "Duplicated " + itemExcelRecordErrorDTO.RecordType;
+                        foreach (var err in validationList)
+                        {
+                            itemExcelRecordErrorDTO.FieldsErrors.Add(err.ErrorMessage);
+                            switch (err.ErrorType)
+                            {
+                                case "Warning":
+                                    hasWarning = true;
+                                    break;
+                                case "Stopper":
+                                    hasError = true;
+                                    break;
+                                case "Duplication":
+                                    itemExcelResultsDTO.HasDuplication = true;
+                                    break;
+                            }
+                        }
                     }
+                    #region code, name, email and website validation    
+                    //if (RecordsCodes.Where(r => r == itemExcelDto.Code).ToList().Count() > 1)
+                    //{
+                    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Code: must be used Once."); hasError = true;
+                    //    recordErrorMEssage = "Duplicated " + itemExcelRecordErrorDTO.RecordType;
+                    //}
                     ItemType itemExcelRecordType;
                     //if (string.IsNullOrEmpty(itemExcelDto.Code)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Code: Should Have a Value."); hasError = true; }
                     //if (string.IsNullOrEmpty(itemExcelDto.Name)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Name: Should Have a Value."); hasError = true; }
@@ -5252,40 +5294,40 @@ namespace onetouch.AppItems
                     //if (string.IsNullOrEmpty(itemExcelDto.RecordType) && Enum.TryParse<ItemType>(itemExcelDto.RecordType.Replace (" ",""), out itemExcelRecordType))
                     //{ itemExcelRecordErrorDTO.FieldsErrors.Add("Record Type: Item|Item Variant"); hasError = true; }
 
-                    if (itemExcelDto.RecordType.Replace(" ", "") == ItemType.ItemVariant.ToString() && result.Where(r => r.Code == itemExcelDto.ParentCode && r.RecordType.Replace(" ", "") == ItemType.Item.ToString()).ToList().Count() == 0)
-                    {
-                        itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code: Item variant parent should be of Type Item."); hasError = true;
-                    }
+                    //if (itemExcelDto.RecordType.Replace(" ", "") == ItemType.ItemVariant.ToString() && result.Where(r => r.Code == itemExcelDto.ParentCode && r.RecordType.Replace(" ", "") == ItemType.Item.ToString()).ToList().Count() == 0)
+                    //{
+                    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code: Item variant parent should be of Type Item."); hasError = true;
+                    //}
 
-                    if (!string.IsNullOrEmpty(itemExcelDto.Currency) && GetTypeId(itemExcelDto.Currency, currencyIds) == 0)
-                    { itemExcelRecordErrorDTO.FieldsErrors.Add("Currency: Should Have a Valid Currency Value."); hasError = true; }
+                    //if (!string.IsNullOrEmpty(itemExcelDto.Currency) && GetTypeId(itemExcelDto.Currency, currencyIds) == 0)
+                    //{ itemExcelRecordErrorDTO.FieldsErrors.Add("Currency: Should Have a Valid Currency Value."); hasError = true; }
 
-                    if (!string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode))
-                    {
-                        var returnResult = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput { NameFilter = itemExcelDto.ProductClassificationCode });
-                        long classId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectClassification.Id : 0; //GetClassId(itemExcelDto.ProductClassificationDescription, classIds);
-                        if (classId == 0)
-                        {
-                            itemExcelRecordErrorDTO.FieldsErrors.Add("Product Classification is not found.");
-                            hasWarning = true;
-                        }
-                        else { itemExcelDto.EntityObjectClassificaionID = classId; }
-                    }
+                    //if (!string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode))
+                    //{
+                    //    var returnResult = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput { NameFilter = itemExcelDto.ProductClassificationCode });
+                    //    long classId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectClassification.Id : 0; //GetClassId(itemExcelDto.ProductClassificationDescription, classIds);
+                    //    if (classId == 0)
+                    //    {
+                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Product Classification is not found.");
+                    //        hasWarning = true;
+                    //    }
+                    //    else { itemExcelDto.EntityObjectClassificaionID = classId; }
+                    //}
 
-                    if (!string.IsNullOrEmpty(itemExcelDto.ProductCategoryCode))
-                    {
-                        var returnResult = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name", NameFilter = itemExcelDto.ProductCategoryCode });
-                        long categId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectCategory.Id : 0;
-                        if (categId == 0)
-                        {
-                            itemExcelRecordErrorDTO.FieldsErrors.Add("Product Category is not found.");
-                            hasWarning = true;
-                        }
-                        else
-                        {
-                            itemExcelDto.EntityObjectCategoryID = categId;
-                        }
-                    }
+                    //if (!string.IsNullOrEmpty(itemExcelDto.ProductCategoryCode))
+                    //{
+                    //    var returnResult = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name", NameFilter = itemExcelDto.ProductCategoryCode });
+                    //    long categId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectCategory.Id : 0;
+                    //    if (categId == 0)
+                    //    {
+                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Product Category is not found.");
+                    //        hasWarning = true;
+                    //    }
+                    //    else
+                    //    {
+                    //        itemExcelDto.EntityObjectCategoryID = categId;
+                    //    }
+                    //}
 
 
                     //xxxx
@@ -5404,10 +5446,161 @@ namespace onetouch.AppItems
             return itemExcelResultsDTO;
         }
         //Iteation#46[Start]
+        public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto)
+        {
+            List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
+            //foreach (var itemExcelDto in input) 
+            {
+                 //if (itemExcelDto.ProductType == "Product Type")
+                 //   {
+                 //       continue;
+                 //   }
+                var ValidateResults = new List<ValidationResult>();
+                Validator.TryValidateObject(itemExcelDto, new System.ComponentModel.DataAnnotations.ValidationContext(itemExcelDto), ValidateResults, true);
+
+                if (ValidateResults.Count > 0)
+                {
+                    foreach (var res in ValidateResults)
+                    {
+                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage,ErrorType = "Stopper" });
+                    }
+                }
+                if (itemExcelDto.RecordType == "Item")
+                {
+                    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
+                        && string.IsNullOrEmpty(itemExcelDto.Dimension1Name))
+                    {
+                        returnList.Add(new ImportItemReturnDto {RecordKey= itemExcelDto.Code,
+                            ErrorMessage= "Dimension 1 name cannot be empty if size scale number of dimesions is 1",
+                            ErrorType = "Stopper"
+                        });
+                    }
+                        //itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
+                    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 2 &&
+                        (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) | string.IsNullOrEmpty(itemExcelDto.Dimension2Name)))
+                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, 
+                            ErrorMessage = "Dimension 1 name and Dimension 2 name cannot be empty if size scale number of dimesions is 2",
+                            ErrorType = "Stopper"
+                        });
+                    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 3 &
+                        (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) | string.IsNullOrEmpty(itemExcelDto.Dimension2Name) |
+                        string.IsNullOrEmpty(itemExcelDto.Dimension3Name)))
+                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code,
+                            ErrorMessage = "Dimension 1 name, Dimension 2 name, and Dimension 3 name cannot be empty if size scale number of dimesions is 3",
+                            ErrorType = "Stopper"
+                        });
+                    //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
+                    if (!string.IsNullOrEmpty(itemExcelDto.SizeRatioName) & string.IsNullOrEmpty(itemExcelDto.SizeRatioValue))
+                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code,
+                            ErrorMessage = "Size ratio value cannot be empty if size ratio name is not empty",
+                            ErrorType = "Stopper"
+                        });
+
+                }
+                var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
+                
+                if (itemExists != null)
+                {
+                   returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code,
+                       ErrorMessage = "Code :" + itemExcelDto.Code + " already exists!", ErrorType = "Duplication" });
+                   
+                }
+                if (!string.IsNullOrEmpty(itemExcelDto.ImageType))
+                {
+                    var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(itemExcelDto.ImageType.ToUpper().TrimEnd());
+                    if (attCoverId == 0)
+                    {
+                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = "Invalid Image Type.", ErrorType = "Stopper" });
+                    }
+                }
+                if (itemExcelDto.RecordType != "Item" && string.IsNullOrEmpty(itemExcelDto.ParentCode))
+                {
+                    returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = "Parent Code cannot be empty.",
+                        ErrorType = "Stopper" });
+                }
+                //if (input.Where(r => r.Code == itemExcelDto.Code).ToList().Count() > 1)
+                //{
+                //    returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = "Code: must be used Once." });
+                //}
+                //if (itemExcelDto.RecordType.Replace(" ", "") == ItemType.ItemVariant.ToString() &&
+                //    input.Where(r => r.Code == itemExcelDto.ParentCode && r.RecordType.Replace(" ", "") == ItemType.Item.ToString()).ToList().Count() == 0)
+                //{
+                //    returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = "Parent Code: Item variant parent should be of Type Item." });
+                //}
+
+                if (!string.IsNullOrEmpty(itemExcelDto.PriceCurrencyCode) && GetTypeId(itemExcelDto.PriceCurrencyCode, currencyIds) == 0)
+                {
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Currency: Should Have a Valid Currency Value.",
+                        ErrorType = "Stopper"
+                    });
+                } 
+                if (!string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode))
+                {
+                    var returnResult = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput { NameFilter = itemExcelDto.ProductClassificationCode });
+                    long classId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectClassification.Id : 0; //GetClassId(itemExcelDto.ProductClassificationDescription, classIds);
+                    if (classId == 0)
+                    {
+                        returnList.Add(new ImportItemReturnDto
+                        {
+                            RecordKey = itemExcelDto.Code, 
+                            ErrorMessage = "Product Classification is not found.", ErrorType = "Warning"});
+                        
+                    }
+                    //else { itemExcelDto.EntityObjectClassificaionID = classId; }
+                }
+
+                if (!string.IsNullOrEmpty(itemExcelDto.ProductCategoryCode))
+                {
+                    var returnResult = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name", NameFilter = itemExcelDto.ProductCategoryCode });
+                    long categId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectCategory.Id : 0;
+                    if (categId == 0)
+                    {
+                        returnList.Add(new ImportItemReturnDto
+                        {
+                            RecordKey = itemExcelDto.Code,
+                            ErrorMessage = "Product Category is not found.",
+                            ErrorType = "Warning"
+                        });
+                        
+                    }
+                }
+            }
+            
+            return returnList;
+        }
         public async Task<List<AppItemValidationInputDTO>> ValidateItemData(List<AppItemValidationInputDTO> input)
         {
-            List<AppItemValidationInputDTO> returnList = new List<AppItemValidationInputDTO>();
-            return returnList;
+            //List<AppItemValidationInputDTO> returnList = new List<AppItemValidationInputDTO>();
+            foreach (var item in input)
+            {
+                item.ErrorMessages = new List<string>();
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    item.ErrorMessages.Add("Item Code cannot be empty");
+                }
+                if (string.IsNullOrEmpty(item.Name))
+                {
+                    item.ErrorMessages.Add("Item Name cannot be empty");
+                }
+                if (string.IsNullOrEmpty(item.Description))
+                {
+                    item.ErrorMessages.Add("Item Descriptiom cannot be empty");
+                }
+                if (item.EntityObjectTypeId ==0 || item.EntityObjectTypeId == null)
+                {
+                    item.ErrorMessages.Add("Item Product Type cannot be empty");
+                }
+                if (item.EntityAttachments == null || item.EntityAttachments.Count == 0)
+                {
+                    item.ErrorMessages.Add("Item default image cannot be empty"); 
+                }
+
+            }
+            return input;
         }
         //Iteration#46[End]
         public async Task<long> GetCategoryId(string categoryName, PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categoryIds)
@@ -7906,7 +8099,7 @@ namespace onetouch.AppItems
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var productCodeSegment = _sycSegmentIdentifierDefinition.GetAll().Where(e => e.SycIdentifierDefinitionId == identifierId).OrderBy(z => z.SegmentNumber).ToList();
-
+                List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
                 var sycSegmentIdentifierDefinitionList = ObjectMapper.Map<List<SycSegmentIdentifierDefinitionDto>>(productCodeSegment);
                 Dictionary<string, string> segments = new Dictionary<string, string>();
                 if (sycSegmentIdentifierDefinitionList != null && sycSegmentIdentifierDefinitionList.Count > 0)
