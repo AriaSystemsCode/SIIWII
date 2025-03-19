@@ -12271,6 +12271,62 @@ export class AppItemsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    validateItem(body: CreateOrEditAppItemDto | undefined): Observable<ValidationResult> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateItem";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidateItem(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidateItem(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ValidationResult>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ValidationResult>;
+        }));
+    }
+
+    protected processValidateItem(response: HttpResponseBase): Observable<ValidationResult> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ValidationResult.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     createOrEdit(body: CreateOrEditAppItemDto | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/CreateOrEdit";
         url_ = url_.replace(/[?&]$/, "");
@@ -55502,6 +55558,379 @@ export class UserLoginServiceProxy {
 }
 
 @Injectable()
+export class ValidationRulesServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param fieldNameFilter (optional) 
+     * @param ruleTypeFilter (optional) 
+     * @param ruleValueFilter (optional) 
+     * @param errorMessageFilter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(filter: string | null | undefined, fieldNameFilter: string | null | undefined, ruleTypeFilter: string | null | undefined, ruleValueFilter: string | null | undefined, errorMessageFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetValidationRuleForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/ValidationRules/GetAll?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (fieldNameFilter !== undefined && fieldNameFilter !== null)
+            url_ += "FieldNameFilter=" + encodeURIComponent("" + fieldNameFilter) + "&";
+        if (ruleTypeFilter !== undefined && ruleTypeFilter !== null)
+            url_ += "RuleTypeFilter=" + encodeURIComponent("" + ruleTypeFilter) + "&";
+        if (ruleValueFilter !== undefined && ruleValueFilter !== null)
+            url_ += "RuleValueFilter=" + encodeURIComponent("" + ruleValueFilter) + "&";
+        if (errorMessageFilter !== undefined && errorMessageFilter !== null)
+            url_ += "ErrorMessageFilter=" + encodeURIComponent("" + errorMessageFilter) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetValidationRuleForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetValidationRuleForViewDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PagedResultDtoOfGetValidationRuleForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetValidationRuleForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getValidationRuleForView(id: number | undefined): Observable<GetValidationRuleForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/ValidationRules/GetValidationRuleForView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetValidationRuleForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetValidationRuleForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetValidationRuleForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetValidationRuleForViewDto>;
+        }));
+    }
+
+    protected processGetValidationRuleForView(response: HttpResponseBase): Observable<GetValidationRuleForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetValidationRuleForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getValidationRuleForEdit(id: number | undefined): Observable<GetValidationRuleForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/ValidationRules/GetValidationRuleForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetValidationRuleForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetValidationRuleForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetValidationRuleForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetValidationRuleForEditOutput>;
+        }));
+    }
+
+    protected processGetValidationRuleForEdit(response: HttpResponseBase): Observable<GetValidationRuleForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetValidationRuleForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEdit(body: CreateOrEditValidationRuleDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/ValidationRules/CreateOrEdit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCreateOrEdit(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/ValidationRules/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param fieldNameFilter (optional) 
+     * @param ruleTypeFilter (optional) 
+     * @param ruleValueFilter (optional) 
+     * @param errorMessageFilter (optional) 
+     * @return Success
+     */
+    getValidationRulesToExcel(filter: string | null | undefined, fieldNameFilter: string | null | undefined, ruleTypeFilter: string | null | undefined, ruleValueFilter: string | null | undefined, errorMessageFilter: string | null | undefined): Observable<FileDto> {
+        let url_ = this.baseUrl + "/api/services/app/ValidationRules/GetValidationRulesToExcel?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (fieldNameFilter !== undefined && fieldNameFilter !== null)
+            url_ += "FieldNameFilter=" + encodeURIComponent("" + fieldNameFilter) + "&";
+        if (ruleTypeFilter !== undefined && ruleTypeFilter !== null)
+            url_ += "RuleTypeFilter=" + encodeURIComponent("" + ruleTypeFilter) + "&";
+        if (ruleValueFilter !== undefined && ruleValueFilter !== null)
+            url_ += "RuleValueFilter=" + encodeURIComponent("" + ruleValueFilter) + "&";
+        if (errorMessageFilter !== undefined && errorMessageFilter !== null)
+            url_ += "ErrorMessageFilter=" + encodeURIComponent("" + errorMessageFilter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetValidationRulesToExcel(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetValidationRulesToExcel(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileDto>;
+        }));
+    }
+
+    protected processGetValidationRulesToExcel(response: HttpResponseBase): Observable<FileDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FileDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class WebhookEventServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -58788,6 +59217,74 @@ export class PagedResultDtoOfGetMemberForViewDto implements IPagedResultDtoOfGet
 export interface IPagedResultDtoOfGetMemberForViewDto {
     totalCount: number;
     items: GetMemberForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
+    paymentTermsId!: number | undefined;
+    shipViaId!: number | undefined;
+    shipViaCode!: string | undefined;
+    shipViaName!: string | undefined;
+    paymentTermsCode!: string | undefined;
+    paymentTermsName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IGetContactDefaultsOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.paymentTermsId = _data["paymentTermsId"];
+            this.shipViaId = _data["shipViaId"];
+            this.shipViaCode = _data["shipViaCode"];
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsCode = _data["paymentTermsCode"];
+            this.paymentTermsName = _data["paymentTermsName"];
+        }
+    }
+
+    static fromJS(data: any): GetContactDefaultsOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetContactDefaultsOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["paymentTermsId"] = this.paymentTermsId;
+        data["shipViaId"] = this.shipViaId;
+        data["shipViaCode"] = this.shipViaCode;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsCode"] = this.paymentTermsCode;
+        data["paymentTermsName"] = this.paymentTermsName;
+        return data;
+    }
+}
+
+export interface IGetContactDefaultsOutput {
+    paymentTermsId: number | undefined;
+    shipViaId: number | undefined;
+    shipViaCode: string | undefined;
+    shipViaName: string | undefined;
+    paymentTermsCode: string | undefined;
+    paymentTermsName: string | undefined;
 
     [key: string]: any;
 }
@@ -71616,6 +72113,168 @@ export interface ICreateOrEditAppItemDto {
     tenantId: number | undefined;
     tenantOwner: number | undefined;
     id: number;
+
+    [key: string]: any;
+}
+
+export enum Severity {
+    Error = 0,
+    Warning = 1,
+    Info = 2,
+}
+
+export class ValidationFailure implements IValidationFailure {
+    propertyName!: string | undefined;
+    errorMessage!: string | undefined;
+    attemptedValue!: any | undefined;
+    customState!: any | undefined;
+    severity!: Severity;
+    errorCode!: string | undefined;
+    formattedMessagePlaceholderValues!: { [key: string]: any; } | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IValidationFailure) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.propertyName = _data["propertyName"];
+            this.errorMessage = _data["errorMessage"];
+            this.attemptedValue = _data["attemptedValue"];
+            this.customState = _data["customState"];
+            this.severity = _data["severity"];
+            this.errorCode = _data["errorCode"];
+            if (_data["formattedMessagePlaceholderValues"]) {
+                this.formattedMessagePlaceholderValues = {} as any;
+                for (let key in _data["formattedMessagePlaceholderValues"]) {
+                    if (_data["formattedMessagePlaceholderValues"].hasOwnProperty(key))
+                        (<any>this.formattedMessagePlaceholderValues)![key] = _data["formattedMessagePlaceholderValues"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ValidationFailure {
+        data = typeof data === 'object' ? data : {};
+        let result = new ValidationFailure();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["propertyName"] = this.propertyName;
+        data["errorMessage"] = this.errorMessage;
+        data["attemptedValue"] = this.attemptedValue;
+        data["customState"] = this.customState;
+        data["severity"] = this.severity;
+        data["errorCode"] = this.errorCode;
+        if (this.formattedMessagePlaceholderValues) {
+            data["formattedMessagePlaceholderValues"] = {};
+            for (let key in this.formattedMessagePlaceholderValues) {
+                if (this.formattedMessagePlaceholderValues.hasOwnProperty(key))
+                    (<any>data["formattedMessagePlaceholderValues"])[key] = (<any>this.formattedMessagePlaceholderValues)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IValidationFailure {
+    propertyName: string | undefined;
+    errorMessage: string | undefined;
+    attemptedValue: any | undefined;
+    customState: any | undefined;
+    severity: Severity;
+    errorCode: string | undefined;
+    formattedMessagePlaceholderValues: { [key: string]: any; } | undefined;
+
+    [key: string]: any;
+}
+
+export class ValidationResult implements IValidationResult {
+    readonly isValid!: boolean;
+    errors!: ValidationFailure[] | undefined;
+    ruleSetsExecuted!: string[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IValidationResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            (<any>this).isValid = _data["isValid"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(ValidationFailure.fromJS(item));
+            }
+            if (Array.isArray(_data["ruleSetsExecuted"])) {
+                this.ruleSetsExecuted = [] as any;
+                for (let item of _data["ruleSetsExecuted"])
+                    this.ruleSetsExecuted!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ValidationResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new ValidationResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["isValid"] = this.isValid;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item.toJSON());
+        }
+        if (Array.isArray(this.ruleSetsExecuted)) {
+            data["ruleSetsExecuted"] = [];
+            for (let item of this.ruleSetsExecuted)
+                data["ruleSetsExecuted"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IValidationResult {
+    isValid: boolean;
+    errors: ValidationFailure[] | undefined;
+    ruleSetsExecuted: string[] | undefined;
 
     [key: string]: any;
 }
@@ -107940,6 +108599,290 @@ export class ListResultDtoOfUserLoginAttemptDto implements IListResultDtoOfUserL
 
 export interface IListResultDtoOfUserLoginAttemptDto {
     items: UserLoginAttemptDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class ValidationRuleDto implements IValidationRuleDto {
+    fieldName!: string | undefined;
+    ruleType!: string | undefined;
+    ruleValue!: string | undefined;
+    errorMessage!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IValidationRuleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.fieldName = _data["fieldName"];
+            this.ruleType = _data["ruleType"];
+            this.ruleValue = _data["ruleValue"];
+            this.errorMessage = _data["errorMessage"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): ValidationRuleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ValidationRuleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["fieldName"] = this.fieldName;
+        data["ruleType"] = this.ruleType;
+        data["ruleValue"] = this.ruleValue;
+        data["errorMessage"] = this.errorMessage;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IValidationRuleDto {
+    fieldName: string | undefined;
+    ruleType: string | undefined;
+    ruleValue: string | undefined;
+    errorMessage: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetValidationRuleForViewDto implements IGetValidationRuleForViewDto {
+    validationRule!: ValidationRuleDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetValidationRuleForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.validationRule = _data["validationRule"] ? ValidationRuleDto.fromJS(_data["validationRule"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetValidationRuleForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetValidationRuleForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["validationRule"] = this.validationRule ? this.validationRule.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetValidationRuleForViewDto {
+    validationRule: ValidationRuleDto;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfGetValidationRuleForViewDto implements IPagedResultDtoOfGetValidationRuleForViewDto {
+    totalCount!: number;
+    items!: GetValidationRuleForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfGetValidationRuleForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(GetValidationRuleForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfGetValidationRuleForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfGetValidationRuleForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfGetValidationRuleForViewDto {
+    totalCount: number;
+    items: GetValidationRuleForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditValidationRuleDto implements ICreateOrEditValidationRuleDto {
+    fieldName!: string;
+    ruleType!: string;
+    ruleValue!: string | undefined;
+    errorMessage!: string;
+    id!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditValidationRuleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.fieldName = _data["fieldName"];
+            this.ruleType = _data["ruleType"];
+            this.ruleValue = _data["ruleValue"];
+            this.errorMessage = _data["errorMessage"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditValidationRuleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditValidationRuleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["fieldName"] = this.fieldName;
+        data["ruleType"] = this.ruleType;
+        data["ruleValue"] = this.ruleValue;
+        data["errorMessage"] = this.errorMessage;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ICreateOrEditValidationRuleDto {
+    fieldName: string;
+    ruleType: string;
+    ruleValue: string | undefined;
+    errorMessage: string;
+    id: number | undefined;
+
+    [key: string]: any;
+}
+
+export class GetValidationRuleForEditOutput implements IGetValidationRuleForEditOutput {
+    validationRule!: CreateOrEditValidationRuleDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetValidationRuleForEditOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.validationRule = _data["validationRule"] ? CreateOrEditValidationRuleDto.fromJS(_data["validationRule"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetValidationRuleForEditOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetValidationRuleForEditOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["validationRule"] = this.validationRule ? this.validationRule.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetValidationRuleForEditOutput {
+    validationRule: CreateOrEditValidationRuleDto;
 
     [key: string]: any;
 }
