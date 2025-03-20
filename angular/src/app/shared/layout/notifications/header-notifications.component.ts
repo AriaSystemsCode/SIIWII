@@ -54,13 +54,13 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
             return;
         }
 
-        this._notificationService.getUserNotifications(undefined, undefined, undefined, 3, 0).subscribe(result => {
-            this.unreadNotificationCount = result.unreadCount;
-            this.notifications = [];
-            _.forEach(result.items, (item: UserNotification) => {
-                this.notifications.push(this._userNotificationHelper.format(<any>item));
-            });
-        });
+        // this._notificationService.getUserNotifications(undefined, undefined, undefined, 3, 0).subscribe(result => {
+        //     this.unreadNotificationCount = result.unreadCount;
+        //     this.notifications = [];
+        //     _.forEach(result.items, (item: UserNotification) => {
+        //         this.notifications.push(this._userNotificationHelper.format(<any>item));
+        //     });
+        // });
     }
 
     registerToEvents() {

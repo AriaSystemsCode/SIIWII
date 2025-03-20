@@ -126,6 +126,7 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
 import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
 import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Components/share-transaction-tab/share-transaction-tab.component";
 import { TabViewModule } from 'primeng/tabview';
+import { PublicComponent } from './shared/layout/public/public.component';
 @NgModule({
     declarations: [
         AppComponent,
@@ -195,7 +196,8 @@ import { TabViewModule } from 'primeng/tabview';
         CreateOrAddShippingInformationComponent,
         CreateOrEditBillingInfoComponent,
         ViewBillingInfoComponent,
-        ShareTransactionTabComponent
+        ShareTransactionTabComponent,
+        PublicComponent
     ],
     imports: [
         BrowserAnimationsModule,

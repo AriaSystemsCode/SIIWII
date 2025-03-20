@@ -83,36 +83,36 @@ export class NotificationsComponent extends AppComponentBase {
 
         this.primengTableHelper.showLoadingIndicator();
 
-        this._notificationService.getUserNotifications(
-            this.readStateFilter === 'ALL' ? undefined : UserNotificationState.Unread,
-            moment(this.dateRange[0]),
-            moment(this.dateRange[1]).endOf('day'),
-            this.primengTableHelper.getMaxResultCount(this.paginator, event),
-            this.primengTableHelper.getSkipCount(this.paginator, event)
-        ).pipe(finalize(() => this.primengTableHelper.hideLoadingIndicator())).subscribe((result) => {
-            this.primengTableHelper.totalRecordsCount = result.totalCount;
-            this.primengTableHelper.records = this.formatNotifications(result.items);
-            this.primengTableHelper.hideLoadingIndicator();
-        });
+        // this._notificationService.getUserNotifications(
+        //     this.readStateFilter === 'ALL' ? undefined : UserNotificationState.Unread,
+        //     moment(this.dateRange[0]),
+        //     moment(this.dateRange[1]).endOf('day'),
+        //     this.primengTableHelper.getMaxResultCount(this.paginator, event),
+        //     this.primengTableHelper.getSkipCount(this.paginator, event)
+        // ).pipe(finalize(() => this.primengTableHelper.hideLoadingIndicator())).subscribe((result) => {
+        //     this.primengTableHelper.totalRecordsCount = result.totalCount;
+        //     this.primengTableHelper.records = this.formatNotifications(result.items);
+        //     this.primengTableHelper.hideLoadingIndicator();
+        // });
     }
 
     setAllNotificationsAsRead(): void {
-        this._userNotificationHelper.setAllAsRead(() => {
-            this.getNotifications();
-        });
+        // this._userNotificationHelper.setAllAsRead(() => {
+        //     this.getNotifications();
+        // });
     }
 
     openNotificationSettingsModal(): void {
-        this._userNotificationHelper.openSettingsModal();
+        // this._userNotificationHelper.openSettingsModal();
     }
 
     setNotificationAsRead(userNotification: UserNotification, callback: () => void): void {
-        this._userNotificationHelper
-            .setAsRead(userNotification.id, () => {
-                if (callback) {
-                    callback();
-                }
-            });
+        // this._userNotificationHelper
+        //     .setAsRead(userNotification.id, () => {
+        //         if (callback) {
+        //             callback();
+        //         }
+        //     });
     }
 
     deleteNotification(userNotification: UserNotification): void {

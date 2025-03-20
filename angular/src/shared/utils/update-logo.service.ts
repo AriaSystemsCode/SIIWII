@@ -24,13 +24,13 @@ export class UpdateLogoService {
   }
 
   updateProfilePicture() {
-    this._profileServiceProxy.getProfilePicture().subscribe((result) => {
-      if (result && result.profilePicture) {
-        this.profilePicture =
-          "data:image/jpeg;base64," + result.profilePicture;
-        this.profilePictureUpdated.next(this.profilePicture)
-      }
-    });
+    // this._profileServiceProxy.getProfilePicture().subscribe((result) => {
+    //   if (result && result.profilePicture) {
+    //     this.profilePicture =
+    //       "data:image/jpeg;base64," + result.profilePicture;
+    //     this.profilePictureUpdated.next(this.profilePicture)
+    //   }
+    // });
   }
 
 

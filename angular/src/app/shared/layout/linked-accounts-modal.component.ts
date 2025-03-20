@@ -36,15 +36,15 @@ export class LinkedAccountsModalComponent extends AppComponentBase {
     getLinkedUsers(event?: LazyLoadEvent) {
         this.primengTableHelper.showLoadingIndicator();
 
-        this._userLinkService.getLinkedUsers(
-            this.primengTableHelper.getMaxResultCount(this.paginator, event),
-            this.primengTableHelper.getSkipCount(this.paginator, event),
-            this.primengTableHelper.getSorting(this.dataTable)
-        ).pipe(finalize(() => this.primengTableHelper.hideLoadingIndicator())).subscribe(result => {
-            this.primengTableHelper.totalRecordsCount = result.totalCount;
-            this.primengTableHelper.records = result.items;
-            this.primengTableHelper.hideLoadingIndicator();
-        });
+        // this._userLinkService.getLinkedUsers(
+        //     this.primengTableHelper.getMaxResultCount(this.paginator, event),
+        //     this.primengTableHelper.getSkipCount(this.paginator, event),
+        //     this.primengTableHelper.getSorting(this.dataTable)
+        // ).pipe(finalize(() => this.primengTableHelper.hideLoadingIndicator())).subscribe(result => {
+        //     this.primengTableHelper.totalRecordsCount = result.totalCount;
+        //     this.primengTableHelper.records = result.items;
+        //     this.primengTableHelper.hideLoadingIndicator();
+        // });
     }
 
     getShownLinkedUserName(linkedUser: LinkedUserDto): string {

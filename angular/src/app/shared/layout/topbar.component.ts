@@ -218,20 +218,20 @@ export class TopBarComponent
 
     orderNo: any;
     getOderNumber(tranType: string, tranName: string) {
-        this._AppTransactionServiceProxy
-            .getNextOrderNumber(tranType)
-            .subscribe((res: any) => {
-                console.log(">>", res);
-                this.orderNo = res;
-                this.display = true;
-                this.formType = tranType;
-                let str = new Date().setSeconds(0, 0);
-                this.dt = this.datePipe.transform(
-                    new Date(str).toISOString(),
-                    "MMM d, y, h a"
-                );
-                this.modalheaderName = tranName;
-            });
+        // this._AppTransactionServiceProxy
+        //     .getNextOrderNumber(tranType)
+        //     .subscribe((res: any) => {
+        //         console.log(">>", res);
+        //         this.orderNo = res;
+        //         this.display = true;
+        //         this.formType = tranType;
+        //         let str = new Date().setSeconds(0, 0);
+        //         this.dt = this.datePipe.transform(
+        //             new Date(str).toISOString(),
+        //             "MMM d, y, h a"
+        //         );
+        //         this.modalheaderName = tranName;
+        //     });
     }
 
     ngOnInit() {
@@ -240,26 +240,26 @@ export class TopBarComponent
         // .subscribe((res: any) => {
         //     console.log(res);
         // });
-        const subs = this.userClickService.clickSubject$.subscribe((res) => {
-            if (res == "refreshShoppingInfoInTopbar") {
-                this.getShoppingCartInfo();
-            }
-        });
+        // const subs = this.userClickService.clickSubject$.subscribe((res) => {
+        //     if (res == "refreshShoppingInfoInTopbar") {
+        //         this.getShoppingCartInfo();
+        //     }
+        // });
 
-        this.hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(this.attachmentBaseUrl + "/signalr-build")
-            .build();
-        this.hubConnection
-            .start()
-            .then(() => console.log("Connection started"))
-            .catch((err) =>
-                console.log("Error while starting connection: " + err)
-            );
+        // this.hubConnection = new signalR.HubConnectionBuilder()
+        //     .withUrl(this.attachmentBaseUrl + "/signalr-build")
+        //     .build();
+        // this.hubConnection
+        //     .start()
+        //     .then(() => console.log("Connection started"))
+        //     .catch((err) =>
+        //         console.log("Error while starting connection: " + err)
+        //     );
 
-        this.hubConnection.on("SendBuildMessage", (data) => {
-            this.belowBar(data);
-            console.log(data);
-        });
+        // this.hubConnection.on("SendBuildMessage", (data) => {
+        //     this.belowBar(data);
+        //     console.log(data);
+        // });
 
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.isHost = !this._abpSessionService.tenantId;
@@ -267,7 +267,7 @@ export class TopBarComponent
         this.isImpersonatedLogin =
             this._abpSessionService.impersonatorUserId > 0;
         this.setCurrentLoginInformations();
-        this.getProfilePicture();
+        // this.getProfilePicture();
         this.getRecentlyLinkedUsers();
         this.appSession.user.memberId;
         this.appSession.user.id;
@@ -276,17 +276,17 @@ export class TopBarComponent
         if(!this.isHost)
           this.getShoppingCartInfo();
 
-        this.messageReadService.readMessageSubject$.subscribe((res) => {
-            if (res) {
-                this.getUnreadMessageCount();
-            }
-        });
+        // this.messageReadService.readMessageSubject$.subscribe((res) => {
+        //     if (res) {
+        //         this.getUnreadMessageCount();
+        //     }
+        // });
         this.getBelowBar();
     }
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
-            this.getProfilePicture();
+            // this.getProfilePicture();
         });
 
         abp.event.on("app.chat.unreadMessageCountChanged", (messageCount) => {
@@ -333,9 +333,9 @@ export class TopBarComponent
     }
 
     getProfilePicture(): void {
-        this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
-            this.profilePicture = res;
-        });
+        // this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
+        //     this.profilePicture = res;
+        // });
         // this._profileServiceProxy.getProfilePicture().subscribe((result) => {
         //     if (result && result.profilePicture) {
         //         this.profilePicture =
@@ -345,11 +345,11 @@ export class TopBarComponent
     }
 
     getRecentlyLinkedUsers(): void {
-        this._userLinkServiceProxy
-            .getRecentlyUsedLinkedUsers()
-            .subscribe((result) => {
-                this.recentlyLinkedUsers = result.items;
-            });
+        // this._userLinkServiceProxy
+        //     .getRecentlyUsedLinkedUsers()
+        //     .subscribe((result) => {
+        //         this.recentlyLinkedUsers = result.items;
+        //     });
     }
 
     showLoginAttempts(): void {
@@ -399,24 +399,24 @@ export class TopBarComponent
     }
 
     downloadCollectedData(): void {
-        this._profileServiceProxy.prepareCollectedData().subscribe(() => {
-            this.message.success(this.l("GdprDataPrepareStartedNotification"));
-        });
+        // this._profileServiceProxy.prepareCollectedData().subscribe(() => {
+        //     this.message.success(this.l("GdprDataPrepareStartedNotification"));
+        // });
     }
 
     updateBuildWithUserId(): void {
-        this._maintainancesServiceProxy
-            .updateOpenBuildWithUserId(this.appSession.user.id)
-            .subscribe(() => {
-                this.notify.success(this.l("SuccessfullySaved"));
-            });
+        // this._maintainancesServiceProxy
+        //     .updateOpenBuildWithUserId(this.appSession.user.id)
+        //     .subscribe(() => {
+        //         this.notify.success(this.l("SuccessfullySaved"));
+        //     });
         this._belowBar = false;
         this._belowBarMessage = "";
     }
     getBelowBar(): void {
-        this._maintainancesServiceProxy.getOpenBuild().subscribe((data) => {
-            this.belowBar(data);
-        });
+        // this._maintainancesServiceProxy.getOpenBuild().subscribe((data) => {
+        //     this.belowBar(data);
+        // });
     }
 
     belowBar(data: GetMaintainanceForViewDto): void {
@@ -488,39 +488,39 @@ export class TopBarComponent
         this.userClickService.userClicked(target);
     }
     getUnreadMessageCount() {
-        this._MessageServiceProxy.getUnreadCounts(null).subscribe((result) => {
-            this.unreadMessageCount = result;
-        });
+        // this._MessageServiceProxy.getUnreadCounts(null).subscribe((result) => {
+        //     this.unreadMessageCount = result;
+        // });
     }
 
     getShoppingCartInfo(openShoppingCart: boolean = false) {
-        this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
-            .subscribe((res: ShoppingCartSummary) => {
-                this.shoppingCartSummary = res;
-                if (this.shoppingCartSummary.orderType == this._TransactionType.SalesOrder)
-                    this.transactionType = "SO";
-                if (this.shoppingCartSummary.orderType == this._TransactionType.PurchaseOrder)
-                    this.transactionType = "PO";
+        // this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
+        //     .subscribe((res: ShoppingCartSummary) => {
+        //         this.shoppingCartSummary = res;
+        //         if (this.shoppingCartSummary.orderType == this._TransactionType.SalesOrder)
+        //             this.transactionType = "SO";
+        //         if (this.shoppingCartSummary.orderType == this._TransactionType.PurchaseOrder)
+        //             this.transactionType = "PO";
 
-                if (!this.shoppingCartSummary.sellerLogo)
-                    this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
-                if (!this.shoppingCartSummary.buyerLogo)
-                    this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
+        //         if (!this.shoppingCartSummary.sellerLogo)
+        //             this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
+        //         if (!this.shoppingCartSummary.buyerLogo)
+        //             this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
 
 
-                  if(this.shoppingCartSummary?.amount)
-                  this.shoppingCartSummary?.amount % 1 ==0?this.shoppingCartSummary.amount=parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)):null; 
+        //           if(this.shoppingCartSummary?.amount)
+        //           this.shoppingCartSummary?.amount % 1 ==0?this.shoppingCartSummary.amount=parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)):null; 
 
-                if (openShoppingCart)
-                    this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
+        //         if (openShoppingCart)
+        //             this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
 
-                     //Currency
-            this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
-            .subscribe((res: CurrencyInfoDto) => {
-                this.currencySymbol = res.symbol ? res.symbol : res.code  ;
-            });
+        //              //Currency
+        //     this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+        //     .subscribe((res: CurrencyInfoDto) => {
+        //         this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+        //     });
 
-            });
+        //     });
             
     }
 

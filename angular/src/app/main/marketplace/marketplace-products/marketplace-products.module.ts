@@ -30,6 +30,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TabViewModule } from 'primeng/tabview';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AppCommonModule } from "@app/shared/common/app-common.module";
+import { CopyMarketplaceViewComponent } from './components/copy-marketplace-view/copy-marketplace-view.component';
 @NgModule({
     declarations: [
         MarketplaceProductsComponent,
@@ -40,6 +41,7 @@ import { AppCommonModule } from "@app/shared/common/app-common.module";
         ProductFiltersComponent,
         MobileFiltersDialogComponent,
         ProductDetailImagesComponent,
+        CopyMarketplaceViewComponent,
     ],
     imports: [
         CommonModule,
