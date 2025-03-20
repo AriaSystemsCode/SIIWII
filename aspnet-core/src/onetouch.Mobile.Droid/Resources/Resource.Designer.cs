@@ -10208,7 +10208,7 @@ namespace onetouch
 			public const int mr_dynamic_dialog_header_text_color_dark = 2131034204;
 			
 			// aapt resource value: 0x7F05005D
-			public const int mr_dynamic_dialog_header_text_color_light = 2131034205;
+			public const int mr_dynamic_dialog_header_text_color_light = 2131034200;
 			
 			// aapt resource value: 0x7F05005E
 			public const int mr_dynamic_dialog_icon_dark = 2131034206;
@@ -14636,7 +14636,7 @@ namespace onetouch
 			public const int TextAppearance_AppCompat_Widget_ActionMode_Subtitle = 2131624204;
 			
 			// aapt resource value: 0x7F0E010D
-			public const int TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse = 2131624205;
+			public const int TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse = 2131624200;
 			
 			// aapt resource value: 0x7F0E010E
 			public const int TextAppearance_AppCompat_Widget_ActionMode_Title = 2131624206;
