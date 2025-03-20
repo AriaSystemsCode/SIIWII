@@ -167,10 +167,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             reference:[""],
             priceLevel:['MSRP'],
             currencyId:[this.appSession.tenant.currencyInfoDto.value],
- 
+            buyerCompanySSIN: [''], 
 
         });
         this.orderForm.reset();
+         this.buyerCompanySSIN = ''
+         this.sellerCompanySSIN = ''
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
@@ -227,7 +229,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             reference:[""],
             priceLevel:['MSRP'],
             currencyId:[this.appSession.tenant.currencyInfoDto.value],
-   
+            buyerCompanySSIN: [''], 
 
             
         });
@@ -328,6 +330,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = !this.isBuyerTempAccount;
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
+             this.buyerCompanySSIN = ''
             this.areSame = false
             this.orderForm.controls["buyerCompanyBranch"].clearValidators();
             this.orderForm.controls["buyerCompanyBranch"].reset();
@@ -335,6 +338,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             this.orderForm.controls["buyerContactName"].reset();
             this.orderForm.controls["buyerContactEMailAddress"].reset();
             this.orderForm.controls["buyerContactPhoneNumber"].reset();
+            this.orderForm.controls["buyerCompanySSIN"].setValue('');
         }
 
         else
@@ -1303,11 +1307,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             reference:[""],
             priceLevel:[""],
             currencyId:[this.appSession.tenant.currencyInfoDto.value],
-     
+            buyerCompanySSIN: [''], 
 
             
         });
-       
+           this.buyerCompanySSIN = ''
+        this.sellerCompanySSIN =''
         let today = new Date();
         let month = today.getMonth();
         let year = today.getFullYear();
