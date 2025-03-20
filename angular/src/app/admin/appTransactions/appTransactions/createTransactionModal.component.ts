@@ -171,8 +171,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
         });
         this.orderForm.reset();
-           this.buyerCompanySSIN = ''
-        this.sellerCompanySSIN = ''
+         this.buyerCompanySSIN = ''
+         this.sellerCompanySSIN = ''
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
@@ -331,7 +331,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = !this.isBuyerTempAccount;
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
-            this.buyerCompanySSIN = ''
+             this.buyerCompanySSIN = ''
             this.areSame = false
             this.orderForm.controls["buyerCompanyBranch"].clearValidators();
             this.orderForm.controls["buyerCompanyBranch"].reset();
@@ -340,10 +340,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             this.orderForm.controls["buyerContactName"].reset();
             this.orderForm.controls["buyerContactEMailAddress"].reset();
             this.orderForm.controls["buyerContactPhoneNumber"].reset();
-            this.buyerCompanySSIN = this.orderForm.controls["buyerCompanySSIN"].value
-     
-
+            this.orderForm.controls["buyerCompanySSIN"].setValue('');
         }
+
         else
             this.orderForm.controls["buyerCompanyBranch"].setValidators([Validators.required]);
         
@@ -1319,7 +1318,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
             
         });
-        this.buyerCompanySSIN = ''
+           this.buyerCompanySSIN = ''
         this.sellerCompanySSIN =''
         let today = new Date();
         let month = today.getMonth();
