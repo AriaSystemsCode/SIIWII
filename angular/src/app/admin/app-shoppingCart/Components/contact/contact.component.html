@@ -49,7 +49,7 @@
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"
                     (onSelect)="onChangeCompany($event)"
-                   
+                    (change)="appTransactionsForViewDto?.buyerCompanySSIN == '' ? addName($event) : ''"
                     [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" 
                     field="name" 
                     [forceSelection]="false" 
@@ -117,13 +117,14 @@
                             (change)="onChangePhoneNumber($event)"
                                 [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber"
                                 #phoneNumberInput="ngModel"  name="phoneNumber" minlength="5" maxlength="20"
-                                pattern="[0-9]*" 
+                                pattern="^(\+?[1-9]\d{0,2}(\s|-)?\(?\d{1,4}\)?(\s|-)?\d{1,4}(\s|-)?\d{1,4}|\(?\d{3}\)?(\s|-)?\d{3}(\s|-)?\d{4}|\d{7,15})$"
+
                                 />
                         </div>
                     </div>
                     <div *ngIf="phoneNumberInput.invalid && (phoneNumberInput.dirty || phoneNumberInput.touched)" class="text-danger">
                         <small *ngIf="phoneNumberInput.errors?.pattern">
-                            Phone number must contain only numbers.
+                            Please enter a valid phone number.
                         </small>
                         <small *ngIf="!phoneNumberInput.errors?.pattern && (phoneNumberInput.value.length < 5 || phoneNumberInput.value.length > 20)">
                             Phone number must be between 5 and 20 characters long.
@@ -172,7 +173,7 @@
             -->
 
       
-          
+         
             <p-autoComplete
             #autoComplete
             [dropdown]="!tempAccount"

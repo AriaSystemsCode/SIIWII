@@ -67,8 +67,8 @@
 <div>
                 <div class="py-2 px-3 text-right  row  d-lg-flex
                 d-none">
-                <button type="button" class="btn  syncBtn"
-                [disabled]="!appTransactionsForViewDto?.showSync"
+                <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn  syncBtn"
+                [disabled]="!appTransactionsForViewDto?.showSync "
              
                 style="height: 37px; white-space: nowrap;" (click)="sync()">
                 <svg width="16" height="23" viewBox="0 0 16 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -77,7 +77,7 @@
                     
                 {{l("Sync")}}
             </button>
-                    <button type="button" class="btn   border-0  shareBtn"
+                    <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn   border-0  shareBtn"
                         [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
@@ -130,7 +130,7 @@
                                 href="javascript:;">
                            
                                     
-                                <button type="button" class="btn border-0  mx-1"
+                                <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn border-0  mx-1"
                                     [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                                     [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                                     style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
@@ -175,7 +175,7 @@
                             </a>
                        
                     <a class="dropdown-item d-flex" id="syncTransaction">
-                        <button type="button" class="btn  "
+                        <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn  "
                         [disabled]="!appTransactionsForViewDto?.showSync"
                      
                         style="height: 37px; white-space: nowrap;" (click)="sync()">
@@ -448,7 +448,7 @@
                                                             *ngIf="i === 0"></p-treeTableToggler>
                                                         <label *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                             {{ rowData[col.field] }}</label>
-                                                            <label *ngIf="(col.field=='price')||(col.field=='amount')">
+                                                            <label *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice) || (col.field=='amount')">
                                                                 {{ rowData[col.field] | currency:' ' }}</label>
                                                         <label
                                                             *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
@@ -486,6 +486,26 @@
                                                             </div>
 
                                                         </label>
+
+                                                        <label
+                                                        *ngIf="col.field=='price' && rowNode?.node?.data?.showEditPrice">
+                                                        <div class="editQtyContainer">
+                                                            <div class="fieldset">
+                                                                <input type="number" min="0"
+                                                                    class="form-control inputs form-text"
+                                                                    id="editPrice"
+                                                                    [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                    (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                                <button
+                                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                    (click)="onEditPrice(rowNode);"
+                                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                                    [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                    
                                                     </td>
 
                                                     <td class="p-treeTable text-center"  style="width: 5rem;"  *ngIf="canChange">
@@ -506,7 +526,7 @@
                                                                 aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                                 <div *ngIf="rowNode?.node?.data?.editQty"
                                                                     class="pointer"
-                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty ; rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
                                                                     <a class="link purpleColor p-3">
                                                                         <svg class="ml-3" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
                                                                             <g clip-path="url(#clip0_83_2871)">
@@ -662,7 +682,7 @@
                                 <div class="font-weight-bold">{{currencySymbol}} {{appTransactionsForViewDto?.totalAmount   ? (appTransactionsForViewDto?.totalAmount | currency:' ') : '0.00' }}</div>
                             </div>
                             <div class="row w-100 mt-4 mb-4 d-flex justify-content-between">
-                                <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
+                                <div class="col-6 font-weight-bold" style="white-space: nowrap;">{{l("TotalQuantity")}}</div>
                                 <div class="font-weight-bold">{{appTransactionsForViewDto?.totalQuantity ?
                                     appTransactionsForViewDto?.totalQuantity : 0 }}</div>
                             </div>
@@ -705,7 +725,7 @@
                     <div class="row mt-4 ml-3" 
                     [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
-                        <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
+                        <div class="w-100 comment-warper   order-summary p-4  mt-3 purpleColor" >
                             <app-comment-parent [addNewThread]="true"  *ngIf="appTransactionsForViewDto"
                             [cartStyle]="true" #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                             (newCommentAdded)="onGeneratOrderReport(true)">
@@ -750,7 +770,7 @@ height: 48px;"
                     href="javascript:;">
                
                         
-                    <button type="button" class="btn border-0  mx-1"
+                    <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn border-0  mx-1"
                         [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
@@ -832,7 +852,7 @@ height: 48px;"
                 
         </a>
         <a class="dropdown-item d-flex" id="syncTransaction">
-            <button type="button" class="btn  "
+            <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button" class="btn  "
             [disabled]="!appTransactionsForViewDto?.showSync"
          
             style="height: 37px; white-space: nowrap;" (click)="sync()">
@@ -1166,11 +1186,12 @@ height: 48px;"
                                                         *ngIf="i === 0"></p-treeTableToggler>
                                                     <label *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                         {{ rowData[col.field] }}</label>
-                                                        <label *ngIf="(col.field=='price')||(col.field=='amount')">
+                                                        <label *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice)||(col.field=='amount')">
                                                             {{ rowData[col.field] | currency:' ' }}</label>
                                                     <label
                                                         *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
                                                         {{ rowData[col.field] }}</label>
+                                                        
 
                                                     <label *ngIf="col.field=='image'">
                                                         <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
@@ -1204,6 +1225,25 @@ height: 48px;"
                                                         </div>
 
                                                     </label>
+
+                                                    <label
+                                                        *ngIf="col.field=='price'&& rowNode?.node?.data?.showEditPrice">
+                                                        <div class="editQtyContainer">
+                                                            <div class="fieldset">
+                                                                <input type="number" min="0"
+                                                                    class="form-control inputs form-text"
+                                                                    id="editPrice"
+                                                                    [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                    (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                                <button
+                                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                    (click)="onEditPrice(rowNode);"
+                                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                                    [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
+                                                            </div>
+                                                        </div>
+                                                    </label>
                                                 </td>
 
                                                 <td class="p-treeTable"  style="width: 3rem;"  *ngIf="canChange">
@@ -1224,7 +1264,7 @@ height: 48px;"
                                                             aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                             <div *ngIf="rowNode?.node?.data?.editQty"
                                                                 class="pointer"
-                                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty;rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
                                                                 <a class="link purpleColor p-3">
                                                                     <svg class="ml-3" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
                                                                         <g clip-path="url(#clip0_83_2871)">
@@ -1381,7 +1421,7 @@ height: 48px;"
                                 <div class="font-weight-bold">{{currencySymbol}} {{appTransactionsForViewDto?.totalAmount   ? (appTransactionsForViewDto?.totalAmount | currency:' ') : '0.00' }}</div>
                             </div>
                             <div class="row w-100 mt-4 mb-4 d-flex justify-content-between">
-                                <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
+                                <div class="col-6 font-weight-bold" style="white-space: nowrap;">{{l("TotalQuantity")}}</div>
                                 <div class="font-weight-bold">{{appTransactionsForViewDto?.totalQuantity ?
                                     appTransactionsForViewDto?.totalQuantity : 0 }}</div>
                             </div>

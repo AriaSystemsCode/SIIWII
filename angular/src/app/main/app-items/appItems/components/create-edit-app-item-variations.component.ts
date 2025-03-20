@@ -253,7 +253,7 @@ export class CreateEditAppItemVariationsComponent
 
           this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
           this.selectedAttrID?null:this.editVariationsOpend=true;
-
+          this.getAspectatio();
     }
 
     async getSiwiiMarketPlaceColor() {
@@ -949,13 +949,60 @@ this.showMainSpinner();
         });
     }
 
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      onDragOver(event: DragEvent) {
+        event.preventDefault(); // Required to allow dropping
+        event.stopPropagation();
+      }
+      
+    onDrop(event: DragEvent, index: number) {
+        event.preventDefault();
+        event.stopPropagation();
+      
+        if (event.dataTransfer?.files.length) {
+          const file = event.dataTransfer.files[0];
+      
+          console.log("File dropped:", file);
+      
+          const mockEvent = {
+            target: { files: [file], value: file.name } // Mimicking an input event
+          };
+      
+          this.fileChange(
+            mockEvent as unknown as Event
+          );
+        }
+      }
+      
+    aspectRatio;
+    getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.aspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
+    }
+
     fileChange(event) {
         if (event.target.value) {
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
+          
+                let aspectRatio=this.aspectRatio;
+
             let { onCropDone, data } = this.openImageCropper(
                 event,
-                undefined,
+                aspectRatio,
                 true
             );
             let subs = onCropDone.subscribe((res) => {

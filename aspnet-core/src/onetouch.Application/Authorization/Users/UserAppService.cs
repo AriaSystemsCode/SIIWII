@@ -403,7 +403,7 @@ namespace onetouch.Authorization.Users
             }
             //Mariam[Start]
             
-            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
+            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.EntityFk.TenantId==AbpSession.TenantId &&  x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
             if (contactEntityExtraData != null)
             {
 

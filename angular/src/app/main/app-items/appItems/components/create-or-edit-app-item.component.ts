@@ -206,6 +206,22 @@ export class CreateOrEditAppItemComponent
             this.checkAndAddDefaultPriceObject();
         }
         this.getCurrencies();
+        this.getAspectatio();
+    }
+
+    aspectRatio;
+    getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.aspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
     }
 
     ngAfterViewInit() {
@@ -1094,6 +1110,40 @@ let x=  this.appItem.nonLookupValues;
         this.formTouched = true;
     }
 
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      onDragOver(event: DragEvent) {
+        event.preventDefault(); // Required to allow dropping
+        event.stopPropagation();
+      }
+      
+    onDrop(event: DragEvent, index: number) {
+        event.preventDefault();
+        event.stopPropagation();
+      
+        if (event.dataTransfer?.files.length) {
+          const file = event.dataTransfer.files[0];
+      
+          console.log("File dropped:", file);
+      
+          const mockEvent = {
+            target: { files: [file], value: file.name } // Mimicking an input event
+          };
+      
+          this.fileChange(
+            mockEvent as unknown as Event,
+            this.productImageCategory,
+            index,
+            undefined,
+            true
+          );
+        }
+      }
+
+      
     fileChange(
         event,
         attachmentCategory: GetSycAttachmentCategoryForViewDto,
@@ -1103,6 +1153,11 @@ let x=  this.appItem.nonLookupValues;
     ) {
         this.formTouched = true;
         if (event.target.value) {
+
+            //get aspectRatio 
+            if(!aspectRatio)
+                aspectRatio=this.aspectRatio;
+
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
             let { onCropDone, data } = this.openImageCropper(

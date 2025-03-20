@@ -168,6 +168,8 @@ export class AppItemsViewComponent
     display: boolean = false;
     timezoneOffset: number;
 
+    acceptedAspectRatio;
+
     public constructor(
         private _router: Router,
         private _appItemsServiceProxy: AppItemsServiceProxy,
@@ -179,7 +181,25 @@ export class AppItemsViewComponent
         private datePipe: DatePipe
     ) {
         super(injector, _location);
+
+        this.getAspectatio();
     }
+
+
+    getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.acceptedAspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
+    }
+
     appSizeRatio: AppItemSizesScaleInfo;
     ngOnChanges(changes: SimpleChanges) {
         if (this.appItemViewInput) {

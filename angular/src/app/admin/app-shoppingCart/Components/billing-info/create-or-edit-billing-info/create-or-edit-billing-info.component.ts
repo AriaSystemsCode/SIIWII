@@ -42,7 +42,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   cancelBtn: boolean = false;
   saveBtn: boolean = false;
   SuccessMsg: boolean = false;
-
+  isAccManual :boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -67,6 +67,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       
   }
   ngOnInit() {
+    this.isMamualAcc()
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
@@ -88,7 +89,20 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     }
   }
   }
+  isMamualAcc() {
+    let accSSin = ''
+    if(this.appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER') {
+      accSSin = this.appTransactionsForViewDto?.buyerCompanySSIN
+    } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER'){
+      accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
+    }
+    this._AppTransactionServiceProxy.isManualCompany(accSSin)
+      .subscribe((res) => {
 
+        this.isAccManual = res;
+   
+      })
+  }
   updateTabInfo(addObj, contactRole) {
     let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
     if (contactIndex < 0 || contactIndex == this.appTransactionsForViewDto?.appTransactionContacts?.length) {
