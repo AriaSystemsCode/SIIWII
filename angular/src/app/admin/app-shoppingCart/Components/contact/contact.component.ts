@@ -435,7 +435,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
             }
-            this.isValidForm();
+            // this.isValidForm();
         }
    
         
@@ -491,7 +491,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
         
 
-        getBranches(apply = true) {
+        getBranches() {
             const contact = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex];
             
             if (contact?.selectedCompany?.accountSSIN) {
@@ -579,7 +579,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
                 this.hideMainSpinner();
 
-                this.isValidForm();
+                // this.isValidForm();
     }
 
     isValidForm(): boolean {
@@ -767,7 +767,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     // // this.sellerCompanies = [...res.items];
                 });
         }, 1000);
-        this.isValidForm();
+        // this.isValidForm();
     }
     handleBranchSearch(event){
     this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
@@ -779,7 +779,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     
     });
-    this.isValidForm();
+    // this.isValidForm();
 }
 
 
@@ -791,7 +791,7 @@ getBranchDetails(id) {
         console.log(this.branchData, 'Branch Data Received');
         this.extractPhoneTypes(this.branchData,'changed');
     });
-         this.isValidForm();
+        //  this.isValidForm();
 }
 
 extractPhoneTypes(response: any,changeBranch?:any) {
