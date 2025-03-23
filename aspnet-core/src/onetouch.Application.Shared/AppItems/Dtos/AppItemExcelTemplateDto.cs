@@ -7,6 +7,7 @@ using System.Text;
 using Abp.Extensions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Runtime.CompilerServices;
+using System.Data;
 namespace onetouch.AppItems.Dtos
 {
     public class AppItemExcelDto
@@ -72,6 +73,7 @@ namespace onetouch.AppItems.Dtos
        public string ErrorMessage{ set; get; }
 
        public string ErrorType { set; get; }
+        public long? Id { set; get; }
     }
     public class ImportItemInputDto
     {
@@ -103,6 +105,8 @@ namespace onetouch.AppItems.Dtos
         public string BrandName { set; get; }
         public string StartShipDate { set; get; }
         public string Dimension1Sizes { set; get; }
+        public string Dimension2Sizes { set; get; }
+        public string Dimension3Sizes { set; get; }
         public string Dimension1Name { set; get; }
         public string Dimension2Name { set; get; }
         public string Dimension3Name { set; get; }

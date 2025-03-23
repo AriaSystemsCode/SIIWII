@@ -59289,7 +59289,7 @@ export interface IGetContactDefaultsOutput {
     [key: string]: any;
 }
 
-export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
+/*export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
     paymentTermsId!: number | undefined;
     shipViaId!: number | undefined;
     shipViaCode!: string | undefined;
@@ -59344,7 +59344,7 @@ export class GetContactDefaultsOutput implements IGetContactDefaultsOutput {
         data["paymentTermsName"] = this.paymentTermsName;
         return data;
     }
-}
+}*/
 
 export interface IGetContactDefaultsOutput {
     paymentTermsId: number | undefined;
@@ -59354,7 +59354,7 @@ export interface IGetContactDefaultsOutput {
     paymentTermsCode: string | undefined;
     paymentTermsName: string | undefined;
 
-    [key: string]: any;
+    //[key: string]: any;
 }
 
 export class AccountAppEntityLookupTableDto implements IAccountAppEntityLookupTableDto {
