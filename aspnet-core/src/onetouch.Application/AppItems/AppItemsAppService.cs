@@ -5485,13 +5485,19 @@ namespace onetouch.AppItems
                 itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
                 itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
                 #endregion
-                
+                ////I46 test
+
+
+                //// x = ObjectMapper.Map<List<ImportItemInputDto>>(itemExcelResultsDTO.ExcelRecords);
+                //await ImportItem(x, ExcelRecordRepeateHandler.CreateACopy);
+                ////I46 Test
+
             }
             catch (Exception ex)
             {
                 throw new UserFriendlyException(ex.Message);
             }
-
+            
             // ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
             return itemExcelResultsDTO;
         }
