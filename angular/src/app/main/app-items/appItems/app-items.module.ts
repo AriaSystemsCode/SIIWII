@@ -36,6 +36,7 @@ import { TableModule } from 'primeng/table';
 import { TreeModule } from 'primeng/tree';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 
 
 @NgModule({
@@ -45,6 +46,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
     VariationsMetaInfoComponent,
     MyItemViewComponent,
     MyAppItemsComponent,
+    dynamicInputs
   ],
   imports: [
     CommonModule,
