@@ -34,6 +34,7 @@ using Tweetinvi.Core.Extensions;
 using onetouch.AppSiiwiiTransaction;
 using System.Security.Cryptography;
 using Microsoft.CodeAnalysis;
+using DevExpress.Data.Extensions;
 
 namespace onetouch.Web.Services
 {
@@ -172,8 +173,11 @@ namespace onetouch.Web.Services
 
                                         break;
                                     case "LANGUAGENAME":
-                                        report.Parameters["muserCountry"].Value = Convert.ChangeType(
-                                      parameters.Get("languageName").ToUpper(), report.Parameters["muserCountry"].Type);
+                                        if (report.Parameters.FindIndex(e => e.Name.ToUpper() == "muserCountry".ToUpper()) > -1)
+                                        {
+                                            report.Parameters["muserCountry"].Value = Convert.ChangeType(
+                                            parameters.Get("languageName").ToUpper(), report.Parameters["muserCountry"].Type);
+                                        }
                                         break;
                                     default:
                                         report.Parameters[parameterName].Value = Convert.ChangeType(

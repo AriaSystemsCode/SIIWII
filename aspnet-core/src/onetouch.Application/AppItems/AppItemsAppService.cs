@@ -3622,6 +3622,44 @@ namespace onetouch.AppItems
                     var itemObjectId = await _helper.SystemTables.GetObjectListingId();
                     List<AppMarketplaceItems.AppMarketplaceItems> children = new List<AppMarketplaceItems.AppMarketplaceItems>();
                     //XX
+                    //MD
+                    var marketplaceItems = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
+                        .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
+                        .Where(x => x.Code == appItem.SSIN || (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).ToListAsync();
+                    if (marketplaceItems != null && marketplaceItems.Count > 1)
+                    {
+                        //int cnt = 0;
+                        foreach (var markItem in marketplaceItems.Where(z => z.Code != z.SSIN).ToList())
+                        {
+                            //cnt++;
+                            //if (markItem.Code != markItem.SSIN)
+                            // {
+                            //  continue;
+                            await _appMarketplaceItem.DeleteAsync(markItem);
+                            //}
+                        }
+                        await CurrentUnitOfWork.SaveChangesAsync();
+
+                        var marketplaceItemsList = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
+                       .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
+                       .Where(x => x.Code == appItem.SSIN || (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).ToListAsync();
+                        if (marketplaceItemsList != null && marketplaceItemsList.Count > 1)
+                        {
+                            int cntt = 0;
+                            foreach (var markItem in marketplaceItemsList)
+                            {
+                                cntt++;
+                                if (cntt==1)
+                                {
+                                    continue;
+                                }
+                                await _appMarketplaceItem.DeleteAsync(markItem);
+                                
+                            }
+                        }
+                    }
+                
+                    //MD
                     AppMarketplaceItems.AppMarketplaceItems marketplaceItem = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
                         .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
                         .Where(x => x.Code == appItem.SSIN || (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
@@ -5826,7 +5864,8 @@ namespace onetouch.AppItems
                         Price = appItem.Price,
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceA))
@@ -5848,7 +5887,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceA),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceB))
@@ -5870,7 +5910,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceB),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceC))
@@ -5892,7 +5933,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceC),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceD))
@@ -5914,7 +5956,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceD),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 //MMT0311
@@ -6706,7 +6749,8 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
                             Price = appChildItem.Price,
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
-                            TenantId = AbpSession.TenantId
+                            TenantId = AbpSession.TenantId,
+                            IsDefault = true
                         });
                     }
                     //MMT0311
@@ -6729,7 +6773,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceA),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault =true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceB))
@@ -6751,7 +6796,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceB),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault = true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceC))
@@ -6773,7 +6819,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceC),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault = true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceD))
@@ -6795,7 +6842,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceD),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault = true
                         });
                     }
                     //MMT0311
