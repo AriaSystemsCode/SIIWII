@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AddVariationToInputDto, AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AddVariationToInputDto, AppEntitiesServiceProxy, AppEntityExtraDataDto, AppTransactionServiceProxy, CreateOrEditAppItemDto, CurrencyInfoDto, GetAccountInformationOutputDto, GetAllEntityObjectTypeOutput, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, SycEntityObjectTypesServiceProxy, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -20,6 +20,10 @@ import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catal
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
 import { AppConsts } from '@shared/AppConsts';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
+import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
+import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/models/filtered-extra-attribute';
+import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -116,6 +120,13 @@ currentFilter: string = '';
 regenrate : boolean = false
 syncMsg : boolean = false
 mainLoad : boolean = false
+appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
+  selectedItemTypeData: GetAllEntityObjectTypeOutput =
+        new GetAllEntityObjectTypeOutput();
+
+extraAttributes: {
+  [key in EExtraAttributeUsage]: CreateEditAppItemExtraAttribute;
+};
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -125,11 +136,15 @@ mainLoad : boolean = false
     private router: Router,
     private cdr: ChangeDetectorRef,
     private _formBuilder: FormBuilder,
+     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
+      private _extraAttributeDataService: ExtraAttributeDataService,
   ) {
     super(injector);
 
   }
   ngOnInit(): void {
+    this.defineExtraAttributes();
+    this.getAppItemTypeExtraAttributesById(114); // or your dynamic ID
     this.initFilterForm()
   
  let value = localStorage.getItem("comNew"); 
@@ -1518,4 +1533,235 @@ stopReport(event) {
 }
 
 
+
+    defineExtraAttributes() {
+        
+        this.extraAttributes = {
+            [EExtraAttributeUsage.Recommended]:
+                new CreateEditAppItemExtraAttribute({
+                    header: this.l("Recommended"),
+                    title: this.l("BuyersMayAlsoBeInterestedInTheseItemSpecifics"),
+                    usageEnum: EExtraAttributeUsage.Recommended,
+                    orderOfDisplay: 1,
+                }),
+            [EExtraAttributeUsage.Additional]:
+                new CreateEditAppItemExtraAttribute({
+                    header: this.l("Additional"),
+                    title: this.l(
+                        "Buyersfrequentlysearchfortheseitemspecifics"
+                    ),
+                    usageEnum: EExtraAttributeUsage.Additional,
+                    orderOfDisplay: 2,
+                }),
+        };
+    }
+    getAppItemTypeExtraAttributesById(id: number) {
+      this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id)
+        .subscribe((res) => {
+          if (res?.length > 0) {
+            this.selectedItemTypeData = res[0];
+    
+            // Set recommended/additional attributes
+            this.setAdditionalAndRecommendedExtraAttributes();
+    
+            // Load lookup lists
+            // this.loadRecommendedAndAdditionalExtraDataLookupLists();
+    
+            // // Set selected values if editing
+            // if (this.appItem?.entityExtraData?.length) {
+            //   this.setSelectedAppEntityExtraDataOnEditMode();
+            // }
+          }
+        });
+    }
+    
+
+    loadRecommendedAndAdditionalExtraDataLookupLists() {
+        this.extraAttributes.RECOMMENDED.extraAttributes.forEach(
+            (extraAttr) => {
+                if (!extraAttr.isLookup) return;
+                this.loadExtraDataLookupList(extraAttr);
+            }
+        );
+        this.extraAttributes.ADDITIONAL.extraAttributes.forEach((extraAttr) => {
+            if (!extraAttr.isLookup) return;
+            this.loadExtraDataLookupList(extraAttr);
+        });
+    }
+    loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
+        this._extraAttributeDataService
+            .getExtraAttributeLookupDataWithPaging(
+                extraAttr.entityObjectTypeCode,
+                extraAttr.paginationSetting.skipCount,
+                extraAttr.paginationSetting.maxResultCount
+            )
+            .subscribe((result) => {
+                extraAttr.paginationSetting.totalCount = result.totalCount;
+                if (extraAttr.paginationSetting.skipCount == 0)
+                    extraAttr.paginationSetting.list = [];
+                else
+                    extraAttr.paginationSetting.list.splice(
+                        extraAttr.paginationSetting.list.length - 1,
+                        1
+                    );
+                     let isExist=result.items.filter((item)=>{ return item.value==extraAttr.attributeId});
+                    if((isExist!.length==0||isExist==undefined)  && extraAttr?.selectedValues?.length>0){
+
+                        const tempAtt = new LookupLabelDto({
+                            code:extraAttr.code,
+                            label:extraAttr.selectedValues,
+                            stockAvailability:undefined,
+                            value:extraAttr.selectedValues,
+                            isHostRecord:false,
+                            hexaCode:undefined,
+                            image:undefined
+                        })
+                        result.items.push(tempAtt)
+                    }
+
+                extraAttr.paginationSetting.list.push(...result.items);
+                if (
+                    extraAttr.paginationSetting.list.length <
+                    extraAttr.paginationSetting.totalCount
+                ) {
+                    const showMoreSelectItem: SelectItem = {
+                        value: -1,
+                        label: this.l("showMore"),
+                        icon: "fas  fa-reply",
+                        styleClass: "showMore",
+                        disabled: false,
+                    };
+                    extraAttr.paginationSetting.list.push(showMoreSelectItem);
+                }
+                extraAttr.paginationSetting.skipCount +=
+                    extraAttr.paginationSetting.maxResultCount;
+            });
+    }
+
+      setAdditionalAndRecommendedExtraAttributes() {
+            const extraAttributres =
+                this.selectedItemTypeData.extraAttributes.extraAttributes;
+            this.extraAttributes.RECOMMENDED.extraAttributes =
+                this._extraAttributeDataService.getFilteredAttributesByUsage(
+                    extraAttributres,
+                    EExtraAttributeUsage.Recommended,
+                    false
+                );
+            this.extraAttributes.ADDITIONAL.extraAttributes =
+                this._extraAttributeDataService.getFilteredAttributesByUsage(
+                    extraAttributres,
+                    EExtraAttributeUsage.Additional,
+                    false
+                );
+        }
+    
+        setSelectedAppEntityExtraDataOnEditMode() {
+            // if (!this.appItem.entityExtraData) return;
+            let selectedExtraDataAsObject: { [key: number]: any } = {}; // {[12]:[15,18,19]} = {[colorId]=[15,12,16]}
+            const getFilterDefinition = (itemExtraData: AppEntityExtraDataDto) => {
+                const item = [
+                    ...this.extraAttributes.ADDITIONAL.extraAttributes,
+                    ...this.extraAttributes.RECOMMENDED.extraAttributes,
+                ].filter((x) => x.attributeId == itemExtraData.attributeId);
+                return item.length ? item[0] : undefined;
+            };
+            this.appItem.entityExtraData.forEach((ItemExtraData) => {
+                const extraAttrDef = getFilterDefinition(ItemExtraData);
+                let key = ItemExtraData.attributeId;
+                const isLookup: boolean = !!ItemExtraData.attributeValueId;
+                let value = isLookup
+                    ? ItemExtraData.attributeValueId
+                    : ItemExtraData.attributeValue;
+                if (!selectedExtraDataAsObject[key])
+                    selectedExtraDataAsObject[key] = [];
+                isLookup && extraAttrDef?.acceptMultipleValues
+                    ? selectedExtraDataAsObject[key].push(value)
+                    : (selectedExtraDataAsObject[key] = value);
+            });
+    
+            this.extraAttributes.ADDITIONAL.extraAttributes.map((elem) => {
+                let _selectedValues = selectedExtraDataAsObject[elem.attributeId];
+                if (_selectedValues !== undefined)
+                    elem.selectedValues = _selectedValues;
+                return elem;
+            });
+    
+            this.extraAttributes.RECOMMENDED.extraAttributes.map((elem) => {
+                let _selectedValue = selectedExtraDataAsObject[elem.attributeId];
+                if (_selectedValue !== undefined)
+                    elem.selectedValues = _selectedValue;
+                return elem;
+            });
+        }
+        extraSelectedValuesExtraData() {
+          const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
+              ...this.extraAttributes.ADDITIONAL.extraAttributes,
+              ...this.extraAttributes.RECOMMENDED.extraAttributes,
+          ];
+          const previousExtraAttributes: AppEntityExtraDataDto[] =
+              this.appItem.entityExtraData || [];
+          this.appItem.entityExtraData = [];
+          recentlyExtraAttributes.forEach((extraAttr) => {
+              if (!extraAttr.selectedValues || extraAttr.isSelectedOnVariation)
+                  return;
+              if (extraAttr.isLookup) {
+                  // is lookup
+                  if (extraAttr.acceptMultipleValues) {
+                      // multi selection
+                      extraAttr?.selectedValues?.forEach((attributeValueId) => {
+                          const alreadySelected: AppEntityExtraDataDto =
+                              previousExtraAttributes.filter((item) => {
+                                  return item.attributeValueId == attributeValueId;
+                              })[0];
+                          if (alreadySelected)
+                              return this.appItem.entityExtraData.push(
+                                  alreadySelected
+                              );
+                          const entityExtraData: AppEntityExtraDataDto =
+                              new AppEntityExtraDataDto();
+                          entityExtraData.id = 0;
+                          entityExtraData.attributeValueId = attributeValueId;
+                          entityExtraData.attributeId = extraAttr.attributeId;
+                          this.appItem.entityExtraData.push(entityExtraData);
+                      });
+                  } else {
+                      // single selection
+                      const alreadySelected: AppEntityExtraDataDto =
+                          previousExtraAttributes.filter((item) => {
+                           return   item.attributeId == extraAttr.attributeId;
+                          })[0];
+                      if (alreadySelected) {
+                          alreadySelected.attributeValueId =
+                          parseInt(extraAttr?.selectedValues);
+                          this.appItem.entityExtraData.push(alreadySelected);
+                      } else {
+                          const entityExtraData: AppEntityExtraDataDto =
+                              new AppEntityExtraDataDto();
+                          entityExtraData.id = 0;
+                          entityExtraData.attributeValueId =
+                              parseInt(extraAttr?.selectedValues);
+                          entityExtraData.attributeId = extraAttr.attributeId;
+                          this.appItem.entityExtraData.push(entityExtraData);
+                      }
+                  }
+              } else {
+                  // any other not lookup data
+                  const alreadySelected: AppEntityExtraDataDto =
+                      previousExtraAttributes.filter((item) => {
+                         return item.attributeId == extraAttr?.attributeId;
+                      })[0];
+                  if (alreadySelected) {
+                      alreadySelected.attributeValue = extraAttr?.selectedValues;
+                      this.appItem.entityExtraData.push(alreadySelected);
+                  } else {
+                      const entityExtraData: AppEntityExtraDataDto =
+                          new AppEntityExtraDataDto();
+                      entityExtraData.id = 0;
+                      entityExtraData.attributeValue = extraAttr?.selectedValues;
+                      entityExtraData.attributeId = extraAttr.attributeId;
+                      this.appItem.entityExtraData.push(entityExtraData);
+                  }
+              }
+          });
+      }   
 }
