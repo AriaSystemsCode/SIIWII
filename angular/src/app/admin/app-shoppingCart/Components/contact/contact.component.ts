@@ -350,6 +350,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             // ✅ Ensure ContactPhoneTypeName is set correctly
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = 
                 $event?.value?.phoneTypeName || "Default Type";
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = 
+                $event?.value?.phoneNumber ;
         } else {
             console.log($event, '22222 <<<');
             console.log(this.allPhoneTypes, '22222 this.allPhoneTypes <<<');
@@ -416,7 +418,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         }
     
                         else
-                            this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact);
+                            this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact,false);
                     }
                 });
             }
@@ -435,7 +437,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
             }
-            // this.isValidForm();
+            this.isValidForm();
         }
    
         
@@ -508,7 +510,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                             contact.selectedBranch = this.allBranches[0];
                         }
         
-                        // ✅ Ensure `getBranchDetails` is only called when `selectedBranch` exists
+                        //  Ensure `getBranchDetails` is only called when `selectedBranch` exists
                         if (contact.selectedBranch) {
                             this.getBranchDetails(contact.selectedBranch.id)
                         } else {
@@ -579,7 +581,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
                 this.hideMainSpinner();
 
-                // this.isValidForm();
+                this.isValidForm();
     }
 
     isValidForm(): boolean {
@@ -669,7 +671,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     }
 
-    onChangeContact(event: any) {
+    onChangeContact(event: any,stop=true) {
        
         console.log(event, 'Incoming Event Data');
         console.log(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType, 'Previous Phone Type');
@@ -688,8 +690,10 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             // Assign new contact details
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
             this.allPhoneTypes = event?.phoneList ;
-    
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone || "";
+    if(stop){
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone || "";
+    }
+         
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = event?.phone || "";
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId = event?.phoneTypeId || "";
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = event?.phoneTypeName || "";
@@ -767,7 +771,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     // // this.sellerCompanies = [...res.items];
                 });
         }, 1000);
-        // this.isValidForm();
+        this.isValidForm();
     }
     handleBranchSearch(event){
     this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
@@ -779,7 +783,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     
     });
-    // this.isValidForm();
+    this.isValidForm();
 }
 
 
@@ -791,7 +795,7 @@ getBranchDetails(id) {
         console.log(this.branchData, 'Branch Data Received');
         this.extractPhoneTypes(this.branchData,'changed');
     });
-        //  this.isValidForm();
+         this.isValidForm();
 }
 
 extractPhoneTypes(response: any,changeBranch?:any) {
@@ -825,15 +829,15 @@ extractPhoneTypes(response: any,changeBranch?:any) {
 
         this.allPhoneTypes = [...arr];
 
-        // ✅ Assign correct phone type based on selected phone number
-        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber) {
-            const selectedPhone = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
-            const matchedPhoneType = this.allPhoneTypes.find(p => p.phoneNumber === selectedPhone);
+        // // ✅ Assign correct phone type based on selected phone number
+        // if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber) {
+        //     const selectedPhone = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
+        //     const matchedPhoneType = this.allPhoneTypes.find(p => p.phoneNumber === selectedPhone);
 
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = matchedPhoneType;
-        console.log(matchedPhoneType, 'matchedPhoneType');
+        //     // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = matchedPhoneType;
+        // console.log(matchedPhoneType, 'matchedPhoneType');
 
-        }
+        // }
         if(changeBranch =='changed'){
             this.onchangePhoneType(this.allPhoneTypes[0]);
 
