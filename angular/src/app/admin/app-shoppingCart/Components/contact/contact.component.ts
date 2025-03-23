@@ -842,7 +842,7 @@ extractPhoneTypes(response: any,changeBranch?:any) {
             this.onchangePhoneType(this.allPhoneTypes[0]);
 
         }
-        this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+        // this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
         this.cdr.detectChanges(); 
         console.log(this.allPhoneTypes, 'Extracted Phone Types');
         console.log(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber, 'ifff');
