@@ -296,7 +296,7 @@
                                                     <div
                                                         class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
                                                     >
-                                                        <img *ngIf="img?.colorImage"
+                                                        <img *ngIf="img?.colorImage && (!img?.colorHexaCode || img?.colorHexaCode === '')"
                                                             [src]="
                                                                 attachmentBaseUrl +
                                                                 '/' +
