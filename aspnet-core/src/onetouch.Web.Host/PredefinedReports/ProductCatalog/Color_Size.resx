@@ -119,34 +119,35 @@
   </resheader>
   <data name="$this.ScriptsSource" xml:space="preserve">
     <value>
-private void tableCell24_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-}
-
-private void tableCell52_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-
- 
-}
-
-private void Color_Size_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-Color_Size.Width = 1000;    
-}
-
 private void Detail_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
- 
+    // Find the table by name (Replace 'xrTable1' with your actual table name)
+       // XRTable table = this.FindControl("table2", true) as XRTable;
+       // if (table != null )
+       // {
+            //table.WidthF = 2350; // Set new table width dynamically
 
-        
-                
+            // Adjust column widths proportionally
+            //int columnCount = table.Rows[0].Cells.Count;
+            //float newCellWidth = table.WidthF / columnCount;
+
+            //foreach (XRTableRow row in table.Rows)
+            //{
+               // foreach (XRTableCell cell in row.Cells)
+                //{
+                  //  cell.WidthF = newCellWidth;
+               // }
+            //}
+        //}
+    
+
 }
 
-private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEventArgs e) {
- 
-
-    
+private void tableCell30_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
+    //tableCell30.WidthF = 250;
 }
 
-private void table2_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-    table2.WidthF=1200;
-    
+private void tableCell29_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
+   //  tableCell29.WidthF = 250;
 }
 </value>
   </data>

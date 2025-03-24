@@ -121,6 +121,7 @@
             this.Detail.KeepTogether = true;
             this.Detail.KeepTogetherWithDetailReports = true;
             this.Detail.Name = "Detail";
+            this.Detail.Scripts.OnBeforePrint = "Detail_BeforePrint";
             this.Detail.StylePriority.UseBackColor = false;
             this.Detail.StylePriority.UseTextAlignment = false;
             // 
@@ -198,8 +199,8 @@
             this.tableCell25.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.tableCell25.Dpi = 254F;
             this.tableCell25.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "iif(len(trim([AttributeValue]))>7 and [DataSource.CurrentRowIndex] > 0, Substring" +
-                    "([AttributeValue],0 ,6 )+\'...\',[AttributeValue])")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "iif(len(trim([AttributeValue]))>11 and [DataSource.CurrentRowIndex] > 0, Substrin" +
+                    "g([AttributeValue],0 ,10 )+\'...\',[AttributeValue])")});
             this.tableCell25.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell25.Name = "tableCell25";
             this.tableCell25.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
@@ -211,20 +212,22 @@
             // 
             // tableCell26
             // 
+            this.tableCell26.CanGrow = false;
             this.tableCell26.Dpi = 254F;
             this.tableCell26.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Trim([AttributeValue3])")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[AttributeValue3]")});
             this.tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell26.Name = "tableCell26";
             this.tableCell26.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell26.StyleName = "DetailData1";
             this.tableCell26.StylePriority.UseFont = false;
             this.tableCell26.StylePriority.UsePadding = false;
+            this.tableCell26.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell26.Weight = 0.060046189376443418D;
+            this.tableCell26.WordWrap = false;
             // 
             // xrTableCell1
             // 
-            this.xrTableCell1.CanGrow = false;
             this.xrTableCell1.Dpi = 254F;
             this.xrTableCell1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=0,Trim([Total]) ,Iif(Min(?showNo, [counter])=1, Trim(" +
@@ -242,7 +245,6 @@
             // 
             // tableCell27
             // 
-            this.tableCell27.CanGrow = false;
             this.tableCell27.Dpi = 254F;
             this.tableCell27.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>0"),
@@ -260,7 +262,6 @@
             // 
             // tableCell28
             // 
-            this.tableCell28.CanGrow = false;
             this.tableCell28.Dpi = 254F;
             this.tableCell28.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>1"),
@@ -278,7 +279,6 @@
             // 
             // tableCell29
             // 
-            this.tableCell29.CanGrow = false;
             this.tableCell29.Dpi = 254F;
             this.tableCell29.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>2"),
@@ -287,6 +287,7 @@
             this.tableCell29.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell29.Name = "tableCell29";
             this.tableCell29.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
+            this.tableCell29.Scripts.OnBeforePrint = "tableCell29_BeforePrint";
             this.tableCell29.StyleName = "DetailData1";
             this.tableCell29.StylePriority.UseFont = false;
             this.tableCell29.StylePriority.UsePadding = false;
@@ -296,7 +297,6 @@
             // 
             // tableCell30
             // 
-            this.tableCell30.CanGrow = false;
             this.tableCell30.Dpi = 254F;
             this.tableCell30.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>3"),
@@ -305,6 +305,7 @@
             this.tableCell30.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell30.Name = "tableCell30";
             this.tableCell30.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
+            this.tableCell30.Scripts.OnBeforePrint = "tableCell30_BeforePrint";
             this.tableCell30.StyleName = "DetailData1";
             this.tableCell30.StylePriority.UseFont = false;
             this.tableCell30.StylePriority.UsePadding = false;
@@ -314,7 +315,6 @@
             // 
             // tableCell31
             // 
-            this.tableCell31.CanGrow = false;
             this.tableCell31.Dpi = 254F;
             this.tableCell31.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>4"),
@@ -332,7 +332,6 @@
             // 
             // tableCell32
             // 
-            this.tableCell32.CanGrow = false;
             this.tableCell32.Dpi = 254F;
             this.tableCell32.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>5"),
@@ -350,7 +349,6 @@
             // 
             // tableCell33
             // 
-            this.tableCell33.CanGrow = false;
             this.tableCell33.Dpi = 254F;
             this.tableCell33.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>6"),
@@ -368,7 +366,6 @@
             // 
             // tableCell34
             // 
-            this.tableCell34.CanGrow = false;
             this.tableCell34.Dpi = 254F;
             this.tableCell34.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>7"),
@@ -502,10 +499,13 @@
             // 
             // Color_Size
             // 
+            this.BackColor = System.Drawing.Color.Turquoise;
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
             this.TopMargin,
             this.BottomMargin,
             this.Detail});
+            this.BorderDashStyle = DevExpress.XtraPrinting.BorderDashStyle.Dash;
+            this.BorderWidth = 5F;
             this.ComponentStorage.AddRange(new System.ComponentModel.IComponent[] {
             this.sqlDataSource1});
             this.DataMember = "Color_Sizes";
@@ -537,7 +537,6 @@
             this.onlyInStockColors});
             this.ReportPrintOptions.PrintOnEmptyDataSource = false;
             this.ReportUnit = DevExpress.XtraReports.UI.ReportUnit.TenthsOfAMillimeter;
-            this.Scripts.OnBeforePrint = "Color_Size_BeforePrint";
             this.ScriptsSource = resources.GetString("$this.ScriptsSource");
             this.SnapGridSize = 25F;
             this.StyleSheet.AddRange(new DevExpress.XtraReports.UI.XRControlStyle[] {
