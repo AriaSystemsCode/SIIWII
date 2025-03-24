@@ -66,119 +66,7 @@
                     
                     </div>
                 </div>
-                <div class="col-12 col-md-6 ">
-                    <div class="mb-3 ">
-                        <label class="form-label">Entered Date*</label>
-                        <div class="position-relative">
-                        
-                        <p-calendar
-                        #calendar1
-                        [appendTo]="'body'"
-                            formControlName="enteredDate"
-                            [showIcon]="true"
-                            [readonlyInput]="false"
-                            (focus)="onFocus()" (blur)="onBlur()"
-                            (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
-                            [ngClass]="isFocused ? 'focused-calendar' : ''"
-                            [showOtherMonths]="true"
-                            [selectOtherMonths]="true"
-                         
-                        ></p-calendar>
-                        <img  src="../../../../../assets/icons/calendar.png"  (click)="openCalendar(calendar1)"  alt="" srcset="">
-                           </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="mb-3 ">
-                        <label class="form-label">Start Date*</label>
-                        <div class="position-relative">
-                        <p-calendar
-                        #calendar2
-                        [appendTo]="'body'"
-                        #calendar
-                            formControlName="startDate"
-                            [showIcon]="true"
-                            (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
-                            [readonlyInput]="false"
-                          [minDate]="minSEnteredDate"
-                          [showOtherMonths]="true"
-                          [selectOtherMonths]="true"
-                        ></p-calendar>
-                        <img (click)="openCalendar(calendar2)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
-                       
-                        
-                    </div>
-                
-                        <small
-                        class="text-danger"
-                        *ngIf="
-                           
-                        submitted &&  startDateMsg
-                        "
-                    >
-                    start date Can’t be befor the Entered date 
-                    </small>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="mb-3 relative">
-                        <label class="form-label">Complete Date*</label>
-                        <div class="position-relative">
-
-                        <p-calendar
-                        #calendar3
-
-                        [appendTo]="'body'"
-                            formControlName="completeDate"
-                            [showIcon]="true"
-                            [minDate]="minStartDate"
-                            [readonlyInput]="false"
-                            (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
-                            [showOtherMonths]="true"
-                            [selectOtherMonths]="true"
-                        ></p-calendar>
-                        <img (click)="openCalendar(calendar3)" src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
-                        </div>
-                        <small
-                        class="text-danger"
-                        *ngIf="
-                           
-                        submitted &&  comtDateMsg
-                        "
-                    >
-                    Complete date Can’t be before the Start date 
-                    </small>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="mb-3 ">
-                        <label class="form-label">Available Date*</label>
-                        <div class="position-relative">
-
-                        <p-calendar
-                        #calendar4
-                        [appendTo]="'body'"
-                            formControlName="availableDate"
-                            [showIcon]="true"
-                            [readonlyInput]="false"
-                            (ngModelChange)="changeAvailbeDate(orderForm.get('availableDate'))"
-                            [showOtherMonths]="true"
-                            [selectOtherMonths]="true"
-                            [minDate]="minCompleteDate"
-                        ></p-calendar>
-                        <img (click)="openCalendar(calendar4)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
-                       </div>
-                    </div>
-                    <small
-                    class="text-danger"
-                    *ngIf="
-                       
-                    submitted &&  avalabletDateMsg
-                    "
-                >
-                Available date Can’t be before the complete date 
-                </small>
-                </div>
+              
                 
                 </div>
     </form>
@@ -590,7 +478,7 @@
                 <span>Seller Information</span>
             </div>
             <form class="form mt-3" [formGroup]="orderForm">
-                <div class="row">
+                <div class="row calendar-form">
                     <!-- <div class="col-md-12">
                         <div class="flex align-items-center gap-1 my-2">
                             <p-checkbox [disabled]="isSeller" value="Seller" (click)="$event.stopPropagation();" (onChange)="selectTempSeller()"></p-checkbox>
@@ -853,6 +741,121 @@
                                 Buyer and Seller are same person please choose another option
                             </p>
                         </div>
+                    </div>
+
+
+                    <div class="col-12 col-md-6 ">
+                        <div class="mb-3 ">
+                            <label class="form-label">Entered Date*</label>
+                            <div class="position-relative">
+                            
+                            <p-calendar
+                            #calendar1
+                            [appendTo]="'body'"
+                                formControlName="enteredDate"
+                                [showIcon]="true"
+                                [readonlyInput]="false"
+                                (focus)="onFocus()" (blur)="onBlur()"
+                                (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
+                                [ngClass]="isFocused ? 'focused-calendar' : ''"
+                                [showOtherMonths]="true"
+                                [selectOtherMonths]="true"
+                             
+                            ></p-calendar>
+                            <img  src="../../../../../assets/icons/calendar.png"  (click)="openCalendar(calendar1)"  alt="" srcset="">
+                               </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3 ">
+                            <label class="form-label">Start Date*</label>
+                            <div class="position-relative">
+                            <p-calendar
+                            #calendar2
+                            [appendTo]="'body'"
+                            #calendar
+                                formControlName="startDate"
+                                [showIcon]="true"
+                                (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
+                                [readonlyInput]="false"
+                              [minDate]="minSEnteredDate"
+                              [showOtherMonths]="true"
+                              [selectOtherMonths]="true"
+                            ></p-calendar>
+                            <img (click)="openCalendar(calendar2)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                           
+                            
+                        </div>
+                    
+                            <small
+                            class="text-danger"
+                            *ngIf="
+                               
+                            submitted &&  startDateMsg
+                            "
+                        >
+                        start date Can’t be befor the Entered date 
+                        </small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3 relative">
+                            <label class="form-label">Complete Date*</label>
+                            <div class="position-relative">
+    
+                            <p-calendar
+                            #calendar3
+    
+                            [appendTo]="'body'"
+                                formControlName="completeDate"
+                                [showIcon]="true"
+                                [minDate]="minStartDate"
+                                [readonlyInput]="false"
+                                (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
+                                [showOtherMonths]="true"
+                                [selectOtherMonths]="true"
+                            ></p-calendar>
+                            <img (click)="openCalendar(calendar3)" src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
+                            </div>
+                            <small
+                            class="text-danger"
+                            *ngIf="
+                               
+                            submitted &&  comtDateMsg
+                            "
+                        >
+                        Complete date Can’t be before the Start date 
+                        </small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3 ">
+                            <label class="form-label">Available Date*</label>
+                            <div class="position-relative">
+    
+                            <p-calendar
+                            #calendar4
+                            [appendTo]="'body'"
+                                formControlName="availableDate"
+                                [showIcon]="true"
+                                [readonlyInput]="false"
+                                (ngModelChange)="changeAvailbeDate(orderForm.get('availableDate'))"
+                                [showOtherMonths]="true"
+                                [selectOtherMonths]="true"
+                                [minDate]="minCompleteDate"
+                            ></p-calendar>
+                            <img (click)="openCalendar(calendar4)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                           </div>
+                        </div>
+                        <small
+                        class="text-danger"
+                        *ngIf="
+                           
+                        submitted &&  avalabletDateMsg
+                        "
+                    >
+                    Available date Can’t be before the complete date 
+                    </small>
                     </div>
                 </div>
             </form>
