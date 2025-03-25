@@ -101,12 +101,12 @@
     </Item5>
     <Item6 Ref="67" ControlType="DetailBand" Name="Detail" HeightF="1694.6488" Dpi="254">
       <HierarchyPrintOptions Ref="68" Indent="50.8" />
-      <MultiColumn Ref="69" ColumnCount="2" Layout="AcrossThenDown" Mode="UseColumnCount" />
+      <MultiColumn Ref="69" ColumnCount="2" ColumnWidth="1300" Layout="AcrossThenDown" Mode="UseColumnWidth" />
       <Controls>
         <Item1 Ref="70" ControlType="XRSubreport" Name="subreport1" SizeF="1235.3634,320.544922" LocationFloat="36.2919235,1349.10376" Dpi="254">
           <Scripts Ref="71" OnBeforePrint="subreport1_BeforePrint" />
         </Item1>
-        <Item2 Ref="72" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="1302.02124,1349.10376" LocationFloat="52.4143143,0" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
+        <Item2 Ref="72" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="1274.99988,1349.10376" LocationFloat="0.000121116638,0" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
           <Controls>
             <Item1 Ref="73" ControlType="XRLabel" Name="xrLabel3" Multiline="true" ProcessDuplicatesMode="Suppress" Angle="90" Text="xrLabel3" TextAlignment="MiddleCenter" SizeF="74.08334,918.86615" LocationFloat="51.2269363,26.2768211" Dpi="254" Padding="5,5,0,0,254">
               <ExpressionBindings>
