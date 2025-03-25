@@ -1023,6 +1023,9 @@ namespace onetouch
             //    .ForMember(d => d.Dimension2Position, s => s.MapFrom(ss => ss.D2Pos))
             //    .ForMember(d => d.Dimension3Position, s => s.MapFrom(ss => ss.D3Pos))
             //    ;
+            configuration.CreateMap<CreateOrEditAccountInfoDto, AppContactValidationInputDTO>();
+            configuration.CreateMap<AppContactValidationInputDTO, CreateOrEditAccountInfoDto>();
+
             configuration.CreateMap<CreateOrEditAppItemDto, AppItemValidationInputDTO>();
             configuration.CreateMap<AppItemValidationInputDTO, CreateOrEditAppItemDto>();
             configuration.CreateMap<AppItemtExcelRecordDTO ,ImportItemInputDto> ()

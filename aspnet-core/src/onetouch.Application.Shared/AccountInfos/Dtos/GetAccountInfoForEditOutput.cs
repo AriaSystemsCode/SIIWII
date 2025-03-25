@@ -31,5 +31,13 @@ namespace onetouch.AccountInfos.Dtos
         public string PaymentTermsCode { set; get; }
         public string PaymentTermsName { set; get; }
     }
+    //Iteration#46[Start]
+    public class AppContactValidationInputDTO : CreateOrEditAccountInfoDto
+    {
+
+        public List<string> ErrorMessages { get; set; }
+
+    }
+    //Iteration#46[End]
     //I46[End]
 }
