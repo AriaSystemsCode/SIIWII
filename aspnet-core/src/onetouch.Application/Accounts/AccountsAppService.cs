@@ -4976,7 +4976,7 @@ namespace onetouch.Accounts
                     accountExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath = accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44302/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
+                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44301/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath = accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"Templates:AccountExcelLogFileName"];
 
