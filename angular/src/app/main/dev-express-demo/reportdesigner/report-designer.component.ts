@@ -23,7 +23,7 @@ export class ReportDesignerComponent extends AppComponentBase {
   appSession: AppSessionService=undefined;
   getDesignerModelAction = "api/ReportDesigner/GetReportDesignerModel";
   reportUrl = undefined;
-  hostUrl="https://localhost:44301/";
+  hostUrl="https://localhost:44302/";
   constructor(injector: Injector) { 
 
     super(injector);

@@ -408,12 +408,11 @@
                         >
                             <div
                                 class="price pt-2"
-                                *ngIf="
-                                    appItemForViewDto?.minPrice !=
+                                *ngIf="appItemForViewDto?.minPrice !=
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{ "MSRP" | localize }}:
+                                {{  languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  | localize }}:
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{ appItemForViewDto?.minPrice }} -
                                 {{ tenantDefaultCurrency.symbol
@@ -426,7 +425,7 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{ "MSRP" | localize }}:
+                                {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  | localize }}:
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{appItemForViewDto?.minPrice | currency:' '}}
                              

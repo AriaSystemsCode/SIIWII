@@ -339,14 +339,5 @@ debugger
       this.appTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
       this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
     }
-    this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId ? this.isContactsValid = true : this.isContactsValid = false;    
-    if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
-      this.isContactsValid = true;
-      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
-
-    } else {
-      this.isContactsValid = false;
-    }
-    
   }
 }
