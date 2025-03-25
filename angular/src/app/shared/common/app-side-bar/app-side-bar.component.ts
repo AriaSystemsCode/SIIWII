@@ -10,6 +10,7 @@ export class AppSideBarComponent extends AppComponentBase implements OnChanges {
 
   @Input() entityTypeName = "";
   @Input() id: string;
+  @Input() fromMsgs: boolean=false;
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef }) dynamicComponentContainer: ViewContainerRef;
   componentFound: boolean = false;
   @Output("hideSideBar") hideSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
