@@ -127,6 +127,8 @@ appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
 extraAttributes: {
   [key in EExtraAttributeUsage]: CreateEditAppItemExtraAttribute;
 };
+openAdditional= false
+hasLoadedAdditional: boolean = false;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -144,7 +146,10 @@ extraAttributes: {
   }
   ngOnInit(): void {
     this.defineExtraAttributes();
-    this.getAppItemTypeExtraAttributesById(114); // or your dynamic ID
+    if(this.appTransactionsForViewDto){
+      this.getAppItemTypeExtraAttributesById(); // or your dynamic ID
+
+    }
     this.initFilterForm()
   
  let value = localStorage.getItem("comNew"); 
@@ -182,7 +187,28 @@ const button = document.getElementById("stickyButton");
    
 
   }
-
+  onAccordionChange(index: number | number[]) {
+    console.log('Accordion tab opened:', index);
+  
+    // Example: If first tab is opened
+    if (Array.isArray(index)) {
+      index.forEach(i => this.loadTabData(i));
+    } else {
+      this.loadTabData(index);
+    }
+  }
+  
+  loadTabData(tabIndex: number) {
+    const key = Object.keys(this.extraAttributes)[tabIndex];
+    const tab = this.extraAttributes[key];
+    console.log('Opened tab:', key, tab);
+  
+    // Call your logic, e.g.
+    if (key === 'ADDITIONAL') {
+      this.getAppItemTypeExtraAttributesById();
+    }
+  }
+  
  
 initFilterForm() {  
 
@@ -1555,8 +1581,8 @@ stopReport(event) {
                 }),
         };
     }
-    getAppItemTypeExtraAttributesById(id: number) {
-      this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id)
+    getAppItemTypeExtraAttributesById() {
+      this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(114)
         .subscribe((res) => {
           if (res?.length > 0) {
             this.selectedItemTypeData = res[0];
@@ -1565,12 +1591,12 @@ stopReport(event) {
             this.setAdditionalAndRecommendedExtraAttributes();
     
             // Load lookup lists
-            // this.loadRecommendedAndAdditionalExtraDataLookupLists();
+            this.loadRecommendedAndAdditionalExtraDataLookupLists();
     
             // // Set selected values if editing
-            // if (this.appItem?.entityExtraData?.length) {
-            //   this.setSelectedAppEntityExtraDataOnEditMode();
-            // }
+            if (this.appItem?.entityExtraData?.length) {
+              this.setSelectedAppEntityExtraDataOnEditMode();
+            }
           }
         });
     }
@@ -1764,4 +1790,80 @@ stopReport(event) {
               }
           });
       }   
+
+
+      onExtraAttributesChanged(dataFromChild: any[]) {
+        if (!this.appTransactionsForViewDto) {
+          this.appTransactionsForViewDto = new GetAppTransactionsForViewDto();
+        }
+      
+        if (!this.appTransactionsForViewDto.entityExtraData) {
+          this.appTransactionsForViewDto.entityExtraData = [];
+        }
+      
+        const existingData = this.appTransactionsForViewDto.entityExtraData;
+      
+        const incomingData: AppEntityExtraDataDto[] = dataFromChild.map(attr => {
+          if (attr.isLookup && attr.acceptMultipleValues) {
+            return attr.value.map(v => {
+              const d = new AppEntityExtraDataDto();
+              d.attributeId = attr.attributeId;
+              d.attributeValueId = v;
+              return d;
+            });
+          } else {
+            const dto = new AppEntityExtraDataDto();
+            dto.attributeId = attr.attributeId;
+            if (attr.isLookup) {
+              dto.attributeValueId = attr.value;
+            } else {
+              dto.attributeValue = attr.value;
+            }
+            return dto;
+          }
+        }).flat();
+      
+        // Merge logic: Replace existing attributeId matches, keep others
+        for (const incoming of incomingData) {
+          const index = existingData.findIndex(
+            x => x.attributeId === incoming.attributeId && (!incoming.attributeValueId || x.attributeValueId === incoming.attributeValueId)
+          );
+      
+          if (index > -1) {
+            existingData[index] = incoming;
+          } else {
+            existingData.push(incoming);
+          }
+        }
+      
+        console.log(existingData, '✅ Merged Extra Attributes');
+      
+        this.appTransactionsForViewDto.entityExtraData = existingData;
+      }
+      
+      
+      saveExtra(){
+        this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+        .pipe(finalize(() => {
+
+     
+      //  this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+      //  this.getShoppingCartData()
+
+
+      }
+        ))
+        .subscribe((res) => {
+
+          if (res) {
+          // this.getShoppingCartData()
+
+          // this.hideMainSpinner();
+
+
+      
+          }
+        });
+      }
+      
 }

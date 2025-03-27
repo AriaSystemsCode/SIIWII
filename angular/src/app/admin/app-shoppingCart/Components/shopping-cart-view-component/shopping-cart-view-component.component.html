@@ -631,35 +631,31 @@
                         </p-accordionTab>
 
 
-                        <div class="d-flex flex-column">
-                            <div 
-                                [ngStyle]="{'order':extraAttributeObject.value.orderOfDisplay}"
-                                *ngFor="let extraAttributeObject of extraAttributes | keyvalue">
-                                <div>
-                                    <div >
-                                        <p-accordion>
-                                            <p-accordionTab>
-                                                <ng-template pTemplate="header">
-                                                    <div class="d-inline-block custom-header p-3 ml-3">
-                                                        <h6 class="mb-1 font-weight-bold">{{extraAttributeObject.value.header | localize}}</h6>
-                                                        <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
-                                                    </div>
-                                                </ng-template>
-            
-                                                 <!-- /////////// POC [Start] ///////// -->
-                                                  <app-dynamicInputs [extraAttributeObject]="extraAttributeObject" [entityObjectTypeId]="114" [entityType]="'Item'"> </app-dynamicInputs>
-                                                <!-- /////////// POC [End] ///////// -->
-            
-            
-                                               
-            
-            
-                                            </p-accordionTab>
-                                        </p-accordion>
-                                    </div>
+                        <p-accordion (activeIndexChange)="onAccordionChange($event)">
+                            <p-accordionTab *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index">
+                              <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header ">
+                                  <h6 class="mb-1 ">{{extraAttributeObject.value.header | localize}}</h6>
+                                  <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
                                 </div>
-                            </div>
-                        </div>
+                              </ng-template>
+                          
+                              <app-dynamicInputs
+                                [extraAttributeObject]="extraAttributeObject"
+                                [entityObjectTypeId]="114"
+                                [entityType]="'Transaction'"
+                                (extraDataChanged)="onExtraAttributesChanged($event)">
+                                >
+                              </app-dynamicInputs>
+                              <button type="button"
+                              class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
+                              style="height: 37px;"  (click)="saveExtra()">
+                              Save
+                          </button>
+                            </p-accordionTab>
+
+                          </p-accordion>
+                          
                         <!-- order Preview tab -->
                         <p-accordionTab class="shoppingCartAccordionTabBG"  (click)="currentTab=7"
                             *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint()">
@@ -677,6 +673,8 @@
                                     [orderId]="orderId" (stopReport)="stopReport($event)"></app-order-preview>
                             </ng-template>
                         </p-accordionTab>
+
+                    
                         <!-- order Preview tab -->
                     </p-accordion>
 
