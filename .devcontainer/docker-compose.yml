@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    image: mcr.microsoft.com/dotnet/core/sdk:3.1
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    network_mode: service:db
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: Siiwii@2024
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"

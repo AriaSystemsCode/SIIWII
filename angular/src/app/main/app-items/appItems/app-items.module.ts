@@ -36,6 +36,8 @@ import { TableModule } from 'primeng/table';
 import { TreeModule } from 'primeng/tree';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
+import { SharedDynamicInputsModule } from '@shared/shared-module';
 
 
 @NgModule({
@@ -45,6 +47,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
     VariationsMetaInfoComponent,
     MyItemViewComponent,
     MyAppItemsComponent,
+    
   ],
   imports: [
     CommonModule,
@@ -76,7 +79,9 @@ import { InputNumberModule } from 'primeng/inputnumber';
     SharedFormsComponentsModule,
     InputNumberModule,
     BulkImportModule,
-    AppitemsCatalogueReportModule
+    AppitemsCatalogueReportModule,
+    SharedDynamicInputsModule 
+    
   ],
   providers:[
     ExtraAttributeDataService,
@@ -84,6 +89,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
     PublishAppItemListingService,
     AppitemListPublishService
   ],
+
 })
 export class AppItemsModule { }
 

@@ -571,6 +571,8 @@
                 </div>
             </div>
 
+           
+            
             <div class="d-flex flex-column">
                 <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
                     [ngStyle]="{'order':extraAttributeObject.value.orderOfDisplay}"
@@ -585,159 +587,24 @@
                                             <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
                                         </div>
                                     </ng-template>
-                                    <div class="row pl-3 mt-4">
-                                        <div class="col-lg-8 col-md-10 col">
-                                            <div class="row  pt-4">
-                                                <div class="col-md-6 col-12 mb-4"
-                                                    [ngClass]="{ 'd-none' : extraAttr.isSelectedOnVariation && extraAttr.isVariation}"
-                                                    *ngFor="let extraAttr of extraAttributeObject.value.extraAttributes">
-                                                    <div *ngIf="!extraAttr.isSelectedOnVariation && !extraAttr.isVariation">
-                                                        <div>
-                                                            <label>{{extraAttr.name | localize}}</label>
-                                                        </div>
-                                                        <div class="d-flex align-items-center">
 
-                                                            <div class="wide-drop-down d-flex flex-grow-1 "
-                                                                *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup">
-                                                                <div class="flex-grow-1 mr-1">
-                                                                    <p-multiSelect
-                                                                        [options]="extraAttr.paginationSetting.list"
-                                                                        [styleClass]="'w-100'"
-                                                                        [(ngModel)]="extraAttr.selectedValues"
-                                                                        name="extraAttr_{{extraAttr.name}}"
-                                                                        [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                                        (onChange)="multiValuesExtraAttributeOnChange($event,extraAttr)">
-                                                                    </p-multiSelect>
-                                                                    <!-- <app-dropdown-with-pagination
-                                                                        [paginationSettings]="extraAttr.paginationSetting"
-                                                                        [title]='extraAttr.name'
-                                                                        [selectionType]='DropdownSelection.Multi'
-                                                                        [initialValues]="extraAttr.selectedValues"
-                                                                        (selectionChanged)='multiValuesExtraAttributeOnChange($event,extraAttr)'
-                                                                        (loadMoreData)="loadMoreLookupData(extraAttr)"
-                                                                    >
-                                                                    </app-dropdown-with-pagination> -->
-                                                                </div>
-                                                            </div>
+                                     <!-- /////////// POC [Start] ///////// -->
+                                      <app-dynamicInputs [extraAttributeObject]="extraAttributeObject" [entityObjectTypeId]="appItem?.entityObjectTypeId" [entityType]="'Item'"> </app-dynamicInputs>
+                                    <!-- /////////// POC [End] ///////// -->
 
-                                                            <div class="wide-drop-down flex-grow-1 "
-                                                                *ngIf="extraAttr?.paginationSetting && !extraAttr?.acceptMultipleValues && extraAttr.isLookup">
-                                                                <!-- <app-dropdown-with-pagination
-                                                                    [paginationSettings]="extraAttr.paginationSetting"
-                                                                    [title]='extraAttr.name'
-                                                                    [selectionType]='DropdownSelection.Single'
-                                                                    (selectionChanged)='singleValueExtraAttributeOnChange($event,extraAttr)'
-                                                                    (loadMoreData)="loadMoreLookupData(extraAttr)"
-                                                                >
-                                                                </app-dropdown-with-pagination> -->
-                                                                <p-dropdown [options]="extraAttr.paginationSetting.list"
-                                                                    [styleClass]="'w-100'"
-                                                                    [(ngModel)]="extraAttr.selectedValues"
-                                                                    name="extraAttr_{{extraAttr.name}}"
-                                                                    [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                                    (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)">
-                                                                </p-dropdown>
-                                                            </div>
-                                                            <div class="flex-grow-1"
-                                                                *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
-                                                                <input type="text"
-                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                                    name="{{extraAttr.name}}"
-                                                                    placeholder="{{extraAttr.name}}"
-                                                                    class="form-control"
-                                                                    id="extraAttr{{extraAttr.name}}"
-                                                                    [(ngModel)]="extraAttr.selectedValues"
-                                                                    style="background-color: #EEEEEE !important;
-                                                                    border: none !important">
-                                                            </div>
-                                                            <div class="flex-grow-1"
-                                                                *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
-                                                                <div class="radio-inline mt-2">
-                                                                    <label class="radio radio-accent radio-primary mr-4"
-                                                                        for="extraAttr{{extraAttr.name}}_1">
-                                                                        <input type="radio"
-                                                                            (click)="notLookupExtraAttributeOnChange('true',extraAttr)"
-                                                                            name="extraAttr_{{extraAttr.name}}"
-                                                                            id="extraAttr{{extraAttr.name}}_1"
-                                                                            [value]="'true'"
-                                                                            [(ngModel)]="extraAttr.selectedValues" 
-                                                                            style="background-color: #EEEEEE !important;
-                                                                            border: none !important"/>
-                                                                        {{ "Yes" | localize }}
-                                                                    </label>
-                                                                    <label class="radio radio-accent radio-primary"
-                                                                        for="extraAttr{{extraAttr.name}}_0">
-                                                                        <input type="radio"
-                                                                            (click)="notLookupExtraAttributeOnChange('false',extraAttr)"
-                                                                            name="extraAttr_{{extraAttr.name}}"
-                                                                            id="extraAttr{{extraAttr.name}}_0"
-                                                                            [value]="'false'"
-                                                                            [(ngModel)]="extraAttr.selectedValues"
-                                                                            style="background-color: #EEEEEE !important;
-                                                                            border: none !important">
-                                                                        {{ "No" | localize }}
-                                                                    </label>
-                                                                    <a *ngIf="extraAttr.selectedValues"
-                                                                        class="ml-5 pointer text-black-50 font-weight-bold"
-                                                                        (click)="resetExtraAttributeSelectedValue(extraAttr)">
-                                                                        Reset</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex-grow-1"
-                                                                *ngIf="extraAttr.dataType === 'Datetime' ">
-                                                                <input type="text"
-                                                                    (ngModelChange)="notLookupExtraAttributeOnChange($event,extraAttr)"
-                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                                    name="{{extraAttr.name}}" autocomplete="off"
-                                                                    placeholder="{{extraAttr.name}}"
-                                                                    class="form-control"
-                                                                    [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }"
-                                                                    bsDatepicker id="extraAttr{{extraAttr.name}}"
-                                                                    [(ngModel)]="extraAttr.selectedValues"
-                                                                    style="background-color: #EEEEEE !important;
-                                                                    border: none !important">
-                                                            </div>
-                                                            <div class="flex-grow-1"
-                                                                *ngIf="extraAttr.dataType === 'Numeric' ">
-                                                                <input type="number"
-                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                                    name="{{extraAttr.name}}"
-                                                                    placeholder="{{extraAttr.name}}"
-                                                                    class="form-control"
-                                                                    id="extraAttr{{extraAttr.name}}"
-                                                                    [(ngModel)]="extraAttr.selectedValues"
-                                                                    style="background-color: #EEEEEE !important;
-                                                                    border: none !important">
-                                                            </div>
 
-                                                            <!-- <p class="ml-2" *ngIf="extraAttr.isLookup && !extraAttr?.lookupData?.length">{{ "NoData" | localize }} ...</p> -->
-                                                            <a class="border rounded text-primary add-new-lookup-btn ml-3"
-                                                                *ngIf="extraAttr.isLookup && extraAttr.allowAddNew"
-                                                                (click)="openCreateNewAppEntityModal(extraAttr)">
-                                                                <i class="fas fa-pen"></i>
-                                                            </a>
-                                                        </div>
+                                   
 
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <small class="ml-2"
-                                                        *ngIf="!extraAttributeObject.value?.extraAttributes?.length && !appItem.entityObjectTypeId">{{
-                                                        "PleaseSelectAProductTypeFirst" | localize }}</small>
-                                                    <small class="ml-2"
-                                                        *ngIf="!extraAttributeObject.value?.extraAttributes?.length && appItem.entityObjectTypeId">{{
-                                                        "No" | localize }} {{extraAttributeObject.value.header}} {{
-                                                        "Attributes" | localize }}</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                 </p-accordionTab>
                             </p-accordion>
                         </div>
                     </div>
                 </div>
             </div>
+
+
+         
 
         </div>
     </form>
