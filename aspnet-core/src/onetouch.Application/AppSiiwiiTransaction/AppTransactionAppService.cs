@@ -4191,7 +4191,9 @@ namespace onetouch.AppSiiwiiTransaction
 
             if (input != null && position != null)
             {
-                var transOrg = await _appTransactionsHeaderRepository.GetAll().Include(a => a.AppTransactionContacts).Include(z => z.EntityCategories).ThenInclude(z => z.EntityObjectCategoryFk)
+                var transOrg = await _appTransactionsHeaderRepository.GetAll().Include(a => a.AppTransactionContacts)
+                    .Include(z=>z.EntityExtraData)
+                    .Include(z => z.EntityCategories).ThenInclude(z => z.EntityObjectCategoryFk)
                     .Include(a => a.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
                     .Include(a => a.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                 .Where(a => a.Id == transactionId).FirstOrDefaultAsync();
@@ -4199,6 +4201,7 @@ namespace onetouch.AppSiiwiiTransaction
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(a => a.AppTransactionContacts)
                     .ThenInclude(s => s.ContactAddressFk).Include(z => z.EntityCategories)
                     .Include(a => a.EntityClassifications)
+                    .Include(z=>z.EntityExtraData)
                             // .Include(a => a.AppTransactionDetails)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Name.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
