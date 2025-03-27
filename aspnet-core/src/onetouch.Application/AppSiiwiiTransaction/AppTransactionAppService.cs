@@ -4687,11 +4687,16 @@ namespace onetouch.AppSiiwiiTransaction
                 //                   on o.ContactSSIN equals a.SSIN into j
                 //                   from s in j.DefaultIfEmpty()
                 //                   select new { TenantId = s.TenantId, Role = o.ContactRole };
+                //T-SII-20250313.0001-Transaction-Creating orders without selecting contact name after sharing - the order type will be the same for the creator and recipient[Start]
+                //var transTenants = transContacts.Join(
+                //    _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantId != null && z.PartnerId == null && z.IsProfileData),
+                //                                      x => x.ContactSSIN, z => z.SSIN,
+                //                                      (s, sa) => new { TenantId = sa.TenantId, Role = s.ContactRole });
                 var transTenants = transContacts.Join(
-                    _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantId != null && z.PartnerId == null && z.IsProfileData),
-                                                      x => x.ContactSSIN, z => z.SSIN,
+                    _appContactRepository.GetAll().Where(z =>  z.TenantId != null && z.PartnerId == null && z.IsProfileData),
+                                                      x => (x.ContactSSIN == null ? x.CompanySSIN : x.ContactSSIN), z => z.SSIN,
                                                       (s, sa) => new { TenantId = sa.TenantId, Role = s.ContactRole });
-
+                //T-SII-20250313.0001-Transaction-Creating orders without selecting contact name after sharing - the order type will be the same for the creator and recipient[End]
                 var transTenantsList = transTenants.ToList();
 
 
