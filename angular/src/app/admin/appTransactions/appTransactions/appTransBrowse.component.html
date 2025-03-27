@@ -545,7 +545,7 @@
                                     <td>{{ product?.transactionType == 0 ?   'Sales Order'  : 'Purchase Order' }}</td>
                                     <td>{{ product.transactionNumber }}</td>
                                     <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
-                                    <td>{{ product?.manufacturerCode }}</td>
+                                    <td> <span style="white-space: pre-wrap">{{ product.manufacturerCode }}</span></td>
                                     <td>{{ product.name }}</td>
                                     <td style="text-align: right !important;">{{ product.qty  }}</td>
                                     <td style="text-align: right !important;">{{ product.price | number: '1.2-2'  }}</td>
