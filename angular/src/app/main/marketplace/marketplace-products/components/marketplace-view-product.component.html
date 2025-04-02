@@ -513,21 +513,16 @@ top: 4px;">
                                     ">
 
                                     <div
-                                    *ngIf="
-                                        color.colorCode &&
-                                        !color.colorImg
-                                    "
+                                    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                              
                                     class="colorBox"
                                     [ngStyle]="{'background-color':color.colorCode}"
                                     (click)="setSizes(i)"
                                
                                 ></div>
                                 <img
-                                    *ngIf="
-                                        (!color.colorImg&&
-                                            !color.colorCode) ||
-                                        color.colorImg
-                                    "
+                                *ngIf="color?.colorImg && !color?.colorCode"
+                             
                                     (click)="setSizes(i)"
                                     [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
@@ -584,10 +579,8 @@ top: 4px;">
                                             : ''
                                     ">
                                     <div
-                                    *ngIf="
-                                        color.colorCode&&
-                                        !color.colorImg
-                                    "
+                                    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                              
                                     class="colorBox"
                                     [ngStyle]="{'background-color': color.colorCode}"
                                     (click)="setSizes(i)"
@@ -598,11 +591,8 @@ top: 4px;">
                                     "
                                 ></div>
                                 <img
-                                    *ngIf="
-                                        (color.colorImg === null &&
-                                            color.colorCode === null) ||
-                                        color.colorImg !== null
-                                    "
+                                *ngIf="color?.colorImg && !color?.colorCode"
+                               
                                     (click)="setSizes(i)"
                                     [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
@@ -1439,10 +1429,8 @@ top: 4px;">
                                             : ''
                                     ">
                                     <div
-                                    *ngIf="
-                                        color.colorCode !== null &&
-                                        color.colorImg === null
-                                    "
+                                    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                                
                                     class="colorBox"
                                     [ngStyle]="{'background-color':color.colorCode}"
                                     (click)="setSizes(i)"
@@ -1453,11 +1441,8 @@ top: 4px;">
                                     "
                                 ></div>
                                 <img
-                                    *ngIf="
-                                        (color.colorImg === null &&
-                                            color.colorCode === null) ||
-                                        color.colorImg !== null
-                                    "
+                                *ngIf="color?.colorImg && !color?.colorCode"
+                            
                                     (click)="setSizes(i)"
                                     [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
@@ -1514,10 +1499,7 @@ top: 4px;">
                                                         : ''
                                                 ">
                                                 <div
-                                                *ngIf="
-                                                    color.colorCode !== null &&
-                                                    color.colorImg === null
-                                                "
+                                                *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
                                                 class="colorBox"
                                                 [ngStyle]="{'background-color': color.colorCode}"
                                                 (click)="setSizes(i)"
@@ -1528,11 +1510,7 @@ top: 4px;">
                                                 "
                                             ></div>
                                             <img
-                                                *ngIf="
-                                                    (color.colorImg === null &&
-                                                        color.colorCode === null) ||
-                                                    color.colorImg !== null
-                                                "
+                                            *ngIf="color?.colorImg && !color?.colorCode"
                                                 (click)="setSizes(i)"
                                                 [src]="
                                                     attachmentBaseUrl + '/' + color.colorImg
