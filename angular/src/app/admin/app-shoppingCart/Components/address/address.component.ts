@@ -206,17 +206,19 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                             savedAddress.id === shippingAddress.addressId
                                         );
                                         
-                                      
+                                      console.log(matchedAddress,'matchedAddress')
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
-                                            this.addAddressDataToDto(2)
-                                            if(!this.selectedAddressDetails){
-                                                this.selectedAddress = matchedAddress;
-                                                this.selectAddress(this.selectedAddress.id)
-
-                                            }
+                                            this.addAddressDataToDto(2);
+                                        
+                                            // ✅ Set selectedAddress and selectedAddressDetails properly
+                                            this.selectedAddress = matchedAddress;
+                                            this.selectedAddressDetails = { ...matchedAddress }; // <-- FIXED!
+                                        
+                                            this.selectAddress(this.selectedAddress.id);
                                         }
+                                        
                                     }
             
                                 }   else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo) {
@@ -235,12 +237,15 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
-                                            this.addAddressDataToDto(1)
-                                            if(!this.selectedAddressDetails){
+                                            this.addAddressDataToDto(1);
+                                        
+                                            // ✅ Update both references
                                             this.selectedAddress = matchedAddress;
-                                            this.selectAddress(this.selectedAddress.id)
-                                            }
+                                            this.selectedAddressDetails = { ...matchedAddress };
+                                        
+                                            this.selectAddress(this.selectedAddress.id);
                                         }
+                                        
                                     }
                                 }
             
