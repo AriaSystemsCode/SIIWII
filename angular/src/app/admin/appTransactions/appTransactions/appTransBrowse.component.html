@@ -232,9 +232,19 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="variationCodeFilter">{{l("Variation Code")}}</label>
-                                            <input type="text" class="form-control" id="variationCodeFilter"
-                                                formControlName="variationCodeFilter" [(ngModel)]="variationCodeFilter"
-                                                (keyup)="getVariationDetail()">
+                                            <div class="input-group">
+                                                <span class="input-group-btn">
+                                                    <button  (click)="getVariationDetail()" class="searchBtn" type="submit">
+                                                        <img 
+                                                            src="../../../assets/landingPage/Search.png" />
+                                                        </button>
+                                                </span>
+                                            
+                                                   <input type="text" style="padding-left: 35px;" class="form-control" id="variationCodeFilter"
+                                                   formControlName="variationCodeFilter" [(ngModel)]="variationCodeFilter"
+                                                   (keydown.enter)="getVariationDetail()">
+                                            </div>
+                                       
                                         </div>
                                     </div>
 
