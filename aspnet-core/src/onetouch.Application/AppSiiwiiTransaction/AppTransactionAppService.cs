@@ -7024,7 +7024,7 @@ namespace onetouch.AppSiiwiiTransaction
                     // *Abdo End
                     //get all extra data type, AttributeId
                     var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
-                    var usedExtraDataPagedPerAttribute = _appEntitiesAppService.GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = "", AttributeIds = attributesIds, EntityId = transactionId }).Result.Items.ToList();
+                    var usedExtraDataPagedPerAttribute = _appEntitiesAppService.GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = transactionId }).Result.Items.ToList();
 
                     List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
 
