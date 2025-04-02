@@ -241,6 +241,14 @@ SuccessMsg: boolean = false;
       this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
     }
 
+    if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {  
+      this.shippingTabValid = true;
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+
+    } else {
+      this.shippingTabValid = false;
+    }
+
   }
   enterStore() {
     this.appTransactionsForViewDto.buyerStore = this.storeVal;
