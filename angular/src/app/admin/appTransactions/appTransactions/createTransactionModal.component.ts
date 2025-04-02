@@ -1247,11 +1247,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.buyerContacts = [];
         this.orderForm.reset();
         this.role = "";
+        // to merge
         this.modalClose.emit(false);
         this.display = false;
         this.Role.value = {};
         this.submitted = false;
         this.roles = [];
+        // to merge
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
