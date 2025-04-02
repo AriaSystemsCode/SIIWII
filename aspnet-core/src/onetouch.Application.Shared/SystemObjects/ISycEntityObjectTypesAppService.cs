@@ -36,6 +36,8 @@ namespace onetouch.SystemObjects
 
         Task<PagedResultDto<SycEntityObjectTypeSycIdentifierDefinitionLookupTableDto>> GetAllSycIdentifierDefinitionForLookupTable(onetouch.SystemObjects.Dtos.GetAllForLookupTableInput input);
 		Task<SelectItemDto[]> GetAllParentsIds();
-
-	}
+		//I46[Start]
+		Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributes(long id);
+        //I46[End]
+    }
 }
