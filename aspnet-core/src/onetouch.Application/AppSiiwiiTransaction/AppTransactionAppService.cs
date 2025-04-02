@@ -72,6 +72,7 @@ using Abp.AutoMapper;
 using Namotion.Reflection;
 using onetouch.Globals;
 using onetouch.AppSubScriptionPlan;
+using onetouch.SystemObjects.Dtos;
 
 
 //using NUglify.Helpers;
@@ -4436,6 +4437,12 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         //Iteration#45[End]
                         //End
+                        //I46[Start]
+                        viewTrans.Recommended = new List<ExtraDataAttrDto>();
+                        viewTrans.Additional = new List<ExtraDataAttrDto>();
+                        viewTrans.Recommended = GetAppTransactionExtraDataWithPaging(transactionId,viewTrans.EntityObjectTypeId, RecommandedOrAdditional.RECOMMENDED).Result.Items.ToList();
+                        viewTrans.Additional= GetAppTransactionExtraDataWithPaging(transactionId, viewTrans.EntityObjectTypeId, RecommandedOrAdditional.ADDITIONAL).Result.Items.ToList();
+                        //I46[End]
                         return viewTrans;
                     }
 
@@ -6997,6 +7004,55 @@ namespace onetouch.AppSiiwiiTransaction
                 return true;
             else
                 return false;
+        }
+        public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppTransactionExtraDataWithPaging(long transactionId, long entityObjectTypeId,RecommandedOrAdditional recommandedOrAdditional)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
+                var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
+                if (entityObjectExtraAttributeReturn != null)
+                {
+                     entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
+                }
+                    
+
+
+                if (transactionId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
+                {
+                    var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
+                    // *Abdo End
+                    //get all extra data type, AttributeId
+                    var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
+                    var usedExtraDataPagedPerAttribute = _appEntitiesAppService.GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = "", AttributeIds = attributesIds, EntityId = transactionId }).Result.Items.ToList();
+
+                    List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
+
+                    foreach (var EntityExtraData in extraAttributedefintion)
+                    {
+                        if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
+                        {
+                            var extraDataAttrDtoPagedlocal = _appEntitiesAppService.GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = transactionId }).Result.Items.ToList();
+                            var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+
+                            if (extraDataSelectedValues.ToList().Count > 0)
+                            {
+                                var extraDataAttrDto = new ExtraDataAttrDto();
+                                extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
+                                extraDataAttrDto.extraAttrName = EntityExtraData.Name;
+                                extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
+                                extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
+
+                                if (!string.IsNullOrEmpty(EntityExtraData.Usage) && EntityExtraData.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper())
+                                { returnedList.Add(extraDataAttrDto); }
+                            }
+                        }
+
+                    }
+                    return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
+                }
+                return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
+            }
         }
         //I46{End}
     }
