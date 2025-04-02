@@ -52,6 +52,7 @@ export class ShoppingCartViewComponentComponent
   createOrEditSalesRepInfo: boolean = true;
   createOrEditshippingInfO: boolean = true;
   createOrEditBillingInfo: boolean = true;
+  createOrEditExtraData: boolean = true;
   loadNotesComp: boolean = false;
   transactionNum: Number = 0;
   disableProceedBtn: boolean = true;
@@ -153,6 +154,7 @@ extraAttributes: {
 };
 openAdditional= false
 hasLoadedAdditional: boolean = false;
+extraAttributesMeta:any
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -209,7 +211,11 @@ const button = document.getElementById("stickyButton");
 
   }
   ngOnChanges() {
-   
+    this.extraAttributesMeta = [
+      ...this.extraAttributes.RECOMMENDED.extraAttributes,
+      ...this.extraAttributes.ADDITIONAL.extraAttributes,
+    ];
+
 
   }
   onAccordionChange(index: number | number[]) {
@@ -229,9 +235,9 @@ const button = document.getElementById("stickyButton");
     console.log('Opened tab:', key, tab);
   
     // Call your logic, e.g.
-    if (key === 'ADDITIONAL') {
+    // if (key === 'ADDITIONAL') {
       this.getAppItemTypeExtraAttributesById();
-    }
+    // }
   }
   
  
@@ -694,6 +700,7 @@ loadCommentsList() {
       this.createOrEditSalesRepInfo = true;
       this.createOrEditshippingInfO = true;
       this.createOrEditBillingInfo = true;
+      this.createOrEditExtraData = true;
     }
     else {
       this.showTabs = true;
@@ -703,6 +710,8 @@ loadCommentsList() {
       this.createOrEditSalesRepInfo = false;
       this.createOrEditshippingInfO = false;
       this.createOrEditBillingInfo = false;
+      this.createOrEditExtraData = false;
+
     }
 
     this.getColumns();
@@ -744,9 +753,10 @@ loadCommentsList() {
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
+    this.createOrEditExtraData = true
     this.appTransactionsForViewDto=null;
   }
-
+ 
   getColumns() {
     this.cols = [
       { field: "image", header: "Image" },
@@ -2261,5 +2271,7 @@ stopReport(event) {
           }
         });
       }
+      
+
       
 }

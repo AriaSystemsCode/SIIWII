@@ -368,6 +368,8 @@
                                     </app-create-or-edit-billing-info>
                                 </div>
                         </p-accordionTab>
+
+
                         <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="currentTab=6; getLinesData()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
@@ -1063,7 +1065,7 @@
 
 
                         <p-accordion (activeIndexChange)="onAccordionChange($event)">
-                            <p-accordionTab *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index">
+                            <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index">
                               <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header ">
                                   <h6 class="mb-1 ">{{extraAttributeObject.value.header | localize}}</h6>
@@ -1071,21 +1073,66 @@
                                 </div>
                               </ng-template>
                           
-                              <app-dynamicInputs
+                              <!-- <app-dynamicInputs
                                 [extraAttributeObject]="extraAttributeObject"
                                 [entityObjectTypeId]="114"
                                 [entityType]="'Transaction'"
                                 (extraDataChanged)="onExtraAttributesChanged($event)">
                                 >
                               </app-dynamicInputs>
-                              <button type="button"
-                              class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
-                              style="height: 37px;"  (click)="saveExtra()">
-                              Save
+
+                              <app-dynamicInputs-view
+                         [appTransactionsForViewDto]="appTransactionsForViewDto"
+                           >
+                            </app-dynamicInputs-view> -->
+                            <create-or-edit-extra-data 
+                            [extraAttributeObject]="extraAttributeObject"
+                                  
+                            [appTransactionsForViewDto]="appTransactionsForViewDto"
+                   
+                            [createOrEditExtraData]="createOrEditExtraData"
+                            
+                      
+
+                            [canChange]="canChange"
+          ></create-or-edit-extra-data>
+                            <div>
+
+                            </div>
+                              <!-- <div class="d-flex justify-content-end mx-3"  *ngIf="appTransactionsForViewDto?.entityStatusCode != 'OPEN'">
+                                <button type="button"
+                                class="btn bgPurple  bgPurple border-0  pointer Proceedtocheckout"
+                                style="height: 37px;"  (click)="saveExtra()">
+                                countinue
+                             
+                            
                           </button>
+                                </div>
+
+                                 <div class="d-flex justify-content-end mx-3" *ngIf="appTransactionsForViewDto?.entityStatusCode == 'OPEN'">
+                            <button type="button"
+                            class="btn bgPurple  bgPurple border-0  pointer Proceedtocheckout"
+                            style="height: 37px;"  (click)="saveExtra()">
+                            Save
+                         
+                        
+                      </button>
+
+                      <button type="button"
+                      class="btn bg-white border-0  pointer Proceedtocheckout"
+                      style="height: 37px;"  (click)="saveExtra()">
+                      cancel
+                   
+                  
+                </button>
+                                  </div> -->
                             </p-accordionTab>
 
                           </p-accordion>
+                        
+                
+                        
+                        
                           
                         <!-- order Preview tab -->
                         <p-accordionTab class="shoppingCartAccordionTabBG"  (click)="currentTab=7"

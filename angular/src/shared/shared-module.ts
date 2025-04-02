@@ -23,12 +23,14 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 import { BsDatepickerModule } from '@node_modules/ngx-bootstrap/datepicker';
 import { CalendarModule } from 'primeng/calendar';
+import { dynamicInputsView } from '@shared/components/dynamic-inputs-view/dynamic-inputs-view.component';
 
 
 @NgModule({
   declarations: [
  
-    dynamicInputs
+    dynamicInputs,
+    dynamicInputsView
   ],
   imports: [
    
@@ -64,7 +66,8 @@ import { CalendarModule } from 'primeng/calendar';
   
   ],
   exports:[
-    dynamicInputs
+    dynamicInputs,
+    dynamicInputsView
   ]
 })
 export class SharedDynamicInputsModule  { }
