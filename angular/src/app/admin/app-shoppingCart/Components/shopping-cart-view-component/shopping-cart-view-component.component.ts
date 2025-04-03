@@ -99,7 +99,7 @@ totalVariationsCount: number = 0;
   selectedVariation: string = '';
   selectedPrice: number = 0; // Holds the selected price
 selectedQuantity: number = 0; // Holds the entered quantity
-selectedImg: number = 0; // Holds the entered quantity
+selectedImg: string = ''; // Holds the entered quantity
 amount: number = 0; // Holds the calculated amount
 showAddLine : boolean = false
 newData:any
@@ -336,8 +336,9 @@ onVariationSelect(event: any) {
   // this.selectedPrice = 0;
   this.newData = event;
 
-  if ( event.value.appItem.price) {
-    this.selectedImg = event.value.appItem.image
+  if ( event) {
+    this.selectedImg = event.value.appItem.imageUrl
+  
    
      this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
     //  this.selectedPrice = filters.selectedPrice
