@@ -653,7 +653,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
 
     createOrEditTransaction() {
-        // this.showMainSpinner();
+        this.showMainSpinner();
         // this.onChangeDate();
         let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
         let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
@@ -672,7 +672,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
         .pipe(finalize(() =>  {
-
+ this.hideMainSpinner()
     //  this.SuccessMsg = true
     this.refreshShoppingCart.emit(true)     
         }))
