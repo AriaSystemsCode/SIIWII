@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { AccountBranchDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, PhoneNumberAndtype, TransactionType } from "@shared/service-proxies/service-proxies";
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
-import { stringInsert } from "@devexpress/analytics-core/analytics-internal";
 import { AppComponentBase } from "@shared/common/app-component-base";
-import { EMPTY, finalize, switchMap } from "rxjs";
-import { threadId } from "worker_threads";
+
 
 @Component({
     selector: "app-contact",
@@ -388,7 +386,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     
     
         getContacts(tempContact:boolean=false) {
-            // getcontact
             if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
                 this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, undefined).subscribe(result => {
                     this.allContacts = result;
@@ -437,7 +434,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
             }
-            // call is valid
             this.isValidForm();
         }
    
