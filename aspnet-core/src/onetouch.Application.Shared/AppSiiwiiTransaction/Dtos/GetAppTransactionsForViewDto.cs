@@ -49,8 +49,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual DateTime CreationDate { set; get; }
         //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
         //I46[Start] 
-        public List<ExtraDataAttrDto> Recommended { get; set; }
-        public List<ExtraDataAttrDto> Additional { get; set; }
+        public List<ExtraDataAttrDto> ExtraDataAttributes { get; set; }
+       // public List<ExtraDataAttrDto> Additional { get; set; }
         //I46[End]
     }
 
