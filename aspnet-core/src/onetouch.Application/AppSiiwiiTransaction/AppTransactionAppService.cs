@@ -994,7 +994,7 @@ namespace onetouch.AppSiiwiiTransaction
                             CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                             CompanyName = contactCompany != null ? contactCompany.Name : null,
                             BranchName = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchName :
-                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchName : null),
+                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchName : "*Main*"),
                             BranchSSIN = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchSSIN :
                             ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchSSIN : null)
                         });
@@ -1020,7 +1020,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 ContactRole = ContactRoleEnum.SalesRep1.ToString(),
                                 CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                                 CompanyName = contactCompany != null ? contactCompany.Name : null,
-                                BranchName = null,
+                                BranchName = "*Main*",
                                 BranchSSIN = null
                             });
 
@@ -2129,7 +2129,9 @@ namespace onetouch.AppSiiwiiTransaction
 
 
                 var pagedAndFilteredAppTransactionsRes = from e in pagedAndFilteredAppTransactions.Include(z => z.AppTransactionContacts)
-                                                         .ThenInclude(z => z.ContactAddressFk).Include(z => z.AppTransactionDetails)
+                                                         .ThenInclude(z => z.ContactAddressFk)
+                                                         .Include(z => z.AppTransactionDetails
+                                                         .Where(x => input.hasParentItems == false ? x.ParentId != null : true))
                                                          join
                                                          x in _appContactRepository.GetAll().Where(s => s.TenantId == AbpSession.TenantId) on
                                                          e.SellerCompanySSIN.Trim() equals x.SSIN.Trim()

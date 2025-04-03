@@ -66,4 +66,31 @@ export class CommentComponent implements OnChanges {
         return content.substring(0, this.charLimit) + '...';
       }
       
+
+
+      getFormattedContent(): string {
+        if (!this.comment?.messages?.bodyFormat) {
+          return '';
+        }
+    
+        const content = this.comment.messages.bodyFormat;
+    
+        // If already expanded, return full content
+        if (this.isExpanded) {
+          return content;
+        }
+    
+        // Truncate content while preserving HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+    
+        let text = tempDiv.innerText || tempDiv.textContent || '';
+    
+        if (text.length > this.charLimit) {
+          return text.substring(0, this.charLimit) + '...';
+        }
+    
+        return text;
+      }
+    
 }

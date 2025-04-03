@@ -169,6 +169,7 @@ export class AppItemsViewComponent
     timezoneOffset: number;
 
     acceptedAspectRatio;
+    languageSettingName  =AppConsts.languageSettingName;
 
     public constructor(
         private _router: Router,

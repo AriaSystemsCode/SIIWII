@@ -78,6 +78,7 @@ export class MarketplaceViewProductComponent
     visible: boolean = false;
     priceLevel :any
     showSpecialPrice: boolean = false;
+    languageSettingName  =AppConsts.languageSettingName;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
