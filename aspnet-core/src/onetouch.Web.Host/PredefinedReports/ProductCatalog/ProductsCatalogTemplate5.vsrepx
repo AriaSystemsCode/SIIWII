@@ -76,20 +76,20 @@
             <Item1 Ref="55" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[TenantLogo]" />
           </ExpressionBindings>
         </Item1>
-        <Item2 Ref="56" ControlType="XRLabel" Name="label9" Multiline="true" Text="label9" SizeF="518.5834,58.42002" LocationFloat="481.0975,23.4069214" Dpi="254" Font="Arial, 11pt, style=Bold" ForeColor="Black" Padding="5,5,0,0,254">
+        <Item2 Ref="56" ControlType="XRLabel" Name="label9" Multiline="true" Text="label9" SizeF="518.5834,58.42032" LocationFloat="481.0975,23.4069214" Dpi="254" Font="Arial, 11pt, style=Bold" ForeColor="Black" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="57" EventName="BeforePrint" PropertyName="Text" Expression="[TenantName]" />
           </ExpressionBindings>
           <StylePriority Ref="58" UseFont="false" UseForeColor="false" />
         </Item2>
-        <Item3 Ref="59" ControlType="XRLabel" Name="label13" Multiline="true" Text="&#xD;&#xA;" TextAlignment="TopCenter" SizeF="778.315063,58.42003" LocationFloat="1067.95728,23.4068947" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black">
+        <Item3 Ref="59" ControlType="XRLabel" Name="label13" Multiline="true" Text="&#xD;&#xA;" TextAlignment="TopCenter" SizeF="778.315063,58.42033" LocationFloat="1067.95728,23.4068947" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black">
           <ExpressionBindings>
             <Item1 Ref="60" EventName="BeforePrint" PropertyName="Text" Expression="?reportTitle" />
             <Item2 Ref="61" EventName="BeforePrint" PropertyName="Visible" Expression="IsNullOrEmpty(?reportTitle)=false and ?reportTitle !='undefined'&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="62" UseFont="false" UseForeColor="false" UseTextAlignment="false" />
         </Item3>
-        <Item4 Ref="63" ControlType="XRPageInfo" Name="pageInfo3" PageInfo="DateTime" TextFormatString="{0:MMM dd, yyyy}" SizeF="232.833252,58.42003" LocationFloat="2477.274,23.4068947" Dpi="254" />
+        <Item4 Ref="63" ControlType="XRPageInfo" Name="pageInfo3" PageInfo="DateTime" TextFormatString="{0:MMM dd, yyyy}" SizeF="232.833252,58.42033" LocationFloat="2477.274,23.4068947" Dpi="254" />
       </Controls>
     </Item4>
     <Item5 Ref="64" ControlType="PageFooterBand" Name="PageFooter" PrintOn="NotWithReportHeader" HeightF="58.64726" Dpi="254">
@@ -101,12 +101,12 @@
     </Item5>
     <Item6 Ref="67" ControlType="DetailBand" Name="Detail" HeightF="1694.6488" Dpi="254">
       <HierarchyPrintOptions Ref="68" Indent="50.8" />
-      <MultiColumn Ref="69" ColumnCount="2" Layout="AcrossThenDown" Mode="UseColumnCount" />
+      <MultiColumn Ref="69" ColumnCount="2" ColumnWidth="1300" Layout="AcrossThenDown" Mode="UseColumnWidth" />
       <Controls>
         <Item1 Ref="70" ControlType="XRSubreport" Name="subreport1" SizeF="1235.3634,320.544922" LocationFloat="36.2919235,1349.10376" Dpi="254">
           <Scripts Ref="71" OnBeforePrint="subreport1_BeforePrint" />
         </Item1>
-        <Item2 Ref="72" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="1302.02124,1349.10376" LocationFloat="52.4143143,0" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
+        <Item2 Ref="72" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="1274.99988,1349.10376" LocationFloat="0.000121116638,0" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
           <Controls>
             <Item1 Ref="73" ControlType="XRLabel" Name="xrLabel3" Multiline="true" ProcessDuplicatesMode="Suppress" Angle="90" Text="xrLabel3" TextAlignment="MiddleCenter" SizeF="74.08334,918.86615" LocationFloat="51.2269363,26.2768211" Dpi="254" Padding="5,5,0,0,254">
               <ExpressionBindings>
@@ -154,7 +154,7 @@
             </Item7>
             <Item8 Ref="96" ControlType="XRLabel" Name="label11" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="1075.00024,60" LocationFloat="154.868286,1079.99988" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="97" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showPrice  And (([ItemMSRPPriceFrom] &gt;= 0 and [ItemMSRPPriceFrom]!= [MajorMSRP]) Or ([ItemMSRPPriceTo] &gt; 0 and [ItemMSRPPriceTo]!= [MajorMSRP])), &#xA;Iif(?muserCountry=='RRP','RRP','MSRP')+'  '+[currencySymbol]+ToStr([ItemMSRPPriceFrom])+' - '+[currencySymbol]+ToStr( [ItemMSRPPriceTo]),'' )" />
+                <Item1 Ref="97" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showPrice  And (([ItemMSRPPriceFrom] &gt; 0 and [ItemMSRPPriceFrom]!= [MajorMSRP]) Or ([ItemMSRPPriceTo] &gt; 0 and [ItemMSRPPriceTo]!= [MajorMSRP])), &#xA;Iif(?muserCountry=='RRP','RRP','MSRP')+'  '+[currencySymbol]+ToStr([ItemMSRPPriceFrom])+' - '+[currencySymbol]+ToStr( [ItemMSRPPriceTo]),'' )" />
               </ExpressionBindings>
               <StylePriority Ref="98" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item8>

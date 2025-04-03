@@ -77,20 +77,20 @@
             <Item1 Ref="56" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[TenantLogo]" />
           </ExpressionBindings>
         </Item1>
-        <Item2 Ref="57" ControlType="XRLabel" Name="label9" Multiline="true" Text="label9" SizeF="518.5834,58.42002" LocationFloat="481.0975,23.4069214" Dpi="254" Font="Arial, 11pt, style=Bold" ForeColor="Black" Padding="5,5,0,0,254">
+        <Item2 Ref="57" ControlType="XRLabel" Name="label9" Multiline="true" Text="label9" SizeF="518.5834,58.42032" LocationFloat="481.0975,23.4069214" Dpi="254" Font="Arial, 11pt, style=Bold" ForeColor="Black" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="58" EventName="BeforePrint" PropertyName="Text" Expression="[TenantName]" />
           </ExpressionBindings>
           <StylePriority Ref="59" UseFont="false" UseForeColor="false" />
         </Item2>
-        <Item3 Ref="60" ControlType="XRLabel" Name="label13" Multiline="true" Text="&#xD;&#xA;" TextAlignment="TopCenter" SizeF="778.315063,58.42003" LocationFloat="1067.95728,23.4068947" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black">
+        <Item3 Ref="60" ControlType="XRLabel" Name="label13" Multiline="true" Text="&#xD;&#xA;" TextAlignment="TopCenter" SizeF="778.315063,58.42033" LocationFloat="1067.95728,23.4068947" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black">
           <ExpressionBindings>
             <Item1 Ref="61" EventName="BeforePrint" PropertyName="Text" Expression="?reportTitle" />
             <Item2 Ref="62" EventName="BeforePrint" PropertyName="Visible" Expression="IsNullOrEmpty(?reportTitle)=false and ?reportTitle !='undefined'&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="63" UseFont="false" UseForeColor="false" UseTextAlignment="false" />
         </Item3>
-        <Item4 Ref="64" ControlType="XRPageInfo" Name="pageInfo3" PageInfo="DateTime" TextFormatString="{0:MMM dd, yyyy}" SizeF="232.833252,58.42003" LocationFloat="1907.64587,23.4069214" Dpi="254" />
+        <Item4 Ref="64" ControlType="XRPageInfo" Name="pageInfo3" PageInfo="DateTime" TextFormatString="{0:MMM dd, yyyy}" SizeF="232.833252,58.42033" LocationFloat="1907.64587,23.4069214" Dpi="254" />
       </Controls>
     </Item4>
     <Item5 Ref="65" ControlType="PageFooterBand" Name="PageFooter" PrintOn="NotWithReportHeader" HeightF="58.64726" Dpi="254">

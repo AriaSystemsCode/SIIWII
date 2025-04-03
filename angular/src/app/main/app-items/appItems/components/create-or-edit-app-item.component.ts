@@ -55,6 +55,7 @@ import { AppEntityDtoWithActions } from "../models/app-entity-dto-with-actions";
 import { PricingHelpersService } from "../../app-item-shared/services/pricing-helpers.service";
 import { ApplyVariationOutput } from "./create-edit-app-item-variations.component";
 import Swal from "sweetalert2";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
     selector: "app-create-or-edit-app-item",
@@ -207,8 +208,12 @@ export class CreateOrEditAppItemComponent
         }
         this.getCurrencies();
         this.getAspectatio();
-    }
 
+        this.languageSettingName  =AppConsts.languageSettingName;
+        //this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
+      
+    }
+    languageSettingName;
     aspectRatio;
     getAspectatio() {
         let sycAttachmentCategoryImage;
@@ -1291,6 +1296,43 @@ let x=  this.appItem.nonLookupValues;
             });
     // }
 
+    const hasZeroPrice = this.appItem?.variationItems?.some(variation =>
+        variation.appItemPriceInfos?.some(priceInfo => priceInfo.price == 0)
+    );
+    if (hasZeroPrice) {
+        Swal.fire({
+            title: "",
+            text: "Some variation have zero price continue ?",
+             icon: "info",
+                showCancelButton: true,
+                confirmButtonText:
+                    "Yes",
+                cancelButtonText: "No",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class2",
+            },
+        }).then((result) => {
+            if (!result.isConfirmed) 
+              return;
+
+            else
+            this._saveProuct(form);
+    })
+}
+else
+this._saveProuct(form);
+
+}
+
+
+_saveProuct(form){
         this.submitted = true;
         if (form.form.invalid) {
             form.form.markAllAsTouched();
@@ -1341,7 +1383,7 @@ let x=  this.appItem.nonLookupValues;
                     return this.askToPublish();
                 this.goBack("app/main/products");
             });
-    }
+}
     extraSelectedValuesExtraData() {
         const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
             ...this.extraAttributes.ADDITIONAL.extraAttributes,

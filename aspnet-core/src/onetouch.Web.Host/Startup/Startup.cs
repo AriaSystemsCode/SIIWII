@@ -169,6 +169,8 @@ namespace onetouch.Web.Startup
             services.AddSingleton<IWebDocumentViewerExceptionHandler, CustomWebDocumentViewerExceptionHandler>();
             services.AddTransient<onetouch.Web.Host.Controllers.CustomQueryBuilderController>();
 
+            services.AddSingleton<IServiceProviderIsService, CustomServiceProviderIsService>();
+            ConfigureSwagger(services);
 
 
             services.Configure<FormOptions>(x =>
