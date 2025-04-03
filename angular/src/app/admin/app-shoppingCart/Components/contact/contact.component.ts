@@ -46,21 +46,22 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     filteredContacts :any[]=[]
     filteredBranches :any[]=[]
     createManualComp: boolean = false;
-
+    branchData:any
+    @Input() addressValid: boolean;
     @Output() isTempComp = new EventEmitter<boolean>();
     @Output() validateTempBuyer = new EventEmitter<boolean>();
     conNew:boolean = false
     comNew:boolean = false
     emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
-    branchData:any
-    @Input() addressValid: boolean;
+
  
     constructor(
         injector: Injector,
+  
+        private cdr: ChangeDetectorRef,
+        private _accountsServiceProxy :AccountsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private cdr: ChangeDetectorRef,
-        private _accountsServiceProxy :AccountsServiceProxy
     ) {
         super(injector);
         
