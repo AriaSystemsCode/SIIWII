@@ -1238,34 +1238,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.invalidSellerContactEMailAddress = "";
     }
 
-    cancel() {
-        this.isSeller = false;
-        this.isBuyer = false;
-        this.isBuyerTempAccount = false;
-        this.isSellerCompanyIdExist = false;
-        this.isCompantIdExist = false;
-        this.orderForm.controls["buyerCompanySSIN"].setValue('');
-        this.areSame = false
-        this.buyerComapnyId = 0
-        // merge
-        // merge
-        // merge
-        this.getAllCompanies();
-        this.sellerContacts = [];
-        this.buyerContacts = [];
-        this.orderForm.reset();
-        this.role = "";
-        this.modalClose.emit(false);
-        this.display = false;
-        this.Role.value = {};
-        this.submitted = false;
-        this.roles = [];
-        this.invalidSellerPhoneNumber = "";
-        this.invalidBuyerPhoneNumber = "";
-        this.invalidBuyerContactEMailAddress = "";
-        this.invalidSellerContactEMailAddress = "";
 
-    }
 
     changeTouchState(event){
         this.orderForm.controls['currencyId'].setValue(event.value)
@@ -1333,6 +1306,32 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minDate.setFullYear(prevYear);
         this.orderForm.controls['enteredDate'].setValue(new Date());
 
+
+    }
+
+    cancel() {
+        this.isSeller = false;
+        this.isBuyer = false;
+        this.isBuyerTempAccount = false;
+        this.isSellerCompanyIdExist = false;
+        this.isCompantIdExist = false;
+        this.orderForm.controls["buyerCompanySSIN"].setValue('');
+        this.areSame = false
+        this.buyerComapnyId = 0
+        this.getAllCompanies();
+        this.sellerContacts = [];
+        this.buyerContacts = [];
+        this.orderForm.reset();
+        this.role = "";
+        this.modalClose.emit(false);
+        this.display = false;
+        this.Role.value = {};
+        this.submitted = false;
+        this.roles = [];
+        this.invalidSellerPhoneNumber = "";
+        this.invalidBuyerPhoneNumber = "";
+        this.invalidBuyerContactEMailAddress = "";
+        this.invalidSellerContactEMailAddress = "";
 
     }
 }
