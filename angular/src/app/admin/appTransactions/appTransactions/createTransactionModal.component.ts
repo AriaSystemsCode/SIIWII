@@ -1244,9 +1244,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = false;
         this.isSellerCompanyIdExist = false;
         this.isCompantIdExist = false;
+        // merge
         this.orderForm.controls["buyerCompanySSIN"].setValue('');
         this.areSame = false
         this.buyerComapnyId = 0
+        // merge
         this.getAllCompanies();
         this.sellerContacts = [];
         this.buyerContacts = [];
