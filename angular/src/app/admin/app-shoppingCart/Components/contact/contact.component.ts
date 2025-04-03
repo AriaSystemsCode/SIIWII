@@ -337,7 +337,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     onchangePhoneType($event) {
         if ($event?.value) {
-            console.log($event, '1111111111 <<<');
+   
     
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.value?.phoneTypeId);
     
@@ -353,14 +353,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = 
                 $event?.value?.phoneNumber ;
         } else {
-            console.log($event, '22222 <<<');
-            console.log(this.allPhoneTypes, '22222 this.allPhoneTypes <<<');
+           
     
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.phoneTypeId);
     
             if (indx >= 0) {
-                console.log($event, '3333333333 <<<');
-                console.log(indx, 'indx');
+         
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = $event;
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = 
                     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType?.phoneNumber;
@@ -801,7 +799,7 @@ getBranchDetails(id) {
 extractPhoneTypes(response: any,changeBranch?:any) {
     console.log(response, 'Response in extractPhoneTypes');
 
-    // setTimeout(() => { // Delay execution to allow UI updates
+
         let arr: PhoneNumberAndtype[] = [];
 
         this.allPhoneTypes = [];
@@ -829,7 +827,7 @@ extractPhoneTypes(response: any,changeBranch?:any) {
 
         this.allPhoneTypes = [...arr];
 
-        // // ✅ Assign correct phone type based on selected phone number
+        //  Assign correct phone type based on selected phone number
         // if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber) {
         //     const selectedPhone = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
         //     const matchedPhoneType = this.allPhoneTypes.find(p => p.phoneNumber === selectedPhone);
@@ -844,11 +842,7 @@ extractPhoneTypes(response: any,changeBranch?:any) {
         }
         // this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
         this.cdr.detectChanges(); 
-        console.log(this.allPhoneTypes, 'Extracted Phone Types');
-        console.log(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber, 'ifff');
-
-        console.log( this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType, 'sel');
-    // }, 0);
+ 
     this.isValidForm();
 }
 
@@ -860,7 +854,7 @@ extractPhoneTypes(response: any,changeBranch?:any) {
 
   }
     ngDoCheck() {
-        // this.isValidForm();
+    
    
 if(this.appTransactionsForViewDto?.buyerCompanySSIN != '' || this.appTransactionsForViewDto?.buyerCompanySSIN != null){
 
