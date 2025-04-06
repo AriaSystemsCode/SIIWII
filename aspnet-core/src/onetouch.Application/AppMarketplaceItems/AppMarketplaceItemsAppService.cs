@@ -447,6 +447,33 @@ namespace onetouch.AppMarketplaceItems
                 stopwatch.Start();
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
+
+                    //T-SII-20250221.0004,1 MMT 03/13/2025 - Display the logged in Tenant Product special price[Start]
+                    if (string.IsNullOrEmpty(input.BuyerAccountSSIN) && string.IsNullOrEmpty(input.SellerAccountSSIN))
+                    {
+                        var appItemObj = await _appMarketplaceItem.GetAll().Where(z => z.Id == input.ItemId).FirstOrDefaultAsync();
+                        if (appItemObj != null)
+                        {
+                            if (appItemObj.TenantOwner != AbpSession.TenantId)
+                            {
+                                var accountBuyer = await _appContactRepository.GetAll()
+                                   .Where(z => z.PartnerId == null && z.ParentId == null  && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                                if (accountBuyer != null)
+                                {
+                                    input.BuyerAccountSSIN = accountBuyer.SSIN;
+                                }
+                                var accountSeller= await _appContactRepository.GetAll()
+                                   .Where(z => z.PartnerId == null && z.ParentId == null && z.TenantId == appItemObj.TenantOwner).FirstOrDefaultAsync();
+                                if (accountSeller != null)
+                                {
+                                    input.SellerAccountSSIN = accountSeller.SSIN;
+                                }
+                            }
+                        }
+
+                    }
+                    //T-SII-20250221.0004,1 MMT 03/13/2025 - Display the logged in Tenant Product special price[End]
+
                     string level = "MSRP";
                     if (input.BuyerAccountSSIN != null && input.SellerAccountSSIN != null)
                     {
