@@ -62,10 +62,12 @@ using Microsoft.AspNetCore.Http.Features;
 using DevExpress.AspNetCore.Reporting.QueryBuilder;
 using Microsoft.AspNetCore.SignalR;
 using onetouch.Build;
-using k8s.KubeConfigModels;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace onetouch.Web.Startup
 {
+
     public class CustomServiceProviderIsService : IServiceProviderIsService
     {
         public bool IsService(Type serviceType)
@@ -172,6 +174,8 @@ namespace onetouch.Web.Startup
             services.AddSingleton<IWebDocumentViewerExceptionHandler, CustomWebDocumentViewerExceptionHandler>();
             services.AddTransient<onetouch.Web.Host.Controllers.CustomQueryBuilderController>();
 
+            services.AddSingleton<IServiceProviderIsService, CustomServiceProviderIsService>();
+            ConfigureSwagger(services);
 
             // Register missing service
  
