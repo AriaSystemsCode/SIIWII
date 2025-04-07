@@ -9,8 +9,10 @@
           [extraAttributeObject]="extraAttributeObject"
           [entityObjectTypeId]="114"
           [entityType]="'Transaction'"
+          [appTransactionsForViewDto]="appTransactionsForViewDto"
+          (extraDataCleared)="onExtraAttributeCleared($event)"
           (extraDataChanged)="onExtraAttributesChanged($event)">
-          >
+          
         </app-dynamicInputs>
 
       </div>
@@ -36,6 +38,7 @@
                          (onshowSaveBtn)="onshowSaveBtn($event)"
                          [canChange]="canChange"
                          [isCreateOrEdit] ='createOrEditExtraData'
+                             [extraAttributeObject]="extraAttributeObject"
                            >
                             </app-dynamicInputs-view>
 </div>
@@ -43,7 +46,7 @@
 
 <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditExtraData ?  'd-block' : 'd-none'">
   <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
-      <button   class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
+      <button   class="continuebtn text-center btn float-right" (click)="saveExtra()"   *ngIf="!showSaveBtn && extraAttributeObject.value.header.toUpperCase() == 'ADDITIONAL'">
           {{l("Continue")}}
      </button>
 <button

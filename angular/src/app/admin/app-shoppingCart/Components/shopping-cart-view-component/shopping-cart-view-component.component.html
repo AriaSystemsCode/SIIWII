@@ -1064,8 +1064,10 @@
                         </p-accordionTab>
 
 
-                        <p-accordion (activeIndexChange)="onAccordionChange($event)">
-                            <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index">
+                        <p-accordion [(activeIndex)]="activeIndex"  *ngIf="showTabs" (activeIndexChange)="onAccordionChange($event)" > 
+                            <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index"   (click)="i == 0 ?currentTab = 7: currentTab = 8">
+                         
+
                               <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header ">
                                   <h6 class="mb-1 ">{{extraAttributeObject.value.header | localize}}</h6>
@@ -1085,17 +1087,23 @@
                          [appTransactionsForViewDto]="appTransactionsForViewDto"
                            >
                             </app-dynamicInputs-view> -->
+                         <div *ngIf="currentTab==7 || currentTab==8">
                             <create-or-edit-extra-data 
+                        
                             [extraAttributeObject]="extraAttributeObject"
-                                  
+                            [activeTab]="extraAttributeObject.value.header.toUpperCase() == 'ADDITIONAL' ? 7 : 8"
+                            [currentTab]="currentTab"
                             [appTransactionsForViewDto]="appTransactionsForViewDto"
                    
                             [createOrEditExtraData]="createOrEditExtraData"
                             
-                      
+                            (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
+                        
+                            (refreshShoppingCart)="refreshShoppingCart($event)"
 
                             [canChange]="canChange"
           ></create-or-edit-extra-data>
+        </div>
                             <div>
 
                             </div>
@@ -1135,7 +1143,7 @@
                         
                           
                         <!-- order Preview tab -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG"  (click)="currentTab=7"
+                        <p-accordionTab class="shoppingCartAccordionTabBG"  (click)="currentTab=9"
                             *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
@@ -1143,7 +1151,7 @@
                                 </div>
                             </ng-template> 
                             <ng-template pTemplate="content">
-                                <app-order-preview  *ngIf="currentTab == 7"
+                                <app-order-preview  *ngIf="currentTab == 9"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     [transactionFormPath]="transactionFormPath"
                                     [regenrate]="regenrate"

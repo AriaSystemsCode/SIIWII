@@ -32,11 +32,23 @@
                             </p-dropdown>
                         </div>
 
-                        <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
-                            <input (input)="onAnyInputChange()" type="text" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
-                                class="form-control" id="extraAttr{{extraAttr.name}}"
-                                [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                     border: none !important">
+                        <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
+                            <input
+                          
+                            type="text"
+                            name="{{extraAttr.name}}"
+                            placeholder="{{extraAttr.name}}"
+                            class="form-control"
+                            [(ngModel)]="extraAttr.selectedValues"
+                            style="background-color: #EEEEEE !important; border: none !important"
+                            (ngModelChange)="onAnyInputChange()"
+                          />
+                          <i
+                          class="pi pi-times position-absolute"
+                          style="right: 10px; top: 10px; cursor: pointer;"
+                          *ngIf="extraAttr.selectedValues"
+                          (click)="clearExtraAttr(extraAttr)"
+                        ></i>
                             <!-- (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" -->
                         </div>
 
@@ -86,7 +98,7 @@
                               [placeholder]="extraAttr.name"
                               (ngModelChange)="onAnyInputChange()"
                               appendTo="body"
-                              inputStyle="background-color: #EEEEEE; border: none;"
+                              [inputStyle]="{ 'background-color': '#EEEEEE', 'border': 'none' }"
                               styleClass="w-100"
                             ></p-calendar>
                             <i

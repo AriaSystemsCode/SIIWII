@@ -16,18 +16,23 @@ export class dynamicInputs implements OnInit,OnChanges {
    @Output() extraDataChanged = new EventEmitter<any[]>();
    @Input() createOrEdit: boolean = true;
 @Input() canChange: boolean = true;
+@Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
 
 @Output() toggleEditMode = new EventEmitter<boolean>();
 hasUserInteracted = false;
 
 selectedExtraData: any[] = [];
+@Input() appTransactionsForViewDto: any;
+
 
     ngOnInit(): void {
+      this.fillSelectedValuesFromDto();
     }
     openCalendar(calendar: any) {
         calendar.overlayVisible = true;
       }
     ngOnChanges(){
+      this.fillSelectedValuesFromDto();
         this.onAnyInputChange();
     }
     onAnyInputChange() {
@@ -71,18 +76,91 @@ selectedExtraData: any[] = [];
       }
       
       
+      fillSelectedValuesFromDto() {
+        if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
+          return;
+        }
+      
+        const dtoData = this.appTransactionsForViewDto.extraDataAttributes;
+      
+        for (const attr of this.extraAttributeObject.value.extraAttributes) {
+          const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
+        
+          if (matchedDto && matchedDto.selectedValues?.length) {
+            const dtoValue = matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value; // ✅ Take last value
+        
+            if (attr.isLookup) {
+              const matchedOption = attr.paginationSetting?.list?.find(opt => {
+                return opt.label === dtoValue || opt.value === dtoValue;
+              });
+        
+              if (matchedOption) {
+                attr.selectedValues = matchedOption.value;
+              } else {
+                // Option not in list: push manually
+                const manualOption = {
+                  value: dtoValue,
+                  label: dtoValue,
+                  code: null,
+                  isHostRecord: false,
+                  stockAvailability: null,
+                  image: null,
+                  hexaCode: null
+                };
+                attr.paginationSetting.list.push(manualOption);
+                attr.selectedValues = manualOption.value;
+              }
+            } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
+              attr.selectedValues = new Date(dtoValue);
+            } else {
+              attr.selectedValues = dtoValue;
+            }
+          }
+        }
+        
+      }
+      
       
       clearExtraAttr(attr: any) {
-        attr.selectedValues = null;
+        if (attr.acceptMultipleValues) {
+          attr.selectedValues = [];
+        } else {
+          attr.selectedValues = null;
+        }
       
-        // Remove from selectedExtraData immediately
+        // ✅ Important: also clear original source
+        const matchedAttr = this.extraAttributeObject?.value?.extraAttributes?.find(
+          a => a.attributeId === attr.attributeId
+        );
+        if (matchedAttr) {
+          if (matchedAttr.acceptMultipleValues) {
+            matchedAttr.selectedValues = [];
+          } else {
+            matchedAttr.selectedValues = null;
+          }
+        }
+      
+        // Clean DTO
+        const dtoData = this.appTransactionsForViewDto?.extraDataAttributes;
+        if (dtoData) {
+          const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
+          if (matchedDto) {
+            matchedDto.selectedValues = [];
+          }
+        }
+      
+        // Clean emitted data
         this.selectedExtraData = this.selectedExtraData.filter(
           x => x.attributeId !== attr.attributeId
         );
       
         this.extraDataChanged.emit(this.selectedExtraData);
-        console.log('🧹 Attribute cleared:', attr.attributeId);
+        this.extraDataCleared.emit(attr.attributeId); // 🔥 parent notified
+        console.log('🧹 Attribute cleared and notified parent:', attr.attributeId);
       }
+      
+      
+      
       
       
 }

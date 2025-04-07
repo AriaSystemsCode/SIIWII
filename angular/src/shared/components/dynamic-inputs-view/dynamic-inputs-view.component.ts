@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -10,7 +10,7 @@ import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, GetAppTra
     styleUrls: ['./dynamic-inputs-view.component.scss'],
 
 })
-export class dynamicInputsView implements OnInit {
+export class dynamicInputsView   extends AppComponentBase implements OnInit {
 
     @Input("isCreateOrEdit") isCreateOrEdit: boolean;
     @Input("activeTab") activeTab: number;
@@ -19,7 +19,7 @@ export class dynamicInputsView implements OnInit {
     shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
     @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
 
-    
+    @Input("extraAttributeObject") extraAttributeObject;
 
     @Input("canChange")  canChange:boolean=true;
 
@@ -30,63 +30,102 @@ export class dynamicInputsView implements OnInit {
   
     extraAttributesToShow: { name: string; value: any }[] = [];
   
+    recommendedAttributes = [];
+additionalAttributes = [];
+
+
+usageTypeAttributeMap: { [key: string]: any[] } = {};
+  constructor(
+    injector: Injector,
+    private cdr: ChangeDetectorRef,
+
+  ) {
+    super(injector);
+
+  }
+
     ngOnInit(): void {
-        if (this.isReady) {
-          this.extraAttributesToShow = this.entityExtraData.map((attr) => {
-            const meta = this.extraAttributeMeta.find(m => m.attributeId === attr.attributeId);
-            let value = attr.attributeValueId ?? attr.attributeValue;
-            if (meta?.dataType === 'Datetime' && value) {
-              value = new Date(value).toLocaleDateString();
-            }
-            return {
-              name: meta?.name || `Attribute ${attr.attributeId}`,
-              value: value,
-            };
-          });
-        }
+
+      // this.prepareUsageTypeAttributeMap();
+        // if (this.isReady) {
+        //   this.extraAttributesToShow = this.entityExtraData.map((attr) => {
+        //     const meta = this.extraAttributeMeta.find(m => m.attributeId === attr.attributeId);
+        //     let value = attr.attributeValueId ?? attr.attributeValue;
+        //     if (meta?.dataType === 'Datetime' && value) {
+        //       value = new Date(value).toLocaleDateString();
+        //     }
+        //     return {
+        //       name: meta?.name || `Attribute ${attr.attributeId}`,
+        //       value: value,
+        //     };
+        //   });
+        // }
       }
       
 
-    get isReady(): boolean {
-        return Array.isArray(this.entityExtraData) && Array.isArray(this.extraAttributeMeta);
+    // get isReady(): boolean {
+    //     return Array.isArray(this.entityExtraData) && Array.isArray(this.extraAttributeMeta);
+    //   }
+      
+    ngOnChanges(changes: SimpleChanges): void {
+      // this.prepareUsageTypeAttributeMap();
+    }
+     
+      
+      // setupAttributes() {
+      //   if (this.entityExtraData?.length && this.extraAttributeMeta?.length) {
+      //     this.extraAttributesToShow = this.entityExtraData.map((attr) => {
+      //       const meta = this.extraAttributeMeta.find(
+      //         (m) => m.attributeId === attr.attributeId
+      //       );
+      //       let value = attr.attributeValueId ?? attr.attributeValue;
+      //       if (meta?.dataType === 'Datetime' && value) {
+      //         value = new Date(value).toLocaleDateString();
+      //       }
+      //       return {
+      //         name: meta?.name || `Attribute ${attr.attributeId}`,
+      //         value: value,
+      //       };
+      //     });
+      //   }
+      // }
+      
+      // getAttributeDisplayValue(attrMeta: any): any {
+      //   const attr = this.entityExtraData.find(d => d.attributeId === attrMeta.attributeId);
+      
+      //   if (!attr) return null;
+      
+      //   let value = attr.attributeValueId ?? attr.attributeValue;
+      
+      //   if (attrMeta?.dataType === 'Datetime' && value) {
+      //     value = new Date(value).toLocaleDateString();
+      //   }
+      
+      //   return value;
+      // }
+      
+      // prepareExtraAttributes(): void {
+      //   if (this.appTransactionsForViewDto?.extraDataAttributes?.length) {
+      //     this.recommendedAttributes = this.appTransactionsForViewDto.extraDataAttributes.filter(
+      //       (attr) => attr.extraAttrUsage === 'RECOMMENDED'
+      //     );
+      //     this.additionalAttributes = this.appTransactionsForViewDto.extraDataAttributes.filter(
+      //       (attr) => attr.extraAttrUsage === 'ADDITIONAL'
+      //     );
+      //   }
+      // }
+ 
+      prepareUsageTypeAttributeMap() {
+        const attributes = this.appTransactionsForViewDto.extraDataAttributes || [];
+      
+        this.usageTypeAttributeMap = attributes.reduce((map, attr) => {
+          if (!map[attr.extraAttrUsage]) {
+            map[attr.extraAttrUsage] = [];
+          }
+          map[attr.extraAttrUsage].push(attr);
+          return map;
+        }, {});
       }
-      
-      ngOnChanges(): void {
-        this.setupAttributes();
-      }
-      
-      setupAttributes() {
-        if (this.entityExtraData?.length && this.extraAttributeMeta?.length) {
-          this.extraAttributesToShow = this.entityExtraData.map((attr) => {
-            const meta = this.extraAttributeMeta.find(
-              (m) => m.attributeId === attr.attributeId
-            );
-            let value = attr.attributeValueId ?? attr.attributeValue;
-            if (meta?.dataType === 'Datetime' && value) {
-              value = new Date(value).toLocaleDateString();
-            }
-            return {
-              name: meta?.name || `Attribute ${attr.attributeId}`,
-              value: value,
-            };
-          });
-        }
-      }
-      
-      getAttributeDisplayValue(attrMeta: any): any {
-        const attr = this.entityExtraData.find(d => d.attributeId === attrMeta.attributeId);
-      
-        if (!attr) return null;
-      
-        let value = attr.attributeValueId ?? attr.attributeValue;
-      
-        if (attrMeta?.dataType === 'Datetime' && value) {
-          value = new Date(value).toLocaleDateString();
-        }
-      
-        return value;
-      }
-      
   showEditMode() {
     this.isCreateOrEdit = true;
     this.onshowSaveBtn.emit(true);

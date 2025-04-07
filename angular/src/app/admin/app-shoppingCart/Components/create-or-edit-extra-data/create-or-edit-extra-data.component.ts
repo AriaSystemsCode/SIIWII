@@ -74,6 +74,7 @@ import { finalize } from "rxjs";
   
     ngOnInit(): void {
       if(this.appTransactionsForViewDto){
+        this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto)); // ✅ add this
         this.getAppItemTypeExtraAttributesById(); // or your dynamic ID
   
       }
@@ -81,6 +82,7 @@ import { finalize } from "rxjs";
     }
   
     ngOnChanges(changes: SimpleChanges): void {
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
       if (changes.entityExtraData || changes.extraAttributesMeta) {
         this.mapDataToForm();
       }
@@ -125,17 +127,21 @@ import { finalize } from "rxjs";
 
 
 
-
-
+    onUpdateAppTransactionsForViewDto($event) {
+      this.appTransactionsForViewDto = $event;
+      
+  
+    }
+    
     cancel() {
       this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
-
+      this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
       this.createOrEditExtraData = false;
       this.showSaveBtn = false;
     }
     save() {
       this.createOrEditExtraData = false;
-
+       this.saveExtra()
       // this.createOrEditTransaction();
     }
     onshowSaveBtn($event) {
@@ -149,6 +155,7 @@ import { finalize } from "rxjs";
           this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(114)
             .subscribe((res) => {
               if (res?.length > 0) {
+                console.log( this.selectedItemTypeData ,' this.selectedItemTypeData ')
                 this.selectedItemTypeData = res[0];
         
                 // Set recommended/additional attributes
@@ -229,6 +236,11 @@ import { finalize } from "rxjs";
         }
     
           setAdditionalAndRecommendedExtraAttributes() {
+            if (!this.extraAttributes) {
+              console.warn('extraAttributes is undefined');
+              return;
+            }
+          
                 const extraAttributres =
                     this.selectedItemTypeData.extraAttributes.extraAttributes;
                 this.extraAttributes.RECOMMENDED.extraAttributes =
@@ -405,12 +417,26 @@ import { finalize } from "rxjs";
             this.appTransactionsForViewDto.entityExtraData = existingData;
           }
           
+          onExtraAttributeCleared(attributeId: number) {
+            const data = this.appTransactionsForViewDto?.entityExtraData;
+            if (data && data.length > 0) {
+              let index = -1;
+              while ((index = data.findIndex(x => x.attributeId === attributeId)) !== -1) {
+                data.splice(index, 1);
+              }
+              console.log('🧹 Parent fully removed attribute from entityExtraData:', attributeId);
+              console.log('🧹 dto:', data);
+            }
+          }
+          
+          
           
           saveExtra(){
+            this.showMainSpinner()
             this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
             .pipe(finalize(() => {
     
-         
+         this.hideMainSpinner()
           //  this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
           //  this.getShoppingCartData()
     
@@ -420,13 +446,22 @@ import { finalize } from "rxjs";
             .subscribe((res) => {
     
               if (res) {
+    
+                  this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+               this.refreshShoppingCart.emit(true)
+                  if (!this.showSaveBtn)
+                    this.ontabChange.emit(this.activeTab);
+                  else
+                    this.showSaveBtn = false;
+        
+                }
               // this.getShoppingCartData()
     
               // this.hideMainSpinner();
     
     
           
-              }
+              
             });
           }
           

@@ -1545,6 +1545,7 @@ stopReport(event) {
 
   }
   ontabChange($event) {
+    console.log($event,'$even')
     this.activeIndex = $event + 1;
     this.currentTab= this.activeIndex ;
   }
