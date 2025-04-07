@@ -46,7 +46,7 @@
 
 <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditExtraData ?  'd-block' : 'd-none'">
   <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
-      <button   class="continuebtn text-center btn float-right" (click)="saveExtra()"   *ngIf="!showSaveBtn && extraAttributeObject.value.header.toUpperCase() == 'ADDITIONAL'">
+      <button   class="continuebtn text-center btn float-right" (click)="saveExtra()"   *ngIf="!showSaveBtn">
           {{l("Continue")}}
      </button>
 <button

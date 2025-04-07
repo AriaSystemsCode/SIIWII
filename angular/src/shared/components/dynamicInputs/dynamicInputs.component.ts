@@ -14,15 +14,10 @@ export class dynamicInputs implements OnInit,OnChanges {
    @Input("entityType") entityType;
    @Input("entityObjectTypeId") entityObjectTypeId;
    @Output() extraDataChanged = new EventEmitter<any[]>();
-   @Input() createOrEdit: boolean = true;
-@Input() canChange: boolean = true;
 @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
-
-@Output() toggleEditMode = new EventEmitter<boolean>();
-hasUserInteracted = false;
-
 selectedExtraData: any[] = [];
 @Input() appTransactionsForViewDto: any;
+originalValuesMap = new Map<number, any>();
 
 
     ngOnInit(): void {
@@ -36,44 +31,70 @@ selectedExtraData: any[] = [];
         this.onAnyInputChange();
     }
     onAnyInputChange() {
-        if (!this.selectedExtraData) {
-          this.selectedExtraData = [];
-        }
-      
-        const updatedDataMap = new Map<number, any>();
-      
-        // Add all previously selected values to map
-        for (const item of this.selectedExtraData) {
-          updatedDataMap.set(item.attributeId, item);
-        }
-      
-        // Update or add new values
-        if (this.extraAttributeObject?.value?.extraAttributes) {
-          for (const attr of this.extraAttributeObject.value.extraAttributes) {
-            if (attr.selectedValues != null && attr.selectedValues !== '') {
-              let formattedValue = attr.selectedValues;
-      
-              if (attr.dataType === 'Datetime' && formattedValue instanceof Date) {
-                formattedValue = formattedValue.toISOString(); // or custom format
+      if (!this.selectedExtraData) {
+        this.selectedExtraData = [];
+      }
+    
+      const updatedDataMap = new Map<number, any>();
+    
+      // Preserve existing values
+      for (const item of this.selectedExtraData) {
+        updatedDataMap.set(item.attributeId, item);
+      }
+    
+      if (this.extraAttributeObject?.value?.extraAttributes) {
+        for (const attr of this.extraAttributeObject.value.extraAttributes) {
+
+          // ✅ Skip hidden fields
+          if (attr.isSelectedOnVariation || attr.isVariation) {
+            continue;
+          }
+        
+          let formattedValue = attr.selectedValues;
+        
+          // ✅ Handle datetime formatting and empty input case
+          if (attr.dataType === 'Datetime') {
+            const dateValue = new Date(formattedValue);
+        
+            if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
+              formattedValue = null;
+            } else {
+              formattedValue = dateValue.toISOString();
+        
+              // ✅ If it is epoch (1970) and original value exists, treat as unchanged
+              if (formattedValue === '1970-01-01T00:00:00.000Z') {
+                const originalValue = this.originalValuesMap.get(attr.attributeId);
+                if (originalValue) {
+                  formattedValue = originalValue; // keep original value
+                }
               }
-      
-              const updatedValue = {
-                attributeId: attr.attributeId,
-                value: formattedValue,
-                isLookup: attr.isLookup,
-                acceptMultipleValues: attr.acceptMultipleValues
-              };
-      
-              updatedDataMap.set(attr.attributeId, updatedValue);
             }
           }
+        
+          const originalValue = this.originalValuesMap.get(attr.attributeId);
+          const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
+        
+          const finalValue = (!isSame && formattedValue != null) ? formattedValue : null;
+        
+          const updatedValue = {
+            attributeId: attr.attributeId,
+            value: finalValue,
+            isLookup: attr.isLookup === true,
+            acceptMultipleValues: attr.acceptMultipleValues === true
+          };
+        
+          updatedDataMap.set(attr.attributeId, updatedValue);
         }
-      
-        // Final merged array
-        this.selectedExtraData = Array.from(updatedDataMap.values());
-        this.extraDataChanged.emit(this.selectedExtraData);
-        console.log('✅ Final emitted data:', this.selectedExtraData);
+        
       }
+      
+    
+      this.selectedExtraData = Array.from(updatedDataMap.values());
+    
+      this.extraDataChanged.emit(this.selectedExtraData);
+      console.log('✅ Final emitted data:', this.selectedExtraData);
+    }
+    
       
       
       fillSelectedValuesFromDto() {
@@ -128,35 +149,33 @@ selectedExtraData: any[] = [];
           attr.selectedValues = null;
         }
       
-        // ✅ Important: also clear original source
+        //  Also clear original source value 
         const matchedAttr = this.extraAttributeObject?.value?.extraAttributes?.find(
           a => a.attributeId === attr.attributeId
         );
         if (matchedAttr) {
-          if (matchedAttr.acceptMultipleValues) {
-            matchedAttr.selectedValues = [];
-          } else {
-            matchedAttr.selectedValues = null;
-          }
+          matchedAttr.selectedValues = attr.selectedValues;
         }
       
-        // Clean DTO
-        const dtoData = this.appTransactionsForViewDto?.extraDataAttributes;
-        if (dtoData) {
-          const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
-          if (matchedDto) {
-            matchedDto.selectedValues = [];
-          }
-        }
-      
-        // Clean emitted data
-        this.selectedExtraData = this.selectedExtraData.filter(
-          x => x.attributeId !== attr.attributeId
+        //  Update selectedExtraData to keep the attributeId, but empty value
+        const existingIndex = this.selectedExtraData.findIndex(
+          x => x.attributeId === attr.attributeId
         );
       
+        if (existingIndex !== -1) {
+          this.selectedExtraData[existingIndex].value = attr.acceptMultipleValues ? [] : null;
+        } else {
+          // If not found, push a new clean entry
+          this.selectedExtraData.push({
+            attributeId: attr.attributeId,
+            value: attr.acceptMultipleValues ? [] : null,
+            isLookup: attr.isLookup,
+            acceptMultipleValues: attr.acceptMultipleValues
+          });
+        }
+      
         this.extraDataChanged.emit(this.selectedExtraData);
-        this.extraDataCleared.emit(attr.attributeId); // 🔥 parent notified
-        console.log('🧹 Attribute cleared and notified parent:', attr.attributeId);
+        console.log(' Attribute cleared (but kept in data):', this.selectedExtraData);
       }
       
       

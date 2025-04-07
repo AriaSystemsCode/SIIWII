@@ -779,7 +779,7 @@ this.hideMainSpinner();
     .subscribe((res: GetAppTransactionsForViewDto) => {
          res.companeyNames=this.companeyNames;
           this.appTransactionsForViewDto = res;
-
+          this.getAppItemTypeExtraAttributesById();
           /// set validations 
           this.orderInfoValid = this.appTransactionsForViewDto.isOrderInformationValid;
           this.buyerContactInfoValid = this.appTransactionsForViewDto.isBuyerContactInformationValid;
@@ -1548,6 +1548,11 @@ stopReport(event) {
     console.log($event,'$even')
     this.activeIndex = $event + 1;
     this.currentTab= this.activeIndex ;
+if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+    console.log( this.currentTab,'$ this.currentTab')
+
   }
 
   refreshShoppingCart(event) {

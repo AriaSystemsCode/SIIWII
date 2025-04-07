@@ -17,7 +17,7 @@
             <label class="font-weight-bold">{{ attrMeta.extraAttrName | localize }}</label>
           </div>
           <div class="mt-1">
-            <ng-container>
+            <ng-container *ngIf="attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value">
               <span *ngIf="attrMeta.extraAttrDataType === 'Datetime'">
                 {{ attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value | date: 'dd MMMM yyyy' }}
               </span>
@@ -26,6 +26,9 @@
               </span>
               
             </ng-container>
+            <div *ngIf="!attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value || attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value ==''">
+              -
+            </div>
           </div>
         </div>
       </ng-container>
