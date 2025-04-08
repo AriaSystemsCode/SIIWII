@@ -2334,26 +2334,31 @@ namespace onetouch.AppItems
                 //MMT
                 List<AppEntity> sizesList = new List<AppEntity>();
                 List<AppEntity> colorsList = new List<AppEntity>();
-                foreach (var child in input.VariationItems)
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
-                    var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
-                    if (ext != null && sizesList.FirstOrDefault(z => z.Code == ext.AttributeCode) == null)
+                   
+                    foreach (var child in input.VariationItems)
                     {
-                        var sizesInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == ext.AttributeCode
-                           && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
-                        if(sizesInfo!=null)
-                            sizesList.Add(sizesInfo);
-                    }
-                    var extclr = child.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
-                    if (extclr != null && colorsList.FirstOrDefault(z => z.Code == extclr.AttributeCode) == null)
-                    {
-                        var colorInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == extclr.AttributeCode
-                           && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
-                        if (colorInfo != null)
-                            colorsList.Add(colorInfo);
+                        var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
+                        if (ext != null && sizesList.FirstOrDefault(z => z.Code == ext.AttributeCode) == null)
+                        {
+                            var sizesInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == ext.AttributeCode
+                               && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+                            if (sizesInfo != null)
+                                sizesList.Add(sizesInfo);
+                        }
+                        var extclr = child.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
+                        if (extclr != null && colorsList.FirstOrDefault(z => z.Code == extclr.AttributeCode) == null)
+                        {
+                            var colorInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                .Where(z => z.Code == extclr.AttributeCode
+                               && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+                            if (colorInfo != null)
+                                colorsList.Add(colorInfo);
+                        }
                     }
                 }
-                
                 //MMT
 
 
