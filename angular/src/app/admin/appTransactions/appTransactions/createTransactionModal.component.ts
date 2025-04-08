@@ -167,10 +167,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             reference:[""],
             priceLevel:['MSRP'],
             currencyId:[this.appSession.tenant.currencyInfoDto.value],
- 
+            buyerCompanySSIN: [''], 
 
         });
         this.orderForm.reset();
+         this.buyerCompanySSIN = ''
+         this.sellerCompanySSIN = ''
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
@@ -227,11 +229,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             reference:[""],
             priceLevel:['MSRP'],
             currencyId:[this.appSession.tenant.currencyInfoDto.value],
-   
+            buyerCompanySSIN: [''], 
 
             
         });
         this.orderForm.reset();
+        this.buyerCompanySSIN = ''
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
@@ -328,13 +331,16 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = !this.isBuyerTempAccount;
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
+             this.buyerCompanySSIN = ''
             this.areSame = false
             this.orderForm.controls["buyerCompanyBranch"].clearValidators();
             this.orderForm.controls["buyerCompanyBranch"].reset();
             this.orderForm.controls["buyerCompanyName"].reset();
+            this.orderForm.controls["buyerCompanySSIN"].setValue('');
             this.orderForm.controls["buyerContactName"].reset();
             this.orderForm.controls["buyerContactEMailAddress"].reset();
             this.orderForm.controls["buyerContactPhoneNumber"].reset();
+            this.orderForm.controls["buyerCompanySSIN"].setValue('');
         }
 
         else
@@ -1232,28 +1238,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.invalidSellerContactEMailAddress = "";
     }
 
-    cancel() {
-        this.isSeller = false;
-        this.isBuyer = false;
-        this.isBuyerTempAccount = false;
-        this.isSellerCompanyIdExist = false;
-        this.isCompantIdExist = false;
-        this.getAllCompanies();
-        this.sellerContacts = [];
-        this.buyerContacts = [];
-        this.orderForm.reset();
-        this.role = "";
-        this.modalClose.emit(false);
-        this.display = false;
-        this.Role.value = {};
-        this.submitted = false;
-        this.roles = [];
-        this.invalidSellerPhoneNumber = "";
-        this.invalidBuyerPhoneNumber = "";
-        this.invalidBuyerContactEMailAddress = "";
-        this.invalidSellerContactEMailAddress = "";
 
-    }
 
     changeTouchState(event){
         this.orderForm.controls['currencyId'].setValue(event.value)
@@ -1303,11 +1288,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             reference:[""],
             priceLevel:[""],
             currencyId:[this.appSession.tenant.currencyInfoDto.value],
-     
+            buyerCompanySSIN: [''], 
 
             
         });
-       
+           this.buyerCompanySSIN = ''
+        this.sellerCompanySSIN =''
         let today = new Date();
         let month = today.getMonth();
         let year = today.getFullYear();
@@ -1320,6 +1306,32 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minDate.setFullYear(prevYear);
         this.orderForm.controls['enteredDate'].setValue(new Date());
 
+
+    }
+
+    cancel() {
+        this.isSeller = false;
+        this.isBuyer = false;
+        this.isBuyerTempAccount = false;
+        this.isSellerCompanyIdExist = false;
+        this.isCompantIdExist = false;
+        this.orderForm.controls["buyerCompanySSIN"].setValue('');
+        this.areSame = false
+        this.buyerComapnyId = 0
+        this.getAllCompanies();
+        this.sellerContacts = [];
+        this.buyerContacts = [];
+        this.orderForm.reset();
+        this.role = "";
+        this.modalClose.emit(false);
+        this.display = false;
+        this.Role.value = {};
+        this.submitted = false;
+        this.roles = [];
+        this.invalidSellerPhoneNumber = "";
+        this.invalidBuyerPhoneNumber = "";
+        this.invalidBuyerContactEMailAddress = "";
+        this.invalidSellerContactEMailAddress = "";
 
     }
 }
