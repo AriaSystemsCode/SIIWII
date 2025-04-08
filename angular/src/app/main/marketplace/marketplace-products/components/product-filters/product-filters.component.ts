@@ -174,42 +174,71 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     }
 
     // get parent departements
-    getParentDepartments() {
-        let apiMethod = "getAllWithChildsForProductWithPaging";
-        const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            true,
-            undefined,
-            [],
-            "name",
-            0,
-            10
-        ).subscribe(
-            (res: {
-                items: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
-                totalCount: number;
-            }) => {
-                this.files = res.items;
-                if(this.savedFilters){
-                    this.selectedFile = this.findNodeById(this.files, this.selectedFile[0]);
-                }
+    // getParentDepartments() {
+    //     let apiMethod = "getAllWithChildsForProductWithPaging";
+    //     const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         true,
+    //         undefined,
+    //         [],
+    //         "name",
+    //         0,
+    //         10
+    //     ).subscribe(
+    //         (res: {
+    //             items: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
+    //             totalCount: number;
+    //         }) => {
+    //             this.files = res.items;
+    //             if(this.savedFilters){
+    //                 this.selectedFile = this.findNodeById(this.files, this.selectedFile[0]);
+    //             }
                 
-            }
-        );
-    }
-
-    collapseAll() {
-        this.files.forEach((node) => {
-            this.expandRecursive(node, false);
+    //         }
+    //     );
+    // }
+    hasSelectedChild(node: any, selectedId: number): boolean {
+        if (!node.children) return false;
+        return node.children.some(child => {
+          if (child.data.sycEntityObjectCategory.id === selectedId) {
+            return true;
+          }
+          // Recursively check deeper levels
+          return this.hasSelectedChild(child, selectedId);
         });
-    }
+      }
+      
+      collapseAll(selectedId?: number) {
+        this.files.forEach(node => {
+          node.expanded = false;
+      
+          // If selectedId is provided, expand node which has selected child
+          if (selectedId && this.hasSelectedChild(node, selectedId)) {
+            node.expanded = true;
+          }
+      
+          if (node.children) {
+            this.expandRecursiveWithSelection(node, selectedId);
+          }
+        });
+      }
+      expandRecursiveWithSelection(node: any, selectedId: number) {
+        node.expanded = this.hasSelectedChild(node, selectedId);
+      
+        if (node.children) {
+          node.children.forEach(childNode => {
+            this.expandRecursiveWithSelection(childNode, selectedId);
+          });
+        }
+      }
+            
 
     private expandRecursive(
         node: TreeNodeOfGetSycEntityObjectCategoryForViewDto,
@@ -222,6 +251,53 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
             });
         }
     }
+
+    expandToNodeById(nodes: any[], targetId: number): void {
+        for (let node of nodes) {
+          if (node.data.sycEntityObjectCategory.id === targetId) {
+            node.expanded = true;
+            return;
+          }
+      
+          if (node.children) {
+            const found = this.findNodeById(node.children, targetId);
+            if (found) {
+              node.expanded = true;
+              this.expandToNodeById(node.children, targetId);
+              return;
+            }
+          } else {
+            // If children are not yet loaded, load them and continue expanding
+            this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              node.data.sycEntityObjectCategory.id,
+              true,
+              undefined,
+              undefined,
+              "name",
+              0,
+              10
+            ).subscribe(res => {
+              node.children = res.items;
+              node.expanded = true;
+      
+              const found = this.findNodeById(node.children, targetId);
+              if (found) {
+                this.selectedFile = found;
+              } else {
+                this.expandToNodeById(node.children, targetId);
+              }
+            });
+          }
+        }
+      }
+      
 
     // get childs related to parents
     nodeExpand(value: any) {
@@ -325,30 +401,61 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         this.startSoldout = undefined
         
     }
+    getParentDepartments(): Promise<void> {
+        return new Promise((resolve) => {
+          let apiMethod = "getAllWithChildsForProductWithPaging";
+          this._sycEntityObjectCategoriesServiceProxy[apiMethod](
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            true,
+            undefined,
+            [],
+            "name",
+            0,
+            10
+          ).subscribe((res: any) => {
+            this.files = res.items;
+            resolve();
+          });
+        });
+      }
+      
 
     ngOnInit(): void {
- 
         this.savedFilters = localStorage.getItem("productFilters");
-            
+      
         if (this.savedFilters) {
-            const parsedFilters = JSON.parse(this.savedFilters);
-            console.log(parsedFilters.selectedDepartments,'parsedFilters.selectedDepartments')
-    
-            this.selectedFile = parsedFilters.selectedDepartments;
-            this.min = parsedFilters.minimumPrice;
-            this.max = parsedFilters.maximumPrice;
-            this.catalogId =  parsedFilters.appItemListId ;
-        
-            this.stockAvailablty = parsedFilters.onlyAvailableStock;
-            this.startSoldout = parsedFilters.startSoldOutData;
-            this.endSoldout = parsedFilters.endSoldOutData;
-            this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
-            this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
-            this.selctedBradns = parsedFilters.brands;
-       
-         
+          const parsedFilters = JSON.parse(this.savedFilters);
+          const selectedDepartmentId = parsedFilters.selectedDepartments?.[0];
+      
+          this.selectedFile = parsedFilters.selectedDepartments;
+          this.min = parsedFilters.minimumPrice;
+          this.max = parsedFilters.maximumPrice;
+          this.catalogId = parsedFilters.appItemListId;
+          this.stockAvailablty = parsedFilters.onlyAvailableStock;
+          this.startSoldout = parsedFilters.startSoldOutData;
+          this.endSoldout = parsedFilters.endSoldOutData;
+          this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
+          this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
+          this.selctedBradns = parsedFilters.brands;
+      
+          this.getParentDepartments().then(() => {
+            if (selectedDepartmentId) {
+              this.expandToNodeById(this.files, selectedDepartmentId);
+              this.collapseAll(selectedDepartmentId);
+            }
+          });
+        } else {
+          this.getParentDepartments();
         }
-    }
+      }
+      
     clearAllFiltrs(){
         this.resetFilters()
     this.handleStartPrice.emit('');

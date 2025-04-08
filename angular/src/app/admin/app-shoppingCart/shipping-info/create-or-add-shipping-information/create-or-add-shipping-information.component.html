@@ -95,6 +95,7 @@
     <div class="col-md-6 col-12 mb-4">
         <label class="label mt-1 mb-1">{{l("ShipVia")}}</label>
         <p-dropdown
+        *ngIf="appTransactionsForViewDto && shipViaList.length"
         (onChange)="selectShipVia($event)"
         id="shipVia"
         [(ngModel)]="appTransactionsForViewDto.shipViaId"

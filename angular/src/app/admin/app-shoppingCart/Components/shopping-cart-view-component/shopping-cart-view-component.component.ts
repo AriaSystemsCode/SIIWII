@@ -820,7 +820,7 @@ this.hideMainSpinner();
 
   getLinesData(){
      //lines
-   if  ((this.showTabs && this.activeIndex==6 ) || (!this.showTabs && this.activeIndex==0 )){
+   if  ((this.showTabs && this.activeIndex==8 ) || (this.showTabs && this.currentTab==8 ) || (!this.showTabs && this.activeIndex==0 )){
      this._AppTransactionServiceProxy
      .getOrderDetailsForView(
        this.orderId,
