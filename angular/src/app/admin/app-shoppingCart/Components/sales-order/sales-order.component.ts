@@ -209,6 +209,11 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     }
 
+    onReferenceChange() {
+        this.appTransactionsForViewDto.reference = this.reference;
+      }
+      
+
     openCalendar(calendar: Calendar) {
         calendar.inputfieldViewChild.nativeElement.click();
       }
