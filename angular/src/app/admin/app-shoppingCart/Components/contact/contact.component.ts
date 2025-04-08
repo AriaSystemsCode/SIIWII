@@ -1,14 +1,14 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { AccountBranchDto, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, PhoneNumberAndtype, TransactionType } from "@shared/service-proxies/service-proxies";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { AccountBranchDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, PhoneNumberAndtype, TransactionType } from "@shared/service-proxies/service-proxies";
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
-import { stringInsert } from "@devexpress/analytics-core/analytics-internal";
 import { AppComponentBase } from "@shared/common/app-component-base";
-import { EMPTY, switchMap } from "rxjs";
+
 
 @Component({
     selector: "app-contact",
     templateUrl: "./contact.component.html",
     styleUrls: ["./contact.component.scss"],
+    changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class ContactComponent extends AppComponentBase implements OnInit, OnChanges {
     companeyNames: any[];
@@ -27,7 +27,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     appTransactionContactsIndex = -1;
 
-    allPhoneTypes: PhoneNumberAndtype[];
+    allPhoneTypes: any[] = []; 
     filteredPhoneTypes :any
     allContacts: GetContactInformationDto[];
     allBranches;
@@ -44,43 +44,55 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     filteredContacts :any[]=[]
     filteredBranches :any[]=[]
     createManualComp: boolean = false;
-
+    branchData:any
+    @Input() addressValid: boolean;
     @Output() isTempComp = new EventEmitter<boolean>();
     @Output() validateTempBuyer = new EventEmitter<boolean>();
     conNew:boolean = false
     comNew:boolean = false
     emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+
+ 
     constructor(
         injector: Injector,
+  
+        private cdr: ChangeDetectorRef,
+        private _accountsServiceProxy :AccountsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private cdr: ChangeDetectorRef
     ) {
         super(injector);
         
     }
 
     ngOnInit(): void {
-        if(  this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN){
-            this.onClearText()
-
+        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
+            this.onClearText();
         }
-        this.resetSelectedData(); 
+    
+        this.resetSelectedData();
         this.setSelectedData();
-        this.getContacts()
-       
-     //   this.getAllCompaniesData();
-    //   this.comNew = JSON.stringify.(localStorage.getItem("comNew"));
-
-      const value = localStorage.getItem("comNew");
-        if (value) this.comNew = Boolean((value));
-
+    
+        // ✅ Fetch contacts and phone list if contact exists
+        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.ssin) {
+            this.getContacts();
+        } else {
+            this.getBranches();
+        }
+    
+        const value = localStorage.getItem("comNew");
+        if (value) this.comNew = Boolean(value);
+    
         const value2 = localStorage.getItem("conNew");
-        if (value2) this.conNew = Boolean((value2));
-     this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
+        if (value2) this.conNew = Boolean(value2);
+    
+        this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
+        this.isValidForm()
     }
+    
 
     ngOnChanges(changes: SimpleChanges) {
+      
      
        if( (changes?.currentTab?.currentValue !== undefined &&
         this.activeTab ==changes?.currentTab?.currentValue ) || (changes?.isCreateOrEdit !== undefined))
@@ -95,9 +107,16 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.getAllCompaniesData();
            
             // this.setSelectedData();
+        this.isValidForm()
+         
             
 
         }
+        this.isValidForm()
+        if (changes.addressValid && this.addressValid) {
+            this.isValidForm(); // Call the validation function when addressValid is updated
+          }
+
     }
 
 
@@ -145,6 +164,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.appTransactionsForViewDto.createManualContact = event?.target?.checked
 
         }
+        this.isValidForm();
 
     }
     preventTyping(event: KeyboardEvent): void {
@@ -174,44 +194,59 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
     }
 
-    setSelectedData(){
-       
-        if(this.appTransactionContactsIndex>=0){
-        if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany){
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany=new GetAccountInformationOutputDto();
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.name =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyName;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.accountSSIN =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companySSIN;
+    setSelectedData() {
+        if (this.appTransactionContactsIndex >= 0) {
+            if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany) {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = new GetAccountInformationOutputDto();
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.name =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyName;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.accountSSIN =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companySSIN;
+            }
+    
+            if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch) {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch = new AccountBranchDto();
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.name =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchName || '*Main*';
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.ssin =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchSSIN;
+            }
+    
+            if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = new GetContactInformationDto();
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.ssin =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactSSIN;
+            }
+    
+            if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType) {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = new PhoneNumberAndtype();
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType.phoneTypeName =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType.phoneTypeId =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId;
 
-        }
-      
-        if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch){
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch=new AccountBranchDto();
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.name =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchName || '*Main*';
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.ssin =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchSSIN;
-        }
-      
-        if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact){
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact=new GetContactInformationDto();
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.ssin =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactSSIN;
-        }
-
-        if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType){
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType=new PhoneNumberAndtype();
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType.phoneTypeName =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType.phoneTypeId =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId;
-        } 
-        if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber)
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType.phoneNumber =  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
+            }
     
+            if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber)
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
     
-        if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContactEmail)
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =   this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail;
+            if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContactEmail)
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail;
     
-    } 
+           
+            if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.ssin) {
+                this.getContacts(true);  // Fetch the contact's phone list
+            }
+        }
+        this.isValidForm()
 
     }
-
+    
     onChangeCompany(event) {
        
         var tempContact:boolean=false;
@@ -234,6 +269,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = ''
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = event?.email
+
+        this.isValidForm();
     }
 
     getAppTransactionContactsIndex() {
@@ -295,88 +332,59 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
 
-    /*  getPhoneType() {
-         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
-             this.allPhoneTypes = result;
- 
-             // if (!this.selectedPhoneType) {
-             this.selectedPhoneType = this.allPhoneTypes?.find(x => x.value == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneTypeId);
-             if (!this.selectedPhoneType)
-                 this.selectedPhoneType = null;
-             this.__selectedPhoneTypeValue = this.selectedPhoneType?.value;
-             //  }
- 
-         });
-     } */
-        //  handlePhoneSearch($event){
-        //     console.log($event,'phonesearch')
-        //     console.log(this.allPhoneTypes,'this.allPhoneTypes')
-        //     // var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.query);
-        //     // if ($event?.phoneNumber) {
-        //     //     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = $event?.phoneNumber
-        //     // }else {
-        //     //     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  null
-        //     // }
-        //     this.filteredPhoneTypes = this.allPhoneTypes.filter(type => 
-        //         type.phoneTypeName.toLowerCase().includes($event.query.toLowerCase())
-        //     );
-        //     console.log(this.allPhoneTypes,'this.allPhoneTypesennnnndddd')
 
-        //  }
-    // onchangePhoneType($event) {
-    //     console.log($event,'$evvphoone')
-    //     if ($event) {
-    //         console.log($event,'helllo')
-    //         var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.query);
-    //     if ($event?.phoneNumber) {
-    //         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = $event?.phoneNumber
-    //     }else {
-    //         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  null
-    //     }
-    //     }
-    //     else
-    //         var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.phoneTypeId);
-    //     if (indx >= 0)
-    //         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes[indx];
-
-    //     if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType)
-    //         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-    //     this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId
-
-    //     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = ! this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber  ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber ;
-    //     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = ! this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContactEmail  ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail ;
-        
-        
-    //     }
 
     onchangePhoneType($event) {
-
         if ($event?.value) {
-        
+   
+    
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.value?.phoneTypeId);
+    
+            if ($event?.value?.phoneNumber) {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = $event?.value?.phoneNumber;
+            } else {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = null;
+            }
+    
+            // ✅ Ensure ContactPhoneTypeName is set correctly
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = 
+                $event?.value?.phoneTypeName || "Default Type";
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = 
+                $event?.value?.phoneNumber ;
+        } else {
            
-        if ($event?.value?.phoneNumber) {
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = $event?.value?.phoneNumber
-        }else {
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  null
-        }
-        }
-        else
+    
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.phoneTypeId);
-          
-
-        if (indx >= 0)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes[indx];
-
-        if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-        this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId
-
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = ! this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber  ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber ;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = ! this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContactEmail  ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail ;
-        
-        
+    
+            if (indx >= 0) {
+         
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = $event;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = 
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType?.phoneNumber;
+                
+                // ✅ Ensure ContactPhoneTypeName is set correctly
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = 
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType?.phoneTypeName || "Default Type";
+            }
         }
+    
+        if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType) {
+            console.log($event, '444444 <<<');
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
+            this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
+    
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber || "";
+    
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail || "";
+            
+            // ✅ Set default value to avoid empty validation errors
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = "Default Type";
+        }
+    }
+    
+    
         getContacts(tempContact:boolean=false) {
             if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
                 this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, undefined).subscribe(result => {
@@ -397,22 +405,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         if(this.appTransactionsForViewDto)
                         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = this.allContacts?.find(x => x.ssin == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactSSIN);
     
-                        // if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName){
-                        //      let contact: GetContactInformationDto = new GetContactInformationDto();
-                             
-                           
-                        //         contact.ssin=null;
-                        //         contact.id=0;
-                        //         contact.name=this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
-                        //         contact.email=this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactEmail;
-                        //         contact.phone=this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
-                        //         contact.phoneTypeId=this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId;
-                        //         contact.phoneTypeName=this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName;
-                        //         contact.phoneList=[];
-                             
-                        //     this.allContacts.push(contact);
-                        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = this.allContacts?.find(x => x.name == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName);
-                        // }
+                     
                         if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact){
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
@@ -422,7 +415,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         }
     
                         else
-                            this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact);
+                            this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact,false);
                     }
                 });
             }
@@ -441,7 +434,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
             }
-    
+            this.isValidForm();
         }
    
         
@@ -492,27 +485,43 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 
             });
         }
+        this.isValidForm()
+
         }
         
 
-    getBranches() {
-        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
-            this.showMainSpinner();
-            this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
-                this.allBranches = result;
-                if(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.branchName){
-                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch = this.allBranches?.find(x => x.name == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.branchName);
+        getBranches() {
+            const contact = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex];
+            
+            if (contact?.selectedCompany?.accountSSIN) {
+                this.showMainSpinner();
+        
+                this._AppTransactionServiceProxy.getAccountBranches(contact.selectedCompany.accountSSIN)
+                    .subscribe(result => {
+                        this.allBranches = result;
+        
+                        // Assign the correct branch
+                        if (contact.branchName) {
+                            contact.selectedBranch = this.allBranches?.find(x => x.name === contact.branchName);
+                        } else if (this.allBranches.length === 1) {
+                            contact.selectedBranch = this.allBranches[0];
+                        }
+        
+                        //  Ensure `getBranchDetails` is only called when `selectedBranch` exists
+                        if (contact.selectedBranch) {
+                            this.getBranchDetails(contact.selectedBranch.id)
+                        } else {
+                            this.hideMainSpinner(); // Hide spinner if no branch is selected
+                        }
+                    });
+            }
+            this.hideMainSpinner(); // Hide spinner if no branch is selected
+            this.isValidForm()
+ 
 
-                }else if (this.allBranches.length==1){
-                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch =this.allBranches[0];
-                }
-                this.hideMainSpinner();
-
-                // if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch)
-                //     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.name = 'Main'
-            });
         }
-    }
+
+        
     getAllCompaniesData() {
        
         this.companyFilterValue = "";
@@ -538,21 +547,24 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     // this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact);
                 }
                 else {
+                    // this.getBranches();
                     this.tempAccount = false;
                     if(this.appTransactionsForViewDto)
                     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN)
 
                     if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
+
+
                         //  if(this.isCreateOrEdit){
                         // this.getContacts();
 
                         // }
-                        this.getBranches();
+                        
                       
                         if (this.loadAddressComponent) {
                             this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id });
                         }
-                    }
+                    } 
 
                    
                     // else if(this.appTransactionsForViewDto){
@@ -565,6 +577,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 }
 
                 this.hideMainSpinner();
+
+                this.isValidForm();
     }
 
     isValidForm(): boolean {
@@ -582,6 +596,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType) {
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeName;
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber  = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneNumber;
+
                 this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
             }
 
@@ -636,78 +652,83 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
         return isValid;
     }
+
+    
     
     onChangeEmail($event){
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail;
+        this.isValidForm()
 
     }
 
     onChangePhoneNumber(event){
        
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber;
+        this.isValidForm()
+
     }
 
-    onChangeContact(event:any) {
-      
+    onChangeContact(event: any,stop=true) {
+       
+        console.log(event, 'Incoming Event Data');
+        console.log(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType, 'Previous Phone Type');
+    
         if (this.tempContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
-            this.tempContact = false
+            this.tempContact = false;
             this.contactFilterValue = "";
-     
-
         }
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
-
-        
-
-
+    
+        // Reset contact details
+        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
+        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
+        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
+    
         if (event) {
-          
-            this.allPhoneTypes = event?.phoneList;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes?.find(x => x.phoneTypeId == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneTypeId);
-
-            // this.handlePhoneSearch(event.phoneList)
+            // Assign new contact details
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
-            if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  event?.email ;
-        }
-
-        else {
-   
-
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = this.allPhoneTypes?.find(x => x.phoneTypeId == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneTypeId);
-            this.allPhoneTypes = event?.phoneList;
-            // this.handlePhoneSearch(event.phoneList)
-
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
-            // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =     event?.phoneNumber ;
-            // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  event?.emaail ;
-        } 
-
-      
-
-        if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType)
-           {
-
-
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-            event?.phone == null ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber ;
-            event?.email == null ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail ;
-        } 
-           
-
-        else
-      
-
-            this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
-
-        this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
-
+            this.allPhoneTypes = event?.phoneList ;
+    if(stop){
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone || "";
     }
+         
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = event?.phone || "";
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId = event?.phoneTypeId || "";
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = event?.phoneTypeName || "";
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = event?.email || "";
+    
+            // ✅ Ensure selected phone type is assigned correctly
+            if (event?.phoneList?.length > 0) {
+                let matchedPhoneType = event.phoneList.find(p => p.phoneNumber === event.phone);
+    
+                if (!matchedPhoneType) {
+                    // Try to keep the previous selection if it's still valid
+                    const prevPhoneType = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType;
+                    
+                    if (prevPhoneType && event.phoneList.some(p => p.phoneTypeId === prevPhoneType.phoneTypeId)) {
+                        matchedPhoneType = event.phoneList.find(p => p.phoneTypeId === prevPhoneType.phoneTypeId);
+                    } 
+                }
+    
+                // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = matchedPhoneType;
+            }
+        } else {
+            // Reset selection if event is null
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
+        }
+    
+        // Assign selected phone type value (for UI binding)
 
+
+        this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+    // }
+        this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId || null;
+        this.isValidForm();
+    }
+    
+    
 
 
 
@@ -747,6 +768,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     // // this.sellerCompanies = [...res.items];
                 });
         }, 1000);
+        this.isValidForm();
     }
     handleBranchSearch(event){
     this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
@@ -758,12 +780,97 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     
     });
+    this.isValidForm();
 }
+
+
+getBranchDetails(id) {
+    if ( !id || this.branchData?.id === id) return; // Prevent redundant calls
+
+    this._accountsServiceProxy.getBranchForEdit(id).subscribe(res => {
+        this.branchData = res; 
+        console.log(this.branchData, 'Branch Data Received');
+        this.extractPhoneTypes(this.branchData,'changed');
+    });
+         this.isValidForm();
+}
+
+extractPhoneTypes(response: any,changeBranch?:any) {
+    console.log(response, 'Response in extractPhoneTypes');
+
+
+        let arr: PhoneNumberAndtype[] = [];
+
+        this.allPhoneTypes = [];
+
+        Object.keys(response).forEach((key) => {
+            if (key.startsWith("phone") && key.endsWith("TypeId")) {
+                const phoneTypeId = response[key];
+                const phoneTypeNameKey = key.replace("TypeId", "TypeName");
+                const phoneTypeName = response[phoneTypeNameKey];
+
+                const phoneNumberKey = key.replace("TypeId", "Number");
+                const phoneNumber = response[phoneNumberKey];
+
+                if (phoneTypeId && phoneTypeName && phoneNumber) {
+                    arr.push({
+                        phoneNumber: phoneNumber,
+                        phoneTypeId: phoneTypeId,
+                        phoneTypeName: phoneTypeName,
+                        init: () => {},
+                        toJSON: () => ({ phoneNumber, phoneTypeId, phoneTypeName })
+                    });
+                }
+            }
+        });
+
+        this.allPhoneTypes = [...arr];
+
+        //  Assign correct phone type based on selected phone number
+        // if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber) {
+        //     const selectedPhone = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
+        //     const matchedPhoneType = this.allPhoneTypes.find(p => p.phoneNumber === selectedPhone);
+
+        //     // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = matchedPhoneType;
+        // console.log(matchedPhoneType, 'matchedPhoneType');
+
+        // }
+        if(changeBranch =='changed'){
+            this.onchangePhoneType(this.allPhoneTypes[0]);
+
+        }
+        // this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+        this.cdr.detectChanges(); 
+ 
+    this.isValidForm();
+}
+
+
+
+  onBranchChange(event){
+    this.getBranchDetails(event?.id)
+    this.isValidForm()
+
+  }
     ngDoCheck() {
-        
-        this.isValidForm();
-        this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
-        
+    
+   
+if(this.appTransactionsForViewDto?.buyerCompanySSIN != '' || this.appTransactionsForViewDto?.buyerCompanySSIN != null){
+
+
+        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType) {
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeName;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
+
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneNumber;
+            
+            this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
+        }
+       
+    }
+
+    // this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+       
     }
 
 }
