@@ -336,6 +336,12 @@ debugger
       this.appTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
       this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
     }
+    if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) {
+      this.isContactsValid = true;
+      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
+    } else {
+      this.isContactsValid = false;
+    }
   }
   updateArContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ARContact);

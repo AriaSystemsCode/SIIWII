@@ -235,7 +235,7 @@ SuccessMsg: boolean = false;
       });
   }
 
-  }
+  
   enterStore() {
     this.appTransactionsForViewDto.buyerStore = this.storeVal;
   }
