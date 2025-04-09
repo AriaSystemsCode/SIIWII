@@ -235,7 +235,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         });
         this.orderForm.reset();
         this.buyerCompanySSIN = ''
-        this.buyerCompanySSIN = ''
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
@@ -337,7 +336,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             this.orderForm.controls["buyerCompanyBranch"].clearValidators();
             this.orderForm.controls["buyerCompanyBranch"].reset();
             this.orderForm.controls["buyerCompanyName"].reset();
-            this.orderForm.controls["buyerCompanySSIN"].setValue('');
             this.orderForm.controls["buyerCompanySSIN"].setValue('');
             this.orderForm.controls["buyerContactName"].reset();
             this.orderForm.controls["buyerContactEMailAddress"].reset();
@@ -1241,7 +1239,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
 
-
     changeTouchState(event){
         this.orderForm.controls['currencyId'].setValue(event.value)
         
@@ -1336,4 +1333,5 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.invalidSellerContactEMailAddress = "";
 
     }
+
 }
