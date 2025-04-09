@@ -173,96 +173,96 @@ import { finalize } from "rxjs";
         }
         
     
-        loadRecommendedAndAdditionalExtraDataLookupLists() {
-            this.extraAttributes.RECOMMENDED.extraAttributes.forEach(
-                (extraAttr) => {
-                    if (!extraAttr.isLookup) return;
-                    this.loadExtraDataLookupList(extraAttr);
-                }
-            );
-            this.extraAttributes.ADDITIONAL.extraAttributes.forEach((extraAttr) => {
-                if (!extraAttr.isLookup) return;
-                this.loadExtraDataLookupList(extraAttr);
-            });
-        }
-        loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
-          this._extraAttributeDataService
-            .getExtraAttributeLookupDataWithPaging(
-              extraAttr.entityObjectTypeCode,
-              extraAttr.paginationSetting.skipCount,
-              extraAttr.paginationSetting.maxResultCount
-            )
-            .subscribe((result) => {
-              extraAttr.paginationSetting.totalCount = result.totalCount;
+        // loadRecommendedAndAdditionalExtraDataLookupLists() {
+        //     this.extraAttributes.RECOMMENDED.extraAttributes.forEach(
+        //         (extraAttr) => {
+        //             if (!extraAttr.isLookup) return;
+        //             this.loadExtraDataLookupList(extraAttr);
+        //         }
+        //     );
+        //     this.extraAttributes.ADDITIONAL.extraAttributes.forEach((extraAttr) => {
+        //         if (!extraAttr.isLookup) return;
+        //         this.loadExtraDataLookupList(extraAttr);
+        //     });
+        // }
+        // loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
+        //   this._extraAttributeDataService
+        //     .getExtraAttributeLookupDataWithPaging(
+        //       extraAttr.entityObjectTypeCode,
+        //       extraAttr.paginationSetting.skipCount,
+        //       extraAttr.paginationSetting.maxResultCount
+        //     )
+        //     .subscribe((result) => {
+        //       extraAttr.paginationSetting.totalCount = result.totalCount;
         
-              if (extraAttr.paginationSetting.skipCount === 0) {
-                extraAttr.paginationSetting.list = [];
-              } else {
-                extraAttr.paginationSetting.list.splice(
-                  extraAttr.paginationSetting.list.length - 1,
-                  1
-                );
-              }
+        //       if (extraAttr.paginationSetting.skipCount === 0) {
+        //         extraAttr.paginationSetting.list = [];
+        //       } else {
+        //         extraAttr.paginationSetting.list.splice(
+        //           extraAttr.paginationSetting.list.length - 1,
+        //           1
+        //         );
+        //       }
         
-              const isExist = result.items.some(
-                (item) => item.value == extraAttr.selectedValues
-              );
+        //       const isExist = result.items.some(
+        //         (item) => item.value == extraAttr.selectedValues
+        //       );
         
-              if (!isExist && extraAttr?.selectedValues) {
-                const tempAtt = new LookupLabelDto({
-                  code: extraAttr.code,
-                  label: extraAttr.selectedValues,
-                  stockAvailability: undefined,
-                  value: extraAttr.selectedValues,
-                  isHostRecord: false,
-                  hexaCode: undefined,
-                  image: undefined,
-                });
-                result.items.push(tempAtt);
-              }
+        //       if (!isExist && extraAttr?.selectedValues) {
+        //         const tempAtt = new LookupLabelDto({
+        //           code: extraAttr.code,
+        //           label: extraAttr.selectedValues,
+        //           stockAvailability: undefined,
+        //           value: extraAttr.selectedValues,
+        //           isHostRecord: false,
+        //           hexaCode: undefined,
+        //           image: undefined,
+        //         });
+        //         result.items.push(tempAtt);
+        //       }
         
-              extraAttr.paginationSetting.list.push(...result.items);
+        //       extraAttr.paginationSetting.list.push(...result.items);
         
-              if (
-                extraAttr.paginationSetting.list.length <
-                extraAttr.paginationSetting.totalCount
-              ) {
-                const showMoreSelectItem: SelectItem = {
-                  value: -1,
-                  label: this.l("showMore"),
-                  icon: "fas fa-reply",
-                  styleClass: "showMore",
-                  disabled: false,
-                };
-                extraAttr.paginationSetting.list.push(showMoreSelectItem);
-              }
+        //       if (
+        //         extraAttr.paginationSetting.list.length <
+        //         extraAttr.paginationSetting.totalCount
+        //       ) {
+        //         const showMoreSelectItem: SelectItem = {
+        //           value: -1,
+        //           label: this.l("showMore"),
+        //           icon: "fas fa-reply",
+        //           styleClass: "showMore",
+        //           disabled: false,
+        //         };
+        //         extraAttr.paginationSetting.list.push(showMoreSelectItem);
+        //       }
         
-              extraAttr.paginationSetting.skipCount +=
-                extraAttr.paginationSetting.maxResultCount;
-            });
-        }
+        //       extraAttr.paginationSetting.skipCount +=
+        //         extraAttr.paginationSetting.maxResultCount;
+        //     });
+        // }
         
-          setAdditionalAndRecommendedExtraAttributes() {
-            if (!this.extraAttributes) {
-              console.warn('extraAttributes is undefined');
-              return;
-            }
+        //   setAdditionalAndRecommendedExtraAttributes() {
+        //     if (!this.extraAttributes) {
+        //       console.warn('extraAttributes is undefined');
+        //       return;
+        //     }
           
-                const extraAttributres =
-                    this.selectedItemTypeData.extraAttributes.extraAttributes;
-                this.extraAttributes.RECOMMENDED.extraAttributes =
-                    this._extraAttributeDataService.getFilteredAttributesByUsage(
-                        extraAttributres,
-                        EExtraAttributeUsage.Recommended,
-                        false
-                    );
-                this.extraAttributes.ADDITIONAL.extraAttributes =
-                    this._extraAttributeDataService.getFilteredAttributesByUsage(
-                        extraAttributres,
-                        EExtraAttributeUsage.Additional,
-                        false
-                    );
-            }
+        //         const extraAttributres =
+        //             this.selectedItemTypeData.extraAttributes.extraAttributes;
+        //         this.extraAttributes.RECOMMENDED.extraAttributes =
+        //             this._extraAttributeDataService.getFilteredAttributesByUsage(
+        //                 extraAttributres,
+        //                 EExtraAttributeUsage.Recommended,
+        //                 false
+        //             );
+        //         this.extraAttributes.ADDITIONAL.extraAttributes =
+        //             this._extraAttributeDataService.getFilteredAttributesByUsage(
+        //                 extraAttributres,
+        //                 EExtraAttributeUsage.Additional,
+        //                 false
+        //             );
+        //     }
         
             // setSelectedAppEntityExtraDataOnEditMode() {
             //     // if (!this.appItem.entityExtraData) return;
@@ -387,9 +387,10 @@ import { finalize } from "rxjs";
           
             const existingData = this.appTransactionsForViewDto.entityExtraData;
           
-            const incomingData: AppEntityExtraDataDto[] = dataFromChild.map(attr => {
+            // Step 1: Map incoming data cleanly
+            const incomingData: AppEntityExtraDataDto[] = dataFromChild.flatMap(attr => {
               if (attr.isLookup && attr.acceptMultipleValues) {
-                return attr.value.map(v => {
+                return (attr.value || []).map(v => {
                   const d = new AppEntityExtraDataDto();
                   d.attributeId = attr.attributeId;
                   d.attributeValueId = v;
@@ -405,25 +406,29 @@ import { finalize } from "rxjs";
                 }
                 return dto;
               }
-            }).flat();
+            });
           
-            // Merge logic: Replace existing attributeId matches, keep others
-            for (const incoming of incomingData) {
-              const index = existingData.findIndex(
-                x => x.attributeId === incoming.attributeId && (!incoming.attributeValueId || x.attributeValueId === incoming.attributeValueId)
-              );
+            // Step 2: Filter out invalid values (null / undefined / empty strings)
+            const cleanIncomingData = incomingData.filter(
+              d => (d.attributeValueId != null) || 
+                   (d.attributeValue != null && d.attributeValue !== '')
+            );
+            
           
-              if (index > -1) {
-                existingData[index] = incoming;
-              } else {
-                existingData.push(incoming);
-              }
-            }
+            // Step 3: Remove old entries for incoming attributeIds
+            const incomingAttributeIds = new Set(cleanIncomingData.map(d => d.attributeId));
+            const filteredExistingData = existingData.filter(
+              d => !incomingAttributeIds.has(d.attributeId)
+            );
           
-            console.log(existingData, '✅ Merged Extra Attributes');
+            // Step 4: Merge clean incoming data
+            const finalData = [...filteredExistingData, ...cleanIncomingData];
           
-            this.appTransactionsForViewDto.entityExtraData = existingData;
+            this.appTransactionsForViewDto.entityExtraData = finalData;
+          
+            console.log(finalData, '✅ Cleaned and Merged Extra Attributes');
           }
+          
           
           onExtraAttributeCleared(attributeId: number) {
             const data = this.appTransactionsForViewDto?.entityExtraData;

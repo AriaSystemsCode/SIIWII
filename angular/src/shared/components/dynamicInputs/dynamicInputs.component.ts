@@ -42,8 +42,8 @@ originalValuesMap = new Map<number, any>();
         updatedDataMap.set(item.attributeId, item);
       }
     
-      if (this.extraAttributeObject?.value?.extraAttributes) {
-        for (const attr of this.extraAttributeObject.value.extraAttributes) {
+      if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
+        for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
 
           // ✅ Skip hidden fields
           if (attr.isSelectedOnVariation || attr.isVariation) {

@@ -371,7 +371,7 @@
 
 
               
-                            <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="i == 0 ?currentTab = 6: currentTab = 7">
+                            <!-- <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="i == 0 ?currentTab = 6: currentTab = 7">
                          
 
                               <ng-template pTemplate="header">
@@ -381,18 +381,7 @@
                                 </div>
                               </ng-template>
                           
-                              <!-- <app-dynamicInputs
-                                [extraAttributeObject]="extraAttributeObject"
-                                [entityObjectTypeId]="114"
-                                [entityType]="'Transaction'"
-                                (extraDataChanged)="onExtraAttributesChanged($event)">
-                                >
-                              </app-dynamicInputs>
-
-                              <app-dynamicInputs-view
-                         [appTransactionsForViewDto]="appTransactionsForViewDto"
-                           >
-                            </app-dynamicInputs-view> -->
+                     
                          <div *ngIf="currentTab==6 || currentTab==7">
                             <create-or-edit-extra-data 
                         
@@ -413,40 +402,17 @@
                             <div>
 
                             </div>
-                              <!-- <div class="d-flex justify-content-end mx-3"  *ngIf="appTransactionsForViewDto?.entityStatusCode != 'OPEN'">
-                                <button type="button"
-                                class="btn bgPurple  bgPurple border-0  pointer Proceedtocheckout"
-                                style="height: 37px;"  (click)="saveExtra()">
-                                countinue
+                      
                              
-                            
-                          </button>
-                                </div>
-
-                                 <div class="d-flex justify-content-end mx-3" *ngIf="appTransactionsForViewDto?.entityStatusCode == 'OPEN'">
-                            <button type="button"
-                            class="btn bgPurple  bgPurple border-0  pointer Proceedtocheckout"
-                            style="height: 37px;"  (click)="saveExtra()">
-                            Save
-                         
-                        
-                      </button>
-
-                      <button type="button"
-                      class="btn bg-white border-0  pointer Proceedtocheckout"
-                      style="height: 37px;"  (click)="saveExtra()">
-                      cancel
-                   
-                  
-                </button>
-                                  </div> -->
-                            </p-accordionTab>
+                     
+                 
+                            </p-accordionTab> -->
 
                
                         
 
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="currentTab=8; getLinesData()">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="currentTab=6; getLinesData()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 mt-1 purpleColor">{{l("OrderDetails")}}</h6>
@@ -666,10 +632,7 @@
                                               (onChange)="onColorSelect($event)"
                                               #dropdown
                                             >
-                                            <!-- [(ngModel)]="selectedVariation"
-                                            (onFilter)="handleVarSearch($event, dropdown)"
-                                               formControlName="selectedVariation"
-                                          -->
+                                       
                                               <!-- Custom item template -->
                                               <ng-template let-option pTemplate="item">
                                                 <div>{{ option.colorName }} </div>
@@ -687,10 +650,8 @@
                                                 <div class="col-md-6 col-12 d-flex" *ngIf="displayProductdata">
                                                     <img
                                               
-                                              
-                                                    src="
-                                                    https://static.zara.net/assets/public/fede/6bac/bd674da19a97/65e20b1bbf1f/03067306250-p/03067306250-p.jpg?ts=1736959809724&w=330
-                                                    "
+                                                    [src]="
+                                                    attachmentBaseUrl + '/' + selectedMainImgProduct"
                                                     alt="images slides"
                                                     [ngStyle]="{ 'width.px':  (140 * acceptedAspectRatio )  }"
                                                     style="height: 140px;margin-right: 5px; border-radius: 6px;"
@@ -848,21 +809,15 @@
                                            
                                           
                                         ></div>
-                                        <!-- [src]="
-                                        attachmentBaseUrl + '/' + selectedColorImg
-                                    " -->
+                                 
                                         <img
-                                            *ngIf="
-                                                (selectedColorImg === null &&
-                                                selectedColorCode === null) ||
-                                                selectedColorImg !== null
-                                            "
+                                        *ngIf="
+                                       (( selectedColorCode =='' && selectedColorImg !=''  ) || (selectedColorCode=='' && selectedColorImg==''))
+                                        "
                                       
-                                      
-                                            
-                                            src="
-                                            https://static.zara.net/assets/public/fede/6bac/bd674da19a97/65e20b1bbf1f/03067306250-p/03067306250-p.jpg?ts=1736959809724&w=330
-                                            "
+                                            [src]="
+                                            attachmentBaseUrl + '/' + selectedColorImg
+                                        "
                                     
                                             [ngStyle]="{ 'height.px':  (65 / acceptedAspectRatio )  }"
                                             alt="images slides"
@@ -871,7 +826,17 @@
                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                       
                                         />
-                                       
+                                        <div
+                                        *ngIf="
+                                        ( selectedColorCode !='' )
+                                         "
+                        
+                                    style="width: 65px;border-top-left-radius: 6px;border-top-right-radius: 6px;"
+                                    class="imageSlides"
+                                    class="colorBox"
+                                    [ngStyle]="{'background-color':selectedColorCode, 'height.px':  (65 / acceptedAspectRatio )}"
+                              
+                                ></div>
                                         <div class="" style="font-size: 10px;">
                                       
                                            
@@ -1842,11 +1807,9 @@ height: 48px;"
                                         <div class="d-flex row">
                                             <div class="col-md-6 col-12 d-flex" *ngIf="displayProductdata">
                                                 <img
-                                          
-                                          
-                                                src="
-                                                https://static.zara.net/assets/public/fede/6bac/bd674da19a97/65e20b1bbf1f/03067306250-p/03067306250-p.jpg?ts=1736959809724&w=330
-                                                "
+                                              
+                                                [src]="
+                                                attachmentBaseUrl + '/' + selectedMainImgProduct"
                                                 alt="images slides"
                                                 [ngStyle]="{ 'width.px':  (140 * acceptedAspectRatio )  }"
                                                 style="height: 140px;margin-right: 5px; border-radius: 6px;"
@@ -2007,26 +1970,33 @@ height: 48px;"
                                     <!-- [src]="
                                     attachmentBaseUrl + '/' + selectedColorImg
                                 " -->
-                                    <img
+                                <img
                                         *ngIf="
-                                            (selectedColorImg === null &&
-                                            selectedColorCode === null) ||
-                                            selectedColorImg !== null
+                                       (( selectedColorCode =='' && selectedColorImg !=''  ) || (selectedColorCode=='' && selectedColorImg==''))
                                         "
-                                  
-                                  
-                                        
-                                        src="
-                                        https://static.zara.net/assets/public/fede/6bac/bd674da19a97/65e20b1bbf1f/03067306250-p/03067306250-p.jpg?ts=1736959809724&w=330
+                                      
+                                            [src]="
+                                            attachmentBaseUrl + '/' + selectedColorImg
                                         "
-                                
-                                        [ngStyle]="{ 'height.px':  (65 / acceptedAspectRatio )  }"
-                                        alt="images slides"
-                                        style="width: 65px;"
-                                        class="imageSlides"
-                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                  
-                                    />
+                                    
+                                            [ngStyle]="{ 'height.px':  (65 / acceptedAspectRatio )  }"
+                                            alt="images slides"
+                                            style="width: 65px;"
+                                            class="imageSlides"
+                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                      
+                                        />
+                                        <div
+                                        *ngIf="
+                                        ( selectedColorCode !='' )
+                                         "
+                        
+                                    style="width: 65px;border-top-left-radius: 6px;border-top-right-radius: 6px;"
+                                    class="imageSlides"
+                                    class="colorBox"
+                                    [ngStyle]="{'background-color':selectedColorCode, 'height.px':  (65 / acceptedAspectRatio )}"
+                              
+                                ></div>
                                    
                                     <div class="" style="font-size: 10px;">
                                   

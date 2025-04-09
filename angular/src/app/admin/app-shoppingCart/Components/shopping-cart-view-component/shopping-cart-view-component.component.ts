@@ -149,9 +149,7 @@ appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
   selectedItemTypeData: GetAllEntityObjectTypeOutput =
         new GetAllEntityObjectTypeOutput();
 
-extraAttributes: {
-  [key in EExtraAttributeUsage]: CreateEditAppItemExtraAttribute;
-};
+extraAttributes:any;
 openAdditional= false
 hasLoadedAdditional: boolean = false;
 extraAttributesMeta:any
@@ -427,25 +425,13 @@ loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
 onVariationSelect(event: any) {
   // Reset quantity and price when a new variation is selected  
   console.log(event,'mmmmmmevv')
-// this.filterForm.reset();
-  // filters.reset()
-  // this.filterForm.controls['selectedQuantity']?.setValue(0);
-  // this.selectedQuantity = 0;
-  // this.selectedPrice = 0;
-  // this.newData = event;
-
-  // if ( event.value.appItem.price) {
-  //   this.selectedImg = event.value.appItem.image
-   
-  //    this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
-  //   //  this.selectedPrice = filters.selectedPrice
-  //   this.updateAmount(); // Recalculate the amount when a new price is selected
-  // }
   this.getProductDetailsForView( event.value.appItem.id)
   this.selectedMainImgProduct =  event.value.appItem.imageUrl
   this.displayProductdata = true
   this.displayColordata = false
   this.displaysizesdata = false
+  console.log(this.selectedMainImgProduct,'this.selectedMainImgProduct')
+
 }
 
 updateAmount() {
@@ -523,35 +509,6 @@ saveVariations() {
 
 
 
-//   const body = new AddVariationToInputDto();
-//   const filters = this.filterForm.value;
-  
-//  this.selectedPrice = filters.selectedPrice
-//  this.selectedQuantity = filters.selectedQuantity
-//   // Assign each property to the DTO object
-//   body.variationSSIN = this.newData?.value?.appItem?.ssin;
-//   body.qty = this.selectedQuantity;
-//   body.price = this.selectedPrice;
-//   body.transactionId = this.orderId;
-//   body.transactionType = this.appTransactionsForViewDto?.transactionType;
-
-//   this._AppTransactionServiceProxy.addVariationToTransaction(body)
-//     .pipe(finalize(() =>  {
-//         this.selectedVariation = '';
-//   this.selectedQuantity = 0;
-//   this.selectedPrice = 0
-//   this.amount = 0;
-//   // this.filterForm.value.reset()
-//   // this.hideMainSpinner()
-//   this.getShoppingCartData();
-//   this.showSaveCancel = false
-
-//     }))
-//     .subscribe((res) => {
-//       console.log(this.displayedVariations, 'displayedVariations');
-//       // Handle post-save logic here
-//     });
-//     this.addNewLinebtn = true
 }
 
 cancelAddLine() {
@@ -587,21 +544,8 @@ cancelsaveLine() {
   this.getSellerVariations(0,10,'')
     this.hideMainSpinner();
     this.getShoppingCartData();
-  // this.addLine = true
-  // this.showAddLine = false;
-  // this.showSaveCancel = false;
- 
-  // this.addNewLinebtn = true
- 
-  //   this.selectedVariation = '';
-  //   this.filterForm.controls['selectedQuantity']?.setValue(0);
-  //   this.filterForm.controls['selectedPrice']?.setValue(0);
 
-  //   this.selectedQuantity = 0;
 
-  // this.selectedPrice = 0
-  // this.amount = 0;
-  
 }
 
   
@@ -820,7 +764,7 @@ this.hideMainSpinner();
 
   getLinesData(){
      //lines
-   if  ((this.showTabs && this.activeIndex==8 ) || (this.showTabs && this.currentTab==8 ) || (!this.showTabs && this.activeIndex==0 )){
+   if  ((this.showTabs && this.activeIndex==6 ) || (this.showTabs && this.currentTab==6 ) || (!this.showTabs && this.activeIndex==0 )){
      this._AppTransactionServiceProxy
      .getOrderDetailsForView(
        this.orderId,
@@ -1807,8 +1751,7 @@ if (document.activeElement instanceof HTMLElement) {
       this.selectedColorName = event.value.colorName
       this.selectedColorImg = event.value.colorImg
       this.selectedColorCode = event.value.colorCode
-        console.log(event,'my wwweeeeen')
-        console.log( this.selectedColorImg ,' this.selectedColorImg ')
+     
         this.displayColordata = true
         this.displaysizesdata = true
           }
@@ -1972,60 +1915,66 @@ if (document.activeElement instanceof HTMLElement) {
       return sum;
   }
 
-    defineExtraAttributes() {
-        
-        this.extraAttributes = {
-            [EExtraAttributeUsage.Recommended]:
-                new CreateEditAppItemExtraAttribute({
-                    header: this.l("Recommended"),
-                    title: this.l("BuyersMayAlsoBeInterestedInTheseItemSpecifics"),
-                    usageEnum: EExtraAttributeUsage.Recommended,
-                    orderOfDisplay: 1,
-                }),
-            [EExtraAttributeUsage.Additional]:
-                new CreateEditAppItemExtraAttribute({
-                    header: this.l("Additional"),
-                    title: this.l(
-                        "Buyersfrequentlysearchfortheseitemspecifics"
-                    ),
-                    usageEnum: EExtraAttributeUsage.Additional,
-                    orderOfDisplay: 2,
-                }),
-        };
-    }
-    getAppItemTypeExtraAttributesById() {
-      this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(114)
-        .subscribe((res) => {
-          if (res?.length > 0) {
-            this.selectedItemTypeData = res[0];
-    
-            // Set recommended/additional attributes
-            this.setAdditionalAndRecommendedExtraAttributes();
-    
-            // Load lookup lists
+  defineExtraAttributes() {
+    this.extraAttributes = {};
+  
+    const allAttributes = this.selectedItemTypeData?.extraAttributes?.extraAttributes ?? [];
+  
+    allAttributes.forEach(attr => {
+      const usageKey = attr.usage?.replace(/\s+/g, '_').toUpperCase() || 'DEFAULT';
+  
+      if (!this.extraAttributes[usageKey]) {
+        this.extraAttributes[usageKey] = new CreateEditAppItemExtraAttribute({
+          header: this.l(attr.usage),
+          title: this.l(attr.usage),
+          usageEnum: usageKey as unknown as EExtraAttributeUsage,
+          orderOfDisplay: 1,
+          filteredExtraAttributes: [],
+          extraAttributes: [] // ✅ Add this!
+        });
+      }
+  
+      this.extraAttributes[usageKey].filteredExtraAttributes.push(attr); // ✅ FIXED
+    });
+  
+    console.log('✅ Final extraAttributes:', this.extraAttributes);
+  }
+  
+  getAppItemTypeExtraAttributesById() {
+    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId)
+      .subscribe((res) => {
+        console.log('🎯 API Response:', res); // Add this ✅
+  
+        if (res?.length > 0) {
+          this.selectedItemTypeData = res[0];
+  
+          const attributes = res[0]?.extraAttributes?.extraAttributes;
+  
+          console.log('🎯 Extracted Attributes:', attributes); // Add this ✅
+  
+          if (attributes?.length > 0) {
+            this.defineExtraAttributes();
             this.loadRecommendedAndAdditionalExtraDataLookupLists();
-    
-            // // Set selected values if editing
-            if (this.appItem?.entityExtraData?.length) {
-              this.setSelectedAppEntityExtraDataOnEditMode();
-            }
+          } else {
+            this.extraAttributes = {}; // No data, keep empty
           }
-        });
-    }
-    
+        }
+      });
+  }
+  
 
-    loadRecommendedAndAdditionalExtraDataLookupLists() {
-        this.extraAttributes.RECOMMENDED.extraAttributes.forEach(
-            (extraAttr) => {
-                if (!extraAttr.isLookup) return;
-                this.loadExtraDataLookupList(extraAttr);
-            }
-        );
-        this.extraAttributes.ADDITIONAL.extraAttributes.forEach((extraAttr) => {
-            if (!extraAttr.isLookup) return;
-            this.loadExtraDataLookupList(extraAttr);
-        });
-    }
+  loadRecommendedAndAdditionalExtraDataLookupLists() {
+    Object.keys(this.extraAttributes).forEach(key => {
+      const group = this.extraAttributes[key];
+      group.filteredExtraAttributes.forEach(extraAttr => {
+        if (extraAttr.isLookup) {
+          this.loadExtraDataLookupList(extraAttr);
+        }
+      });
+    });
+  }
+  
+
     loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
         this._extraAttributeDataService
             .getExtraAttributeLookupDataWithPaging(
@@ -2076,61 +2025,24 @@ if (document.activeElement instanceof HTMLElement) {
             });
     }
 
-      setAdditionalAndRecommendedExtraAttributes() {
-            const extraAttributres =
-                this.selectedItemTypeData.extraAttributes.extraAttributes;
-            this.extraAttributes.RECOMMENDED.extraAttributes =
-                this._extraAttributeDataService.getFilteredAttributesByUsage(
-                    extraAttributres,
-                    EExtraAttributeUsage.Recommended,
-                    false
-                );
-            this.extraAttributes.ADDITIONAL.extraAttributes =
-                this._extraAttributeDataService.getFilteredAttributesByUsage(
-                    extraAttributres,
-                    EExtraAttributeUsage.Additional,
-                    false
-                );
-        }
+      // setAdditionalAndRecommendedExtraAttributes() {
+      //       const extraAttributres =
+      //           this.selectedItemTypeData.extraAttributes.extraAttributes;
+      //       this.extraAttributes.RECOMMENDED.extraAttributes =
+      //           this._extraAttributeDataService.getFilteredAttributesByUsage(
+      //               extraAttributres,
+      //               EExtraAttributeUsage.Recommended,
+      //               false
+      //           );
+      //       this.extraAttributes.ADDITIONAL.extraAttributes =
+      //           this._extraAttributeDataService.getFilteredAttributesByUsage(
+      //               extraAttributres,
+      //               EExtraAttributeUsage.Additional,
+      //               false
+      //           );
+      //   }
     
-        setSelectedAppEntityExtraDataOnEditMode() {
-            // if (!this.appItem.entityExtraData) return;
-            let selectedExtraDataAsObject: { [key: number]: any } = {}; // {[12]:[15,18,19]} = {[colorId]=[15,12,16]}
-            const getFilterDefinition = (itemExtraData: AppEntityExtraDataDto) => {
-                const item = [
-                    ...this.extraAttributes.ADDITIONAL.extraAttributes,
-                    ...this.extraAttributes.RECOMMENDED.extraAttributes,
-                ].filter((x) => x.attributeId == itemExtraData.attributeId);
-                return item.length ? item[0] : undefined;
-            };
-            this.appItem.entityExtraData.forEach((ItemExtraData) => {
-                const extraAttrDef = getFilterDefinition(ItemExtraData);
-                let key = ItemExtraData.attributeId;
-                const isLookup: boolean = !!ItemExtraData.attributeValueId;
-                let value = isLookup
-                    ? ItemExtraData.attributeValueId
-                    : ItemExtraData.attributeValue;
-                if (!selectedExtraDataAsObject[key])
-                    selectedExtraDataAsObject[key] = [];
-                isLookup && extraAttrDef?.acceptMultipleValues
-                    ? selectedExtraDataAsObject[key].push(value)
-                    : (selectedExtraDataAsObject[key] = value);
-            });
-    
-            this.extraAttributes.ADDITIONAL.extraAttributes.map((elem) => {
-                let _selectedValues = selectedExtraDataAsObject[elem.attributeId];
-                if (_selectedValues !== undefined)
-                    elem.selectedValues = _selectedValues;
-                return elem;
-            });
-    
-            this.extraAttributes.RECOMMENDED.extraAttributes.map((elem) => {
-                let _selectedValue = selectedExtraDataAsObject[elem.attributeId];
-                if (_selectedValue !== undefined)
-                    elem.selectedValues = _selectedValue;
-                return elem;
-            });
-        }
+   
         extraSelectedValuesExtraData() {
           const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
               ...this.extraAttributes.ADDITIONAL.extraAttributes,

@@ -3,9 +3,9 @@
         <div class="row  pt-4">
             <!-- //API GetAllWithExtraAttributes -->
             <div class="col-md-6 col-12 mb-4"
-                [ngClass]="{ 'd-none' : extraAttr.isSelectedOnVariation && extraAttr.isVariation}"
-                *ngFor="let extraAttr of extraAttributeObject.value.extraAttributes">
-                <div *ngIf="!extraAttr.isSelectedOnVariation && !extraAttr.isVariation">
+            
+                *ngFor="let extraAttr of extraAttributeObject.value.filteredExtraAttributes">
+                <div >
                     <div>
                         <label>{{extraAttr.name | localize}}</label>
                     </div>
@@ -135,9 +135,9 @@
 
             <div>
                 <small class="ml-2"
-                    *ngIf="entityType=='Item'  && !extraAttributeObject.value?.extraAttributes?.length && !entityObjectTypeId">{{
+                    *ngIf="entityType=='Item'  && !extraAttributeObject.value?.filteredExtraAttributes?.length && !entityObjectTypeId">{{
                     "PleaseSelectAProductTypeFirst" | localize }}</small>
-                <small class="ml-2" *ngIf="!extraAttributeObject.value?.extraAttributes?.length &&
+                <small class="ml-2" *ngIf="!extraAttributeObject.value?.filteredExtraAttributes?.length &&
                            (entityType === 'Item' ? !!entityObjectTypeId : true)">
                     {{"No" | localize }} {{ extraAttributeObject.value?.header }} {{"Attributes" | localize }}
                 </small>

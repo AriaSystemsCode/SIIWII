@@ -169,7 +169,7 @@
                         (mouseover)="displaneSel = true"
                         (mouseleave)="displaneSel = false"
                     />
-                    <span *ngIf="displaneSel" class="tooltip-text">seller: bbbb</span>
+                    <span *ngIf="displaneSel" class="tooltip-text">{{shoppingCartSummary?.sellerName}}</span>
                   </li>
                   <li  class="nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
@@ -179,7 +179,7 @@
                         (mouseover)="displaneBuy = true"
                         (mouseleave)="displaneBuy = false"
                     />
-                    <span *ngIf="displaneBuy" class="tooltip-text-b">buyer: bbbb</span>
+                    <span *ngIf="displaneBuy" class="tooltip-text-b">{{shoppingCartSummary?.buyerName}}</span>
                   </li>
                   </ul>
 
