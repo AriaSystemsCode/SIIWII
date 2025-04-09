@@ -421,11 +421,12 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
             10
           ).subscribe((res: any) => {
             this.files = res.items;
-            resolve();
+            resolve(); // ✅ Important!
           });
         });
       }
       
+    
 
     ngOnInit(): void {
         this.savedFilters = localStorage.getItem("productFilters");
@@ -444,13 +445,13 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
           this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
           this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
           this.selctedBradns = parsedFilters.brands;
-      
           this.getParentDepartments().then(() => {
             if (selectedDepartmentId) {
-              this.expandToNodeById(this.files, selectedDepartmentId);
-              this.collapseAll(selectedDepartmentId);
+              this.expandAndSelectNode(selectedDepartmentId);
             }
           });
+          
+  
         } else {
           this.getParentDepartments();
         }
@@ -470,6 +471,48 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     this.clearAll.emit(true);
     
 }
+
+  expandAndSelectNode(targetId: number, nodes: any[] = this.files, parentNode?: any): void {
+    if (!nodes) return;
+  
+    for (let node of nodes) {
+      if (node.data.sycEntityObjectCategory.id === targetId) {
+        if (parentNode) {
+          parentNode.expanded = true; // ✅ expand parent
+        }
+        node.expanded = true;
+        this.selectedFile = node;
+        return;
+      }
+  
+      if (node.children && node.children.length > 0) {
+        this.expandAndSelectNode(targetId, node.children, node);
+      } else {
+        this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          node.data.sycEntityObjectCategory.id,
+          true,
+          undefined,
+          undefined,
+          "name",
+          0,
+          10
+        ).subscribe(res => {
+          node.children = res.items;
+          node.expanded = true;
+          this.expandAndSelectNode(targetId, node.children, node);
+        });
+      }
+    }
+  }
+  
+  
     ngOnDestroy(): void {
         clearTimeout(this.timeOut);
     }
