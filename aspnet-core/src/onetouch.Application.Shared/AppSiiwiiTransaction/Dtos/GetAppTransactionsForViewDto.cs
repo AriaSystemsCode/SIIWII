@@ -141,6 +141,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public ValidateTransaction ValidateOrder { get; set; }
         public TransactionType OrderType { get; set; }
         public string CurrencyCode { set; get; }
+        public string BuyerName { set; get; }
+        public string SellerName { set; get; }
 
     }
 

@@ -2375,6 +2375,10 @@ namespace onetouch.AppSiiwiiTransaction
                     //objReturn.SellerId = seller.Id;
                     objReturn.BuyerSSIN = TransactionIdFk.BuyerCompanySSIN;
                     objReturn.CurrencyCode = TransactionIdFk.CurrencyCode;
+                    //I46[Start]
+                    objReturn.BuyerName = TransactionIdFk.BuyerCompanyName;
+                    objReturn.SellerName = TransactionIdFk.SellerCompanyName;
+                    //I46[End]
                     TransactionType OrderTypeOut = TransactionType.SalesOrder;
                     objReturn.OrderType = OrderTypeOut;
                     var OrderType = TransactionIdFk.EntityObjectTypeCode;
