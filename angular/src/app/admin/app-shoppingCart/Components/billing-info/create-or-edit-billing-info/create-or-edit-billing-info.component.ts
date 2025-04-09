@@ -329,9 +329,6 @@ debugger
   updateApContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.APContact);
   }
-  updateArContact(addObj) {
-    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
-  }
 
   onchangePayment($event) {
     var indx = this.payTermsListList?.findIndex(x => x.value == $event?.value);
@@ -340,4 +337,9 @@ debugger
       this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
     }
   }
+  updateArContact(addObj) {
+    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
+  }
+
+
 }

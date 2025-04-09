@@ -234,12 +234,6 @@ SuccessMsg: boolean = false;
         }
       });
   }
-  selectShipVia($event) {
-    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
-    if (index >= 0) {
-      this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
-      this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
-    }
 
   }
   enterStore() {
@@ -284,7 +278,22 @@ SuccessMsg: boolean = false;
   }
 
   
+  selectShipVia($event) {
+    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
+    if (index >= 0) {
+      this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
+      this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
+    }
 
+    if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {  
+      this.shippingTabValid = true;
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+
+    } else {
+      this.shippingTabValid = false;
+    }
+
+  }
 
   isMamualAcc() {
     let accSSin = ''
