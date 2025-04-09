@@ -57,36 +57,33 @@ SuccessMsg: boolean = false;
 
   ngAfterViewInit() {
 
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.loadAddresComponentShipFrom = true;
-      this.contactIdShipFrom = this.shipFromData?.compId;
-        if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
-  
-        
-  
-      this.contactIdShipTo = this.shipToData?.compId;
-      this.loadAddresComponentShipTo = true;
-      if( this.AddressComponentChild)
-      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
-    }  
-      
+    
   }
   ngOnInit() {
-    this.isMamualAcc()
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+    this.isMamualAcc();
   
-    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-    let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-    shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
-    let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-    shipToObj[0]?.companySSIN && shipToObj[0]?.contactAddressDetail?.addressLine1  ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
-    this.storeVal = this.appTransactionsForViewDto?.buyerStore;
-    //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
-   // this.loadShipViaList();
-    console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
+    if (this.currentTab == ShoppingCartoccordionTabs.ShippingInfo) {
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+  
+      const shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.find(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+      if (shipFromObj?.companySSIN && shipFromObj?.contactAddressDetail?.addressLine1) {
+        this.shipFromSelectedAdd = shipFromObj.contactAddressDetail;
+      }
+  
+      const shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.find(x => x.contactRole == ContactRoleEnum.ShipToContact);
+      if (shipToObj?.companySSIN && shipToObj?.contactAddressDetail?.addressLine1) {
+        this.shipToSelectedAdd = shipToObj.contactAddressDetail;
+      }
+  
+      this.storeVal = this.appTransactionsForViewDto?.buyerStore;
+      this.loadShipViaList();
+  
+      // ✅ Preset data for reload
+      this.shipFromData = { compId: shipFromObj?.companySSIN, compssin: shipFromObj?.companySSIN };
+      this.shipToData = { compId: shipToObj?.companySSIN, compssin: shipToObj?.companySSIN };
     }
   }
+  
   ngOnChanges(changes: SimpleChanges) {
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
 
@@ -118,10 +115,7 @@ SuccessMsg: boolean = false;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
+
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine1=addObj?.selectedAddressObj?.addressLine1;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine2=addObj?.selectedAddressObj?.addressLine2;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressName=addObj?.selectedAddressObj?.name;
@@ -328,23 +322,25 @@ SuccessMsg: boolean = false;
   shipFromData;
   shipToData;
   reloadAddresscomponentShipFrom(data) {
-    this.shipFromData=data;
-    console.log(this.shipFromData,'this.shipFromData')
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+    if (data && data.compId !== this.shipFromData?.compId) {
+      this.shipFromData = data;
       this.contactIdShipFrom = this.shipFromData?.compId;
-
-        if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
+      if (this.AddressComponentChild) {
+        this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
+      }
+    }
   }
-}
+  
   reloadAddresscomponentShipTo(data) {
-  this.shipToData=data;
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+    if (data && data.compId !== this.shipToData?.compId) {
+      this.shipToData = data;
       this.contactIdShipTo = this.shipToData?.compId;
-
-  if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
-}
+      if (this.AddressComponentChild) {
+        const component = this.AddressComponentChild['second'] || this.AddressComponentChild['last'];
+        component?.getAddressList(this.shipToData?.compssin);
+      }
+    }
   }
+  
 
 }

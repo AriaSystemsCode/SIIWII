@@ -39,7 +39,6 @@
     [canChange]="canChange"
     [currentTab]="currentTab"
     ></app-address>
-    
 </div>
 <div class="container-fluid pt-1 mb-3">
     <div class="header p-2 my-2 d-flex align-items-center">
@@ -51,16 +50,19 @@
             <app-contact 
             class="w-100"  
              [billingIndexInfo]="2"
+     
             [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab"
             [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                 (formValidityChanged)="isContactFormValid_2($event)"
+                
                 ></app-contact>
         </div>
     </div>
     <hr class="my-2" />
     <app-address 
+
     [appTransactionsForViewDto]="appTransactionsForViewDto"
     [isCreateOredit]="createOrEditBillingInfo"
     [contactId]="contactIdARContact"
@@ -69,7 +71,6 @@
     [canChange]="canChange"
     [currentTab]="currentTab"
     ></app-address>
-
 </div>
 <div class="container-fluid pt-1 mb-3 mt-3">
     <div class="header p-2 my-2 d-flex  justify-content-between">

@@ -114,6 +114,7 @@
 
 
 <div *ngIf="!createOrEditBillingInfo">
+
     <app-view-billing-info
     (showBillingEditMode)="onshowBillingEditMode($event)"
     (onshowSaveBtn)="onshowSaveBtn($event)"
@@ -128,6 +129,7 @@
     [canChange]="canChange"
     (isContactsValid_1)="isContactFormValid($event,1)"
     (isContactsValid_2)="isContactFormValid($event,2)">
+    
 </app-view-billing-info>
 </div>
 

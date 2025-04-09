@@ -116,38 +116,13 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             } else if ( role == 4) {
                 this.selectedAddressDetails = {
                     ...apRoleContact.contactAddressDetail,
-                    // code: shIPtOroleContact.contactAddressCode,
-                    // name: shIPtOroleContact.contactAddressName,
-                    // id: generatedId
+               
                 };
-                // Set data for role 4 (Billing) and handle both Shipping and AP
-                // const generatedId = this.generateNewId();
-                
-              
-        
-                // // Address for role 4 (Billing)
-                // if (apRoleContact?.contactAddressDetail?.countryCode) {
-                //     const apGeneratedId = this.generateNewId();
-                //     this.savedAddressesList[1] = {
-                //         ...apRoleContact.contactAddressDetail,
-                //         code: apRoleContact.contactAddressCode,
-                //         name: apRoleContact.contactAddressName,
-                //         id: apGeneratedId
-                //     };
-                //     this.refSavedAddressesList[1] = {
-                //         ...apRoleContact.contactAddressDetail,
-                //         code: apRoleContact.contactAddressCode,
-                //         name: apRoleContact.contactAddressName,
-                //         id: apGeneratedId
-                //     };
-                //     this.selectedAddress = this.savedAddressesList[1];
-                // } else {
-                //     this.selectedAddress = null;
-                // }
+
             } 
           
         
-            console.log(this.savedAddressesList, 'this.savedAddressesList');
+            // console.log(this.savedAddressesList, 'this.savedAddressesList');
         }
     }
     }
@@ -366,7 +341,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                         this.selectedAddress = null;
                     }
                 
-                    console.log(this.savedAddressesList, 'this.savedAddressesList');
+                    // console.log(this.savedAddressesList, 'this.savedAddressesList');
                 }
                 
                         
