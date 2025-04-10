@@ -62,12 +62,13 @@ import { dynamicInputsView } from '@shared/components/dynamic-inputs-view/dynami
  
     
   ],
-  providers:[
-  
-  ],
+
   exports:[
     dynamicInputs,
     dynamicInputsView
+  ],
+  providers:[
+  
   ]
 })
 export class SharedDynamicInputsModule  { }

@@ -151,27 +151,6 @@ import { finalize } from "rxjs";
     
 
 
-     getAppItemTypeExtraAttributesById() {
-          this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(114)
-            .subscribe((res) => {
-              if (res?.length > 0) {
-                console.log( this.selectedItemTypeData ,' this.selectedItemTypeData ')
-                this.selectedItemTypeData = res[0];
-        
-                // Set recommended/additional attributes
-                // this.setAdditionalAndRecommendedExtraAttributes();
-        
-                // Load lookup lists
-                // this.loadRecommendedAndAdditionalExtraDataLookupLists();
-        
-                // // Set selected values if editing
-                // if (this.appItem?.entityExtraData?.length) {
-                //   this.setSelectedAppEntityExtraDataOnEditMode();
-                // }
-              }
-            });
-        }
-        
     
         // loadRecommendedAndAdditionalExtraDataLookupLists() {
         //     this.extraAttributes.RECOMMENDED.extraAttributes.forEach(
@@ -473,6 +452,29 @@ import { finalize } from "rxjs";
               
             });
           }
+
+          
+     getAppItemTypeExtraAttributesById() {
+      this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(114)
+        .subscribe((res) => {
+          if (res?.length > 0) {
+            console.log( this.selectedItemTypeData ,' this.selectedItemTypeData ')
+            this.selectedItemTypeData = res[0];
+    
+            // Set recommended/additional attributes
+            // this.setAdditionalAndRecommendedExtraAttributes();
+    
+            // Load lookup lists
+            // this.loadRecommendedAndAdditionalExtraDataLookupLists();
+    
+            // // Set selected values if editing
+            // if (this.appItem?.entityExtraData?.length) {
+            //   this.setSelectedAppEntityExtraDataOnEditMode();
+            // }
+          }
+        });
+    }
+    
           
   }
 

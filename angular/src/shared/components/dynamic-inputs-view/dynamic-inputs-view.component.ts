@@ -44,24 +44,6 @@ usageTypeAttributeMap: { [key: string]: any[] } = {};
 
   }
 
-    ngOnInit(): void {
-
-      // this.prepareUsageTypeAttributeMap();
-        // if (this.isReady) {
-        //   this.extraAttributesToShow = this.entityExtraData.map((attr) => {
-        //     const meta = this.extraAttributeMeta.find(m => m.attributeId === attr.attributeId);
-        //     let value = attr.attributeValueId ?? attr.attributeValue;
-        //     if (meta?.dataType === 'Datetime' && value) {
-        //       value = new Date(value).toLocaleDateString();
-        //     }
-        //     return {
-        //       name: meta?.name || `Attribute ${attr.attributeId}`,
-        //       value: value,
-        //     };
-        //   });
-        // }
-      }
-      
 
     // get isReady(): boolean {
     //     return Array.isArray(this.entityExtraData) && Array.isArray(this.extraAttributeMeta);
@@ -131,4 +113,24 @@ usageTypeAttributeMap: { [key: string]: any[] } = {};
     this.onshowSaveBtn.emit(true);
   
   }
+
+  
+  ngOnInit(): void {
+
+    // this.prepareUsageTypeAttributeMap();
+      // if (this.isReady) {
+      //   this.extraAttributesToShow = this.entityExtraData.map((attr) => {
+      //     const meta = this.extraAttributeMeta.find(m => m.attributeId === attr.attributeId);
+      //     let value = attr.attributeValueId ?? attr.attributeValue;
+      //     if (meta?.dataType === 'Datetime' && value) {
+      //       value = new Date(value).toLocaleDateString();
+      //     }
+      //     return {
+      //       name: meta?.name || `Attribute ${attr.attributeId}`,
+      //       value: value,
+      //     };
+      //   });
+      // }
+    }
+    
 }

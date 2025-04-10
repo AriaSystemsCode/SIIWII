@@ -20,10 +20,6 @@ selectedExtraData: any[] = [];
 originalValuesMap = new Map<number, any>();
 
 
-    ngOnInit(): void {
-      this.fillSelectedValuesFromDto();
-      setTimeout(() => this.onAnyInputChange(), 0);
-    }
 
     openCalendar(calendar: any) {
         calendar.overlayVisible = true;
@@ -210,7 +206,11 @@ originalValuesMap = new Map<number, any>();
       }
       
       
-      
+      ngOnInit(): void {
+        this.fillSelectedValuesFromDto();
+        setTimeout(() => this.onAnyInputChange(), 0);
+      }
+  
       
       
 }
