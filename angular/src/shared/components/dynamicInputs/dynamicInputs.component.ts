@@ -22,7 +22,9 @@ originalValuesMap = new Map<number, any>();
 
     ngOnInit(): void {
       this.fillSelectedValuesFromDto();
+      setTimeout(() => this.onAnyInputChange(), 0);
     }
+
     openCalendar(calendar: any) {
         calendar.overlayVisible = true;
       }
@@ -31,9 +33,7 @@ originalValuesMap = new Map<number, any>();
         this.onAnyInputChange();
     }
     onAnyInputChange() {
-      if (!this.selectedExtraData) {
-        this.selectedExtraData = [];
-      }
+     
     
       const updatedDataMap = new Map<number, any>();
     
@@ -44,103 +44,134 @@ originalValuesMap = new Map<number, any>();
     
       if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
         for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
-
-          // ✅ Skip hidden fields
+    
           if (attr.isSelectedOnVariation || attr.isVariation) {
             continue;
           }
-        
+    
           let formattedValue = attr.selectedValues;
-        
-          // ✅ Handle datetime formatting and empty input case
+    
+          // ✅ Handle Datetime
           if (attr.dataType === 'Datetime') {
             const dateValue = new Date(formattedValue);
-        
+    
             if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
-              formattedValue = null;
+              formattedValue = '';
             } else {
               formattedValue = dateValue.toISOString();
-        
-              // ✅ If it is epoch (1970) and original value exists, treat as unchanged
               if (formattedValue === '1970-01-01T00:00:00.000Z') {
                 const originalValue = this.originalValuesMap.get(attr.attributeId);
-                if (originalValue) {
-                  formattedValue = originalValue; // keep original value
-                }
+                formattedValue = originalValue || '';
               }
             }
           }
-        
+    
+          // ✅ Handle String input
+          if (attr.dataType === 'string' && !attr.isLookup) {
+            if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
+              formattedValue = '';
+            }
+          }
+    
+          // ✅ Handle Numeric input
+          if (attr.dataType === 'Numeric') {
+            if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
+              formattedValue = '';
+            }
+          }
+    
+          // ✅ Handle Boolean / Bit
+          if (attr.dataType === 'boolean' || attr.dataType === 'bit') {
+            if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
+              formattedValue = '';
+            }
+          }
+    
           const originalValue = this.originalValuesMap.get(attr.attributeId);
           const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
-        
-          const finalValue = (!isSame && formattedValue != null) ? formattedValue : null;
-        
+    
+          let finalValue;
+    
+          if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
+            finalValue = formattedValue.length ? formattedValue : [];
+          } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
+            finalValue = ''; // ✅ always send empty string
+          } else if (!isSame) {
+            finalValue = formattedValue;
+          } else {
+            finalValue = formattedValue || '';
+          }
+    
           const updatedValue = {
             attributeId: attr.attributeId,
             value: finalValue,
             isLookup: attr.isLookup === true,
             acceptMultipleValues: attr.acceptMultipleValues === true
           };
-        
+    
           updatedDataMap.set(attr.attributeId, updatedValue);
         }
-        
       }
-      
     
       this.selectedExtraData = Array.from(updatedDataMap.values());
     
       this.extraDataChanged.emit(this.selectedExtraData);
-      console.log('✅ Final emitted data:', this.selectedExtraData);
+      console.log('✅ Final emitted data (with empty strings):', this.selectedExtraData);
     }
+    
+    
     
       
       
-      fillSelectedValuesFromDto() {
-        if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
-          return;
-        }
-      
-        const dtoData = this.appTransactionsForViewDto.extraDataAttributes;
-      
-        for (const attr of this.extraAttributeObject.value.extraAttributes) {
-          const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
-        
-          if (matchedDto && matchedDto.selectedValues?.length) {
-            const dtoValue = matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value; // ✅ Take last value
-        
-            if (attr.isLookup) {
-              const matchedOption = attr.paginationSetting?.list?.find(opt => {
-                return opt.label === dtoValue || opt.value === dtoValue;
-              });
-        
-              if (matchedOption) {
-                attr.selectedValues = matchedOption.value;
-              } else {
-                // Option not in list: push manually
-                const manualOption = {
-                  value: dtoValue,
-                  label: dtoValue,
-                  code: null,
-                  isHostRecord: false,
-                  stockAvailability: null,
-                  image: null,
-                  hexaCode: null
-                };
-                attr.paginationSetting.list.push(manualOption);
-                attr.selectedValues = manualOption.value;
-              }
-            } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
-              attr.selectedValues = new Date(dtoValue);
+    fillSelectedValuesFromDto() {
+      if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
+        return;
+      }
+    
+      const dtoData = this.appTransactionsForViewDto.extraDataAttributes;
+    
+      const allAttributes = [
+        ...(this.extraAttributeObject.value.extraAttributes || []),
+        ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
+      ];
+    
+      for (const attr of allAttributes) {
+        const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
+    
+        if (matchedDto && matchedDto.selectedValues?.length) {
+          const dtoValue = matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
+    
+          if (attr.isLookup) {
+            const matchedOption = attr.paginationSetting?.list?.find(opt => {
+              return opt.label === dtoValue || opt.value === dtoValue;
+            });
+    
+            if (matchedOption) {
+              attr.selectedValues = matchedOption.value;
             } else {
-              attr.selectedValues = dtoValue;
+              const manualOption = {
+                value: dtoValue,
+                label: dtoValue,
+                code: null,
+                isHostRecord: false,
+                stockAvailability: null,
+                image: null,
+                hexaCode: null
+              };
+              attr.paginationSetting.list.push(manualOption);
+              attr.selectedValues = manualOption.value;
             }
+          } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
+            attr.selectedValues = new Date(dtoValue);
+          } else {
+            attr.selectedValues = dtoValue;
           }
+          this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
         }
-        
       }
       
+    }
+    
       
       clearExtraAttr(attr: any) {
         if (attr.acceptMultipleValues) {
@@ -163,12 +194,12 @@ originalValuesMap = new Map<number, any>();
         );
       
         if (existingIndex !== -1) {
-          this.selectedExtraData[existingIndex].value = attr.acceptMultipleValues ? [] : null;
+          this.selectedExtraData[existingIndex].value = attr.acceptMultipleValues ? [] : '';
         } else {
           // If not found, push a new clean entry
           this.selectedExtraData.push({
             attributeId: attr.attributeId,
-            value: attr.acceptMultipleValues ? [] : null,
+            value: attr.acceptMultipleValues ? [] : '',
             isLookup: attr.isLookup,
             acceptMultipleValues: attr.acceptMultipleValues
           });

@@ -408,12 +408,8 @@ import { finalize } from "rxjs";
               }
             });
           
-            // Step 2: Filter out invalid values (null / undefined / empty strings)
-            const cleanIncomingData = incomingData.filter(
-              d => (d.attributeValueId != null) || 
-                   (d.attributeValue != null && d.attributeValue !== '')
-            );
-            
+            // ✅ Step 2: No filter — keep all values
+            const cleanIncomingData = incomingData;
           
             // Step 3: Remove old entries for incoming attributeIds
             const incomingAttributeIds = new Set(cleanIncomingData.map(d => d.attributeId));
@@ -428,6 +424,7 @@ import { finalize } from "rxjs";
           
             console.log(finalData, '✅ Cleaned and Merged Extra Attributes');
           }
+          
           
           
           onExtraAttributeCleared(attributeId: number) {

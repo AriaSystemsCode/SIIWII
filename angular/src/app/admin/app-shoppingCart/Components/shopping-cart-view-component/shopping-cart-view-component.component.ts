@@ -713,6 +713,7 @@ loadCommentsList() {
   }
 
   getShoppingCartData(temp: TreeNode<any>[] = null) {
+
 this.temp=temp;
     this.showMainSpinner();
     //header
@@ -724,6 +725,8 @@ this.hideMainSpinner();
          res.companeyNames=this.companeyNames;
           this.appTransactionsForViewDto = res;
           this.getAppItemTypeExtraAttributesById();
+   
+
           /// set validations 
           this.orderInfoValid = this.appTransactionsForViewDto.isOrderInformationValid;
           this.buyerContactInfoValid = this.appTransactionsForViewDto.isBuyerContactInformationValid;
@@ -764,7 +767,7 @@ this.hideMainSpinner();
 
   getLinesData(){
      //lines
-   if  ((this.showTabs && this.activeIndex==6 ) || (this.showTabs && this.currentTab==6 ) || (!this.showTabs && this.activeIndex==0 )){
+   if  ((this.showTabs && this.activeIndex==7 ) || (this.showTabs && this.currentTab==7 ) || (!this.showTabs && this.activeIndex==0 )){
      this._AppTransactionServiceProxy
      .getOrderDetailsForView(
        this.orderId,
@@ -1930,21 +1933,31 @@ if (document.activeElement instanceof HTMLElement) {
           usageEnum: usageKey as unknown as EExtraAttributeUsage,
           orderOfDisplay: 1,
           filteredExtraAttributes: [],
-          extraAttributes: [] // ✅ Add this!
+          extraAttributes: []
         });
       }
   
-      this.extraAttributes[usageKey].filteredExtraAttributes.push(attr); // ✅ FIXED
+      // ✅ Add this if missing
+      if (!attr.paginationSetting) {
+        attr.paginationSetting = {
+          skipCount: 0,
+          maxResultCount: 10,
+          totalCount: 0,
+          list: []
+        };
+      }
+  
+      this.extraAttributes[usageKey].filteredExtraAttributes.push(attr);
     });
   
     console.log('✅ Final extraAttributes:', this.extraAttributes);
   }
   
+  
   getAppItemTypeExtraAttributesById() {
     this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId)
       .subscribe((res) => {
         console.log('🎯 API Response:', res); // Add this ✅
-  
         if (res?.length > 0) {
           this.selectedItemTypeData = res[0];
   
@@ -1978,11 +1991,12 @@ if (document.activeElement instanceof HTMLElement) {
     loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
         this._extraAttributeDataService
             .getExtraAttributeLookupDataWithPaging(
-                extraAttr.entityObjectTypeCode,
-                extraAttr.paginationSetting.skipCount,
-                extraAttr.paginationSetting.maxResultCount
+               'APPROVALR',
+                0,
+                10
             )
             .subscribe((result) => {
+              console.log(result,'')
                 extraAttr.paginationSetting.totalCount = result.totalCount;
                 if (extraAttr.paginationSetting.skipCount == 0)
                     extraAttr.paginationSetting.list = [];
@@ -2025,6 +2039,8 @@ if (document.activeElement instanceof HTMLElement) {
             });
     }
 
+
+ 
       // setAdditionalAndRecommendedExtraAttributes() {
       //       const extraAttributres =
       //           this.selectedItemTypeData.extraAttributes.extraAttributes;

@@ -371,22 +371,22 @@
 
 
               
-                            <!-- <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="i == 0 ?currentTab = 6: currentTab = 7">
+                            <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="currentTab = 6">
                          
 
                               <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header ">
-                                  <h6 class="mb-1 ">{{extraAttributeObject.value.header | localize}}</h6>
-                                  <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
+                                  <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header | localize}}</h6>
+                                  <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
                                 </div>
                               </ng-template>
                           
                      
-                         <div *ngIf="currentTab==6 || currentTab==7">
+                         <div *ngIf="currentTab==6 ">
                             <create-or-edit-extra-data 
                         
                             [extraAttributeObject]="extraAttributeObject"
-                            [activeTab]="extraAttributeObject.value.header.toUpperCase() == 'ADDITIONAL' ? 6 : 7"
+                            [activeTab]="6"
                             [currentTab]="currentTab"
                             [appTransactionsForViewDto]="appTransactionsForViewDto"
                    
@@ -406,13 +406,13 @@
                              
                      
                  
-                            </p-accordionTab> -->
+                            </p-accordionTab>
 
                
                         
 
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="currentTab=6; getLinesData()">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="currentTab=7; getLinesData()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 mt-1 purpleColor">{{l("OrderDetails")}}</h6>

@@ -11,8 +11,7 @@
     <div class="row p-3">
       <ng-container *ngFor="let attrMeta of appTransactionsForViewDto?.extraDataAttributes">
         <div class="col-md-6 mb-3"
-          *ngIf="(extraAttributeObject.value.header.toUpperCase() === 'ADDITIONAL' && attrMeta.extraAttrUsage === 'ADDITIONAL') || 
-                 (extraAttributeObject.value.header.toUpperCase() === 'RECOMMENDED' && attrMeta.extraAttrUsage === 'RECOMMENDED')">
+      >
           <div>
             <label class="font-weight-bold">{{ attrMeta.extraAttrName | localize }}</label>
           </div>
