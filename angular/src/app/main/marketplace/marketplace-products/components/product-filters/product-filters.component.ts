@@ -1,4 +1,5 @@
 import {
+  
     Component,
     EventEmitter,
     Input,
@@ -31,8 +32,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     files: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
     loading: boolean;
     selectedFile: any;
-    startShipDate: string;
-    endShipDate: string;
+    startShipDate: Date;
+    endShipDate: Date;
     startSoldout: string;
     endSoldout: string;
     timeOut: any;
@@ -54,19 +55,54 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     @Output() handleEndSoldOutDate: EventEmitter<any> = new EventEmitter();
     @Output() handleStockSiwtch: EventEmitter<any> = new EventEmitter();
     @Output() handleBrandsSelection: EventEmitter<any> = new EventEmitter();
+    @Output() clearAll: EventEmitter<any> = new EventEmitter();
     accountSSIN:string;
+    savedFilters :any
+    isSelected: boolean = false
+    isFromSellerRoom:boolean
+    ismarketPLace:boolean
     constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _SycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private _appMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy
+        private _appMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy,
+     
     ) {
-
-        this.accountSSIN=sessionStorage.getItem("SellerSSIN");
+        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
+        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace") );
+        this.savedFilters = localStorage.getItem("productFilters");
+            
+        if (this.savedFilters) {
+            const parsedFilters = JSON.parse(this.savedFilters);
+        
+            this.selectedFile = parsedFilters.selectedDepartments;
+            this.min = parsedFilters.minimumPrice;
+            this.max = parsedFilters.maximumPrice;
+            this.catalogId = parsedFilters.appItemListId;
+            this.stockAvailablty = parsedFilters.onlyAvailableStock;
+        
+            // Ensure these are Date objects before using them
+            this.startSoldout = parsedFilters.startSoldOutData;
+            this.endSoldout = parsedFilters.endSoldOutData;
+        
+            this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
+            this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
+        
+            this.selctedBradns = parsedFilters.brands;
+        
+         
+        }
+        
+        
+        this.accountSSIN=localStorage.getItem("SellerSSIN");
         this.getAllProductCAtalogs();
         this.getParentDepartments();
         this.getAllBrands();
+        console.log(this.files,">> files" )
+        console.log(this.selectedFile,">> 555" )
+   
+        
     }
 
     // get all brands
@@ -161,6 +197,10 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
                 totalCount: number;
             }) => {
                 this.files = res.items;
+                if(this.savedFilters){
+                    this.selectedFile = this.findNodeById(this.files, this.selectedFile[0]);
+                }
+                
             }
         );
     }
@@ -212,7 +252,18 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
                 });
         }
     }
-
+    findNodeById(nodes: any[], id: number): any {
+        for (let node of nodes) {
+          if (node.data.sycEntityObjectCategory.id === id) {
+            return node; // Return the node if the ID matches
+          }
+          if (node.children) {
+            const found = this.findNodeById(node.children, id);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
     nodeSelect(value: any) {
         console.log(">>", value);
         this.handledeDratmentsTreeSelections.emit(value);
@@ -264,16 +315,54 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         this.stockAvailablty = false;
         this.catalogId = null;
         this.collapseAll();
-        this.selectedFile = null;
+        this.selectedFile = []
         this.selctedBradns = [];
         this.min = "";
         this.max = "";
+        this.startShipDate = undefined
+        this.endShipDate = undefined
+        this.endSoldout = undefined
+        this.startSoldout = undefined
+        
     }
 
     ngOnInit(): void {
-        throw new Error("Method not implemented.");
+ 
+        this.savedFilters = localStorage.getItem("productFilters");
+            
+        if (this.savedFilters) {
+            const parsedFilters = JSON.parse(this.savedFilters);
+            console.log(parsedFilters.selectedDepartments,'parsedFilters.selectedDepartments')
+    
+            this.selectedFile = parsedFilters.selectedDepartments;
+            this.min = parsedFilters.minimumPrice;
+            this.max = parsedFilters.maximumPrice;
+            this.catalogId =  parsedFilters.appItemListId ;
+        
+            this.stockAvailablty = parsedFilters.onlyAvailableStock;
+            this.startSoldout = parsedFilters.startSoldOutData;
+            this.endSoldout = parsedFilters.endSoldOutData;
+            this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
+            this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
+            this.selctedBradns = parsedFilters.brands;
+       
+         
+        }
     }
-
+    clearAllFiltrs(){
+        this.resetFilters()
+    this.handleStartPrice.emit('');
+    this.handleEndPrice.emit('');
+    this.handleCatalogSelections.emit('');
+    this.handledeDratmentsTreeSelections.emit(null)
+    this.handleBrandsSelection.emit([]);
+    this.handleEndShipDate.emit(undefined);
+    this.handleStartShipDate.emit(undefined);
+    this.handleEndSoldOutDate.emit(undefined);
+    this.handleSatrtsoldOutDate.emit(undefined);
+    this.clearAll.emit(true);
+    
+}
     ngOnDestroy(): void {
         clearTimeout(this.timeOut);
     }

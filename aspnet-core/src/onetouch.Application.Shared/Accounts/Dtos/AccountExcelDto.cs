@@ -101,4 +101,13 @@ namespace onetouch.Accounts.Dtos
         public string Image5FileName { get; set; }
         public string Image5Guid { get; set; }
     }
+    //I46[Start]
+    public class ImportContactReturnDto
+    {
+        public string RecordKey { set; get; }
+        public string ErrorMessage { set; get; }
+
+        public string ErrorType { set; get; }
+    }
+    //I46[End]
 }

@@ -64,13 +64,13 @@ font-weight: 700;
         line-height: normal;
     }
     .p-dropdown-label {
-        color:#9E9E9E  !important;
+        color: #595959  !important;
         font-size: 14px !important;
 font-style: normal;
 font-weight: 600 !important;
     }
     .p-calendar .p-inputtext {
-        color: #9E9E9E !important;
+        color: #595959 !important;
         font-size: 14px !important;
 font-style: normal !important;
 font-weight: 600 !important;
@@ -126,12 +126,17 @@ color: #4a0d4a;
     .form-control {
         height: 44px !important;
         border-radius: 8px !important;
-border: 1px solid #D5D4DC !important;
+border: 1px solid #D9D9D9 !important;
 background: #FFF !important;
-color: #9E9E9E !important;
+color: #595959 !important;
 font-size: 14px !important;
 font-style: normal !important;
 font-weight: 600 !important;
+    }
+
+    .form-control::placeholder {
+        color: #595959 !important; /* Change to your preferred color */
+        opacity: 1; /* Ensure full opacity */
     }
     .form-control:focus {
         border-radius: 8px !important;
@@ -263,10 +268,10 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 
     // }
     .text-danger {
-        color: #C83532ed !important;
+        color: #C83532 !important;
     }
     .was-validated .form-control:invalid, .form-control.is-invalid {
-        border: 1px solid#C83532ed !important;
+        border: 1px solid#C83532 !important;
 
     }
     // .is-invalid {
@@ -280,7 +285,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
         .p-button{
             background-color:  #fff !important;
             color: #9E9E9E !important;
-            border: 1px solid #e2e5ec !important;
+            border: 1px solid #D9D9D9 !important;
             border-left: none !important;
             border-top-right-radius: 8px !important;
             border-bottom-right-radius: 8px !important;
@@ -292,9 +297,9 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
             height: 44px !important;
             border-top-left-radius: 8px !important;
             border-bottom-left-radius: 8px !important;
-            border: 1px solid #e2e5ec !important;
+            border: 1px solid #D9D9D9 !important;
     border-right: none !important;
-    color: #9E9E9E !important;
+    color: #595959 !important;
     font-size: 14px !important;
     font-weight: 600 !important;
         }

@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
@@ -50,6 +50,7 @@ SuccessMsg: boolean = false;
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+      private _AccountsServiceProxy: AccountsServiceProxy,
   ) {
     super(injector);
 
@@ -75,7 +76,7 @@ SuccessMsg: boolean = false;
   ngOnInit() {
     this.isMamualAcc()
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-  
+      this.GetContactDefaults()
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
     shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
@@ -235,6 +236,7 @@ SuccessMsg: boolean = false;
       });
   }
 
+
   
   enterStore() {
     this.appTransactionsForViewDto.buyerStore = this.storeVal;
@@ -355,5 +357,21 @@ SuccessMsg: boolean = false;
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
 }
   }
+  GetContactDefaults(){
+   
+      this._AccountsServiceProxy.getContactDefaults()
+      .subscribe((res)=>{
+        // if(!this.appTransactionsForViewDto.shipViaId && res.shipViaId){
+          this.appTransactionsForViewDto.shipViaId= res.shipViaId; 
+          this.appTransactionsForViewDto.shipViaCode= res.shipViaCode; 
+        // } else if (!res.shipViaId){
+        //   this.appTransactionsForViewDto.shipViaId = this.shipViaList[0]?.value ;
+        //   this.appTransactionsForViewDto.shipViaCode = this.shipViaList[0]?.code ;
+        // }
+     
 
+      });
+    
+    
+   }
 }

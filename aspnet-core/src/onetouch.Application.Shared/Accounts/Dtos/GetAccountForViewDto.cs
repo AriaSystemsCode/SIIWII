@@ -9,5 +9,6 @@
         //MMT10
         public bool IsPublished { get; set; }
         //MMT10
+       
     }
 }

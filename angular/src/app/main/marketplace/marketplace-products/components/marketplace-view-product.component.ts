@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AppItemViewInput } from "@app/main/app-items/app-item-view/models/app-item-view-input";
+import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 import { animate, style, transition, trigger } from "@node_modules/@angular/animations";
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
@@ -21,6 +22,7 @@ import {
 import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageService } from "abp-ng2-module";
 import { throws } from "assert";
+import * as moment from "moment";
 import { ConfirmEventType, ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
@@ -79,6 +81,18 @@ export class MarketplaceViewProductComponent
     priceLevel :any
     showSpecialPrice: boolean = false;
     languageSettingName  =AppConsts.languageSettingName;
+    isFromSellerRoom:boolean
+    ismarketPLace:boolean
+    orderNo:any
+    body:any
+    buyerDataofPO:any
+    buyerbranchPO:any
+    sellerbranchPO:any
+    isBuyerInfoLoaded :boolean = false
+    alreadyOrderd:boolean = false
+    productData: any;
+     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
+     reportUrl="";
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -87,13 +101,18 @@ export class MarketplaceViewProductComponent
         private messageService: MessageService,
         private userClickService: UserClickService,
         private router: Router,
+        private _appTransactionServiceProxy: AppTransactionServiceProxy,
+        private appItemsAppservice :AppItemsServiceProxy,
         injector: Injector
     ) {
         super(injector);
+        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
+        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace") );
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.priceLevel = localStorage.getItem("tempPriceLevel");
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
+    
     }
     ngOnInit(): void {
         this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
@@ -143,7 +162,7 @@ export class MarketplaceViewProductComponent
         // this.subscriptions.push(subs);
         this.filteredColors = this.colorsData;
       
-
+  this.IsVariationOrdered()
     }
  onFilterTextChanged() {
     this.showIconClose = this.filterText.trim() !== '';
@@ -221,6 +240,7 @@ export class MarketplaceViewProductComponent
                                     )
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res?.appItem;
+                        this.productData = res;                    
                         this.productDetails.maxSpecialPrice =  this.productDetails?.maxSpecialPrice ?  this.productDetails?.maxSpecialPrice : 0;
                         this.updatedSpecialPrice = this.productDetails?.maxSpecialPrice;
                         this.productDetails?.minMSRP % 1 == 0 ? this.productDetails.minMSRP = Math.round(this.productDetails?.minMSRP * 100 / 100).toFixed(2) : null;
@@ -366,7 +386,7 @@ export class MarketplaceViewProductComponent
     // total of all order qty and price in order by size and prepack
     totalOrderQTY: number = 0;
     totlaOrderPrices: number = 0;
-   /*  calculateTotalOrderPriceAndQty(orders: any) {
+    calculateTotalOrderPriceAndQty(orders: any) {
         let qty = 0;
         let price = 0;
         orders?.map((order: any) => {
@@ -390,46 +410,9 @@ export class MarketplaceViewProductComponent
                 this.totlaOrderPrices = price;
             });
         });
-    } */
+    }
 
-
-        calculateTotalOrderPriceAndQty(orders: any) {
-            let qty = 0;
-            let price = 0;
-            orders.map((order: any) => {
-                order.color.sizes.map((size,index) => {
-
-if(!this.productDetails?.orderByPrePack ){
-    if (!size.orderedQty)
-        size.orderedQty = 0
-    let priceMultibly = size.orderedQty * size.price;
-    qty = qty + size.orderedQty;
-    price = price + priceMultibly;
-}
-                  else
-                  {
-                    if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[order.colorIndex])){ 
-                        let multiby =
-                            size.sizeRatio * order.color.sizes[index].orderedPrePacks;
-                        let priceMultibly = multiby * size.price;
-                        qty = qty + multiby;
-                        price = price + priceMultibly;
-                    } else {
-                        if (!size.orderedPrePacks)
-                            size.orderedPrePacks = 0
-                        let priceMultibly = size.orderedPrePacks * size.price;
-                        qty = qty + size.orderedPrePacks;
-                        price = price + priceMultibly;
-                    }
-                }
-    
-                    this.totalOrderQTY = qty;
-                    this.totlaOrderPrices = price;
-                });
-            });
-        }
-
-   /*  removeColor(color, i: number) {
+    removeColor(color, i: number) {
         this.currentIndex =
             this.orderSummary.length === 0 ? 0 : color.colorIndex;
             if (!this.productDetails?.orderByPrePack) {
@@ -462,64 +445,9 @@ if(!this.productDetails?.orderByPrePack ){
             this.colorsData[color.colorIndex].sizes[0].orderedPrePacks = 0;
         }
         this.orderSummary.splice(i, 1);
-    } */
-
-
-    removeColor(color, i: number) {
-        this.currentIndex =
-            this.orderSummary.length === 0 ? 0 : color.colorIndex;
-
-          if(!this.productDetails?.orderByPrePack)  {
-                let qty = 0;
-                let price = 0;
-                this.orderSummary[i].color.sizes.map((size) => {
-                    let priceMultibly = size.orderedQty * size.price;
-                    qty = qty + size.orderedQty;
-                    price = price + priceMultibly;
-                });
-                this.totlaOrderPrices = this.totlaOrderPrices - price;
-                this.totalOrderQTY = this.totalOrderQTY - qty;
-                this.colorsData[color.colorIndex].sizes.forEach((element) => {
-                    element.orderedQty = 0;
-                });
-            }
-
-            else{
-            if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[color.colorIndex])){ 
-                // this.totalOrderQTY  = this.totalOrderQTY - this.cal
-            let qty = 0;
-            let price = 0;
-            this.orderSummary[i].color.sizes.map((size) => {
-                let priceMultibly = size.orderedPrePacks * size.price;
-                qty = qty + size.orderedPrePacks;
-                price = price + priceMultibly;
-            });
-            this.totlaOrderPrices = this.totlaOrderPrices - price;
-            this.totalOrderQTY = this.totalOrderQTY - qty;
-            this.colorsData[color.colorIndex].sizes.forEach((element) => {
-                element.orderedPrePacks = 0;
-            });
-        } else {
-            let qty = 0;
-            let price = 0;
-            this.orderSummary[i].color.sizes.map((size,index) => {
-                let multiby =
-                    size.sizeRatio *
-                    this.orderSummary[i].color.sizes[index].orderedPrePacks;
-                let priceMultibly = multiby * size.price;
-                qty = qty + multiby;
-                price = price + priceMultibly;
-            });
-        
-            this.totlaOrderPrices = this.totlaOrderPrices - price;
-            this.totalOrderQTY = this.totalOrderQTY - qty;
-            this.colorsData[color.colorIndex].sizes[0].orderedPrePacks = 0;
-        }
-    }
-        this.orderSummary.splice(i, 1);
     }
 
-/*     removeSize(sizeIndex: number, size, color, orderIndex: number) {
+    removeSize(sizeIndex: number, size, color, orderIndex: number) {
         this.currentIndex = color.colorIndex;
         let amount=0;
 
@@ -554,53 +482,6 @@ if(!this.productDetails?.orderByPrePack ){
                     sizes.unshift(preorderItem);
             }
     }
-} */
-
-removeSize(sizeIndex: number, size, color, orderIndex: number) {
-    this.currentIndex = color.colorIndex;
-    let amount=0;
-
-    if(!this.productDetails?.orderByPrePack)  {
-        this.totalOrderQTY =
-        this.totalOrderQTY -
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty;
-     amount =
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty *
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
-    }
-
-    else{
-    if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[color.colorIndex])){ 
-        this.totalOrderQTY =
-        this.totalOrderQTY -
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks;
-     amount =
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks *
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
-    }
-    else{
-        this.totalOrderQTY =
-        this.totalOrderQTY -
-        (this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks);
-
-     amount =
-       this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks *
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
-    }
-    }
-    this.totlaOrderPrices = this.totlaOrderPrices - amount;
-    this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty = 0;
-    this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks=0;
-
-    if (sizeIndex == 0 && this.orderSummary[orderIndex].color.sizes?.length > 0) {
-        const sizes = this.colorsData[this.currentIndex].sizes;
-        const preorderIndex = (this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) ? sizes.findIndex(size => size.orderedQty) : sizes.findIndex(size => size.orderedPrePacks)  ;
-    
-        if (preorderIndex > 0) {
-            const [preorderItem] = sizes.splice(preorderIndex, 1);
-                sizes.unshift(preorderItem);
-        }
-}
 }
 
     // total ordered QTY in order by size
@@ -636,11 +517,11 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
     }
 
     // totla ordered prepack QTY
-    calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number, colorIndex:number) {
+    calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item,index) => {
             let multiby;
-            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[colorIndex])
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item.orderedPrePacks;
 
             else
@@ -654,7 +535,7 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
     }
 
     // totla amount for each size in order by prepack
-    getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number, colorIndex:number) {
+    getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item,index) => {
             let multiby;
@@ -695,8 +576,61 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
         }
         
     }
+    getBuyerInfoForPO(){
+        this._AppTransactionServiceProxy
+        .getCurrentTenantAccountProfileInformation()
+        .pipe(finalize(() => {
+            this.getBuyerBranche();
+            this.getsellerBranche()
+        }))
+        .subscribe((res: any) => {
+            console.log(res, 'reeeeees  bbbbbb mmmm');
+            this.buyerDataofPO = {
+                buyerCompanySSIN: res?.accountSSIN,
+                buyerContactPhoneNumber: res?.phone,
+                buyerContactEMailAddress: res?.email
+            };
+            // this.isBuyerInfoLoaded = true;  // Set flag to true after data is loaded
+        });
+    }
+    
+    // getOderNumber() {
+       
+    //     this._appTransactionServiceProxy
+    //         .getNextOrderNumber("PO")
+    //         .pipe(finalize(() => {
+            
+    //         }))
+    //         .subscribe((res: any) => {
+    //             this.orderNo = res;
+              
+    //         });
+    // }
+  
+
+    getBuyerBranche(){
+        this._AppTransactionServiceProxy.getAccountBranches(this.buyerDataofPO.buyerCompanySSIN).subscribe(result => {
+        
+            this.buyerbranchPO = {
+                buyerBranchSSIN: result[0]?.ssin,
+            
+            };
+        }); 
+    }
+
+    getsellerBranche(){
+        this._AppTransactionServiceProxy.getAccountBranches(this.productData.sellerSSIN).subscribe(result => {
+        
+            this.sellerbranchPO = {
+                sellerBranchSSIN: result[0]?.ssin,
+            
+            };
+        }); 
+    }
 
     addToShoppingCart() {
+        console.log(this.isFromSellerRoom,'isFromSellerRoom')
+        console.log(this.ismarketPLace,'ismarketPLace')
         // this.confirmationService.confirm({
         //     message:
         //         "Are you sure Want to add ordered qunatities to you cart ?",
@@ -722,6 +656,8 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
         //     },
         //     reject: (type: ConfirmEventType) => { },
         // });
+
+if(this.isFromSellerRoom) {
 
 
 
@@ -800,11 +736,231 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
             }
         }
         )
+    }else if(this.ismarketPLace){
+         
+        this.getBuyerInfoForPO()
 
+
+
+        this._appTransactionServiceProxy
+        .getNextOrderNumber("PO")
+        .pipe(finalize(() => {
+            Swal.fire({
+                title: "",
+                text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText:
+                    "Yes",
+                cancelButtonText: "No",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class2",
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+    
+    
+    
+                    this.showMainSpinner()
+    
+    
+                        console.log(this.buyerDataofPO,'buyerDataofPO')
+    
+                        this.body = {
+                                     
+                                         sellerContactName:null,
+                                                                             
+                                         buyerContactName: this.appSession.user.name,
+                                         sellerContactId:null,
+                                         buyerContactId:this.appSession.user.id,
+                                         sellerContactEmailAddress:null,
+                                         buyerContactEmailAddress:this.appSession.user.emailAddress,
+                                         // buyerContactEmailAddress:  this.buyerDataofPO.buyerContactEMailAddress,
+                                         buyerContactPhoneNumber: '',
+                                         sellerContactPhoneNumber:null,
+                                         buyerCompanyName: this.appSession.tenancyName,
+                                         sellerCompanyName:  this.productData.sellerCompanyName, 
+                                         enteredByUserRole: "I'm a Buyer",
+                                         code: this.orderNo,
+                                         transactionType:  1,
+                                         sellerContactSSIN: null,
+                                         buyerContactSSIN: this.appSession.user.accountId,
+                                         sellerCompanySSIN:  this.productData.sellerSSIN, 
+                                         buyerCompanySSIN:   this.buyerDataofPO.buyerCompanySSIN ,
+                                         buyerBranchSSIN: null,
+                                         buyerBranchName: '*Main*' ,
+                                         sellerBranchSSIN:  null,
+                                         sellerBranchName: '*Main*',
+                                             completeDate: moment(new Date).format('YYYY-MM-DD'),
+                                             enteredDate: moment(new Date).format('YYYY-MM-DD'),
+                                             startDate: moment(new Date).format('YYYY-MM-DD'),
+                                             availableDate: moment(new Date).format('YYYY-MM-DD'),
+                                         reference:  "",
+                                         priceLevel: "MSRP",
+                                         currencyId: this.appSession.tenant.currencyInfoDto.value
+                                     }; 
+                 
+                 
+                 
+                 
+                 
+                 
+                 console.log(this.body,'kkkk booooodddddy')
+    
+    
+    
+    
+                    this._AppTransactionServiceProxy
+                                 .createOrEdit(this.body)
+                                 .pipe(finalize(() =>  {
+                                   
+    
+          //     /////
+                    for (let index = 0; index < this.colorsData?.length; index++) {
+                    if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
+                        this.productDetails.variations.map((variation: any) => {
+                            if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                               let value= variation?.selectedValues[index];
+                                    value.edRestAttributes.forEach((attr) => {
+                                        if (attr.extraAttrName === "SIZE") {
+                                            attr.values.forEach((sizeValue) => {
+                                                sizeValue.orderedQty = sizeValue.orderedPrePacks;
+                                                sizeValue.orderedPrePacks = 0;
+                                            });
+                                        }
+                                    });
+                            }
+                        });
+                    }
+                }
+                    /////
+    
+                    let bodyRequest: any = {
+                        appItem: this.productDetails,
+                    };
+                    this.showMainSpinner();
+                    this._AppTransactionServiceProxy
+                        .addTransactionDetails(
+                            localStorage.getItem("transNO"), 'PO',
+                            bodyRequest
+                        )
+                        .pipe(
+                            finalize(() => {
+                                this.hideMainSpinner();
+                                localStorage.setItem(
+                                    "SellerSSIN",
+                                    JSON.stringify(this.productBodyData.sellerSSIN)
+                                );
+                                localStorage.setItem(
+                                    "currencyCode",
+                                    JSON.stringify(this.productBodyData.currencyCode)
+                                );
+    
+                              this.goToShowroom()
+                            })
+                        )
+                        .subscribe(async (res) => {
+                            console.log(">>", res);
+    
+                            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+    
+                        });
+    
+    
+                                 } ))
+                                 .subscribe((response: any) => {
+                                   
+                                         this._AppTransactionServiceProxy
+                                             .setCurrentUserActiveTransaction(
+                                                 response
+                                             )
+                                             .subscribe((res) => {
+                                        
+                                                 this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+                                              
+                                          
+                                             });
+                                     
+                             
+                 
+                                     //////
+                                     this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
+                                     this.printInfoParam.TransactionId=response;
+                                 //  this.printInfoParam.orderType=this.formType.toUpperCase();
+                                     this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.body.enteredByUserRole);
+                                     this.printInfoParam.saveToPDF=true;
+                                     this.printInfoParam.tenantId = this.appSession?.tenantId
+                                     this.printInfoParam.userId = this.appSession?.userId
+                                     this.reportUrl = this.printInfoParam.getReportUrl()
+                                
+                                     localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+                                     localStorage.setItem("fromMarketPlace",JSON.stringify(false));
+                                    //  localStorage.setItem(
+                                    //      "SellerId",
+                                    //      JSON.stringify(this.sellerCompanyId)
+                                    //  );
+                                    
+                                     localStorage.setItem("transNO", this.orderNo);
+                                    //  localStorage.setItem(
+                                    //      "contactSSIN",
+                                    //      JSON.stringify(this.buyerContactSSIN)
+                                    //  );
+                 
+                                    //  localStorage.setItem(
+                                    //      "SellerSSIN",
+                                    //      JSON.stringify(this.body.sellerCompanySSIN)
+                                    //  );
+                 
+                              
+                                        //  localStorage.setItem(
+                                        //      "BuyerSSIN",
+                                        //      JSON.stringify(this.buyerCompanySSIN)
+                                        //  );
+                 
+                                         
+                                       
+                                             
+                                         localStorage.setItem(
+                                             "currencyCode",
+                                             JSON.stringify(this.appSession.tenant.currencyInfoDto)
+                                         );
+                                     
+                 
+                                 
+                              
+                                              
+                                 });
+                     }
+    
+    
+    
+    
+    
+          
+                }
+            
+            )
+        
+        }))
+        .subscribe((res: any) => {
+            this.orderNo = res;
+          
+        });
+      
+
+    }
     }
 
     goToShowroom() {
-        sessionStorage.setItem(
+        localStorage.removeItem("productFilters");
+        localStorage.setItem(
             "SellerSSIN",
             JSON.stringify(this.productBodyData.sellerSSIN)
         );
@@ -812,6 +968,13 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
             "currencyCode",
             JSON.stringify(this.productBodyData.currencyCode)
         );
+        localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+      
+        localStorage.setItem("fromMarketPlace",JSON.stringify(false));
+        this.router.navigateByUrl("app/main/marketplace/products");
+    }
+
+    backToResult() {
 
         this.router.navigateByUrl("app/main/marketplace/products");
     }
@@ -852,6 +1015,26 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
         }
     }
     
+
+    IsVariationOrdered (){ 
+      
+        
+        this.appItemsAppservice.isVariationOrdered(this.productDetails?.code).pipe(
+                        finalize(() => {
+                            // this.hideMainSpinner();
+                            // this.alreadyOrderd = true
+                        })
+                    )
+                    .subscribe( (res) => {
+                        console.log("is orderd", res);
+
+
+                    });
+
+    }
+
+
+
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AddVariationToInputDto, AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AddVariationToInputDto, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, CreateOrEditAppItemDto, CurrencyInfoDto, GetAccountInformationOutputDto, GetAllEntityObjectTypeOutput, GetAppMarketItemForViewDto, GetAppMarketplaceItemDetailForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, LookupLabelDto, MarketplaceExtraDataAttrDto, PagedResultDtoOfGetAccountInformationOutputDto, SycEntityObjectTypesServiceProxy, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -21,11 +21,16 @@ import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/r
 import { AppConsts } from '@shared/AppConsts';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment';
+import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
+import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
+import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/models/filtered-extra-attribute';
+import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
   templateUrl: './shopping-cart-view-component.component.html',
   styleUrls: ['./shopping-cart-view-component.component.scss'],
+  providers:[AppMarketplaceItemsServiceProxy]
 })
 export class ShoppingCartViewComponentComponent
   extends AppComponentBase
@@ -47,6 +52,7 @@ export class ShoppingCartViewComponentComponent
   createOrEditSalesRepInfo: boolean = true;
   createOrEditshippingInfO: boolean = true;
   createOrEditBillingInfo: boolean = true;
+  createOrEditExtraData: boolean = true;
   loadNotesComp: boolean = false;
   transactionNum: Number = 0;
   disableProceedBtn: boolean = true;
@@ -117,6 +123,36 @@ currentFilter: string = '';
 regenrate : boolean = false
 syncMsg : boolean = false
 mainLoad : boolean = false
+    productBodyData: any;
+    productImages: AppEntityAttachmentDto[];
+    productDetails: any;
+    colorsData: any[];
+    updatedSpecialPrice: number = 0;
+    filteredColors: any[] = [];
+  productVarImages: MarketplaceExtraDataAttrDto[];
+  showEditSpecialPrice: boolean = true;
+  orderType :any
+  selectedColorName :any
+  selectedColorImg:any
+  selectedColorCode:any
+  chk_Order_by_prepack:boolean [] =[]
+  currentIndex: number = 0;
+  displayProductdata:boolean = false
+  displayColordata:boolean = false
+  displaysizesdata:boolean = false
+  visibleSP:boolean = false
+  selectedMainImgProduct:any
+  orderSummary: any = [];
+  sycAttachmentCategoryImage:any
+  acceptedAspectRatio:any
+appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
+  selectedItemTypeData: GetAllEntityObjectTypeOutput =
+        new GetAllEntityObjectTypeOutput();
+
+extraAttributes:any;
+openAdditional= false
+hasLoadedAdditional: boolean = false;
+extraAttributesMeta:any
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -126,12 +162,21 @@ mainLoad : boolean = false
     private router: Router,
     private cdr: ChangeDetectorRef,
     private _formBuilder: FormBuilder,
+    private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
+     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
+      private _extraAttributeDataService: ExtraAttributeDataService,
   ) {
     super(injector);
 
   }
   ngOnInit(): void {
+    this.defineExtraAttributes();
+    if(this.appTransactionsForViewDto){
+      this.getAppItemTypeExtraAttributesById(); // or your dynamic ID
+
+    }
     this.initFilterForm()
+    this.calcHight()
   
  let value = localStorage.getItem("comNew"); 
 
@@ -164,10 +209,35 @@ const button = document.getElementById("stickyButton");
 
   }
   ngOnChanges() {
-   
+    this.extraAttributesMeta = [
+      ...this.extraAttributes.RECOMMENDED.extraAttributes,
+      ...this.extraAttributes.ADDITIONAL.extraAttributes,
+    ];
+
 
   }
-
+  onAccordionChange(index: number | number[]) {
+    console.log('Accordion tab opened:', index);
+  
+    // Example: If first tab is opened
+    if (Array.isArray(index)) {
+      index.forEach(i => this.loadTabData(i));
+    } else {
+      this.loadTabData(index);
+    }
+  }
+  
+  loadTabData(tabIndex: number) {
+    const key = Object.keys(this.extraAttributes)[tabIndex];
+    const tab = this.extraAttributes[key];
+    console.log('Opened tab:', key, tab);
+  
+    // Call your logic, e.g.
+    // if (key === 'ADDITIONAL') {
+      this.getAppItemTypeExtraAttributesById();
+    // }
+  }
+  
  
 initFilterForm() {  
 
@@ -176,7 +246,10 @@ initFilterForm() {
       this.filterForm = this._formBuilder.group({
         selectedVariation: ['', Validators.required],
         selectedQuantity: [null, [Validators.required, Validators.min(1)]],
-        selectedPrice: [null, [Validators.required, Validators.min(1)]]
+        selectedPrice: [null, [Validators.required, Validators.min(1)]],
+        updatedSpecialPrice: [null, [ Validators.min(0)]],
+        
+
 
       });
  
@@ -185,6 +258,7 @@ initFilterForm() {
 
 addNewLine() {
   console.log(this.newData, 'newData'); // Log new data for debugging
+  console.log(this.orderSummary, 'sssss '); // Log new data for debugging
   const filters = this.filterForm.value;
 
   // Get the item data from the selected line (newData)
@@ -256,12 +330,7 @@ addNewLine() {
 
   // Reset variables
   this.showSaveCancel = false;
-  this.addLine = true
-  // this.selectedVariation = '';
-  // this.selectedQuantity = 0;
-  // this.selectedPrice = 0
-  // this.amount = 0;
-  // this.getSellerVariations()
+
   this.addLine = false
 }
 handleVarSearch(event: any, dropdown?: any) {
@@ -279,16 +348,43 @@ getSellerVariations(
   maxResultCount: number = this.incrementCount,
   filter: string = ''
 ) {
-  this._AppTransactionServiceProxy
-    .getAllSellerVariations(
-      this.appTransactionsForViewDto?.sellerCompanySSIN,
-      filter, // Pass filter to the backend
-      this.appTransactionsForViewDto?.buyerContactSSIN,
-      'USD',
-      undefined,
-      skipCount,
+  // this._AppTransactionServiceProxy
+  //   .getAllSellerVariations(
+  //     this.appTransactionsForViewDto?.sellerCompanySSIN,
+  //     filter, // Pass filter to the backend
+  //     this.appTransactionsForViewDto?.buyerContactSSIN,
+  //     'USD',
+  //     undefined,
+  //     skipCount,
+  //     maxResultCount
+  //   )
+   this._AppMarketplaceItemsServiceProxy
+            .getAll(
+              this.appTransactionsForViewDto.sellerContactSSIN,
+               this.appTransactionsForViewDto.sellerCompanySSIN,
+                null, // tenant id
+                null,
+                false, // false
+                filter, // search text
+                null, //null
+                null, //null
+                null, // null
+                [], // depratment
+                null,
+                null,
+               2,
+                false,
+                undefined, //'2022-2-2'
+                undefined,
+                undefined,
+                undefined,
+                [], // ids
+                'USD',
+                'name',
+                      skipCount,
       maxResultCount
-    )
+            )
+  
     .pipe(finalize(() => this.hideMainSpinner()))
     .subscribe((res) => {
       this.totalVariationsCount = res.totalCount;
@@ -329,20 +425,13 @@ loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
 onVariationSelect(event: any) {
   // Reset quantity and price when a new variation is selected  
   console.log(event,'mmmmmmevv')
-// this.filterForm.reset();
-  // filters.reset()
-  this.filterForm.controls['selectedQuantity']?.setValue(0);
-  this.selectedQuantity = 0;
-  // this.selectedPrice = 0;
-  this.newData = event;
+  this.getProductDetailsForView( event.value.appItem.id)
+  this.selectedMainImgProduct =  event.value.appItem.imageUrl
+  this.displayProductdata = true
+  this.displayColordata = false
+  this.displaysizesdata = false
+  console.log(this.selectedMainImgProduct,'this.selectedMainImgProduct')
 
-  if ( event.value.appItem.price) {
-    this.selectedImg = event.value.appItem.image
-   
-     this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
-    //  this.selectedPrice = filters.selectedPrice
-    this.updateAmount(); // Recalculate the amount when a new price is selected
-  }
 }
 
 updateAmount() {
@@ -363,39 +452,67 @@ updatePrice() {
 }
 
 saveVariations() {
-  const body = new AddVariationToInputDto();
-  const filters = this.filterForm.value;
-  
- this.selectedPrice = filters.selectedPrice
- this.selectedQuantity = filters.selectedQuantity
-  // Assign each property to the DTO object
-  body.variationSSIN = this.newData?.value?.appItem?.ssin;
-  body.qty = this.selectedQuantity;
-  body.price = this.selectedPrice;
-  body.transactionId = this.orderId;
-  body.transactionType = this.appTransactionsForViewDto?.transactionType;
+    /////
+    for (let index = 0; index < this.colorsData?.length; index++) {
+      if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
+          this.productDetails.variations.map((variation: any) => {
+              if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                 let value= variation?.selectedValues[index];
+                      value.edRestAttributes.forEach((attr) => {
+                          if (attr.extraAttrName === "SIZE") {
+                              attr.values.forEach((sizeValue) => {
+                                  sizeValue.orderedQty = sizeValue.orderedPrePacks;
+                                  sizeValue.orderedPrePacks = 0;
+                              });
+                          }
+                      });
+              }
+          });
+      }
+  }
+      /////
 
-  this._AppTransactionServiceProxy.addVariationToTransaction(body)
-    .pipe(finalize(() =>  {
-        this.selectedVariation = '';
-  this.selectedQuantity = 0;
-  this.selectedPrice = 0
-  this.amount = 0;
-  // this.filterForm.value.reset()
-  // this.hideMainSpinner()
-  this.getShoppingCartData();
-  this.showSaveCancel = false
+      let bodyRequest: any = {
+          appItem: this.productDetails,
+      };
+      console.log(bodyRequest,'boooodddy')
+      this.showMainSpinner();
+      this._AppTransactionServiceProxy
+          .addTransactionDetails(
+            this.transactionCode, this.appTransactionsForViewDto.transactionType == 0 ? 'SO':'PO',
+            bodyRequest
+          )
+          .pipe(
+              finalize(() => {
+                this.showSaveCancel = false
+                this.displayColordata = false
+                this.displayProductdata = false
+                this.displaysizesdata = false
+                this.addLine = true;
+                this.addNewLinebtn = true ;
+                this.showAddLine = false;
+                this.filterForm.value.reset()
+                this.displayedVariations = []
+                this.getSellerVariations(0,10,'')
+                  this.hideMainSpinner();
+                  this.getShoppingCartData();
+                
+              })
+          )
+          .subscribe(async (res) => {
+              console.log(">>", res);
 
-    }))
-    .subscribe((res) => {
-      console.log(this.displayedVariations, 'displayedVariations');
-      // Handle post-save logic here
-    });
-    this.addNewLinebtn = true
+              this.getShoppingCartData();
+   this.filterForm.controls['selectedVariation'].reset()
+          });
+
+
+
+
 }
 
 cancelAddLine() {
-  this.addLine = true
+  // this.addLine = true
   this.showAddLine = false;
   this.showSaveCancel = false;
  
@@ -415,21 +532,20 @@ cancelAddLine() {
 }
 
 cancelsaveLine() {
-  this.addLine = true
+  this.showSaveCancel = false
+  this.displayColordata = false
+  this.displayProductdata = false
+  this.displaysizesdata = false
+  this.addLine = true;
+  this.addNewLinebtn = true ;
   this.showAddLine = false;
-  this.showSaveCancel = false;
- 
-  this.addNewLinebtn = true
- 
-    this.selectedVariation = '';
-    this.filterForm.controls['selectedQuantity']?.setValue(0);
-    this.filterForm.controls['selectedPrice']?.setValue(0);
+  this.filterForm.value.reset()
+  this.displayedVariations = []
+  this.getSellerVariations(0,10,'')
+    this.hideMainSpinner();
+    this.getShoppingCartData();
 
-    this.selectedQuantity = 0;
 
-  this.selectedPrice = 0
-  this.amount = 0;
-  
 }
 
   
@@ -528,6 +644,7 @@ loadCommentsList() {
       this.createOrEditSalesRepInfo = true;
       this.createOrEditshippingInfO = true;
       this.createOrEditBillingInfo = true;
+      this.createOrEditExtraData = true;
     }
     else {
       this.showTabs = true;
@@ -537,6 +654,8 @@ loadCommentsList() {
       this.createOrEditSalesRepInfo = false;
       this.createOrEditshippingInfO = false;
       this.createOrEditBillingInfo = false;
+      this.createOrEditExtraData = false;
+
     }
 
     this.getColumns();
@@ -578,9 +697,10 @@ loadCommentsList() {
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
+    this.createOrEditExtraData = true
     this.appTransactionsForViewDto=null;
   }
-
+ 
   getColumns() {
     this.cols = [
       { field: "image", header: "Image" },
@@ -593,6 +713,7 @@ loadCommentsList() {
   }
 
   getShoppingCartData(temp: TreeNode<any>[] = null) {
+
 this.temp=temp;
     this.showMainSpinner();
     //header
@@ -603,12 +724,14 @@ this.hideMainSpinner();
     .subscribe((res: GetAppTransactionsForViewDto) => {
          res.companeyNames=this.companeyNames;
           this.appTransactionsForViewDto = res;
+          this.getAppItemTypeExtraAttributesById();
+   
 
           /// set validations 
           this.orderInfoValid = this.appTransactionsForViewDto.isOrderInformationValid;
           this.buyerContactInfoValid = this.appTransactionsForViewDto.isBuyerContactInformationValid;
           this.SellerContactInfoValid = this.appTransactionsForViewDto.isSellerContactInformationValid;
-          this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : this.appTransactionsForViewDto.isSalesRepInformationValid ;
+          this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole?.toString()?.includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : this.appTransactionsForViewDto.isSalesRepInformationValid ;
           this.shippingInfOValid = this.appTransactionsForViewDto.isShippingInformationValid;
           this.BillingInfoValid = this.appTransactionsForViewDto.isBillingInformationValid;
           ///
@@ -644,7 +767,7 @@ this.hideMainSpinner();
 
   getLinesData(){
      //lines
-   if  ((this.showTabs && this.activeIndex==6 ) || (!this.showTabs && this.activeIndex==0 )){
+   if  ((this.showTabs && this.activeIndex==7 ) || (this.showTabs && this.currentTab==7 ) || (!this.showTabs && this.activeIndex==0 )){
      this._AppTransactionServiceProxy
      .getOrderDetailsForView(
        this.orderId,
@@ -665,7 +788,7 @@ this.hideMainSpinner();
        if (res.transactionType == TransactionType.SalesOrder)
          this.transactionType = "Sales Order";
 
-         this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
+         this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole?.toString()?.includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
 
 
        if (!this.temp) this.shoppingCartTreeNodes = res.detailsView;
@@ -719,10 +842,11 @@ onShowVariations(event) {
 
 
   onContinueShopping() {
+    localStorage.removeItem("productFilters");
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.appTransactionsForViewDto?.sellerCompanySSIN) {
-      sessionStorage.setItem(
+      localStorage.setItem(
         "SellerSSIN",
         JSON.stringify(this.appTransactionsForViewDto?.sellerCompanySSIN)
       );
@@ -739,6 +863,8 @@ onShowVariations(event) {
         "transNO",
         this.appTransactionsForViewDto.code
       );
+      localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+      localStorage.setItem("fromMarketPlace",JSON.stringify(false));
      // this.router.navigateByUrl("app/main/marketplace/products");
 
       if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
@@ -916,7 +1042,6 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
-                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -935,7 +1060,6 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
-                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -952,7 +1076,6 @@ onShowVariations(event) {
                   // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
-                  rowNode.node.data.showEditPrice = false;
                   this.hideMainSpinner();
               });
             break;
@@ -976,7 +1099,6 @@ onShowVariations(event) {
       rowNode.node.data.amount =  this.amount
       rowNode.node.data.qty =  this.selectedQuantity 
       rowNode.node.data.showEditQty = false;
-      rowNode.node.data.showEditPrice = false;
 
     }else {
 
@@ -997,7 +1119,6 @@ onShowVariations(event) {
             if (res) this.notify.info("Successfully Updated.");
             // this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
-            rowNode.node.data.showEditPrice = false;
             this.getShoppingCartData();
             this.hideMainSpinner();
           });
@@ -1030,7 +1151,6 @@ onShowVariations(event) {
               // this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
               // rowNode.node.data.showEditQty = false;
-              //  rowNode.node.data.showEditPrice = false;
               this.hideMainSpinner();
             });
         } else {
@@ -1051,60 +1171,6 @@ onShowVariations(event) {
     }
   }
 }
-
-
-onEditPrice(rowNode) {
-  if(rowNode.node.data.added)
-    rowNode.node.data.showEditPrice = false;
-
-  else {
-  this.showMainSpinner();
-          switch (rowNode.level) {
-            case 0:
-            case 2:
-              this._AppTransactionServiceProxy
-                .updatePriceByProductLineId(
-                  this.orderId,
-                  rowNode.node.data.lineId,
-                  rowNode.node.data.updatedPrice
-                )
-                .subscribe((res) => {
-                  if (res)
-                  this.notify.info("Successfully Updated.");
-                  rowNode.node.data.showEditPrice = false;
-                  rowNode.node.data.price= rowNode.node.data.updatedPrice;
-                  this.getShoppingCartData();
-                  this.hideMainSpinner();
-                });
-              break;
-              case 1:
-                this.showMainSpinner();
-                  this._AppTransactionServiceProxy
-                    .updatePriceByProductSSINColor(
-                      this.orderId,
-                      rowNode.node.data.parentId,
-                      rowNode.node.data.colorCode,
-                      rowNode.node.data.colorId,
-                      rowNode.node.data.updatedPrice
-                    )
-                    .subscribe((res) => {
-                      if (res) this.notify.info("Successfully Updated.");
-                      rowNode.node.data.showEditPrice = false;
-                      rowNode.node.data.price= rowNode.node.data.updatedPrice;
-                      this.getShoppingCartData();
-                      this.hideMainSpinner();
-                    });
-                  break;
-
-     default:
-          break;
-
-                  }
-  }
-    
-  
-}
-
   hide() {
     this.resetData();
     this.modal.hide();
@@ -1280,7 +1346,6 @@ stopReport(event) {
          
             localStorage.removeItem("comNew");
             localStorage.removeItem("conNew");
-            localStorage.removeItem("tempPriceLevel");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
          this.getShoppingCartData()
@@ -1372,7 +1437,7 @@ stopReport(event) {
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10,transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
 
@@ -1427,8 +1492,14 @@ stopReport(event) {
 
   }
   ontabChange($event) {
+    console.log($event,'$even')
     this.activeIndex = $event + 1;
     this.currentTab= this.activeIndex ;
+if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+    console.log( this.currentTab,'$ this.currentTab')
+
   }
 
   refreshShoppingCart(event) {
@@ -1600,6 +1671,542 @@ stopReport(event) {
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
+    getProductDetailsForView(id:any) {
+      this.appTransactionsForViewDto.transactionType == 0 ? this.orderType = 'SO' : this.orderType = 'PO'
+        this.showMainSpinner();
+        this.showEditSpecialPrice = true;
+        this._AppMarketplaceItemsServiceProxy
+        .getMarketplaceAppItemForView(
+            undefined,
+            0,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            'USD',
+            this.appTransactionsForViewDto?.buyer,
+            this.appTransactionsForViewDto?.sellerCompanySSIN,
+            // 353338,
+            '',
+            id,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            0,
+            10
+        )  
+                          .pipe(
+                            finalize(() => {
+                                this.hideMainSpinner();
+                            })
+                        )
+        .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
+            this.productDetails = res?.appItem;
+            // this.productData = res;                    
+            this.productDetails.maxSpecialPrice =  this.productDetails?.maxSpecialPrice ?  this.productDetails?.maxSpecialPrice : 0;
+            // this.updatedSpecialPrice = ;
+            this.filterForm.controls['updatedSpecialPrice']?.setValue(this.productDetails?.maxSpecialPrice);
+            this.productImages = res?.appItem?.entityAttachments;
+            this.productVarImages = res?.appItem?.variations;
+            let colorVariation: any[] = res?.appItem?.variations?.filter(
+                (variation: any) => variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName
+            );
+            let selectedValues = [
+                ...colorVariation.map(
+                    (selected: any) => selected?.selectedValues
+                ),
+            ];
+
+            this.colorsData = selectedValues[0]?.map((variation: any) => {
+                let sizesValue = variation?.edRestAttributes?.map(
+                    (attr: any) => {
+                        if (attr?.extraAttrName === "SIZE") {
+                            return [...attr.values];
+                        }
+                    }
+                );
+                return {
+                    colorName: variation?.value,
+                    sizes: sizesValue[0],
+                    colorImg: variation?.colorImage,
+                    colorCode: variation?.colorHexaCode,
+                    colorCodeSelectedValues:variation?.code
+                };
+            });
+            this.filteredColors = this.colorsData
+            this.chk_Order_by_prepack=[];
+            this.chk_Order_by_prepack = new Array(this.colorsData?.length).fill(true);
+             console.log(this.colorsData,'colooors')
+        });
+
+    }
+    onColorSelect(event){
+      this.currentIndex = this.colorsData.findIndex(
+        (option) => option.colorName === event.value.colorName
+    );
+      this.selectedColorName = event.value.colorName
+      this.selectedColorImg = event.value.colorImg
+      this.selectedColorCode = event.value.colorCode
+     
+        this.displayColordata = true
+        this.displaysizesdata = true
+          }
+
+       // create order by size summary JSON
+       onNumberChange(e: any, color: any, sizeIndex: any) {
+        let orederedMappedData = {
+            color,
+            sizeIndex,
+            colorIndex: this.currentIndex,
+        };
+        let foundColor = false;
+        this.orderSummary.forEach((summary: any) => {
+            if (summary?.color?.colorName === color?.colorName) {
+                foundColor = true;
+            }
+        });
+        if (!foundColor) {
+          
+
+            this.orderSummary.push(orederedMappedData);
+        }
+        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
+            this.productDetails.variations.map((variation: any) => {
+                if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                    variation?.selectedValues?.forEach((value) => {
+                        if (
+                            value?.value ===
+                            this.filteredColors[this.currentIndex]?.colorName
+                        ) {
+                            value?.edRestAttributes?.forEach((attr) => {
+                                if (attr?.extraAttrName === "SIZE") {
+  
+
+                                    attr?.values?.forEach((sizeValue) => {
+                                        sizeValue.orderedPrePacks =
+                                            this.filteredColors[
+                                                this.currentIndex
+                                            ]?.sizes[0]?.orderedPrePacks;
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    
+        this.calculateTotalOrderPriceAndQty(this.orderSummary);
+    }
 
 
+    onChangechk_Order_by_prepack() {
+      if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
+          this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
+              item.orderedPrePacks=0;
+          });
+      }
+          else{
+          this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
+              item.orderedPrePacks*=item?.sizeRatio;
+          });
+      }
+  }
+
+  onEditpecialPrice() {
+        
+    this.productDetails.variations.map((variation: any) => {
+        if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+            variation.selectedValues.forEach((value) => {
+                value.edRestAttributes.forEach((attr) => {
+                    if (attr.extraAttrName === "SIZE") {
+                        attr.values.forEach((sizeValue) => {
+                            sizeValue.price =  this.filterForm.controls['updatedSpecialPrice']?.value;
+                        });
+                    }
+                });
+
+            });
+        }
+
+        this.calculateTotalOrderPriceAndQty(this.orderSummary);
+    });
+
+   // this.productDetails.minSpecialPrice = updatedSpecialPrice;
+    this.productDetails.maxSpecialPrice = this.filterForm.controls['updatedSpecialPrice']?.value;
+    this.showEditSpecialPrice = true
+}
+
+    // total of all order qty and price in order by size and prepack
+    totalOrderQTY: number = 0;
+    totlaOrderPrices: number = 0;
+    calculateTotalOrderPriceAndQty(orders: any) {
+        let qty = 0;
+        let price = 0;
+        orders?.map((order: any) => {
+            order?.color?.sizes?.map((size,index) => {
+                if (this.productDetails.orderByPrePack) {
+
+                    let multiby =
+                        size?.sizeRatio * order?.color?.sizes[index]?.orderedPrePacks;
+                    let priceMultibly = multiby * size?.price;
+                    qty = qty + multiby;
+                    price = price + priceMultibly;
+                } else {
+                    if (!size.orderedQty)
+                        size.orderedQty = 0
+                    let priceMultibly = size?.orderedQty * size?.price;
+                    qty = qty + size?.orderedQty;
+                    price = price + priceMultibly;
+                }
+
+                this.totalOrderQTY = qty;
+                this.totlaOrderPrices = price;
+            });
+        });
+    }
+
+   calcHight(){
+    this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER","IMAGE"]).subscribe((result)=>{
+      result.forEach(item=>{
+         
+      if(item.code == "IMAGE") {
+        this.sycAttachmentCategoryImage = item
+          let [width,height,border] = this.sycAttachmentCategoryImage.aspectRatio.split(':')
+        this.acceptedAspectRatio = Number(width) / Number(height)  ;
+          }
+            })
+            console.log( this.acceptedAspectRatio,' this.acceptedAspectRatio')
+   })
+  }
+
+   // totla ordered prepack QTY
+   calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number) {
+    let sum = 0;
+    prepackSizes.forEach((item,index) => {
+        let multiby;
+        if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
+            multiby = item.orderedPrePacks;
+
+        else
+            multiby =
+                item.sizeRatio *
+                this.orderSummary[orderIndex]?.color?.sizes[index]?.orderedPrePacks;
+
+        sum = sum + multiby;
+    });
+    return sum;
+}
+
+    // totla ratios in order by prepack
+    getTotlaPrepackSum() {
+      let sum: any = 0;
+      this.colorsData[this.currentIndex]?.sizes.forEach((item) => {
+          sum = sum + item?.sizeRatio;
+      });
+      //console.log('first pack ' , sum)
+      //sum=Math.round(sum * 100 / 100).toFixed(2);
+      //console.log('second pack ' , sum)
+
+      return sum;
+  }
+
+  defineExtraAttributes() {
+    this.extraAttributes = {};
+  
+    const allAttributes = this.selectedItemTypeData?.extraAttributes?.extraAttributes ?? [];
+  
+    allAttributes.forEach(attr => {
+      const usageKey = attr.usage?.replace(/\s+/g, '_').toUpperCase() || 'DEFAULT';
+  
+      if (!this.extraAttributes[usageKey]) {
+        this.extraAttributes[usageKey] = new CreateEditAppItemExtraAttribute({
+          header: this.l(attr.usage),
+          title: this.l(attr.usage),
+          usageEnum: usageKey as unknown as EExtraAttributeUsage,
+          orderOfDisplay: 1,
+          filteredExtraAttributes: [],
+          // extraAttributes: []
+        });
+      }
+  
+      // ✅ Add this if missing
+      if (!attr.paginationSetting) {
+        attr.paginationSetting = {
+          skipCount: 0,
+          maxResultCount: 10,
+          totalCount: 0,
+          list: []
+        };
+      }
+  
+      this.extraAttributes[usageKey].filteredExtraAttributes.push(attr);
+    });
+  
+    console.log('✅ Final extraAttributes:', this.extraAttributes);
+  }
+  
+  
+  getAppItemTypeExtraAttributesById() {
+    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId)
+      .subscribe((res) => {
+        console.log('🎯 API Response:', res); // Add this ✅
+        if (res?.length > 0) {
+          this.selectedItemTypeData = res[0];
+  
+          const attributes = res[0]?.extraAttributes?.extraAttributes;
+  
+          console.log('🎯 Extracted Attributes:', attributes); // Add this ✅
+  
+          if (attributes?.length > 0) {
+            this.defineExtraAttributes();
+            this.loadRecommendedAndAdditionalExtraDataLookupLists();
+          } else {
+            this.extraAttributes = {}; // No data, keep empty
+          }
+        }
+      });
+  }
+  
+
+  loadRecommendedAndAdditionalExtraDataLookupLists() {
+    Object.keys(this.extraAttributes).forEach(key => {
+      const group = this.extraAttributes[key];
+      group.filteredExtraAttributes.forEach(extraAttr => {
+        if (extraAttr.isLookup) {
+          this.loadExtraDataLookupList(extraAttr);
+        }
+      });
+    });
+  }
+  
+
+    loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
+        this._extraAttributeDataService
+            .getExtraAttributeLookupDataWithPaging(
+               'APPROVALR',
+                0,
+                10
+            )
+            .subscribe((result) => {
+              console.log(result,'')
+                extraAttr.paginationSetting.totalCount = result.totalCount;
+                if (extraAttr.paginationSetting.skipCount == 0)
+                    extraAttr.paginationSetting.list = [];
+                else
+                    extraAttr.paginationSetting.list.splice(
+                        extraAttr.paginationSetting.list.length - 1,
+                        1
+                    );
+                     let isExist=result.items.filter((item)=>{ return item.value==extraAttr.attributeId});
+                    if((isExist!.length==0||isExist==undefined)  && extraAttr?.selectedValues?.length>0){
+
+                        const tempAtt = new LookupLabelDto({
+                            code:extraAttr.code,
+                            label:extraAttr.selectedValues,
+                            stockAvailability:undefined,
+                            value:extraAttr.selectedValues,
+                            isHostRecord:false,
+                            hexaCode:undefined,
+                            image:undefined
+                        })
+                        result.items.push(tempAtt)
+                    }
+
+                extraAttr.paginationSetting.list.push(...result.items);
+                if (
+                    extraAttr.paginationSetting.list.length <
+                    extraAttr.paginationSetting.totalCount
+                ) {
+                    const showMoreSelectItem: SelectItem = {
+                        value: -1,
+                        label: this.l("showMore"),
+                        icon: "fas  fa-reply",
+                        styleClass: "showMore",
+                        disabled: false,
+                    };
+                    extraAttr.paginationSetting.list.push(showMoreSelectItem);
+                }
+                extraAttr.paginationSetting.skipCount +=
+                    extraAttr.paginationSetting.maxResultCount;
+            });
+    }
+
+
+ 
+      // setAdditionalAndRecommendedExtraAttributes() {
+      //       const extraAttributres =
+      //           this.selectedItemTypeData.extraAttributes.extraAttributes;
+      //       this.extraAttributes.RECOMMENDED.extraAttributes =
+      //           this._extraAttributeDataService.getFilteredAttributesByUsage(
+      //               extraAttributres,
+      //               EExtraAttributeUsage.Recommended,
+      //               false
+      //           );
+      //       this.extraAttributes.ADDITIONAL.extraAttributes =
+      //           this._extraAttributeDataService.getFilteredAttributesByUsage(
+      //               extraAttributres,
+      //               EExtraAttributeUsage.Additional,
+      //               false
+      //           );
+      //   }
+    
+   
+        extraSelectedValuesExtraData() {
+          const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
+              ...this.extraAttributes.ADDITIONAL.extraAttributes,
+              ...this.extraAttributes.RECOMMENDED.extraAttributes,
+          ];
+          const previousExtraAttributes: AppEntityExtraDataDto[] =
+              this.appItem.entityExtraData || [];
+          this.appItem.entityExtraData = [];
+          recentlyExtraAttributes.forEach((extraAttr) => {
+              if (!extraAttr.selectedValues || extraAttr.isSelectedOnVariation)
+                  return;
+              if (extraAttr.isLookup) {
+                  // is lookup
+                  if (extraAttr.acceptMultipleValues) {
+                      // multi selection
+                      extraAttr?.selectedValues?.forEach((attributeValueId) => {
+                          const alreadySelected: AppEntityExtraDataDto =
+                              previousExtraAttributes.filter((item) => {
+                                  return item.attributeValueId == attributeValueId;
+                              })[0];
+                          if (alreadySelected)
+                              return this.appItem.entityExtraData.push(
+                                  alreadySelected
+                              );
+                          const entityExtraData: AppEntityExtraDataDto =
+                              new AppEntityExtraDataDto();
+                          entityExtraData.id = 0;
+                          entityExtraData.attributeValueId = attributeValueId;
+                          entityExtraData.attributeId = extraAttr.attributeId;
+                          this.appItem.entityExtraData.push(entityExtraData);
+                      });
+                  } else {
+                      // single selection
+                      const alreadySelected: AppEntityExtraDataDto =
+                          previousExtraAttributes.filter((item) => {
+                           return   item.attributeId == extraAttr.attributeId;
+                          })[0];
+                      if (alreadySelected) {
+                          alreadySelected.attributeValueId =
+                          parseInt(extraAttr?.selectedValues);
+                          this.appItem.entityExtraData.push(alreadySelected);
+                      } else {
+                          const entityExtraData: AppEntityExtraDataDto =
+                              new AppEntityExtraDataDto();
+                          entityExtraData.id = 0;
+                          entityExtraData.attributeValueId =
+                              parseInt(extraAttr?.selectedValues);
+                          entityExtraData.attributeId = extraAttr.attributeId;
+                          this.appItem.entityExtraData.push(entityExtraData);
+                      }
+                  }
+              } else {
+                  // any other not lookup data
+                  const alreadySelected: AppEntityExtraDataDto =
+                      previousExtraAttributes.filter((item) => {
+                         return item.attributeId == extraAttr?.attributeId;
+                      })[0];
+                  if (alreadySelected) {
+                      alreadySelected.attributeValue = extraAttr?.selectedValues;
+                      this.appItem.entityExtraData.push(alreadySelected);
+                  } else {
+                      const entityExtraData: AppEntityExtraDataDto =
+                          new AppEntityExtraDataDto();
+                      entityExtraData.id = 0;
+                      entityExtraData.attributeValue = extraAttr?.selectedValues;
+                      entityExtraData.attributeId = extraAttr.attributeId;
+                      this.appItem.entityExtraData.push(entityExtraData);
+                  }
+              }
+          });
+      }   
+
+
+      onExtraAttributesChanged(dataFromChild: any[]) {
+        if (!this.appTransactionsForViewDto) {
+          this.appTransactionsForViewDto = new GetAppTransactionsForViewDto();
+        }
+      
+        if (!this.appTransactionsForViewDto.entityExtraData) {
+          this.appTransactionsForViewDto.entityExtraData = [];
+        }
+      
+        const existingData = this.appTransactionsForViewDto.entityExtraData;
+      
+        const incomingData: AppEntityExtraDataDto[] = dataFromChild.map(attr => {
+          if (attr.isLookup && attr.acceptMultipleValues) {
+            return attr.value.map(v => {
+              const d = new AppEntityExtraDataDto();
+              d.attributeId = attr.attributeId;
+              d.attributeValueId = v;
+              return d;
+            });
+          } else {
+            const dto = new AppEntityExtraDataDto();
+            dto.attributeId = attr.attributeId;
+            if (attr.isLookup) {
+              dto.attributeValueId = attr.value;
+            } else {
+              dto.attributeValue = attr.value;
+            }
+            return dto;
+          }
+        }).flat();
+      
+        // Merge logic: Replace existing attributeId matches, keep others
+        for (const incoming of incomingData) {
+          const index = existingData.findIndex(
+            x => x.attributeId === incoming.attributeId && (!incoming.attributeValueId || x.attributeValueId === incoming.attributeValueId)
+          );
+      
+          if (index > -1) {
+            existingData[index] = incoming;
+          } else {
+            existingData.push(incoming);
+          }
+        }
+      
+        console.log(existingData, '✅ Merged Extra Attributes');
+      
+        this.appTransactionsForViewDto.entityExtraData = existingData;
+      }
+      
+      
+      saveExtra(){
+        this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+        .pipe(finalize(() => {
+
+     
+      //  this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+      //  this.getShoppingCartData()
+
+
+      }
+        ))
+        .subscribe((res) => {
+
+          if (res) {
+          // this.getShoppingCartData()
+
+          // this.hideMainSpinner();
+
+
+      
+          }
+        });
+      }
+      
+
+      
 }

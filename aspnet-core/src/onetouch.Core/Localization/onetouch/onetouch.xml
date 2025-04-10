@@ -1,6 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>
+	<texts>    <text name="ValidationRules">Validation rules</text>
+    <text name="ValidationRule">Validation rule</text>
+    <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
+    <text name="FieldName">Field name</text>
+    <text name="RuleType">Rule type</text>
+    <text name="RuleValue">Rule value</text>
+    <text name="ErrorMessage">Error message</text>
+    <text name="ValidationRulesHeaderInfo">Validation rules header info</text>
+    <text name="CreateNewValidationRule">Create new validation rule</text>
+    <text name="EditValidationRule">Edit validation rule</text>
+    <text name="DeleteValidationRule">Delete validation rule</text>
+
     <text name="AppFeatureDescription">App feature description</text>
     <text name="PickAppFeature">Pick app feature</text>
 

@@ -166,14 +166,20 @@
                         [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' +  shoppingCartSummary?.sellerLogo  : defaultSellerLogo "
                         onerror="this.onerror=null;this.src=defaultSellerLogo"
                         class="navbar-brand"
+                        (mouseover)="displaneSel = true"
+                        (mouseleave)="displaneSel = false"
                     />
+                    <span *ngIf="displaneSel" class="tooltip-text">seller: bbbb</span>
                   </li>
                   <li  class="nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
                     [src]="shoppingCartSummary?.buyerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.buyerLogo : defaultBuyerLogo"
                     onerror="this.onerror=null;this.src=defaultBuyerLogo"
                         class="navbar-brand"
+                        (mouseover)="displaneBuy = true"
+                        (mouseleave)="displaneBuy = false"
                     />
+                    <span *ngIf="displaneBuy" class="tooltip-text-b">buyer: bbbb</span>
                   </li>
                   </ul>
 

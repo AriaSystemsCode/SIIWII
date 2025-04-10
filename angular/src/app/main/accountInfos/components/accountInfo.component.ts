@@ -73,6 +73,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     allLanguages: LookupLabelDto[];
     allPriceLevel: SelectItem[] = [];
     accountTypes: SelectItem[] = [];
+    allShipVia:LookupLabelDto[];
+    allPaymentTerms :LookupLabelDto[];
 
     logoId:number;
     bannerId:number;
@@ -166,6 +168,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange()
         this.initUploaders();
+       this.GetContactDefaults();
+    }
+
+   paymentTermsId; 
+   shipViaId;
+    GetContactDefaults(){
+        this._AccountsServiceProxy.getContactDefaults()
+        .subscribe((res)=>{
+            this.paymentTermsId= res.paymentTermsId; 
+            this.shipViaId=res.shipViaId; 
+        });
     }
     handleRoutingChange(){
         this._route.queryParamMap.subscribe(paramsObj => {
@@ -201,7 +214,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     break;
                 case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ProfileCreateOrEdit] :
                     if(this.isMyAccount) this.getMyAccountDataForEdit()
-                    else if ( this.isManualAccountEdit || this.isExternalAccountEdit) this.getAccountDataForEdit()
+                    else if ( this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView.isConnected) this.getAccountDataForEdit()
                     break;
                 default:
                     break;
@@ -363,8 +376,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     loadInitData(){
-        if(this.accountInfoTemp)
+        if(this.accountInfoTemp){
         this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+        }
 
         this.defineAccountTypes();
         this.getLanguages();
@@ -372,7 +386,23 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.getCurrenciesDto();
         this.getPhoneTypes();
        this.allPriceLevel= this.getPriceLevel();
+      this.getShipVia();
+      this.getPaymentTerms();
        this.getAccountTypes();
+    }
+
+    getShipVia() {
+        this._AppEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
+        .subscribe((res) => {
+          this.allShipVia = res;
+        });
+    }
+
+    getPaymentTerms(){
+        this._AppEntitiesServiceProxy.getAllEntitiesByTypeCode('PAYMENT-TERMS')
+        .subscribe((res) => {
+          this.allPaymentTerms = res;
+        });
     }
 
     getAccountTypes(){ 
@@ -422,6 +452,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 this.accountInfoTemp.name = this.appSession.tenant.name
                 this.accountInfoTemp.tradeName = this.appSession.tenant.name
             }
+
+           
+                this.accountInfoTemp.paymentTermsId=  !result?.accountInfo?.id  ?  this.paymentTermsId  :  
+                            result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+                this.accountInfoTemp.shipViaId= 
+                !result?.accountInfo?.id  ?  this.shipViaId  :  
+                   result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
+
         }
     }
     resetFormData(){
@@ -495,11 +533,23 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     if(result){
                         this.languageIdName=result.languageName;
                         this.accountInfoTemp.languageId=result.accountInfo.languageId;
-
+                        this.accountInfoTemp.paymentTermsId=  ! this.accountInfoTemp?.id  ?  this.paymentTermsId  :  
+                        result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+            this.accountInfoTemp.shipViaId= 
+            ! this.accountInfoTemp?.id  ?  this.shipViaId  :  
+               result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
                     }
 
                 })
                }
+            }
+
+            else{
+                this.accountInfoTemp.paymentTermsId= ! this.accountInfoTemp?.id  ?  this.paymentTermsId  :  
+                result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
+    this.accountInfoTemp.shipViaId= 
+    ! this.accountInfoTemp?.id  ?  this.shipViaId  :  
+       result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
             }
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
@@ -754,7 +804,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             return
         }
         this.saving = true;
-        if(this.accountLevel === AccountLevelEnum.Profile) {
+
+     
+        if(this.accountLevel === AccountLevelEnum.Profile && !this.accountDataForView?.isConnected) {
             
         if( this.accountInfoOldCurrencyId   && this.accountInfoTemp.currencyId !=this.accountInfoOldCurrencyId ){
                         //    this.l('The default currency of all prices that you assign to all products will be affected by this change. Do you need to proceed with this change?'),
@@ -778,7 +830,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.saveMyAccount()
             
         } else {
-            this.accountInfoTemp.accountLevel = this.accountLevel
+            this.accountInfoTemp.accountLevel = !this.accountDataForView?.isConnected ?  this.accountLevel  : 2;
             this.saveExternalOrManualAccount()
         }
     }
@@ -1257,5 +1309,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             skipCount,
             maxResultCount + skipCount
         )
+    }
+    getCodeValue(code: string) {
+        this.accountInfoTemp.code = code;
     }
 }

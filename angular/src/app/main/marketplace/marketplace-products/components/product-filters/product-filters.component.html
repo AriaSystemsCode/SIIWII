@@ -24,23 +24,32 @@
             <!-- product list -->
             <p-accordionTab
                 header="Product List"
-                *ngIf="isSellerIdExists"
+                *ngIf="isSellerIdExists || isFromSellerRoom"
                 [selected]="true"
             >
                 <div *ngFor="let list of productList">
                     <button
                         (click)="selectCatalog(list)"
-                        [ngClass]="{ selectedCatalog: catalogId === list.id }"
+                        [ngClass]="{ 'selectedCatalog': catalogId == list.id  }"
                         class="btn btn-list w-100 d-flex align-items-center justify-content-lg-start"
                     >
                         <span>{{ list.name }}</span>
                     </button>
+                  
+                </div>
+
+
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handleCatalogSelections.emit('');catalogId=null" class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
             <!-- product list -->
             <p-accordionTab header="Departments" [selected]="true">
+            
                 <div class="card flex justify-content-start">
                     <p-tree
+                    [styleClass]="selectedFile?.length >0 ? 'bgAdd' : ''"
+                    [ngClass]="selectedFile?.length >0 ? 'bgAdd' : ''"
                         class="w-full md:w-30rem"
                         [value]="files"
                         (onNodeExpand)="nodeExpand($event)"
@@ -51,9 +60,12 @@
                         [(selection)]="selectedFile"
                     ></p-tree>
                 </div>
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handledeDratmentsTreeSelections.emit(null);selectedFile=''" class="clrBtn">    Clear Filter</a>
+                </div>
             </p-accordionTab>
             <p-accordionTab header="Brands" [selected]="true" 
-            *ngIf="isSellerIdExists">
+            *ngIf="isSellerIdExists || isFromSellerRoom">
                 <div
                     *ngFor="let brand of brands"
                     class="d-flex align-items-center justify-content-lg-start px-2"
@@ -66,6 +78,10 @@
                         (onChange)="handlebrandsSelction()"
                     ></p-checkbox>
                     <label for="ny">{{ brand.label }}</label>
+                </div>
+
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handleBrandsSelection.emit([]);selctedBradns=[]" class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Price" [selected]="false">
@@ -87,6 +103,9 @@
                         [(ngModel)]="max"
                         (keyup)="handleEndPriceTyping($event)"
                     />
+                </div>
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a        (click)="handleStartPrice.emit('');handleEndPrice.emit('');min = '';max=''" class="clrBtn">    Clear Filter</a>
                 </div>
             </p-accordionTab>
             <p-accordionTab header="Start Ship Date" [selected]="false">
@@ -118,6 +137,10 @@
                         </div>
                     </div>
                 </div>
+                <!--     -->
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a    (click)="handleEndShipDate.emit(undefined);handleStartShipDate.emit(undefined);endShipDate = undefined;startShipDate=undefined"  class="clrBtn">    Clear Filter</a>
+                </div>
             </p-accordionTab>
             <p-accordionTab header="Sold-Out Date" [selected]="false">
                 <div class="soldout-date px-3">
@@ -148,7 +171,16 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="d-flex justify-content-end my-2 mx-4">
+                    <a    (click)="handleEndSoldOutDate.emit(undefined);handleSatrtsoldOutDate.emit(undefined);startSoldout = undefined;endSoldout=undefined"  class="clrBtn">    Clear Filter</a>
+                </div>
             </p-accordionTab>
+
+
+            <div class="d-flex justify-content-end my-3 mx-4">
+                <a        (click)="clearAllFiltrs()" class="clrBtn">    Clear All Filters</a>
+            </div>
         </p-accordion>
     </div>
 </div>

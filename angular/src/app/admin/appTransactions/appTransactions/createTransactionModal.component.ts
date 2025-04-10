@@ -240,6 +240,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
 
+
     }
     // minDateValidator(minDate: Date) {
     //     return (control: any) => {
@@ -384,7 +385,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.isCompantIdExist = false;
                     this.handleSellerNameSearch("");
                     // add seller values
-                    // this.orderForm.get("sellerContactName").setValue(res.name);
+                    //  this.orderForm.get("sellerContactName").setValue(res.name);
+                    this.selectedSellerContact = { name: `${this.appSession?.user?.name}  ${this.appSession?.user?.surname}` }
+                
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
                     this.orderForm.get('sellerContactPhoneNumber').setValue(res.phone)
                     this.orderForm.get('sellerContactEMailAddress').setValue(res.email)
@@ -413,6 +416,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.buyerCompanySSIN = res.accountSSIN;
                     this.handleBuyerNameSearch("");
                     // this.orderForm.get("buyerContactName").setValue(res.name);
+                    this.selectedBuyerContact = { name: `${this.appSession?.user?.name}  ${this.appSession?.user?.surname}` }
                     this.orderForm.get("buyerCompanyName").setValue(res.name);
                     this.orderForm.get('buyerContactPhoneNumber').setValue(res.phone)
                     this.orderForm.get('buyerContactEMailAddress').setValue(res.email)
@@ -445,7 +449,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
        // if (this.formType?.toUpperCase() == "PO")
         this.getAllCompanies();
     }
-
+    onDropdownClick(event: any) {
+        if (!this.filteredSellerContacts || this.filteredSellerContacts.length === 0) {
+          this.loadInitialSellerContacts();
+        }
+    }
     handleBuyerCompanySearch(event: any) {
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
@@ -572,7 +580,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(() => {
                 this._AppTransactionServiceProxy
-                    .getAccountRelatedContacts(this.buyerComapnyId, this.selectedBuyerContact)
+                    .getAccountRelatedContacts(this.buyerComapnyId, event?.query)
                     .subscribe((res: any) => {
                         this.buyerContacts = [...res];
                         // Apply filtering after fetching data
@@ -596,7 +604,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         //     this.searchTermSeller =undefined;
         
         // }
-        if (this.sellerContacts && this.sellerContacts.length > 0) {
+        if (this.sellerContacts && this.sellerContacts.length > 0 ) {
             // Filtering logic
             const query = event?.query?.toLowerCase();
             this.filteredSellerContacts = this.sellerContacts.filter(contact =>
@@ -607,7 +615,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.searchTimeout = setTimeout(() => {
            
             this._AppTransactionServiceProxy
-                .getAccountRelatedContacts(this.sellerCompanyId,this.selectedSellerContact)
+                .getAccountRelatedContacts(this.sellerCompanyId,event?.query)
                 .subscribe((res: any) => {
                     // if(this.sellerContacts?.length == 0  && event.filter != undefined) {
                     //     // this.emptyMessage = ` Click to add "${this.searchTerm}".`;
@@ -1090,6 +1098,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.btnLoader = false
                     localStorage.removeItem("comNew");
                     localStorage.removeItem("conNew");
+                    localStorage.removeItem("productFilters");
                 } ))
                 .subscribe((response: any) => {
                     if (this.setCurrentUserActiveTransaction) {
@@ -1120,6 +1129,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.display = false;
                     this.modalClose.emit(false);
                     this.reset();
+                    localStorage.setItem("fromSellerRoom",JSON.stringify(true));
+                    localStorage.setItem("fromMarketPlace",JSON.stringify(false));
                     localStorage.setItem(
                         "SellerId",
                         JSON.stringify(this.sellerCompanyId)
@@ -1160,7 +1171,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         );
                     }
 
-
+                
                      ////////////////////////////
 
                      if(this.currencyCode){
