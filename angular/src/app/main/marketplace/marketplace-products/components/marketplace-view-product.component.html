@@ -344,8 +344,8 @@
                             <div
                                 class="msrp d-flex "
                             >
-                                <h5 class="mr-2" style="color: black !important;font-size: 16px;"> {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }} </h5>
-                                <h5  *ngIf="productDetails?.minMSRP">
+                                <h5 class="mr-2" style="color: black !important;font-size: 16px;">MSRP:  </h5>
+                                <h5>
                                     <!-- {{
                                         productDetails?.appItemPriceInfos[0]
                                             .currencySymbol
@@ -385,8 +385,12 @@
                         >
                         <div>
                             <div class="msrp d-flex align-items-center ">
-                            <h5 *ngIf="productDetails?.maxSpecialPrice" class="mr-2" style="color: black !important;font-size: 14px;white-space: nowrap;;">Special Price:  </h5>
-                            <h5 *ngIf="productDetails?.maxSpecialPrice   && showEditSpecialPrice">
+                            <h5 class="mr-2" style="color: black !important;font-size: 14px;white-space: nowrap;;">Special Price:  </h5>
+                              
+                         
+                            
+                            <h5 *ngIf="showEditSpecialPrice"> 
+                                    
                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                             </h5>
 
@@ -484,7 +488,7 @@ top: 4px;">
                                             </button>
                                     </span>
                                     <input #filterInput [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
-                                        class="form-control m-input" placeholder="Search by Color"
+                                        class="form-control m-input" placeholder="search with color"
                                         type="text" >
                                        
                                         <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText(filterInput)">
@@ -519,16 +523,21 @@ top: 4px;">
                                     ">
 
                                     <div
-                                    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
-                              
+                                    *ngIf="
+                                        color.colorCode &&
+                                        !color.colorImg
+                                    "
                                     class="colorBox"
                                     [ngStyle]="{'background-color':color.colorCode}"
                                     (click)="setSizes(i)"
                                
                                 ></div>
                                 <img
-                                *ngIf="color?.colorImg && !color?.colorCode"
-                             
+                                    *ngIf="
+                                        (!color.colorImg&&
+                                            !color.colorCode) ||
+                                        color.colorImg
+                                    "
                                     (click)="setSizes(i)"
                                     [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
@@ -585,8 +594,10 @@ top: 4px;">
                                             : ''
                                     ">
                                     <div
-                                    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
-                              
+                                    *ngIf="
+                                        color.colorCode&&
+                                        !color.colorImg
+                                    "
                                     class="colorBox"
                                     [ngStyle]="{'background-color': color.colorCode}"
                                     (click)="setSizes(i)"
@@ -597,8 +608,11 @@ top: 4px;">
                                     "
                                 ></div>
                                 <img
-                                *ngIf="color?.colorImg && !color?.colorCode"
-                               
+                                    *ngIf="
+                                        (color.colorImg === null &&
+                                            color.colorCode === null) ||
+                                        color.colorImg !== null
+                                    "
                                     (click)="setSizes(i)"
                                     [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
@@ -1255,8 +1269,8 @@ top: 4px;">
                                         <div
                                             class="msrp d-flex mb-2"
                                         >
-                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;"> {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}  </h5>
-                                            <h5  *ngIf="productDetails?.minMSRP">
+                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">MSRP:  </h5>
+                                            <h5 >
                                                 <!-- {{
                                                     productDetails?.appItemPriceInfos[0]
                                                         .currencySymbol
@@ -1296,16 +1310,16 @@ top: 4px;">
                         >
                         <div>
                             <div class="msrp d-flex align-items-center ">
-                            <h5  *ngIf="productDetails?.maxSpecialPrice"  class="mr-2" style="color: black !important;font-size: 12px;">Special Price:  </h5>
+                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">Special Price:  </h5>
                               
                          
                             
-                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice"> 
+                            <h5 *ngIf="showEditSpecialPrice"> 
                                     
                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                             </h5>
 
-                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice "  class="mx-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"  class="mx-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
                         
                         </div>
@@ -1402,7 +1416,7 @@ top: 4px;">
                                                     </button>
                                             </span>
                                             <input #filterInput [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
-                                                class="form-control m-input" placeholder="Search by Color"
+                                                class="form-control m-input" placeholder="search with color"
                                                 type="text" >
                                                
                                                 <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText(filterInput)">
@@ -1435,8 +1449,10 @@ top: 4px;">
                                             : ''
                                     ">
                                     <div
-                                    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
-                                
+                                    *ngIf="
+                                        color.colorCode !== null &&
+                                        color.colorImg === null
+                                    "
                                     class="colorBox"
                                     [ngStyle]="{'background-color':color.colorCode}"
                                     (click)="setSizes(i)"
@@ -1447,8 +1463,11 @@ top: 4px;">
                                     "
                                 ></div>
                                 <img
-                                *ngIf="color?.colorImg && !color?.colorCode"
-                            
+                                    *ngIf="
+                                        (color.colorImg === null &&
+                                            color.colorCode === null) ||
+                                        color.colorImg !== null
+                                    "
                                     (click)="setSizes(i)"
                                     [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
@@ -1505,7 +1524,10 @@ top: 4px;">
                                                         : ''
                                                 ">
                                                 <div
-                                                *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                                                *ngIf="
+                                                    color.colorCode !== null &&
+                                                    color.colorImg === null
+                                                "
                                                 class="colorBox"
                                                 [ngStyle]="{'background-color': color.colorCode}"
                                                 (click)="setSizes(i)"
@@ -1516,7 +1538,11 @@ top: 4px;">
                                                 "
                                             ></div>
                                             <img
-                                            *ngIf="color?.colorImg && !color?.colorCode"
+                                                *ngIf="
+                                                    (color.colorImg === null &&
+                                                        color.colorCode === null) ||
+                                                    color.colorImg !== null
+                                                "
                                                 (click)="setSizes(i)"
                                                 [src]="
                                                     attachmentBaseUrl + '/' + color.colorImg

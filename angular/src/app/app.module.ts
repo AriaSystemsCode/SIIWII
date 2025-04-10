@@ -126,6 +126,9 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
 import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
 import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Components/share-transaction-tab/share-transaction-tab.component";
 import { TabViewModule } from 'primeng/tabview';
+import { SharedDynamicInputsModule } from "@shared/shared-module";
+import { ExtraAttributeDataService } from "./main/app-items/app-item-shared/services/extra-attribute-data.service";
+import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Components/create-or-edit-extra-data/create-or-edit-extra-data.component";
 @NgModule({
     declarations: [
         AppComponent,
@@ -195,7 +198,10 @@ import { TabViewModule } from 'primeng/tabview';
         CreateOrAddShippingInformationComponent,
         CreateOrEditBillingInfoComponent,
         ViewBillingInfoComponent,
-        ShareTransactionTabComponent
+        ShareTransactionTabComponent,
+        // mmmm
+        // mmmm
+        CreateOrEditExtraDataComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -239,7 +245,8 @@ import { TabViewModule } from 'primeng/tabview';
         TreeSelectModule,
         CalendarModule, TooltipModule,DevExpressDemoModule,
         ChipModule,
-        TabViewModule
+        TabViewModule,
+        SharedDynamicInputsModule
     ],
     providers: [
         ImpersonationService,
@@ -247,6 +254,7 @@ import { TabViewModule } from 'primeng/tabview';
         FileDownloadService,
         UserNotificationHelper,
         ChatSignalrService,
+         ExtraAttributeDataService,
         {
             provide: PERFECT_SCROLLBAR_CONFIG,
             useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,

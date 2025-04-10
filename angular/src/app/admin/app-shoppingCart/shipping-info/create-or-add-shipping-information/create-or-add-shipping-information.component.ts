@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -51,6 +51,7 @@ SuccessMsg: boolean = false;
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
       private _AccountsServiceProxy: AccountsServiceProxy,
+      private cdRef: ChangeDetectorRef,
   ) {
     super(injector);
 
@@ -320,6 +321,7 @@ SuccessMsg: boolean = false;
             this.shipViaValue=this.shipViaList[0];
             this.appTransactionsForViewDto.shipViaId = this.shipViaValue?.value;
             this.appTransactionsForViewDto.shipViaCode = this.shipViaValue?.code;
+            this.cdRef.detectChanges();
         }else if(this.appTransactionsForViewDto.shipViaId){
           this.shipViaValue=this.shipViaList.filter(item=>item.value==this.appTransactionsForViewDto.shipViaId);
         }
@@ -335,6 +337,7 @@ SuccessMsg: boolean = false;
   }
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
+    
   }
   shipFromData;
   shipToData;
@@ -358,20 +361,14 @@ SuccessMsg: boolean = false;
 }
   }
   GetContactDefaults(){
-   
-      this._AccountsServiceProxy.getContactDefaults()
-      .subscribe((res)=>{
-        // if(!this.appTransactionsForViewDto.shipViaId && res.shipViaId){
-          this.appTransactionsForViewDto.shipViaId= res.shipViaId; 
-          this.appTransactionsForViewDto.shipViaCode= res.shipViaCode; 
-        // } else if (!res.shipViaId){
-        //   this.appTransactionsForViewDto.shipViaId = this.shipViaList[0]?.value ;
-        //   this.appTransactionsForViewDto.shipViaCode = this.shipViaList[0]?.code ;
-        // }
-     
-
+    this._AccountsServiceProxy.getContactDefaults()
+      .subscribe((res) => {
+        if (!this.appTransactionsForViewDto.shipViaId) {
+          this.appTransactionsForViewDto.shipViaId = res.shipViaId; 
+          this.appTransactionsForViewDto.shipViaCode = res.shipViaCode; 
+          this.cdRef.detectChanges();
+        }
       });
-    
-    
-   }
+  }
+  
 }

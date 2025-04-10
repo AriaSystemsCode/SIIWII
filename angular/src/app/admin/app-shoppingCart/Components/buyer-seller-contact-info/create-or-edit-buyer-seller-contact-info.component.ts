@@ -160,9 +160,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.appTransactionsForViewDto.appTransactionContacts[1].branchCode = this.appTransactionsForViewDto?.appTransactionContacts[1].selectedBranch.code
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
-        console.log(this.appTransactionsForViewDto?.appTransactionContacts[1]?.selectedCompany,'00000')
-        console.log(this.appTransactionsForViewDto?.appTransactionContacts[1]?.selectedContact,'11111')
-        console.log(this.appTransactionsForViewDto?.appTransactionContacts[1]?.selectedBranch,'22222')
+
         // this.generatOrderReport.emit(true); 
       //  this.SuccessMsg = true
         }))
