@@ -102,6 +102,7 @@ SuccessMsg: boolean = false;
       this.loadShipViaList();
     }
   }
+  this.checkValid()
   }
 
   updateTabInfo(addObj, contactRole) {
@@ -198,12 +199,18 @@ SuccessMsg: boolean = false;
         this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressId = this.shipToSelectedAdd?.id;
       }
     }
+  this.checkValid()
+
   }
   updateShipToAddress(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ShipToContact);
+  this.checkValid()
+
   }
   updateShipFromAddress(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ShipFromContact);
+  this.checkValid()
+
   }
   createOrEditTransaction() {
     this.showMainSpinner()
@@ -369,6 +376,15 @@ SuccessMsg: boolean = false;
           this.cdRef.detectChanges();
         }
       });
+  }
+
+  checkValid(){
+    if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {
+      this.shippingTabValid = true;
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+    } else {
+      this.shippingTabValid = false;
+    }
   }
   
 }

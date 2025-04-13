@@ -385,7 +385,10 @@ getSellerVariations(
       maxResultCount
             )
   
-    .pipe(finalize(() => this.hideMainSpinner()))
+    .pipe(finalize(() => {
+      this.hideMainSpinner()
+   
+}))
     .subscribe((res) => {
       this.totalVariationsCount = res.totalCount;
 
@@ -496,10 +499,12 @@ saveVariations() {
                 this.getSellerVariations(0,10,'')
                   this.hideMainSpinner();
                   this.getShoppingCartData();
+          this.getLinesData();
+
                 
               })
           )
-          .subscribe(async (res) => {
+          .subscribe( (res) => {
               console.log(">>", res);
 
               this.getShoppingCartData();
@@ -767,7 +772,7 @@ this.hideMainSpinner();
 
   getLinesData(){
      //lines
-   if  ((this.showTabs && this.activeIndex==7 ) || (this.showTabs && this.currentTab==7 ) || (!this.showTabs && this.activeIndex==0 )){
+   if  ((this.showTabs && this.activeIndex==6 ) || (this.showTabs && this.currentTab==6 ) || (!this.showTabs && this.activeIndex==0 )){
      this._AppTransactionServiceProxy
      .getOrderDetailsForView(
        this.orderId,
@@ -2197,7 +2202,7 @@ if (document.activeElement instanceof HTMLElement) {
         .subscribe((res) => {
 
           if (res) {
-          // this.getShoppingCartData()
+          this.getShoppingCartData()
 
           // this.hideMainSpinner();
 
