@@ -38,7 +38,8 @@
                     class="form-control "
                     style="    width: 95% !important;
     margin-left: 3px;"
-                    [(ngModel)]="reference"
+                   [(ngModel)]="reference"
+                   (ngModelChange)="onReferenceChange()"  
                 />
              
            
