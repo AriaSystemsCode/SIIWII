@@ -385,7 +385,10 @@ getSellerVariations(
       maxResultCount
             )
   
-    .pipe(finalize(() => this.hideMainSpinner()))
+    .pipe(finalize(() => {
+      this.hideMainSpinner()
+      this.getShoppingCartData()
+}))
     .subscribe((res) => {
       this.totalVariationsCount = res.totalCount;
 
@@ -2196,7 +2199,7 @@ if (document.activeElement instanceof HTMLElement) {
         .subscribe((res) => {
 
           if (res) {
-          // this.getShoppingCartData()
+          this.getShoppingCartData()
 
           // this.hideMainSpinner();
 
