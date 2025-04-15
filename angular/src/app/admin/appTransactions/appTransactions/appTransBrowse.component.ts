@@ -51,26 +51,20 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     showHeader: boolean = true;
     showDetails: boolean = false;
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
-    products:any
+    products: any
     selectedProduct: any;
     variationDetails: any[];
-    transactionTypeFilter :number 
+    transactionTypeFilter: number
     transactionNumberFilter = ''
     variationCodeFilter = ''
     referenceNumberFilter = ''
-    minPrice :number 
-    maxPrice :number 
-    minAmount :number 
-    maxAmount :number 
+    minPrice: number
+    maxPrice: number
+    minAmount: number
+    maxAmount: number
     totalRecords: number = 0;
     page: number = 0; // current page number
-    rowsPerPage: number = 10; // rows per page, can be changed by user
-    // totalRecords: number = 0;
-    // loading: boolean = false;
-    // page: number = 0;
-    // rowsPerPage: number = 10;
-
-    // filters: any;
+    rowsPerPage: number = 10;
     sortField: string | undefined;
     sortOrder: number | undefined;
     constructor(
@@ -82,63 +76,48 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
-  
+
     }
     ngOnInit(): void {
-      
+        setTimeout(() => {
+            this.showHeader = true;
+            this.cdr.detectChanges();
+        });
         this.setPageMainFilters();
         this.initFilterForm();
-        // this.getVariationDetail()
-        // this.getAppTransactions();
+
     }
 
     ngOnChanges(): void {
-  
         this.initFilterForm();
 
     }
-    initFilterForm() {  
 
 
-        // if (this.showHeader) {
-            this.filterForm = this._formBuilder.group({
-                search: undefined,
-                sellerNameFilter: undefined,
-                buyerNameFilter: undefined,
-                codeFilter: undefined,
-                statusFilter: 0,
-                maxCreateDateFilter: undefined,
-                minCreateDateFilter: undefined,
-                maxCompleteDateFilter: undefined,
-                minCompleteDateFilter: undefined,
-                mainFilterType: this.defaultMainFilter,
-                transactionTypeFilter: undefined,
-                transactionNumberFilter: undefined,
-                nameFilter: undefined,
-                variationCodeFilter: undefined,
-                referenceNumberFilter: undefined,
-                minPrice: undefined,
-                maxPrice : undefined,
-                minAmount: undefined,
-                maxAmount: undefined,
-    
-            });
-        // } 
-        //  else if (this.showDetails) {
-        //     this.filterForm = this._formBuilder.group({
-        //         search: undefined,
-        //         mainFilterType: this.defaultMainFilter,
-        //         transactionTypeFilter: undefined,
-        //         transactionNumberFilter: undefined,
-        //         nameFilter: undefined,
-        //         variationCodeFilter: undefined,
-        //         minPrice: undefined,
-        //         maxPrice : undefined,
-        //         minAmount: undefined,
-        //         maxAmount: undefined,
-    
-        //     });
-        //  }
+    initFilterForm() {
+        this.filterForm = this._formBuilder.group({
+            search: undefined,
+            sellerNameFilter: undefined,
+            buyerNameFilter: undefined,
+            codeFilter: undefined,
+            statusFilter: 0,
+            maxCreateDateFilter: undefined,
+            minCreateDateFilter: undefined,
+            maxCompleteDateFilter: undefined,
+            minCompleteDateFilter: undefined,
+            mainFilterType: this.defaultMainFilter,
+            transactionTypeFilter: undefined,
+            transactionNumberFilter: undefined,
+            nameFilter: undefined,
+            variationCodeFilter: undefined,
+            referenceNumberFilter: undefined,
+            minPrice: undefined,
+            maxPrice: undefined,
+            minAmount: undefined,
+            maxAmount: undefined,
+
+        });
+
 
         const selectedfilter = this.pageMainFilters.filter(
             (item) => this.defaultMainFilter.id == item.id
@@ -163,7 +142,6 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this._sycEntityObjectTypesServiceProxy.getSycEntityObjectTypeForObjectAsTableDropdown("TRANSACTION").subscribe(result => {
             this.pageMainFilters = result;
             for (let index = 0; index < this.pageMainFilters.length; index++) {
-                //   this.filterTransType.push(this.pageMainFilters[index].displayName.toUpperCase().toString().replace(/ /g, ""));
                 this.filterTransType.push({ label: this.pageMainFilters[index].displayName, value: this.pageMainFilters[index].id });
             }
 
@@ -193,44 +171,40 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
         const filters = this.filterForm.value;
         this.loading = true;
-        // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false,0,filters.search,
+            false, 0, filters.search,
             filters.codeFilter, undefined,
-            filters.mainFilterType?.id,filters.minCreateDateFilter
+            filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
-            
+
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
-            undefined,undefined,filters.referenceNumberFilter,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter == null ? undefined : filters.statusFilter, false,
+            undefined, undefined, filters.referenceNumberFilter,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
-            // this.dataTable.filters
         ).subscribe(result => {
             this.loading = false;
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
-            // console.log(result.items,'dataaaaaaaaaaaaaaaaaaa')
             this.primengTableHelper.hideLoadingIndicator();
         });
     }
 
     onSelectionChange($event) {
- 
-        /* if($event.entityObjectStatusCode!="DRAFT")
-             return ; */
+
+
         if ($event?.id)
             this.orderId = $event?.id;
-        
+
         if (this.orderId) {
-            if($event.entityObjectStatusCode =="DRAFT") {
+            if ($event.entityObjectStatusCode == "DRAFT") {
                 this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.createOrEdit);
 
             } else {
                 this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
-                
+
             }
         }
     }
@@ -239,14 +213,13 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.paginator.changePage(this.paginator.getPage());
     }
     resetList() {
-        // this.filterForm.reset();
-       this.sortField = undefined
-       this.sortOrder = undefined
+        this.sortField = undefined
+        this.sortOrder = undefined
         this.initFilterForm()
         this.dataTable.reset();
         this.dataDetailTable.reset();
-        this.setMainPageFilter(this.defaultMainFilter); 
-        if(this.showHeader) {
+        this.setMainPageFilter(this.defaultMainFilter);
+        if (this.showHeader) {
             this.getAppTransactions();
 
         } else if (this.showDetails) {
@@ -308,16 +281,16 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     }
     getVariationDetail(event?: { page?: number; rows?: number }) {
         this.showMainSpinner();
-    
+
         // Update pagination if pagination event passed
         if (event) {
             this.page = event.page ?? this.page;
             this.rowsPerPage = event.rows ?? this.rowsPerPage;
         }
-    
+
         const skipCount = this.page * this.rowsPerPage;
         const filters = this.filterForm.value;
-    
+
         this._appTransactionServiceProxy
             .getllTransactionVariationsDetail(
                 filters.variationCodeFilter,
@@ -346,7 +319,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 }
             );
     }
-    
+
 
 
 
@@ -360,9 +333,9 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         filter(value);
     }
 
-    onHideShoppingCartModal($event){
-        if($event)
-          this.getAppTransactions();
+    onHideShoppingCartModal($event) {
+        if ($event)
+            this.getAppTransactions();
     }
 
 

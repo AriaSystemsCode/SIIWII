@@ -1,6 +1,6 @@
 ﻿import { Component, Injector, ViewEncapsulation, ViewChild } from '@angular/core';
-import { ActivatedRoute , Router} from '@angular/router';
-import { AppTransactionsServiceProxy, AppTransactionDto  } from '@shared/service-proxies/service-proxies';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AppTransactionsServiceProxy, AppTransactionDto } from '@shared/service-proxies/service-proxies';
 import { NotifyService } from 'abp-ng2-module';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
@@ -23,38 +23,37 @@ import { Observable } from 'rxjs';
     animations: [appModuleAnimation()]
 })
 export class AppTransactionsComponent extends AppComponentBase {
-    
-    
+
+
     @ViewChild('createOrEditAppTransactionModal', { static: true }) createOrEditAppTransactionModal: CreateOrEditAppTransactionModalComponent;
-    @ViewChild('viewAppTransactionModalComponent', { static: true }) viewAppTransactionModal: ViewAppTransactionModalComponent;   
-    
+    @ViewChild('viewAppTransactionModalComponent', { static: true }) viewAppTransactionModal: ViewAppTransactionModalComponent;
+
     @ViewChild('dataTable', { static: true }) dataTable: Table;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
 
     advancedFiltersAreShown = false;
     filterText = '';
     codeFilter = '';
-    maxDateFilter : moment.Moment;
-		minDateFilter : moment.Moment;
-    maxAddDateFilter : moment.Moment;
-		minAddDateFilter : moment.Moment;
-    maxEndDateFilter : moment.Moment;
-		minEndDateFilter : moment.Moment;
-
-
-
-
-
+    maxDateFilter: moment.Moment;
+    minDateFilter: moment.Moment;
+    maxAddDateFilter: moment.Moment;
+    minAddDateFilter: moment.Moment;
+    maxEndDateFilter: moment.Moment;
+    minEndDateFilter: moment.Moment
 
     constructor(
         injector: Injector,
         private _appTransactionsServiceProxy: AppTransactionsServiceProxy,
-        private _notifyService: NotifyService,
-        private _tokenAuth: TokenAuthServiceProxy,
-        private _activatedRoute: ActivatedRoute,
         private _fileDownloadService: FileDownloadService
     ) {
         super(injector);
+    }
+
+
+    ngAfterViewInit() {
+        setTimeout(() => {
+            this.advancedFiltersAreShown = true; 
+        });
     }
 
     getAppTransactions(event?: LazyLoadEvent) {
@@ -90,29 +89,29 @@ export class AppTransactionsComponent extends AppComponentBase {
     }
 
     createAppTransaction(): void {
-        this.createOrEditAppTransactionModal.show();        
+        this.createOrEditAppTransactionModal.show();
     }
 
 
     deleteAppTransaction(appTransaction: AppTransactionDto): void {
         var isConfirmed: Observable<boolean>;
-        isConfirmed   = this.askToConfirm("","AreYouSure");
-    
-       isConfirmed.subscribe((res)=>{
-          if(res){
-                    this._appTransactionsServiceProxy.delete(appTransaction.id)
-                        .subscribe(() => {
-                            this.reloadPage();
-                            this.notify.success(this.l('SuccessfullyDeleted'));
-                        });
-                }
+        isConfirmed = this.askToConfirm("", "AreYouSure");
+
+        isConfirmed.subscribe((res) => {
+            if (res) {
+                this._appTransactionsServiceProxy.delete(appTransaction.id)
+                    .subscribe(() => {
+                        this.reloadPage();
+                        this.notify.success(this.l('SuccessfullyDeleted'));
+                    });
             }
+        }
         );
     }
 
     exportToExcel(): void {
         this._appTransactionsServiceProxy.getAppTransactionsToExcel(
-        this.filterText,
+            this.filterText,
             this.codeFilter,
             this.maxDateFilter === undefined ? this.maxDateFilter : moment(this.maxDateFilter).endOf('day'),
             this.minDateFilter === undefined ? this.minDateFilter : moment(this.minDateFilter).startOf('day'),
@@ -121,12 +120,12 @@ export class AppTransactionsComponent extends AppComponentBase {
             this.maxEndDateFilter === undefined ? this.maxEndDateFilter : moment(this.maxEndDateFilter).endOf('day'),
             this.minEndDateFilter === undefined ? this.minEndDateFilter : moment(this.minEndDateFilter).startOf('day'),
         )
-        .subscribe(result => {
-            this._fileDownloadService.downloadTempFile(result);
-         });
+            .subscribe(result => {
+                this._fileDownloadService.downloadTempFile(result);
+            });
     }
-    
-    
-    
-    
+
+
+
+
 }

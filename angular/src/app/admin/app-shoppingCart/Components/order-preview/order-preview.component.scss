@@ -1,15 +1,17 @@
-.orderForm{
-    .header{
-        span{
+.orderForm {
+    .header {
+        span {
             color: #f6851d
         }
     }
 }
+
 @media (min-width: 992px) {
     .download-section {
         display: none;
     }
-    .orderInfoForm  {
+
+    .orderInfoForm {
         display: block;
     }
 }
@@ -19,10 +21,12 @@
     .download-section {
         display: block;
     }
-    .orderInfoForm  {
+
+    .orderInfoForm {
         display: none;
     }
 }
+
 .btnPdf {
     background-color: #4A0D4A;
     color: #fff;
@@ -35,39 +39,41 @@
         border: 0 none;
         margin: 0;
         background: #4A0D4A !important;
-      }
+    }
+
     .p-dialog {
 
 
-padding: 24px 24px 32px !important;
-min-width: 350px !important;
-height: 98 !important;
+        padding: 24px 24px 32px !important;
+        min-width: 350px !important;
+        height: 98 !important;
 
-background: #FFFFFF !important;
-border: 1px solid #EEEEEE !important;
-box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15) !important;
-border-radius: 10px !important;
+        background: #FFFFFF !important;
+        border: 1px solid #EEEEEE !important;
+        box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15) !important;
+        border-radius: 10px !important;
 
-      }
-        .p-dialog .p-dialog-header {
-          border:  none !important;
-          background: white !important;
-          padding: 0 !important;
-        }
+    }
+
+    .p-dialog .p-dialog-header {
+        border: none !important;
+        background: white !important;
+        padding: 0 !important;
+    }
 
 
- 
+
 
 }
 
 .regText {
 
-font-weight: 700;
-font-size: 14px;
-line-height: 21px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 21px;
 
 
-color: #1B101B;
+    color: #1B101B;
 
 
 

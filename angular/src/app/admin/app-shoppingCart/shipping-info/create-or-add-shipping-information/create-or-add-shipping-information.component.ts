@@ -1,381 +1,346 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import {
+  Component,
+  Injector,
+  Input,
+  OnInit,
+  Output,
+  EventEmitter,
+  ViewChildren,
+  SimpleChanges,
+  OnChanges,
+  AfterViewInit
+} from '@angular/core';
+import * as moment from 'moment';
+import {
+  AppEntitiesServiceProxy,
+  AppTransactionServiceProxy,
+  GetAppTransactionsForViewDto,
+  ContactRoleEnum,
+  AppTransactionContactDto
+} from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
-import * as moment from 'moment';
+import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
+
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
   styleUrls: ['./create-or-add-shipping-information.component.scss']
 })
-export class CreateOrAddShippingInformationComponent extends AppComponentBase  implements OnInit,OnChanges,AfterViewInit{
-  @Input("activeTab") activeTab: number;
-  @Input("currentTab") currentTab: number;
-  @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-  @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
-  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
-  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
+export class CreateOrAddShippingInformationComponent
+  extends AppComponentBase
+  implements OnInit, OnChanges, AfterViewInit {
 
-  @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
-  isshipFromContactsValid: boolean = false;
-  isShipToContactsValid: boolean = false;
+  @Input() activeTab: number;
+  @Input() currentTab: number;
+  @Input() appTransactionsForViewDto: GetAppTransactionsForViewDto;
+  @Input() createOrEditshippingInfO = true;
+  @Input() showSaveBtn = false;
+  @Input() canChange = true;
+
+  @Output() shippingInfOValid = new EventEmitter<ShoppingCartoccordionTabs>();
+  @Output() refreshShoppingCart = new EventEmitter<boolean>();
+  @Output() ontabChange = new EventEmitter<ShoppingCartoccordionTabs>();
+  @Output() generatOrderReport = new EventEmitter<boolean>();
+
   @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
-  loadAddresComponentShipFrom: boolean = false;
-  loadAddresComponentShipTo: boolean = false;
-  contactIdShipTo: string = '';
-  contactIdShipFrom: string = '';
-  addressSelected: boolean = false;
-  enableSAveShipFrom: boolean = false;
-  enableSAveShipTo: boolean = false;
+
+  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+
+  oldappTransactionsForViewDto: GetAppTransactionsForViewDto;
+
+  shipViaList: any[] = [];
+  shipViaValue: any;
   storeVal: any = null;
-  shipViaValue: any = null;
-  shipViaList: any = [];
-  @Input("createOrEditshippingInfO") createOrEditshippingInfO: boolean = true;
-  oldappTransactionsForViewDto;
-  @Input("showSaveBtn") showSaveBtn: boolean = false;
-  shippingTabValid: boolean = false;
-  addressSelectedShipTo: boolean = false;
+
   shipFromSelectedAdd: any;
   shipToSelectedAdd: any;
-  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
-  @Input("canChange")  canChange:boolean=true;
-isAccManual :boolean = false
-visible: boolean = false;
-cancelBtn: boolean = false;
-saveBtn: boolean = false;
-SuccessMsg: boolean = false;
+  shipFromData: any;
+  shipToData: any;
+
+  contactIdShipTo = '';
+  contactIdShipFrom = '';
+
+  enableSAveShipFrom = false;
+  enableSAveShipTo = false;
+
+  shippingTabValid = false;
+  isAccManual = false;
+  visible = false;
+  cancelBtn = false;
+  saveBtn = false;
+  SuccessMsg = false;
+
   constructor(
     injector: Injector,
-    private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-    private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-      private _AccountsServiceProxy: AccountsServiceProxy,
-      private cdRef: ChangeDetectorRef,
+    private _transactionService: AppTransactionServiceProxy,
+    private _entitiesService: AppEntitiesServiceProxy
   ) {
     super(injector);
-
   }
 
-  ngAfterViewInit() {
+  ngOnInit(): void {
+    this.checkManualAccount();
 
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.loadAddresComponentShipFrom = true;
-      this.contactIdShipFrom = this.shipFromData?.compId;
-        if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
-  
-        
-  
-      this.contactIdShipTo = this.shipToData?.compId;
-      this.loadAddresComponentShipTo = true;
-      if( this.AddressComponentChild)
-      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
-    }  
-      
-  }
-  ngOnInit() {
-    this.isMamualAcc()
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.GetContactDefaults()
-    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-    let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-    shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
-    let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-    shipToObj[0]?.companySSIN && shipToObj[0]?.contactAddressDetail?.addressLine1  ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
-    this.storeVal = this.appTransactionsForViewDto?.buyerStore;
-    //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
-   // this.loadShipViaList();
-    console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
+    if (this.isShippingTab()) {
+      this.cloneDto();
+      this.loadInitialAddresses();
+      this.storeVal = this.appTransactionsForViewDto?.buyerStore;
     }
   }
-  ngOnChanges(changes: SimpleChanges) {
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
 
-    if (this.appTransactionsForViewDto) {
-      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-      let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-      shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1  ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
-      let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-      shipToObj[0]?.companySSIN  && shipToObj[0]?.contactAddressDetail?.addressLine1 ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
+  ngAfterViewInit(): void {
+    if (this.isShippingTab()) {
+      this.loadAddressComponents();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.isShippingTab() && this.appTransactionsForViewDto) {
+      this.cloneDto();
+      this.loadInitialAddresses();
       this.storeVal = this.appTransactionsForViewDto?.buyerStore;
       this.loadShipViaList();
     }
   }
-  this.checkValid()
+
+   isShippingTab(): boolean {
+    return this.currentTab === ShoppingCartoccordionTabs.ShippingInfo;
   }
 
-  updateTabInfo(addObj, contactRole) {
-    let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
-
-    if (contactIndex < 0 || contactIndex == this.appTransactionsForViewDto?.appTransactionContacts?.length) {
-      var appTransactionContactDto: AppTransactionContactDto = new AppTransactionContactDto();
-      appTransactionContactDto.contactRole = contactRole;
-      appTransactionContactDto.contactAddressCode = addObj.code;
-      appTransactionContactDto.contactAddressId = addObj.id;
-      appTransactionContactDto.contactAddressTypyId = addObj.typeId;
-
-      this.appTransactionsForViewDto?.appTransactionContacts.push(appTransactionContactDto);
-    } else {
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine1=addObj?.selectedAddressObj?.addressLine1;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine2=addObj?.selectedAddressObj?.addressLine2;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressName=addObj?.selectedAddressObj?.name;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressPostalCode=addObj?.selectedAddressObj?.postalCode;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressState=addObj?.selectedAddressObj?.state;
-   this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressDetail= addObj?.selectedAddressObj;
-
-
-
-    }
-    if (this.shippingTabValid) {
-      let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-      let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-      shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1  ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
-      shipToObj[0]?.contactAddressDetail  && shipToObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
-
-      if (this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId) { 
-        this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
-
-      }
-    }
-    if (contactRole == ContactRoleEnum.ShipFromContact) {
-      this.shipFromSelectedAdd = addObj.selectedAddressObj
-    } else {
-      this.shipToSelectedAdd = addObj.selectedAddressObj
-
-    }
+   cloneDto(): void {
+    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
   }
-  cancel() {
-    this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
-    this.shipFromSelectedAdd=null;
-    this.shipToSelectedAdd=null;
+
+   loadInitialAddresses(): void {
+    const shipFrom = this.getContact(ContactRoleEnum.ShipFromContact);
+    const shipTo = this.getContact(ContactRoleEnum.ShipToContact);
+
+    this.shipFromSelectedAdd = shipFrom?.companySSIN && shipFrom?.contactAddressDetail?.addressLine1
+      ? shipFrom.contactAddressDetail : null;
+
+    this.shipToSelectedAdd = shipTo?.companySSIN && shipTo?.contactAddressDetail?.addressLine1
+      ? shipTo.contactAddressDetail : null;
+  }
+
+   loadAddressComponents(): void {
+    this.contactIdShipFrom = this.shipFromData?.compId;
+    this.AddressComponentChild?.['first']?.getAddressList(this.shipFromData?.compssin);
+
+    this.contactIdShipTo = this.shipToData?.compId;
+    const target = this.AddressComponentChild?.['second'] || this.AddressComponentChild?.['last'];
+    target?.getAddressList(this.shipToData?.compssin);
+  }
+
+   getContact(role: number): AppTransactionContactDto {
+    return this.appTransactionsForViewDto?.appTransactionContacts?.find(x => x.contactRole === role);
+  }
+
+  updateTabInfo(addObj: any, contactRole: number): void {
+    let contact = this.getContact(contactRole);
+
+    if (!contact) {
+      contact = new AppTransactionContactDto();
+      contact.contactRole = contactRole;
+      this.appTransactionsForViewDto?.appTransactionContacts.push(contact);
+    }
+
+    Object.assign(contact, {
+      contactAddressCode: addObj.code,
+      contactAddressId: addObj.id,
+      contactAddressTypyId: addObj.typeId,
+      contactAddressLine1: addObj?.selectedAddressObj?.addressLine1,
+      contactAddressLine2: addObj?.selectedAddressObj?.addressLine2,
+      contactAddressName: addObj?.selectedAddressObj?.name,
+      contactAddressPostalCode: addObj?.selectedAddressObj?.postalCode,
+      contactAddressState: addObj?.selectedAddressObj?.state,
+      contactAddressDetail: addObj?.selectedAddressObj
+    });
+
+    if (contactRole === ContactRoleEnum.ShipFromContact) {
+      this.shipFromSelectedAdd = addObj.selectedAddressObj;
+    } else {
+      this.shipToSelectedAdd = addObj.selectedAddressObj;
+    }
+
+    this.evaluateSaveEnablers();
+    this.validateShippingTab();
+  }
+
+  cancel(): void {
+    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+    this.shipFromSelectedAdd = null;
+    this.shipToSelectedAdd = null;
     this.setAddress();
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditshippingInfO = false;
     this.showSaveBtn = false;
   }
-  save() {
+
+  save(): void {
     this.createOrEditshippingInfO = false;
     this.setAddress();
     this.createOrEditTransaction();
   }
 
-  setAddress() {
-    let shipFromIndx = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-    let shipToIndx = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.ShipToContact);
+   setAddress(): void {
+    this.updateAddressForRole(ContactRoleEnum.ShipFromContact, this.shipFromSelectedAdd);
+    this.updateAddressForRole(ContactRoleEnum.ShipToContact, this.shipToSelectedAdd);
+    this.validateShippingTab();
+  }
 
+   updateAddressForRole(role: number, selectedAddress: any): void {
+    const contact = this.getContact(role);
 
-    if (!this.shipFromSelectedAdd) {
-      let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-      shipFromObj[0]?.companySSIN   && shipFromObj[0]?.contactAddressDetail?.addressLine1  ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
-
-      if (shipFromIndx >= 0)
-        this.appTransactionsForViewDto.appTransactionContacts[shipFromIndx].contactAddressId = this.shipFromSelectedAdd?.id;
-    }
-    else {
-      if (shipFromIndx >= 0) {
-        this.appTransactionsForViewDto.appTransactionContacts[shipFromIndx].contactAddressDetail = this.shipFromSelectedAdd;
-        this.appTransactionsForViewDto.appTransactionContacts[shipFromIndx].contactAddressId = this.shipFromSelectedAdd?.id;
+    if (!selectedAddress) {
+      if (contact?.companySSIN && contact?.contactAddressDetail?.addressLine1) {
+        selectedAddress = contact.contactAddressDetail;
       }
     }
 
-    if (!this.shipToSelectedAdd) {
-      let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-      shipToObj[0]?.companySSIN  && shipToObj[0]?.contactAddressDetail?.addressLine1 ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
-      if (shipToIndx >= 0)
-        this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressId = this.shipToSelectedAdd?.id;
+    if (contact) {
+      contact.contactAddressId = selectedAddress?.id;
+      contact.contactAddressDetail = selectedAddress;
     }
-    else {
-      if (shipToIndx >= 0) {
-        this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressDetail = this.shipToSelectedAdd;
-        this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressId = this.shipToSelectedAdd?.id;
-      }
-    }
-  this.checkValid()
-
   }
-  updateShipToAddress(addObj) {
-    this.updateTabInfo(addObj, ContactRoleEnum.ShipToContact);
-  this.checkValid()
 
-  }
-  updateShipFromAddress(addObj) {
+  updateShipFromAddress(addObj: any): void {
     this.updateTabInfo(addObj, ContactRoleEnum.ShipFromContact);
-  this.checkValid()
-
+    if (addObj) this.enableSAveShipFrom = true;
   }
-  createOrEditTransaction() {
-    this.showMainSpinner()
-    let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-    let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-    let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-    let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
 
+  updateShipToAddress(addObj: any): void {
+    this.updateTabInfo(addObj, ContactRoleEnum.ShipToContact);
+    if (addObj) this.enableSAveShipTo = true;
+  }
 
-    this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-    this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-    this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-    this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
-    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => { this.hideMainSpinner();
-        //  this.generatOrderReport.emit(true) ;
-       this.refreshShoppingCart.emit(true)
+   createOrEditTransaction(): void {
+    this.showMainSpinner();
 
-        // this.SuccessMsg = true
+    const dto = this.appTransactionsForViewDto;
+    dto.enteredDate = moment.utc(dto.enteredDate.toLocaleString());
+    dto.startDate = moment.utc(dto.startDate.toLocaleString());
+    dto.availableDate = moment.utc(dto.availableDate.toLocaleString());
+    dto.completeDate = moment.utc(dto.completeDate.toLocaleString());
+    dto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    this._transactionService.createOrEditTransaction(dto)
+      .pipe(finalize(() => {
+        this.hideMainSpinner();
+        this.refreshShoppingCart.emit(true);
       }))
-      .subscribe((res) => {
+      .subscribe(res => {
         if (res) {
-          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-          if (!this.showSaveBtn)
-            this.ontabChange.emit(ShoppingCartoccordionTabs.ShippingInfo);
-
-          else
-            this.showSaveBtn = false;
+          this.cloneDto();
+          this.showSaveBtn ? this.showSaveBtn = false : this.ontabChange.emit(ShoppingCartoccordionTabs.ShippingInfo);
         }
       });
   }
-  selectShipVia($event) {
-    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
-    if (index >= 0) {
-      this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value ;
-      this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code ;
-      this.cdRef.detectChanges();
-    }
 
-  }
-  enterStore() {
-    this.appTransactionsForViewDto.buyerStore = this.storeVal;
-  }
-  isContactFormValid(value, sectionIndex) {
-    let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-    let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-    if (this.activeTab == this.shoppingCartoccordionTabs.ShippingInfo) {
-      this.shippingTabValid = value;
-      if (this.shippingTabValid) {
+  isContactFormValid(value: boolean, sectionIndex: number): void {
+    this.shippingTabValid = value;
 
-        if (sectionIndex == 1) {
-          
-          (!shipFromObj[0]?.companySSIN) || (shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1) ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
+    if (value) {
+      const shipFrom = this.getContact(ContactRoleEnum.ShipFromContact);
+      const shipTo = this.getContact(ContactRoleEnum.ShipToContact);
 
-
-        } else {
-        (shipToObj[0]?.contactAddressDetail && shipToObj[0]?.contactAddressDetail?.addressLine1) ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
-        }
-        this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId ? this.shippingTabValid = true : this.shippingTabValid = false;  
-
-        if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {  
-          this.shippingTabValid = true;
-          this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
-
-        } else {
-          this.shippingTabValid = false;
-        }
+      if (sectionIndex === 1) {
+        this.enableSAveShipFrom = !!(shipFrom?.contactAddressDetail?.addressLine1 || shipFrom?.contactAddressId);
       } else {
-        if (sectionIndex == 1) {
-          this.enableSAveShipFrom = false;
-        } else {
-          this.enableSAveShipTo = false;
-        }
-
-
+        this.enableSAveShipTo = !!(shipTo?.contactAddressDetail?.addressLine1 || shipTo?.contactAddressId);
       }
-
+    } else {
+      if (sectionIndex === 1) this.enableSAveShipFrom = false;
+      else this.enableSAveShipTo = false;
     }
 
+    this.validateShippingTab();
   }
 
-  
+   evaluateSaveEnablers(): void {
+    const shipFrom = this.getContact(ContactRoleEnum.ShipFromContact);
+    const shipTo = this.getContact(ContactRoleEnum.ShipToContact);
 
+    this.enableSAveShipFrom = !!(shipFrom?.contactAddressDetail?.addressLine1 || shipFrom?.contactAddressId);
+    this.enableSAveShipTo = !!(shipTo?.contactAddressDetail?.addressLine1 || shipTo?.contactAddressId);
+  }
 
-  isMamualAcc() {
-    let accSSin = ''
-    if(this.appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER') {
-      accSSin = this.appTransactionsForViewDto?.buyerCompanySSIN
-    } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER'){
-      accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
+  validateShippingTab(): void {
+    const isValid = this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId;
+    this.shippingTabValid = true;
+    if (isValid) {
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
     }
-    this._AppTransactionServiceProxy.isManualCompany(accSSin)
-      .subscribe((res) => {
+  }
 
-        this.isAccManual = res;
-   
-      })
+  selectShipVia(event: any): void {
+    const selected = this.shipViaList.find(x => x.value === event?.value);
+    if (selected) {
+      this.appTransactionsForViewDto.shipViaId = selected.value;
+      this.appTransactionsForViewDto.shipViaCode = selected.code;
+    }
+    this.validateShippingTab();
   }
-  loadShipViaList() {
-    this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
-      .subscribe((res) => {
-        this.shipViaList = res;
-        // debugger
-        if(!this.appTransactionsForViewDto.shipViaId&&this.shipViaList.length==1){
-            this.shipViaValue=this.shipViaList[0];
-            this.appTransactionsForViewDto.shipViaId = this.shipViaValue?.value;
-            this.appTransactionsForViewDto.shipViaCode = this.shipViaValue?.code;
-            this.cdRef.detectChanges();
-        }else if(this.appTransactionsForViewDto.shipViaId){
-          this.shipViaValue=this.shipViaList.filter(item=>item.value==this.appTransactionsForViewDto.shipViaId);
-        }
-      })
+
+   checkManualAccount(): void {
+    const accSSIN = this.appTransactionsForViewDto?.entityObjectTypeCode === 'SALESORDER'
+      ? this.appTransactionsForViewDto.buyerCompanySSIN
+      : this.appTransactionsForViewDto?.sellerCompanySSIN;
+
+    this._transactionService.isManualCompany(accSSIN).subscribe(res => {
+      this.isAccManual = res;
+    });
   }
-  onshowSaveBtn($event) {
-    this.showSaveBtn = $event;
+
+  loadShipViaList(): void {
+    this._entitiesService.getAllEntitiesByTypeCode('SHIPVIA').subscribe(res => {
+      this.shipViaList = res;
+      if (!this.appTransactionsForViewDto.shipViaId && res.length === 1) {
+        this.shipViaValue = res[0];
+        this.appTransactionsForViewDto.shipViaId = res[0].value;
+        this.appTransactionsForViewDto.shipViaCode = res[0].code;
+      } else if (this.appTransactionsForViewDto.shipViaId) {
+        this.shipViaValue = res.find(item => item.value === this.appTransactionsForViewDto.shipViaId);
+      }
+    });
   }
-  onshowShippingEditMode($event) {
-    if ($event) {
+
+  onshowSaveBtn(event: boolean): void {
+    this.showSaveBtn = event;
+  }
+
+  onshowShippingEditMode(event: boolean): void {
+    if (event) {
       this.createOrEditshippingInfO = true;
     }
   }
-  onUpdateAppTransactionsForViewDto($event) {
-    this.appTransactionsForViewDto = $event;
-    
-  }
-  shipFromData;
-  shipToData;
-  reloadAddresscomponentShipFrom(data) {
-    this.shipFromData=data;
-    console.log(this.shipFromData,'this.shipFromData')
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.contactIdShipFrom = this.shipFromData?.compId;
 
-        if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
-  }
-}
-  reloadAddresscomponentShipTo(data) {
-  this.shipToData=data;
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.contactIdShipTo = this.shipToData?.compId;
-
-  if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
-}
-  }
-  GetContactDefaults(){
-    this._AccountsServiceProxy.getContactDefaults()
-      .subscribe((res) => {
-        if (!this.appTransactionsForViewDto.shipViaId) {
-          this.appTransactionsForViewDto.shipViaId = res.shipViaId; 
-          this.appTransactionsForViewDto.shipViaCode = res.shipViaCode; 
-          this.cdRef.detectChanges();
-        }
-      });
+  onUpdateAppTransactionsForViewDto(dto: GetAppTransactionsForViewDto): void {
+    this.appTransactionsForViewDto = dto;
+    this.validateShippingTab();
   }
 
-  checkValid(){
-    if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {
-      this.shippingTabValid = true;
-      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
-    } else {
-      this.shippingTabValid = false;
-    }
+  reloadAddresscomponentShipFrom(data: any): void {
+    this.shipFromData = data;
+    this.contactIdShipFrom = data?.compId;
+    this.AddressComponentChild?.['first']?.getAddressList(data?.compssin);
+    this.validateShippingTab();
   }
-  
+
+  reloadAddresscomponentShipTo(data: any): void {
+    this.shipToData = data;
+    this.contactIdShipTo = data?.compId;
+    const component = this.AddressComponentChild?.['second'] || this.AddressComponentChild?.['last'];
+    component?.getAddressList(data?.compssin);
+    this.validateShippingTab();
+  }
+
+  enterStore(): void {
+    this.appTransactionsForViewDto.buyerStore = this.storeVal;
+  }
+
+  addressUpdated(event: boolean): void {
+    if (event) this.validateShippingTab();
+  }
 }

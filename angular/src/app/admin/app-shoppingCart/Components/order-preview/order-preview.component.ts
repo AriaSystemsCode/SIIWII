@@ -10,12 +10,10 @@ import { finalize } from "rxjs";
 })
 export class OrderPreviewComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-    // @Input("orderConfirmationFile") orderConfirmationFile;
     @Input("transactionFormPath") transactionFormPath;
     @Input("orderId") orderId;
     @Input("regenrate") regenrate;
     @Input("mainLoad") mainLoad;
-    @Output("stopReport") stopReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
     loadingError: boolean = false;
     showReport: boolean = false;
@@ -37,30 +35,25 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         if (!this.dialogClosed) { // Prevent re-triggering if the dialog is closed
             this.loadPdf();
         }
-    // this.isOrderConfirmationNeedsReprint()
-        }
-   
+    }
 
-    
+
+
     ngAfterViewInit() {
-     
+
     }
     async loadPdf() {
-        // if (this.startload) {
-        //     // Guard condition to prevent reopening
-        //     return;
-        // }
-    
+
         this.showReport = false;
         this.startload = true;
-        this.visible =  false
-    
+        this.visible = false
+
         if (this.regenrate == true) {
             this.visible = true;
         } else if (this.mainLoad) {
             this.showMainSpinner();
         }
-    
+
         try {
             await this.delay(10000);
             const subs = this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
@@ -98,7 +91,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
                         this.loadingError = true;
                     }
                 );
-    
+
             this.subscriptions.push(subs);
         } catch (error) {
             console.error('Error during PDF load process:', error);
@@ -116,8 +109,8 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         // Reset regenrate if necessary to prevent reopening
         this.regenrate = false;
     }
-    
-   
+
+
     delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }

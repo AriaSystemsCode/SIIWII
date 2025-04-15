@@ -88,10 +88,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         // ✅ Now safe to reset & set data
         this.resetSelectedData();
         this.setSelectedData();
-    
-        // ✅ Log now after data is set
-        console.log(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch, 'contact.selectedBranch');
-    
+
         // ✅ Final validations
         this.isValidForm();
     
@@ -138,7 +135,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     addName(event) {
         const companyName = event.target.value;
-        console.log(companyName, 'event.target.value');
     
         // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = 
         //     new GetAccountInformationOutputDto({
@@ -404,7 +400,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
     
         if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType) {
-            console.log($event, '444444 <<<');
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
             this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
     
@@ -877,7 +872,6 @@ getBranchDetails(id): Promise<void> {
 
         this._accountsServiceProxy.getBranchForEdit(id).subscribe(res => {
             this.branchData = res;
-            console.log(this.branchData, 'Branch Data Received');
             this.extractPhoneTypes(this.branchData, 'changed');
             resolve(); // ✅ Resolve after async call finishes
         }, () => {
@@ -888,7 +882,6 @@ getBranchDetails(id): Promise<void> {
 
 
 extractPhoneTypes(response: any,changeBranch?:any) {
-    console.log(response, 'Response in extractPhoneTypes');
 
 
         let arr: PhoneNumberAndtype[] = [];
@@ -917,21 +910,10 @@ extractPhoneTypes(response: any,changeBranch?:any) {
         });
 
         this.allPhoneTypes = [...arr];
-
-        //  Assign correct phone type based on selected phone number
-        // if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber) {
-        //     const selectedPhone = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber;
-        //     const matchedPhoneType = this.allPhoneTypes.find(p => p.phoneNumber === selectedPhone);
-
-        //     // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = matchedPhoneType;
-        // console.log(matchedPhoneType, 'matchedPhoneType');
-
-        // }
         if(changeBranch =='changed'){
             this.onchangePhoneType(this.allPhoneTypes[0]);
 
         }
-        // this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
         this.cdr.detectChanges(); 
  
     this.isValidForm();

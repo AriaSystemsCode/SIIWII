@@ -68,7 +68,7 @@
                                                         src="../../../assets/landingPage/Search.png" />
                                                     </button>
                                             </span>
-                                            <input [(ngModel)]="filterText"   formControlName="search" autoFocus
+                                            <input    formControlName="search" autoFocus
                                                 class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
                                                 type="text"     (keydown.enter)="onSearch($event)"
                                                >
@@ -129,7 +129,7 @@
                                         <div class="form-group">
                                             <label for="SellerNameFilter">{{l("SellerName")}}</label>
                                             <input type="text" class="form-control" id="SellerNameFilter"
-                                                formControlName="sellerNameFilter" [(ngModel)]="sellerNameFilter"
+                                                formControlName="sellerNameFilter"
                                                 (keyup)="getAppTransactions()">
                                         </div>
                                     </div>
@@ -137,7 +137,7 @@
                                         <div class="form-group">
                                             <label for="BuyerNameFilter">{{l("buyerName")}}</label>
                                             <input type="text" class="form-control" id="BuyerNameFilter"
-                                                formControlName="buyerNameFilter" [(ngModel)]="buyerNameFilter"
+                                                formControlName="buyerNameFilter" 
                                                 (keyup)="getAppTransactions()">
                                         </div>
                                     </div>
@@ -147,7 +147,7 @@
                                         <div class="form-group">
                                             <label for="CodeFilter">{{l("Code")}}</label>
                                             <input type="text" class="form-control" id="CodeFilter"
-                                                formControlName="codeFilter" [(ngModel)]="codeFilter"
+                                                formControlName="codeFilter" 
                                                 (keyup)="getAppTransactions()">
                                         </div>
                                     </div>
@@ -160,12 +160,12 @@
                                             <div class="input-group">
                                                 <input class="form-control m-input" id="MinCreateDateFilter"
                                                     formControlName="minCreateDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minCreateDateFilter"
+                                                    placeholder="{{l('MinValue')}}"
                                                     (focusout)="getAppTransactions()">
                                                 <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
                                                 <input class="form-control m-input" id="MaxCreateDateFilter"
                                                     formControlName="maxCreateDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxCreateDateFilter"
+                                                    placeholder="{{l('MaxValue')}}"
                                                     (focusout)="getAppTransactions()">
                                             </div>
                                         </div>
@@ -176,12 +176,12 @@
                                             <div class="input-group">
                                                 <input class="form-control m-input" id="MinCompleteDateFilter"
                                                     formControlName="minCompleteDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minCompleteDateFilter"
+                                                    placeholder="{{l('MinValue')}}"
                                                     (focusout)="getAppTransactions()">
                                                 <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
                                                 <input class="form-control m-input" id="MaxCompleteDateFilter"
                                                     formControlName="maxCompleteDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxCompleteDateFilter"
+                                                    placeholder="{{l('MaxValue')}}" 
                                                     (focusout)="getAppTransactions()">
                                             </div>
                                         </div>
@@ -192,7 +192,7 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="statusFilter">{{l("Status")}}</label>
-                                            <p-dropdown [ngModel]="statusFilter" [options]="filterStatus"
+                                            <p-dropdown [options]="filterStatus"
                                                 (onChange)=" getAppTransactions()" placeholder="Any" [showClear]="true"
                                                 appendTo="body" formControlName="statusFilter">
                                             </p-dropdown>
@@ -204,7 +204,7 @@
                                         <div class="form-group">
                                             <label for="referenceNumberFilter">{{l("Reference Number")}}</label>
                                             <input type="text" class="form-control" id="referenceNumberFilter"
-                                                formControlName="referenceNumberFilter" [(ngModel)]="referenceNumberFilter"
+                                                formControlName="referenceNumberFilter" 
                                                 (keyup)="getAppTransactions()">
                                         </div>
                                     </div>
@@ -223,7 +223,7 @@
                                         <div class="form-group">
                                             <label for="transactionNumberFilter">{{l("Transaction Number")}}</label>
                                             <input type="text" class="form-control" id="transactionNumberFilter"
-                                                formControlName="transactionNumberFilter" [(ngModel)]="transactionNumberFilter"
+                                                formControlName="transactionNumberFilter"
                                                 (keyup)="getVariationDetail()">
                                         </div>
                                     </div>
@@ -232,9 +232,19 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="variationCodeFilter">{{l("Variation Code")}}</label>
-                                            <input type="text" class="form-control" id="variationCodeFilter"
-                                                formControlName="variationCodeFilter" [(ngModel)]="variationCodeFilter"
-                                                (keyup)="getVariationDetail()">
+                                            <div class="input-group">
+                                                <span class="input-group-btn">
+                                                    <button  (click)="getVariationDetail()" class="searchBtn" type="submit">
+                                                        <img 
+                                                            src="../../../assets/landingPage/Search.png" />
+                                                        </button>
+                                                </span>
+                                            
+                                                   <input type="text" style="padding-left: 35px;" class="form-control" id="variationCodeFilter"
+                                                   formControlName="variationCodeFilter" 
+                                                   (keydown.enter)="getVariationDetail()">
+                                            </div>
+                                       
                                         </div>
                                     </div>
 
@@ -247,12 +257,12 @@
                                             <div class="input-group">
                                                 <input class="form-control m-input" id="minPrice"
                                                     formControlName="minPrice" type="number" 
-                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minPrice"
+                                                    placeholder="{{l('MinValue')}}" 
                                                     (focusout)="getVariationDetail()">
                                                 <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
                                                 <input class="form-control m-input" id="maxPrice" type="text" 
                                                     formControlName="maxPrice" 
-                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxPrice"
+                                                    placeholder="{{l('MaxValue')}}" 
                                                     (focusout)="getVariationDetail()">
                                             </div>
                                         </div>
@@ -263,12 +273,12 @@
                                             <div class="input-group">
                                                 <input class="form-control m-input" id="minAmount"
                                                     formControlName="minAmount" type="text" 
-                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minAmount"
+                                                    placeholder="{{l('MinValue')}}"
                                                     (focusout)="getVariationDetail()">
                                                 <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
                                                 <input class="form-control m-input" id="maxAmount"
                                                     formControlName="maxAmount" type="text" 
-                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxAmount"
+                                                    placeholder="{{l('MaxValue')}}" 
                                                     (focusout)="getVariationDetail()">
                                             </div>
                                         </div>
@@ -324,77 +334,52 @@
                                         <th style="width: 150px" pSortableColumn="sellerCompanyName" class="purpleColor">
                                             {{l('SellerName')}}
                                             <p-sortIcon class="purpleSortableIcon" field="sellerCompanyName"></p-sortIcon>
-                                            <!-- <p-columnFilter type="text" field="sellerCompanyName" display="menu"
-                                                class="ml-auto">
-                                            </p-columnFilter> -->
+                                 
                                         </th>
                                         <th style="width: 150px" pSortableColumn="buyerCompanyName" class="purpleColor">
                                             {{l('BuyerName')}}
                                             <p-sortIcon class="purpleSortableIcon" field="buyerCompanyName"></p-sortIcon>
-                                            <!-- <p-columnFilter type="text" field="buyerCompanyName" display="menu"
-                                                class="ml-auto">
-                                            </p-columnFilter> -->
+                                   
                                         </th>
                                         <th style="width: 160px" pSortableColumn="entityObjectTypeCode"
                                             class="purpleColor">
                                             {{l('TransactionType')}}
                                             <p-sortIcon class="purpleSortableIcon"
                                                 field="entityObjectTypeCode"></p-sortIcon>
-                                            <!-- <p-columnFilter field="entityObjectTypeCode" matchMode="equals"
-                                                [showMenu]="false">
-                                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                                    <p-dropdown [ngModel]="value" [options]="filterTransType"
-                                                        (onChange)="customFilterCallback(filter,$event.value)"
-                                                        placeholder="Any" [showClear]="true" appendTo="body">
-                                                    </p-dropdown>
-                                                </ng-template>
-                                            </p-columnFilter> -->
+                                  
 
                                         </th>
                                         <th style="width: 150px" pSortableColumn="code" class="purpleColor">
                                             {{l('Transaction #')}}
                                             <p-sortIcon class="purpleSortableIcon" field="code"></p-sortIcon>
-                                            <!-- <p-columnFilter type="numeric" field="code" display="menu" class="ml-auto">
-                                            </p-columnFilter> -->
+                               
                                         </th>
                                         <th style="width: 150px" pSortableColumn="entityObjectStatusCode"
                                             class="purpleColor">
                                             {{l('Status')}}
                                             <p-sortIcon class="purpleSortableIcon"
                                                 field="entityObjectStatusCode"></p-sortIcon>
-                                            <!-- <p-columnFilter field="entityObjectStatusCode" matchMode="equals"
-                                                [showMenu]="false">
-                                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                                    <p-dropdown [ngModel]="value" [options]="filterStatus"
-                                                        (onChange)="customFilterCallback(filter,$event.value)"
-                                                        placeholder="Any" [showClear]="true" appendTo="body">
-                                                    </p-dropdown>
-                                                </ng-template>
-                                            </p-columnFilter> -->
+                                    
                                         </th>
                                         <th style="width: 150px" pSortableColumn="creationTime" class="purpleColor">
                                             {{l('DateCreated')}}
                                             <p-sortIcon class="purpleSortableIcon" field="creationTime"></p-sortIcon>
-                                            <!-- <p-columnFilter type="date" field="creationTime" display="menu"
-                                                class="ml-auto"></p-columnFilter> -->
+                                      
                                         </th>
                                         <th style="width: 150px" pSortableColumn="completeDate" class="purpleColor">
                                             {{l('CompleteDate')}}
                                             <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
-                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
-                                                class="ml-auto"></p-columnFilter> -->
+                                
                                         </th>
                                         <th style="width: 150px" pSortableColumn="reference"   class="purpleColor">
                                             {{l('Reference #')}}
                                             <p-sortIcon class="purpleSortableIcon"  field="reference"></p-sortIcon>
-                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
-                                                class="ml-auto"></p-columnFilter> -->
+                                
                                         </th>
                                         <th style="width: 190px" pSortableColumn="creatorTenantName"  class="purpleColor">
                                             {{l('Creator Tenant Name')}}
                                             <p-sortIcon class="purpleSortableIcon" field="creatorTenantName"></p-sortIcon>
-                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
-                                                class="ml-auto"></p-columnFilter> -->
+                               
                                         </th>
                                         
                                 
@@ -402,14 +387,12 @@
                                         <th style="width: 150px;white-space: nowrap;;text-align: right !important" pSortableColumn="totalQuantity"  class="purpleColor">
                                             {{l('TotalQuantity')}}
                                             <p-sortIcon class="purpleSortableIcon" field="totalQuantity"></p-sortIcon>
-                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
-                                                class="ml-auto"></p-columnFilter> -->
+                              
                                         </th>
                                         <th style="width: 150px;text-align: right !important" pSortableColumn="totalAmount"  class="purpleColor">
                                             {{l('TotalAmount')}}
                                             <p-sortIcon class="purpleSortableIcon" field="totalAmount"></p-sortIcon>
-                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
-                                                class="ml-auto"></p-columnFilter> -->
+                                    
                                         </th>
                                         
                                     </tr>
@@ -482,14 +465,12 @@
                                             <span >
                                                 {{record.totalQuantity  }}
                                             </span>
-                                            <!-- <span *ngIf="!record.totalQuantity">-</span> -->
                                         </td>
                                         <td style="width:150px;text-align: right !important">
                                             <span class="p-column-title" style="text-align: right !important"> {{l('TotalAmount' )}}</span>
                                             <span >
                                                 {{record.totalAmount | number: '1.2-2' }}
                                             </span>
-                                            <!-- <span *ngIf="!record.totalAmount">-</span> -->
                                         </td>
                                     </tr>
 
@@ -545,7 +526,7 @@
                                     <td>{{ product?.transactionType == 0 ?   'Sales Order'  : 'Purchase Order' }}</td>
                                     <td>{{ product.transactionNumber }}</td>
                                     <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
-                                    <td>{{ product?.manufacturerCode }}</td>
+                                    <td> <span style="white-space: pre-wrap">{{ product.manufacturerCode }}</span></td>
                                     <td>{{ product.name }}</td>
                                     <td style="text-align: right !important;">{{ product.qty  }}</td>
                                     <td style="text-align: right !important;">{{ product.price | number: '1.2-2'  }}</td>

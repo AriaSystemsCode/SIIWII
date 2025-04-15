@@ -12,18 +12,20 @@ import { finalize } from 'rxjs';
 export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
   implements OnInit {
 
-    @Input("isCreateOrEdit") isCreateOrEdit: boolean;
-    @Input("activeTab") activeTab: number;
-    @Input("currentTab") currentTab: number;
-    @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-    shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
-    @Output("showBuyer_sellerEditMode") showBuyer_sellerEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
-    @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
-    
 
-    @Input("canChange")  canChange:boolean=true;
+  @Output("showBuyer_sellerEditMode") showBuyer_sellerEditMode: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+  @Input("canChange") canChange: boolean = true;
+  @Input("isCreateOrEdit") isCreateOrEdit: boolean;
+  @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
+  @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
+
+  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy
@@ -33,7 +35,7 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
   ngOnInit(): void {
 
   }
-  
+
   ngOnChanges(changes: SimpleChanges) {
   }
 
@@ -53,7 +55,7 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
   createOrEditTransaction() {
     this.showMainSpinner();
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
         if (res) {
           this.onshowSaveBtn.emit(false);
@@ -61,8 +63,8 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
       });
   }
   isContactFormValid(value) {
-    if(this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo ||this.activeTab==this.shoppingCartoccordionTabs.SellerContactInfo)
+    if (this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo || this.activeTab == this.shoppingCartoccordionTabs.SellerContactInfo)
       this.isContactsValid.emit(value)
   }
-  
+
 }

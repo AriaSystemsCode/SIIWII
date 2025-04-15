@@ -237,6 +237,8 @@ export class TopBarComponent
     }
 
     ngOnInit() {
+        this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
+        this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
         // this._AppTransactionServiceProxy
         // .getRelatedAccounts()
         // .subscribe((res: any) => {
@@ -498,6 +500,11 @@ export class TopBarComponent
         });
     }
 
+    
+    onImageError(event: any, type: 'seller' | 'buyer') {
+      event.target.src = type === 'seller' ? this.defaultSellerLogo : this.defaultBuyerLogo;
+    }
+    
     getShoppingCartInfo(openShoppingCart: boolean = false) {
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
@@ -506,11 +513,6 @@ export class TopBarComponent
                     this.transactionType = "SO";
                 if (this.shoppingCartSummary?.orderType == this._TransactionType?.PurchaseOrder)
                     this.transactionType = "PO";
-
-                if (!this.shoppingCartSummary?.sellerLogo)
-                    this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
-                if (!this.shoppingCartSummary?.buyerLogo)
-                    this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
 
 
                   if(this.shoppingCartSummary?.amount)

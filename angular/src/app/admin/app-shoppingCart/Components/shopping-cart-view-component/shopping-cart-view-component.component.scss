@@ -360,8 +360,8 @@ input.ng-invalid.ng-touched {
 /*---------------------custome style for comment component--------------------*/
 .comment-warper{
     position: relative;
-    height: 95vh;
-    min-height: 40vh !important;
+    // height: 95vh;
+    // min-height: 40vh !important;
 }
 
 // handle responsive screens
@@ -796,11 +796,29 @@ height: 100px !important;
 .tabSSec {
     min-height: 70vh;
 }
-
+@media only screen and (min-width: 1100px) {
 .fixScrollS {
-    position: fixed; max-width: 440px;right: 50px;
+    position: fixed;
+    max-width: 28%;
+    right: 4%;
+}
 }
 
+
+@media only screen and (max-width: 1100px) {
+    .fixScrollS {
+        position: fixed;
+        max-width: 27%;
+        right: 4%;
+    }
+    }
+
+
+
+
+
+
+    
 .imageSlides {
     // width: 85px;
     // height: 70px;
@@ -1030,12 +1048,8 @@ padding: 0 !important;
         border: none!important;
         border-radius: 6px !important;
         padding: 0 !important;
-        //  width: 66px  !important;
          height: 66px !important;
-        //  margin: auto !important;
-        //  margin-top: 0 !important;
          .tab-header {
-            // background-color: #4A0D4A !important;
             border-radius: 6px !important;
             color: white !important;
             padding: 2px 5px !important;
@@ -1136,7 +1150,6 @@ background-color: white;
     width: 26px;
     left: 4px;
     bottom: 4px;
-   //background-color: white;
     transition: .4s;
 }
 

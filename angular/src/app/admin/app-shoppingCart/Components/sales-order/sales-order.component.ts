@@ -1,755 +1,425 @@
 import { AfterViewInit, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
-    AppEntitiesServiceProxy,
-    AppEntityCategoryDto,
-    AppEntityClassification,
-    AppEntityClassificationDto,
-    AppTransactionServiceProxy,
-    CreateOrEditSycEntityObjectCategoryDto,
-    CreateOrEditSycEntityObjectClassificationDto,
-    CurrencyInfoDto,
-    GetAppTransactionForViewDto,
-    GetAppTransactionsForViewDto,
-    SycEntityObjectCategoriesServiceProxy,
-    SycEntityObjectClassificationsServiceProxy,
-    SycEntityObjectTypesServiceProxy,
-    TreeNodeOfGetSycEntityObjectCategoryForViewDto,
-    TreeNodeOfGetSycEntityObjectClassificationForViewDto,
-    TreeNodeOfGetSycEntityObjectTypeForViewDto,
+  AppEntitiesServiceProxy,
+  AppEntityCategoryDto,
+  AppEntityClassificationDto,
+  AppTransactionServiceProxy,
+  CreateOrEditSycEntityObjectCategoryDto,
+  CreateOrEditSycEntityObjectClassificationDto,
+  GetAppTransactionsForViewDto,
+  SycEntityObjectCategoriesServiceProxy,
+  SycEntityObjectClassificationsServiceProxy,
+  TreeNodeOfGetSycEntityObjectCategoryForViewDto,
+  TreeNodeOfGetSycEntityObjectClassificationForViewDto,
 } from "@shared/service-proxies/service-proxies";
-import { Router } from "express-serve-static-core";
 import { finalize } from "rxjs";
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import * as moment from "moment";
-import { forEach } from "lodash";
 import { TreeSelect } from "primeng/treeselect";
-import { TreeNode } from "primeng/api";
 import { Calendar } from "primeng/calendar";
 
 @Component({
-    selector: "app-sales-order",
-    templateUrl: "./sales-order.component.html",
-    styleUrls: ["./sales-order.component.scss"],
+  selector: "app-sales-order",
+  templateUrl: "./sales-order.component.html",
+  styleUrls: ["./sales-order.component.scss"],
 })
-export class SalesOrderComponent extends AppComponentBase implements OnInit, OnChanges , AfterViewInit {
-    fullName: string;
-    companeyNames: any[];
-    nodes: any[];
-    category : CreateOrEditSycEntityObjectCategoryDto
-    classification : CreateOrEditSycEntityObjectClassificationDto
+export class SalesOrderComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
 
-    selectedCategories: AppEntityCategoryDto[]=[];
-    selectedCategoriesShow: any;
-    selectedClassificationsShow: any;
+  /** ViewChilds */
+  @ViewChild('calendar1') calendar1: Calendar;
+  @ViewChild('calendar2') calendar2: Calendar;
+  @ViewChild('calendar3') calendar3: Calendar;
+  @ViewChild('calendar4') calendar4: Calendar;
+  @ViewChild(TreeSelect) treeSelect!: TreeSelect;
 
-    classificationsFiles: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
-    categoriesFiles: any[];
-    loading: boolean = false;
-    selectedClassification: AppEntityClassificationDto[]=[];
-    // selectedCategories: any[] = ['kkkkk'];
-    currencies: any[];
-    selectedCurrency;
-    selectedCurrrency: any;
-    @Output("orderInfoValid") orderInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
-    @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
-    @Input("activeTab") activeTab: number;
-    @Input("currentTab") currentTab: number;
-    @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-    shoppingCartoccordionTabs = ShoppingCartoccordionTabs; 
-    @Input("createOrEditorderInfo") createOrEditorderInfo: boolean ;
-    @Input("oldCreateOrEditorderInfo") oldCreateOrEditorderInfo: boolean ;
+  /** Outputs */
+  @Output() generatOrderReport = new EventEmitter<boolean>();
+  @Output() refreshShoppingCart = new EventEmitter<boolean>();
+  @Output() orderInfoValid = new EventEmitter<ShoppingCartoccordionTabs>();
+  @Output() ontabChange = new EventEmitter<ShoppingCartoccordionTabs>();
 
-    enteredDate = new Date();
-    startDate = new Date();
-    availableDate = new Date();
-    completeDate = new Date();
-    reference: any 
+  /** Inputs */
+  @Input() canChange: boolean = true;
+  @Input() activeTab: number;
+  @Input() currentTab: number;
+  @Input() appTransactionsForViewDto: GetAppTransactionsForViewDto;
+  @Input() createOrEditorderInfo: boolean;
+  @Input() oldCreateOrEditorderInfo: boolean;
 
-    showSaveBtn: boolean = false;
-    showCatBtn: boolean = false;
-    hideCatBtn: boolean = true;
-    hideClassBtn: boolean = true;
-    showSelectedCat: boolean = false;
-    showClassBtn: boolean = false;
-    showSelectedClass: boolean = false;
-    showExistCat: boolean = false;
-    showExistClass: boolean = false;
-    oldappTransactionsForViewDto;
-    @ViewChild(TreeSelect) treeSelect!: TreeSelect;
-    @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
-  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Input("canChange") canChange: boolean = true;
-    sycEntityObjectCategory: CreateOrEditSycEntityObjectCategoryDto = new CreateOrEditSycEntityObjectCategoryDto();
-    entityObjectType:string ="CATEGORY"
-    entityObjectClassificationType:string ="CLASSIFICATION"
-    sortBy: string = "name";
-    skipCount: number = 0;
-    maxResultCount: number = 10;
-    allRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
-    filteredRecords: any[] = [];
-    allClassFilteredRecords :any[] =[]
-    tempDeselectedCategories: any[] = [];
-    tempDeselectedClassification :any[]=[]
-    allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
-    loadedChildrenRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = []
+  /** Global Variables */
+  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  fullName: string;
+  reference: any;
 
-    parentClassification : CreateOrEditSycEntityObjectClassificationDto
-    savedIds: number[]; // input
-  
-    parentCat : any;
-    parentClass : any;
-    addSubCat: boolean = false;
-    editSubCat: boolean = false;
+  /** Dates */
+  enteredDate = new Date();
+  startDate = new Date();
+  availableDate = new Date();
+  completeDate = new Date();
 
-    addSubClas: boolean = false;
-    editSubClass: boolean = false;
-    openDropDown: boolean = false;
-    showAppCodes: boolean = false;
-    showAppCatCodes: boolean = false;
-    
-    selectAllChecked: boolean = false;
-    visible: boolean = false;
-    cancelBtn: boolean = false;
-    saveBtn: boolean = false;
-    SuccessMsg: boolean = false;
-    @ViewChild('calendar1') calendar1: Calendar;
-    @ViewChild('calendar2') calendar2: Calendar;
-    @ViewChild('calendar3') calendar3: Calendar;
-    @ViewChild('calendar4') calendar4: Calendar;
-    constructor(
-        injector: Injector,
-        private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _sycEntityObjectClassificationsServiceProxy: SycEntityObjectClassificationsServiceProxy,
-        private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy
-    ) {
+  /** Entity Types */
+  entityObjectType = "CATEGORY";
+  entityObjectClassificationType = "CLASSIFICATION";
 
-        
-        super(injector);
-        // this.getAppTransactionList();
-       
-      
+  /** Category */
+  category = new CreateOrEditSycEntityObjectCategoryDto();
+  sycEntityObjectCategory = new CreateOrEditSycEntityObjectCategoryDto();
+  selectedCategories: AppEntityCategoryDto[] = [];
+  selectedCategoriesShow: any;
+  parentCat: any;
+
+  /** Classification */
+  classification = new CreateOrEditSycEntityObjectClassificationDto();
+  selectedClassification: AppEntityClassificationDto[] = [];
+  selectedClassificationsShow: any;
+  parentClass: any;
+
+  /** Tree Data */
+  allRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
+  filteredRecords: any[] = [];
+  allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
+  allClassFilteredRecords: any[] = [];
+  tempDeselectedCategories: any[] = [];
+  tempDeselectedClassification: any[] = [];
+
+  /** UI Controls */
+  showSaveBtn = false;
+  showCatBtn = false;
+  hideCatBtn = true;
+  hideClassBtn = true;
+  showSelectedCat = false;
+  showClassBtn = false;
+  showSelectedClass = false;
+  showExistCat = false;
+  showExistClass = false;
+  addSubCat = false;
+  editSubCat = false;
+  addSubClas = false;
+  editSubClass = false;
+  openDropDown = false;
+  showAppCodes = false;
+  showAppCatCodes = false;
+
+  /** Currency */
+  currencies: any[] = [];
+  selectedCurrency: any;
+
+  /** Others */
+  oldappTransactionsForViewDto;
+  isContactsValid = false;
+
+
+  constructor(
+    injector: Injector,
+    private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+    private _sycEntityObjectClassificationsServiceProxy: SycEntityObjectClassificationsServiceProxy,
+    private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
+    private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+
+  ) {
+    super(injector);
+  }
+  ngOnInit(): void {
+    if (this.currentTab === ShoppingCartoccordionTabs.orderInfo) {
+      this.fullName = `${this.appSession.user.name}${this.appSession.user.surname}`;
+      this.initDates();
+      this.getAppTransactionList();
+      this.getAppTransactionClassList();
     }
+  }
 
-    ngAfterViewInit() {
-        if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
-            
-            // this.getParentCategories();
-            // this.getParentClassifications();
-            this.getAllCurrencies();
-            }
+  ngAfterViewInit(): void {
+    if (this.currentTab === ShoppingCartoccordionTabs.orderInfo) {
+      this.getAllCurrencies();
     }
-    ngOnInit(): void {
-        
-        if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
-            this.getAppTransactionList();
-            this.getAppTransactionClassList()
-        if(!this.category) {
-            this.category = new CreateOrEditSycEntityObjectCategoryDto()
-        }
-        if(!this.classification) {
-            this.classification = new CreateOrEditSycEntityObjectClassificationDto()
-        }
-        // if(this.parentClassification && this.parentClassification.id ) {
-        //     this.classification.parentId = this.parentClassification.id
-        // }
-        // DepartmentFlag: false
-        // EntityId: 165420
-        // Sorting: name
-        // SkipCount: 0
-        // MaxResultCount: 10
-    
-        this.fullName =
-            this.appSession.user.name + this.appSession.user.surname;
-        this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
-        this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
-        this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
-        this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
-        this.reference = this.appTransactionsForViewDto?.reference;
-        
-        // this.selectedCategories = this.appTransactionsForViewDto.entityCategories
-        this.classificationItemPath = [];
-        this.categoriesItemPath = [];
-        console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
+  }
 
-
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.currentTab === ShoppingCartoccordionTabs.orderInfo && this.appTransactionsForViewDto) {
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+      this.initDates();
+      this.reference = this.appTransactionsForViewDto.reference;
+      this.selectedCurrency = this.appTransactionsForViewDto.currencyId || this.selectedCurrency;
+      this.selectedCategories = this.appTransactionsForViewDto.entityCategories || [];
+      this.selectedCategoriesShow = [...(this.appTransactionsForViewDto.entityCategoriesNames?.items || [])];
+      this.selectedClassification = this.appTransactionsForViewDto.entityClassifications || [];
+      this.selectedClassificationsShow = [...(this.appTransactionsForViewDto.entityClassificationsNames?.items || [])];
+      this.showSaveBtn = false;
     }
-}
-
-    ngOnChanges(changes: SimpleChanges) {
-        if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
-        if (this.appTransactionsForViewDto) {
-            this.createOrEditorderInfo=this.oldCreateOrEditorderInfo;
-            this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-            this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
-            this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
-            this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
-            this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
-        this.reference = this.appTransactionsForViewDto?.reference;
-
-            if (!this.selectedCurrency)
-                this.selectedCurrency = this.appTransactionsForViewDto?.currencyId;
-            this.showSaveBtn = false;
-
-            if (this.appTransactionsForViewDto?.entityCategories) {
-                this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-                this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
-            }
-            if (this.appTransactionsForViewDto?.entityClassifications) {
-                this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-                this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
-            }
-        }
-      
-
-        
-    }
-
-    }
-
-    openCalendar(calendar: Calendar) {
-        calendar.inputfieldViewChild.nativeElement.click();
-      }
-    toggleDropDown (){
-        this.openDropDown  = !this.openDropDown
-    }
-    getAllCurrencies() {
-        this._AppEntitiesServiceProxy
-            .getAllCurrencyForTableDropdown()
-            .subscribe((res: any) => {
-                this.currencies = res;
-            });
-    }
-
-    onNodeToggle(event: any, isExpanded: boolean) {
-    const node = event.node;
-    if (isExpanded) {
-
-        // Custom logic when a node is expanded
-    } else {
-
-        // Custom logic when a node is collapsed
-    }
-}
-
-
-    getCodeValue(code: string) {
-        // if(this.category?.code)
-        this.category.code= code;
-    }
-    getClassCodeValue(code: string) {
-        this.classification.code= code;
-    }
-    // get parent categories
-    getParentCategories() {
-        // let apiMethod = "getAllWithChildsForProductWithPaging";
-        let apiMethod ="getAllWithChildsForTransactionWithPaging";
-        const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            false,
-            165420,
-            [],
-            "name",
-            0,
-            100
-        ).subscribe(
-            (res: {
-                items: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
-                totalCount: number;
-            }) => {
-                // this.categoriesFiles = res.items;
-
-
-                this.categoriesItemPath?.forEach(item => {
-                    const filteredCategoriesFiles = this.categoriesFiles.filter(function (_item) {
-                        return (_item?.data?.sycEntityObjectCategory?.id != item?.data?.sycEntityObjectCategory?.id);
-                    });
-                    // this.categoriesFiles = filteredCategoriesFiles;
-                });
-            }
-        );
-    }
-
-    getParentClassifications() {
-        // let apiMethod = "getAllWithChildsForProductWithPaging";
-        let apiMethod ="getAllWithChildsForTransactionWithPaging";
-        const subs = this._sycEntityObjectClassificationsServiceProxy[
-            apiMethod
-        ](
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            165420,
-            "name",
-            0,
-            100
-        )
-            .pipe(finalize(() => (this.loading = false)))
-            .subscribe(
-                (res: {
-                    items: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
-                    totalCount: number;
-                }) => {
-                    this.classificationsFiles = res.items;
-
-                    this.classificationItemPath?.forEach(item => {
-                        const filteredClassificationFiles = this.classificationsFiles.filter(function (_item) {
-                            return (_item?.data?.sycEntityObjectClassification?.id != item?.data?.sycEntityObjectClassification?.id);
-                        });
-                        this.classificationsFiles = filteredClassificationFiles;
-                    });
-                }
-            );
-    }
-
-    // get childs related to parents
-    classificationNodeExpand(value: any) {
-    
-
-        if (value.node) {
-            this.loading = true;
-            this._sycEntityObjectClassificationsServiceProxy
-                .getAllChildsWithPaging(
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    value.node.data.sycEntityObjectClassification.id,
-                    null,
-                    165420,
-                    "name",
-                    0,
-                    100
-                )
-                .pipe(finalize(() => (this.loading = false)))
-                .subscribe((res: any) => {
-                    value.node.children = res.items;
-                    this.classificationsFiles = [...this.classificationsFiles];
-                });
-        }
-    }
-
-
-    categoriesNodeExpand(value: any) {
-        if (value.node) {
-            this.loading = true;
-            this._sycEntityObjectCategoriesServiceProxy
-                .getAllChildsWithPaging(
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    value.node.data.sycEntityObjectCategory.id,
-                    true,
-                    undefined,
-                    undefined,
-                    "name",
-                    0,
-                    10
-                )
-                .pipe(finalize(() => (this.loading = false)))
-                .subscribe((res: any) => {
-                    value.node.children = res.items;
-                    // this.categoriesFiles = [...this.categoriesFiles];
-                });
-        }
-    }
-
-    classificationItemPath: any[] = [];
-    classififcationNodeSelect(event: any) {
-
-
-        this.getClassificationPath(event.node)
-        if (!this.appTransactionsForViewDto?.entityClassifications || this.appTransactionsForViewDto?.entityClassifications?.length == 0)
-            this.appTransactionsForViewDto.entityClassifications = [];
-
-        this.classificationItemPath.forEach(item => {
-            let indx = this.appTransactionsForViewDto.entityClassifications?.findIndex(x => x.entityObjectClassificationId == item?.data?.sycEntityObjectClassification?.id)
-            if (indx < 0) {
-                let appEntityClassificationDto = new AppEntityClassificationDto();
-                appEntityClassificationDto.entityObjectClassificationCode = item?.data?.sycEntityObjectClassification?.code;
-                appEntityClassificationDto.entityObjectClassificationId = item?.data?.sycEntityObjectClassification?.id;
-                appEntityClassificationDto.entityObjectClassificationName = item?.data?.sycEntityObjectClassification?.name;
-                this.appTransactionsForViewDto.entityClassifications.push(appEntityClassificationDto)
-            }
-            const filteredClassificationFiles = this.classificationsFiles.filter(function (_item) {
-                return (_item?.data?.sycEntityObjectClassification?.id != item?.data?.sycEntityObjectClassification?.id);
-            });
-
-            this.classificationsFiles = filteredClassificationFiles;
-        });
-        this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-    }
-
-
-    classififcationNodeUnSelect(event: any) {
-        let indx = this.appTransactionsForViewDto.entityClassifications?.findIndex(x => x.entityObjectClassificationId == event?.entityObjectClassificationId)
-        if (indx >= 0)
-            this.appTransactionsForViewDto.entityClassifications.splice(indx, 1);
-
-
-        let classificationsItemPathindx = this.classificationItemPath?.findIndex(x => x.data.sycEntityObjectClassification.id == event.entityObjectClassificationId);
-        if (classificationsItemPathindx >= 0)
-            this.classificationItemPath.splice(classificationsItemPathindx, 1);
-
-        this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-
-        this.getParentClassifications();
-
-    }
-
-
-
-    
-    onLabelClick(event: Event) {
-        event.stopPropagation(); // Prevent selection on label click
-      }
-
-      toggleSelectAll() {
-        // Check if all nodes are already selected
-        const allNodesSelected = this.selectedCategories.length === this.filteredRecords.length;
-      
-        if (allNodesSelected) {
-          // Deselect all nodes
-          this.selectedCategories = [];
-        } else {
-          // Select all nodes
-          this.selectedCategories = this.filteredRecords.map(node => {
-            // Ensure the node has valid data
-            if (node && node.data && node.data.sycEntityObjectCategory) {
-              const category = node.data.sycEntityObjectCategory;
-              return new AppEntityCategoryDto({
-                entityObjectCategoryId: category.id || 0,
-                entityObjectCategoryCode: category.code || '',
-                entityObjectCategoryName: category.name || '',
-                id: 0,
-              });
-            } else {
-              console.warn('Invalid node structure:', node);
-              return null;
-            }
-          }).filter(category => category !== null);
-        }
-      
-        // Optionally update appTransactionsForViewDto
-        this.appTransactionsForViewDto.entityCategories = this.selectedCategories;
-      }
-      
-    
-    
-    collapseAll() {
-        this.filteredRecords.forEach(node => {
-            node.expanded = false;
-        });
-    }
-    categoriesItemPath: any[] = [];
-    
-  
-    // categoriesNodeUnSelect(event: any) {
-    //     let indx = this.appTransactionsForViewDto.entityCategories.findIndex(x => x.entityObjectCategoryId == event?.entityObjectCategoryId);
-    //     if (indx >= 0)
-    //         this.appTransactionsForViewDto.entityCategories.splice(indx, 1);
-
-
-    //     let categoriesItemPathindx = this.categoriesItemPath?.findIndex(x => x.data.sycEntityObjectCategory.id == event.entityObjectCategoryId);
-    //     if (categoriesItemPathindx >= 0)
-    //         this.categoriesItemPath.splice(categoriesItemPathindx, 1);
-
-    //     this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-
-    //     this.getParentCategories();
-
-    // }
-
-    getCategoriesPath(item: any): any {
-        // if (!item.parent) {
-        //     return item.label;
-        // }
-        // return this.getCategoriesPath(item.parent) + "-" + item.label;
-        if (item.children && item.children?.length > 0) {
-            item.children.forEach(child => {
-                this.getCategoriesPath(child)
-            });
-        }
-
-        this.categoriesItemPath.push(item);
-    }
-    addAsNewChild(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
-     
-        this.showCatBtn = true;
-        this.addSubCat = true;
-        // Set the parent category details when adding a subcategory
-        this.parentCat = {
-            code: this.category.code,
-            parentId: node.data.sycEntityObjectCategory.id,
-        };
-    }
-
-
-    addAsNewChildClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
-      
-        this.showClassBtn = true
-        this.addSubClas = true
-     this.parentClass = {
-
-        code: this.classification.code,
-        parentId: node.data.sycEntityObjectClassification.id,
- }
-
-
- 
-  
-    }
-    
-
-
-    EditCat(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
-        this.showCatBtn = true
-        this.editSubCat = true
-     this.parentCat = {
-        name: node.data.sycEntityObjectCategory.name,
-        
-        code: node.data.sycEntityObjectCategory.code,
-        id: node.data.sycEntityObjectCategory.id,
- }
-
- 
- this.category.name =  this.parentCat.name
-
-
-    }
-    EditClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
-
-
-        this.showClassBtn = true
-        this.editSubClass = true
-     this.parentClass = {
-        name: node.data.sycEntityObjectClassification.name,
-        
-        code: node.data.sycEntityObjectClassification.code,
-        id: node.data.sycEntityObjectClassification.id,
-    }
-     this.classification.name =  this.parentClass.name
-
-    
-        }
-    getClassificationPath(item: any): any {
-        if (item.children && item.children?.length > 0) {
-            item.children.forEach(child => {
-                this.getClassificationPath(child)
-            });
-        }
-
-        this.classificationItemPath.push(item);
-
-        // if (!item.parent) {
-        //     return item.label;
-        // }
-        // return this.getClassificationPath(item.parent) + "-" + item.label;
-    }
-
-    isSalesOrderValidForm(): boolean {
-        // Check if all required fields have values
-
-        // this.appTransactionsForViewDto.entityClassifications.length !== 0 &&
-        // this.appTransactionsForViewDto.entityCategories.length !== 0 &&
-        const isValid = this.appTransactionsForViewDto?.currencyCode &&
-            this.appTransactionsForViewDto?.currencyExchangeRate &&
-            moment(
-                this.appTransactionsForViewDto?.enteredDate,
-                "YYYY-MM-DD HH:mm:ss",
-                true
-            ).isValid() &&
-            moment(
-                this.appTransactionsForViewDto?.completeDate,
-                "YYYY-MM-DD HH:mm:ss",
-                true
-            ).isValid() &&
-            moment(
-                this.appTransactionsForViewDto?.availableDate,
-                "YYYY-MM-DD HH:mm:ss",
-                true
-            ).isValid() &&
-            moment(
-                this.appTransactionsForViewDto?.startDate,
-                "YYYY-MM-DD HH:mm:ss",
-                true
-            ).isValid();
-        // this.availabledate &&
-        // this.startDate &&
-        // this.enterdDate &&
-        // this.compeleteDate;
-        return isValid;
-    }
-
-    onchangeCurrency() {
-        var indx = this.currencies.findIndex(x => x.value == this.selectedCurrency);
-        if (indx >= 0) {
-            this.appTransactionsForViewDto.currencyId = this.currencies[indx].value;
-            this.appTransactionsForViewDto.currencyCode = this.currencies[indx].code;
-        }
-    }
-    onChangeDate() {
-        //Dates
-
-       
-    
-        if ( !this.completeDate || this.completeDate <=  this.startDate) {
-            this.completeDate=this.startDate;
-        }
-    
-        if ( !this.availableDate ||  this.availableDate <= this.startDate) {
-            this.availableDate=this.startDate;
-        }
-
-        let enteredDate = this.enteredDate;
-        let startDate = this.startDate;
-        let availableDate = this.availableDate;
-        let completeDate = this.completeDate;
-            console.log(enteredDate,'enteredDate')
-
-        this.appTransactionsForViewDto.enteredDate =   moment(enteredDate);
-        this.appTransactionsForViewDto.startDate = moment(startDate);
-        this.appTransactionsForViewDto.availableDate = moment(availableDate);
-        this.appTransactionsForViewDto.completeDate = moment(completeDate);
-        //         let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-        // let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-        // let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-        // let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
-    
-    
-        // this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-        // this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-        // this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-        // this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
-        console.log(this.appTransactionsForViewDto.enteredDate,'this.appTransactionsForViewDto.enteredDate')
-
-    }
-    changeCompleteDate(date) {
-        const selectedDate = date;
-    
-        this.completeDate = selectedDate;
-        this.availableDate=selectedDate;
-        this.onChangeDate()
-    }
-
-    createOrEditTransaction() {
-        // this.showMainSpinner();
-        // this.onChangeDate();
-        let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-        let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-        let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-        let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
-    
-    
-        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
-
-         this.appTransactionsForViewDto.reference = this.reference;
-         this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-
-        this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-
-        .pipe(finalize(() =>  {
-
-    //  this.SuccessMsg = true
-            // this.generatOrderReport.emit(true)      
-        }))
-           
-        .subscribe((res) => {
-                if (res) {
-                    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-       this.refreshShoppingCart.emit(true)
-                   
-                    // this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
-
-                    if (!this.showSaveBtn)
-                        this.ontabChange.emit(ShoppingCartoccordionTabs.orderInfo);
-
-                    else
-                        this.showSaveBtn = false;
-
-                }
-            });
-    
-
-    }
-
-
-    isContactsValid: boolean = false;
-    isContactFormValid(value) {
-        if(this.activeTab==this.shoppingCartoccordionTabs.orderInfo)
-        {
-            this.isContactsValid = value;
-            if (value) {
-                this.isContactsValid = true;
-                if (this.isSalesOrderValidForm())
-                    this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
-            }
-        }
-    }
-   
-    deSelectCat(
-        category: any,
-        i: number
-    ) {
-
-
-        if (category?.data?.sycEntityObjectCategory?.id) {
-            category.removed = true;
-        } else this.selectedCategories.splice(i, 1);
-
-        this.tempDeselectedCategories.push(category);
-        this.showSelectedCat = true
-    }
-
-
-onNodeSelectCat(event: any) {
-    this.processNodeSelectionCat(event.node, true);
+  }
+
+  initDates(): void {
+    this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
+    this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
+    this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
+    this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
+  }
+
+  onReferenceChange() {
+    this.appTransactionsForViewDto.reference = this.reference;
   }
   
-  
+  openCalendar(calendar: Calendar) {
+    calendar.inputfieldViewChild.nativeElement.click();
+  }
+
+  toggleDropDown() {
+    this.openDropDown = !this.openDropDown
+  }
+
+  getAllCurrencies() {
+    this._AppEntitiesServiceProxy
+      .getAllCurrencyForTableDropdown()
+      .subscribe((res: any) => {
+        this.currencies = res;
+      });
+  }
+
+  getCodeValue(code: string) {
+
+    this.category.code = code;
+  }
+  getClassCodeValue(code: string) {
+    this.classification.code = code;
+  }
+
+
+  onLabelClick(event: Event) {
+    event.stopPropagation(); // Prevent selection on label click
+  }
+
+  toggleSelectAll() {
+    // Check if all nodes are already selected
+    const allNodesSelected = this.selectedCategories.length === this.filteredRecords.length;
+
+    if (allNodesSelected) {
+      // Deselect all nodes
+      this.selectedCategories = [];
+    } else {
+      // Select all nodes
+      this.selectedCategories = this.filteredRecords.map(node => {
+        // Ensure the node has valid data
+        if (node && node.data && node.data.sycEntityObjectCategory) {
+          const category = node.data.sycEntityObjectCategory;
+          return new AppEntityCategoryDto({
+            entityObjectCategoryId: category.id || 0,
+            entityObjectCategoryCode: category.code || '',
+            entityObjectCategoryName: category.name || '',
+            id: 0,
+          });
+        } else {
+          return null;
+        }
+      }).filter(category => category !== null);
+    }
+
+    // Optionally update appTransactionsForViewDto
+    this.appTransactionsForViewDto.entityCategories = this.selectedCategories;
+  }
+
+  collapseAll() {
+    this.filteredRecords.forEach(node => {
+      node.expanded = false;
+    });
+  }
+
+
+  addAsNewChild(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
+    this.showCatBtn = true;
+    this.addSubCat = true;
+    // Set the parent category details when adding a subcategory
+    this.parentCat = {
+      code: this.category.code,
+      parentId: node.data.sycEntityObjectCategory.id,
+    };
+  }
+
+
+  addAsNewChildClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
+    this.showClassBtn = true
+    this.addSubClas = true
+    this.parentClass = {
+      code: this.classification.code,
+      parentId: node.data.sycEntityObjectClassification.id,
+    }
+  }
+
+  EditCat(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
+    this.showCatBtn = true
+    this.editSubCat = true
+    this.parentCat = {
+      name: node.data.sycEntityObjectCategory.name,
+      code: node.data.sycEntityObjectCategory.code,
+      id: node.data.sycEntityObjectCategory.id,
+    }
+    this.category.name = this.parentCat.name
+  }
+
+  EditClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
+    this.showClassBtn = true
+    this.editSubClass = true
+    this.parentClass = {
+      name: node.data.sycEntityObjectClassification.name,
+      code: node.data.sycEntityObjectClassification.code,
+      id: node.data.sycEntityObjectClassification.id,
+    }
+    this.classification.name = this.parentClass.name
+  }
+
+
+  isSalesOrderValidForm(): boolean {
+    // Check if all required fields have values
+    const isValid = this.appTransactionsForViewDto?.currencyCode &&
+      this.appTransactionsForViewDto?.currencyExchangeRate &&
+      moment(
+        this.appTransactionsForViewDto?.enteredDate,
+        "YYYY-MM-DD HH:mm:ss",
+        true
+      ).isValid() &&
+      moment(
+        this.appTransactionsForViewDto?.completeDate,
+        "YYYY-MM-DD HH:mm:ss",
+        true
+      ).isValid() &&
+      moment(
+        this.appTransactionsForViewDto?.availableDate,
+        "YYYY-MM-DD HH:mm:ss",
+        true
+      ).isValid() &&
+      moment(
+        this.appTransactionsForViewDto?.startDate,
+        "YYYY-MM-DD HH:mm:ss",
+        true
+      ).isValid();
+    return isValid;
+  }
+
+  onchangeCurrency() {
+    var indx = this.currencies.findIndex(x => x.value == this.selectedCurrency);
+    if (indx >= 0) {
+      this.appTransactionsForViewDto.currencyId = this.currencies[indx].value;
+      this.appTransactionsForViewDto.currencyCode = this.currencies[indx].code;
+    }
+  }
+  onChangeDate() {
+
+    if (!this.completeDate || this.completeDate <= this.startDate) {
+      this.completeDate = this.startDate;
+    }
+
+    if (!this.availableDate || this.availableDate <= this.startDate) {
+      this.availableDate = this.startDate;
+    }
+
+    let enteredDate = this.enteredDate;
+    let startDate = this.startDate;
+    let availableDate = this.availableDate;
+    let completeDate = this.completeDate;
+
+    this.appTransactionsForViewDto.enteredDate = moment(enteredDate);
+    this.appTransactionsForViewDto.startDate = moment(startDate);
+    this.appTransactionsForViewDto.availableDate = moment(availableDate);
+    this.appTransactionsForViewDto.completeDate = moment(completeDate);
+
+
+  }
+  changeCompleteDate(date) {
+    const selectedDate = date;
+
+    this.completeDate = selectedDate;
+    this.availableDate = selectedDate;
+    this.onChangeDate()
+  }
+
+  createOrEditTransaction() {
+    let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+    let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+    let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+    let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+    this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+    this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+    this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+
+    this.appTransactionsForViewDto.reference = this.reference;
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+
+      .pipe(finalize(() => {
+     
+      }))
+
+      .subscribe((res) => {
+        if (res) {
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+          this.refreshShoppingCart.emit(true)
+
+          if (!this.showSaveBtn)
+            this.ontabChange.emit(ShoppingCartoccordionTabs.orderInfo);
+
+          else
+            this.showSaveBtn = false;
+
+        }
+      });
+
+
+  }
+
+
+  isContactFormValid(value) {
+    if (this.activeTab == this.shoppingCartoccordionTabs.orderInfo) {
+      this.isContactsValid = value;
+      if (value) {
+        this.isContactsValid = true;
+        if (this.isSalesOrderValidForm())
+          this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
+      }
+    }
+  }
+
+  deSelectCat(
+    category: any,
+    i: number
+  ) {
+
+    if (category?.data?.sycEntityObjectCategory?.id) {
+      category.removed = true;
+    } else this.selectedCategories.splice(i, 1);
+
+    this.tempDeselectedCategories.push(category);
+    this.showSelectedCat = true
+  }
+
+
+  onNodeSelectCat(event: any) {
+    this.processNodeSelectionCat(event.node, true);
+  }
+
+
   onNodeUnselectCat(event: any) {
     this.processNodeSelectionCat(event.node, false);
   }
-  
+
   processNodeSelectionCat(node: any, isSelected: boolean) {
     const category = node?.data?.sycEntityObjectCategory;
     if (!category) {
-      console.warn('Invalid node data:', node);
       return;
     }
-  
+
     const newCategory = new AppEntityCategoryDto({
       id: 0,
       entityObjectCategoryId: category.id || 0,
       entityObjectCategoryCode: category.code || '',
       entityObjectCategoryName: category.name || '',
     });
-  
+
     this.appTransactionsForViewDto.entityCategories ||= [];
-  
+
     if (isSelected) {
       if (node.leaf) {  // Check if it's a leaf node
         const leafCategory = new AppEntityCategoryDto({
@@ -758,16 +428,16 @@ onNodeSelectCat(event: any) {
           entityObjectCategoryCode: category.code,
           entityObjectCategoryName: this.getPath(node),  // Use the provided path
         });
-        
+
         // Add the leaf category if not already in selected categories
         if (!this.selectedCategories.some(
-            cat => cat.entityObjectCategoryId === leafCategory.entityObjectCategoryId)) {
+          cat => cat.entityObjectCategoryId === leafCategory.entityObjectCategoryId)) {
           this.selectedCategories.push(leafCategory);
         }
       } else {
         // Add the category if not already in selected categories
         if (!this.appTransactionsForViewDto.entityCategories.some(
-            cat => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId)) {
+          cat => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId)) {
           this.appTransactionsForViewDto.entityCategories.push(newCategory);
           this.selectedCategories.push(newCategory);
         }
@@ -781,12 +451,12 @@ onNodeSelectCat(event: any) {
         cat => cat.entityObjectCategoryId !== newCategory.entityObjectCategoryId
       );
     }
-  
+
     // Handle parent-child selection/deselection relationships
     this.ensureParentChildSelectionCat(node, isSelected);
   }
-  
-  
+
+
   // Function to manage parent-child relationships during selection
   ensureParentChildSelectionCat(node: any, isSelected: boolean) {
     if (node.children && node.children.length > 0) {
@@ -798,224 +468,153 @@ onNodeSelectCat(event: any) {
               selected.entityObjectCategoryId ===
               child.data?.sycEntityObjectCategory?.id
           );
-  
+
           if (childIndex !== -1) {
             this.selectedCategories.splice(childIndex, 1);
             this.appTransactionsForViewDto.entityCategories.splice(childIndex, 1);
           }
         }
       });
-    } 
+    }
 
   }
-  
-  
-    // categoriesNodeSelect(event: any) {
-    //     console.log(event, 'Event received in categoriesNodeSelect');
-    
-    //     const newNode = event[event.length - 1];
-    
-    //     if (newNode?.data?.sycEntityObjectCategory) {
-    //         const category = newNode.data.sycEntityObjectCategory;
-    
-    //         const newCategory = new AppEntityCategoryDto();
-    //         newCategory.entityObjectCategoryId = category.id || 0;
-    //         newCategory.entityObjectCategoryCode = category.code || '';
-    //         newCategory.entityObjectCategoryName = category.name || '';
-    //         newCategory.id = 0;
-    
-    //         if (!this.appTransactionsForViewDto?.entityCategories) {
-    //             this.appTransactionsForViewDto.entityCategories = [];
-    //         }
-    
-    //         this.selectedCategories = this.selectedCategories.filter(
-    //             (cat) => !(cat instanceof AppEntityCategoryDto && cat.entityObjectCategoryId === newCategory.entityObjectCategoryId)
-    //         );
-    
-    //         const categoryExists = this.appTransactionsForViewDto.entityCategories.some(
-    //             (cat) => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId
-    //         );
-    
-    //         if (!categoryExists) {
-    //             this.appTransactionsForViewDto.entityCategories.push(newCategory);
-    //             this.selectedCategories.push(newCategory);
-    //         }
-    
-    //         console.log(this.selectedCategories, 'Current selected categories');
-    //     } else {
-    //         console.warn('Invalid node data:', newNode);
-    //     }
-    // }
-    
-    
-    
-    
-    saveSelection() {
- 
-        this.selectedCategories = this.selectedCategories.filter(
-            (cat) => cat instanceof AppEntityCategoryDto
-        );
-    
- 
-        this.selectedCategoriesShow = this.selectedCategories.map(
-            (cat) => cat.entityObjectCategoryName 
-        );
-    
-  
-        this.appTransactionsForViewDto.entityCategories = this.selectedCategories.map((item) => {
-            return new AppEntityCategoryDto({
-                entityObjectCategoryId: item.entityObjectCategoryId || 0,
-                entityObjectCategoryCode: item.entityObjectCategoryCode || '',
-                entityObjectCategoryName: item.entityObjectCategoryName || "",
-                id: 0, 
-            });
-        });
-    
 
-        this.showExistCat = false;
-        this.treeSelect.hide();  
-        this.getAppTransactionList();  
-   }
-   
-    
-    
-    cancelSelection() {
-        this.closeDropdown();
-        this.treeSelect.hide();
-        this.showExistCat = false
-        this.tempDeselectedCategories =[]
-        if (this.appTransactionsForViewDto?.entityCategories) {
-            this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-            this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
-        }
+
+
+  saveSelection() {
+    this.selectedCategories = this.selectedCategories.filter(
+      (cat) => cat instanceof AppEntityCategoryDto
+    );
+    this.selectedCategoriesShow = this.selectedCategories.map(
+      (cat) => cat.entityObjectCategoryName
+    );
+
+    this.appTransactionsForViewDto.entityCategories = this.selectedCategories.map((item) => {
+      return new AppEntityCategoryDto({
+        entityObjectCategoryId: item.entityObjectCategoryId || 0,
+        entityObjectCategoryCode: item.entityObjectCategoryCode || '',
+        entityObjectCategoryName: item.entityObjectCategoryName || "",
+        id: 0,
+      });
+    });
+
+
+    this.showExistCat = false;
+    this.treeSelect.hide();
+    this.getAppTransactionList();
+  }
+
+
+
+  cancelSelection() {
+    this.closeDropdown();
+    this.treeSelect.hide();
+    this.showExistCat = false
+    this.tempDeselectedCategories = []
+    if (this.appTransactionsForViewDto?.entityCategories) {
+      this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+      this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
     }
+  }
 
-    saveCat(category: any) {
-        const isEditing = this.editSubCat;
-        
+  saveCat(category: any) {
+    const isEditing = this.editSubCat;
+
+    if (!isEditing) {
+      this.getCodeValue(this.generateUniqueCode());
+    }
+    const parentId = this.addSubCat ? this.parentCat?.parentId : undefined;
+
+
+    let cat = new CreateOrEditSycEntityObjectCategoryDto({
+      code: this.category.code,
+      name: category.name,
+      objectId: undefined,
+      parentId: parentId,
+      id: isEditing ? this.parentCat.id : undefined,
+    });
+
+
+    this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
+      .pipe(finalize(() => {
+        this.getAppTransactionList();
+      }))
+      .subscribe(() => {
+
         if (!isEditing) {
-            this.getCodeValue(this.generateUniqueCode()); 
+          this.notify.info('Added Successfully');
+        } else {
+          this.notify.info('Updated Successfully');
         }
-        
+      });
 
-        const parentId = this.addSubCat ? this.parentCat?.parentId : undefined;
-        
-       
-        let cat = new CreateOrEditSycEntityObjectCategoryDto({
-            code: this.category.code, 
-            name: category.name,
-            objectId: undefined,
-            parentId: parentId, 
-            id: isEditing ? this.parentCat.id : undefined,
-        });
-        
+    // Reset the flags and form inputs
+    this.showExistCat = true;
+    this.addSubCat = false;
+    this.editSubCat = false;
+    this.category.name = '';
+  }
 
-        this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
-            .pipe(finalize(() => {
-                this.getAppTransactionList(); 
-            }))
-            .subscribe(() => {
-           
-                if (!isEditing) {
-                    this.notify.info('Added Successfully');
-                } else {
-                    this.notify.info('Updated Successfully');
-                }
-            });
-    
-        // Reset the flags and form inputs
-        this.showExistCat = true;
-        this.addSubCat = false;
-        this.editSubCat = false;
-        this.category.name = '';
-    }
-    
-    // Function to generate a unique code for new categories or subcategories
-    generateUniqueCode(): string {
-        return 'CAT-' + Math.floor(Math.random() * 100000).toString();
-    }
+  // Function to generate a unique code for new categories or subcategories
+  generateUniqueCode(): string {
+    return 'CAT-' + Math.floor(Math.random() * 100000).toString();
+  }
 
-    generateUniqueCodeClass(): string {
-      
-        return 'CLS-' + Math.floor(Math.random() * 100000).toString();
-    }
-    
+  generateUniqueCodeClass(): string {
+
+    return 'CLS-' + Math.floor(Math.random() * 100000).toString();
+  }
 
 
-
-    // handleNodeSelect(event: any) {
-    //     // Custom logic to handle node selection
-    //     console.log('Node selected:', event.node);
-    //     const selectedNode = event.node;
-    
-    //     // Check if the node is already in the selectedClassification array
-    //     if (!this.selectedClassification.find(node => node.id === selectedNode.id)) {
-    //         // Add the newly selected node to the selectedClassification array
-    //         this.selectedClassification.push(selectedNode);
-    //     }
-    // }
-    
-    // handleNodeUnselect(event: any) {
-    //     const unselectedNode = event.node;
-    
-    //     // Remove the unselected node from the selectedClassification array
-    //     this.selectedClassification = this.selectedClassification.filter(node => node.id !== unselectedNode.id);
-    // }
-    
-    
-
-    deSelectClass(
-        classification: any,
-        i: number
-    ) {
+  deSelectClass(
+    classification: any,
+    i: number
+  ) {
 
 
-        if (classification?.data?.sycEntityObjectClassification?.id) {
-            classification.removed = true;
-        } else this.selectedClassification.splice(i, 1);
+    if (classification?.data?.sycEntityObjectClassification?.id) {
+      classification.removed = true;
+    } else this.selectedClassification.splice(i, 1);
 
-        this.tempDeselectedClassification.push(classification);
-        this.showSelectedClass= true
+    this.tempDeselectedClassification.push(classification);
+    this.showSelectedClass = true
+  }
+
+  getPath(item: any): any {
+    if (!item.parent) {
+      return item.label;
     }
 
-    getPath(item: any): any {
-        if (!item.parent) {
-            return item.label;
-        }
-    
-        // Recursively build the path including all ancestor nodes
-        const parentPath = this.getPath(item.parent);
-        return parentPath ? parentPath + "-" + item.label : item.label;
-    }
-// Handles when a node is selected
-onNodeSelect(event: any) {
-    // console.log(">>evvvvvvvvvvvvvvvvvvvv", event.node);
-
+    // Recursively build the path including all ancestor nodes
+    const parentPath = this.getPath(item.parent);
+    return parentPath ? parentPath + "-" + item.label : item.label;
+  }
+  // Handles when a node is selected
+  onNodeSelect(event: any) {
     this.processNodeSelection(event.node, true);
   }
-  
+
   // Handles when a node is unselected
   onNodeUnselect(event: any) {
     this.processNodeSelection(event.node, false);
   }
-  
+
   processNodeSelection(node: any, isSelected: boolean) {
     const classification = node?.data?.sycEntityObjectClassification;
-  
+
     if (!classification) {
-      console.warn('Invalid node data:', node);
       return;
     }
-  
+
     const newClassification = new AppEntityClassificationDto({
       id: 0,
       entityObjectClassificationId: classification.id || 0,
       entityObjectClassificationCode: classification.code || '',
       entityObjectClassificationName: classification.name || '',
     });
-  
+
     this.appTransactionsForViewDto.entityClassifications ||= [];
-  
+
     if (isSelected) {
       if (node.leaf) { // Check if it's a leaf node
         const leafClassification = new AppEntityClassificationDto({
@@ -1024,16 +623,16 @@ onNodeSelect(event: any) {
           entityObjectClassificationCode: classification.code,
           entityObjectClassificationName: this.getPath(node), // Use the provided path
         });
-  
+
         // Add the leaf classification if not already in selected classifications
         if (!this.selectedClassification.some(
-            classificate => classificate.entityObjectClassificationId === leafClassification.entityObjectClassificationId)) {
+          classificate => classificate.entityObjectClassificationId === leafClassification.entityObjectClassificationId)) {
           this.selectedClassification.push(leafClassification);
         }
       } else {
         // Add the classification if not already in selected classifications
         if (!this.appTransactionsForViewDto.entityClassifications.some(
-            classificate => classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId)) {
+          classificate => classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId)) {
           this.appTransactionsForViewDto.entityClassifications.push(newClassification);
           this.selectedClassification.push(newClassification);
         }
@@ -1047,16 +646,14 @@ onNodeSelect(event: any) {
         classificate => classificate.entityObjectClassificationId !== newClassification.entityObjectClassificationId
       );
     }
-  
+
     // Handle parent-child selection/deselection relationships
     this.ensureParentChildSelection(node, isSelected);
   }
-  
 
 
-getParentNode(node: TreeNode): TreeNode | null {
-    return node?.parent || null; // Return the parent if it exists, otherwise null
-}
+
+
   // Additional function to handle parent-child selection relationships
   ensureParentChildSelection(node: any, isSelected: boolean) {
     // Check if the node is a parent or has children
@@ -1077,383 +674,234 @@ getParentNode(node: TreeNode): TreeNode | null {
       });
     }
   }
-  
-  
-    // classificationNodeSelect(event: any) {
-    
-    //     const newNode = event[event.length - 1];
-    
-    //     if (newNode?.data?.sycEntityObjectClassification) {
-    //         const classification = newNode.data.sycEntityObjectClassification;
-    
-    //         const newClassification= new AppEntityClassificationDto();
-    //         newClassification.entityObjectClassificationId = classification.id || 0;
-    //         newClassification.entityObjectClassificationCode = classification.code || '';
-    //         newClassification.entityObjectClassificationName = classification.name || '';
-    //         newClassification.id = 0;
-    
-    //         if (!this.appTransactionsForViewDto?.entityClassifications) {
-    //             this.appTransactionsForViewDto.entityClassifications = [];
-    //         }
-    
-    //         this.selectedClassification = this.selectedClassification.filter(
-    //             (classificate) => !(classificate instanceof AppEntityClassificationDto && classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId)
-    //         );
-    
-    //         const classificationExists = this.appTransactionsForViewDto.entityClassifications.some(
-    //             (classificate) => classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId
-    //         );
-    
-    //         if (!classificationExists) {
-    //             this.appTransactionsForViewDto.entityClassifications.push(newClassification);
-    //             this.selectedClassification.push(newClassification);
-    //         }
-    
-    //         console.log(this.selectedClassification, 'Current selected classification');
-    //     } else {
-    //         console.warn('Invalid node data:', newNode);
-    //     }
-    // }
-    saveClassSelection() {
-        
-        this.selectedClassification = this.selectedClassification.filter(
-            item => item instanceof AppEntityClassificationDto
-        );
-        this.selectedClassificationsShow = this.selectedClassification.map(
-            (cat) => cat.entityObjectClassificationName
-        );
-        
-         
-        // this.selectedClassificationsShow = this.selectedClassification;
 
 
-        this.appTransactionsForViewDto.entityClassifications = this.selectedClassification.map(item => {
-            return new AppEntityClassificationDto({
-                entityObjectClassificationId: item.entityObjectClassificationId || 0,
-                entityObjectClassificationCode: item.entityObjectClassificationCode || '',
-                entityObjectClassificationName: item.entityObjectClassificationName || '',
-                id: 0 
-            });
-        });
+  saveClassSelection() {
+    this.selectedClassification = this.selectedClassification.filter(
+      item => item instanceof AppEntityClassificationDto
+    );
+    this.selectedClassificationsShow = this.selectedClassification.map(
+      (cat) => cat.entityObjectClassificationName
+    );
 
-        // this.showSelectedClass = true;
-     
-        this.showExistClass = false;
-        this.closeDropdown();
-        this.treeSelect.hide();
-        this.getAppTransactionClassList(); 
+    this.appTransactionsForViewDto.entityClassifications = this.selectedClassification.map(item => {
+      return new AppEntityClassificationDto({
+        entityObjectClassificationId: item.entityObjectClassificationId || 0,
+        entityObjectClassificationCode: item.entityObjectClassificationCode || '',
+        entityObjectClassificationName: item.entityObjectClassificationName || '',
+        id: 0
+      });
+    });
+
+
+    this.showExistClass = false;
+    this.closeDropdown();
+    this.treeSelect.hide();
+    this.getAppTransactionClassList();
+  }
+
+
+  cancelClassSelection() {
+
+    this.closeDropdown();
+    this.treeSelect.hide();
+
+    this.showExistClass = false
+
+    this.tempDeselectedClassification = []
+    if (this.appTransactionsForViewDto?.entityClassifications) {
+      this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
+      this.selectedClassificationsShow = [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
     }
-    
-    
-    
-    
-    
-    cancelClassSelection() {
-      
-        this.closeDropdown();
-        this.treeSelect.hide();
 
-        this.showExistClass = false
-     
-        this.tempDeselectedClassification =[]
-        if (this.appTransactionsForViewDto?.entityClassifications) {
-            this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-            this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
-        }
-
+  }
+  closeDropdown() {
+    if (this.treeSelect) {
+      this.treeSelect.hide(); // Close the dropdown (make sure this method exists in your TreeSelect version)
     }
-    closeDropdown() {
-        if (this.treeSelect) {
-          this.treeSelect.hide(); // Close the dropdown (make sure this method exists in your TreeSelect version)
-        }
-      }
-   
+  }
 
-
-
-
-saveClass(classification:any,type?:''){
+  saveClass(classification: any, type?: '') {
     const isEditing = this.editSubClass;
     if (!isEditing) {
-        this.getClassCodeValue(this.generateUniqueCodeClass()); 
+      this.getClassCodeValue(this.generateUniqueCodeClass());
     }
 
     const parentId = this.addSubClas ? this.parentClass?.parentId : undefined;
     let classificate = new CreateOrEditSycEntityObjectClassificationDto({
-        code:  this.classification.code,
-        name: classification.name,
-        objectId: undefined,
-        parentId:  parentId,
-        id:  isEditing ? this.parentClass.id : undefined,
+      code: this.classification.code,
+      name: classification.name,
+      objectId: undefined,
+      parentId: parentId,
+      id: isEditing ? this.parentClass.id : undefined,
     });
-  
+
     this._sycEntityObjectClassificationsServiceProxy.createOrEditForObjectTransaction(classificate)
-    .pipe(finalize(() => { 
+      .pipe(finalize(() => {
         this.getAppTransactionClassList()
 
-    }))
-    .subscribe(() => {
+      }))
+      .subscribe(() => {
         if (!isEditing) {
 
-            this.notify.info('Added Successfuly');
-                   } else {
-            this.notify.info('Updated Sucssefuly');
-           
-                   }
+          this.notify.info('Added Successfuly');
+        } else {
+          this.notify.info('Updated Sucssefuly');
 
-    });
+        }
+
+      });
     this.showClassBtn = false
     this.addSubClas = false
     this.editSubClass = false
     this.classification.name = '';
-   
-
-    
-}
 
 
 
+  }
 
 
-
-deleteCat(cat:any){
-   
-
+  deleteCategory(cat: any) {
     this._sycEntityObjectCategoriesServiceProxy.delete(cat.data.sycEntityObjectCategory.id)
-    .pipe(finalize(() => { 
-        // this.saving = false;
-    }))
-    .subscribe(() => {
+      .pipe(finalize(() => {
+      }))
+      .subscribe(() => {
         this.notify.info("Successfully deleted.");
-       this.getAppTransactionList()
+        this.getAppTransactionList()
 
 
-    });
-    // this.showCatBtn = false
-        // this.selectedCategories[0] = {...cat};
-    //    this.category.name = ''
-       
-    
-}
+      });
 
-deleteClass(classi:any){
-   
 
+  }
+
+  deleteClassification(classi: any) {
     this._sycEntityObjectClassificationsServiceProxy.delete(classi.data.sycEntityObjectClassification.id)
-    .pipe(finalize(() => { 
-        // this.saving = false;
-    }))
-    .subscribe(() => {
+      .pipe(finalize(() => {
+      }))
+      .subscribe(() => {
         this.notify.info("Successfully deleted.");
-       this.getAppTransactionClassList()
+        this.getAppTransactionClassList()
+      });
 
 
-    });
-    // this.showCatBtn = false
-        // this.selectedCategories[0] = {...cat};
-    //    this.category.name = ''
-      
-    
-}
-cancelCat(){
-     this.getAppTransactionList()
-       this.category.name = ''
-       this.addSubCat = false
-       this.editSubCat = false
-    //    this.tempDeselectedCategories =[]
 
-}
+  }
+  cancelCategory() {
+    this.getAppTransactionList()
+    this.category.name = ''
+    this.addSubCat = false
+    this.editSubCat = false
+  }
 
-cancelClass(){
+  cancelClassification() {
     this.getAppTransactionClassList()
-      this.classification.name = ''
-      this.addSubClas = false
-      this.editSubClass = false
-}
-    showEditMode() {
-        this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
-        this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications; 
-        this.createOrEditorderInfo = true;
-        this.showSaveBtn = true;
-        this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+    this.classification.name = ''
+    this.addSubClas = false
+    this.editSubClass = false
+  }
+  showEditMode() {
+    this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
+    this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications;
+    this.createOrEditorderInfo = true;
+    this.showSaveBtn = true;
+    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+  }
+
+  save() {
+    this.tempDeselectedCategories = [];
+    this.tempDeselectedClassification = [];
+    this.createOrEditorderInfo = false;
+    this.createOrEditTransaction();
+    this.getAppTransactionList()
+    this.getAppTransactionClassList()
+
+    if (this.appTransactionsForViewDto?.entityCategories) {
+      this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+      this.selectedCategoriesShow = [...this.selectedCategories];
     }
-
-    save() {
-        this.tempDeselectedCategories = [];
-        this.tempDeselectedClassification = [];
-
-        this.createOrEditorderInfo = false;
-        this.createOrEditTransaction();
-        this.getAppTransactionList()
-        this.getAppTransactionClassList()
-
-        if (this.appTransactionsForViewDto?.entityCategories) {
-            this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-            this.selectedCategoriesShow = [...this.selectedCategories];
-        }
-        if (this.appTransactionsForViewDto?.entityClassifications) {
-            this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-            this.selectedClassificationsShow= [...this.selectedClassification];
-        }
+    if (this.appTransactionsForViewDto?.entityClassifications) {
+      this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
+      this.selectedClassificationsShow = [...this.selectedClassification];
     }
-    cancel() {
-        this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
-        this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
-        this.createOrEditorderInfo = false;
-        this.showSaveBtn = false;
-        this.tempDeselectedCategories =[]
-        this.tempDeselectedClassification=[]
-        this.getAppTransactionList()
-        this.getAppTransactionClassList()
-        if (this.appTransactionsForViewDto?.entityClassifications) {
-            this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-            this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
-        }
-        if (this.appTransactionsForViewDto?.entityCategories) {
-            this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-            this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
-        }
+  }
+  cancel() {
+    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+    this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
+    this.createOrEditorderInfo = false;
+    this.showSaveBtn = false;
+    this.tempDeselectedCategories = []
+    this.tempDeselectedClassification = []
+    this.getAppTransactionList()
+    this.getAppTransactionClassList()
+    if (this.appTransactionsForViewDto?.entityClassifications) {
+      this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
+      this.selectedClassificationsShow = [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
     }
-    onUpdateAppTransactionsForViewDto($event) {
-        this.appTransactionsForViewDto = $event;
+    if (this.appTransactionsForViewDto?.entityCategories) {
+      this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+      this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
     }
+  }
+  onUpdateAppTransactionsForViewDto($event) {
+    this.appTransactionsForViewDto = $event;
+  }
 
 
-    // loadedChildrenRecords: TreeNodeOfGetSycEntityObjectTypeForViewDto[] = [];
-    // lastSelectedRecord: TreeNodeOfGetSycEntityObjectTypeForViewDto;
-    getAppTransactionList(searchQuery?: string) {
-       
-        // this.loading = true;
-        const subs = this._sycEntityObjectCategoriesServiceProxy
-            .getAllWithChildsForTransaction(
-                // searchQuery,
-                // undefined,
-                // undefined,
-                // undefined,
-                // undefined,
-                // undefined,
-                // undefined,
-                // undefined,
-                // false,
-                // undefined,
-                // undefined,
-                // this.sortBy,
-                // this.skipCount,
-                // this.maxResultCount
-            )
-            .pipe(finalize(() => (this.loading = false)))
-            .subscribe((result) => {
-                // this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
-          
 
-                // if (searchQuery !== undefined) this.allRecords = [];
-                // result.items.map((record) => {
-              
-                //     // const cachedItem : TreeNodeOfGetSycEntityObjectTypeForViewDto = this.loadedChildrenRecords.filter((selectedRecord:TreeNodeOfGetSycEntityObjectTypeForViewDto)=>{
-                //     //     const isCached : boolean = selectedRecord.data.sycEntityObjectType.id == record.data.sycEntityObjectType.id
-                //     //     return isCached
-                //     // })[0]
-                //     // const isCached : boolean = !!cachedItem
+  getAppTransactionList(searchQuery?: string) {
 
-                //     // if(isCached){
-                //     //     record.children = cachedItem.children
-                //     //     record.expanded = cachedItem.expanded
-                //     //     record.totalChildrenCount = cachedItem.totalChildrenCount;
-                //     //     (record as any).partialSelected = (cachedItem as any).partialSelected
-                //     // }
+    const subs = this._sycEntityObjectCategoriesServiceProxy
+      .getAllWithChildsForTransaction()
+      .subscribe((result) => {
 
-                //     // this.checkItemSelection(record);
-
-                //     return record;
-                // });
-                this.allRecords = [];
-  
-                
-                this.allRecords.push(...result.items);
-   
-                this.filteredRecords = this.allRecords.filter(record =>
-                    !this.selectedCategories.some(
-                        selected => selected.entityObjectCategoryId === record.data?.sycEntityObjectCategory?.id
-                    )
-                
-                  );
-                //   this.filteredRecords = [
-                //     {
-                //       key: 'customNode', // Unique key to identify the custom node
-                //       label: '', // Optional label if needed
-                //       data: null, // Optional data if needed
-                //     },
-                //     ...this.filteredRecords, // Your actual nodes go here
-                //   ];
-              
-                // }
-               
-                // this.lastSelectedRecord = this.selectedRecord;
-                // this.selectedRecord = undefined;
-                // this.displayedRecords = this.allRecords;
-                // this.totalCount = result.totalCount;
-                // this.showMoreListDataButton =
-                //     this.allRecords.length < this.totalCount;
-                // this.active = true;
-                // this.loading = false;
-            });
-        this.subscriptions.push(subs);
-    }
+        this.allRecords = [];
+        this.allRecords.push(...result.items);
+        this.filteredRecords = this.allRecords.filter(record =>
+          !this.selectedCategories.some(
+            selected => selected.entityObjectCategoryId === record.data?.sycEntityObjectCategory?.id
+          )
+        );
+      });
+    this.subscriptions.push(subs);
+  }
 
 
 
 
-    getAppTransactionClassList(searchQuery?: string) {
-       
-        // this.loading = true;
-        const subs = this._sycEntityObjectClassificationsServiceProxy
-            .getAllWithChildsForTransaction(
+  getAppTransactionClassList(searchQuery?: string) {
+    const subs = this._sycEntityObjectClassificationsServiceProxy
+      .getAllWithChildsForTransaction(
 
-            )
-            .pipe(finalize(() => (this.loading = false)))
-            .subscribe((result) => {
-           
-                this.allClassRecords = [];
-                this.allClassRecords.push(...result.items);
-             
-  
+    )
+      .subscribe((result) => {
 
-                this.allClassFilteredRecords = this.allClassRecords.filter(record =>
-                    !this.selectedClassification.some(
-                      (  selected => selected.entityObjectClassificationId === record.data?.sycEntityObjectClassification?.id)
-                    )
-                  );
-
-                //   this.allClassFilteredRecords = this.allClassRecords.filter(record => {
-           
-                //      !this.selectedClassification.some(selected => 
-                     
-                   
-                //         record.children?.some(child => 
-                //             selected.entityObjectClassificationId === child.data?.sycEntityObjectClassification?.id
-                //         )
-                //     );
-                // });
-
-            });
-        this.subscriptions.push(subs);
-    }
+        this.allClassRecords = [];
+        this.allClassRecords.push(...result.items);
+        this.allClassFilteredRecords = this.allClassRecords.filter(record =>
+          !this.selectedClassification.some(
+            (selected => selected.entityObjectClassificationId === record.data?.sycEntityObjectClassification?.id)
+          )
+        );
+      });
+    this.subscriptions.push(subs);
+  }
 
 
-    toggleAppCodes() {
-        this.showAppCodes = false;
-        setTimeout(() => {
-          this.showAppCodes = true; // Re-render app-codes after a delay
-        }, 0); // Delay to force Angular to re-create the component
-      }
+  toggleAppCodes() {
+    this.showAppCodes = false;
+    setTimeout(() => {
+      this.showAppCodes = true; // Re-render app-codes after a delay
+    }, 0); // Delay to force Angular to re-create the component
+  }
 
-      toggleAppCatCodes() {
-        this.showAppCatCodes = false;
-        setTimeout(() => {
-          this.showAppCatCodes = true; // Re-render app-codes after a delay
-        }, 0); // Delay to force Angular to re-create the component
-      }
+  toggleAppCatCodes() {
+    this.showAppCatCodes = false;
+    setTimeout(() => {
+      this.showAppCatCodes = true; // Re-render app-codes after a delay
+    }, 0); // Delay to force Angular to re-create the component
+  }
 
 
-      
+
 }
