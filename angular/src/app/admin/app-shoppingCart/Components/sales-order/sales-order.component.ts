@@ -163,10 +163,12 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     
         this.fullName =
             this.appSession.user.name + this.appSession.user.surname;
-        this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
-        this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
-        this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
-        this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
+            this.enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+
+
+            this.startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+            this.availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+            this.completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
         this.reference = this.appTransactionsForViewDto?.reference;
         
         // this.selectedCategories = this.appTransactionsForViewDto.entityCategories
@@ -183,10 +185,12 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         if (this.appTransactionsForViewDto) {
             this.createOrEditorderInfo=this.oldCreateOrEditorderInfo;
             this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-            this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
-            this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
-            this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
-            this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
+            this.enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+
+
+            this.startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+            this.availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+            this.completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
         this.reference = this.appTransactionsForViewDto?.reference;
 
             if (!this.selectedCurrency)
@@ -626,26 +630,17 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             this.availableDate=this.startDate;
         }
 
-        let enteredDate = this.enteredDate;
-        let startDate = this.startDate;
-        let availableDate = this.availableDate;
-        let completeDate = this.completeDate;
-            console.log(enteredDate,'enteredDate')
 
-        this.appTransactionsForViewDto.enteredDate =   moment(enteredDate);
-        this.appTransactionsForViewDto.startDate = moment(startDate);
-        this.appTransactionsForViewDto.availableDate = moment(availableDate);
-        this.appTransactionsForViewDto.completeDate = moment(completeDate);
-        //         let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-        // let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-        // let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-        // let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+                let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+        let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+        let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+        let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
     
     
-        // this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-        // this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-        // this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-        // this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
         console.log(this.appTransactionsForViewDto.enteredDate,'this.appTransactionsForViewDto.enteredDate')
 
     }
@@ -660,16 +655,14 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     createOrEditTransaction() {
         // this.showMainSpinner();
         // this.onChangeDate();
-        let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-        let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-        let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-        let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+        this.onChangeDate(); // ensure date fields are updated before save
+
+        // Prepare clean UTC moment dates
+        this.appTransactionsForViewDto.enteredDate = moment(this.enteredDate).utc();
+        this.appTransactionsForViewDto.startDate = moment(this.startDate).utc();
+        this.appTransactionsForViewDto.availableDate = moment(this.availableDate).utc();
+        this.appTransactionsForViewDto.completeDate = moment(this.completeDate).utc();
     
-    
-        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
 
          this.appTransactionsForViewDto.reference = this.reference;
          this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
