@@ -1,106 +1,128 @@
 .tab-cont {
     background-color: #fff;
     padding: 10px;
-    .header{
+
+    .header {
         border-radius: 10px 10px 0px 0px;
         border: 1px solid #E5E5E5;
-        
+
         background: #F8F8F8;
     }
-    .mainheadertxt{
+
+    .mainheadertxt {
         color: #1B101B;
         font-size: 28px;
-font-style: normal;
-font-weight: 700;
+        font-style: normal;
+        font-weight: 700;
     }
+
     label {
         color: #1B101B;
-font-size: 16px;
-font-style: normal;
-font-weight: 600;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
     }
+
     .custom-sec {
         border-radius: 10px 10px 0px 0px;
         border: 1px solid #E5E5E5;
     }
-    .shareSectionCont{
+
+    .shareSectionCont {
         background-color: #fff;
     }
-    .addContBtn{
+
+    .addContBtn {
         background-color: #4A0D4A;
         color: #fff;
     }
-    .selected-contact-list{
+
+    .selected-contact-list {
         flex-direction: row;
-        gap: 0.5rem!important;
+        gap: 0.5rem !important;
         height: 150px;
         max-height: 150px;
         overflow-y: auto;
         align-content: flex-start;
     }
 }
+
 .orderForm .header span {
     color: #1B101B;
 
-font-size: 20px;
-font-style: normal;
-font-weight: 700;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
 }
-.removeShare{
+
+.removeShare {
     color: #4a0d4a;
     cursor: pointer;
 }
+
 ::ng-deep {
     .p-autocomplete .p-autocomplete-multiple-container:not(.p-disabled).p-focus {
-        box-shadow:  none !important;
+        box-shadow: none !important;
         border: 1px solid #4A0D4A !important;
     }
 }
-.reloadContact{
+
+.reloadContact {
     color: #fff;
     cursor: pointer;
     background-color: #4A0D4A;
     border-radius: 50%;
-    font-size: 9px; 
+    font-size: 9px;
     padding: 4px;
     margin-left: 5px;
 }
-.removedContact{
+
+.removedContact {
     text-decoration: line-through;
 
 }
-h6{
+
+h6 {
     margin: 8px;
 }
-:host ::ng-deep div.p-chip.removedContact{
-    border:1px solid #4A0D4A;
+
+:host ::ng-deep div.p-chip.removedContact {
+    border: 1px solid #4A0D4A;
 
 }
-:host ::ng-deep div.p-chip{
-    background-color:#F3F6F9;
+
+:host ::ng-deep div.p-chip {
+    background-color: #F3F6F9;
 }
-.closeShareMode{
+
+.closeShareMode {
     margin-left: auto;
     color: #4a0d4a;
     font-size: 17px;
 }
-.btn-danger{
+
+.btn-danger {
     background-color: white !important;
     color: #F88011 !important;
     border: 1px solid #F88011 !important;
 }
-.btn-success,.btn-danger{
+
+.btn-success,
+.btn-danger {
     outline: none;
 }
-.btn-success,.btn-success:focus,.btn-success:active{
+
+.btn-success,
+.btn-success:focus,
+.btn-success:active {
     background-color: #4a0d4a;
     border: none;
 
 }
-.userImage
-{
-    width:25px;
-    height:25px;
-    margin-right:10px;
+
+.userImage {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
     border-radius: 50%;
 }

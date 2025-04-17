@@ -17,14 +17,17 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
-  @Output("showSalesRepEditMode") showSalesRepEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
+  @Input("canChange") canChange: boolean = true;
+
+  @Output("showSalesRepEditMode") showSalesRepEditMode: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
   salesRepIndex = 1;
   salesReps: any[];
-  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
-  @Input("canChange")  canChange:boolean=true;
-  @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
+
 
 
   constructor(
@@ -74,7 +77,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   createOrEditTransaction() {
     this.showMainSpinner();
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
         if (res) {
           this.onshowSaveBtn.emit(false);
@@ -83,7 +86,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   }
 
   isContactFormValid(value) {
-    if(this.activeTab==this.shoppingCartoccordionTabs.SalesRepInfo)
+    if (this.activeTab == this.shoppingCartoccordionTabs.SalesRepInfo)
       this.isContactsValid.emit(value)
   }
 

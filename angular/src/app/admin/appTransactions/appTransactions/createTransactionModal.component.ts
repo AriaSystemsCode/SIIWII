@@ -2,30 +2,23 @@ import {
     Injector,
     Component,
     OnInit,
-    ViewEncapsulation,
     OnChanges,
     Output,
     EventEmitter,
     Input,
     ViewChild,
 } from "@angular/core";
-import { MenuItem, SelectItem } from "primeng/api";
+import { SelectItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
     FormGroupName,
     Validators,
 } from "@angular/forms";
-import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { Dropdown } from "primeng/dropdown";
 import {
-    LinkedUserDto,
-    MessageServiceProxy,
-    ProfileServiceProxy,
-    UserLinkServiceProxy,
-    GetMaintainanceForViewDto,
-    MaintainancesServiceProxy,
+
     AppTransactionServiceProxy,
     ICreateOrEditAppTransactionsDto,
     TransactionType,
@@ -70,7 +63,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     @Output() modalClose: EventEmitter<any> = new EventEmitter<any>();
 
-    dt: string;
     orderForm: FormGroup;
     submitted: boolean = false;
     buyerCompanies: any[];
@@ -310,8 +302,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
         else
             this.orderForm.controls["buyerCompanyBranch"].setValidators([Validators.required]);
-
-
         this.orderForm.controls["buyerCompanyBranch"].updateValueAndValidity();
 
     }
@@ -349,7 +339,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     this.isCompantIdExist = false;
                     this.handleSellerNameSearch("");
                     // add seller values
-                    //  this.orderForm.get("sellerContactName").setValue(res.name);
                     this.selectedSellerContact = { name: `${this.appSession?.user?.name}  ${this.appSession?.user?.surname}` }
 
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
@@ -708,12 +697,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     let formValue = this.orderForm
                         .value as ICreateOrEditAppTransactionsDto;
                     this.body = {
-                        /*  sellerContactName:
-                         this.orderForm.controls['sellerContactName']?.value ? this.orderForm.controls['sellerContactName']?.value : this.orderForm.value?.sellerContactName?.name &&
-                                 this.orderForm.value?.sellerContactName?.name !==
-                                 null
-                                 ? this.orderForm.value?.sellerContactName?.name
-                                 :   null, */
+
                         sellerContactName: this.isSellerTempAccount
                             ? this.orderForm.value?.sellerContactName
                             : this.orderForm.value?.sellerContactName?.name &&
@@ -765,7 +749,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         sellerCompanySSIN: this.sellerCompanySSIN,
                         buyerCompanySSIN: this.buyerCompanySSIN,
                         buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch']?.value?.ssin,
-                        // buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
                         buyerBranchName: this.isBuyerTempAccount ? this.orderForm.controls['buyerBranchName']?.setValue('Main') : this.orderForm.controls['buyerCompanyBranch']?.value?.name,
                         sellerBranchSSIN: this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
@@ -773,16 +756,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         enteredDate: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
                         startDate: moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
                         availableDate: moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
-                        //     completeDate: moment(this.orderForm.controls['completeDate']?.value).toISOString().slice(0, 19),
-                        // enteredDate: moment(this.orderForm.controls['enteredDate']?.value).toISOString().slice(0, 19),
-                        // startDate: moment(this.orderForm.controls['startDate']?.value).toISOString().slice(0, 19),
-                        // availableDate: moment(this.orderForm.controls['availableDate']?.value).toISOString().slice(0, 19),
-
-
-
-
-
-
                         reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
                         priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "MSRP",
                         currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : this.appSession.tenant.currencyInfoDto.value
@@ -836,7 +809,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.minCompleteDate = this.orderForm.get('completeDate')?.value;
         this.minStartDate = this.orderForm.get('startDate')?.value;
         this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
-        //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
 
         const selectedStartDate = new Date(startDateControl.value);
         if (selectedStartDate < this.minSEnteredDate) {
@@ -847,19 +819,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             this.startDateMsg = false
             startDateControl.setErrors(null);
         }
-
-
-
-
-        //    const selectedavailableDate = new Date(availableDateControl.value);
-        //    if (selectedavailableDate < selectedCompliteDate) {
-        //      this.avalabletDateMsg = true
-        //      availableDateControl.setErrors({ minDate: true });
-        //    } else {
-
-        //     this.avalabletDateMsg = false
-        //     availableDateControl.setErrors(null); 
-        //    }
 
 
     }
@@ -1070,9 +1029,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         );
                     }
 
-
-                    ////////////////////////////
-
                     if (this.currencyCode) {
                         this._AppMarketplaceItemsServiceProxy
                             .checkCurrencyExchangeRate(this.currencyCode)
@@ -1114,7 +1070,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                             JSON.stringify(this.currencyCode)
                         );
                     }
-                    //////////////////////////
+
 
 
 

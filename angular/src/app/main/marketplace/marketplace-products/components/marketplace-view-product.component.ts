@@ -21,11 +21,11 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageService } from "abp-ng2-module";
-import { throws } from "assert";
 import * as moment from "moment";
 import { ConfirmEventType, ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
+
 
 @Component({
     selector: "app-marketplace-view-product",
@@ -34,32 +34,22 @@ import Swal from "sweetalert2";
     providers: [ConfirmationService, MessageService],
     animations: [
         trigger('routerTransition', [
-          transition(':enter', [
-            style({ opacity: 0 }),
-            animate('0.5s ease-in', style({ opacity: 1 })),
-          ]),
-          transition(':leave', [
-            animate('0.5s ease-out', style({ opacity: 0 })),
-          ]),
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('0.5s ease-in', style({ opacity: 1 })),
+            ]),
+            transition(':leave', [
+                animate('0.5s ease-out', style({ opacity: 0 })),
+            ]),
         ]),
-      ],
+    ],
 })
 export class MarketplaceViewProductComponent
     extends AppComponentBase
     implements OnInit, OnDestroy {
-    // productId: number;
-    // skipCount: number = 0;
-    // maxResultCount: number = 10;
-    // appItemViewInput: AppItemViewInput;
-    // _appItemViewInput: AppItemViewInput = {
-    //     header: this.l("MarcketplaceProductDetailView"),
-    //     marketPlace: true,
-    //     appItemForViewDto: new AppItemForViewDto(),
-    //     publish: false,
-    // };
     activeTabIndex: number = 0;
     filterText = ''
-    showIconClose : boolean = false
+    showIconClose: boolean = false
     productBodyData: any;
     productImages: AppEntityAttachmentDto[];
     productDetails: any;
@@ -75,116 +65,81 @@ export class MarketplaceViewProductComponent
     showEditSpecialPrice: boolean = true;
     updatedSpecialPrice: number = 0;
     filteredColors: any[] = [];
-    handleSCreenSelect :number = 0
-    chk_Order_by_prepack:boolean [] =[]
+    handleSCreenSelect: number = 0
+    chk_Order_by_prepack: boolean[] = []
     visible: boolean = false;
-    isFromSellerRoom:boolean
-    ismarketPLace:boolean
-    orderNo:any
-    body:any
-    buyerDataofPO:any
-    buyerbranchPO:any
-    sellerbranchPO:any
-    isBuyerInfoLoaded :boolean = false
-    alreadyOrderd:boolean = false
+    isFromSellerRoom: boolean
+    ismarketPLace: boolean
+    orderNo: any
+    body: any
+    buyerDataofPO: any
+    buyerbranchPO: any
+    sellerbranchPO: any
+    alreadyOrderd: boolean = false
     productData: any;
-     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
-     reportUrl="";
+    printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
+    reportUrl = "";
+    totalOrderQTY: number = 0;
+    totlaOrderPrices: number = 0;
+    isColorView: boolean = false
+
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private confirmationService: ConfirmationService,
-        private messageService: MessageService,
         private userClickService: UserClickService,
         private router: Router,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
-        private appItemsAppservice :AppItemsServiceProxy,
+        private appItemsAppservice: AppItemsServiceProxy,
         injector: Injector
     ) {
         super(injector);
-        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
-        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace") );
+        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom"));
+        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
-    
+
     }
     ngOnInit(): void {
 
         const screenWidth = window.innerWidth;
         if (screenWidth >= 992) { // lg screen
-          this.handleSCreenSelect = 5
+            this.handleSCreenSelect = 5
         } else if (screenWidth >= 768) { // md screen
             this.handleSCreenSelect = 3
 
-        } 
-        
-        // this.productId = this._activatedRoute.snapshot.params["id"];
-        // this.showMainSpinner();
-        // const subs = this._appItemsServiceProxy
-        //     .getAppItemForView(
-        //         undefined,
-        //         0,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         this.productId,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         this.skipCount,
-        //         this.maxResultCount
-        //     )
-        //     .pipe(
-        //         finalize(() => {
-        //             this.hideMainSpinner();
-        //         })
-        //     )
-        //     .subscribe((result) => {
-        //         this._appItemViewInput.appItemForViewDto = result.appItem;
-        //         this.appItemViewInput = this._appItemViewInput;
-        //     });
-        // this.subscriptions.push(subs);
+        }
+
         this.filteredColors = this.colorsData;
-      
-  this.IsVariationOrdered()
+
+        this.IsVariationOrdered()
     }
- onFilterTextChanged() {
-    this.showIconClose = this.filterText.trim() !== '';
-  
+    onFilterTextChanged() {
+        this.showIconClose = this.filterText.trim() !== '';
 
-    if (!this.filterText) {
-        this.filteredColors = this.colorsData;
-    } else {
-        const filterTextLower = this.filterText?.toLowerCase();
 
-        this.filteredColors = this.colorsData.filter(color =>
-            (color?.colorName && color?.colorName?.toLowerCase()?.includes(filterTextLower)) ||
-            (color?.colorCodeSelectedValues && color?.colorCodeSelectedValues?.toLowerCase()?.includes(filterTextLower))
-        );
+        if (!this.filterText) {
+            this.filteredColors = this.colorsData;
+        } else {
+            const filterTextLower = this.filterText?.toLowerCase();
+
+            this.filteredColors = this.colorsData.filter(color =>
+                (color?.colorName && color?.colorName?.toLowerCase()?.includes(filterTextLower)) ||
+                (color?.colorCodeSelectedValues && color?.colorCodeSelectedValues?.toLowerCase()?.includes(filterTextLower))
+            );
+        }
+
+
     }
 
- 
-}
-
-      clearFilterText(inputElement: HTMLInputElement) {
+    clearFilterText(inputElement: HTMLInputElement) {
         this.filterText = '';
         this.filteredColors = this.colorsData;
 
         this.showIconClose = false;
         inputElement.focus();
-      }
+    }
     getProductDetailsForView() {
         this.showMainSpinner();
         this.showEditSpecialPrice = true;
@@ -227,16 +182,16 @@ export class MarketplaceViewProductComponent
                         undefined,
                         0,
                         10
-                    )  
-                                      .pipe(
-                                        finalize(() => {
-                                            this.hideMainSpinner();
-                                        })
-                                    )
+                    )
+                    .pipe(
+                        finalize(() => {
+                            this.hideMainSpinner();
+                        })
+                    )
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res?.appItem;
-                        this.productData = res;                    
-                        this.productDetails.maxSpecialPrice =  this.productDetails?.maxSpecialPrice ?  this.productDetails?.maxSpecialPrice : 0;
+                        this.productData = res;
+                        this.productDetails.maxSpecialPrice = this.productDetails?.maxSpecialPrice ? this.productDetails?.maxSpecialPrice : 0;
                         this.updatedSpecialPrice = this.productDetails?.maxSpecialPrice;
                         this.productDetails?.minMSRP % 1 == 0 ? this.productDetails.minMSRP = Math.round(this.productDetails?.minMSRP * 100 / 100).toFixed(2) : null;
                         this.productDetails?.maxMSRP % 1 == 0 ? this.productDetails.maxMSRP = Math.round(this.productDetails?.maxMSRP * 100 / 100).toFixed(2) : null;
@@ -264,15 +219,15 @@ export class MarketplaceViewProductComponent
                                 sizes: sizesValue[0],
                                 colorImg: variation?.colorImage,
                                 colorCode: variation?.colorHexaCode,
-                                colorCodeSelectedValues:variation?.code
+                                colorCodeSelectedValues: variation?.code
                             };
                         });
                         this.filteredColors = this.colorsData
-                        this.chk_Order_by_prepack=[];
+                        this.chk_Order_by_prepack = [];
                         this.chk_Order_by_prepack = new Array(this.colorsData?.length).fill(true);
                     });
 
-                  
+
 
                 this.GetCurrencyInfo();
             }
@@ -286,7 +241,6 @@ export class MarketplaceViewProductComponent
             });
     }
 
-    isColorView: boolean = false
     setSizes(index: number) {
         this.currentIndex = index;
         this.isColorView = false
@@ -329,7 +283,7 @@ export class MarketplaceViewProductComponent
             }
         });
         if (!foundColor) {
-          
+
 
             this.orderSummary.push(orederedMappedData);
         }
@@ -343,7 +297,7 @@ export class MarketplaceViewProductComponent
                         ) {
                             value?.edRestAttributes?.forEach((attr) => {
                                 if (attr?.extraAttrName === "SIZE") {
-  
+
 
                                     attr?.values?.forEach((sizeValue) => {
                                         sizeValue.orderedPrePacks =
@@ -358,18 +312,17 @@ export class MarketplaceViewProductComponent
                 }
             });
         }
-    
+
         this.calculateTotalOrderPriceAndQty(this.orderSummary);
     }
 
     // total of all order qty and price in order by size and prepack
-    totalOrderQTY: number = 0;
-    totlaOrderPrices: number = 0;
+
     calculateTotalOrderPriceAndQty(orders: any) {
         let qty = 0;
         let price = 0;
         orders?.map((order: any) => {
-            order?.color?.sizes?.map((size,index) => {
+            order?.color?.sizes?.map((size, index) => {
                 if (this.productDetails.orderByPrePack) {
 
                     let multiby =
@@ -395,7 +348,6 @@ export class MarketplaceViewProductComponent
         this.currentIndex =
             this.orderSummary?.length === 0 ? 0 : color?.colorIndex;
         if (!this.productDetails?.orderByPrePack) {
-            // this.totalOrderQTY  = this.totalOrderQTY - this.cal
             let qty = 0;
             let price = 0;
             this.orderSummary[i]?.color?.sizes?.map((size) => {
@@ -411,7 +363,7 @@ export class MarketplaceViewProductComponent
         } else {
             let qty = 0;
             let price = 0;
-            this.orderSummary[i]?.color?.sizes.map((size,index) => {
+            this.orderSummary[i]?.color?.sizes.map((size, index) => {
                 let multiby =
                     size.sizeRatio *
                     this.orderSummary[i]?.color?.sizes[index]?.orderedPrePacks;
@@ -428,40 +380,40 @@ export class MarketplaceViewProductComponent
 
     removeSize(sizeIndex: number, size, color, orderIndex: number) {
         this.currentIndex = color.colorIndex;
-        let amount=0;
+        let amount = 0;
 
         if (this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) {
-        this.totalOrderQTY =
-            this.totalOrderQTY -
-            this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedQty;
-         amount =
-            this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedQty *
-            this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.price;
-        }
-        else{
             this.totalOrderQTY =
-            this.totalOrderQTY -
-            (this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.sizeRatio * this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedPrePacks);
+                this.totalOrderQTY -
+                this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedQty;
+            amount =
+                this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedQty *
+                this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.price;
+        }
+        else {
+            this.totalOrderQTY =
+                this.totalOrderQTY -
+                (this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.sizeRatio * this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedPrePacks);
 
-         amount =
-           this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.sizeRatio * this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedPrePacks *
-            this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.price;
+            amount =
+                this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.sizeRatio * this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.orderedPrePacks *
+                this.orderSummary[orderIndex]?.color?.sizes[sizeIndex]?.price;
         }
 
         this.totlaOrderPrices = this.totlaOrderPrices - amount;
         this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty = 0;
-        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks=0;
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks = 0;
 
         if (sizeIndex == 0 && this.orderSummary[orderIndex]?.color.sizes?.length > 0) {
             const sizes = this.colorsData[this.currentIndex]?.sizes;
-            const preorderIndex = (this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) ? sizes.findIndex(size => size.orderedQty) : sizes.findIndex(size => size.orderedPrePacks)  ;
-        
+            const preorderIndex = (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) ? sizes.findIndex(size => size.orderedQty) : sizes.findIndex(size => size.orderedPrePacks);
+
             if (preorderIndex > 0) {
                 const [preorderItem] = sizes.splice(preorderIndex, 1);
-                    sizes.unshift(preorderItem);
+                sizes.unshift(preorderItem);
             }
+        }
     }
-}
 
     // total ordered QTY in order by size
     calculateOrderedQTYSum(sizes): number {
@@ -488,9 +440,7 @@ export class MarketplaceViewProductComponent
         this.colorsData[this.currentIndex]?.sizes.forEach((item) => {
             sum = sum + item?.sizeRatio;
         });
-        //console.log('first pack ' , sum)
-        //sum=Math.round(sum * 100 / 100).toFixed(2);
-        //console.log('second pack ' , sum)
+
 
         return sum;
     }
@@ -498,7 +448,7 @@ export class MarketplaceViewProductComponent
     // totla ordered prepack QTY
     calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number) {
         let sum = 0;
-        prepackSizes.forEach((item,index) => {
+        prepackSizes.forEach((item, index) => {
             let multiby;
             if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item.orderedPrePacks;
@@ -516,7 +466,7 @@ export class MarketplaceViewProductComponent
     // totla amount for each size in order by prepack
     getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number) {
         let sum = 0;
-        prepackSizes.forEach((item,index) => {
+        prepackSizes.forEach((item, index) => {
             let multiby;
             if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item?.orderedPrePacks;
@@ -531,20 +481,20 @@ export class MarketplaceViewProductComponent
         });
         return sum;
     }
-    goToSummary(){
-        this.activeTabIndex = 1; 
+    goToSummary() {
+        this.activeTabIndex = 1;
         setTimeout(() => {
             const targetElement = document.getElementById("targetDiv2");
-        if (targetElement) {
-            targetElement.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
-        }
-          }, 100); // Adjust the delay as needed based on your tab switch animation
-       
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }
+        }, 100); // Adjust the delay as needed based on your tab switch animation
+
     }
-   
+
     scrollToTargetDiv() {
         const targetElement = document.getElementById("targetDiv");
         if (targetElement) {
@@ -553,180 +503,56 @@ export class MarketplaceViewProductComponent
                 block: "start",
             });
         }
-        
-    }
-    getBuyerInfoForPO(){
-        this._AppTransactionServiceProxy
-        .getCurrentTenantAccountProfileInformation()
-        .pipe(finalize(() => {
-            this.getBuyerBranche();
-            this.getsellerBranche()
-        }))
-        .subscribe((res: any) => {
-            console.log(res, 'reeeeees  bbbbbb mmmm');
-            this.buyerDataofPO = {
-                buyerCompanySSIN: res?.accountSSIN,
-                buyerContactPhoneNumber: res?.phone,
-                buyerContactEMailAddress: res?.email
-            };
-            // this.isBuyerInfoLoaded = true;  // Set flag to true after data is loaded
-        });
-    }
-    
-    // getOderNumber() {
-       
-    //     this._appTransactionServiceProxy
-    //         .getNextOrderNumber("PO")
-    //         .pipe(finalize(() => {
-            
-    //         }))
-    //         .subscribe((res: any) => {
-    //             this.orderNo = res;
-              
-    //         });
-    // }
-  
 
-    getBuyerBranche(){
+    }
+    getBuyerInfoForPO() {
+        this._AppTransactionServiceProxy
+            .getCurrentTenantAccountProfileInformation()
+            .pipe(finalize(() => {
+                this.getBuyerBranche();
+                this.getsellerBranche()
+            }))
+            .subscribe((res: any) => {
+                this.buyerDataofPO = {
+                    buyerCompanySSIN: res?.accountSSIN,
+                    buyerContactPhoneNumber: res?.phone,
+                    buyerContactEMailAddress: res?.email
+                };
+            });
+    }
+
+
+
+
+    getBuyerBranche() {
         this._AppTransactionServiceProxy.getAccountBranches(this.buyerDataofPO.buyerCompanySSIN).subscribe(result => {
-        
+
             this.buyerbranchPO = {
                 buyerBranchSSIN: result[0]?.ssin,
-            
+
             };
-        }); 
+        });
     }
 
-    getsellerBranche(){
+    getsellerBranche() {
         this._AppTransactionServiceProxy.getAccountBranches(this.productData.sellerSSIN).subscribe(result => {
-        
+
             this.sellerbranchPO = {
                 sellerBranchSSIN: result[0]?.ssin,
-            
+
             };
-        }); 
+        });
     }
 
     addToShoppingCart() {
-        console.log(this.isFromSellerRoom,'isFromSellerRoom')
-        console.log(this.ismarketPLace,'ismarketPLace')
-        // this.confirmationService.confirm({
-        //     message:
-        //         "Are you sure Want to add ordered qunatities to you cart ?",
-        //     icon: "pi pi-exclamation-triangle",
-        //     accept: () => {
-        //         let bodyRequest: any = {
-        //             appItem: this.productDetails,
-        //         };
-        //         this.showMainSpinner();
-        //         this._AppTransactionServiceProxy
-        //             .addTransactionDetails(
-        //                 localStorage.getItem("transNO"),
-        //                 bodyRequest
-        //             )
-        //             .pipe(
-        //                 finalize(() => {
-        //                     this.hideMainSpinner();
-        //                 })
-        //             )
-        //             .subscribe((res) => {
-        //                 console.log(">>", res);
-        //             });
-        //     },
-        //     reject: (type: ConfirmEventType) => { },
-        // });
 
-if(this.isFromSellerRoom) {
+        if (this.isFromSellerRoom) {
 
 
 
-        Swal.fire({
-            title: "",
-            text: "Are you sure you want to add ordered quantities to you cart ?",
-            icon: "info",
-            showCancelButton: true,
-            confirmButtonText:
-                "Yes",
-            cancelButtonText: "No",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            backdrop: true,
-            customClass: {
-                popup: "popup-class",
-                icon: "icon-class",
-                content: "content-class",
-                actions: "actions-class",
-                confirmButton: "confirm-button-class2",
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-
-
-                /////
-                for (let index = 0; index < this.colorsData?.length; index++) {
-                if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
-                    this.productDetails.variations.map((variation: any) => {
-                        if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
-                           let value= variation?.selectedValues[index];
-                                value.edRestAttributes.forEach((attr) => {
-                                    if (attr.extraAttrName === "SIZE") {
-                                        attr.values.forEach((sizeValue) => {
-                                            sizeValue.orderedQty = sizeValue.orderedPrePacks;
-                                            sizeValue.orderedPrePacks = 0;
-                                        });
-                                    }
-                                });
-                        }
-                    });
-                }
-            }
-                /////
-
-                let bodyRequest: any = {
-                    appItem: this.productDetails,
-                };
-                this.showMainSpinner();
-                this._AppTransactionServiceProxy
-                    .addTransactionDetails(
-                        localStorage.getItem("transNO"), this.orderType,
-                        bodyRequest
-                    )
-                    .pipe(
-                        finalize(() => {
-                            this.hideMainSpinner();
-                            localStorage.setItem(
-                                "SellerSSIN",
-                                JSON.stringify(this.productBodyData.sellerSSIN)
-                            );
-                            localStorage.setItem(
-                                "currencyCode",
-                                JSON.stringify(this.productBodyData.currencyCode)
-                            );
-
-                            this.router.navigateByUrl("app/main/marketplace/products");
-                        })
-                    )
-                    .subscribe(async (res) => {
-                        console.log(">>", res);
-
-                        this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-
-                    });
-            }
-        }
-        )
-    }else if(this.ismarketPLace){
-         
-        this.getBuyerInfoForPO()
-
-
-
-        this._appTransactionServiceProxy
-        .getNextOrderNumber("PO")
-        .pipe(finalize(() => {
             Swal.fire({
                 title: "",
-                text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                text: "Are you sure you want to add ordered quantities to you cart ?",
                 icon: "info",
                 showCancelButton: true,
                 confirmButtonText:
@@ -744,69 +570,14 @@ if(this.isFromSellerRoom) {
                 },
             }).then((result) => {
                 if (result.isConfirmed) {
-    
-    
-    
-                    this.showMainSpinner()
-    
-    
-                        console.log(this.buyerDataofPO,'buyerDataofPO')
-    
-                        this.body = {
-                                     
-                                         sellerContactName:null,
-                                                                             
-                                         buyerContactName: this.appSession.user.name,
-                                         sellerContactId:null,
-                                         buyerContactId:this.appSession.user.id,
-                                         sellerContactEmailAddress:null,
-                                         buyerContactEmailAddress:this.appSession.user.emailAddress,
-                                         // buyerContactEmailAddress:  this.buyerDataofPO.buyerContactEMailAddress,
-                                         buyerContactPhoneNumber: '',
-                                         sellerContactPhoneNumber:null,
-                                         buyerCompanyName: this.appSession.tenancyName,
-                                         sellerCompanyName:  this.productData.sellerCompanyName, 
-                                         enteredByUserRole: "I'm a Buyer",
-                                         code: this.orderNo,
-                                         transactionType:  1,
-                                         sellerContactSSIN: null,
-                                         buyerContactSSIN: this.appSession.user.accountId,
-                                         sellerCompanySSIN:  this.productData.sellerSSIN, 
-                                         buyerCompanySSIN:   this.buyerDataofPO.buyerCompanySSIN ,
-                                         buyerBranchSSIN: null,
-                                         buyerBranchName: '*Main*' ,
-                                         sellerBranchSSIN:  null,
-                                         sellerBranchName: '*Main*',
-                                             completeDate: moment(new Date).format('YYYY-MM-DD'),
-                                             enteredDate: moment(new Date).format('YYYY-MM-DD'),
-                                             startDate: moment(new Date).format('YYYY-MM-DD'),
-                                             availableDate: moment(new Date).format('YYYY-MM-DD'),
-                                         reference:  "",
-                                         priceLevel: "MSRP",
-                                         currencyId: this.appSession.tenant.currencyInfoDto.value
-                                     }; 
-                 
-                 
-                 
-                 
-                 
-                 
-                 console.log(this.body,'kkkk booooodddddy')
-    
-    
-    
-    
-                    this._AppTransactionServiceProxy
-                                 .createOrEdit(this.body)
-                                 .pipe(finalize(() =>  {
-                                   
-    
-          //     /////
+
+
+                    /////
                     for (let index = 0; index < this.colorsData?.length; index++) {
-                    if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
-                        this.productDetails.variations.map((variation: any) => {
-                            if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
-                               let value= variation?.selectedValues[index];
+                        if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
+                            this.productDetails.variations.map((variation: any) => {
+                                if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                                    let value = variation?.selectedValues[index];
                                     value.edRestAttributes.forEach((attr) => {
                                         if (attr.extraAttrName === "SIZE") {
                                             attr.values.forEach((sizeValue) => {
@@ -815,19 +586,19 @@ if(this.isFromSellerRoom) {
                                             });
                                         }
                                     });
-                            }
-                        });
+                                }
+                            });
+                        }
                     }
-                }
                     /////
-    
+
                     let bodyRequest: any = {
                         appItem: this.productDetails,
                     };
                     this.showMainSpinner();
                     this._AppTransactionServiceProxy
                         .addTransactionDetails(
-                            localStorage.getItem("transNO"), 'PO',
+                            localStorage.getItem("transNO"), this.orderType,
                             bodyRequest
                         )
                         .pipe(
@@ -841,100 +612,215 @@ if(this.isFromSellerRoom) {
                                     "currencyCode",
                                     JSON.stringify(this.productBodyData.currencyCode)
                                 );
-    
-                              this.goToShowroom()
+
+                                this.router.navigateByUrl("app/main/marketplace/products");
                             })
                         )
                         .subscribe(async (res) => {
-                            console.log(">>", res);
-    
+
                             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-    
+
                         });
-    
-    
-                                 } ))
-                                 .subscribe((response: any) => {
-                                   
-                                         this._AppTransactionServiceProxy
-                                             .setCurrentUserActiveTransaction(
-                                                 response
-                                             )
-                                             .subscribe((res) => {
-                                        
-                                                 this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-                                              
-                                          
-                                             });
-                                     
-                             
-                 
-                                     //////
-                                     this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
-                                     this.printInfoParam.TransactionId=response;
-                                 //  this.printInfoParam.orderType=this.formType.toUpperCase();
-                                     this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.body.enteredByUserRole);
-                                     this.printInfoParam.saveToPDF=true;
-                                     this.printInfoParam.tenantId = this.appSession?.tenantId
-                                     this.printInfoParam.userId = this.appSession?.userId
-                                     this.reportUrl = this.printInfoParam.getReportUrl()
-                                
-                                     localStorage.setItem("fromSellerRoom",JSON.stringify(true));
-                                     localStorage.setItem("fromMarketPlace",JSON.stringify(false));
+                }
+            }
+            )
+        } else if (this.ismarketPLace) {
+
+            this.getBuyerInfoForPO()
+
+
+
+            this._appTransactionServiceProxy
+                .getNextOrderNumber("PO")
+                .pipe(finalize(() => {
+                    Swal.fire({
+                        title: "",
+                        text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                        icon: "info",
+                        showCancelButton: true,
+                        confirmButtonText:
+                            "Yes",
+                        cancelButtonText: "No",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        backdrop: true,
+                        customClass: {
+                            popup: "popup-class",
+                            icon: "icon-class",
+                            content: "content-class",
+                            actions: "actions-class",
+                            confirmButton: "confirm-button-class2",
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+
+
+                            this.showMainSpinner()
+
+
+
+                            this.body = {
+
+                                sellerContactName: null,
+
+                                buyerContactName: this.appSession.user.name,
+                                sellerContactId: null,
+                                buyerContactId: this.appSession.user.id,
+                                sellerContactEmailAddress: null,
+                                buyerContactEmailAddress: this.appSession.user.emailAddress,
+                                buyerContactPhoneNumber: '',
+                                sellerContactPhoneNumber: null,
+                                buyerCompanyName: this.appSession.tenancyName,
+                                sellerCompanyName: this.productData.sellerCompanyName,
+                                enteredByUserRole: "I'm a Buyer",
+                                code: this.orderNo,
+                                transactionType: 1,
+                                sellerContactSSIN: null,
+                                buyerContactSSIN: this.appSession.user.accountId,
+                                sellerCompanySSIN: this.productData.sellerSSIN,
+                                buyerCompanySSIN: this.buyerDataofPO.buyerCompanySSIN,
+                                buyerBranchSSIN: null,
+                                buyerBranchName: '*Main*',
+                                sellerBranchSSIN: null,
+                                sellerBranchName: '*Main*',
+                                completeDate: moment(new Date).format('YYYY-MM-DD'),
+                                enteredDate: moment(new Date).format('YYYY-MM-DD'),
+                                startDate: moment(new Date).format('YYYY-MM-DD'),
+                                availableDate: moment(new Date).format('YYYY-MM-DD'),
+                                reference: "",
+                                priceLevel: "MSRP",
+                                currencyId: this.appSession.tenant.currencyInfoDto.value
+                            };
+
+
+
+
+
+
+
+
+
+                            this._AppTransactionServiceProxy
+                                .createOrEdit(this.body)
+                                .pipe(finalize(() => {
+
+
+                                    //     /////
+                                    for (let index = 0; index < this.colorsData?.length; index++) {
+                                        if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
+                                            this.productDetails.variations.map((variation: any) => {
+                                                if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                                                    let value = variation?.selectedValues[index];
+                                                    value.edRestAttributes.forEach((attr) => {
+                                                        if (attr.extraAttrName === "SIZE") {
+                                                            attr.values.forEach((sizeValue) => {
+                                                                sizeValue.orderedQty = sizeValue.orderedPrePacks;
+                                                                sizeValue.orderedPrePacks = 0;
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                    /////
+
+                                    let bodyRequest: any = {
+                                        appItem: this.productDetails,
+                                    };
+                                    this.showMainSpinner();
+                                    this._AppTransactionServiceProxy
+                                        .addTransactionDetails(
+                                            localStorage.getItem("transNO"), 'PO',
+                                            bodyRequest
+                                        )
+                                        .pipe(
+                                            finalize(() => {
+                                                this.hideMainSpinner();
+                                                localStorage.setItem(
+                                                    "SellerSSIN",
+                                                    JSON.stringify(this.productBodyData.sellerSSIN)
+                                                );
+                                                localStorage.setItem(
+                                                    "currencyCode",
+                                                    JSON.stringify(this.productBodyData.currencyCode)
+                                                );
+
+                                                this.goToShowroom()
+                                            })
+                                        )
+                                        .subscribe(async (res) => {
+
+                                            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+
+                                        });
+
+
+                                }))
+                                .subscribe((response: any) => {
+
+                                    this._AppTransactionServiceProxy
+                                        .setCurrentUserActiveTransaction(
+                                            response
+                                        )
+                                        .subscribe((res) => {
+
+                                            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+
+
+                                        });
+
+
+
+                                    //////
+                                    this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+                                    this.printInfoParam.TransactionId = response;
+                                    //  this.printInfoParam.orderType=this.formType.toUpperCase();
+                                    this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.body.enteredByUserRole);
+                                    this.printInfoParam.saveToPDF = true;
+                                    this.printInfoParam.tenantId = this.appSession?.tenantId
+                                    this.printInfoParam.userId = this.appSession?.userId
+                                    this.reportUrl = this.printInfoParam.getReportUrl()
+
+                                    localStorage.setItem("fromSellerRoom", JSON.stringify(true));
+                                    localStorage.setItem("fromMarketPlace", JSON.stringify(false));
                                     //  localStorage.setItem(
                                     //      "SellerId",
                                     //      JSON.stringify(this.sellerCompanyId)
                                     //  );
-                                    
-                                     localStorage.setItem("transNO", this.orderNo);
-                                    //  localStorage.setItem(
-                                    //      "contactSSIN",
-                                    //      JSON.stringify(this.buyerContactSSIN)
-                                    //  );
-                 
-                                    //  localStorage.setItem(
-                                    //      "SellerSSIN",
-                                    //      JSON.stringify(this.body.sellerCompanySSIN)
-                                    //  );
-                 
-                              
-                                        //  localStorage.setItem(
-                                        //      "BuyerSSIN",
-                                        //      JSON.stringify(this.buyerCompanySSIN)
-                                        //  );
-                 
-                                         
-                                       
-                                             
-                                         localStorage.setItem(
-                                             "currencyCode",
-                                             JSON.stringify(this.appSession.tenant.currencyInfoDto)
-                                         );
-                                     
-                 
-                                 
-                              
-                                              
-                                 });
-                     }
-    
-    
-    
-    
-    
-          
-                }
-            
-            )
-        
-        }))
-        .subscribe((res: any) => {
-            this.orderNo = res;
-          
-        });
-      
 
-    }
+                                    localStorage.setItem("transNO", this.orderNo);
+
+                                    localStorage.setItem(
+                                        "currencyCode",
+                                        JSON.stringify(this.appSession.tenant.currencyInfoDto)
+                                    );
+
+
+
+
+
+                                });
+                        }
+
+
+
+
+
+
+                    }
+
+                    )
+
+                }))
+                .subscribe((res: any) => {
+                    this.orderNo = res;
+
+                });
+
+
+        }
     }
 
     goToShowroom() {
@@ -947,9 +833,9 @@ if(this.isFromSellerRoom) {
             "currencyCode",
             JSON.stringify(this.productBodyData.currencyCode)
         );
-        localStorage.setItem("fromSellerRoom",JSON.stringify(true));
-      
-        localStorage.setItem("fromMarketPlace",JSON.stringify(false));
+        localStorage.setItem("fromSellerRoom", JSON.stringify(true));
+
+        localStorage.setItem("fromMarketPlace", JSON.stringify(false));
         this.router.navigateByUrl("app/main/marketplace/products");
     }
 
@@ -957,9 +843,9 @@ if(this.isFromSellerRoom) {
 
         this.router.navigateByUrl("app/main/marketplace/products");
     }
-    
+
     onEditpecialPrice(updatedSpecialPrice) {
-        
+
         this.productDetails.variations.map((variation: any) => {
             if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
                 variation.selectedValues.forEach((value) => {
@@ -977,38 +863,35 @@ if(this.isFromSellerRoom) {
             this.calculateTotalOrderPriceAndQty(this.orderSummary);
         });
 
-       // this.productDetails.minSpecialPrice = updatedSpecialPrice;
+        // this.productDetails.minSpecialPrice = updatedSpecialPrice;
         this.productDetails.maxSpecialPrice = updatedSpecialPrice;
         this.showEditSpecialPrice = true
     }
     onChangechk_Order_by_prepack() {
         if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
             this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
-                item.orderedPrePacks=0;
+                item.orderedPrePacks = 0;
             });
         }
-            else{
+        else {
             this.colorsData[this.currentIndex]?.sizes?.forEach((item) => {
-                item.orderedPrePacks*=item?.sizeRatio;
+                item.orderedPrePacks *= item?.sizeRatio;
             });
         }
     }
-    
 
-    IsVariationOrdered (){ 
-      
-        
+
+    IsVariationOrdered() {
+
+
         this.appItemsAppservice.isVariationOrdered(this.productDetails?.code).pipe(
-                        finalize(() => {
-                            // this.hideMainSpinner();
-                            // this.alreadyOrderd = true
-                        })
-                    )
-                    .subscribe( (res) => {
-                        console.log("is orderd", res);
+            finalize(() => {
 
+            })
+        )
+            .subscribe((res) => {
 
-                    });
+            });
 
     }
 
@@ -1017,7 +900,6 @@ if(this.isFromSellerRoom) {
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
-        // document.body.style.overflow = 'auto';
 
     }
 

@@ -12,30 +12,29 @@ import * as moment from 'moment';
 })
 
 export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
+  @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
+  @Output("SalesRepInfoValid") SalesRepInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-  @Output("SalesRepInfoValid") SalesRepInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
-  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
-  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
-
-  @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
-  salesRepIndex = 1;
-  salesReps: any[];
   @Input("showSaveBtn") showSaveBtn: boolean = false;
   @Input("createOrEditSalesRepInfo") createOrEditSalesRepInfo: boolean = true;
+  @Input("canChange") canChange: boolean = true;
+
+  shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  salesRepIndex = 1;
+  salesReps: any[];
   oldappTransactionsForViewDto;
-  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
-  @Input("canChange")  canChange:boolean=true;
-  visible: boolean = false;
   cancelBtn: boolean = false;
   saveBtn: boolean = false;
-  SuccessMsg: boolean = false;
+  isContactsValid: boolean = false;
+
 
   constructor(
     injector: Injector,
-   
-   
     private _AppTransactionServiceProxy: AppTransactionServiceProxy
   ) {
     super(injector);
@@ -43,7 +42,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   ngOnInit(): void {
   }
   ngOnChanges(changes: SimpleChanges) {
-    this.oldappTransactionsForViewDto =JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
 
     this.salesReps = [];
     this.salesReps.push(1);
@@ -59,7 +58,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   onShowSalesRepEditMode($event) {
     if ($event) {
       this.createOrEditSalesRepInfo = true;
-      this.oldappTransactionsForViewDto=JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
 
     }
   }
@@ -72,34 +71,33 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
     this.createOrEditSalesRepInfo = false;
     this.createOrEditTransaction();
   }
-  cancel(){
-    this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+  cancel() {
+    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditSalesRepInfo = false;
     this.showSaveBtn = false;
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-      let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-            let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-            let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-            let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
-        
-        
-            this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-            this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-            this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-            this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
-    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+    let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+    let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+    let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+    let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+    this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+    this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+    this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() =>  {this.hideMainSpinner();
-        // this.generatOrderReport.emit(true) ; 
-        // this.SuccessMsg = true
+      .pipe(finalize(() => {
+        this.hideMainSpinner();
       }))
       .subscribe((res) => {
         if (res) {
-          this.oldappTransactionsForViewDto=JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-       this.refreshShoppingCart.emit(true)
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+          this.refreshShoppingCart.emit(true)
 
           if (!this.showSaveBtn)
             this.ontabChange.emit(ShoppingCartoccordionTabs.SalesRepInfo);
@@ -115,16 +113,14 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
     this.appTransactionsForViewDto = $event;
   }
 
-  isContactsValid: boolean = false;
   isContactFormValid(value) {
-    if(this.activeTab==this.shoppingCartoccordionTabs.SalesRepInfo)
-    {
-    this.isContactsValid = value;
-    if (value) {
-      this.isContactsValid = true;
-      this.SalesRepInfoValid.emit(ShoppingCartoccordionTabs.SalesRepInfo);
+    if (this.activeTab == this.shoppingCartoccordionTabs.SalesRepInfo) {
+      this.isContactsValid = value;
+      if (value) {
+        this.isContactsValid = true;
+        this.SalesRepInfoValid.emit(ShoppingCartoccordionTabs.SalesRepInfo);
+      }
     }
-  }
 
   }
 
