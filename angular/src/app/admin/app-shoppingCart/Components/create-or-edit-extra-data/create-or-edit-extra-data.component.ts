@@ -115,7 +115,6 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
   save() {
     this.createOrEditExtraData = false;
     this.saveExtra()
-    // this.createOrEditTransaction();
   }
   onshowSaveBtn($event) {
     this.createOrEditExtraData = true;

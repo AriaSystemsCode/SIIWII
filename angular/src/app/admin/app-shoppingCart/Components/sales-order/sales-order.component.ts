@@ -26,20 +26,17 @@ import { Calendar } from "primeng/calendar";
 })
 export class SalesOrderComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
 
-  /** ViewChilds */
   @ViewChild('calendar1') calendar1: Calendar;
   @ViewChild('calendar2') calendar2: Calendar;
   @ViewChild('calendar3') calendar3: Calendar;
   @ViewChild('calendar4') calendar4: Calendar;
   @ViewChild(TreeSelect) treeSelect!: TreeSelect;
 
-  /** Outputs */
   @Output() generatOrderReport = new EventEmitter<boolean>();
   @Output() refreshShoppingCart = new EventEmitter<boolean>();
   @Output() orderInfoValid = new EventEmitter<ShoppingCartoccordionTabs>();
   @Output() ontabChange = new EventEmitter<ShoppingCartoccordionTabs>();
 
-  /** Inputs */
   @Input() canChange: boolean = true;
   @Input() activeTab: number;
   @Input() currentTab: number;
@@ -97,7 +94,6 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
   editSubCat = false;
   addSubClas = false;
   editSubClass = false;
-  openDropDown = false;
   showAppCodes = false;
   showAppCatCodes = false;
 
@@ -164,9 +160,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     calendar.inputfieldViewChild.nativeElement.click();
   }
 
-  toggleDropDown() {
-    this.openDropDown = !this.openDropDown
-  }
+
 
   getAllCurrencies() {
     this._AppEntitiesServiceProxy
@@ -507,7 +501,6 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
 
   cancelSelection() {
-    this.closeDropdown();
     this.treeSelect.hide();
     this.showExistCat = false
     this.tempDeselectedCategories = []
@@ -695,7 +688,6 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
 
     this.showExistClass = false;
-    this.closeDropdown();
     this.treeSelect.hide();
     this.getAppTransactionClassList();
   }
@@ -703,7 +695,6 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
   cancelClassSelection() {
 
-    this.closeDropdown();
     this.treeSelect.hide();
 
     this.showExistClass = false
@@ -715,11 +706,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
 
   }
-  closeDropdown() {
-    if (this.treeSelect) {
-      this.treeSelect.hide(); // Close the dropdown (make sure this method exists in your TreeSelect version)
-    }
-  }
+
 
   saveClass(classification: any, type?: '') {
     const isEditing = this.editSubClass;

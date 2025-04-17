@@ -55,15 +55,12 @@ export class ShoppingCartViewComponentComponent
   createOrEditBillingInfo: boolean = true;
   createOrEditExtraData: boolean = true;
   loadNotesComp: boolean = false;
-  transactionNum: Number = 0;
-  disableProceedBtn: boolean = true;
   productCode;
   colorFilter;
   colors: SelectItem[] = [];
   sizeFilter;
   sizes: SelectItem[] = [];
   showVariations: boolean = false;
-  oldShowVariations: boolean = false;
   validateOrder: boolean = false;
   orderId: number = 0;
   cols!: any[];
@@ -91,7 +88,6 @@ export class ShoppingCartViewComponentComponent
   companeyNames: GetAccountInformationOutputDto[];
   currentTab: number
   shareDone: boolean = false;
-  openActions: boolean = false
   temp: TreeNode<any>[] = null;
   addLine: boolean = true;
   visible: boolean = false
@@ -132,7 +128,7 @@ export class ShoppingCartViewComponentComponent
   orderSummary: any = [];
   sycAttachmentCategoryImage: any
   acceptedAspectRatio: any
-  selectedItemTypeData: GetAllEntityObjectTypeOutput =
+  selectedTransactionTypeData: GetAllEntityObjectTypeOutput =
     new GetAllEntityObjectTypeOutput();
 
   extraAttributes: any;
@@ -452,14 +448,12 @@ export class ShoppingCartViewComponentComponent
   resetData() {
     this.activeIndex = -1;
     this.currentTab = -1;
-    this.transactionNum = 0;
     this.productCode = undefined;
     this.colorFilter = undefined;
     this.colors = [];
     this.sizeFilter = undefined;
     this.sizes = [];
     this.showVariations = false;
-    this.oldShowVariations = false;
     this.validateOrder = false;
     this.cols = [];
     this.showTabs = false;
@@ -845,9 +839,6 @@ export class ShoppingCartViewComponentComponent
 
 
     if (rowNode.node.data.added) {
-
-
-
       rowNode.node.data.showEditQty = false;
 
     } else {
@@ -1564,7 +1555,7 @@ export class ShoppingCartViewComponentComponent
   defineExtraAttributes() {
     this.extraAttributes = {};
 
-    const allAttributes = this.selectedItemTypeData?.extraAttributes?.extraAttributes ?? [];
+    const allAttributes = this.selectedTransactionTypeData?.extraAttributes?.extraAttributes ?? [];
 
     allAttributes.forEach(attr => {
       const usageKey = attr.usage?.replace(/\s+/g, '_').toUpperCase() || 'DEFAULT';
@@ -1600,7 +1591,7 @@ export class ShoppingCartViewComponentComponent
     this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId)
       .subscribe((res) => {
         if (res?.length > 0) {
-          this.selectedItemTypeData = res[0];
+          this.selectedTransactionTypeData = res[0];
 
           const attributes = res[0]?.extraAttributes?.extraAttributes;
 

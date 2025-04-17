@@ -19,7 +19,7 @@
                 style="padding-right: 13px;padding-left: 4px !important;">
                 <label class="label pl-1">Reference #</label>
                 <input type="text" placeholder="Reference Number" class="form-control " style="    width: 95% !important;
-    margin-left: 3px;"    [(ngModel)]="reference"
+    margin-left: 3px;"    [(ngModel)]="reference" name="reference"
                    (ngModelChange)="onReferenceChange()"   />
 
 
@@ -458,7 +458,7 @@
                         <label class="label">Entered Date</label>
                         <div class="">
                             <p-calendar #calendar1 appendTo="body" [(ngModel)]="enteredDate" [showIcon]="true"
-                                (ngModelChange)="onChangeDate()" [showOtherMonths]="true"
+                                (ngModelChange)="onChangeDate()" [showOtherMonths]="true" name="enteredDate"
                                 [selectOtherMonths]="true"></p-calendar>
 
                             <img src="../../../../../assets/icons/calendar.png" style="cursor: pointer;"
@@ -478,7 +478,7 @@
                 <div class="col-md-6 mt-2 position-relative dates">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
-                        <p-calendar #calendar2 appendTo="body" [(ngModel)]="startDate" [showIcon]="true"
+                        <p-calendar #calendar2 appendTo="body" [(ngModel)]="startDate" name="startDate" [showIcon]="true"
                             (ngModelChange)="onChangeDate()" [showOtherMonths]="true"
                             [selectOtherMonths]="true"></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png" style="cursor: pointer;"
@@ -497,7 +497,7 @@
                 <div class="col-md-6 mt-2 position-relative dates">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Available Date</label>
-                        <p-calendar #calendar3 appendTo="body" [(ngModel)]="availableDate" [showIcon]="true"
+                        <p-calendar #calendar3 appendTo="body" [(ngModel)]="availableDate" name="availableDate" [showIcon]="true"
                             (ngModelChange)="onChangeDate()" [minDate]="startDate" [showOtherMonths]="true"
                             [selectOtherMonths]="true"></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png" style="cursor: pointer;"
@@ -518,7 +518,7 @@
                 <div class="col-md-6 mt-2 position-relative dates">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
-                        <p-calendar #calendar4 appendTo="body" [(ngModel)]="completeDate" [showIcon]="true"
+                        <p-calendar #calendar4 appendTo="body" [(ngModel)]="completeDate" name="completeDate" [showIcon]="true"
                             (onSelect)="changeCompleteDate(completeDate)"
                             (ngModelChange)="changeCompleteDate(completeDate)" [minDate]="availableDate"
                             [showOtherMonths]="true" [selectOtherMonths]="true"></p-calendar>

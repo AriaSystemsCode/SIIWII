@@ -31,7 +31,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     roles: any[];
     modalheaderName: string;
     formType: string;
-    orderNo: any;
+    orderNo: string;
     fullName: string = "";
     display: boolean = false;
     filterTransType: SelectItem[] = [];

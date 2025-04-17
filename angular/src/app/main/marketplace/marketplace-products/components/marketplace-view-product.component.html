@@ -139,7 +139,7 @@
                                             </tbody>
                                             <tbody *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                                 order.color.sizes,
-                                                orderIndex
+                                                orderIndex, order.colorIndex
                                             )">
                                                 <ng-container *ngFor="
                                                     let size of order.color.sizes;
@@ -198,7 +198,7 @@
                                                         {{
                                                         calculatePrepackOrderedQTYSum(
                                                         order.color.sizes,
-                                                        orderIndex
+                                                        orderIndex, order.colorIndex
                                                         )
                                                         }}
                                                     </th>
@@ -206,7 +206,7 @@
                                                         {{
                                                         getTotalPrepackSizeAmount(
                                                         order.color.sizes,
-                                                        orderIndex
+                                                        orderIndex,order.colorIndex
                                                         )| currency:' '
                                                         }}
                                                     </th>
@@ -267,7 +267,7 @@
                             <div class="price mb-4">
                                 <!-- show msrp price and range in this product has no special pricing -->
                                 <div class="msrp d-flex ">
-                                    <h5 class="mr-2" style="color: black !important;font-size: 16px;">MSRP: </h5>
+                                    <h5 class="mr-2" style="color: black !important;font-size: 16px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
                                     <h5>
 
                                         {{
@@ -308,7 +308,7 @@
                                                 "0" | currency:' ' }}
                                             </h5>
 
-                                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice "
+                                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice "
                                                 class="mx-1  poniter" style="cursor: pointer;"
                                                 src="../../../../../assets/Items//edit-svgrepo-com 1.png"
                                                 (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
@@ -422,16 +422,15 @@ top: 4px;">
                                             : ''
                                     ">
 
-                                    <div *ngIf="
-                                        color.colorCode &&
-                                        !color.colorImg
+                                    <div  *ngIf="
+                                    color.colorCode &&
+                                    !color.colorImg
                                     " class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
                                         (click)="setSizes(i)"></div>
-                                    <img *ngIf="
-                                        (!color.colorImg&&
-                                            !color.colorCode) ||
-                                        color.colorImg
-                                    " (click)="setSizes(i)" [src]="
+                                    <img  *ngIf="
+                                    (!color.colorImg&&
+                                        !color.colorCode) ||
+                                    color.colorImg" (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
                                         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
@@ -475,23 +474,18 @@ top: 4px;">
                                             ? 'border border-primary '
                                             : ''
                                     ">
-                                            <div *ngIf="
-                                        color.colorCode&&
-                                        !color.colorImg
-                                    " class="colorBox" [ngStyle]="{'background-color': color.colorCode}"
-                                                (click)="setSizes(i)" [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    "></div>
-                                            <img *ngIf="
-                                        (color.colorImg === null &&
-                                            color.colorCode === null) ||
-                                        color.colorImg !== null
-                                    " (click)="setSizes(i)" [src]="
+                                    <div  *ngIf="
+                                    color.colorCode &&
+                                    !color.colorImg
+                                    " class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
+                                        (click)="setSizes(i)"></div>
+                                    <img  *ngIf="
+                                    (!color.colorImg&&
+                                        !color.colorCode) ||
+                                    color.colorImg" (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
-                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
                                             <div class="card-body">
 
 
@@ -827,8 +821,8 @@ top: 4px;">
                                             </tr>
                                         </tbody>
                                         <tbody *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
-                                    order.color.sizes,
-                                    orderIndex
+                                            order.color.sizes,
+                                            orderIndex, order.colorIndex
                                 )">
                                             <ng-container *ngFor="
                                         let size of order.color.sizes;
@@ -889,7 +883,7 @@ top: 4px;">
                                                     {{
                                                     calculatePrepackOrderedQTYSum(
                                                     order.color.sizes,
-                                                    orderIndex
+                                                    orderIndex, order.colorIndex
                                                     )
                                                     }}
                                                 </th>
@@ -897,7 +891,7 @@ top: 4px;">
                                                     {{
                                                     getTotalPrepackSizeAmount(
                                                     order.color.sizes,
-                                                    orderIndex
+                                                    orderIndex,order.colorIndex
                                                     )| currency:' '
                                                     }}
                                                 </th>
@@ -1023,7 +1017,7 @@ top: 4px;">
                                     <div class="price mb-4" style="font-size: 12px !important;white-space: nowrap;">
                                         <!-- show msrp price and range in this product has no special pricing -->
                                         <div class="msrp d-flex mb-2">
-                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">MSRP:
+                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:
                                             </h5>
                                             <h5>
 
@@ -1064,7 +1058,7 @@ top: 4px;">
                                                         productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                                                     </h5>
 
-                                                    <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"
+                                                    <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"
                                                         class="mx-2  poniter" style="cursor: pointer;"
                                                         src="../../../../../assets/Items//edit-svgrepo-com 1.png"
                                                         (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
@@ -1182,23 +1176,18 @@ top: 4px;">
                                             ? 'border border-primary '
                                             : ''
                                     ">
-                                            <div *ngIf="
-                                        color.colorCode !== null &&
-                                        color.colorImg === null
+                                    <div  *ngIf="
+                                    color.colorCode &&
+                                    !color.colorImg
                                     " class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
-                                                (click)="setSizes(i)" [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    "></div>
-                                            <img *ngIf="
-                                        (color.colorImg === null &&
-                                            color.colorCode === null) ||
-                                        color.colorImg !== null
-                                    " (click)="setSizes(i)" [src]="
+                                        (click)="setSizes(i)"></div>
+                                    <img  *ngIf="
+                                    (!color.colorImg&&
+                                        !color.colorCode) ||
+                                    color.colorImg" (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
-                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
                                             <div class="card-body">
 
 
@@ -1239,23 +1228,18 @@ top: 4px;">
                                                         ? 'border border-primary '
                                                         : ''
                                                 ">
-                                                    <div *ngIf="
-                                                    color.colorCode !== null &&
-                                                    color.colorImg === null
-                                                " class="colorBox" [ngStyle]="{'background-color': color.colorCode}"
-                                                        (click)="setSizes(i)" [ngClass]="
-                                                    i === currentIndex
-                                                        ? 'border border-primary '
-                                                        : ''
-                                                "></div>
-                                                    <img *ngIf="
-                                                    (color.colorImg === null &&
-                                                        color.colorCode === null) ||
-                                                    color.colorImg !== null
-                                                " (click)="setSizes(i)" [src]="
+                                                <div  *ngIf="
+                                                color.colorCode &&
+                                                !color.colorImg
+                                                " class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
+                                                    (click)="setSizes(i)"></div>
+                                                <img  *ngIf="
+                                                (!color.colorImg&&
+                                                    !color.colorCode) ||
+                                                color.colorImg" (click)="setSizes(i)" [src]="
                                                     attachmentBaseUrl + '/' + color.colorImg
                                                 " alt="images slides" class="imageSlides"
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
                                                     <div class="card-body">
 
 
@@ -1595,7 +1579,7 @@ top: 4px;">
                                                 </tbody>
                                                 <tbody *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
                                                     order.color.sizes,
-                                                    orderIndex
+                                                    orderIndex, order.colorIndex
                                                 )">
                                                     <ng-container *ngFor="
                                                         let size of order.color.sizes;
@@ -1657,7 +1641,7 @@ top: 4px;">
                                                             {{
                                                             calculatePrepackOrderedQTYSum(
                                                             order.color.sizes,
-                                                            orderIndex
+                                                            orderIndex, order.colorIndex
                                                             )
                                                             }}
                                                         </th>
@@ -1665,7 +1649,7 @@ top: 4px;">
                                                             {{
                                                             getTotalPrepackSizeAmount(
                                                             order.color.sizes,
-                                                            orderIndex
+                                                            orderIndex,order.colorIndex
                                                             )| currency:' '
                                                             }}
                                                         </th>
