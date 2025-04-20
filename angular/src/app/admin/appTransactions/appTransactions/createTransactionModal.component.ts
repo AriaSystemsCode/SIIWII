@@ -120,7 +120,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     showAddTextBtn: boolean = false
     showAddSellBtn: boolean = false
     showAddBuyBtn: boolean = false
-    isFocused: boolean = false;
     areSame: boolean = false;
 
     allCurrencies: LookupLabelDto[];
@@ -193,13 +192,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     openCalendar(calendar: Calendar) {
         calendar.inputfieldViewChild.nativeElement.click();
     }
-    onFocus() {
-        this.isFocused = true;
-    }
 
-    onBlur() {
-        this.isFocused = false;
-    }
 
     ngOnChanges() {
         this.getCurrencies();
@@ -396,11 +389,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
         this.getAllCompanies();
     }
-    onDropdownClick(event: any) {
-        if (!this.filteredSellerContacts || this.filteredSellerContacts.length === 0) {
-            this.loadInitialSellerContacts();
-        }
-    }
+
     handleBuyerCompanySearch(event: any) {
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
@@ -793,7 +782,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         const completeDateControl = this.orderForm.controls['completeDate'];
         const availableDateControl = this.orderForm.controls['availableDate'];
         const startDateControl = this.orderForm.controls['startDate'];
-        const EnteredDateControl = this.orderForm.controls['enteredDate'];
 
 
 

@@ -425,9 +425,9 @@
                             <div class="position-relative">
 
                                 <p-calendar #calendar1 [appendTo]="'body'" formControlName="enteredDate"
-                                    [showIcon]="true" [readonlyInput]="false" (focus)="onFocus()" (blur)="onBlur()"
+                                    [showIcon]="true" [readonlyInput]="false" 
                                     (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
-                                    [ngClass]="isFocused ? 'focused-calendar' : ''" [showOtherMonths]="true"
+                                   [showOtherMonths]="true"
                                     [selectOtherMonths]="true"></p-calendar>
                                 <img src="../../../../../assets/icons/calendar.png" (click)="openCalendar(calendar1)"
                                     alt="" srcset="">

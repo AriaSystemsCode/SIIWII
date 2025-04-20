@@ -46,23 +46,14 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
   extraDataForm: { [key: string]: any } = {};
   originalData: any = {};
 
-
-  appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
-  selectedItemTypeData: GetAllEntityObjectTypeOutput =
-    new GetAllEntityObjectTypeOutput();
-
   extraAttributes: {
     [key in EExtraAttributeUsage]: CreateEditAppItemExtraAttribute;
   };
-  openAdditional = false
-  hasLoadedAdditional: boolean = false;
+
 
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-    private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-    private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
-    private _extraAttributeDataService: ExtraAttributeDataService,
   ) {
 
 

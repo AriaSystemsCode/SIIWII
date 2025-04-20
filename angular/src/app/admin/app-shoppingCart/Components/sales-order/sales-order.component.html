@@ -105,7 +105,7 @@
                             <div class="formGroup  col-8">
 
                                 <input type="text" placeholder="classification" class="form-control "
-                                    style="width: 95% !important;" [(ngModel)]="classification.name" />
+                                    style="width: 95% !important;" [(ngModel)]="classification.name" name="classificationName" />
 
 
                             </div>
@@ -303,7 +303,7 @@
                             <div class="formGroup  col-8">
 
                                 <input type="text" placeholder="Category" class="form-control "
-                                    style="width: 95% !important;" [(ngModel)]="category.name" />
+                                    style="width: 95% !important;" [(ngModel)]="category.name" name="categoryName" />
 
 
                             </div>
@@ -564,7 +564,7 @@
                         <input
                             [readonly]="appTransactionsForViewDto?.currencyExchangeRate && appTransactionsForViewDto?.currencyExchangeRate >0"
                             type="text" placeholder="Exchange Rate..." class="form-control w-100"
-                            [(ngModel)]="appTransactionsForViewDto.currencyExchangeRate" />
+                            [(ngModel)]="appTransactionsForViewDto.currencyExchangeRate" name="exchangeRate" />
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">

@@ -532,7 +532,8 @@ export class ShoppingCartViewComponentComponent
 
   getLinesData() {
     //lines
-    if ((this.showTabs && this.activeIndex == 6) || (this.showTabs && this.currentTab == 6) || (!this.showTabs && this.activeIndex == 0)) {
+    
+    if ( (this.showTabs ) || (!this.showTabs && this.activeIndex == 0)) {
       this._AppTransactionServiceProxy
         .getOrderDetailsForView(
           this.orderId,
@@ -1582,6 +1583,7 @@ export class ShoppingCartViewComponentComponent
       }
 
       this.extraAttributes[usageKey].filteredExtraAttributes.push(attr);
+   
     });
 
   }
@@ -1669,7 +1671,12 @@ export class ShoppingCartViewComponentComponent
       });
   }
 
-
+  getOrderDetailsTabIndex(): number {
+    const extraAttrKeys = Object.keys(this.extraAttributes || {});
+    const extraAttrTabCount = extraAttrKeys.length;
+    return extraAttrTabCount > 0 ? extraAttrTabCount : 6; // fallback if no extra tabs
+  }
+  
   removeLocalStorage() {
     localStorage.removeItem("comNew");
     localStorage.removeItem("conNew");
