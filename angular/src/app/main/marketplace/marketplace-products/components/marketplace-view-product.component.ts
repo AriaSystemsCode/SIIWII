@@ -744,20 +744,11 @@ export class MarketplaceViewProductComponent
                                 currencyId: this.appSession.tenant.currencyInfoDto.value
                             };
 
-
-
-
-
-
-
-
-
                             this._AppTransactionServiceProxy
                                 .createOrEdit(this.body)
                                 .pipe(finalize(() => {
 
 
-                                    //     /////
                                     for (let index = 0; index < this.colorsData?.length; index++) {
                                         if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
                                             this.productDetails.variations.map((variation: any) => {
@@ -775,7 +766,7 @@ export class MarketplaceViewProductComponent
                                             });
                                         }
                                     }
-                                    /////
+                         
 
                                     let bodyRequest: any = {
                                         appItem: this.productDetails,
@@ -827,7 +818,6 @@ export class MarketplaceViewProductComponent
                                     //////
                                     this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
                                     this.printInfoParam.TransactionId = response;
-                                    //  this.printInfoParam.orderType=this.formType.toUpperCase();
                                     this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.body.enteredByUserRole);
                                     this.printInfoParam.saveToPDF = true;
                                     this.printInfoParam.tenantId = this.appSession?.tenantId
@@ -836,10 +826,10 @@ export class MarketplaceViewProductComponent
 
                                     localStorage.setItem("fromSellerRoom", JSON.stringify(true));
                                     localStorage.setItem("fromMarketPlace", JSON.stringify(false));
-                                    //  localStorage.setItem(
-                                    //      "SellerId",
-                                    //      JSON.stringify(this.sellerCompanyId)
-                                    //  );
+                                     localStorage.setItem(
+                                         "SellerSSIN",
+                                         JSON.stringify(this.productData?.sellerSSIN)
+                                     );
 
                                     localStorage.setItem("transNO", this.orderNo);
 
@@ -878,7 +868,7 @@ export class MarketplaceViewProductComponent
         localStorage.removeItem("productFilters");
         localStorage.setItem(
             "SellerSSIN",
-            JSON.stringify(this.productBodyData.sellerSSIN)
+            JSON.stringify(this.productData.sellerSSIN)
         );
         localStorage.setItem(
             "currencyCode",
