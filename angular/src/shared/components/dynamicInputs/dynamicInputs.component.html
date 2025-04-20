@@ -75,17 +75,7 @@
                             </div>
                         </div>
 
-                        <!-- <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime' "> -->
-                        <!-- <input (bsValueChange)="onAnyInputChange()" type="text" name="{{extraAttr.name}}" autocomplete="off"
-                                placeholder="{{extraAttr.name}}" class="form-control"
-                                [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }" bsDatepicker
-                                id="extraAttr{{extraAttr.name}}" [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                           border: none !important"> -->
-                        <!-- (ngModelChange)="notLookupExtraAttributeOnChange($event,extraAttr)"
-                            (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                             -->
-
-                        <!-- </div> -->
+                 
                         <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                                 [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name"
@@ -94,12 +84,7 @@
                                 styleClass="w-100"></p-calendar>
                             <i class="pi pi-times position-absolute" style="right: 10px; top: 10px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
-                            <!-- <img
-                              src="../../../../../assets/icons/calendar.png"
-                              style="cursor: pointer; position: absolute; right: 10px; top: 10px;"
-                              (click)="openCalendar(calendarRef)"
-                              alt="Calendar"
-                            /> -->
+                     
                         </div>
 
 

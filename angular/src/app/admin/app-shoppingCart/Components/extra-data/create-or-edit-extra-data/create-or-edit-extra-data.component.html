@@ -29,10 +29,10 @@
   <div *ngIf="!createOrEditExtraData">
 
 
-    <app-dynamicInputs-view [appTransactionsForViewDto]="appTransactionsForViewDto"
+    <view-extra-data [appTransactionsForViewDto]="appTransactionsForViewDto"
       (onshowSaveBtn)="onshowSaveBtn($event)" [canChange]="canChange" [isCreateOrEdit]='createOrEditExtraData'
       [extraAttributeObject]="extraAttributeObject">
-    </app-dynamicInputs-view>
+    </view-extra-data>
   </div>
 
 

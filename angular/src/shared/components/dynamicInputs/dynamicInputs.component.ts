@@ -1,7 +1,6 @@
+
 import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
-import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-dynamicInputs',
@@ -20,6 +19,10 @@ export class dynamicInputs implements OnInit, OnChanges {
   originalValuesMap = new Map<number, any>();
 
 
+  ngOnInit(): void {
+    this.fillSelectedValuesFromDto();
+    setTimeout(() => this.onAnyInputChange(), 0);
+  }
 
   openCalendar(calendar: any) {
     calendar.overlayVisible = true;
@@ -112,8 +115,19 @@ export class dynamicInputs implements OnInit, OnChanges {
     this.selectedExtraData = Array.from(updatedDataMap.values());
 
     this.extraDataChanged.emit(this.selectedExtraData);
+    console.log('✅ Final emitted data (with empty strings):', this.selectedExtraData);
   }
 
+  mapEntityExtraDataToExtraDataAttributes(): void {
+    if (!this.appTransactionsForViewDto?.entityExtraData) return;
+
+    this.appTransactionsForViewDto.extraDataAttributes = this.appTransactionsForViewDto.entityExtraData.map(e => {
+      return {
+        extraAttributeId: e.attributeId,
+        selectedValues: e.attributeValueId || e.attributeValue ? [e.attributeValueId ?? e.attributeValue] : [],
+      };
+    });
+  }
 
 
 
@@ -204,10 +218,6 @@ export class dynamicInputs implements OnInit, OnChanges {
   }
 
 
-  ngOnInit(): void {
-    this.fillSelectedValuesFromDto();
-    setTimeout(() => this.onAnyInputChange(), 0);
-  }
 
 
 

@@ -128,7 +128,8 @@ import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Component
 import { TabViewModule } from 'primeng/tabview';
 import { SharedDynamicInputsModule } from "@shared/shared-module";
 import { ExtraAttributeDataService } from "./main/app-items/app-item-shared/services/extra-attribute-data.service";
-import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Components/create-or-edit-extra-data/create-or-edit-extra-data.component";
+import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Components/extra-data/create-or-edit-extra-data/create-or-edit-extra-data.component";
+import { ViewExtraDataComponent } from "./admin/app-shoppingCart/Components/extra-data/view-extra-data/view-extra-data.component";
 @NgModule({
     declarations: [
         AppComponent,
@@ -201,7 +202,8 @@ import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Compone
         ShareTransactionTabComponent,
         // mmmm
         // mmmm
-        CreateOrEditExtraDataComponent
+        CreateOrEditExtraDataComponent,
+        ViewExtraDataComponent
     ],
     imports: [
         BrowserAnimationsModule,
