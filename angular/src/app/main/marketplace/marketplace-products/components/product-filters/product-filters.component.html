@@ -76,14 +76,14 @@
                         <span class="text">From</span>
                         <div class="card flex justify-content-lg-start">
                             <p-calendar appendTo="body" [(ngModel)]="startShipDate" [showIcon]="true"
-                                style="width: 100%" placeholder="Start Date"
+                                class="w-100" placeholder="Start Date"
                                 (ngModelChange)="onStartShipDateChange()"></p-calendar>
                         </div>
                     </div>
                     <div class="to-ship">
                         <span class="text">To</span>
                         <div class="card flex justify-content-lg-start">
-                            <p-calendar appendTo="body" style="width: 100%" [(ngModel)]="endShipDate" [showIcon]="true"
+                            <p-calendar appendTo="body"  class="w-100" [(ngModel)]="endShipDate" [showIcon]="true"
                                 placeholder="End Date" (ngModelChange)="onEndShipDateChange()"></p-calendar>
                         </div>
                     </div>
@@ -98,14 +98,14 @@
                     <div class="from-soldout mb-3">
                         <span class="text">From</span>
                         <div class="card flex justify-content-lg-start">
-                            <p-calendar appendTo="body" [(ngModel)]="startSoldout" [showIcon]="true" style="width: 100%"
+                            <p-calendar appendTo="body" [(ngModel)]="startSoldout" [showIcon]="true"  class="w-100"
                                 placeholder="Start Date" (ngModelChange)="onStartSoldOutDateChange()"></p-calendar>
                         </div>
                     </div>
                     <div class="to-soldout">
                         <span class="text">To</span>
                         <div class="card flex justify-content-lg-start">
-                            <p-calendar appendTo="body" style="width: 100%" [(ngModel)]="endSoldout" [showIcon]="true"
+                            <p-calendar appendTo="body"  class="w-100" [(ngModel)]="endSoldout" [showIcon]="true"
                                 placeholder="End Date" (ngModelChange)="onEndSoldOutDateChange()"></p-calendar>
                         </div>
                     </div>

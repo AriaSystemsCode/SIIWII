@@ -382,34 +382,44 @@
                                 </app-create-or-edit-billing-info>
                             </div>
                         </p-accordionTab>
-                        <p-accordionTab *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index"
-                            [ngClass]="!showTabs ? 'd-none':''" (click)="currentTab = 6">
+                   
+<p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="currentTab = 6">
+                         
 
-
-                            <ng-template pTemplate="header">
-                                <div class="d-inline-block custom-header ">
-                                    <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header |
-                                        localize}}</h6>
-
-                                </div>
-                            </ng-template>
-
-
-                            <div *ngIf="currentTab==6 ">
-                                <create-or-edit-extra-data [extraAttributeObject]="extraAttributeObject" [activeTab]="6"
-                                    [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
-                                    [createOrEditExtraData]="createOrEditExtraData" (ontabChange)="ontabChange($event)"
-                                    [showSaveBtn]="showSaveBtn" (refreshShoppingCart)="refreshShoppingCart($event)"
-                                    [canChange]="canChange"></create-or-edit-extra-data>
-                            </div>
-                            <div>
-
-                            </div>
-
-
-
-
-                        </p-accordionTab>
+    <ng-template pTemplate="header">
+      <div class="d-inline-block custom-header ">
+        <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header | localize}}</h6>
+        <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
+      </div>
+    </ng-template>
+    
+    
+    <div *ngIf="currentTab==6 ">
+    <create-or-edit-extra-data 
+    
+    [extraAttributeObject]="extraAttributeObject"
+    [activeTab]="6"
+    [currentTab]="currentTab"
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    
+    [createOrEditExtraData]="createOrEditExtraData"
+    
+    (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
+    
+    (refreshShoppingCart)="refreshShoppingCart($event)"
+    
+    [canChange]="canChange"
+    ></create-or-edit-extra-data>
+    </div>
+    <div>
+    
+    </div>
+    
+    
+    
+    
+    </p-accordionTab>
+    
 
 
 
@@ -1023,17 +1033,17 @@
                                                 <!-- end order by prepack -->
                                             </div>
 
-
+                                            <div *ngIf="showAddLine" class="d-flex justify-content-between mt-3">
+                                                <button (click)="cancelVariationLine()"
+                                                    class="cancelbtn text-center btn float-right">Cancel</button>
+                                                <button [disabled]="filterForm.controls['selectedVariation'].value == ''"
+                                                    (click)="saveVariations()"
+                                                    class="previewbtn text-center btn ml-2">Save</button>
+                                            </div>
                                         </form>
 
 
-                                        <div *ngIf="showAddLine" class="d-flex justify-content-between mt-3">
-                                            <button (click)="cancelVariationLine()"
-                                                class="cancelbtn text-center btn float-right">Cancel</button>
-                                            <button [disabled]="filterForm.controls['selectedVariation'].value == ''"
-                                                (click)="saveVariations()"
-                                                class="previewbtn text-center btn ml-2">Save</button>
-                                        </div>
+                               
 
                                     </div>
 
@@ -1688,7 +1698,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                     </button>
 
 
-                                                    <form [formGroup]="filterForm" *ngIf="!addLine" style="">
+                                                    <form [formGroup]="filterForm" *ngIf="!addLine" >
                                                         <div class="mb-3 w-100 row ">
                                                             <div class="d-md-flex  w-100">
                                                                 <div class="col-md-4 col-12">
@@ -2123,11 +2133,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                             <!-- end order by prepack -->
                                                         </div>
 
-                                                    </form>
-
-
-
-                                                    <div *ngIf="showAddLine"
+                                                                 <div *ngIf="showAddLine"
                                                         class="d-flex justify-content-between mt-3">
                                                         <button (click)="cancelVariationLine()"
                                                             class="cancelbtn text-center btn float-right">Cancel</button>
@@ -2136,6 +2142,11 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                             (click)="saveVariations();"
                                                             class="previewbtn text-center btn ml-2">Save</button>
                                                     </div>
+                                                    </form>
+
+
+
+                                           
                                                 </div>
                                             </div>
                                         </div>

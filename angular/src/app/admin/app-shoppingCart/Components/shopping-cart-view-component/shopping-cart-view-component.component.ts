@@ -130,7 +130,7 @@ export class ShoppingCartViewComponentComponent
   acceptedAspectRatio: any
   selectedTransactionTypeData: GetAllEntityObjectTypeOutput =
     new GetAllEntityObjectTypeOutput();
-
+    selectedTransTypeData:any
   extraAttributes: any;
   constructor(
     injector: Injector,
@@ -149,6 +149,7 @@ export class ShoppingCartViewComponentComponent
   }
   ngOnInit(): void {
     this.defineExtraAttributes();
+
     this.initFilterForm()
     this.calcHight()
 
@@ -1553,123 +1554,125 @@ export class ShoppingCartViewComponentComponent
     return sum;
   }
 
-  defineExtraAttributes() {
-    this.extraAttributes = {};
+  
+defineExtraAttributes() {
+  this.extraAttributes = {};
 
-    const allAttributes = this.selectedTransactionTypeData?.extraAttributes?.extraAttributes ?? [];
+  const allAttributes = this.selectedTransTypeData?.extraAttributes?.extraAttributes ?? [];
 
-    allAttributes.forEach(attr => {
-      const usageKey = attr.usage?.replace(/\s+/g, '_').toUpperCase() || 'DEFAULT';
+  allAttributes.forEach(attr => {
+    const usageKey = attr.usage?.replace(/\s+/g, '_').toUpperCase() || 'DEFAULT';
 
-      if (!this.extraAttributes[usageKey]) {
-        this.extraAttributes[usageKey] = new CreateEditAppItemExtraAttribute({
-          header: this.l(attr.usage),
-          title: this.l(attr.usage),
-          usageEnum: usageKey as unknown as EExtraAttributeUsage,
-          orderOfDisplay: 1,
-          filteredExtraAttributes: [],
-          // extraAttributes: []
-        });
-      }
-
-      // ✅ Add this if missing
-      if (!attr.paginationSetting) {
-        attr.paginationSetting = {
-          skipCount: 0,
-          maxResultCount: 10,
-          totalCount: 0,
-          list: []
-        };
-      }
-
-      this.extraAttributes[usageKey].filteredExtraAttributes.push(attr);
-   
-    });
-
-  }
-
-
-  getAppItemTypeExtraAttributesById() {
-    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId)
-      .subscribe((res) => {
-        if (res?.length > 0) {
-          this.selectedTransactionTypeData = res[0];
-
-          const attributes = res[0]?.extraAttributes?.extraAttributes;
-
-
-          if (attributes?.length > 0) {
-            this.defineExtraAttributes();
-            this.loadRecommendedAndAdditionalExtraDataLookupLists();
-          } else {
-            this.extraAttributes = {}; // No data, keep empty
-          }
-        }
+    if (!this.extraAttributes[usageKey]) {
+      this.extraAttributes[usageKey] = new CreateEditAppItemExtraAttribute({
+        header: this.l(attr.usage),
+        title: this.l(attr.usage),
+        usageEnum: usageKey as unknown as EExtraAttributeUsage,
+        orderOfDisplay: 1,
+        filteredExtraAttributes: [],
+        extraAttributes: []
       });
-  }
+    }
+
+    // ✅ Add this if missing
+    if (!attr.paginationSetting) {
+      attr.paginationSetting = {
+        skipCount: 0,
+        maxResultCount: 10,
+        totalCount: 0,
+        list: []
+      };
+    }
+
+    this.extraAttributes[usageKey].filteredExtraAttributes.push(attr);
+  });
+
+}
 
 
-  loadRecommendedAndAdditionalExtraDataLookupLists() {
-    Object.keys(this.extraAttributes).forEach(key => {
-      const group = this.extraAttributes[key];
-      group.filteredExtraAttributes.forEach(extraAttr => {
-        if (extraAttr.isLookup) {
-          this.loadExtraDataLookupList(extraAttr);
+getAppItemTypeExtraAttributesById() {
+  this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId)
+    .subscribe((res) => {
+      if (res?.length > 0) {
+        this.selectedTransTypeData = res[0];
+
+        const attributes = res[0]?.extraAttributes?.extraAttributes;
+
+
+        if (attributes?.length > 0) {
+          this.defineExtraAttributes();
+          this.loadRecommendedAndAdditionalExtraDataLookupLists();
+        } else {
+          this.extraAttributes = {}; // No data, keep empty
         }
-      });
+      }
     });
-  }
+}
+
+
+loadRecommendedAndAdditionalExtraDataLookupLists() {
+  Object.keys(this.extraAttributes).forEach(key => {
+    const group = this.extraAttributes[key];
+    group.filteredExtraAttributes.forEach(extraAttr => {
+      if (extraAttr.isLookup) {
+        this.loadExtraDataLookupList(extraAttr);
+      }
+    });
+  });
+}
 
 
   loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
-    this._extraAttributeDataService
-      .getExtraAttributeLookupDataWithPaging(
-        'APPROVALR',
-        0,
-        10
-      )
-      .subscribe((result) => {
-        extraAttr.paginationSetting.totalCount = result.totalCount;
-        if (extraAttr.paginationSetting.skipCount == 0)
-          extraAttr.paginationSetting.list = [];
-        else
-          extraAttr.paginationSetting.list.splice(
-            extraAttr.paginationSetting.list.length - 1,
-            1
-          );
-        let isExist = result.items.filter((item) => { return item.value == extraAttr.attributeId });
-        if ((isExist!.length == 0 || isExist == undefined) && extraAttr?.selectedValues?.length > 0) {
+      this._extraAttributeDataService
+          .getExtraAttributeLookupDataWithPaging(
+             'APPROVALR',
+              0,
+              10
+          )
+          .subscribe((result) => {
+              extraAttr.paginationSetting.totalCount = result.totalCount;
+              if (extraAttr.paginationSetting.skipCount == 0)
+                  extraAttr.paginationSetting.list = [];
+              else
+                  extraAttr.paginationSetting.list.splice(
+                      extraAttr.paginationSetting.list.length - 1,
+                      1
+                  );
+                   let isExist=result.items.filter((item)=>{ return item.value==extraAttr.attributeId});
+                  if((isExist!.length==0||isExist==undefined)  && extraAttr?.selectedValues?.length>0){
 
-          const tempAtt = new LookupLabelDto({
-            code: extraAttr.code,
-            label: extraAttr.selectedValues,
-            stockAvailability: undefined,
-            value: extraAttr.selectedValues,
-            isHostRecord: false,
-            hexaCode: undefined,
-            image: undefined
-          })
-          result.items.push(tempAtt)
-        }
+                      const tempAtt = new LookupLabelDto({
+                          code:extraAttr.code,
+                          label:extraAttr.selectedValues,
+                          stockAvailability:undefined,
+                          value:extraAttr.selectedValues,
+                          isHostRecord:false,
+                          hexaCode:undefined,
+                          image:undefined
+                      })
+                      result.items.push(tempAtt)
+                  }
 
-        extraAttr.paginationSetting.list.push(...result.items);
-        if (
-          extraAttr.paginationSetting.list.length <
-          extraAttr.paginationSetting.totalCount
-        ) {
-          const showMoreSelectItem: SelectItem = {
-            value: -1,
-            label: this.l("showMore"),
-            icon: "fas  fa-reply",
-            styleClass: "showMore",
-            disabled: false,
-          };
-          extraAttr.paginationSetting.list.push(showMoreSelectItem);
-        }
-        extraAttr.paginationSetting.skipCount +=
-          extraAttr.paginationSetting.maxResultCount;
-      });
+              extraAttr.paginationSetting.list.push(...result.items);
+              if (
+                  extraAttr.paginationSetting.list.length <
+                  extraAttr.paginationSetting.totalCount
+              ) {
+                  const showMoreSelectItem: SelectItem = {
+                      value: -1,
+                      label: this.l("showMore"),
+                      icon: "fas  fa-reply",
+                      styleClass: "showMore",
+                      disabled: false,
+                  };
+                  extraAttr.paginationSetting.list.push(showMoreSelectItem);
+              }
+              extraAttr.paginationSetting.skipCount +=
+                  extraAttr.paginationSetting.maxResultCount;
+          });
   }
+
+
 
   getOrderDetailsTabIndex(): number {
     const extraAttrKeys = Object.keys(this.extraAttributes || {});
