@@ -60,10 +60,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     @Input("createOrEditorderInfo") createOrEditorderInfo: boolean ;
     @Input("oldCreateOrEditorderInfo") oldCreateOrEditorderInfo: boolean ;
 
-    enteredDate = new Date();
-    startDate = new Date();
-    availableDate = new Date();
-    completeDate = new Date();
+    enteredDate: Date;
+    startDate: Date;
+    availableDate: Date;
+    completeDate: Date;
     reference: any 
 
     showSaveBtn: boolean = false;
@@ -631,17 +631,13 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         }
 
 
-                let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-        let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-        let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-        let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
     
-    
-        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
-        console.log(this.appTransactionsForViewDto.enteredDate,'this.appTransactionsForViewDto.enteredDate')
+        this.appTransactionsForViewDto.enteredDate = moment.utc(moment(this.enteredDate).format('YYYY-MM-DD'));
+        this.appTransactionsForViewDto.startDate = moment.utc(moment(this.startDate).format('YYYY-MM-DD'));
+        this.appTransactionsForViewDto.availableDate = moment.utc(moment(this.availableDate).format('YYYY-MM-DD'));
+        this.appTransactionsForViewDto.completeDate = moment.utc(moment(this.completeDate).format('YYYY-MM-DD'));
+
+        console.log(this.appTransactionsForViewDto,'this.appTransactionsForViewDto')
 
     }
     changeCompleteDate(date) {
@@ -657,14 +653,9 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // this.onChangeDate();
         this.onChangeDate(); // ensure date fields are updated before save
 
-        // Prepare clean UTC moment dates
-        this.appTransactionsForViewDto.enteredDate = moment(this.enteredDate).utc();
-        this.appTransactionsForViewDto.startDate = moment(this.startDate).utc();
-        this.appTransactionsForViewDto.availableDate = moment(this.availableDate).utc();
-        this.appTransactionsForViewDto.completeDate = moment(this.completeDate).utc();
     
 
-         this.appTransactionsForViewDto.reference = this.reference;
+
          this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)

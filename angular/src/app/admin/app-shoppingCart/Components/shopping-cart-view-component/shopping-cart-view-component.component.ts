@@ -1248,10 +1248,10 @@ stopReport(event) {
     // }).then((result) => {
     //   if (result.isConfirmed) {
         this.showMainSpinner();
-              let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-                let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-                let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-                let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+              let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+                let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+                let availableDate =  moment(this.appTransactionsForViewDto?.availableDate).toDate();
+                let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
             
             
                 this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
