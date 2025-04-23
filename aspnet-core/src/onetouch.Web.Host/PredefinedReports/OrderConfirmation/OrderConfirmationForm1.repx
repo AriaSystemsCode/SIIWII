@@ -407,7 +407,7 @@
                       </ExpressionBindings>
                       <StylePriority Ref="211" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item1>
-                    <Item2 Ref="212" ControlType="XRTableCell" Name="tableCell3" Weight="2.0366281270768831" Multiline="true" Text="tableCell3" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="Transparent">
+                    <Item2 Ref="212" ControlType="XRTableCell" Name="tableCell3" Weight="2.0366281270768831" Multiline="true" AllowMarkupText="true" Text="tableCell3" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="Transparent">
                       <ExpressionBindings>
                         <Item1 Ref="213" EventName="BeforePrint" PropertyName="Text" Expression="[ItemDescription]" />
                       </ExpressionBindings>
