@@ -1,11 +1,9 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
-import { ShoppingCartoccordionTabs } from '../../Components/transaction-information-component/ShoppingCartoccordionTabs';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
-import { AddressComponent } from '../../Components/address/address.component';
-import * as moment from 'moment';
-import { add } from '@node_modules/@types/lodash';
+import { ShoppingCartoccordionTabs } from '../../transaction-information-component/ShoppingCartoccordionTabs';
+import { AddressComponent } from '../../address/address.component';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',

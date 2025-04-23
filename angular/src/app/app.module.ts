@@ -117,8 +117,6 @@ import { NotesComponent } from "./admin/shared/notes/notes.component";
 import { InteractionsModule } from "./main/interactions/interactions.module";
 import { ViewSalesRepInfoComponent } from "./admin/app-TransactionTabsInfo/Components/salesRep-info/view-sales-rep-info.component";
 import { CreateOrEditSalesRepInfoComponent } from "./admin/app-TransactionTabsInfo/Components/salesRep-info/create-or-edit-sales-rep-info.component";
-import { ViewShippingInformationComponent } from "./admin/app-TransactionTabsInfo/shipping-info/view-shipping-information/view-shipping-information.component";
-import { CreateOrAddShippingInformationComponent } from "./admin/app-TransactionTabsInfo/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
 import { CreateOrEditBillingInfoComponent } from "./admin/app-TransactionTabsInfo/Components/billing-info/create-or-edit-billing-info/create-or-edit-billing-info.component";
 import { ViewBillingInfoComponent } from "./admin/app-TransactionTabsInfo/Components/billing-info/view-billing-info/view-billing-info.component";
 import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
@@ -130,6 +128,8 @@ import { CreateOrEditExtraDataComponent } from "./admin/app-TransactionTabsInfo/
 import { ViewExtraDataComponent } from "./admin/app-TransactionTabsInfo/Components/extra-data/view-extra-data/view-extra-data.component";
 import { OrderInformationComponent } from "./admin/app-TransactionTabsInfo/Components/order-information/order-information.component";
 import { TransactionInformationComponent } from "./admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
+import { ViewShippingInformationComponent } from "./admin/app-TransactionTabsInfo/Components/shipping-info/view-shipping-information/view-shipping-information.component";
+import { CreateOrAddShippingInformationComponent } from "./admin/app-TransactionTabsInfo/Components/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
 @NgModule({
     declarations: [
         AppComponent,
