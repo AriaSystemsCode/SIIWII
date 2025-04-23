@@ -78,7 +78,6 @@ import { ViewAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans
 import { CreateOrEditAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans/create-or-edit-appTenantPlan-modal.component";
 
 import { AppTransactionsComponent } from "./appTransactions/appTransactions/appTransactions.component";
-import { ViewAppTransactionModalComponent } from "./appTransactions/appTransactions/view-appTransaction-modal.component";
 
 import { SycPlanServicesComponent } from "./sycPlanServices/sycPlanServices/sycPlanServices.component";
 import { ViewSycPlanServiceModalComponent } from "./sycPlanServices/sycPlanServices/view-sycPlanService-modal.component";
@@ -215,6 +214,7 @@ import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { TreeSelectModule } from 'primeng/treeselect';
 import { CreateOrEditAppTransactionModalComponent } from './appTransactions/create-or-edit-appTransaction-modal/create-or-edit-appTransaction-modal.component';
+import { ViewAppTransactionModalComponent } from './appTransactions/view-appTransaction-modal/view-appTransaction-modal.component';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
