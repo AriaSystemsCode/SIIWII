@@ -173,7 +173,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.reset();
          this.buyerCompanySSIN = ''
          this.sellerCompanySSIN = ''
-        this.getAllCompanies();
+        // this.getAllCompanies();
+        this.getUserDefultRole();
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
@@ -370,6 +371,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     handleRoleChange(data: any) {
         
         this.role = data?.value?.name;
+        this.handleSellerCompanySearch('')
+        this.handleBuyerCompanySearch('')
         this.isRoleExist = false;
         if (data?.value?.code === 1) {
             // i'm a Seller
@@ -432,22 +435,42 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.getBranches(this.buyerCompanySSIN ,'buyer')
 
                 });
-        } else {
+        }else if(data?.value?.name == "I'm an Independent buying office."){
+                // remove buyer values
+                this.isSeller = false;
+                this.isBuyer = false;
+                this.isBuyerTempAccount = false;
+                this.isCompantIdExist = false;
+                this.isSellerCompanyIdExist = false;
+            this.orderForm.get("buyerContactName").reset();
+            this.orderForm.get("buyerCompanyName").reset();
+            this.orderForm.get("buyerContactEMailAddress").reset();
+            this.orderForm.get("buyerContactPhoneNumber").reset();
+            this.orderForm.get("sellerCompanyBranch").reset();
+            this.orderForm.get("buyerCompanyBranch").reset();
+        }else {
             // i'm a sales rep
             this.isSeller = false;
             this.isBuyer = false;
             this.isBuyerTempAccount = false;
             this.isCompantIdExist = false;
             this.isSellerCompanyIdExist = false;
+                         // remove seller values
+                         this.orderForm.get("sellerContactName").reset();
+                         this.orderForm.get("sellerCompanyName").reset();
+                         this.orderForm.get("sellerContactEMailAddress").reset();
+                         this.orderForm.get("sellerContactPhoneNumber").reset();
+                         this.orderForm.get("sellerCompanyBranch").reset();
+                         this.orderForm.get("buyerCompanyBranch").reset();
             // this.buyerCompanies = []
             // this.sellerCompanies = []
             // this.sellerContacts = []
             // this.buyerContacts = []
             //this.orderForm.reset();
         }
-
+  
        // if (this.formType?.toUpperCase() == "PO")
-        this.getAllCompanies();
+        // this.getAllCompanies();
     }
     onDropdownClick(event: any) {
         if (!this.filteredSellerContacts || this.filteredSellerContacts.length === 0) {
@@ -455,8 +478,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         }
     }
     handleBuyerCompanySearch(event: any) {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
+        // clearTimeout(this.searchTimeout);
+        // this.searchTimeout = setTimeout(() => {
             this._AppTransactionServiceProxy
                 .getRelatedAccounts(
                     event.filter,
@@ -478,18 +501,19 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true,this.formType?.toUpperCase()
+                    undefined,true, this.role =="I'm an Independent buying office." ?'SO': this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
                     this.buyerCompanies = [...res.items];
                     // this.sellerCompanies = [...res.items];
                 });
-        }, 1000);
+        // }, 1000);
     }
     handleSellerCompanySearch(event: any) {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
+        // clearTimeout(this.searchTimeout);
+        // this.searchTimeout = setTimeout(() => {
+     
             this._AppTransactionServiceProxy
                 .getRelatedAccounts(
                     event.filter,
@@ -511,13 +535,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true,this.formType?.toUpperCase()
+                    undefined,true,this.role =="I'm an Independent Sales Rep."? 'PO': this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
                     this.sellerCompanies = [...res.items];
                 });
-        }, 1000);
+        // }, 500);
     }
 
     handleBuyerCompanyChange(event: any) {
@@ -1234,7 +1258,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyer = false;
         this.isBuyerTempAccount = false;
         this.isCompantIdExist = false;
-        this.getAllCompanies();
+        this.handleSellerCompanySearch('')
+        this.handleBuyerCompanySearch('')
+        // this.getAllCompanies();
         this.sellerContacts = [];
         this.buyerContacts = [];
         this.orderForm.reset();
@@ -1328,7 +1354,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.controls["buyerCompanySSIN"].setValue('');
         this.areSame = false
         this.buyerComapnyId = 0
-        this.getAllCompanies();
+        this.handleSellerCompanySearch('')
+        this.handleBuyerCompanySearch('')
+        // this.getAllCompanies();
         this.sellerContacts = [];
         this.buyerContacts = [];
         this.orderForm.reset();
