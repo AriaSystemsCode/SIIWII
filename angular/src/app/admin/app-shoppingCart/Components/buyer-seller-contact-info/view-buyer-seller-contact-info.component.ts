@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Injector, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
-import { ShoppingCartoccordionTabs } from '../shopping-cart-view-component/ShoppingCartoccordionTabs';
+import { ShoppingCartoccordionTabs } from '../transaction-information-component/ShoppingCartoccordionTabs';
 import { finalize } from 'rxjs';
 
 @Component({

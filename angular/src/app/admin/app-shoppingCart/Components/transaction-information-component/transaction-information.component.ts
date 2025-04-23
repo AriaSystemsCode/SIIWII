@@ -26,12 +26,12 @@ import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/mode
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 
 @Component({
-  selector: 'app-shopping-cart-view-component',
-  templateUrl: './shopping-cart-view-component.component.html',
-  styleUrls: ['./shopping-cart-view-component.component.scss'],
+  selector: 'app-transaction-information',
+  templateUrl: './transaction-information.component.html',
+  styleUrls: ['./transaction-information.component.scss'],
   providers: [AppMarketplaceItemsServiceProxy]
 })
-export class ShoppingCartViewComponentComponent
+export class TransactionInformationComponent
   extends AppComponentBase
   implements OnInit {
   @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;

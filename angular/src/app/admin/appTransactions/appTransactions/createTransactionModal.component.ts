@@ -31,7 +31,7 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
-import { ShoppingCartViewComponentComponent } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
+import {  TransactionInformationComponent } from "@app/admin/app-shoppingCart/Components/transaction-information-component/transaction-information.component";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { AppConsts } from "@shared/AppConsts";
@@ -51,7 +51,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     @ViewChild('calendar3') calendar3: Calendar;
     @ViewChild('calendar4') calendar4: Calendar;
     @ViewChild('autoComplete') autoComplete: any;
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
+    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     @ViewChild("Role") Role: Dropdown;
 
     @Input() orderNo: string;

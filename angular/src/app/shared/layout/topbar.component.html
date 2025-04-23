@@ -961,7 +961,7 @@
     </div>
     <!-- Container wrapper -->
 </nav>
-<app-shopping-cart-view-component #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-shopping-cart-view-component>
+<app-transaction-information #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-transaction-information>
 
 <createTransactionModal *ngIf="!isHost"   (modalClose)="closeModal($event)" (refreshShoppingCartData)="getShoppingCartInfo()" [roles]="roles" [modalheaderName]="modalheaderName" [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"   ></createTransactionModal>
 

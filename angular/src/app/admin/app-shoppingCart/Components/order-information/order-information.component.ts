@@ -14,7 +14,7 @@ import {
   TreeNodeOfGetSycEntityObjectClassificationForViewDto,
 } from "@shared/service-proxies/service-proxies";
 import { finalize } from "rxjs";
-import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
+import { ShoppingCartoccordionTabs } from "../transaction-information-component/ShoppingCartoccordionTabs";
 import * as moment from "moment";
 import { TreeSelect } from "primeng/treeselect";
 import { Calendar } from "primeng/calendar";

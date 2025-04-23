@@ -47,8 +47,8 @@ import {
 import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { Dropdown } from "primeng/dropdown";
-import { ShoppingCartViewComponentComponent } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
-import { ShoppingCartMode } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartMode";
+import {  TransactionInformationComponent } from "@app/admin/app-shoppingCart/Components/transaction-information-component/transaction-information.component";
+import { ShoppingCartMode } from "@app/admin/app-shoppingCart/Components/transaction-information-component/ShoppingCartMode";
 
 export enum MarketPlace {
     Accounts,
@@ -157,7 +157,7 @@ export class TopBarComponent
     defaultBuyerLogo: string = "";
     _TransactionType = TransactionType;
     transactionType: string = "";
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
+    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     currencySymbol: string = "";
     visible:boolean =false;
     displaneSel :boolean =false;

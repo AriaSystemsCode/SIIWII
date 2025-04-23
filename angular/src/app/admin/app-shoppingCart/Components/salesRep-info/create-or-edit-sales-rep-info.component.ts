@@ -1,6 +1,6 @@
 import { Component, Injector, EventEmitter, Output, Input, SimpleChanges } from '@angular/core';
 import { AppTransactionServiceProxy, ContactRoleEnum, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
-import { ShoppingCartoccordionTabs } from '../shopping-cart-view-component/ShoppingCartoccordionTabs';
+import { ShoppingCartoccordionTabs } from '../transaction-information-component/ShoppingCartoccordionTabs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import * as moment from 'moment';

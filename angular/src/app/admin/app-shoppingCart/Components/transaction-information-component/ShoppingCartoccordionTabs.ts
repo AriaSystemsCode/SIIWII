@@ -6,9 +6,7 @@ export enum ShoppingCartoccordionTabs {
   SalesRepInfo = 3,
   ShippingInfo = 4,
   BillingInfo = 5,
-  AdditionalInfo=6,
-  RecommendedInfo=7,
-  orderDetail=8,
+  orderDetail=6,
 
 
 }

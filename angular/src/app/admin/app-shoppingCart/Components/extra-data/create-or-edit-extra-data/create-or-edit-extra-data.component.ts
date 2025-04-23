@@ -6,7 +6,7 @@ import { AppEntityExtraDataDto, AppTransactionServiceProxy, GetAppTransactionsFo
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
 import { finalize } from "rxjs";
-import { ShoppingCartoccordionTabs } from '../../shopping-cart-view-component/ShoppingCartoccordionTabs';
+import { ShoppingCartoccordionTabs } from '../../transaction-information-component/ShoppingCartoccordionTabs';
 
 
 @Component({

@@ -104,7 +104,6 @@ import { PostsModule } from './main/posts/posts.module';
 import { eventsModule } from './main/AppEvent/events.module';
 import { CreateTransactionModal } from "./admin/appTransactions/appTransactions/createTransactionModal.component";
 import { AppTransactionsBrowseComponent } from "./admin/appTransactions/appTransactions/appTransBrowse.component";
-import { ShoppingCartViewComponentComponent } from "./admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
 import { AccordionModule } from "primeng/accordion";
 import { TreeTableModule } from 'primeng/treetable';
 import {OrderPreviewComponent} from "./admin/app-shoppingCart/Components/order-preview/order-preview.component";
@@ -130,6 +129,7 @@ import { ExtraAttributeDataService } from "./main/app-items/app-item-shared/serv
 import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Components/extra-data/create-or-edit-extra-data/create-or-edit-extra-data.component";
 import { ViewExtraDataComponent } from "./admin/app-shoppingCart/Components/extra-data/view-extra-data/view-extra-data.component";
 import { OrderInformationComponent } from "./admin/app-shoppingCart/Components/order-information/order-information.component";
+import { TransactionInformationComponent } from "./admin/app-shoppingCart/Components/transaction-information-component/transaction-information.component";
 @NgModule({
     declarations: [
         AppComponent,
@@ -185,7 +185,7 @@ import { OrderInformationComponent } from "./admin/app-shoppingCart/Components/o
         ActiveDelegatedUsersComboComponent,
         CreateTransactionModal,
         AppTransactionsBrowseComponent,
-        ShoppingCartViewComponentComponent,
+        TransactionInformationComponent,
         OrderInformationComponent,
         OrderPreviewComponent,
         CreateOrEditBuyerSellerContactInfoComponent,

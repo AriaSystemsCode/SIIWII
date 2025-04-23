@@ -6,8 +6,8 @@ import { LazyLoadEvent, SelectItem, SortEvent } from 'primeng/api';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
-import { ShoppingCartViewComponentComponent } from '@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component';
-import { ShoppingCartMode } from '@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartMode';
+import {  TransactionInformationComponent } from '@app/admin/app-shoppingCart/Components/transaction-information-component/transaction-information.component';
+import { ShoppingCartMode } from '@app/admin/app-shoppingCart/Components/transaction-information-component/ShoppingCartMode';
 
 @Component({
     selector: 'appTransBrowse',
@@ -50,7 +50,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     orderId: number = 0;
     showHeader: boolean = true;
     showDetails: boolean = false;
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
+    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     products: any
     selectedProduct: any;
     variationDetails: any[];

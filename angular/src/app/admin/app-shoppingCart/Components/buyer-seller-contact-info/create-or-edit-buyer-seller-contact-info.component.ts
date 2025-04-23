@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnInit, Output, EventEmitter, SimpleChanges
 import { AccountBranchDto, AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
-import { ShoppingCartoccordionTabs } from '../shopping-cart-view-component/ShoppingCartoccordionTabs';
+import { ShoppingCartoccordionTabs } from '../transaction-information-component/ShoppingCartoccordionTabs';
 import * as moment from 'moment';
 
 @Component({
