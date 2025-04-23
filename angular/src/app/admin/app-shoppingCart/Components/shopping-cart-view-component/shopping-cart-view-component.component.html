@@ -259,14 +259,14 @@
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==0">
-                                <app-sales-order [activeTab]="0" [currentTab]="currentTab"
+                                <app-order-information [activeTab]="0" [currentTab]="currentTab"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (orderInfoValid)="ontabInfoValid($event)"
                                     [createOrEditorderInfo]="createOrEditorderInfo"
                                     [oldCreateOrEditorderInfo]="createOrEditorderInfo"
                                     (ontabChange)="ontabChange($event)"
                                     (refreshShoppingCart)="refreshShoppingCart($event)"
-                                    [canChange]="canChange"></app-sales-order>
+                                    [canChange]="canChange"></app-order-information>
                             </div>
                         </p-accordionTab>
                         <!-- order information tab -->
@@ -1333,14 +1333,14 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                             </div>
                                         </ng-template>
                                         <div *ngIf="currentTab==0">
-                                            <app-sales-order [activeTab]="0" [currentTab]="currentTab"
+                                            <app-order-information [activeTab]="0" [currentTab]="currentTab"
                                                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                                                 (orderInfoValid)="ontabInfoValid($event)"
                                                 [createOrEditorderInfo]="createOrEditorderInfo"
                                                 [oldCreateOrEditorderInfo]="createOrEditorderInfo"
                                                 (ontabChange)="ontabChange($event)"
                                                 (refreshShoppingCart)="refreshShoppingCart($event)"
-                                                [canChange]="canChange"></app-sales-order>
+                                                [canChange]="canChange"></app-order-information>
                                         </div>
                                     </p-accordionTab>
                                     <!-- order information tab -->

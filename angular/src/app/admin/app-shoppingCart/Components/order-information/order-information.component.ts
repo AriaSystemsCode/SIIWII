@@ -20,11 +20,11 @@ import { TreeSelect } from "primeng/treeselect";
 import { Calendar } from "primeng/calendar";
 
 @Component({
-  selector: "app-sales-order",
-  templateUrl: "./sales-order.component.html",
-  styleUrls: ["./sales-order.component.scss"],
+  selector: "app-order-information",
+  templateUrl: "./order-information.component.html",
+  styleUrls: ["./order-information.component.scss"],
 })
-export class SalesOrderComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
+export class OrderInformationComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
 
   @ViewChild('calendar1') calendar1: Calendar;
   @ViewChild('calendar2') calendar2: Calendar;

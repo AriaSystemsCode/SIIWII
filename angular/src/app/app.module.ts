@@ -107,7 +107,6 @@ import { AppTransactionsBrowseComponent } from "./admin/appTransactions/appTrans
 import { ShoppingCartViewComponentComponent } from "./admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
 import { AccordionModule } from "primeng/accordion";
 import { TreeTableModule } from 'primeng/treetable';
-import { SalesOrderComponent } from "./admin/app-shoppingCart/Components/sales-order/sales-order.component";
 import {OrderPreviewComponent} from "./admin/app-shoppingCart/Components/order-preview/order-preview.component";
 import { ContactComponent } from "./admin/app-shoppingCart/Components/contact/contact.component";
 import { TreeSelectModule } from "primeng/treeselect";
@@ -130,6 +129,7 @@ import { SharedDynamicInputsModule } from "@shared/shared-module";
 import { ExtraAttributeDataService } from "./main/app-items/app-item-shared/services/extra-attribute-data.service";
 import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Components/extra-data/create-or-edit-extra-data/create-or-edit-extra-data.component";
 import { ViewExtraDataComponent } from "./admin/app-shoppingCart/Components/extra-data/view-extra-data/view-extra-data.component";
+import { OrderInformationComponent } from "./admin/app-shoppingCart/Components/order-information/order-information.component";
 @NgModule({
     declarations: [
         AppComponent,
@@ -186,7 +186,7 @@ import { ViewExtraDataComponent } from "./admin/app-shoppingCart/Components/extr
         CreateTransactionModal,
         AppTransactionsBrowseComponent,
         ShoppingCartViewComponentComponent,
-        SalesOrderComponent,
+        OrderInformationComponent,
         OrderPreviewComponent,
         CreateOrEditBuyerSellerContactInfoComponent,
         ViewBuyerSellerContactInfoComponent,
@@ -200,8 +200,6 @@ import { ViewExtraDataComponent } from "./admin/app-shoppingCart/Components/extr
         CreateOrEditBillingInfoComponent,
         ViewBillingInfoComponent,
         ShareTransactionTabComponent,
-        // mmmm
-        // mmmm
         CreateOrEditExtraDataComponent,
         ViewExtraDataComponent
     ],
