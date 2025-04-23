@@ -1,7 +1,6 @@
 ﻿import { Component, Injector, ViewEncapsulation, ViewChild } from '@angular/core';
 import { AppTransactionsServiceProxy, AppTransactionDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { CreateOrEditAppTransactionModalComponent } from './create-or-edit-appTransaction-modal.component';
 import { ViewAppTransactionModalComponent } from './view-appTransaction-modal.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';
@@ -11,6 +10,7 @@ import { FileDownloadService } from '@shared/utils/file-download.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Observable } from 'rxjs';
+import { CreateOrEditAppTransactionModalComponent } from '../create-or-edit-appTransaction-modal/create-or-edit-appTransaction-modal.component';
 
 
 @Component({
