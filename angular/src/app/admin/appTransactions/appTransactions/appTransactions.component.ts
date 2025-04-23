@@ -1,11 +1,7 @@
 ﻿import { Component, Injector, ViewEncapsulation, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { AppTransactionsServiceProxy, AppTransactionDto } from '@shared/service-proxies/service-proxies';
-import { NotifyService } from 'abp-ng2-module';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
 import { CreateOrEditAppTransactionModalComponent } from './create-or-edit-appTransaction-modal.component';
-
 import { ViewAppTransactionModalComponent } from './view-appTransaction-modal.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';

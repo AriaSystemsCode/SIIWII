@@ -103,7 +103,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PostsModule } from './main/posts/posts.module';
 import { eventsModule } from './main/AppEvent/events.module';
 import { CreateTransactionModal } from "./admin/appTransactions/appTransactions/createTransactionModal.component";
-import { AppTransactionsBrowseComponent } from "./admin/appTransactions/appTransactions/appTransBrowse.component";
+
 import { AccordionModule } from "primeng/accordion";
 import { TreeTableModule } from 'primeng/treetable';
 import {OrderPreviewComponent} from "./admin/app-TransactionTabsInfo/Components/order-preview/order-preview.component";
@@ -130,6 +130,7 @@ import { OrderInformationComponent } from "./admin/app-TransactionTabsInfo/Compo
 import { TransactionInformationComponent } from "./admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import { ViewShippingInformationComponent } from "./admin/app-TransactionTabsInfo/Components/shipping-info/view-shipping-information/view-shipping-information.component";
 import { CreateOrAddShippingInformationComponent } from "./admin/app-TransactionTabsInfo/Components/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
+import { AppTransactionsBrowseComponent } from "./admin/appTransactions/appTransBrowse/appTransBrowse.component";
 @NgModule({
     declarations: [
         AppComponent,

@@ -2,7 +2,7 @@
 import { AppTransactionServiceProxy, SycEntityObjectStatusesServiceProxy, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent, SelectItem, SortEvent } from 'primeng/api';
+import { SelectItem } from 'primeng/api';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
@@ -19,9 +19,11 @@ import { ShoppingCartMode } from '@app/admin/app-TransactionTabsInfo/Components/
 
 export class AppTransactionsBrowseComponent extends AppComponentBase implements OnInit {
 
+    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     @ViewChild('dataTable', { static: true }) dataTable;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
     @ViewChild('dataDetailTable', { static: true }) dataDetailTable;
+    
     filterForm: FormGroup;
     pageMainFilters;
     showMainFiltersOptions = true;
@@ -50,7 +52,6 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     orderId: number = 0;
     showHeader: boolean = true;
     showDetails: boolean = false;
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     products: any
     selectedProduct: any;
     variationDetails: any[];
