@@ -6,8 +6,8 @@ import { LazyLoadEvent, SelectItem, SortEvent } from 'primeng/api';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
-import {  TransactionInformationComponent } from '@app/admin/app-shoppingCart/Components/transaction-information-component/transaction-information.component';
-import { ShoppingCartMode } from '@app/admin/app-shoppingCart/Components/transaction-information-component/ShoppingCartMode';
+import {  TransactionInformationComponent } from '@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component';
+import { ShoppingCartMode } from '@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/ShoppingCartMode';
 
 @Component({
     selector: 'appTransBrowse',

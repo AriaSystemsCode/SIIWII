@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ShoppingCartoccordionTabs } from '@app/admin/app-shoppingCart/Components/transaction-information-component/ShoppingCartoccordionTabs';
+import { ShoppingCartoccordionTabs } from '@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/ShoppingCartoccordionTabs';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, GetAppTransactionsForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';

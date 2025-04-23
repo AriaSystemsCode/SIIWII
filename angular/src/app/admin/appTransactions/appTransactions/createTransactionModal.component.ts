@@ -31,7 +31,7 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
-import {  TransactionInformationComponent } from "@app/admin/app-shoppingCart/Components/transaction-information-component/transaction-information.component";
+import {  TransactionInformationComponent } from "@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { AppConsts } from "@shared/AppConsts";
