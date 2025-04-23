@@ -9,9 +9,6 @@ import { finalize } from "rxjs";
 import { ShoppingCartoccordionTabs } from '../../shopping-cart-view-component/ShoppingCartoccordionTabs';
 
 
-
-
-
 @Component({
   selector: 'create-or-edit-extra-data',
   templateUrl: './create-or-edit-extra-data.component.html',
@@ -103,7 +100,6 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
   save() {
     this.createOrEditExtraData = false;
     this.saveExtra()
-    // this.createOrEditTransaction();
   }
   onshowSaveBtn($event) {
     this.createOrEditExtraData = true;

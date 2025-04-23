@@ -44,12 +44,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
   @Input() createOrEditorderInfo: boolean;
   @Input() oldCreateOrEditorderInfo: boolean;
 
-  /** Global Variables */
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
   fullName: string;
   reference: any;
 
-  /** Dates */
   enteredDate = new Date();
   startDate = new Date();
   availableDate = new Date();
@@ -101,7 +99,6 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
   currencies: any[] = [];
   selectedCurrency: any;
 
-  /** Others */
   oldappTransactionsForViewDto;
   isContactsValid = false;
 
