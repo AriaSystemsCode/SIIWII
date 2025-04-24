@@ -138,21 +138,21 @@
                             <h6 class="text-right col-2" >
                                 {{ (memberData?.contact?.phone1TypeName ? (memberData?.contact?.phone1TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
                             </h6>
-                            <p class="text-left col">{{memberData?.contact?.phone1Number}}</p>
+                            <p class="text-left col">{{memberData?.contact?.phone1Number}} <span style="font-weight: 500;">{{memberData?.contact?.phone1Ext}}</span> </p>
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone2IsPublic">
                         <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone2IsPublic">
                             <h6 class="text-right col-2" >
                                 {{ (memberData?.contact?.phone2TypeName ? (memberData?.contact?.phone2TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
                             </h6>
-                            <p class="text-left col">{{memberData?.contact?.phone2Number}}</p>
+                            <p class="text-left col">{{memberData?.contact?.phone2Number}} <span style="font-weight: 500;">{{memberData?.contact?.phone2Ext}}</span> </p>
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone3IsPublic">
                         <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone3IsPublic">
                             <h6 class="text-right col-2" >
                                 {{ (memberData?.contact?.phone3TypeName ? (memberData?.contact?.phone3TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
                             </h6>
-                            <p class="text-left col">{{memberData?.contact?.phone3Number}}</p>
+                            <p class="text-left col">{{memberData?.contact?.phone3Number}} <span style="font-weight: 500;">{{memberData?.contact?.phone3Ext}}</span> </p>
                         </div>
                     </div>
 
