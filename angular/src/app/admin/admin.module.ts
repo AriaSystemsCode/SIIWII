@@ -77,7 +77,6 @@ import { AppTenantPlansComponent } from "./appTenantPlans/appTenantPlans/appTena
 import { ViewAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans/view-appTenantPlan-modal.component";
 import { CreateOrEditAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans/create-or-edit-appTenantPlan-modal.component";
 
-import { AppTransactionsComponent } from "./appTransactions/appTransactions/appTransactions.component";
 
 import { SycPlanServicesComponent } from "./sycPlanServices/sycPlanServices/sycPlanServices.component";
 import { ViewSycPlanServiceModalComponent } from "./sycPlanServices/sycPlanServices/view-sycPlanService-modal.component";
@@ -213,8 +212,12 @@ import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { TreeSelectModule } from 'primeng/treeselect';
-import { CreateOrEditAppTransactionModalComponent } from './appTransactions/create-or-edit-appTransaction-modal/create-or-edit-appTransaction-modal.component';
-import { ViewAppTransactionModalComponent } from './appTransactions/view-appTransaction-modal/view-appTransaction-modal.component';
+// import { ViewAppTransactionModalComponent } from '@app/main/transactions/appTransactions/view-appTransaction-modal/view-appTransaction-modal.component';
+// import { CreateOrEditAppTransactionModalComponent } from '@app/main/transactions/appTransactions/create-or-edit-appTransaction-modal/create-or-edit-appTransaction-modal.component';
+import { AppTransactionsComponent } from '@app/main/transactions/appTransactions/appTransactions/appTransactions.component';
+
+
+
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
@@ -332,8 +335,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         CreateOrEditAppTenantPlanModalComponent,
         AppTransactionsComponent,
 
-        ViewAppTransactionModalComponent,
-        CreateOrEditAppTransactionModalComponent,
+        // ViewAppTransactionModalComponent,
+        // CreateOrEditAppTransactionModalComponent,
         SycPlanServicesComponent,
 
         ViewSycPlanServiceModalComponent,

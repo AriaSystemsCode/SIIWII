@@ -143,6 +143,17 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                                 },
                             },
                             {
+                                path: "transactions",
+                                loadChildren: () =>
+                                    import(
+                                        "./transactions/transaction.module"
+                                    ).then((m) => m.TransactionModule),
+                                data: {
+                                    preload: true,
+                                    // permission: "Pages.Marketplace.Events",
+                                },
+                            },
+                            {
                                 path: "news",
                                 loadChildren: () =>
                                     import(

@@ -24,7 +24,6 @@ import { ViewAppAdvertisementComponent } from './appAdvertisements/appAdvertisem
 import { TicketNotesComponent } from './autoTaskTicketNotes/ticketNotes/ticketNotes.component';
 import { TicketsComponent } from './autoTaskTickets/tickets/tickets.component';
 import { AppTenantPlansComponent } from './appTenantPlans/appTenantPlans/appTenantPlans.component';
-import { AppTransactionsComponent } from './appTransactions/appTransactions/appTransactions.component';
 import { SycPlanServicesComponent } from './sycPlanServices/sycPlanServices/sycPlanServices.component';
 import { SycPlansComponent } from './sycPlans/sycPlans/sycPlans.component';
 import { SycServicesComponent } from './sycServices/sycServices/sycServices.component';
@@ -52,11 +51,9 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
 import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/appTenantSubscriptionPlans.component';
 import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
 import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
-import { AppTransactionsBrowseComponent } from './appTransactions/appTransBrowse/appTransBrowse.component';
-// import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
-// import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
-// import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
-// import { EntityDynamicParameterValueComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter-value/entity-dynamic-parameter-value.component';
+import { AppTransactionsComponent } from '@app/main/transactions/appTransactions/appTransactions/appTransactions.component';
+import { AppTransactionsBrowseComponent } from '@app/main/transactions/appTransactions/appTransBrowse/appTransBrowse.component';
+
 
 
 @NgModule({
@@ -93,7 +90,6 @@ import { AppTransactionsBrowseComponent } from './appTransactions/appTransBrowse
                     { path: 'appTenantPlans/appTenantPlans', component: AppTenantPlansComponent, data: { permission: 'Pages.Administration.AppTenantPlans' }  },
                     { path: 'appTransactions/appTransactions', component: AppTransactionsComponent, data: { permission: 'Pages.Administration.AppTransactions' }  },
                     { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent , data: { permission: 'Pages.AppSiiwiiTransactions' } } ,
-                  //  { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent } ,
                     { path: 'sycPlanServices/sycPlanServices', component: SycPlanServicesComponent, data: { permission: 'Pages.Administration.SycPlanServices' }  },
                     { path: 'sycPlans/sycPlans', component: SycPlansComponent, data: { permission: 'Pages.Administration.SycPlans' }  },
                     { path: 'sycServices/sycServices', component: SycServicesComponent, data: { permission: 'Pages.Administration.SycServices' }  },

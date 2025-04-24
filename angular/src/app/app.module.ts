@@ -128,8 +128,8 @@ import { OrderInformationComponent } from "./admin/app-TransactionTabsInfo/Compo
 import { TransactionInformationComponent } from "./admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import { ViewShippingInformationComponent } from "./admin/app-TransactionTabsInfo/Components/shipping-info/view-shipping-information/view-shipping-information.component";
 import { CreateOrAddShippingInformationComponent } from "./admin/app-TransactionTabsInfo/Components/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
-import { AppTransactionsBrowseComponent } from "./admin/appTransactions/appTransBrowse/appTransBrowse.component";
-import { CreateTransactionModal } from "./admin/appTransactions/createTransactionModal/createTransactionModal.component";
+import { CreateTransactionModal } from "./main/transactions/appTransactions/createTransactionModal/createTransactionModal.component";
+import { AppTransactionsBrowseComponent } from "./main/transactions/appTransactions/appTransBrowse/appTransBrowse.component";
 @NgModule({
     declarations: [
         AppComponent,

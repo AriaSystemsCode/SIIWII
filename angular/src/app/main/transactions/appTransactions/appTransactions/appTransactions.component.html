@@ -140,12 +140,12 @@
                                             </button>
 												<ul class="dropdown-menu"  *dropdownMenu>
 												<li>
-													<a href="javascript:;" 
-														(click)="viewAppTransactionModal.show(record)">{{l('View')}}</a>
+													<!-- <a href="javascript:;" 
+														(click)="viewAppTransactionModal.show(record)">{{l('View')}}</a> -->
 												</li>
 												<li>
-                                                <a href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.AppTransactions.Edit')" 
-														(click)="createOrEditAppTransactionModal.show(record.appTransaction.id)">{{l('Edit')}}</a>												
+                                                <!-- <a href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.AppTransactions.Edit')" 
+														(click)="createOrEditAppTransactionModal.show(record.appTransaction.id)">{{l('Edit')}}</a>												 -->
                                                 </li>
 												<li>
 											        <a  href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.AppTransactions.Delete')"
@@ -204,8 +204,8 @@
             </div>
         </div>
     </div>
-    <createOrEditAppTransactionModal #createOrEditAppTransactionModal (modalSave)="getAppTransactions()"></createOrEditAppTransactionModal>    
-    <viewAppTransactionModal #viewAppTransactionModal></viewAppTransactionModal>
+    <!-- <createOrEditAppTransactionModal #createOrEditAppTransactionModal (modalSave)="getAppTransactions()"></createOrEditAppTransactionModal>     -->
+    <!-- <viewAppTransactionModal #viewAppTransactionModal></viewAppTransactionModal> -->
     
   </div>
 </div>
