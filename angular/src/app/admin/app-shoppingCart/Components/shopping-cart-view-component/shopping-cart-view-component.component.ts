@@ -1254,10 +1254,11 @@ stopReport(event) {
                 let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
             
             
-                this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-                this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-                this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-                this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+            
+                this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
