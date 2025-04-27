@@ -4,7 +4,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
 import * as moment from 'moment';
-import { TransactionCartoccordionTabs } from '../../transaction-information-component/TransactionCartoccordionTabs';
+import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
 
 @Component({
   selector: 'app-create-or-edit-billing-info',

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, Input, OnInit, Output, SimpleChanges
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
-import { TransactionCartoccordionTabs } from '../transaction-information-component/TransactionCartoccordionTabs';
+import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
 
 @Component({
   selector: 'app-view-buyer-seller-contact-info',

@@ -7,7 +7,7 @@ import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
 import { TransactionInformationComponent } from '../../app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component';
-import { TransactionCartMode } from '../../app-TransactionTabsInfo/Components/transaction-information-component/TransactionCartMode';
+import { TransactionCartMode } from '../../enums/TransactionCartMode';
 
 @Component({
     selector: 'appTransBrowse',

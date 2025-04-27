@@ -18,7 +18,7 @@ import { finalize } from "rxjs";
 import * as moment from "moment";
 import { TreeSelect } from "primeng/treeselect";
 import { Calendar } from "primeng/calendar";
-import { TransactionCartoccordionTabs } from "../transaction-information-component/TransactionCartoccordionTabs";
+import { TransactionCartoccordionTabs } from "../../../enums/TransactionCartoccordionTabs";
 
 @Component({
   selector: "app-order-information",

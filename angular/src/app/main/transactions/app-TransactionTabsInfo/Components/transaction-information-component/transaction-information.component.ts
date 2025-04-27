@@ -10,7 +10,7 @@ import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
 import { TreeNode } from 'primeng/api';
 import { Router } from '@angular/router';
-import {  TransactionCartMode } from "./TransactionCartMode";
+import {  TransactionCartMode } from "../../../enums/TransactionCartMode";
 import { UserClickService } from '@shared/utils/user-click.service';
 import { finalize } from 'rxjs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
@@ -23,7 +23,7 @@ import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-sh
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/models/filtered-extra-attribute';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
-import { TransactionCartoccordionTabs } from './TransactionCartoccordionTabs';
+import { TransactionCartoccordionTabs } from '../../../enums/TransactionCartoccordionTabs';
 
 @Component({
   selector: 'app-transaction-information',

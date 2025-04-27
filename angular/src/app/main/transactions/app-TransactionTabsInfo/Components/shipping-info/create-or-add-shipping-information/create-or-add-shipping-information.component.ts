@@ -3,7 +3,7 @@ import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactions
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
-import { TransactionCartoccordionTabs } from '../../transaction-information-component/TransactionCartoccordionTabs';
+import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',

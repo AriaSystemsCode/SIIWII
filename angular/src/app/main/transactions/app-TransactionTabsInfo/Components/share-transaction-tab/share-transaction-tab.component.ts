@@ -17,6 +17,14 @@ export class ShareTransactionTabComponent extends AppComponentBase {
   @Output() closeTranScreenEvent = new EventEmitter<any>();
   @Input("orderId") orderId: number;
   @Input("sharedWithUsers") sharedWithUsers: any;
+  @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
+
+  @Output() onShareTransactionByMessage = new EventEmitter<{
+    tenantTransactionInfo: TenantTransactionInfo[],
+    appTransactionsForViewDto: GetAppTransactionsForViewDto
+  }>();
+
+
   emailList: string;
   sharingList: any;
   sharingListForSave: any;
@@ -35,12 +43,7 @@ export class ShareTransactionTabComponent extends AppComponentBase {
   messageBody: string;
   contactsToBeSharedWith: TransactionSharingDto[];
   dasableShareBtn: boolean = true;
-  @Output() onShareTransactionByMessage = new EventEmitter<{
-    tenantTransactionInfo: TenantTransactionInfo[],
-    appTransactionsForViewDto: GetAppTransactionsForViewDto
-  }>();
 
-  @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   constructor(
     injector: Injector,
     private _postService: AppPostsServiceProxy,

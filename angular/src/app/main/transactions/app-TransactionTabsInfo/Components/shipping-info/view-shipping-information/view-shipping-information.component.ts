@@ -1,8 +1,8 @@
 import { Component, Injector, Input, Output, EventEmitter } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
-import { TransactionCartMode } from '../../transaction-information-component/TransactionCartMode';
-import { TransactionCartoccordionTabs } from '../../transaction-information-component/TransactionCartoccordionTabs';
+import { TransactionCartMode } from '../../../../enums/TransactionCartMode';
+import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
 
 
 @Component({

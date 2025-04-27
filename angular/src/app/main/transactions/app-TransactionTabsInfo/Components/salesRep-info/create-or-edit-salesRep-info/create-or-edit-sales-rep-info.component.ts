@@ -2,7 +2,7 @@ import { Component, Injector, EventEmitter, Output, Input, SimpleChanges } from 
 import { AppTransactionServiceProxy, ContactRoleEnum, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
-import { TransactionCartoccordionTabs } from '../transaction-information-component/TransactionCartoccordionTabs';
+import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
 
 @Component({
   selector: 'app-create-or-edit-sales-rep-info',

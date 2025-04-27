@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { TransactionCartoccordionTabs } from '@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/TransactionCartoccordionTabs';
+import { TransactionCartoccordionTabs } from '@app/main/transactions/enums/TransactionCartoccordionTabs';
 
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, GetAppTransactionsForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';

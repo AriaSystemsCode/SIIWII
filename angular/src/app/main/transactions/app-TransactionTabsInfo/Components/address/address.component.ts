@@ -7,7 +7,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs/operators';
 import { NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { TransactionCartoccordionTabs } from "../transaction-information-component/TransactionCartoccordionTabs";
+import { TransactionCartoccordionTabs } from "../../../enums/TransactionCartoccordionTabs";
 
 @Component({
   selector: "app-address",
