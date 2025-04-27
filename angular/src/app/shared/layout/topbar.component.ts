@@ -47,8 +47,7 @@ import {
 import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { Dropdown } from "primeng/dropdown";
-import {  TransactionInformationComponent } from "@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
-import { ShoppingCartMode } from "@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/ShoppingCartMode";
+import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 
 export enum MarketPlace {
     Accounts,

@@ -42,7 +42,7 @@
                     'd-none': !showMenuItem(item) || item.name === 'BillingLog',
                     'spLeng': item.name == 'System Objects'  && openSub && isMinimized ,
                   
-                  }"  [queryParams]="item.parameters"   [routerLink]="item.name != 'Administration' && item.name != 'System Objects'  ? item.route : null" [routerLinkActive]="item.name != 'Administration' && item.name != 'System Objects' ? 'active-link' :''" (click)=" item.name != 'Administration' ? isMinimized = true : ''; ">
+                  }"  [queryParams]="item.parameters"   [routerLink]="  item.name == 'My Transactions' ? '/app/main/transactions/appTransactions/MyTransactions' : item.name != 'Administration' && item.name != 'System Objects'  ? item.route : null" [routerLinkActive]="item.name != 'Administration' && item.name != 'System Objects' ? 'active-link' :''" (click)=" item.name != 'Administration' ? isMinimized = true : ''; ">
                     <svg *ngIf="item.name == 'My Transactions'"  (click)="openSub = false  ; openAdSub = false " xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none"  class="svgIcon">
                         <g clip-path="url(#clip0_272_39693)">
                           <path d="M22.7116 10.3223H2.06641V20.6448H22.7116V10.3223ZM11.3567 19.6126H3.09866V17.5481H11.3567V19.6126ZM11.3567 16.5158H3.09866V14.4513H11.3567V16.5158ZM11.3567 13.419H3.09866V11.3545H11.3567V13.419ZM16.518 19.6126H12.389V17.5481H16.518V19.6126ZM16.518 16.5158H12.389V14.4513H16.518V16.5158ZM16.518 13.419H12.389V11.3545H16.518V13.419ZM21.6793 19.6126H17.5503V17.5481H21.6793V19.6126ZM21.6793 16.5158H17.5503V14.4513H21.6793V16.5158ZM21.6793 13.419H17.5503V11.3545H21.6793V13.419Z" />

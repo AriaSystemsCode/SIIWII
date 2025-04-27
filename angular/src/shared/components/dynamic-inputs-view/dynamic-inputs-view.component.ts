@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ShoppingCartoccordionTabs } from '@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/ShoppingCartoccordionTabs';
-import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { TransactionCartoccordionTabs } from '@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/TransactionCartoccordionTabs';
+
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, GetAppTransactionsForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
@@ -16,7 +16,7 @@ export class dynamicInputsView   extends AppComponentBase implements OnInit {
     @Input("activeTab") activeTab: number;
     @Input("currentTab") currentTab: number;
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-    shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+    shoppingCartoccordionTabs = TransactionCartoccordionTabs;
     @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
 
     @Input("extraAttributeObject") extraAttributeObject;

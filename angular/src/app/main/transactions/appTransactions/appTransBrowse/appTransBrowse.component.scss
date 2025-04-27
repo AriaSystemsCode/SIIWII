@@ -1,9 +1,9 @@
-@import "../../../../assets/styles/base/variables";
+// @import "@app/assets/styles/base/variables";
 
 .list-toolbar-divider {
     width: 2px;
     height: 38px;
-    border-left: 1px dashed $grey-2 !important;
+    border-left: 1px dashed #B5B5C3 !important;
 }
 
 .searchBtn {
@@ -114,7 +114,7 @@
 }
 
 .selected-month-btn {
-    background: var(--Primary-Color, #4A0D4A);
+    background:  #4A0D4A;
     width: Hug (152px)px;
     height: Hug (37px)px;
     padding: 11px 20px 11px 20px;
@@ -129,7 +129,7 @@
 }
 
 .selected-year-btn {
-    background: var(--Primary-Color, #4A0D4A);
+    background: #4A0D4A;
     width: Hug (152px)px;
     height: Hug (37px)px;
     padding: 11px 20px 11px 20px;

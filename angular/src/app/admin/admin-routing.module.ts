@@ -51,7 +51,6 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
 import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/appTenantSubscriptionPlans.component';
 import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
 import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
-import { AppTransactionsComponent } from '@app/main/transactions/appTransactions/appTransactions/appTransactions.component';
 import { AppTransactionsBrowseComponent } from '@app/main/transactions/appTransactions/appTransBrowse/appTransBrowse.component';
 
 
@@ -88,7 +87,6 @@ import { AppTransactionsBrowseComponent } from '@app/main/transactions/appTransa
                     { path: 'appAdvertisements/appAdvertisements/view', component: ViewAppAdvertisementComponent, data: { permission: 'Pages.Administration.AppAdvertisements' }  },
                    { path: 'appTenantsActivitiesLogs/appTenantsActivitiesLogs', component: AppTenantActivitiesLogComponent , data: { permission: 'Pages.Administration.AppTenantsActivitiesLogs' }  },
                     { path: 'appTenantPlans/appTenantPlans', component: AppTenantPlansComponent, data: { permission: 'Pages.Administration.AppTenantPlans' }  },
-                    { path: 'appTransactions/appTransactions', component: AppTransactionsComponent, data: { permission: 'Pages.Administration.AppTransactions' }  },
                     { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent , data: { permission: 'Pages.AppSiiwiiTransactions' } } ,
                     { path: 'sycPlanServices/sycPlanServices', component: SycPlanServicesComponent, data: { permission: 'Pages.Administration.SycPlanServices' }  },
                     { path: 'sycPlans/sycPlans', component: SycPlansComponent, data: { permission: 'Pages.Administration.SycPlans' }  },

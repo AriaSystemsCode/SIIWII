@@ -31,13 +31,13 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
-import {  TransactionInformationComponent } from "@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { AppConsts } from "@shared/AppConsts";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 import * as moment from "moment";
 import { Calendar } from "primeng/calendar";
+import { TransactionInformationComponent } from "../../app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 
 @Component({
     templateUrl: "./createTransactionModal.component.html",

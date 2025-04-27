@@ -6,8 +6,8 @@ import { SelectItem } from 'primeng/api';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
-import {  TransactionInformationComponent } from '@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component';
-import { ShoppingCartMode } from '@app/admin/app-TransactionTabsInfo/Components/transaction-information-component/ShoppingCartMode';
+import { TransactionInformationComponent } from '../../app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component';
+import { TransactionCartMode } from '../../app-TransactionTabsInfo/Components/transaction-information-component/TransactionCartMode';
 
 @Component({
     selector: 'appTransBrowse',
@@ -201,10 +201,10 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
         if (this.orderId) {
             if ($event.entityObjectStatusCode == "DRAFT") {
-                this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.createOrEdit);
+                this.shoppingCartModal.show(this.orderId, true, true, TransactionCartMode.createOrEdit);
 
             } else {
-                this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
+                this.shoppingCartModal.show(this.orderId, true, true, TransactionCartMode.view);
 
             }
         }
