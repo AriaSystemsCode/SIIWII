@@ -71,7 +71,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     ngOnInit(): void {
         this.getAppTransactionContactsIndex();
-
+         this.resetSelectedData()
+         this.setSelectedData()
         const value = localStorage.getItem("comNew");
         if (value) this.comNew = Boolean(value);
 
