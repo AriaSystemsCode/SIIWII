@@ -5,6 +5,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
 import * as moment from 'moment';
+import { add } from '@node_modules/@types/lodash';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
@@ -138,10 +139,6 @@ SuccessMsg: boolean = false;
       shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1  ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
       shipToObj[0]?.contactAddressDetail  && shipToObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
 
-      if (this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId) { 
-        this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
-
-      }
     }
     if (contactRole == ContactRoleEnum.ShipFromContact) {
       this.shipFromSelectedAdd = addObj.selectedAddressObj
@@ -149,6 +146,8 @@ SuccessMsg: boolean = false;
       this.shipToSelectedAdd = addObj.selectedAddressObj
 
     }
+    this.validateShippingTab();
+
   }
   cancel() {
     this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
@@ -196,25 +195,27 @@ SuccessMsg: boolean = false;
         this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressId = this.shipToSelectedAdd?.id;
       }
     }
+    this.validateShippingTab();
+
   }
   updateShipToAddress(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ShipToContact);
+    if(addObj){
+      this.enableSAveShipTo = true
+    this.validateShippingTab();
+
+    }
   }
   updateShipFromAddress(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ShipFromContact);
+    if(addObj){
+      this.enableSAveShipFrom = true
+    this.validateShippingTab();
+
+    }
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-    let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-    let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-    let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-    let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
-
-
-    this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-    this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-    this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-    this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
@@ -234,22 +235,7 @@ SuccessMsg: boolean = false;
         }
       });
   }
-  selectShipVia($event) {
-    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
-    if (index >= 0) {
-      this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
-      this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
-    }
 
-    if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {  
-      this.shippingTabValid = true;
-      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
-
-    } else {
-      this.shippingTabValid = false;
-    }
-
-  }
   enterStore() {
     this.appTransactionsForViewDto.buyerStore = this.storeVal;
   }
@@ -288,11 +274,21 @@ SuccessMsg: boolean = false;
       }
 
     }
+    this.validateShippingTab();
 
   }
 
   
+  selectShipVia($event) {
+    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
+    if (index >= 0) {
+      this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
+      this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
+    }
 
+    this.validateShippingTab();
+
+  }
 
   isMamualAcc() {
     let accSSin = ''
@@ -332,6 +328,8 @@ SuccessMsg: boolean = false;
   }
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
+    this.validateShippingTab();
+
   }
   shipFromData;
   shipToData;
@@ -344,6 +342,8 @@ SuccessMsg: boolean = false;
         if( this.AddressComponentChild)
       this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
   }
+  this.validateShippingTab();
+
 }
   reloadAddresscomponentShipTo(data) {
   this.shipToData=data;
@@ -353,6 +353,28 @@ SuccessMsg: boolean = false;
   if( this.AddressComponentChild)
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
 }
+this.validateShippingTab();
+
+  }
+
+  validateShippingTab() {
+    console.log('Validating Shipping Tab:', {
+      enableSAveShipFrom: this.enableSAveShipFrom,
+      enableSAveShipTo: this.enableSAveShipTo,
+      shipViaId: this.appTransactionsForViewDto.shipViaId,
+    });
+  
+    if (this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId) {
+      this.shippingTabValid = true;
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+    } else {
+      this.shippingTabValid = false;
+    }
+  }
+  addressUpdated($event){
+    if($event){
+      $event == true ? this.validateShippingTab():''
+    }
   }
 
 }

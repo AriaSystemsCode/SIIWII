@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ShoppingCartoccordionTabs } from "../../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -43,10 +43,13 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   saveBtn: boolean = false;
   SuccessMsg: boolean = false;
   isAccManual :boolean = false
+    apContactdata;
+  arContactdata;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+    private cd: ChangeDetectorRef  // <-- inject it
   ) {
     super(injector);
 
@@ -54,15 +57,19 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 
   ngAfterViewInit() {
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
-    this.loadAddresComponentShipFrom = true;
-    this.contactIdApContact = this.apContactdata?.compId;
+   
+      this.contactIdApContact = this.apContactdata?.compId;
       if( this.AddressComponentChild)
     this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
 
       this.contactIdARContact = this.arContactdata?.compId;
-      this.loadAddresComponentShipTo = true;
+
       if( this.AddressComponentChild)
       this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+    
+    
+      this.cd.detectChanges(); // <<< ADD THIS after changes are done
+
     }
       
   }
@@ -75,6 +82,10 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
     arContactObj[0]?.companySSIN  && arContactObj[0]?.contactAddressDetail?.addressLine1 ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
   //  this.loadpayTermsListListist();
+
+
+  
+  
     }
   }
   ngOnChanges(changes: SimpleChanges) {
@@ -138,7 +149,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
       apContactObj[0]?.contactAddressDetail  && apContactObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
       arContactObj[0]?.contactAddressDetail  && arContactObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
-debugger
+
       if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) {   
         this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
@@ -164,7 +175,7 @@ debugger
       this.isContactsValid = value;
       if (this.isContactsValid) {
         if (sectionIndex == 1) {
-          (!apContactObj[0]?.companySSIN) ||( apContactObj[0]?.contactAddressDetail  && apContactObj[0]?.contactAddressDetail?.addressLine1 ) ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
+          ( apContactObj[0]?.contactAddressDetail  && apContactObj[0]?.contactAddressDetail?.addressLine1 ) ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
         } else {
           (!arContactObj[0]?.companySSIN) ||( arContactObj[0]?.contactAddressDetail   && arContactObj[0]?.contactAddressDetail?.addressLine1 )? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
         }
@@ -203,8 +214,8 @@ debugger
     this.appTransactionsForViewDto = $event;
   }
 
-  apContactdata;
-  arContactdata;
+
+
 
   reloadAddresscomponentAPContact(data) {
 
@@ -216,6 +227,8 @@ debugger
       if( this.AddressComponentChild)
         this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
     }
+
+    this.cd.detectChanges(); // <<< add
   }
 
    
@@ -228,21 +241,16 @@ debugger
     if( this.AddressComponentChild)
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
     }
+
+    this.cd.detectChanges(); // <<< add
   }
+
+
 
   createOrEditTransaction() {
     this.showMainSpinner()
     
-    let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-    let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-    let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-    let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
 
-
-    this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-    this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-    this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-    this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
@@ -328,9 +336,10 @@ debugger
 
   updateApContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.APContact);
-  }
-  updateArContact(addObj) {
-    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
+    if(addObj){
+      this.enableSAveApcontact = true
+      this.validateBillingTab()
+    }
   }
 
   onchangePayment($event) {
@@ -340,6 +349,18 @@ debugger
       this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
     }
     this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId ? this.isContactsValid = true : this.isContactsValid = false;    
+this.validateBillingTab()
+    
+  }
+  updateArContact(addObj) {
+    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
+    if(addObj){
+      this.enableSAveArcontact = true
+      this.validateBillingTab()
+    }
+  }
+
+  validateBillingTab() {
     if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
       this.isContactsValid = true;
       this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
