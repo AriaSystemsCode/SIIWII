@@ -47,6 +47,7 @@ visible: boolean = false;
 cancelBtn: boolean = false;
 saveBtn: boolean = false;
 SuccessMsg: boolean = false;
+atInitialize: boolean = true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -71,6 +72,15 @@ SuccessMsg: boolean = false;
       if( this.AddressComponentChild)
       this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
     }  
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+      .subscribe((res) => {
+        if (res) {
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+     
+        }
+      });
+
       
   }
   ngOnInit() {
@@ -159,6 +169,7 @@ SuccessMsg: boolean = false;
     this.showSaveBtn = false;
   }
   save() {
+  
     this.createOrEditshippingInfO = false;
     this.setAddress();
     this.createOrEditTransaction();
@@ -215,22 +226,24 @@ SuccessMsg: boolean = false;
     }
   }
   createOrEditTransaction() {
-    this.showMainSpinner()
+    
+      this.showMainSpinner()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
         //  this.generatOrderReport.emit(true) ;
-       this.refreshShoppingCart.emit(true)
 
+
+       this.refreshShoppingCart.emit(true)
         // this.SuccessMsg = true
       }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-          if (!this.showSaveBtn)
+          if (!this.showSaveBtn )
             this.ontabChange.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
-          else
+          else 
             this.showSaveBtn = false;
         }
       });

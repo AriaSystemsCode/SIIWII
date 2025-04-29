@@ -45,6 +45,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   isAccManual :boolean = false
     apContactdata;
   arContactdata;
+  atInitialize:boolean =true
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -67,12 +68,19 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       if( this.AddressComponentChild)
       this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
     
-    
-      this.cd.detectChanges(); // <<< ADD THIS after changes are done
+   
 
     }
-      
-  }
+    this.setAddress()
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+      .subscribe((res) => {
+        if (res) {
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+     
+        }
+      });
+    }
   ngOnInit() {
     this.isMamualAcc()
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
@@ -248,7 +256,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 
 
   createOrEditTransaction() {
-    this.showMainSpinner()
+      this.showMainSpinner()
+
     
 
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
@@ -256,14 +265,14 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
         //  this.generatOrderReport.emit(true) ; 
-       this.refreshShoppingCart.emit(true)
 
+       this.refreshShoppingCart.emit(true)
           // this.SuccessMsg = true
         }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-          if (!this.showSaveBtn) {
+          if (!this.showSaveBtn ) {
             this.ontabChange.emit(ShoppingCartoccordionTabs.BillingInfo);
           }
           else {
