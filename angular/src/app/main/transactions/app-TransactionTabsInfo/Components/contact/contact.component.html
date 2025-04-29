@@ -62,14 +62,18 @@
                 <div
                     *ngIf="activeTab==transactionCartoccordionTabs.orderInfo || activeTab==transactionCartoccordionTabs.SellerContactInfo">
                     <p class="previewValue text-nowrap m-0 p-0  pl-2 col-6"
-                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name          || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName">
                         {{
-                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name}}
+                            appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name
+                              || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName
+                              || '-'
+                          }}
+                        
                     </p>
-                    <p class="previewValue text-nowrap m-0 p-0 pl-5 col-6"
+                    <!-- <p class="previewValue text-nowrap m-0 p-0 pl-5 col-6"
                         *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
                         -
-                    </p>
+                    </p> -->
                 </div>
             </div>
 

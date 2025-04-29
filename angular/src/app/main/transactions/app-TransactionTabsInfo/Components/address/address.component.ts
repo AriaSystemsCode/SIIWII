@@ -135,7 +135,6 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
 
   getAddressList(companySsin, branchSsin) {
 
-    this.showMainSpinner()
     if (companySsin) {
       this._AppTransactionServiceProxy.getCompanyAddresses(companySsin, null).subscribe(result => {
 

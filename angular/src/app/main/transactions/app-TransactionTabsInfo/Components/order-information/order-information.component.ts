@@ -47,7 +47,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
   transactionCartoccordionTabs = TransactionCartoccordionTabs;
   fullName: string;
-  reference: any;
+  reference: string;
 
   enteredDate = new Date();
   startDate = new Date();
