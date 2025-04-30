@@ -73,15 +73,13 @@
     <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
 
 
-
-        <!-- merge -->
-        <!-- merge -->
     <app-address  
     [isCreateOredit]="createOrEditBillingInfo"
     [contactId]="contactIdARContact"
     (updateSelectedAddress)="updateArContact($event)"
     [selectedAddressDetails]="arContactSelectedAdd"
     [showAddressType]="false"
+    [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
     [currentTab]="currentTab"
     [billingIndexInfo]="2"
 
@@ -89,7 +87,6 @@
     [canChange]="canChange"
     [currentTab]="currentTab"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
-    [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
     ></app-address>
 </div>
     <div class="container-fluid pt-1 mb-3 mt-3"  *ngIf="createOrEditBillingInfo">

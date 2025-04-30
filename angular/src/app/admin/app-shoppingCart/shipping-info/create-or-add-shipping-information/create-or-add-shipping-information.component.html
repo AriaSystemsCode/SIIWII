@@ -84,13 +84,13 @@
    [isCreateOredit]="createOrEditshippingInfO"
    [contactId]="contactIdShipTo"
    (updateSelectedAddress)="updateShipToAddress($event)"
+   [fromSalesRep] ="((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false:true"
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
    [canChange]="canChange"
    [currentTab]="currentTab"  
    [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
 
-   [fromSalesRep] ="((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false:true"
 
    ></app-address>
 </div>
