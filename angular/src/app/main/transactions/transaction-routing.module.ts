@@ -5,15 +5,11 @@ import { AppTransactionsBrowseComponent } from './appTransactions/appTransBrowse
 
 
 const routes: Routes = [
-  {
-    path: '',
-
-    children: [
-      { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent, data: { permission: 'Pages.AppSiiwiiTransactions' } },
 
 
-    ]
-  }
+      { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent, },
+
+  
 ];
 
 

@@ -203,9 +203,10 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                             ).then((m) => m.TransactionModule),
                         data: {
                             preload: true,
-                            permission: "Pages.AppSiiwiiTransactions",
+                            // permission: "Pages.AppSiiwiiTransactions",
                         },
                     },
+                    // { path: '**', redirectTo: '/app/main/dashboard'}
                     { path: "**", redirectTo: "dashboard" },
                 ],
             },
