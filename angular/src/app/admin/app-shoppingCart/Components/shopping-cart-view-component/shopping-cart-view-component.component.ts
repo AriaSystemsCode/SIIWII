@@ -147,20 +147,7 @@ mainLoad : boolean = false
   this.conNew = false;
 
 }
-const button = document.getElementById("stickyButton");
-  const rightCol = document.getElementById("rightCol");
 
-  window.addEventListener("scroll", () => {
-    const rect = rightCol.getBoundingClientRect();
-    if (rect.top < 20 && rect.bottom > window.innerHeight) {
-      button.style.position = "fixed";
-      button.style.bottom = "20px";
-      button.style.right = rect.left + "px"; // Adjust based on the right column's position
-    } else {
-      button.style.position = "absolute";
-      button.style.bottom = "20px";
-    }
-  });
 
   }
   ngOnChanges() {
@@ -1261,16 +1248,17 @@ stopReport(event) {
     // }).then((result) => {
     //   if (result.isConfirmed) {
         this.showMainSpinner();
-              let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
-                let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
-                let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
-                let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+              let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+                let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+                let availableDate =  moment(this.appTransactionsForViewDto?.availableDate).toDate();
+                let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
             
             
-                this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-                this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-                this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-                this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+            
+                this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
