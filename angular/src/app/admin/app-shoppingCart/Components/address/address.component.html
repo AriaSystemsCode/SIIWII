@@ -67,9 +67,6 @@
             <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
         </div>
 
-
-        <!-- merge -->
-        <!-- merge -->
             <div class="d-flex justify-content-end" *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
                 <button class="ml-2 add-new-add-btn" (click)="openAddAddressForm()">
                     <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
@@ -86,8 +83,7 @@
                  <label> {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}{{ address?.addressLine2 ? address?.addressLine2+' ,' : ''}}{{address?.city ? address?.city+' ,' : ''}}{{ address?.state ? address?.state+' ,' : ''}}{{ address?.countryName ? address?.countryName +',' : address?.countryCode ?  address?.countryCode +' ,' : ''}}{{address?.postalCode ? address?.postalCode : ''}}</label>
                 </div>
 
-                <!-- merge -->
-                <!-- merges -->
+
                  <div class="p mt-2 d-flex"  *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
                     <button (click)="editAddress(address.id)" class="acBtn">
                         <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/edit-icon.png">
