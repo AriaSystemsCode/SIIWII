@@ -102,15 +102,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             });
         // this.scrollToBottom();
     }
-    /*  ngAfterViewChecked() {
-        this.scrollToBottom();
-    }
-    scrollToBottom(): void {
-        try {
-            this.containerdetails.nativeElement.scrollTop =
-                this.containerdetails.nativeElement.scrollHeight;
-        } catch (err) {}
-    } */
+
         expandedMessageId: number | null = null;
         maxChars = 410; // Max characters before truncation
         maxLines = 3;   // Max rows before truncation
@@ -249,16 +241,17 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                     this.totalCount = result.totalCount;
 
                     // this.totalUnread = result.totalUnread
-                    this._MessageServiceProxy.getUnreadCounts('MESSAGE').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('MESSAGE')?.subscribe((result) => {
                         this.totalPrimaryUnread = result;
                     });
 
-                    this._MessageServiceProxy.getUnreadCounts('THREAD').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('THREAD')?.subscribe((result) => {
                         this.totalUpdatesUnread = result;
                     });
                     this._MessageServiceProxy.getUnreadCounts('MENTION').subscribe((result) => {
-                        this.totalMentionUnRead = result;
+                        this.totalMentionUnRead = result ?? 0; // If result is null/undefined, use 0
                     });
+                    
                     this.itemsToShow = this.messages.slice(
                         0,
                         this.noOfItemsToShowInitially
@@ -387,7 +380,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
 
 // set message Subject [End]
                 
-                if(this.messageCategoryFilter=='MENTION'){
+                if(this.messageCategoryFilter=='MENTION' || this.messageCategoryFilter=='THREAD'){
                     setTimeout(()=>{
                         this.focusAddComment();
 

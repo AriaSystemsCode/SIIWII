@@ -12,7 +12,7 @@
                 />
             </div>
             <div class="w-80 pt-1">
-                <div class="d-flex flex-column">
+                <div class="d-flex flex-column position-relative">
                     <div>
                         <div
                             class="w-100"
@@ -45,6 +45,9 @@
                         [disabled]="!comment.body"
                         [buttonBusy]="saving"
                         [busyText]="emptyText"
+                        style="    position: absolute;
+                        top: 2px;
+                        right: 2px;"
                         class="send-comment-icon ">
                         <!-- <i class="">  <img src="../../../../../assets/message/Frame 13.png" /></i> -->
                         <svg class="mt-2" width="20" height="25" viewBox="0 0 20 25" fill="none" xmlns="http://www.w3.org/2000/svg">
