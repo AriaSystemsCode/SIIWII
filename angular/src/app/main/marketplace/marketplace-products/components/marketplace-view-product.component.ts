@@ -112,7 +112,7 @@ export class MarketplaceViewProductComponent
         this.priceLevel = localStorage.getItem("tempPriceLevel");
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
-    
+       
     }
     ngOnInit(): void {
         this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
@@ -166,21 +166,40 @@ export class MarketplaceViewProductComponent
     }
  onFilterTextChanged() {
     this.showIconClose = this.filterText.trim() !== '';
-  
+
+    if (!this.colorsData || this.colorsData.length === 0) {
+        return;
+    }
 
     if (!this.filterText) {
-        this.filteredColors = this.colorsData;
+        this.filteredColors = [...this.colorsData];
     } else {
-        const filterTextLower = this.filterText?.toLowerCase();
-
+        const filterTextLower = this.filterText.toLowerCase().trim();
         this.filteredColors = this.colorsData.filter(color =>
-            (color?.colorName && color?.colorName?.toLowerCase()?.includes(filterTextLower)) ||
-            (color?.colorCodeSelectedValues && color?.colorCodeSelectedValues?.toLowerCase()?.includes(filterTextLower))
+            (color?.colorName && color.colorName.toLowerCase().includes(filterTextLower)) ||
+            (color?.colorCodeSelectedValues && color.colorCodeSelectedValues.toLowerCase().includes(filterTextLower))
         );
     }
 
- 
+    if (this.filteredColors.length > 0) {
+        this.currentIndex = 0;
+
+        const firstFilteredCode = this.filteredColors[0]?.colorCodeSelectedValues?.toLowerCase()?.trim();
+        const originalIndex = this.colorsData.findIndex(color =>
+            color?.colorCodeSelectedValues?.toLowerCase()?.trim() === firstFilteredCode
+        );
+
+       
+        this.isColorView = false
+        this.colorAttachmentForMainIamge = this.colorsData[originalIndex]?.colorImg;
+        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments;
+       
+    } else {
+        this.currentIndex = 0;
+        // this.colorAttachmentForMainIamge = '';
+    }
 }
+
 
       clearFilterText(inputElement: HTMLInputElement) {
         this.filterText = '';
@@ -188,6 +207,9 @@ export class MarketplaceViewProductComponent
 
         this.showIconClose = false;
         inputElement.focus();
+        this.currentIndex = 0
+        this.setSizes(this.currentIndex);
+        this.scrollIntoView();
       }
     getProductDetailsForView() {
         this.showMainSpinner();
@@ -293,6 +315,7 @@ export class MarketplaceViewProductComponent
 
     isColorView: boolean = false
     setSizes(index: number) {
+        console.log(index,'indexxx')
         this.currentIndex = index;
         this.isColorView = false
         this.colorAttachmentForMainIamge = this.colorsData[index]?.colorImg;
