@@ -5,8 +5,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
 import * as moment from 'moment';
-import { add } from '@node_modules/@types/lodash';
-import { add } from '@node_modules/@types/lodash';
+ import { add } from '@node_modules/@types/lodash';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
