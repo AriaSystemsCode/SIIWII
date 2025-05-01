@@ -19,6 +19,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("showAddBtn") showAddBtn:boolean=true;
     @Input("showEditDelBtn") showEditDelBtn:boolean=true;
     @Input("fromSalesRep") fromSalesRep:boolean=true;
+    @Input("fromSalesRep") fromSalesRep:boolean=true;
 
     showAddList:boolean=false;
     addressCode: string;
@@ -168,7 +169,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
 
     getAddressList(companySsin,branchSsin){
        
-        this.showMainSpinner()
+        // this.showMainSpinner()
                  if(companySsin) {
                     this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
             
@@ -625,8 +626,10 @@ addAddressDataToDto(index: number) {
     
         // Set the country name based on the countryId
         
-        this.selectedAddress.countryName = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.label;
-        this.selectedAddress.countryCode = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.code;
+        const countryObj = this.countries.find(item => item.value === currentAddress[0]['countryId']);
+        this.selectedAddress.countryName = countryObj ? countryObj.label : '';
+        this.selectedAddress.countryCode = countryObj ? countryObj.code : '';
+        
         this.showAddList = false;
     
         // Ensure no undefined or null values, default them to empty strings or null
