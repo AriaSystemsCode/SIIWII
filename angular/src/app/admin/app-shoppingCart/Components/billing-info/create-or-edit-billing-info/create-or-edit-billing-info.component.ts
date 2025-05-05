@@ -71,15 +71,9 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
    
 
     }
-    this.setAddress()
-    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .subscribe((res) => {
-        if (res) {
-          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-     
-        }
-      });
+   
+    this.saveData()
+
     }
   ngOnInit() {
     this.isMamualAcc()
@@ -259,7 +253,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       this.showMainSpinner()
 
     
-
+ this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
@@ -378,5 +372,28 @@ this.validateBillingTab()
       this.isContactsValid = false;
     }
     
+  }
+  saveDates(){
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
+
+  saveData(){
+    this.saveDates()
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+      .subscribe((res) => {
+        if (res) {
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+     
+        }
+      });
   }
 }
