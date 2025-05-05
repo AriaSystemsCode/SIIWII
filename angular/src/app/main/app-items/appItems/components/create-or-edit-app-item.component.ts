@@ -542,7 +542,7 @@ let x=  this.appItem.nonLookupValues;
             });
     }
     DropdownSelection = DropdownSelection;
-    sellVariationChecked: boolean;
+    sellVariationChecked: boolean = true;
     askToRemoveAllVariations($event) {
         if (this.sellVariationChecked || !this.appItem?.variationItems?.length)
             return;
