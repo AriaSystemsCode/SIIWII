@@ -424,7 +424,7 @@ top: 4px;">
 
                                     <div   *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
                                         (click)="setSizes(i)"></div>
-                                    <img *ngIf="color?.colorImg && !color?.colorCode" (click)="setSizes(i)" [src]="
+                                    <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
                                         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
@@ -470,7 +470,7 @@ top: 4px;">
                                     ">
                                     <div  *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
                                         (click)="setSizes(i)"></div>
-                                    <img  *ngIf="color?.colorImg && !color?.colorCode" (click)="setSizes(i)" [src]="
+                                    <img  *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
                                         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
@@ -1166,7 +1166,7 @@ top: 4px;">
                                     ">
                                     <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
                                         (click)="setSizes(i)"></div>
-                                    <img  *ngIf="color?.colorImg && !color?.colorCode" (click)="setSizes(i)" [src]="
+                                    <img  *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
                                         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
@@ -1212,7 +1212,7 @@ top: 4px;">
                                                 ">
                                                 <div    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
                                                     (click)="setSizes(i)"></div>
-                                                <img *ngIf="color?.colorImg && !color?.colorCode" (click)="setSizes(i)" [src]="
+                                                <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
                                                     attachmentBaseUrl + '/' + color.colorImg
                                                 " alt="images slides" class="imageSlides"
                                                     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />

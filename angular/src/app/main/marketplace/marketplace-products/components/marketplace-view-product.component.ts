@@ -655,16 +655,7 @@ export class MarketplaceViewProductComponent
                         .pipe(
                             finalize(() => {
                                 this.hideMainSpinner();
-                                localStorage.setItem(
-                                    "SellerSSIN",
-                                    JSON.stringify(this.productBodyData.sellerSSIN)
-                                );
-                                localStorage.setItem(
-                                    "currencyCode",
-                                    JSON.stringify(this.productBodyData.currencyCode)
-                                );
-
-                                this.router.navigateByUrl("app/main/marketplace/products");
+                                this.goToShowroom()
                             })
                         )
                         .subscribe(async (res) => {
@@ -780,15 +771,7 @@ export class MarketplaceViewProductComponent
                                         .pipe(
                                             finalize(() => {
                                                 this.hideMainSpinner();
-                                                localStorage.setItem(
-                                                    "SellerSSIN",
-                                                    JSON.stringify(this.productBodyData.sellerSSIN)
-                                                );
-                                                localStorage.setItem(
-                                                    "currencyCode",
-                                                    JSON.stringify(this.productBodyData.currencyCode)
-                                                );
-
+                                         
                                                 this.goToShowroom()
                                             })
                                         )
@@ -826,17 +809,11 @@ export class MarketplaceViewProductComponent
 
                                     localStorage.setItem("fromSellerRoom", JSON.stringify(true));
                                     localStorage.setItem("fromMarketPlace", JSON.stringify(false));
-                                     localStorage.setItem(
-                                         "SellerSSIN",
-                                         JSON.stringify(this.productData?.sellerSSIN)
-                                     );
+                               
 
                                     localStorage.setItem("transNO", this.orderNo);
 
-                                    localStorage.setItem(
-                                        "currencyCode",
-                                        JSON.stringify(this.appSession.tenant.currencyInfoDto)
-                                    );
+                                   this.goToShowroom()
 
 
 
