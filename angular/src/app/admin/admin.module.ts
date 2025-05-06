@@ -202,8 +202,9 @@ import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { TreeSelectModule } from 'primeng/treeselect';
+import { SharedDynamicInputsModule } from '@shared/shared-module';
 
-
+import { AccordionModule } from 'primeng/accordion';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
@@ -245,6 +246,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         DropdownModule,
         ReactiveFormsModule,
         CheckboxModule,
+        SharedDynamicInputsModule,
+        AccordionModule
 
     ],
     declarations: [

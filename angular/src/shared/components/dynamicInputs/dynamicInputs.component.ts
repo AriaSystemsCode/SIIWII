@@ -18,6 +18,7 @@ export class dynamicInputs implements OnInit, OnChanges {
   @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
   selectedExtraData: any[] = [];
   @Input() appTransactionsForViewDto: any;
+  @Input() fromSetting: boolean = false;
   originalValuesMap = new Map<number, any>();
 
 

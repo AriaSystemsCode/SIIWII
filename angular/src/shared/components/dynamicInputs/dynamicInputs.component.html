@@ -2,11 +2,11 @@
     <div class="col-lg-8 col-md-10 col">
         <div class="row  pt-4">
             <!-- //API GetAllWithExtraAttributes -->
-            <div class="col-md-6 col-12 mb-4"
+            <div class="{{fromSetting ? 'col-12' : 'col-md-6'}}  col-12 mb-4"
                 *ngFor="let extraAttr of extraAttributeObject.value.filteredExtraAttributes">
                 <div>
                     <div>
-                        <label>{{extraAttr.name | localize}}</label>
+                        <label class="{{fromSetting ? 'fromSettingLabel':''}}">{{extraAttr.name | localize}}</label>
                     </div>
 
 
@@ -14,7 +14,7 @@
                     <div class="d-flex align-items-center">
 
                         <div class="wide-drop-down d-flex flex-grow-1"
-                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup">
+                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup && !fromSetting">
                             <div class="flex-grow-1 mr-1">
                                 <p-multiSelect (onChange)="onAnyInputChange()"
                                     [options]="extraAttr.paginationSetting.list" [styleClass]="'w-100'"
@@ -22,6 +22,29 @@
                                     [placeholder]="('Select') + ' ' + extraAttr.name">
                                     <!-- (onChange)="multiValuesExtraAttributeOnChange($event,extraAttr)" -->
                                 </p-multiSelect>
+                            </div>
+                        </div>
+
+                        
+                        <div class="wide-drop-down d-flex flex-grow-1"
+                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup && fromSetting">
+                            <div class="flex-grow-1 mr-1">
+                            
+                                
+                                  <div class="form-check" *ngFor="let item of extraAttr.paginationSetting.list">
+                                    <input
+                                      class="form-check-input"
+                                      type="checkbox"
+                                      [id]="'checkbox_' + extraAttr.name + '_' + item.value"
+                                      [value]="item.value"
+                                      [(ngModel)]="extraAttr.selectedValues"
+                                      [checked]="extraAttr.selectedValues?.includes(item.value)"
+                                      (change)="onAnyInputChange()"
+                                    />
+                                    <label class="form-check-label" [for]="'checkbox_' + extraAttr.name + '_' + item.value">
+                                      {{ item.label }}
+                                    </label>
+                                  </div>
                             </div>
                         </div>
 
@@ -74,11 +97,11 @@
                         </div>
 
 
-                        <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'Datetime'">
+                        <div class="flex-grow-1 position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                                 [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name"
-                                (ngModelChange)="onAnyInputChange()" appendTo="body"
-                                [inputStyle]="{ 'background-color': '#EEEEEE', 'border': 'none' }"
+                                (ngModelChange)="onAnyInputChange()" appendTo="body" 
+                                [inputStyle]="{'border': '1px solid #EEEEEE' }"
                                 styleClass="w-100"></p-calendar>
                             <i class="pi pi-times position-absolute" style="right: 10px; top: 10px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
