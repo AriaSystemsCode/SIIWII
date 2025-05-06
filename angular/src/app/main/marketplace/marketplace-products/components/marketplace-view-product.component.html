@@ -518,7 +518,7 @@ top: 4px;">
                                
                                 ></div>
                                 <img
-                                *ngIf="color?.colorImg && !color?.colorCode"
+                                *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
                              
                                     (click)="setSizes(i)"
                                     [src]="
@@ -529,6 +529,7 @@ top: 4px;">
                                     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                               
                                 />
+                          
                                 <div class="card-body">
                               
                                    
@@ -588,7 +589,7 @@ top: 4px;">
                                     "
                                 ></div>
                                 <img
-                                *ngIf="color?.colorImg && !color?.colorCode"
+                                *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
                                
                                     (click)="setSizes(i)"
                                     [src]="
@@ -599,6 +600,8 @@ top: 4px;">
                                     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                               
                                 />
+
+                         
                                 <div class="card-body">
                               
                                    
@@ -1438,7 +1441,7 @@ top: 4px;">
                                     "
                                 ></div>
                                 <img
-                                *ngIf="color?.colorImg && !color?.colorCode"
+                                *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
                             
                                     (click)="setSizes(i)"
                                     [src]="
@@ -1449,6 +1452,8 @@ top: 4px;">
                                     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                               
                                 />
+
+                              
                                 <div class="card-body">
                               
                                    
@@ -1507,7 +1512,7 @@ top: 4px;">
                                                 "
                                             ></div>
                                             <img
-                                            *ngIf="color?.colorImg && !color?.colorCode"
+                                            *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
                                                 (click)="setSizes(i)"
                                                 [src]="
                                                     attachmentBaseUrl + '/' + color.colorImg
@@ -1517,6 +1522,7 @@ top: 4px;">
                                                 onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                           
                                             />
+                                       
                                             <div class="card-body">
                                           
                                                
