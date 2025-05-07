@@ -37,6 +37,8 @@
         <!-- merge -->
         <app-address 
         [appTransactionsForViewDto]="appTransactionsForViewDto"
+        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
+        [fromSalesRep] ="((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false:true"
         [isCreateOredit]="createOrEditshippingInfO"
         [contactId]="contactIdShipFrom"
         (updateSelectedAddress)="updateShipFromAddress($event)"
@@ -45,8 +47,7 @@
         [canChange]="canChange"
         [currentTab]="currentTab"
         [shipInfoIndex]="1"
-        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
-        [fromSalesRep] ="((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false:true"
+       
         ></app-address>
     </div>
     <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
@@ -80,16 +81,17 @@
     <hr class="my-2" />
    <app-address 
    [shipInfoIndex]="2"
+   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
+   [fromSalesRep] ="((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false:true"
+   [canChange]="canChange"
+   [currentTab]="currentTab"
    [appTransactionsForViewDto]="appTransactionsForViewDto"
    [isCreateOredit]="createOrEditshippingInfO"
    [contactId]="contactIdShipTo"
    (updateSelectedAddress)="updateShipToAddress($event)"
-   [fromSalesRep] ="((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false:true"
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
-   [canChange]="canChange"
-   [currentTab]="currentTab"  
-   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
+   
 
 
    ></app-address>
