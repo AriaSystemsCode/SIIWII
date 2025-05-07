@@ -1,5 +1,6 @@
 
 import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
@@ -21,7 +22,7 @@ export class dynamicInputs implements OnInit, OnChanges {
   @Input() fromSetting: boolean = false;
   originalValuesMap = new Map<number, any>();
 
-
+  sycAttachmentCategoryImage: SycAttachmentCategoryDto;
 
   openCalendar(calendar: any) {
     calendar.overlayVisible = true;
@@ -205,12 +206,45 @@ export class dynamicInputs implements OnInit, OnChanges {
     this.extraDataChanged.emit(this.selectedExtraData);
   }
 
+  onImageSelected(event: ImageUploadComponentOutput, attr: any) {
+    attr.selectedValues = event.image;
+    this.onAnyInputChange(); // emit change
+  }
+  
+  onImageRemoved(attr: any) {
+    attr.selectedValues = '';
+    this.onAnyInputChange(); // emit change
+  }
+  
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
+  
+    // ✅ Provide fallback/mock image category
+    if (!this.sycAttachmentCategoryImage) {
+      this.sycAttachmentCategoryImage = {
+        id: 1,
+        code: 'IMAGE',
+        name: 'Mock Image Category',
+        description: 'Fake for testing',
+        entityObjectTypeCode: 'MOCK',
+        isStatic: false,
+        maxFileSize: 1048576, // 1 MB
+        acceptMultipleAttachments: true,
+        isSystem: false,
+        displayName: 'Test Category',
+        icon: '',
+        iconPath: '',
+        tenantId: 1
+      } as unknown as SycAttachmentCategoryDto;
+    }
+  
     setTimeout(() => this.onAnyInputChange(), 0);
   }
-
-
+  
+  isArray(val: any): boolean {
+    return Array.isArray(val);
+  }
+  
 
 }

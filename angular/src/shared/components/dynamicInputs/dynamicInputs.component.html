@@ -38,7 +38,8 @@
                                       [id]="'checkbox_' + extraAttr.name + '_' + item.value"
                                       [value]="item.value"
                                       [(ngModel)]="extraAttr.selectedValues"
-                                      [checked]="extraAttr.selectedValues?.includes(item.value)"
+                                      [checked]="isArray(extraAttr.selectedValues) && extraAttr.selectedValues.includes(item.value)"
+
                                       (change)="onAnyInputChange()"
                                     />
                                     <label class="form-check-label" [for]="'checkbox_' + extraAttr.name + '_' + item.value">
@@ -107,7 +108,18 @@
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
 
                         </div>
-
+                        <div class="flex-grow-1"
+                        >
+                       <app-image-upload
+                           [sycAttachmentCategory]="sycAttachmentCategoryImage"
+                           [image]="extraAttr.selectedValues"
+                           [staticWidth]="170"
+                           [showGuidelines]="true"
+                           (imageBrowseDone)="onImageSelected($event, extraAttr)"
+                           (removeImage)="onImageRemoved(extraAttr)">
+                       </app-image-upload>
+                   </div>
+                   
 
                         <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric' ">
                             <input (ngModelChange)="onAnyInputChange()" type="number" name="{{extraAttr.name}}"
