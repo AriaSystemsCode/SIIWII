@@ -30,9 +30,11 @@
         <app-address 
         [isCreateOredit]="createOrEditBillingInfo"
         [contactId]="contactIdApContact"
-        [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
+    
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
+        [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
+        [showEditDelBtn]="appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual ?false : true"
         [showAddressType]="false"
         [currentTab]="currentTab"
                     [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -41,7 +43,7 @@
         [canChange]="canChange"
         [currentTab]="currentTab"
         [appTransactionsForViewDto]="appTransactionsForViewDto"
-        [showEditDelBtn]="appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual ?false : true"
+   
         ></app-address>
     </div>
     
@@ -76,10 +78,11 @@
     <app-address  
     [isCreateOredit]="createOrEditBillingInfo"
     [contactId]="contactIdARContact"
-    [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
+ 
 
     (updateSelectedAddress)="updateArContact($event)"
     [selectedAddressDetails]="arContactSelectedAdd"
+    [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
     [showAddressType]="false"
     [currentTab]="currentTab"
     [billingIndexInfo]="2"
