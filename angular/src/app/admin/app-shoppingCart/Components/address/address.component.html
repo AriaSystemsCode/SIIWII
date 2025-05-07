@@ -67,7 +67,7 @@
             <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
         </div>
 
-            <div class="d-flex justify-content-end" *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
+            <div  *ngIf="showAddBtn && showEditDelBtn && fromSalesRep" class="d-flex justify-content-end">
                 <button class="ml-2 add-new-add-btn" (click)="openAddAddressForm()">
                     <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
                 </button>
@@ -84,7 +84,7 @@
                 </div>
 
 
-                 <div class="p mt-2 d-flex"  *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
+                 <div *ngIf="showAddBtn && showEditDelBtn && fromSalesRep" class="p mt-2 d-flex"  >
                     <button (click)="editAddress(address.id)" class="acBtn">
                         <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/edit-icon.png">
 
