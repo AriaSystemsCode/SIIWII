@@ -188,8 +188,8 @@
                                         [(ngModel)]="memberDto['phone'+(i+1)+'Number']"
                                     />
                                 </div>
-                                <div class="col-sm-1">
-                                        <input type="text" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
+                                <div class="">
+                                        <input type="text" style="width: 110px;" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
                                         minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ext']" />
                                 </div>
                                 <div class="col-sm-2" *ngIf="!isManualOrExternalContact">
