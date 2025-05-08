@@ -28,6 +28,8 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { finalize } from "rxjs/operators";
 import { AddCommentComponent } from "../comments/components/add-comment/add-comment.component";
+import { ConsoleLogger } from "@node_modules/@microsoft/signalr/dist/esm/Utils";
+import { Console } from "console";
 @Component({
     templateUrl: "./Messages.component.html",
     styleUrls: ["./Messages.component.scss"],
@@ -75,6 +77,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     messageCategoryFilter: string = "MESSAGE";
     showAllMessages: boolean = false;
     maxVisibleMessages: number = 2;
+
+    replyingToMessage: MessagesDto;
+
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -146,7 +151,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         }
     newCommentAddedHandler(event){
       //  this.selectMessage(this.messagesDetails[0].messages);
-        this.getMesssage();
+        // this.getMesssage();
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
@@ -179,7 +184,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.skipCount,
                 this.maxResultCount
             )
-            .pipe(finalize(() => {  this.hideMainSpinner(); }))
+            .pipe(finalize(() => {  this.hideMainSpinner();
+             
+             }))
             .subscribe((result) => {
                 if (search == true) {
                     this.messages = [];
@@ -354,6 +361,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
         
     }
+
+ 
+      
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
         this.showSideBar=false;
@@ -361,7 +371,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
         this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);
-
+       
         this._MessageServiceProxy
             .getMessagesForView(message.id)
             .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
@@ -523,5 +533,22 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     isActive(message: MessagesDto, index: number): boolean {
         if (this.highlightFirstMsg && index == 0) return true;
         else return this.selectedMessage === message.id;
+    }
+
+    refreshData(event){
+        console.log(event,'eventevent')
+        if(event){
+         
+
+            // this.messageCategoryFilter = 'THREAD';
+            this.messages = [];
+            this.messagesDetails = null;
+            this.getMesssage();
+        }
+    }
+    ngOnDestroy() {
+      
+            localStorage.removeItem("messageView");
+      
     }
 }
