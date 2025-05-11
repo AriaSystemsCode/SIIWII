@@ -17,8 +17,6 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("selectedAddressDetails") selectedAddressDetails;
     @Input("showAddressType") showAddressType:boolean=true;
     @Input("showAddBtn") showAddBtn:boolean=true;
-    @Input("showEditDelBtn") showEditDelBtn:boolean=true;
-    @Input("fromSalesRep") fromSalesRep:boolean=true;
 
     showAddList:boolean=false;
     addressCode: string;
@@ -168,7 +166,6 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
 
     getAddressList(companySsin,branchSsin){
        
-        this.showMainSpinner()
                  if(companySsin) {
                     this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
             

@@ -41,12 +41,13 @@
         [isCreateOredit]="createOrEditshippingInfO"
         [contactId]="contactIdShipFrom"
         (updateSelectedAddress)="updateShipFromAddress($event)"
-        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
+ 
 
         [selectedAddressDetails]="shipFromSelectedAdd"
         [showAddressType]="false"
         [canChange]="canChange"
         [currentTab]="currentTab"
+        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
         [shipInfoIndex]="1"
        
         ></app-address>
@@ -86,15 +87,13 @@
    [canChange]="canChange"
    [currentTab]="currentTab"
    [appTransactionsForViewDto]="appTransactionsForViewDto"
+   [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (!isAccManual  )  ) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
    [isCreateOredit]="createOrEditshippingInfO"
    [contactId]="contactIdShipTo"
    (updateSelectedAddress)="updateShipToAddress($event)"
-   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) || !((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual) ) ? true : false"
-   [fromSalesRep]="(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual)  ? false : true"
+
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
-   
-
 
    ></app-address>
 </div>
