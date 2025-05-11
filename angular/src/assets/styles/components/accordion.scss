@@ -6,7 +6,8 @@ body .p-accordion {
         padding-top: 0;
         a {
             background-color: white !important;
-            border: none !important;
+            border: 1px solid #eee !important;
+            border-radius: 8px !important;
             color: #464e5f !important;
             font-size: 14px !important;
             font-weight: 400 !important;

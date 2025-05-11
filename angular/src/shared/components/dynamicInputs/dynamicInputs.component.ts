@@ -246,5 +246,22 @@ export class dynamicInputs implements OnInit, OnChanges {
     return Array.isArray(val);
   }
   
-
+  onCheckboxChange(checked: boolean, value: any, extraAttr: any): void {
+    if (!Array.isArray(extraAttr.selectedValues)) {
+      extraAttr.selectedValues = [];
+    }
+  
+    if (checked) {
+      if (!extraAttr.selectedValues.includes(value)) {
+        extraAttr.selectedValues.push(value);
+      }
+    } else {
+      extraAttr.selectedValues = extraAttr.selectedValues.filter(val => val !== value);
+    }
+  
+    this.onAnyInputChange(); // emit changes
+  }
+  
+  
+  
 }

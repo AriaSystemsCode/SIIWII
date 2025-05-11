@@ -9,7 +9,7 @@ namespace onetouch.Web.Startup
         public static void Main(string[] args)
         {
             CurrentDirectoryHelpers.SetCurrentDirectory();
-            CreateWebHostBuilder(args).Build().Run();
+                 CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)

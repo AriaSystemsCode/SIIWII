@@ -37,10 +37,9 @@
                                       type="checkbox"
                                       [id]="'checkbox_' + extraAttr.name + '_' + item.value"
                                       [value]="item.value"
-                                      [(ngModel)]="extraAttr.selectedValues"
+                                  
                                       [checked]="isArray(extraAttr.selectedValues) && extraAttr.selectedValues.includes(item.value)"
-
-                                      (change)="onAnyInputChange()"
+                                      (change)="onCheckboxChange($event.target.checked, item.value, extraAttr)"
                                     />
                                     <label class="form-check-label" [for]="'checkbox_' + extraAttr.name + '_' + item.value">
                                       {{ item.label }}
@@ -62,7 +61,7 @@
                             *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
                             <input type="text" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
                                 class="form-control" [(ngModel)]="extraAttr.selectedValues"
-                                style="background-color: #EEEEEE !important; border: none !important"
+                               
                                 (ngModelChange)="onAnyInputChange()" />
                             <i class="pi pi-times position-absolute" style="right: 10px; top: 10px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
@@ -76,16 +75,14 @@
                                     for="extraAttr{{extraAttr.name}}_1">
                                     <input (ngModelChange)="onAnyInputChange()" type="radio"
                                         name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_1"
-                                        [value]="'true'" [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                         border: none !important" />
+                                        [value]="'true'" [(ngModel)]="extraAttr.selectedValues"  />
                                     <!-- (click)="notLookupExtraAttributeOnChange('true',extraAttr)" -->
                                     {{ "Yes" | localize }}
                                 </label>
                                 <label class="radio radio-accent radio-primary" for="extraAttr{{extraAttr.name}}_0">
                                     <input (onChange)="onAnyInputChange()" type="radio"
                                         name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_0"
-                                        [value]="'false'" [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                         border: none !important">
+                                        [value]="'false'" [(ngModel)]="extraAttr.selectedValues" >
                                     <!-- (click)="notLookupExtraAttributeOnChange('true',extraAttr)" -->
                                     {{ "No" | localize }}
                                 </label>
@@ -108,7 +105,7 @@
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
 
                         </div>
-                        <div class="flex-grow-1"
+                        <!-- <div class="flex-grow-1"
                         >
                        <app-image-upload
                            [sycAttachmentCategory]="sycAttachmentCategoryImage"
@@ -118,14 +115,13 @@
                            (imageBrowseDone)="onImageSelected($event, extraAttr)"
                            (removeImage)="onImageRemoved(extraAttr)">
                        </app-image-upload>
-                   </div>
+                   </div> -->
                    
 
                         <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric' ">
                             <input (ngModelChange)="onAnyInputChange()" type="number" name="{{extraAttr.name}}"
                                 placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}"
-                                [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                                                                    border: none !important">
+                                [(ngModel)]="extraAttr.selectedValues">
                             <!-- (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" -->
                         </div>
 

@@ -47,9 +47,10 @@
                                   [attr.id]="'usage_' + usage">
                                   
                                   <app-dynamicInputs
-                                    [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage] } }"
+                                  [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
                                     [entityObjectTypeId]="114"
-                                    [entityType]="'Product'"
+                                    [entityType]="'Settings'"
+                                    [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (extraDataCleared)="onExtraAttributeCleared($event)" (extraDataChanged)="onExtraAttributesChanged($event)"
                                     [fromSetting]="true">
                                   </app-dynamicInputs>
