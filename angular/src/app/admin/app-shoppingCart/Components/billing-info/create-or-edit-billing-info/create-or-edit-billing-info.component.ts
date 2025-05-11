@@ -63,9 +63,16 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       this.loadAddresComponentShipTo = true;
       if( this.AddressComponentChild)
       this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+    
+   
+
+    }
+
+    this.saveData()
+
     }
       
-  }
+  
   ngOnInit() {
     this.isMamualAcc()
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
@@ -334,6 +341,29 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId ? this.isContactsValid = true : this.isContactsValid = false;    
 this.validateBillingTab()
     
+  }
+  saveDates(){
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
+
+  saveData(){
+    this.saveDates()
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+      .subscribe((res) => {
+        if (res) {
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+     
+        }
+      });
   }
   updateArContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
