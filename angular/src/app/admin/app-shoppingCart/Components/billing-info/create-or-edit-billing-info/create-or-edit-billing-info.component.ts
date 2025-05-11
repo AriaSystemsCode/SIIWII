@@ -357,24 +357,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 this.validateBillingTab()
     
   }
-  updateArContact(addObj) {
-    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
-    if(addObj){
-      this.enableSAveArcontact = true
-      this.validateBillingTab()
-    }
-  }
-
-  validateBillingTab() {
-    if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
-      this.isContactsValid = true;
-      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
-
-    } else {
-      this.isContactsValid = false;
-    }
-    
-  }
   saveDates(){
     let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
     let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
@@ -398,4 +380,23 @@ this.validateBillingTab()
         }
       });
   }
+  updateArContact(addObj) {
+    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
+    if(addObj){
+      this.enableSAveArcontact = true
+      this.validateBillingTab()
+    }
+  }
+
+  validateBillingTab() {
+    if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
+      this.isContactsValid = true;
+      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
+
+    } else {
+      this.isContactsValid = false;
+    }
+    
+  }
+
 }

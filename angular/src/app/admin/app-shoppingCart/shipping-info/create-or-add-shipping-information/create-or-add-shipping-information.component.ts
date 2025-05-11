@@ -365,27 +365,6 @@ atInitialize: boolean = true;
 this.validateShippingTab();
 
   }
-
-  validateShippingTab() {
-    console.log('Validating Shipping Tab:', {
-      enableSAveShipFrom: this.enableSAveShipFrom,
-      enableSAveShipTo: this.enableSAveShipTo,
-      shipViaId: this.appTransactionsForViewDto.shipViaId,
-    });
-  
-    if (this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId) {
-      this.shippingTabValid = true;
-      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
-    } else {
-      this.shippingTabValid = false;
-    }
-  }
-  addressUpdated($event){
-    if($event){
-      $event == true ? this.validateShippingTab():''
-    }
-  }
-
   saveDates(){
     let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
     let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
@@ -409,5 +388,26 @@ saveData(){
         });
   
 }
+
+  validateShippingTab() {
+    console.log('Validating Shipping Tab:', {
+      enableSAveShipFrom: this.enableSAveShipFrom,
+      enableSAveShipTo: this.enableSAveShipTo,
+      shipViaId: this.appTransactionsForViewDto.shipViaId,
+    });
+  
+    if (this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId) {
+      this.shippingTabValid = true;
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+    } else {
+      this.shippingTabValid = false;
+    }
+  }
+  addressUpdated($event){
+    if($event){
+      $event == true ? this.validateShippingTab():''
+    }
+  }
+
 
 }
