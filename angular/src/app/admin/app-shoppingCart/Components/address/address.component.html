@@ -1,3 +1,4 @@
+
 <div class="selected-addr-comp mb-3" style="padding: 0 20px;" *ngIf="isCreateOredit">
     <div class="selected-add-edit row" >
         <div class="col-md-12 mb-3" *ngIf="showAddressType">
@@ -66,7 +67,8 @@
             type="text"/> 
             <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
         </div>
-            <div class="d-flex justify-content-end" *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
+
+            <div  *ngIf="showAddBtn && showEditDelBtn && fromSalesRep" class="d-flex justify-content-end">
                 <button class="ml-2 add-new-add-btn" (click)="openAddAddressForm()">
                     <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
                 </button>
@@ -81,7 +83,9 @@
                       name="selectedAdd"  [id]="address.id"/> 
                  <label> {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}{{ address?.addressLine2 ? address?.addressLine2+' ,' : ''}}{{address?.city ? address?.city+' ,' : ''}}{{ address?.state ? address?.state+' ,' : ''}}{{ address?.countryName ? address?.countryName +',' : address?.countryCode ?  address?.countryCode +' ,' : ''}}{{address?.postalCode ? address?.postalCode : ''}}</label>
                 </div>
-                 <div class="p mt-2 d-flex"  *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
+
+
+                 <div *ngIf="showAddBtn && showEditDelBtn && fromSalesRep" class="p mt-2 d-flex"  >
                     <button (click)="editAddress(address.id)" class="acBtn">
                         <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/edit-icon.png">
 

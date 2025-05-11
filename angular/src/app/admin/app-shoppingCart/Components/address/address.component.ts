@@ -19,6 +19,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("showAddBtn") showAddBtn:boolean=true;
     @Input("showEditDelBtn") showEditDelBtn:boolean=true;
     @Input("fromSalesRep") fromSalesRep:boolean=true;
+   
 
     showAddList:boolean=false;
     addressCode: string;
@@ -168,6 +169,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
 
     getAddressList(companySsin,branchSsin){
        
+        // this.showMainSpinner()
                  if(companySsin) {
                     this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
             
@@ -205,17 +207,19 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                             savedAddress.id === shippingAddress.addressId
                                         );
                                         
-                                      
+                                      console.log(matchedAddress,'matchedAddress')
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
-                                            this.addAddressDataToDto(2)
-                                            if(!this.selectedAddressDetails){
-                                                this.selectedAddress = matchedAddress;
-                                                this.selectAddress(this.selectedAddress.id)
-
-                                            }
+                                            this.addAddressDataToDto(2);
+                                        
+                                            // ✅ Set selectedAddress and selectedAddressDetails properly
+                                            this.selectedAddress = matchedAddress;
+                                            this.selectedAddressDetails = { ...matchedAddress }; // <-- FIXED!
+                                        
+                                            this.selectAddress(this.selectedAddress.id);
                                         }
+                                        
                                     }
             
                                 }   else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo) {
@@ -234,12 +238,15 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
-                                            this.addAddressDataToDto(1)
-                                            if(!this.selectedAddressDetails){
+                                            this.addAddressDataToDto(1);
+                                        
+                                            // ✅ Update both references
                                             this.selectedAddress = matchedAddress;
-                                            this.selectAddress(this.selectedAddress.id)
-                                            }
+                                            this.selectedAddressDetails = { ...matchedAddress };
+                                        
+                                            this.selectAddress(this.selectedAddress.id);
                                         }
+                                        
                                     }
                                 }
             
@@ -619,8 +626,10 @@ addAddressDataToDto(index: number) {
     
         // Set the country name based on the countryId
         
-        this.selectedAddress.countryName = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.label;
-        this.selectedAddress.countryCode = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.code;
+        const countryObj = this.countries.find(item => item.value === currentAddress[0]['countryId']);
+        this.selectedAddress.countryName = countryObj ? countryObj.label : '';
+        this.selectedAddress.countryCode = countryObj ? countryObj.code : '';
+        
         this.showAddList = false;
     
         // Ensure no undefined or null values, default them to empty strings or null

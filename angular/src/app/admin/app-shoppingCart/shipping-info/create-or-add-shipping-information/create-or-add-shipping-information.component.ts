@@ -5,7 +5,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
 import * as moment from 'moment';
-import { add } from '@node_modules/@types/lodash';
+ import { add } from '@node_modules/@types/lodash';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
@@ -47,6 +47,7 @@ visible: boolean = false;
 cancelBtn: boolean = false;
 saveBtn: boolean = false;
 SuccessMsg: boolean = false;
+atInitialize: boolean = true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -71,11 +72,7 @@ SuccessMsg: boolean = false;
       if( this.AddressComponentChild)
       this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
     }  
-      
  
-    // merge
-    // merge
-
       this.saveData()
   }
   ngOnInit() {
@@ -164,6 +161,7 @@ SuccessMsg: boolean = false;
     this.showSaveBtn = false;
   }
   save() {
+  
     this.createOrEditshippingInfO = false;
     this.setAddress();
     this.createOrEditTransaction();
@@ -220,22 +218,25 @@ SuccessMsg: boolean = false;
     }
   }
   createOrEditTransaction() {
-    this.showMainSpinner()
+    
+      this.showMainSpinner()
+        this.saveData()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
         //  this.generatOrderReport.emit(true) ;
-       this.refreshShoppingCart.emit(true)
 
+
+       this.refreshShoppingCart.emit(true)
         // this.SuccessMsg = true
       }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-          if (!this.showSaveBtn)
+          if (!this.showSaveBtn )
             this.ontabChange.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
-          else
+          else 
             this.showSaveBtn = false;
         }
       });
@@ -279,6 +280,7 @@ SuccessMsg: boolean = false;
       }
 
     }
+    this.validateShippingTab();
     this.validateShippingTab();
 
   }
@@ -361,29 +363,6 @@ SuccessMsg: boolean = false;
 this.validateShippingTab();
 
   }
-  saveDates(){
-    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
-    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
-    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
-    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
-  
-    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
-  }
-saveData(){
-  this.saveDates()
-      this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-      this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-        .subscribe((res) => {
-          if (res) {
-            this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-       
-          }
-        });
-  
-}
 
   validateShippingTab() {
     console.log('Validating Shipping Tab:', {
@@ -404,5 +383,27 @@ saveData(){
       $event == true ? this.validateShippingTab():''
     }
   }
+saveData(){
+  this.saveDates()
+      this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+      this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+        .subscribe((res) => {
+          if (res) {
+            this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+       
+          }
+        });
+  
+}
+saveDates(){
+  let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+  let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+  let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+  let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
 
+  this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+}
 }

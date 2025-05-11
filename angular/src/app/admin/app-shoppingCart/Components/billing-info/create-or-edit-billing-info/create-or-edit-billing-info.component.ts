@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ShoppingCartoccordionTabs } from "../../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -43,10 +43,14 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   saveBtn: boolean = false;
   SuccessMsg: boolean = false;
   isAccManual :boolean = false
+    apContactdata;
+  arContactdata;
+  atInitialize:boolean =true
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+    private cd: ChangeDetectorRef  // <-- inject it
   ) {
     super(injector);
 
@@ -54,25 +58,23 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 
   ngAfterViewInit() {
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
-    this.loadAddresComponentShipFrom = true;
-    this.contactIdApContact = this.apContactdata?.compId;
+   
+      this.contactIdApContact = this.apContactdata?.compId;
       if( this.AddressComponentChild)
     this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
 
       this.contactIdARContact = this.arContactdata?.compId;
-      this.loadAddresComponentShipTo = true;
+
       if( this.AddressComponentChild)
       this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
     
    
 
     }
-
+   
     this.saveData()
 
     }
-      
-  
   ngOnInit() {
     this.isMamualAcc()
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
@@ -82,6 +84,10 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
     arContactObj[0]?.companySSIN  && arContactObj[0]?.contactAddressDetail?.addressLine1 ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
   //  this.loadpayTermsListListist();
+
+
+  
+  
     }
   }
   ngOnChanges(changes: SimpleChanges) {
@@ -210,8 +216,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     this.appTransactionsForViewDto = $event;
   }
 
-  apContactdata;
-  arContactdata;
+
+
 
   reloadAddresscomponentAPContact(data) {
 
@@ -223,6 +229,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       if( this.AddressComponentChild)
         this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
     }
+
+    this.cd.detectChanges(); // <<< add
   }
 
    
@@ -235,25 +243,30 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     if( this.AddressComponentChild)
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
     }
+
+    this.cd.detectChanges(); // <<< add
   }
 
-  createOrEditTransaction() {
-    this.showMainSpinner()
-    
 
+
+  createOrEditTransaction() {
+      this.showMainSpinner()
+
+    
+ this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
         //  this.generatOrderReport.emit(true) ; 
-       this.refreshShoppingCart.emit(true)
 
+       this.refreshShoppingCart.emit(true)
           // this.SuccessMsg = true
         }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-          if (!this.showSaveBtn) {
+          if (!this.showSaveBtn ) {
             this.ontabChange.emit(ShoppingCartoccordionTabs.BillingInfo);
           }
           else {
@@ -342,6 +355,24 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 this.validateBillingTab()
     
   }
+  updateArContact(addObj) {
+    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
+    if(addObj){
+      this.enableSAveArcontact = true
+      this.validateBillingTab()
+    }
+  }
+
+  validateBillingTab() {
+    if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
+      this.isContactsValid = true;
+      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
+
+    } else {
+      this.isContactsValid = false;
+    }
+    
+  }
   saveDates(){
     let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
     let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
@@ -364,23 +395,5 @@ this.validateBillingTab()
      
         }
       });
-  }
-  updateArContact(addObj) {
-    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
-    if(addObj){
-      this.enableSAveArcontact = true
-      this.validateBillingTab()
-    }
-  }
-
-  validateBillingTab() {
-    if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
-      this.isContactsValid = true;
-      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
-
-    } else {
-      this.isContactsValid = false;
-    }
-    
   }
 }
