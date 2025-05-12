@@ -63,7 +63,7 @@
                                 class="form-control" [(ngModel)]="extraAttr.selectedValues"
                                
                                 (ngModelChange)="onAnyInputChange()" />
-                            <i class="pi pi-times position-absolute" style="right: 10px; top: 10px; cursor: pointer;"
+                            <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
                             <!-- (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" -->
                         </div>
@@ -95,13 +95,13 @@
                         </div>
 
 
-                        <div class="flex-grow-1 position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
+                        <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                                 [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name"
                                 (ngModelChange)="onAnyInputChange()" appendTo="body" 
-                                [inputStyle]="{'border': '1px solid #EEEEEE' }"
+                                [inputStyle]="{'border': '1px solid #EEEEEE','border-radius':'8px','height':'44px' }"
                                 styleClass="w-100"></p-calendar>
-                            <i class="pi pi-times position-absolute" style="right: 10px; top: 10px; cursor: pointer;"
+                            <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
 
                         </div>
@@ -118,10 +118,12 @@
                    </div> -->
                    
 
-                        <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric' ">
+                        <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'Numeric' ">
                             <input (ngModelChange)="onAnyInputChange()" type="number" name="{{extraAttr.name}}"
                                 placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}"
                                 [(ngModel)]="extraAttr.selectedValues">
+                                <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
+                                *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
                             <!-- (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" -->
                         </div>
 

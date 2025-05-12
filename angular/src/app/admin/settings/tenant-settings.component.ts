@@ -641,18 +641,62 @@ this.formTouched = false;
 
  
 
+    // saveAll(): void {
+    //     this._tenantSettingsService.updateAllSettings(this.settings).subscribe(() => {
+    //         this.notify.info(this.l('SavedSuccessfully'));
+
+    //         if (abp.clock.provider.supportsMultipleTimezone && this.usingDefaultTimeZone && this.initialTimeZone !== this.settings.general.timezone) {
+    //             this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
+    //                 window.location.reload();
+    //             });
+    //         }
+    //     });
+    // }
+    // saveAll(): void {
+    //   const extraData = this.appTransactionsForViewDto?.entityExtraData || [];
+    
+    //   this._tenantSettingsService.updateAllSettings(this.settings)
+    //     .pipe(finalize(() => {
+    //       // Reset form change tracking
+    //       this.formTouched = false;
+    //     }))
+    //     .subscribe(() => {
+    //       // Update entity extra data after settings saved
+    //       if (extraData.length > 0) {
+    //         // this._extraAttributeDataService.saveEntityExtraData(extraData).subscribe(() => {
+    //         //   this.notify.success(this.l('SavedSuccessfully'));
+    //         // });
+    //       } else {
+    //         this.notify.success(this.l('SavedSuccessfully'));
+    //       }
+    
+    //       if (abp.clock.provider.supportsMultipleTimezone &&
+    //           this.usingDefaultTimeZone &&
+    //           this.initialTimeZone !== this.settings.general.timezone) {
+    //         this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
+    //           window.location.reload();
+    //         });
+    //       }
+    //     });
+    // }
     saveAll(): void {
-        this._tenantSettingsService.updateAllSettings(this.settings).subscribe(() => {
-            this.notify.info(this.l('SavedSuccessfully'));
-
-            if (abp.clock.provider.supportsMultipleTimezone && this.usingDefaultTimeZone && this.initialTimeZone !== this.settings.general.timezone) {
-                this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
-                    window.location.reload();
-                });
-            }
+      const extraData = this.appTransactionsForViewDto?.entityExtraData || [];  
+      this.notify.success(this.l('SavedSuccessfully (Test Mode)'));
+    
+      // Simulate reset of unsaved changes tracking
+      this.formTouched = false;
+    
+      if (
+        abp.clock.provider.supportsMultipleTimezone &&
+        this.usingDefaultTimeZone &&
+        this.initialTimeZone !== this.settings.general.timezone
+      ) {
+        this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
+          window.location.reload();
         });
+      }
     }
-
+    
 defineExtraAttributes() {
   this.extraAttributes = {};
 
