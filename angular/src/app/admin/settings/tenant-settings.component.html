@@ -13,7 +13,7 @@
                 </div>
                 <div class="kt-subheader__toolbar">
                     <div class="kt-subheader__wrapper">
-                        <button class="btn bgPurple text-white" (click)="saveAll()"><i class="la la-floppy-o"></i>
+                        <button class="btn saveBtn text-white" (click)="saveAll()">
                             {{"SaveAll" | localize}}</button>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                 <div class="kt-portlet__body">
                     <div class="row">
                         <!-- Sidebar -->
-                        <div class="col-md-3  leftSec">
+                        <div class="col-lg-3 col-md-5 col-12   leftSec">
                             <ul class="list-group mt-2">
                                 <li
                                   *ngFor="let usage of usageList"
@@ -38,7 +38,7 @@
                         </div>
                       
                         <!-- Right Panel -->
-                        <div class="col-md-9">
+                        <div class="col-lg-9 col-md-7 col-12">
 
                             <p-accordion [multiple]="true" [(activeIndex)]="activeAccordionIndexes">
                                 <p-accordionTab

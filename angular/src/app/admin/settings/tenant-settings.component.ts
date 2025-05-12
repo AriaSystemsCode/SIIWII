@@ -11,6 +11,7 @@ import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/mode
 import { SelectItem } from "primeng/api";
 import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
+import { Observable } from 'rxjs';
 @Component({
     templateUrl: './tenant-settings.component.html',
     styleUrls: [     './tenant-settings.component.scss',
@@ -50,6 +51,8 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
 
       activeAccordionIndexes: number[] = [0]; // open first tab by default
       appTransactionsForViewDto:any
+      hasUnsavedChanges = false;
+
     constructor(
         injector: Injector,
         private _tenantSettingsService: TenantSettingsServiceProxy,
@@ -614,7 +617,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     "isDefault": false,
     "id": 371022
 }
-            
+this.formTouched = false;
     }
 
     ngOnInit(): void {
@@ -795,6 +798,7 @@ getAppItemTypeExtraAttributesById() {
   }
   
   onExtraAttributesChanged(dataFromChild: any[]) {
+    this.formTouched = true;
     if (!this.appTransactionsForViewDto) {
       this.appTransactionsForViewDto = new GetAppTransactionsForViewDto();
     }
@@ -855,6 +859,9 @@ getAppItemTypeExtraAttributesById() {
 
     }
   }
+  
+
+    
 
   
 
