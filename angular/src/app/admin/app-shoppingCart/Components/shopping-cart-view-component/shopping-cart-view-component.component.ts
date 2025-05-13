@@ -1202,6 +1202,8 @@ onEditPrice(rowNode) {
       });
   }
   isOrderConfirmationNeedsReprint(): void {
+    this.saveDates()
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
     .subscribe((res) => {
       if (res) {
@@ -1255,17 +1257,7 @@ stopReport(event) {
     // }).then((result) => {
     //   if (result.isConfirmed) {
         this.showMainSpinner();
-              let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
-                let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
-                let availableDate =  moment(this.appTransactionsForViewDto?.availableDate).toDate();
-                let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
-            
-            
-            
-                this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
-                this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
-                this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
-                this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+       this.saveDates()
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
@@ -1605,4 +1597,16 @@ stopReport(event) {
 }
 
 
+
+saveDates(){
+  let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+  let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+  let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+  let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+
+  this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+}
 }
