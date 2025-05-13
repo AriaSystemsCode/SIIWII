@@ -35,10 +35,10 @@
       
         [showAddressType]="false"
         [currentTab]="currentTab"
-        [showAddBtn] ="(appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) ? false:true" 
+    
                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                 [billingIndexInfo]="1"
-
+                [showAddBtn] ="(appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) ? false:true" 
         [canChange]="canChange"
         [currentTab]="currentTab"
         [appTransactionsForViewDto]="appTransactionsForViewDto"
