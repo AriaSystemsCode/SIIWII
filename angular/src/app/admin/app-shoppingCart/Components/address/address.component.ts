@@ -18,6 +18,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("showAddressType") showAddressType:boolean=true;
     @Input("showAddBtn") showAddBtn:boolean=true;
     @Input("showEditDelBtn") showEditDelBtn:boolean=true;
+    @Input("fromSalesRep") fromSalesRep:boolean=true;
 
     showAddList:boolean=false;
     addressCode: string;
@@ -66,6 +67,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        console.log(this.selectedAddressDetails,'this.selectedAddressDetails')
         if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo  || this.currentTab == ShoppingCartoccordionTabs.ShippingInfo ){
         if(this.selectedAddressDetails){
         this.selectedAddressDetails.addressLine1=  this.selectedAddressDetails?.addressLine1 ? this.selectedAddressDetails?.addressLine1 : '' ;
@@ -166,7 +168,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
 
     getAddressList(companySsin,branchSsin){
        
-        this.showMainSpinner()
+        // this.showMainSpinner()
                  if(companySsin) {
                     this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
             
@@ -178,11 +180,25 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                             // console.log(result,'defauulllt')
 
                             if (result){
+                                let role;
+                
+                                if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex === 2) {
+                                    role = 6;
+                                } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo && this.billingIndexInfo === 1) {
+                                    role = 4;
+                                }
+                            
+                                const shIPtOroleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                                    contact => contact?.contactRole === 6
+                                );
+                                const apRoleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                                    contact => contact?.contactRole === 4
+                                );
                                 if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo) {
                                     // Filter the result to find the address with addressType 'Shipping'
                                     const shippingAddress = result.find(address => address.addressType === 'Shipping');
                                     
-                                    console.log(shippingAddress, 'shippingAddress');
+                               
                                     
                                     if (shippingAddress) {
                                         // Check if the shipping address exists in the savedAddressesList
@@ -190,21 +206,26 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                             savedAddress.id === shippingAddress.addressId
                                         );
                                         
-                                        console.log(matchedAddress, 'matchedAddress');
+                                      console.log(matchedAddress,'matchedAddress')
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
+                                            this.addAddressDataToDto(2);
+                                        
+                                            // ✅ Set selectedAddress and selectedAddressDetails properly
                                             this.selectedAddress = matchedAddress;
-                                            this.addAddressDataToDto(2)
-                                            this.selectAddress(this.selectedAddress.id)
+                                            this.selectedAddressDetails = { ...matchedAddress }; // <-- FIXED!
+                                        
+                                            this.selectAddress(this.selectedAddress.id);
                                         }
+                                        
                                     }
             
                                 }   else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo) {
                                     // Filter the result to find the address with addressType 'Billing'
                                     const billingAddress = result.find(address => address.addressType === 'Billing');
                                     
-                                    console.log(billingAddress, 'billingAddress');
+                                   
                                     
                                     if (billingAddress) {
                                         // Check if the billing address exists in the savedAddressesList
@@ -212,14 +233,19 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                             savedAddress.id === billingAddress.addressId
                                         );
                                         
-                                        console.log(matchedAddress, 'matchedAddress');
+                                    
                                         
                                         // If a matching address is found, set it as the selected address
                                         if (matchedAddress) {
+                                            this.addAddressDataToDto(1);
+                                        
+                                            // ✅ Update both references
                                             this.selectedAddress = matchedAddress;
-                                            this.addAddressDataToDto(1)
-                                            this.selectAddress(this.selectedAddress.id)
+                                            this.selectedAddressDetails = { ...matchedAddress };
+                                        
+                                            this.selectAddress(this.selectedAddress.id);
                                         }
+                                        
                                     }
                                 }
             
@@ -239,9 +265,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                             this.openAddNewAddForm=false;
                             this.showAddList=false;
             
-                            const matchedCountry = this.countries.find(item => item.value === this.selectedAddress[0]?.countryId);
-                            this.selectedAddress.countryName = matchedCountry ? matchedCountry.label : '';
-                            this.selectedAddress.countryCode = matchedCountry ? matchedCountry.code : null;
+                            this.selectedAddress?this.selectedAddress.countryName=this.countries.filter(item=>item.value === this.selectedAddress['countryId'])[0].label:'';
                             // this.selectedAddress?this.showAddList=false:this.showAddList=true;
                         }
                         this.hideMainSpinner()
@@ -600,9 +624,11 @@ addAddressDataToDto(index: number) {
         this.selectedAddress = currentAddress[0] as ContactAppAddressDto;
     
         // Set the country name based on the countryId
-      
-        this.selectedAddress.countryName = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.label;
-        this.selectedAddress.countryCode = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0]?.code;
+        
+        const countryObj = this.countries.find(item => item.value === currentAddress[0]['countryId']);
+        this.selectedAddress.countryName = countryObj ? countryObj.label : '';
+        this.selectedAddress.countryCode = countryObj ? countryObj.code : '';
+        
         this.showAddList = false;
     
         // Ensure no undefined or null values, default them to empty strings or null

@@ -1202,7 +1202,10 @@ onEditPrice(rowNode) {
       });
   }
   isOrderConfirmationNeedsReprint(): void {
-    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    .subscribe((res) => {
+      if (res) {
+        this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
         .subscribe((res) => {
             if (res == true) {
                 this.regenrate = true;
@@ -1217,7 +1220,11 @@ onEditPrice(rowNode) {
               this.mainLoad = true
             }
         });
-}
+      }
+    });
+  }
+  
+
 stopReport(event) {
 
   if (event) {
@@ -1444,30 +1451,38 @@ stopReport(event) {
   printTransaction() {
     // var page = window.open(this._transactionFormPath);
     // page.print();
-    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-    .subscribe((res) => {
-        if (res == true) {
-
-          this.showMainSpinner()
-          this.onGeneratOrderReport(true,undefined,true,false,true)
-        
-
-        }  else {
-            this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
-          .pipe(
-              finalize(() => {
-       
-              })
-          )
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+      .subscribe((res) => {
+        if (res) {
+          this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
           .subscribe((res) => {
-            var page = window.open(res);
-            page.print();
-          }
-           
-          );
-   
+              if (res == true) {
+      
+                this.showMainSpinner()
+                this.onGeneratOrderReport(true,undefined,true,false,true)
+              
+      
+              }  else {
+                  this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
+                .pipe(
+                    finalize(() => {
+             
+                    })
+                )
+                .subscribe((res) => {
+                  var page = window.open(res);
+                  page.print();
+                }
+                 
+                );
+         
+              }
+          });
         }
-    });
+      });
+
+
 
   }
 
