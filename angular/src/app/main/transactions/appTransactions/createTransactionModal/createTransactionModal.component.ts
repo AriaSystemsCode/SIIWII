@@ -143,7 +143,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         super(injector);
         this.initForm()
         this.orderForm.reset();
-        this.getAllCompanies();
+        this.getUserDefultRole();
         this.changeStartDate(this.orderForm.get('startDate'));
 
 
@@ -202,12 +202,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.initForm()
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
-
-
     }
 
     getUserDefultRole() {
-
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result => {
             if (this.formType?.toUpperCase() == "SO") {
                 if (result?.toLowerCase().includes('seller')) {
@@ -244,37 +241,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             }
         });
     }
-    getAllCompanies() {
-        this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                "",
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                true,
-                this.formType?.toUpperCase()
-            )
-            .subscribe((res: any) => {
-                this.buyerCompanies = [...res.items];
-                this.sellerCompanies = [...res.items];
-            });
-    }
+
 
 
     selectTempBuyer() {
@@ -315,8 +282,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     }
     handleRoleChange(data: any) {
-
         this.role = data?.value?.name;
+        this.handleSellerCompanySearch('')
+        this.handleBuyerCompanySearch('')
         this.isRoleExist = false;
         if (data?.value?.code === 1) {
             // i'm a Seller
@@ -377,6 +345,19 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     this.getBranches(this.buyerCompanySSIN, 'buyer')
 
                 });
+        } else if (data?.value?.name == "I'm an Independent buying office.") {
+            // remove buyer values
+            this.isSeller = false;
+            this.isBuyer = false;
+            this.isBuyerTempAccount = false;
+            this.isCompantIdExist = false;
+            this.isSellerCompanyIdExist = false;
+            this.orderForm.get("buyerContactName").reset();
+            this.orderForm.get("buyerCompanyName").reset();
+            this.orderForm.get("buyerContactEMailAddress").reset();
+            this.orderForm.get("buyerContactPhoneNumber").reset();
+            this.orderForm.get("sellerCompanyBranch").reset();
+            this.orderForm.get("buyerCompanyBranch").reset();
         } else {
             // i'm a sales rep
             this.isSeller = false;
@@ -384,75 +365,73 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             this.isBuyerTempAccount = false;
             this.isCompantIdExist = false;
             this.isSellerCompanyIdExist = false;
+            // remove seller values
+            this.orderForm.get("sellerContactName").reset();
+            this.orderForm.get("sellerCompanyName").reset();
+            this.orderForm.get("sellerContactEMailAddress").reset();
+            this.orderForm.get("sellerContactPhoneNumber").reset();
+            this.orderForm.get("sellerCompanyBranch").reset();
+            this.orderForm.get("buyerCompanyBranch").reset();
 
         }
 
-        this.getAllCompanies();
+
     }
-
     handleBuyerCompanySearch(event: any) {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-            this._AppTransactionServiceProxy
-                .getRelatedAccounts(
-                    event.filter,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined, true, this.formType?.toUpperCase()
-                )
-                .subscribe((res: any) => {
-
-                    this.buyerCompanies = [...res.items];
-                });
-        }, 1000);
+        this._AppTransactionServiceProxy
+            .getRelatedAccounts(
+                event.filter,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined, true, this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase()
+            )
+            .subscribe((res: any) => {
+                this.buyerCompanies = [...res.items];
+            });
     }
     handleSellerCompanySearch(event: any) {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-            this._AppTransactionServiceProxy
-                .getRelatedAccounts(
-                    event.filter,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined, true, this.formType?.toUpperCase()
-                )
-                .subscribe((res: any) => {
-
-                    this.sellerCompanies = [...res.items];
-                });
-        }, 1000);
+        this._AppTransactionServiceProxy
+            .getRelatedAccounts(
+                event.filter,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined, true, this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase()
+            )
+            .subscribe((res: any) => {
+                this.sellerCompanies = [...res.items];
+            });
     }
 
     handleBuyerCompanyChange(event: any) {
@@ -464,7 +443,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.areSame = false
         this.orderForm.get('buyerContactPhoneNumber').setValue(event.value.phone)
         this.orderForm.get('buyerContactEMailAddress').setValue(event.value.email)
-
         this.handleBuyerNameSearch("");
         this.buyerBranches = [];
         this.getBranches(this.buyerCompanySSIN, 'buyer')
@@ -1059,9 +1037,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         );
                     }
 
-
-
-
                     if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
                         location.reload();
                     else
@@ -1076,7 +1051,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.isBuyer = false;
         this.isBuyerTempAccount = false;
         this.isCompantIdExist = false;
-        this.getAllCompanies();
+        this.handleSellerCompanySearch('')
+        this.handleBuyerCompanySearch('')
         this.sellerContacts = [];
         this.buyerContacts = [];
         this.orderForm.reset();
@@ -1089,13 +1065,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
+
     }
 
 
     changeTouchState(event) {
         this.orderForm.controls['currencyId'].setValue(event.value)
-
-
     }
 
     changePrice(event) {
@@ -1140,7 +1115,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.orderForm.controls["buyerCompanySSIN"].setValue('');
         this.areSame = false
         this.buyerComapnyId = 0
-        this.getAllCompanies();
+        this.handleSellerCompanySearch('')
+        this.handleBuyerCompanySearch('')
         this.sellerContacts = [];
         this.buyerContacts = [];
         this.orderForm.reset();

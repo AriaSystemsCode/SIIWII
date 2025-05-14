@@ -128,10 +128,11 @@ export class TransactionInformationComponent
   orderSummary: any = [];
   sycAttachmentCategoryImage: any
   acceptedAspectRatio: any
-  selectedTransactionTypeData: GetAllEntityObjectTypeOutput =
-    new GetAllEntityObjectTypeOutput();
-    selectedTransTypeData:any
+  selectedTransactionTypeData: GetAllEntityObjectTypeOutput =new GetAllEntityObjectTypeOutput();
+  selectedTransTypeData:any
   extraAttributes: any;
+  totalOrderQTY: number = 0;
+  totlaOrderPrices: number = 0;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1484,8 +1485,7 @@ export class TransactionInformationComponent
   }
 
   // total of all order qty and price in order by size and prepack
-  totalOrderQTY: number = 0;
-  totlaOrderPrices: number = 0;
+
   calculateTotalOrderPriceAndQty(orders: any) {
     let qty = 0;
     let price = 0;
@@ -1625,9 +1625,9 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
   loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
       this._extraAttributeDataService
           .getExtraAttributeLookupDataWithPaging(
-             'APPROVALR',
-              0,
-              10
+            extraAttr.entityObjectTypeCode,
+            extraAttr.paginationSetting.skipCount,
+            extraAttr.paginationSetting.maxResultCount
           )
           .subscribe((result) => {
               extraAttr.paginationSetting.totalCount = result.totalCount;

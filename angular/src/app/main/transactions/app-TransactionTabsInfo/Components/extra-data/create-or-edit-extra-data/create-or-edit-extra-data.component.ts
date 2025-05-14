@@ -80,15 +80,8 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
   }
 
 
-
-
-
-
-
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
-
-
   }
 
   cancel() {
@@ -175,11 +168,7 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => {
-
         this.hideMainSpinner()
-  
-
-
       }
       ))
       .subscribe((res) => {
@@ -192,15 +181,7 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
             this.ontabChange.emit(this.activeTab);
           else
             this.showSaveBtn = false;
-
         }
-        // this.getShoppingCartData()
-
-        // this.hideMainSpinner();
-
-
-
-
       });
   }
 
