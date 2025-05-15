@@ -29,20 +29,17 @@
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <app-address 
         [isCreateOredit]="createOrEditBillingInfo"
+        [showAddBtn] ="(appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) ? false:true" 
         [contactId]="contactIdApContact"
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
-      
         [showAddressType]="false"
         [currentTab]="currentTab"
-    
-                    [appTransactionsForViewDto]="appTransactionsForViewDto"
-                [billingIndexInfo]="1"
-                [showAddBtn] ="(appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) ? false:true" 
+        [appTransactionsForViewDto]="appTransactionsForViewDto"
+        [billingIndexInfo]="1"
         [canChange]="canChange"
         [currentTab]="currentTab"
         [appTransactionsForViewDto]="appTransactionsForViewDto"
-   
         ></app-address>
     </div>
     
@@ -76,20 +73,16 @@
 
     <app-address  
     [isCreateOredit]="createOrEditBillingInfo"
+    [showAddBtn] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
     [contactId]="contactIdARContact"
- 
-
     (updateSelectedAddress)="updateArContact($event)"
     [selectedAddressDetails]="arContactSelectedAdd"
-
     [showAddressType]="false"
     [currentTab]="currentTab"
     [billingIndexInfo]="2"
-
-                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
     [canChange]="canChange"
     [currentTab]="currentTab"
-    [showAddBtn] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
     ></app-address>
 </div>
