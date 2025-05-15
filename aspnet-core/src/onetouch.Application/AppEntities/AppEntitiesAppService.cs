@@ -1194,7 +1194,7 @@ namespace onetouch.AppEntities
 
                                 if (newRecord)
                                 {
-                                    var att = new AppAttachment { Name = item.guid == null ? item.DisplayName : item.FileName, Attachment = filename, TenantId = input.TenantId };
+                                    var att = new AppAttachment { Name = item.guid == null ? item.DisplayName : item.FileName, Attachment = filename, TenantId = entity.TenantId };
                                     att = await _appAttachmentRepository.InsertAsync(att);
                                     await CurrentUnitOfWork.SaveChangesAsync();
                                     //entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id });
@@ -1211,9 +1211,9 @@ namespace onetouch.AppEntities
                                     existed.Attributes = item.Attributes;
                                 }
                                 if (input.AttachmentSourceTenantId != null && input.AttachmentSourceTenantId > -2)
-                                { MoveFile(filename, input.AttachmentSourceTenantId, input.TenantId); }
+                                { MoveFile(filename, input.AttachmentSourceTenantId, entity.TenantId); }
                                 else
-                                { MoveFile(filename, AbpSession.TenantId, input.TenantId); }
+                                { MoveFile(filename, AbpSession.TenantId, entity.TenantId); }
                             }
                             else
                             {

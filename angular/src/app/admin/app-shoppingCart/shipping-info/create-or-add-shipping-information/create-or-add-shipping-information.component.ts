@@ -73,6 +73,9 @@ atInitialize: boolean = true;
       this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
     }  
  
+    // merge
+    // merge
+
       this.saveData()
   }
   ngOnInit() {
@@ -363,6 +366,29 @@ atInitialize: boolean = true;
 this.validateShippingTab();
 
   }
+  saveDates(){
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+  
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
+saveData(){
+  this.saveDates()
+      this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+      this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+        .subscribe((res) => {
+          if (res) {
+            this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+       
+          }
+        });
+  
+}
 
   validateShippingTab() {
     console.log('Validating Shipping Tab:', {
@@ -383,27 +409,6 @@ this.validateShippingTab();
       $event == true ? this.validateShippingTab():''
     }
   }
-saveData(){
-  this.saveDates()
-      this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-      this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-        .subscribe((res) => {
-          if (res) {
-            this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-       
-          }
-        });
-  
-}
-saveDates(){
-  let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
-  let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
-  let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
-  let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
 
-  this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
-  this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
-  this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
-  this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
-}
+
 }
