@@ -13,6 +13,7 @@ export class AddCommentComponent extends AppComponentBase {
     @ViewChild('CommentTextArea',{static:false}) CommentTextArea :any
     comment:CreateMessageInput = new CreateMessageInput()
     @Output() saveDone : EventEmitter<GetMessagesForViewDto>  = new EventEmitter<GetMessagesForViewDto>();
+    @Output() refresh : EventEmitter<boolean>  = new EventEmitter<boolean>();
     commentObject : CreateMessageInput
     active : boolean
     showContactSuggstions:boolean=false;
@@ -217,7 +218,7 @@ export class AddCommentComponent extends AppComponentBase {
         if(!this.comment.relatedEntityId&&this.relatedEntityId)this.comment.relatedEntityId=this.relatedEntityId;
         this._messageServiceProxy.createMessage(this.comment)
         .pipe(
-            finalize( ()=> this.saving = false )
+            finalize( ()=> {this.saving = false ;this.refresh.emit(true)})
         )
         .subscribe((res)=>{
             this.reset()

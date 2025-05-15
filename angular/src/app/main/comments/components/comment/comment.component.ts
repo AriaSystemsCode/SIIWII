@@ -44,7 +44,7 @@ export class CommentComponent implements OnChanges {
     //   this.isExpanded = !this.isExpanded;
     // }
     setupContent() {
-        const bodyFormat = this.comment?.messages?.bodyFormat || '';
+        const bodyFormat = this.comment?.messages?.body || '';
         if (bodyFormat.length > this.charLimit) {
           this.isLongContent = true;
           this.displayedContent = this.getTruncatedContent(bodyFormat);

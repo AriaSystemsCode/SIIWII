@@ -150,7 +150,7 @@ namespace onetouch.Message
            ||
            (x.SenderId == AbpSession.UserId)))
                          .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD",x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId))
-                         .Where(r => r.Id == _MessagesRepository.GetAll().Where(rr => rr.ThreadId == r.ThreadId).Max(rr => rr.Id));
+                         .WhereIf(input.MessageCategoryFilter.ToUpper() != "MESSAGE",r => r.Id == _MessagesRepository.GetAll().Where(rr => rr.ThreadId == r.ThreadId).Max(rr => rr.Id));
                 /*.Where(x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)                
            ||
            (x.SenderId == AbpSession.UserId)));*/
