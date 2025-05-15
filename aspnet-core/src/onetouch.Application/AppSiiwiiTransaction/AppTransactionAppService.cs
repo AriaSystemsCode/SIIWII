@@ -1089,19 +1089,25 @@ namespace onetouch.AppSiiwiiTransaction
                     z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId).FirstOrDefaultAsync();
                     if (logExist != null)
                     {
-                        logExist.ReadyToBeSent = true;
+                        var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        logExist.EntityObjectStatusId = statusCode;
+                        logExist.EntityObjectStatusCode = "Ready to be Sent";
                         await _appEntityLogRepository.UpdateAsync(logExist);
                     }
                     else
                     {
                         logExist = new AppEntityLog();
-                        logExist.ReadyToBeSent = true;
+                        var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        logExist.EntityObjectStatusId = statusCode;
+                        logExist.EntityObjectStatusCode = "Ready to be Sent";
                         logExist.EntityId = appTrans.Id;
                         logExist.EntityCode = appTrans.Code;
                         logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
                         logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
                         logExist.PartnerCode = "ARIAERP";
                         logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
+                        logExist.ObjectId = appTrans.ObjectId;
+                        logExist.ObjectCode="TRANSACTION";
                         await _appEntityLogRepository.InsertAsync(logExist);
 
                     }
@@ -1626,19 +1632,25 @@ namespace onetouch.AppSiiwiiTransaction
                     z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId).FirstOrDefaultAsync();
                     if (logExist != null)
                     {
-                        logExist.ReadyToBeSent = true;
+                        var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        logExist.EntityObjectStatusId = statusCode;
+                        logExist.EntityObjectStatusCode = "Ready to be Sent";
                         await _appEntityLogRepository.UpdateAsync(logExist);
                     }
                     else
                     {
                         logExist = new AppEntityLog();
-                        logExist.ReadyToBeSent = true;
+                        var statusCode =await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        logExist.EntityObjectStatusId  = statusCode;
+                        logExist.EntityObjectStatusCode= "Ready to be Sent";
                         logExist.EntityId = appTrans.Id;
                         logExist.EntityCode = appTrans.Code;
                         logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
                         logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
                         logExist.PartnerCode = "ARIAERP";
                         logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
+                        logExist.ObjectId = appTrans.ObjectId;
+                        logExist.ObjectCode = "TRANSACTION";
                         await _appEntityLogRepository.InsertAsync(logExist);
 
                     }
@@ -2138,8 +2150,9 @@ namespace onetouch.AppSiiwiiTransaction
                     input.EntityTypeIdFilter = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
                 }
                 //log[Start]
+                var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
                 var notSentTransactions = _appEntityLogRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId &&
-                z.EntityObjectTypeId == input.EntityTypeIdFilter && z.ReadyToBeSent ==true);
+                z.EntityObjectTypeId == input.EntityTypeIdFilter && z.EntityObjectStatusId == statusCode);
 
                 //log[End]
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll()
@@ -2206,8 +2219,9 @@ namespace onetouch.AppSiiwiiTransaction
                 var items = await pagedAndFilteredAppTransactionsRes.ToListAsync();
                 var totalCount = items.DistinctBy(e => e.Trans).Count();
                 var objList = items.DistinctBy(e => e.Trans).ToList();
-
-                objList.ForEach(a=>a.Log.ReadyToBeSent=false);
+                var statusSentCode = await _helper.SystemTables.GetEntityObjectStatusSentEntityLog();
+                objList.ForEach(a=>a.Log.EntityObjectStatusId = statusSentCode);
+                objList.ForEach(a => a.Log.EntityObjectStatusCode = "Sent");
                 objList.ForEach(a => a.Log.SentDate = DateTime.Now);
                 // remove parent items from export based on parameter [Begin]
                 if (input.hasParentItems == false)

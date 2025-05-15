@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using onetouch.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    partial class onetouchDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250515140120_updateEntityLogStru")]
+    partial class updateEntityLogStru
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2551,13 +2554,6 @@ namespace onetouch.Migrations
                     b.Property<long>("EntityId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("EntityObjectStatusCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("EntityObjectStatusId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("EntityObjectTypeCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -2574,15 +2570,11 @@ namespace onetouch.Migrations
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ObjectCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long>("ObjectId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("PartnerCode")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ReadyToBeSent")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("SentDate")
                         .HasColumnType("datetime2");
@@ -2594,11 +2586,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.HasIndex("EntityObjectStatusId");
-
                     b.HasIndex("EntityObjectTypeId");
-
-                    b.HasIndex("ObjectId");
 
                     b.ToTable("AppEntityLog", t =>
                         {
@@ -8240,29 +8228,15 @@ namespace onetouch.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("onetouch.SystemObjects.SycEntityObjectStatus", "EntityObjectStatusFk")
-                        .WithMany()
-                        .HasForeignKey("EntityObjectStatusId");
-
                     b.HasOne("onetouch.SystemObjects.SycEntityObjectType", "EntityObjectTypeFk")
                         .WithMany()
                         .HasForeignKey("EntityObjectTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("onetouch.SystemObjects.SydObject", "ObjectFk")
-                        .WithMany()
-                        .HasForeignKey("ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("EntityFk");
 
-                    b.Navigation("EntityObjectStatusFk");
-
                     b.Navigation("EntityObjectTypeFk");
-
-                    b.Navigation("ObjectFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityReactionsCount", b =>
