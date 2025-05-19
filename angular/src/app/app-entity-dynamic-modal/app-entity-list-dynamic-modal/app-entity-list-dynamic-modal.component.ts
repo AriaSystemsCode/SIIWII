@@ -82,10 +82,21 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
             const isFirstPage = this.skipCount == 0
 
             if( isFirstPage ) this.allRecords = []
-            this.allRecords.push(...result.items);
-            this.nonLookupValues=this.nonLookupValues ? this.nonLookupValues : [] 
-            this.allRecords.push(...this.nonLookupValues);
-            this.displayedRecords = this.allRecords
+                    // Filter out any result items already present in allRecords
+            const newItems = result.items.filter(newItem =>
+                !this.allRecords.some(existing => existing.code === newItem.code)
+            );
+            this.allRecords.push(...newItems);
+
+            // Add nonLookupValues without duplicating existing ones
+            this.nonLookupValues = this.nonLookupValues || [];
+            const uniqueNonLookup = this.nonLookupValues.filter(nonLookup =>
+                !this.allRecords.some(existing => existing.code === nonLookup.code)
+            );
+            this.allRecords.push(...uniqueNonLookup);
+
+            this.displayedRecords = this.allRecords;
+
            
             this.showMoreListDataButton = !isLastPage
 
