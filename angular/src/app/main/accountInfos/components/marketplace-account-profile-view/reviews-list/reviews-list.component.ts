@@ -12,61 +12,46 @@ import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAtt
 
 
 export class ReviewsListComponent extends AppComponentBase implements OnInit {
-  @Input() accountDataForView :AccountDto;
-  @Input() fromOverviewTab :boolean = false
-  
-reviews : any [] =[]
-// @Input('accountDataForView') accountDataForView :AccountDto;
+  @Input() accountDataForView: AccountDto;
+  @Input() fromOverviewTab: boolean = false
 
-@ViewChild('reviewsSection') reviewsSection!: ElementRef;
-totalCount: number = 0; // Total number of reviews
-skipCount: number = 0; // Current offset
-maxResultCount: number = 3; // Number of reviews per request
-reviewRating : number
-selectedRating: number = 0; // Initialize with no rating
-value: number;
-overRating : OverAllRatingDto
-    usersReactionsStats: AppEntityUserReactionsCountDto = new AppEntityUserReactionsCountDto()
+  @ViewChild('reviewsSection') reviewsSection!: ElementRef;
 
-mediaItems : AppEntityAttachmentDto[]
-
-
-reviewText: string = '';
-isHelpful:any
+  reviews: any[] = []
+  totalCount: number = 0;
+  skipCount: number = 0;
+  maxResultCount: number = 3;
+  selectedRating: number = 0;
+  reviewText: string = '';
   selectedMedia: { url: string; type: string; file?: File }[] = [];
-  showEmojiPicker: boolean = false;
-      messages: CreateMessageInput = new CreateMessageInput();
-   attachmentsUploader: FileUploaderCustom;
-   loginAccoutType:string="";
-   isExpanded = false;
-   isUserReviewdBefore : boolean = false
-   SuccessMsg :boolean = false
-   isEmojiPickerOpen: boolean = false; // Toggle emoji picker visibility
-   emojis: string[] = [
-     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
-     '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😜', '🤪', '😝',
-     '🤑', '🤗', '🤔', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄',
-     '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕',
-     '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳'
-   ];
-  constructor(        injector: Injector, private messageServiceProxy:MessageServiceProxy,    private _AccountsServiceProxy: AccountsServiceProxy,       private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-    
+  messages: CreateMessageInput = new CreateMessageInput();
+  attachmentsUploader: FileUploaderCustom;
+  loginAccoutType: string = "";
+  isExpanded = false;
+  isUserReviewdBefore: boolean = false
+  SuccessMsg: boolean = false
+  isEmojiPickerOpen: boolean = false; // Toggle emoji picker visibility
+  emojis: string[] = [
+    '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
+    '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😜', '🤪', '😝',
+    '🤑', '🤗', '🤔', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄',
+    '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕',
+    '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳'
+  ];
+
+
+  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
+
   ) {
     super(injector);
 
-}
+  }
 
-ngOnInit() {
+  ngOnInit() {
+    this.getAllReviws()
+  }
 
-
-//   this.getLoginAccoutType()
- 
-  this.getAllReviws()
-
-
-}
-
-toggleEmojiPicker() {
+  toggleEmojiPicker() {
     this.isEmojiPickerOpen = !this.isEmojiPickerOpen;
   }
 
@@ -77,18 +62,17 @@ toggleEmojiPicker() {
   }
 
 
-setRating(rating: number): void {
+  setRating(rating: number): void {
     this.selectedRating = rating;
-    console.log(`User selected ${rating} stars`);
-   
+
   }
 
-isUserReviewedEntityBefore() {
+  isUserReviewedEntityBefore() {
     this.showMainSpinner()
     const subs = this.messageServiceProxy
       .isUserReviewedEntityBefore(
         this.accountDataForView?.entityId
-    
+
       )
       .pipe(
         finalize(() => {
@@ -97,21 +81,19 @@ isUserReviewedEntityBefore() {
         })
       )
       .subscribe((result) => {
-      console.log(result,'isuuuuuser')
-      if(result){
-    this.SuccessMsg = true
-        
-      }else{
-  this.postReview()
-      }
-    //  this.isUserReviewdBefore = result
+        if (result) {
+          this.SuccessMsg = true
+
+        } else {
+          this.postReview()
+        }
       });
-  
+
     this.subscriptions.push(subs);
   }
-  
-  
-  
+
+
+
   getAllReviws() {
     this.showMainSpinner();
     const subs = this.messageServiceProxy
@@ -139,7 +121,7 @@ isUserReviewedEntityBefore() {
           ...review,
           isExpanded: false, // Add `isExpanded` property for tracking
         }));
-  
+
         if (this.skipCount === 0) {
           // Initial load or refresh
           this.reviews = newReviews;
@@ -147,22 +129,20 @@ isUserReviewedEntityBefore() {
           // Append new reviews to the existing list
           this.reviews = [...this.reviews, ...newReviews];
         }
-  
+
         this.totalCount = result.totalCount; // Update the total count of reviews
       });
-  
+
     this.subscriptions.push(subs);
   }
-  
-  
+
+
   loadMoreReviews(): void {
     if (this.reviews.length < this.totalCount) {
       this.skipCount += this.maxResultCount; // Increment the offset
       this.getAllReviws(); // Fetch more reviews
     }
   }
-  
-
 
 
   adjustTextareaHeight(event: Event): void {
@@ -170,16 +150,12 @@ isUserReviewedEntityBefore() {
     textarea.style.height = 'auto'; // Reset the height to auto to recalculate
     textarea.style.height = textarea.scrollHeight + 'px'; // Set the height to the scrollHeight
   }
-  
+
   toggleExpand(review: any): void {
     review.isExpanded = !review.isExpanded; // Toggle the `isExpanded` property for the specific review
   }
 
-
-
-
-  
-onImageSelected(event: any): void {
+  onImageSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -193,7 +169,7 @@ onImageSelected(event: any): void {
       reader.readAsDataURL(file);
     }
   }
-  
+
   onVideoSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -208,116 +184,97 @@ onImageSelected(event: any): void {
       reader.readAsDataURL(file);
     }
   }
-  
-  
-  
-  
-  
+
+
   removeMedia(index: number): void {
     this.selectedMedia.splice(index, 1);
   }
-  
-  
-  
+
+
+
   resetForm(): void {
     this.reviewText = '';
     this.selectedRating = 0;
     this.selectedMedia = [];
   }
-  
-  
+
+
   onUploadAttachments() {
     const uploadUrl = "/Attachment/UploadFiles";
     this.attachmentsUploader = this.createCustomUploader(uploadUrl);
-  
+
     // Extract files from `selectedMedia`
     const files = this.selectedMedia
-        .filter(media => media.file instanceof File)
-        .map(media => media.file as File);
-  
+      .filter(media => media.file instanceof File)
+      .map(media => media.file as File);
+
     this.attachmentsUploader.addToQueue(files);
-  
+
     this.attachmentsUploader.onBuildItemForm = (fileItem: any, form: any) => {
-        if (!this.messages.entityAttachments) {
-            this.messages.entityAttachments = [];
-        }
-  
-        for (let i = 0; i < files.length; i++) {
-            const guid = this.guid(); // Generate a unique GUID
-            const file = files[i];
-            const correspondingMedia = this.selectedMedia.find(media => media.file === file);
-            const isImage = file.type.startsWith("image/");
-            const isVideo = file.type.startsWith("video/");
-            // Create a new AppEntityAttachmentDto object
-            const att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-            att.fileName = file.name;
-            att.attachmentCategoryId = isImage ? 3 : 4; // Example category ID
-            att.guid = guid;
-          
-           
-  
-            // Add the attachment to `entityAttachments`
-            this.messages.entityAttachments.push(att);
-  
-            // Append GUID to the form
-            form.append(`guid`, guid);
-        }
+      if (!this.messages.entityAttachments) {
+        this.messages.entityAttachments = [];
+      }
+
+      for (let i = 0; i < files.length; i++) {
+        const guid = this.guid(); // Generate a unique GUID
+        const file = files[i];
+        const correspondingMedia = this.selectedMedia.find(media => media.file === file);
+        const isImage = file.type.startsWith("image/");
+        const isVideo = file.type.startsWith("video/");
+        // Create a new AppEntityAttachmentDto object
+        const att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
+        att.fileName = file.name;
+        att.attachmentCategoryId = isImage ? 3 : 4; // Example category ID
+        att.guid = guid;
+
+        // Add the attachment to `entityAttachments`
+        this.messages.entityAttachments.push(att);
+
+        // Append GUID to the form
+        form.append(`guid`, guid);
+      }
     };
-  
+
     this.attachmentsUploader.onErrorItem = (item, response, status) => {
-        this.notify.error(this.l("UploadFailed"));
+      this.notify.error(this.l("UploadFailed"));
     };
-  
+
     this.attachmentsUploader.uploadAllFiles();
   }
-  
-  
-  
-  
-      postReview() {
-  
-          this.showMainSpinner();
-          if(this.selectedMedia?.length>0)
-    
-     
-          this.onUploadAttachments()
-        
-  
-          this.messages.to = null;
-          // this.messages.senderId = 30719;
-          this.messages.bodyFormat = this.reviewText;
-          this.messages.body = this.reviewText;
-          this.messages.mesasgeObjectType = MesasgeObjectType.Review
-          // this.messages.relatedEntityId = 416177
-  
-  
-          this.messages.relatedEntityId = this.accountDataForView?.entityId
-          this.messages.subject = ''
-  
-          // this.messages.entityAttachments=this.prepareAttachments();
-          // this.Messages.entityAttachments=this.attachments
-    
-          this.messageServiceProxy
-              .createMessage(this.messages)
-              .pipe(finalize(() => {
-                 this.hideMainSpinner()  ; 
-                 this.notify.info(this.l("SendSuccessfully"));
-                this.getAllReviws()
-                this.messages.entityAttachments = [];
-             
-                this.messages=new CreateMessageInput();
-                this.resetForm()
-              }))
-              .subscribe(() => {
-        console.log('Review posted:', this.messages);
+
+
+
+
+  postReview() {
+
+    this.showMainSpinner();
+    if (this.selectedMedia?.length > 0)
+      this.onUploadAttachments()
+    this.messages.to = null;
+    this.messages.bodyFormat = this.reviewText;
+    this.messages.body = this.reviewText;
+    this.messages.mesasgeObjectType = MesasgeObjectType.Review
+    this.messages.relatedEntityId = this.accountDataForView?.entityId
+    this.messages.subject = ''
+    this.messageServiceProxy
+      .createMessage(this.messages)
+      .pipe(finalize(() => {
+        this.hideMainSpinner();
+        this.notify.info(this.l("SendSuccessfully"));
+        this.getAllReviws()
+        this.messages.entityAttachments = [];
+
+        this.messages = new CreateMessageInput();
+        this.resetForm()
+      }))
+      .subscribe(() => {
         this.messageServiceProxy
-        .createUserEntityRating(this.selectedRating ,   this.accountDataForView?.entityId)
-    
-        .subscribe(() => {
-          // this.selectedRating =0;this.reviewText ='';
-          // this.getAllReviws()
-        });
-              
-              });
-      }
+          .createUserEntityRating(this.selectedRating, this.accountDataForView?.entityId)
+
+          .subscribe(() => {
+
+          });
+
+      });
+  }
 }

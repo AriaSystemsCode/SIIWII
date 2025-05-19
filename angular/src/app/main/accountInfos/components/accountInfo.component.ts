@@ -390,9 +390,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
       .subscribe((result) => {
         this.accountTypes=result;
       }); 
-      /*  this.accountTypes.push({ label :'Personal' ,value: 'Personal'});
-    this.accountTypes.push({ label :'Business' ,value: 'Business'});
-    this.accountTypes.push({ label :'Group' ,value: 'Group'});*/
+
   } 
 
 

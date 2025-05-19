@@ -12,34 +12,34 @@ import { SelectItem } from 'primeng/api';
   templateUrl: './events-tab.component.html',
   styleUrls: ['./events-tab.component.scss']
 })
-export class EventsTabComponent  implements AfterViewInit{
+export class EventsTabComponent implements AfterViewInit {
 
   @ViewChild('EventBrowseComponent') eventBrowseComponent: EventsBrowseComponent;
-  @Input() accountDataForView :AccountDto;
-  @Input() fromOverviewMarketPlaceProfile :boolean;
-  
+  @Input() accountDataForView: AccountDto;
+  @Input() fromOverviewMarketPlaceProfile: boolean;
 
 
-ngAfterViewInit(): void {
-  const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"
-  const showMainFiltersOptions: boolean = true
-  const pageMainFilters: SelectItem[] = [
+
+  ngAfterViewInit(): void {
+    const defaultMainFilter: EventsFilterTypesEnum = EventsFilterTypesEnum.UpcommingEvents  //  "Business Accounts"
+    const showMainFiltersOptions: boolean = true
+    const pageMainFilters: SelectItem[] = [
       { label: "AllEvents", value: EventsFilterTypesEnum.AllEvents },
       { label: "UpcomingEvents", value: EventsFilterTypesEnum.UpcommingEvents },
       { label: "PriorEvents", value: EventsFilterTypesEnum.PriorEvents },
       { label: "MyEvents", value: EventsFilterTypesEnum.MyEvents }
-  ]
-  const filtersFlags :EventsBrowseComponentFiltersDisplayFlags = new EventsBrowseComponentFiltersDisplayFlags()
-  const statusesFlags :EventsBrowseComponentStatusesFlags = new EventsBrowseComponentStatusesFlags()
-  const actionsMenuFlags :EventsBrowseComponentActionsMenuFlags = new EventsBrowseComponentActionsMenuFlags()
-  filtersFlags.showAll()
-  statusesFlags.showAll()
-  actionsMenuFlags.showAll()
+    ]
+    const filtersFlags: EventsBrowseComponentFiltersDisplayFlags = new EventsBrowseComponentFiltersDisplayFlags()
+    const statusesFlags: EventsBrowseComponentStatusesFlags = new EventsBrowseComponentStatusesFlags()
+    const actionsMenuFlags: EventsBrowseComponentActionsMenuFlags = new EventsBrowseComponentActionsMenuFlags()
+    filtersFlags.showAll()
+    statusesFlags.showAll()
+    actionsMenuFlags.showAll()
 
-  const title:string = ""
-  const canView:boolean = true
-  const canAdd:boolean = false
-  const inputs : EventsBrowseInputs = {
+    const title: string = ""
+    const canView: boolean = true
+    const canAdd: boolean = false
+    const inputs: EventsBrowseInputs = {
       canAdd,
       canView,
       title,
@@ -49,7 +49,7 @@ ngAfterViewInit(): void {
       defaultMainFilter,
       showMainFiltersOptions,
       pageMainFilters
-  }
-  this.eventBrowseComponent.show(inputs)
+    }
+    this.eventBrowseComponent.show(inputs)
   }
 }

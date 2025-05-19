@@ -16,21 +16,22 @@ import {  finalize, Observable } from 'rxjs';
 export class ConnectionsTabComponent extends AppComponentBase {
   @Input() accountDataForView :AccountDto;
   @Input() loginAccoutType:string;
+  @Input() fromOverview:boolean = false;
+
+  @ViewChild("paginator", { static: true }) paginator: Paginator;
+
   singleItemPerRowMode: boolean = false;
   accounts: GetAccountForViewDto[] = [];
   sortingOptions: SelectItem[];
-  filterVisible = false; // To toggle the filter visibility
   active: boolean = false;
   loading: boolean = false;
-  @ViewChild("paginator", { static: true }) paginator: Paginator;
   connectionTypeId: number = 0;
   accountsTypes:LookupLabelDto[]=[];
   filterForm: FormGroup;
-  @Input() fromOverview:boolean = false;
 
-  get sortingCtrl(): AbstractControl {
-    return this.filterForm?.get("sorting");
-  }
+  isHost: boolean;
+  showData:boolean =true;
+
   constructor(
     injector: Injector,
     private _abpSessionService: AbpSessionService,
@@ -41,8 +42,6 @@ export class ConnectionsTabComponent extends AppComponentBase {
 
   }
 
-  isHost: boolean;
-  showData:boolean =true;
   ngOnInit() {
     this.isHost = !this._abpSessionService.tenantId;
     this.singleItemPerRowMode = false;
@@ -56,6 +55,10 @@ export class ConnectionsTabComponent extends AppComponentBase {
     if (changes['accountDataForView'] &&  (changes['accountDataForView']?.currentValue != changes['accountDataForView']?.previousValue )) {
     this.GetSettingValue();
     }
+  }
+
+  get sortingCtrl(): AbstractControl {
+    return this.filterForm?.get("sorting");
   }
 
   getAllAccountTypesForTableDropdownWithPaging(){
@@ -80,7 +83,6 @@ this.accountsTypes=result.items;
 }
 
   GetSettingValue(){
-    //I40-send SettingValueName 
     this._accountsServiceProxy.getSettingValue(
       "", this.accountDataForView?.ssin
     ).pipe(

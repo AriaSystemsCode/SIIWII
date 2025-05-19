@@ -1,45 +1,38 @@
 <form [formGroup]="filterForm">
     <div [@routerTransition] style="margin-top: -90px" class="wrapper">
-        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor mt-md-4 marginMob" [ngClass]="fromOverview ? 'p-0':''">
+        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor mt-md-4 marginMob"
+            [ngClass]="fromOverview ? 'p-0':''">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [ngClass]="fromOverview ? 'p-0':''">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body" [ngClass]="fromOverview ? 'p-0':''">
                         <div class="row">
-                            <!-- <div *ngIf="accounts  && accounts?.length>0">
-                                <input type="radio" id="all" name="option"   [checked]="connectionType === 'All'" />
-                                <label for="all" (click)="connectionType='All';getConnections()">All</label> <span
+
+                            <div *ngIf="accounts  && accounts?.length>0 && accountsTypes && accountsTypes?.length>0 && !fromOverview"
+                                class="row">
+                                <input type="radio" id="all" name="option" [checked]="connectionTypeId ==0" />
+                                <label for="all" (click)="setConnectionType(0)">All</label> <span
                                     style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
-                                <input type="radio" id="people" name="option" />
-                                <label for="people" (click)="connectionType='People';getConnections()">People</label>
-                                <span style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
-                                <input type="radio" id="groups" name="option"
-                                    *ngIf="accountDataForView?.accountType?.toUpperCase()!= 'GROUP'" />
-                                <label for="groups" (click)="connectionType='Groups';getConnections()"
-                                    *ngIf="accountDataForView?.accountType?.toUpperCase()!= 'GROUP'">Groups</label> <span
-                                    *ngIf="accountDataForView?.accountType?.toUpperCase()!= 'GROUP'"
-                                    style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
-                                <input type="radio" id="business" name="option" />
-                                <label for="business"
-                                    (click)="connectionType='Business';getConnections()">Businesses</label>
+
+                                <div *ngFor="let accountsType of accountsTypes; let i = index; let last = last">
+                                    <div
+                                        *ngIf=" (accountsType.code?.toUpperCase() != 'GROUP') || (accountsType.code?.toUpperCase() == 'GROUP'  && accountDataForView?.accountType?.toUpperCase()!= 'GROUP' &&  loginAccoutType?.toUpperCase()!= 'GROUP') ">
+                                        <input type="radio" id="{{accountsType.code}}" name="option" />
+                                        <label for="{{accountsType.code}}"
+                                            (click)="setConnectionType(accountsType.value)">
+                                            {{accountsType.code?.toUpperCase() == 'BUSINESS' ? 'Businesses' :
+                                            accountsType.code?.toUpperCase() == 'GROUP' ? 'Groups' :
+                                            accountsType.code?.toUpperCase() == 'PERSONAL' ? 'People' :
+                                            accountsType.code }}</label>
+                                        <span *ngIf="!last"
+                                            style="color:rgba(238, 238, 238, 1); width: 2px; height: 42px;"> | </span>
+                                    </div>
+                                </div>
                             </div>
- -->
- <div *ngIf="accounts  && accounts?.length>0 && accountsTypes && accountsTypes?.length>0 && !fromOverview" class="row">
-    <input type="radio" id="all" name="option"   [checked]="connectionTypeId ==0" />
-    <label for="all" (click)="setConnectionType(0)">All</label> <span
-        style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
 
-        <div *ngFor="let accountsType of accountsTypes; let i = index; let last = last">
-            <div *ngIf=" (accountsType.code?.toUpperCase() != 'GROUP') || (accountsType.code?.toUpperCase() == 'GROUP'  && accountDataForView?.accountType?.toUpperCase()!= 'GROUP' &&  loginAccoutType?.toUpperCase()!= 'GROUP') ">
-            <input type="radio" id="{{accountsType.code}}" name="option"  />
-            <label for="{{accountsType.code}}" (click)="setConnectionType(accountsType.value)"  > {{accountsType.code?.toUpperCase() == 'BUSINESS'  ? 'Businesses'  :  accountsType.code?.toUpperCase() == 'GROUP' ? 'Groups' : accountsType.code?.toUpperCase() == 'PERSONAL' ? 'People' : accountsType.code  }}</label>
-            <span *ngIf="!last" style="color:rgba(238, 238, 238, 1); width: 2px; height: 42px;"> | </span>
-        </div>
-        </div>
-</div>
 
-                            
                             <div class="col-12" [ngClass]="fromOverview ? 'pr-0':''">
-                                <div *ngIf="!fromOverview&&accounts?.length>0" class="d-flex justify-content-between align-items-center mb-4">
+                                <div *ngIf="!fromOverview&&accounts?.length>0"
+                                    class="d-flex justify-content-between align-items-center mb-4">
                                     <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
                                         {{
                                         paginator.getPage() *
@@ -122,10 +115,9 @@
                                                     'mt-3':fromOverview,
                                                     'mb-5' :!fromOverview
                                             }">
-                                            <app-connections-card [account]="account" 
-                                            [singleItemPerRowMode]="singleItemPerRowMode"
-                                                [isHost]="isHost" (_createRelation)="createRelation($event)"
-                                                (deleteMe)="
+                                            <app-connections-card [account]="account"
+                                                [singleItemPerRowMode]="singleItemPerRowMode" [isHost]="isHost"
+                                                (_createRelation)="createRelation($event)" (deleteMe)="
                                                 askToConfirmDelete(
                                                     $event,
                                                     account.account,
@@ -135,26 +127,25 @@
                                                 connect(account.account)
                                             " (disconnectMe)="
                                                 disconnect(account.account)
-                                            "
-                                            [fromOverview]="fromOverview"
-                                             ></app-connections-card>
+                                            " [fromOverview]="fromOverview"></app-connections-card>
                                         </div>
                                         <div class="  mt-5 p-5 text-center w-100"
                                             *ngIf="showData && accounts.length == 0 && !loading">
-                                            <!-- {{ "NoDataFound" | localize }} -->
-                                            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+                                            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt=""
+                                                srcset="">
                                             {{ "There is no data to show......" | localize }}
                                         </div>
 
                                         <div class="  mt-5 p-5 text-center w-100"
-                                        *ngIf="!showData&& accounts.length == 0 && !loading">
-                                        <!-- {{ "NoDataFound" | localize }} -->
-                                        <img src="../../../../../assets/placeholders/Vector.png" class="mr-2" alt="" srcset="">
-                                        {{ noDataMessage }}
-                                    </div>
+                                            *ngIf="!showData&& accounts.length == 0 && !loading">
+                                            <img src="../../../../../assets/placeholders/Vector.png" class="mr-2" alt=""
+                                                srcset="">
+                                            {{ noDataMessage }}
+                                        </div>
 
                                     </div>
-                                    <div [ngClass]="fromOverview || accounts?.length==0 ? 'd-none':''"   class="primeng-paging-container custom-paginator">
+                                    <div [ngClass]="fromOverview || accounts?.length==0 ? 'd-none':''"
+                                        class="primeng-paging-container custom-paginator">
                                         <p-paginator [rows]="
                                                 primengTableHelper.defaultRecordsCountPerPage
                                             " #paginator (onPageChange)="getConnections($event)" [totalRecords]="
