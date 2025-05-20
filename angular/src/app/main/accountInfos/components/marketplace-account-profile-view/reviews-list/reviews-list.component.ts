@@ -2,7 +2,7 @@ import { Component, ElementRef, Injector, Input, OnInit, ViewChild } from '@angu
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityUserReactionsCountDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-reviews-list',
@@ -32,10 +32,13 @@ export class ReviewsListComponent extends AppComponentBase implements OnInit {
   isEmojiPickerOpen: boolean = false; // Toggle emoji picker visibility
   emojis: string[] = [
     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
-    '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😜', '🤪', '😝',
-    '🤑', '🤗', '🤔', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄',
-    '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕',
-    '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳'
+    '😉', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😜',
+    '🤪', '😝', '🤑', '🤗', '🤔', '🤨', '😐', '😑', '😶', '😏',
+    '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '😴', '😷', '🤒',
+    '🤕', '🤢', '🤮', '🥴', '🥵', '🥶', '😵', '🤯', '🤠', '🥳',
+    '😎', '🤓', '🧐', '😕', '🙃', '😲', '😭', '😤', '😡', '🤬',
+    '❤️', '💔', '❣️', '💖', '💘', '💞', '💕', '💓', '💗', '💙',
+    '👍', '👎', '👏', '🙌', '🙏', '🤝', '💪', '👀', '👋', '🤙'
   ];
 
 

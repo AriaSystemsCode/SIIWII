@@ -18,11 +18,11 @@ export class BranchDetailsDynamicModalComponent extends AppComponentBase impleme
     branchName : string
     branch : BranchDto
     loading:boolean = false
-    // to be defined later istead of any => AppContactAddressDto , but it make error
     billingAddress : AppContactAddressDto
     shippingAddress : AppContactAddressDto
     distributionAddress : AppContactAddressDto
     mailingAddress : AppContactAddressDto
+
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,

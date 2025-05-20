@@ -169,8 +169,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.currSelectAddress = addressNumber;
         this.selectAddress.emit();
     }
-    hasErrorphone1Number(e) {
-    }
+
     getNumberphone1Number(e) {
         // this.branch.phone1Number=e;
     }
@@ -185,8 +184,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     onCountryChangephone1Number(e) {
         this.branch.phone1CountryKey = e.iso2
     }
-    hasErrorphone2Number(e) {
-    }
+  
     getNumberphone2Number(e) {
         this.branch.phone2Number = e;
     }
@@ -200,8 +198,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.branch.phone2CountryKey = e.iso2
 
     }
-    hasErrorphone3Number(e) {
-    }
+ 
     getNumberphone3Number(e) {
         this.branch.phone3Number = e;
     }

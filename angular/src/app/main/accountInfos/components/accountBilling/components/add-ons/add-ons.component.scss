@@ -34,8 +34,9 @@
   font-size: 16px;
   font-weight: 600;
   line-height: 24px;
-  text-align: left;
   text-align: center;
+  display: flex;
+  justify-content: center;
 
 }
 
@@ -174,6 +175,7 @@
 .orderedSummary {
   overflow-y: auto;
   overflow-x: hidden;
+  margin-bottom: 15px;
 }
 .close {
   height: 30px;
@@ -181,7 +183,7 @@
   border-radius: 3px !important;
 }
 .removeBtn {
-  color: #F6851D;
+  color: #F6851D !important;
   font-size: 10px;
 }
 .table-bordered th,

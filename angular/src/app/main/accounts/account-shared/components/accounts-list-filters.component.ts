@@ -1,7 +1,5 @@
-import { AfterViewInit, Component, Injector, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {  Component, Injector, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { MultiSelectionFilterComponent } from '@app/shared/filters-shared/components/multi-selection-filter.component';
-import { TreeMultiSelectionFilterComponent } from '@app/shared/filters-shared/components/tree-multi-selection-filter.component';
 import { FilterMetaData } from '@app/shared/filters-shared/models/FilterMetaData.model';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, SycEntityObjectClassificationsServiceProxy, SycEntityObjectCategoriesServiceProxy,  LookupLabelDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, PagedResultDtoOfLookupLabelDto, ILookupLabelDto } from '@shared/service-proxies/service-proxies';
@@ -15,6 +13,7 @@ import { finalize } from 'rxjs/operators';
 export class AccountsListFiltersComponent extends AppComponentBase implements OnInit, OnDestroy {
 
     @Input('filterForm') filterForm : FormGroup
+    @Input("fromMarketplace") fromMarketplace :boolean=false;
 
     get categoriesCtrl () : AbstractControl { return this.filterForm.get('categories') }
     get classificationsCtrl () : AbstractControl { return this.filterForm.get('classifications') }
@@ -44,7 +43,6 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     categoriesFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
     classificationsFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>
 
-    @Input("fromMarketplace") fromMarketplace :boolean=false;
 
     constructor(
         injector:Injector,

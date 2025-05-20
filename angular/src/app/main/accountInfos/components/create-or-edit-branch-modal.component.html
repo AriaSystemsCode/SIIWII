@@ -89,7 +89,7 @@
                   <div class="form-group m-form__group d-flex">
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
-                        (hasError)="hasErrorphone1Number($event)" [(ngModel)]="branch.phone1Number" name="Phone1Number"
+                        [(ngModel)]="branch.phone1Number" name="Phone1Number"
                         (ng2TelOutput)="getNumberphone1Number($event)"
                         class="form-control form-control-sm aria-input-text phone-input"
                         (intlTelInputObject)="telInputObjectphone1Number($event)"
@@ -130,7 +130,7 @@
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" class="form-control-sm aria-input-text phone-input" name="Phone2Number"
                         ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
-                        (hasError)="hasErrorphone2Number($event)" (ng2TelOutput)="getNumberphone2Number($event)"
+                  (ng2TelOutput)="getNumberphone2Number($event)"
                         [(ngModel)]="branch.phone2Number" (intlTelInputObject)="telInputObjectphone2Number($event)"
                         (countryChange)="onCountryChangephone2Number($event)" />
                     </div>
@@ -168,7 +168,7 @@
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" class="form-control form-control-sm aria-input-text phone-input" ng2TelInput
                         [ng2TelInputOptions]="{initialCountry: 'us'}" name="Phone3Number"
-                        (hasError)="hasErrorphone3Number($event)" (ng2TelOutput)="getNumberphone3Number($event)"
+                        (ng2TelOutput)="getNumberphone3Number($event)"
                         [(ngModel)]="branch.phone3Number" (intlTelInputObject)="telInputObjectphone3Number($event)"
                         (countryChange)="onCountryChangephone3Number($event)" />
                     </div>

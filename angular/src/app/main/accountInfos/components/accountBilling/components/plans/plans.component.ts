@@ -1,5 +1,5 @@
 import { Component, Injector } from '@angular/core';
-import { AppSubscriptionPlanHeadersServiceProxy, AppTenantSubscriptionPlansServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppSubscriptionPlanHeadersServiceProxy, AppTenantSubscriptionPlansServiceProxy, GetAppSubscriptionPlanHeaderForViewDto, GetAppTenantSubscriptionPlanForViewDto, PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 
@@ -12,15 +12,15 @@ import { finalize } from 'rxjs';
 })
 export class PlansComponent extends AppComponentBase {
   isMonthlyPlan: boolean = true;
-  plans: any[] = []
-  allDetails: any[] = [];
+  plans: GetAppSubscriptionPlanHeaderForViewDto[] = []
+  allDetails: GetAppSubscriptionPlanHeaderForViewDto[] = [];
   featureName:string = ''
   visible: boolean;
   tenantId: string =''
-  tenantDto: any
+  tenantDto: GetAppTenantSubscriptionPlanForViewDto
   selectedPlanName: string = '';
-  plansubId: string = ''
-  cols: any
+  plansubId: number
+  cols: GetAppSubscriptionPlanHeaderForViewDto[]
 
   constructor(injector: Injector,
     private _appSubscriptionPlanHeadersServiceProxy: AppSubscriptionPlanHeadersServiceProxy,
@@ -107,14 +107,6 @@ export class PlansComponent extends AppComponentBase {
 
   showDialog(plan: any) {
 
-
-    if (!this.tenantDto) {
-      this.tenantDto = {};
-    }
-
-    if (!this.tenantDto.appTenantSubscriptionPlan) {
-      this.tenantDto.appTenantSubscriptionPlan = {};
-    }
 
 
     this.tenantDto.appTenantSubscriptionPlan.subscriptionPlanCode = plan?.appSubscriptionPlanHeader?.code;

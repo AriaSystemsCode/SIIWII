@@ -6,7 +6,6 @@ import { AccountInfoComponent } from './accountInfo.component';
 const routes: Routes = [
   {
     path: '',
-    // component: ,
     children: [
    { path: 'myaccount', component: AccountInfoComponent, data: { permission: 'Pages.AccountInfo' }  }
 

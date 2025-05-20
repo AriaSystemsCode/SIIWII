@@ -11,7 +11,6 @@ import { PaymentDataService } from '../services/payment-data.service'
   providers:[PaymentDataService]
 })
 export class CreateOrEditpaymentMethodComponent extends AppComponentBase  {
-    paymentMethod : AppContactPaymentMethodDto
 
     @ViewChild('createOrEditModal', { static: true }) modal: ModalDirective;
 
@@ -19,6 +18,7 @@ export class CreateOrEditpaymentMethodComponent extends AppComponentBase  {
     @Output() paymentUpdated: EventEmitter<any> = new EventEmitter<AppContactPaymentMethodDto>();
 
     saving = false;
+    paymentMethod : AppContactPaymentMethodDto
 
     constructor(
         injector: Injector,

@@ -232,8 +232,6 @@ disconnect(account: AccountDto): void {
       });
 }
 
-
-
   createRelation(account) {
     this._accountsServiceProxy
       .applyRelationOnProfile(undefined,account.account.ssin)
