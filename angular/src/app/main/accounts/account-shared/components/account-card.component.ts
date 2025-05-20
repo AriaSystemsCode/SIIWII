@@ -20,6 +20,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Input() fromMarketplace;
     @Output() _createRelation : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
 
+    isRecordOwner : boolean
     
     constructor(
         injector:Injector,
@@ -30,7 +31,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     ngOnChanges(changes: SimpleChanges): void {
         this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId
     }
-    isRecordOwner : boolean
+    
     get id () : number { return this.account.account.id }
     get isManual () : boolean { return this.account.account.isManual }
     deleteAccount(){
@@ -66,9 +67,6 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
    
     }
     clickCardHandler(){
-        // view profile
-
-        // edit manual or external
         if (this.isManual) {
             this.edit()
         } else {

@@ -1,5 +1,5 @@
 import { Component, Injector } from '@angular/core';
-import { AppSubscriptionPlanDetailsServiceProxy, AppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeadersServiceProxy, AppTenantSubscriptionPlansServiceProxy, GetAppSubscriptionPlanHeaderForViewDto } from '@shared/service-proxies/service-proxies';
+import { AppSubscriptionPlanHeadersServiceProxy, AppTenantSubscriptionPlansServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 
@@ -14,12 +14,12 @@ export class PlansComponent extends AppComponentBase {
   isMonthlyPlan: boolean = true;
   plans: any[] = []
   allDetails: any[] = [];
-  featureName: any
+  featureName:string = ''
   visible: boolean;
-  tenantId: any
+  tenantId: string =''
   tenantDto: any
   selectedPlanName: string = '';
-  plansubId: any
+  plansubId: string = ''
   cols: any
 
   constructor(injector: Injector,
@@ -61,8 +61,6 @@ export class PlansComponent extends AppComponentBase {
     const allDetails = this.plans.reduce((acc, plan) => {
       return [...acc, ...plan.appSubscriptionPlanHeader.appSubscriptionPlanDetails];
     }, []);
-
-
     // Extract unique categories
     const uniqueCategories = allDetails
       .map(detail => detail.category)
@@ -130,9 +128,7 @@ export class PlansComponent extends AppComponentBase {
 
 
   confirm() {
-
     let body;
-
     body = this.tenantDto.appTenantSubscriptionPlan
 
     this.showMainSpinner();

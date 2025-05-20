@@ -26,8 +26,7 @@ export class ReviewsListComponent extends AppComponentBase implements OnInit {
   selectedMedia: { url: string; type: string; file?: File }[] = [];
   messages: CreateMessageInput = new CreateMessageInput();
   attachmentsUploader: FileUploaderCustom;
-  loginAccoutType: string = "";
-  isExpanded = false;
+  isExpanded: boolean = false;
   isUserReviewdBefore: boolean = false
   SuccessMsg: boolean = false
   isEmojiPickerOpen: boolean = false; // Toggle emoji picker visibility
@@ -76,7 +75,6 @@ export class ReviewsListComponent extends AppComponentBase implements OnInit {
       )
       .pipe(
         finalize(() => {
-          // Handle loading state here if needed
           this.hideMainSpinner()
         })
       )

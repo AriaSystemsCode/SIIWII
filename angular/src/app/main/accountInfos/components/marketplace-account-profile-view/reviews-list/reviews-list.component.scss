@@ -1,163 +1,4 @@
-.left-sec {
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border: 1px solid #EEEEEE;
-  border-radius: 10px;
-  gap: 20px;
-  padding: 5px !important;
-
-}
-
-.right-sec {
-
-  border: 1px solid #EEEEEE;
-  border-radius: 10px;
-  margin-right: 5px;
-  padding: 3px;
-
-  h4 {
-
-    font-weight: 700;
-    font-size: 20px;
-    line-height: 30px;
-
-    color: #1B101B;
-
-
-  }
-}
-
-.hr {
-
-
-
-  height: 2px;
-
-  background: #EEEEEE;
-  border-radius: 4px;
-  transform: rotate(-180deg);
-
-
-}
-
-.sec-data {
-
-  border: 1px solid #EEEEEE;
-  border-radius: 10px;
-  gap: 10px;
-  padding: 3px;
-
-  h4 {
-
-    font-weight: 700;
-    font-size: 20px;
-    line-height: 30px;
-
-    color: #1B101B;
-
-
-  }
-}
-
-.row-item {
-  margin-bottom: 10px;
-}
-
-.all-btn {
-
-  border: none;
-  border-radius: 6px;
-  height: 32px;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 21px;
-  display: flex;
-  align-items: center;
-  text-transform: capitalize;
-
-  color: #4A0D4A;
-
-
-}
-
-.row-item-title {
-
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 27px;
-  white-space: nowrap;
-  color: #1B101B;
-
-}
-
-.event-img {
-  width: 94px;
-  height: 94px;
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-  object-fit: cover;
-  object-position: center;
-
-}
-
-.event-title {
-
-  font-weight: 900;
-  font-size: 14px;
-  line-height: 21px;
-
-
-  color: #1B101B;
-
-
-}
-
-.event-info {
-  width: 75%;
-  padding: 0px 14px 0px 0px;
-  gap: 10px;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-  height: 94px;
-  background: #FFFFFF;
-  border: 1px solid #F7F7F7;
-
-
-}
-
-.sm-fs {
-  font-size: 8px;
-  color: #1B101B;
-  font-weight: 600;
-
-  span {
-    color: #9E9E9E;
-  }
-}
-
-.connect-d-btn {
-
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 4px 6px;
-  gap: 5px;
-
-  // width: 74px;
-  height: 23px;
-
-  background: #4A0D4A;
-  box-shadow: 2px 2px 6px rgba(22, 22, 22, 0.05);
-  border-radius: 4px;
-
-  color: #FFFFFF;
-}
-
 .stars-container {
-  // position: relative;
   display: inline-block;
   color: transparent;
   font-size: 28px;
@@ -172,24 +13,7 @@
   height: 32px;
 }
 
-::ng-deep {
-  .p-progressbar {
-    height: 10px !important;
-    border-radius: 10px !important;
 
-    .p-progressbar-value {
-      background: #F6851D !important;
-    }
-
-    .p-progressbar-label {
-      display: none !important;
-    }
-  }
-}
-
-p-progressBar {
-  width: 90%;
-}
 
 .star {
   color: #F6851D !important;
@@ -288,31 +112,6 @@ h2 {
 
 }
 
-
-
-.row-item-desc {
-
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 21px;
-  text-transform: capitalize;
-  color: #9E9E9E;
-}
-
-.Classification {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 10px;
-  gap: 10px;
-  height: 34px;
-  background: rgba(248, 248, 248, 0.972549);
-  border: 1px solid #E6E6E6;
-  border-radius: 4px;
-  color: #1B101B;
-
-}
 
 .viewAllBtn {
   display: flex;
@@ -414,22 +213,7 @@ h2 {
   white-space: noWrap;
 }
 
-.rateNum {
 
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 36px;
-  color: #1B101B;
-
-}
-
-.rateTxt {
-  text-align: center;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 21px;
-  color: #9E9E9E;
-}
 
 .addReview {
 
@@ -520,20 +304,7 @@ h2 {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 .addReview {
-  // background-color: #f9f9f9;
   border-radius: 8px;
   padding: 1rem;
 }
@@ -618,13 +389,11 @@ h2 {
 }
 
 .p-button-text {
-  // button {
   background-color: #4A0D4A !important;
   color: #FFF !important;
   border: none !important;
   border-radius: 6px !important;
   padding: 8px 32px;
-  // }
 }
 
 ::ng-deep {
@@ -670,11 +439,9 @@ h2 {
   cursor: pointer;
 }
 
-/* Emoji Picker Popup */
 .emoji-picker {
   position: absolute;
   top: 40px;
-  /* Adjust as needed */
   left: 0;
   right: 0;
   width: 320px;
@@ -686,11 +453,9 @@ h2 {
   z-index: 1000;
 }
 
-/* Emoji Grid */
 .emoji-grid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  /* 8 emojis per row */
   gap: 10px;
 }
 

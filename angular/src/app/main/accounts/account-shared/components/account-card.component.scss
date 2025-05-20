@@ -127,7 +127,6 @@ a.btn {
 
     .accountType_value,
     .connectionName {
-        //float: right;
         border: 1px solid #eeeeee;
         border-radius: 4px;
         padding: 4px 12px;
@@ -142,12 +141,14 @@ a.btn {
         color: #4a0d4a !important;
 
     }
-    .relation_button{
+
+    .relation_button {
         background-color: #4a0d4a;
         color: white;
         border-radius: 6px;
     }
-    .relation_Status_button{
+
+    .relation_Status_button {
         background-color: #FBFBFBFB;
         color: #4A0D4A;
         border-radius: 6px;
@@ -162,10 +163,8 @@ a.btn {
 
 .no-padding-bottom {
     padding-bottom: 0px !important;
-  }
-  
-  .extra-padding-bottom {
-    padding-bottom: 50px !important;
-  }
+}
 
-  
+.extra-padding-bottom {
+    padding-bottom: 50px !important;
+}

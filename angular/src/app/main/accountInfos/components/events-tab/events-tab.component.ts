@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { EventsBrowseComponent } from '@app/main/AppEventsBrowse/components/events-browse/events-browse.component';
 import { EventsBrowseInputs } from '@app/main/AppEventsBrowse/models/Events-browse-inputs';
 import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';

@@ -25,17 +25,16 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Input('connectionCount') connectionCount: number;
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
-    // @Input('connections') appEntityName: string;
-    showEditConnected: boolean = false;
-    priceLevel: string;
-    allPriceLevel: SelectItem[] = [];
+    @Input() personalAccount = false;
 
     @Output("edit") edit: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("delete") delete: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("publish") publish: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("unPublish") unPublish: EventEmitter<boolean> = new EventEmitter<boolean>()
-    // @Output("private") private: EventEmitter<boolean> = new EventEmitter<boolean>()
-    //  @Output("hide") hide: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+    showEditConnected: boolean = false;
+    priceLevel: string;
+    allPriceLevel: SelectItem[] = [];
 
     accountLevelEnum = AccountLevelEnum;
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
@@ -73,7 +72,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     sycAttachmentCategoryBanner: SycAttachmentCategoryDto
     sycAttachmentCategoryImage: SycAttachmentCategoryDto
     btnLoader: boolean = false;
-    @Input() personalAccount = false;
     editInfo = true;
     NoteditInfo = false;
     editFirstNameValue: string = '';
@@ -82,16 +80,20 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     editEMailAddressValue: string = '';
     editLanguageNameValue: string = '';
     editPhoneNumberValue: string = '';
-    Editting:boolean =false;
-    editPersonal:boolean =false;
+    Editting: boolean = false;
+    editPersonal: boolean = false;
+    showPrivate = true;
+
+    showHide = true;
+    hidUshare = false;
+    showIsSync = false;
+    showShare = true;
+    hideshowShare = false;
 
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _AccountsServiceProxy: AccountsServiceProxy,
-        private _publishAccountService: PublishAccountService,
-        // private _accountInfoAppService_oldServiceProxy:AccountInfoAppService_oldServiceProxy,
-
     ) {
         super(injector)
     }
@@ -109,8 +111,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
     }
-    handleInvalidImages(event) {
-    }
+
     prevImageClick() {
         this.slider.prev();
     }
@@ -142,20 +143,20 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
-        if (this.personalAccount  && !this.editPersonal) {
-            this.Editting=true;
+        if (this.personalAccount && !this.editPersonal) {
+            this.Editting = true;
             this.editInfo = false;
             this.NoteditInfo = true;
             this.editFirstNameValue = this.accountData.firstName;
-            this.editLastNameValue= this.accountData.lastName;
-            this.editJobTitleValue= this.accountData.jobTitle;
-            this.editEMailAddressValue= this.accountData.eMailAddress;
-            this.editLanguageNameValue= this.accountData.languageName;
-            this.editPhoneNumberValue= this.accountData.phoneNumber;
+            this.editLastNameValue = this.accountData.lastName;
+            this.editJobTitleValue = this.accountData.jobTitle;
+            this.editEMailAddressValue = this.accountData.eMailAddress;
+            this.editLanguageNameValue = this.accountData.languageName;
+            this.editPhoneNumberValue = this.accountData.phoneNumber;
 
 
         }
-        else{
+        else {
             this.editInfo = true;
             this.NoteditInfo = false;
             this.Editting = false;
@@ -297,40 +298,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     editConnnectedAccount() {
         this.showMainSpinner();
-
-        /*  let createOrEditAccountInfoDto:CreateOrEditAccountInfoDto=new CreateOrEditAccountInfoDto();
-         createOrEditAccountInfoDto.accountType=this.accountData.accountType;
-         createOrEditAccountInfoDto.accountTypeId=this.accountData.accountTypeId;
-         createOrEditAccountInfoDto.attachmentSourceTenantId=this.accountData.attachmentSourceTenantId;
-         createOrEditAccountInfoDto.branches=this.accountData.branches;
-         createOrEditAccountInfoDto.code=this.accountData.code;
-         createOrEditAccountInfoDto.contactAddresses=this.accountData.contactAddresses;
-         createOrEditAccountInfoDto.contactPaymentMethods=this.accountData.contactPaymentMethods;
-         createOrEditAccountInfoDto.currencyId=this.accountData.currencyId;
-         createOrEditAccountInfoDto.eMailAddress=this.accountData.eMailAddress;
-         createOrEditAccountInfoDto.entityAttachments=this.accountData.entityAttachments;
-         createOrEditAccountInfoDto.entityClassifications=this.accountData.entityClassifications;
-         createOrEditAccountInfoDto.entityId=this.accountData.entityId;
-         createOrEditAccountInfoDto.id=this.accountData.id;
-         createOrEditAccountInfoDto.languageId=this.accountData.languageId;
-         createOrEditAccountInfoDto.name=this.accountData.name ?this.accountData.name : this.appSession.tenant.name ;
-         createOrEditAccountInfoDto.notes=this.accountData.notes;
-         createOrEditAccountInfoDto.phone1Ex=this.accountData.phone1Ex;
-         createOrEditAccountInfoDto.phone1Number=this.accountData.phone1Number;
-         createOrEditAccountInfoDto.phone1TypeId=this.accountData.phone1TypeId;
-         createOrEditAccountInfoDto.phone2Ex=this.accountData.phone2Ex;
-         createOrEditAccountInfoDto.phone2Number=this.accountData.phone2Number;
-         createOrEditAccountInfoDto.phone2TypeId=this.accountData.phone2TypeId;
-         createOrEditAccountInfoDto.phone3Ex=this.accountData.phone3Ex;
-         createOrEditAccountInfoDto.phone3Number=this.accountData.phone3Number;
-         createOrEditAccountInfoDto.phone3TypeId=this.accountData.phone3TypeId;
-         createOrEditAccountInfoDto.priceLevel=this.priceLevel;
-         createOrEditAccountInfoDto.ssin=this.accountData.ssin;
-         createOrEditAccountInfoDto.tenantId=this.accountData.tenantId ;
-         createOrEditAccountInfoDto.tradeName=this.accountData.tradeName ?  this.accountData.tradeName : this.appSession.tenant.name;
-         createOrEditAccountInfoDto.website=this.accountData.website;
-         createOrEditAccountInfoDto.UseDTOTenant=true; */
-
         this._AccountsServiceProxy.updateConnectedAccountPriceLevel(this.accountData.id, this.priceLevel)
             .pipe(
                 finalize(
@@ -346,92 +313,73 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     }
 
-    showPrivate = true;
-    showHide = true;
-    hidUshare = false;
+
     openShareAccountsModal() {
-        //I40-shareAccount
-        // const alreadyShared: boolean = true;
-        // const successCallBack = () => {
-        //     this.notify.success(this.l("Shared Successfully"));
-        // };
-        // this._publishAccountService.openAccountSharingModal(
-        //     alreadyShared,
-        //     successCallBack
-        // );
-        // this._publishAccountService._accountId = this.accountData.id;
-        // this._publishAccountService.screen = 1
-        debugger
         this.showMainSpinner();
         this._AccountsServiceProxy.publishProfile(false)
-        .pipe(
-            finalize(() => this.hideMainSpinner()
-            ))
-        .subscribe((response) => {
-            this.notify.info(this.l('Profile Published Successfully'));
-            this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
+            .pipe(
+                finalize(() => this.hideMainSpinner()
+                ))
+            .subscribe((response) => {
+                this.notify.info(this.l('Profile Published Successfully'));
+                this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
                 this.hidUshare = true;
-                this.hideshowShare=true;
-                this.showShare=true;
+                this.hideshowShare = true;
+                this.showShare = true;
             }
-        );
+            );
     }
-    showIsSync = false;
+
     syncAccount() {
-        //I40-syncAccount
-        debugger
-        //this.btnLoader = true;
         this.showMainSpinner();
         this._AccountsServiceProxy.publishProfile(true).pipe(
             finalize(() => this.hideMainSpinner()
             )).subscribe(
-            (response:boolean) => {
-                this.notify.success(this.l("Account sync Successfully"));
-                this.showIsSync = !response;
-                this.isSync=!response;
-            });
+                (response: boolean) => {
+                    this.notify.success(this.l("Account sync Successfully"));
+                    this.showIsSync = !response;
+                    this.isSync = !response;
+                });
 
     }
-    showShare = true;
-    hideshowShare=false;
+
     UnShareAccount() {
-        debugger
         this.showMainSpinner();
         this._AccountsServiceProxy.unPublishProfile().pipe(
             finalize(() => this.hideMainSpinner()
             )).subscribe(
-            (response) => {
-                this.notify.info(this.l('Profile UnPublished Successfully'));
-                this.showShare = false;
-                this.hidUshare = true;
-                this.hideshowShare=true;
-                this.showHide=true;
-                this.showPrivate=true;
-            });
+                (response) => {
+                    this.notify.info(this.l('Profile UnPublished Successfully'));
+                    this.showShare = false;
+                    this.hidUshare = true;
+                    this.hideshowShare = true;
+                    this.showHide = true;
+                    this.showPrivate = true;
+                });
     }
 
 
-    getContactSync(){
+    getContactSync() {
         this._AccountsServiceProxy.getContactSync(this.accountData.id)
-        .subscribe((res:boolean) => {
-            this.isSync=res;
-        });
+            .subscribe((res: boolean) => {
+                this.isSync = res;
+            });
 
     }
 
     isNotManualLevel(): boolean {
         return this.accountLevel !== AccountLevelEnum.Manual;
-      }
+    }
 
 
-      isChangePersonalData() : boolean{
-      if(!this.editFirstNameValue || !this.editLastNameValue || !this.editJobTitleValue || !this.editEMailAddressValue || !this.editLanguageNameValue || !this.editPhoneNumberValue)
-        return false;
+    isChangePersonalData(): boolean {
+        if (!this.editFirstNameValue || !this.editLastNameValue || !this.editJobTitleValue || !this.editEMailAddressValue || !this.editLanguageNameValue || !this.editPhoneNumberValue)
+            return false;
 
-      
-      if(this.editFirstNameValue == this.accountData.firstName && this.editLastNameValue == this.accountData.lastName && this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue== this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue== this.accountData.phoneNumber )
-        return false;
 
-      return true;
-      }
+        if (this.editFirstNameValue == this.accountData.firstName && this.editLastNameValue == this.accountData.lastName && this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue == this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue == this.accountData.phoneNumber)
+            return false;
+
+        return true;
+    }
 }

@@ -1,7 +1,7 @@
-import { Component, Injector, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountsServiceProxy, AppContactAddressDto, BranchDto, LookupLabelDto, SycEntityObjectCategoriesServiceProxy } from '@shared/service-proxies/service-proxies';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { AccountsServiceProxy, AppContactAddressDto, BranchDto, LookupLabelDto } from '@shared/service-proxies/service-proxies';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-branch-details-dynamic-modal',
@@ -19,10 +19,10 @@ export class BranchDetailsDynamicModalComponent extends AppComponentBase impleme
     branch : BranchDto
     loading:boolean = false
     // to be defined later istead of any => AppContactAddressDto , but it make error
-    billingAddress : any
-    shippingAddress : any
-    distributionAddress : any
-    mailingAddress : any
+    billingAddress : AppContactAddressDto
+    shippingAddress : AppContactAddressDto
+    distributionAddress : AppContactAddressDto
+    mailingAddress : AppContactAddressDto
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,

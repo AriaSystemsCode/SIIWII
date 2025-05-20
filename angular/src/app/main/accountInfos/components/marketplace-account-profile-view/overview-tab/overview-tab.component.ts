@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, Injector, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto, CreateMessageInput, GetAppPostForViewDto, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
@@ -15,20 +16,14 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   @Output("activeTabIndexBtn") activeTabIndexBtn: EventEmitter<number> = new EventEmitter<number>()
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;
 
-  baseUrl = "https://localhost:44303/";
-  reviews: any[] = []
-  totalCount: number = 0; // Total number of reviews
-  value: number;
+  baseUrl: string = AppConsts.attachmentBaseUrl;
   overRating: OverAllRatingDto
   mediaItems: AppEntityAttachmentDto[]
-  totalmediaItems: number = 0
 
   messages: CreateMessageInput = new CreateMessageInput();
   loginAccoutType: string = "";
-  lastImageIndex: number = 0;
-  totalItems: number = 0;
-  isModalOpen = false;
-  selectedIndex = 0; // Index of the currently selected image
+  isModalOpen : boolean = false;
+  selectedIndex : number = 0; 
 
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy
 
@@ -41,7 +36,6 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     this.getLoginAccoutType()
     this.getOverAllRatings()
     this.getAllMedia()
-    this.lastImageIndex = Math.min(this.mediaItems?.length - 1, 8);
 
   }
 
@@ -59,7 +53,6 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     ).subscribe((res) => {
 
       this.mediaItems = res?.items
-      this.totalmediaItems = this.mediaItems?.length; // Update total items for pagination
 
     })
   }

@@ -22,8 +22,8 @@ export class MediaTabComponent extends AppComponentBase implements OnInit {
   itemsPerPage: number = 10;
   currentPage: number = 1;
   totalItems: number = 0;
-  isModalOpen = false;
-  selectedIndex = 0;
+  isModalOpen : boolean = false;
+  selectedIndex :number = 0;
   lastImageIndex: number = 0;
 
   constructor(

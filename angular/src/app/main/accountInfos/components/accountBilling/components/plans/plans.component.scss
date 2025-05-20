@@ -1,37 +1,42 @@
 .period-btn {
-  width: Hug (150px)px;
-  height: Hug (37px)px;
+  width: 150px;
+  height: 37px;
   padding: 8px 53px 8px 53px;
   gap: 10px;
   border-radius: 0px 6px 6px 0px;
   border: 1px 0px 0px 0px;
   opacity: 0px;
   border: 1px solid #eeeeeeee;
+  background-color: #EEEEEE;
+  color: #4A0D4A;
+  font-weight: 500;
 }
 
 .selected-month-btn {
-  background: var(--Primary-Color, #4A0D4A);
-  width: Hug (152px)px;
-  height: Hug (37px)px;
+  background: #4A0D4A;
+  width: 150px;
+  height: 37px;
   padding: 8px 46px 8px 46px;
   gap: 10px;
   border-radius: 6px 0px 0px 6px;
   opacity: 0px;
   border: 1px solid #eeeeeeee;
   box-shadow: 1px 1px 2px 0px #1616161A;
-
+  font-weight: 700;
   color: #FFFFFF;
 
 }
 
 .selected-year-btn {
-  background: var(--Primary-Color, #4A0D4A);
-  width: Hug (152px)px;
-  height: Hug (37px)px;
+  background: #4A0D4A;
+  width: 150px;
+  height: 37px;
   padding: 8px 46px 8px 46px;
   gap: 10px;
   border-radius: 0px 6px 6px 0px;
   opacity: 0px;
+  font-weight: 700;
+
   border: 1px solid #eeeeeeee;
   box-shadow: 1px 1px 2px 0px #1616161A;
   color: #FFFFFF;
@@ -51,8 +56,6 @@
   line-height: 30px;
   text-align: left;
   color: #1B101B;
-
-
 }
 
 
@@ -61,16 +64,12 @@
     height: 50vh;
     overflow-y: auto;
     box-sizing: border-box;
-    /* Ensure padding is inside the element */
     padding: 0;
-    /* Remove padding from the scroll container */
     margin: 0;
-    /* Optional: ensure no margins interfere */
   }
 
   ::-webkit-scrollbar {
     width: 8px !important;
-    /* Set the width of the scrollbar */
   }
 
   ::-webkit-scrollbar-thumb {
@@ -83,7 +82,6 @@
 
   ::-webkit-scrollbar-track {
     background-color: #D9D9D9 !important;
-    /* Set the color of the track (the non-draggable part) */
 
   }
 
@@ -115,15 +113,16 @@
   .vertical-header-table td {
     padding: 10px;
 
-    text-align: center; // Center-align text in cells
-    width: 100%; // Ensures all columns share equal width
+    text-align: center; 
+    width: 100%; 
   }
 
   .head-pl,
   .plan-header {
 
-    border: 1px solid #EEEEEE; // Add border for better visibility
-
+    border: 1px solid #EEEEEE; 
+    color: #595959;
+    font-weight: 500;
   }
 
   .table-container {
@@ -137,12 +136,13 @@
   }
 
   .table-row {
-    display: flex; // Use flexbox for equal distribution
+    display: flex; 
   }
 
   .table-cell {
-    flex: 1; // Each cell takes equal width
+    flex: 1; 
     padding: 10px;
+
     text-align: center;
   }
 
@@ -170,6 +170,30 @@
 
   }
 
+  .p-button {
+    border: 1px solid rgba(238, 238, 238, 0.93) !important;
+    box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10) !important;
+    background-color: #fff !important;
+    color: #4A0D4A !important;
+
+  }
+
+  .p-dialog-header {
+
+    background: #fff !important;
+
+  }
+
+  .p-button-no {
+    button {
+      border-radius: 12px !important;
+      border: 1px solid rgba(238, 238, 238, 0.93) !important;
+      box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10) !important;
+      background-color: #fff !important;
+      color: #4A0D4A !important;
+
+    }
+  }
 
   .p-button-text {
     button {
@@ -186,17 +210,6 @@
 
   .pr-font {
     font-weight: 700;
-  }
-
-  .p-button-no {
-    button {
-      border-radius: 12px;
-      border: 1px solid rgba(238, 238, 238, 0.93);
-      box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10);
-
-      color: #4A0D4A !important;
-
-    }
   }
 
   .p-dialog {
@@ -248,17 +261,9 @@
   .seletd-plan {
     border-left: 2px solid #837F7F !important;
     border-right: 2px solid #837F7F !important;
+    color: #9E9E9E;
   }
 
-  .text-col {
-
-
-    color: #9E9E9E !important;
-
-
-
-
-  }
 
   .top-left {
     border-bottom: none;
@@ -382,16 +387,32 @@
 
 }
 
-
-
-
-
 .btn-yes {
   background-color: #4A0D4A;
   color: white;
 }
 
-.btn-no {
-  background-color: white;
-  color: #4A0D4A;
+.p-button-no {
+  color: #4A0D4A !important;
+  border-radius: 8px !important;
+  background: #FFF !important;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25) !important;
+  border: none !important;
+  display: flex !important;
+  padding: 8px 32px !important;
+  align-items: center !important;
+  margin-bottom: 8px;
+}
+
+
+.p-button-text {
+  background-color: #4A0D4A !important;
+  border-radius: 8px !important;
+  color: #FFF !important;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25) !important;
+  border: none !important;
+  display: flex !important;
+  padding: 8px 32px !important;
+  align-items: center !important;
+  margin-bottom: 8px;
 }
