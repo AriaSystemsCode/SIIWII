@@ -386,10 +386,10 @@
                         <div>
                             <div class="msrp d-flex align-items-center ">
                             <h5 *ngIf="productDetails?.maxSpecialPrice" class="mr-2" style="color: black !important;font-size: 14px;white-space: nowrap;;">Special Price:  </h5>
-                            <h5 *ngIf="productDetails?.maxSpecialPrice   && showEditSpecialPrice">
-                                {{ (productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : 0) | currency:'':'symbol':'1.2-2' }}
-
-                            </h5>
+                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice">
+                                {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
+                              </h5>
+                              
 
                             <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"  class="mx-1  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
@@ -1308,10 +1308,9 @@ top: 4px;">
                               
                          
                             
-                            <h5 *ngIf="showEditSpecialPrice"> 
-                                    
-                                {{ (productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : 0) | currency:'':'symbol':'1.2-2' }}
-                            </h5>
+                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice">
+                                {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
+                              </h5>
 
                             <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"  class="mx-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
