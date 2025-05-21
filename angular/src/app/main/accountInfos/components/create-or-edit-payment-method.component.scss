@@ -83,6 +83,8 @@
 
     .modal-header {
         position: static !important;
+        display: block; 
+        background-color: #ffffff !important
     }
 
     .modal-footer {
@@ -108,6 +110,7 @@
 
     .modal-title {
         width: 100% !important;
+        display: block;
     }
 
     .close-model {

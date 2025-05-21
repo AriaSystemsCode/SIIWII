@@ -104,19 +104,21 @@ export class PlansComponent extends AppComponentBase {
 
 
 
-
   showDialog(plan: any) {
-
-
-
+    if (!this.tenantDto || !this.tenantDto.appTenantSubscriptionPlan) {
+      this.tenantDto = {
+        appTenantSubscriptionPlan: {}
+      } as GetAppTenantSubscriptionPlanForViewDto;
+    }
+  
     this.tenantDto.appTenantSubscriptionPlan.subscriptionPlanCode = plan?.appSubscriptionPlanHeader?.code;
     this.tenantDto.appTenantSubscriptionPlan.appSubscriptionPlanHeaderId = plan?.appSubscriptionPlanHeader?.id;
     this.tenantDto.appTenantSubscriptionPlan.tenantId = this.appSession.tenantId;
-
+  
     this.selectedPlanName = plan?.appSubscriptionPlanHeader?.name;
-
     this.visible = true;
   }
+  
 
 
   confirm() {
@@ -135,58 +137,20 @@ export class PlansComponent extends AppComponentBase {
 
 
   }
-  getPlanClass(planIndex: number): string {
 
-    switch (planIndex) {
-      case 0:
-        return 'custom-p-free';  
-      case 1:
-        return 'custom-p-sil';  
-      case 2:
-        return 'custom-p-gold';  
-
-      case 3:
-        return 'default-class'; 
-
-      case 4:
-        return 'custom-p-free';  
-      case 5:
-        return 'custom-p-sil'; 
-      default:
-        return 'default-class'; 
-
-    }
-  }
   hasFeature(plan: any, feature: any): boolean {
     return plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails?.some((detail: any) => detail?.featureName === feature?.featureName);
   }
-  getPlanBtnClass(planIndex: number): string {
-    switch (planIndex) {
-      case 0:
-        return 'free-btn';  
-      case 1:
-        return 'sil-btn';  
-      case 2:
-        return 'gold-btn';  
-      case 3:
-        return 'default-class-b'; 
-      case 4:
-        return 'free-btn';  
-      case 5:
-        return 'sil-btn'; 
-      default:
-        return 'default-class-b';  
-    }
+  getPlanClass(index: number): string {
+    return ['custom-p-free', 'custom-p-sil', 'custom-p-gold', 'default-class', 'custom-p-free', 'custom-p-sil'][index] || 'default-class';
   }
 
-  getFontSize() {
+  getPlanBtnClass(index: number): string {
+    return ['free-btn', 'sil-btn', 'gold-btn', 'default-class-b', 'free-btn', 'sil-btn'][index] || 'default-class-b';
+  }
+
+  getFontSize(): string {
     const baseSize = 20;
-    const maxCols = 4;
-
-
-    if (this.plans.length > maxCols) {
-      return `${baseSize - 8}px`;
-    }
-    return `${baseSize}px`;
+    return this.plans.length > 4 ? `${baseSize - 8}px` : `${baseSize}px`;
   }
 }

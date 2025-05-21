@@ -1,51 +1,48 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BillingOptionsPageTabs } from '../../../models/Billing-options-page-tabs.enum';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-accountbilling',
   templateUrl: './accountbilling.component.html',
   styleUrls: ['./accountbilling.component.scss']
 })
-export class AccountBillingComponent {
+export class AccountBillingComponent implements OnInit {
   billingOptionsTabs = BillingOptionsPageTabs;
-  __router: Router;
   currentTab: BillingOptionsPageTabs;
-  isInvoice: boolean = false;
-  isPlan: boolean = true;
-  isAddOn: boolean = false;
+
+  isInvoice = false;
+  isPlan = true;
+  isAddOn = false;
   isActivityLog = false;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.openbillingpage(BillingOptionsPageTabs.PlansOption, 'planbtn');
   }
 
+  openbillingpage(tab: BillingOptionsPageTabs, id: string): void {
+    this.currentTab = tab;
 
-  openbillingpage(number: BillingOptionsPageTabs, id: string) {
-    this.currentTab = number;
-    if (id == "invoicebtn") {
-      this.isInvoice = true;
-      this.isPlan = false;
-      this.isAddOn = false;
-      this.isActivityLog = false;
-    }
-    if (id == "actlogbtn") {
-      this.isInvoice = false;
-      this.isPlan = false;
-      this.isAddOn = false;
-      this.isActivityLog = true;
-    }
-    if (id == "addonbtn") {
-      this.isInvoice = false;
-      this.isPlan = false;
-      this.isAddOn = true;
-      this.isActivityLog = false;
-    }
-    if (id == "planbtn") {
-      this.isInvoice = false;
-      this.isPlan = true;
-      this.isAddOn = false;
-      this.isActivityLog = false;
+    // Reset all
+    this.isInvoice = false;
+    this.isPlan = false;
+    this.isAddOn = false;
+    this.isActivityLog = false;
+
+    // Set active tab
+    switch (id) {
+      case 'invoicebtn':
+        this.isInvoice = true;
+        break;
+      case 'actlogbtn':
+        this.isActivityLog = true;
+        break;
+      case 'addonbtn':
+        this.isAddOn = true;
+        break;
+      case 'planbtn':
+      default:
+        this.isPlan = true;
+        break;
     }
   }
 }

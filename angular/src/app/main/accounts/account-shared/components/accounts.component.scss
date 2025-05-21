@@ -120,3 +120,27 @@ input[type="radio"]:checked+label {
 
 
 }
+
+
+.ToggleView {
+  padding-left: 10px;
+  background-color: #4A0D4A !important;
+  color: white !important;
+  border-radius: 6px;
+}
+
+.SendMail {
+  background-color: #4A0D4A !important;
+  border-radius: 6px;
+  color: white !important;
+  font-size: 16px;
+}
+
+.transparent-button {
+  background-color: #FFFFFF !important;
+  border: 1px solid #EEEEEEEE !important;
+  color: #4A0D4A !important;
+  padding: 10px;
+  border-radius: 6px;
+  margin-left: 10px;
+}

@@ -69,10 +69,8 @@
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
                                     <div class="mb-lg-4 mb-0 text-center">
-                                        <a class="btn   toolbar-btn btn_Primary"
-                                        style="background-color: #4A0D4A !important;
-                                        border-radius: 6px;
-                                        color: white !important;font-size: 16px;"
+                                        <a class="btn   toolbar-btn btn_Primary SendMail"
+                               
                                             (click)="showSendMail()">
                                             <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2" style="width: 16px;">
                                             {{ "InvitePartner" | localize }}
@@ -84,12 +82,7 @@
                                                         | localize
                                                 "
                                                 class="btn   text-center toolbar-btn transparent-button"
-                                                style="background-color: #FFFFFF !important;
-                                                border: 1px solid #EEEEEEEE !important;
-                                                color: #4A0D4A !important;
-                                                padding: 10px;
-                                                border-radius: 6px;
-                                                margin-left: 10px;"
+                                        
                                                 [routerLink]="[
                                                     '/app/main/account/create-manual'
                                                 ]">
@@ -99,12 +92,7 @@
                                                     'AddExternalAccount'
                                                         | localize
                                                 "
-                                                style="background-color: #FFFFFF !important;
-                                                border: 1px solid #EEEEEEEE !important;
-                                                color: #4A0D4A !important;
-                                                padding: 10px;
-                                                border-radius: 6px;
-                                                margin-left: 10px;"
+                                           
                                                 class="btn   text-center toolbar-btn transparent-button"
                                                 [routerLink]="[
                                                     '/app/main/account/create-external'
@@ -155,11 +143,9 @@
                                                 class="alarmInfo">
                                      
                                         </a>
-                                        <a style="padding-left: 10px;background-color: #4A0D4A !important;
-                                        color: white !important;
-                                        border-radius: 6px;" [title]="'ToggleView' | localize"
+                                        <a  [title]="'ToggleView' | localize"
                                             (click)="triggerListView()"
-                                            class="btn   pr-1 text-center text-primary toolbar-btn btn_Primary">
+                                            class="btn   pr-1 text-center text-primary toolbar-btn btn_Primary ToggleView">
 
                                             <i class="d-inline-block w-100" [ngClass]="
                                                     singleItemPerRowMode

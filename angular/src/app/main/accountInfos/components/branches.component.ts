@@ -3,7 +3,7 @@ import { CreateOrEditAddressModalComponent } from '@app/selectAddress/create-or-
 import { SelectAddressModalComponent } from '@app/selectAddress/selectAddress/selectAddress-modal.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, BranchDto, CreateOrEditAccountInfoDto, LookupLabelDto, TreeNodeOfBranchForViewDto, TreeviewItem } from '@shared/service-proxies/service-proxies';
+import { AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, BranchDto, LookupLabelDto, TreeNodeOfBranchForViewDto, TreeviewItem } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { TreeTable } from 'primeng/treetable';
 import { Observable, Subscription } from 'rxjs';

@@ -127,6 +127,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     getForEditResult: GetAccountInfoForEditOutput
     touched: boolean = false
 
+    isRecordOwner: boolean
+
 
     constructor(
         injector: Injector,
@@ -457,8 +459,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     }
                 )
         }
-        //I40-get personalAccount
-        //   this.personalAccount= result ? result.account.accountType.toUpperCase().trim()=='PERSONAL' : false;
+ 
         this.isPublished = result ? result.isPublished : false;
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
@@ -485,7 +486,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if (this.accountDataForView.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }
-    isRecordOwner: boolean
     setProfileData(result: GetAccountInfoForEditOutput = undefined) {
         if (result) {
             this.accountInfoTemp = CreateOrEditAccountInfoDto.fromJS(result.accountInfo);
@@ -1223,7 +1223,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
 
         const showMainFiltersOptions: boolean = true
-        // const showAddButton : boolean = this.viewMode || this.accountLevel !== this.accountLevelEnum.Profile
         const accountId: number = this?.accountDataForView?.id || this.accountId
         const title = "TeamMembers"
         const memberListComponentInputs: MembersListComponentInputsI = {

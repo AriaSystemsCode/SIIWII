@@ -6,7 +6,6 @@ import { Patterns } from '@shared/utils/patterns/pattern';
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
-import { accountModuleAnimation } from '@shared/animations/routerTransition';
 import { SelectItem } from 'primeng/api';
 
 
@@ -24,13 +23,15 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
   }
 
   @ViewChild("registerTenantModal", { static: true }) modal: ModalDirective;
+
+  @Output() register = new EventEmitter<number>();
+
   registerTenantId: number = 0;
   model: RegisterTenantModel = new RegisterTenantModel();
   domainPattern = Patterns.domainName;
   passwordComplexitySetting: PasswordComplexitySetting = new PasswordComplexitySetting();
   saving: boolean = false;
   recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
-  @Output() register = new EventEmitter<number>();
 
   accountType;
   accountTypes:SelectItem[] = [];
@@ -60,10 +61,6 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
   }
 
    getAccountTypes(){
-      /*this.accountTypes.push({ label :'Personal' ,value: 'Personal'});
-    this.accountTypes.push({ label :'Business' ,value: 'Business'});
-    this.accountTypes.push({ label :'Group' ,value: 'Group'}); */
-   
     this._tenantRegistrationService.getEditionsForSelect()
     .subscribe((result) => {
         for (let i = 0; i < result.editionsWithFeatures.length; i++) {
@@ -93,7 +90,6 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
   }
 
   changeAccountType($event){
-    debugger ;
      let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
 
      if(indx>0)

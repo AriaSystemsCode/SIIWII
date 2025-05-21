@@ -114,7 +114,6 @@ export class AccountsComponent
         if (changes?.defaultMainFilter?.firstChange) {
             this.initFilterForm();
             this.setMainPageFilter(this.defaultMainFilter);
-            debugger
             this.getAccounts({
                 rows: this.primengTableHelper.defaultRecordsCountPerPage,
             });
@@ -146,7 +145,6 @@ export class AccountsComponent
             .pipe(debounceTime(1500))
             .subscribe((status) => {
                 if (status) {
-                    debugger
                     this.getAccounts({
                         rows: this.primengTableHelper
                             .defaultRecordsCountPerPage,
@@ -178,7 +176,6 @@ export class AccountsComponent
     }
 
     accountTypeChanges() {
-        debugger
         this.getAccounts();
     }
     resetList() {

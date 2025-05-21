@@ -43,7 +43,6 @@
     background-color: #3699FF;
     border: none;
     width: 127px;
-    /* height: 35px; */
     border-radius: 5px;
     margin-right: 8px;
     padding: 10px !important;
@@ -53,7 +52,6 @@
     background-color: #E5EAEE;
     border: none;
     width: 127px;
-    /* height: 35px; */
     border-radius: 5px;
     padding: 10px !important;
     width: 140px !important;
@@ -64,7 +62,6 @@
 .modal-footer{
     direction: rtl;
     background-color: #F4F4F4;
-    /* position: absolute; */
     width: 100%;
     position: fixed;
     bottom: 0;
@@ -162,20 +159,6 @@
  }
  .btn-plus{
     background-color: #2786FB;
-
-    /* border-radius: 200px 200px;
-    height: 28px;
-    width: 28px;
-    margin: 0 auto !important;
-*/
-    /* border-radius: 70px 70px;
-    height: 24px;
-    width: 21px;
-    margin: 0 auto !important;
-    text-align: center !important;
-    position: absolute;
-    left: 18px;
-    top: 36px; */
     background: url('assets/profile/Add-Address.svg') no-repeat;
     position: absolute;
     left: 14px;
@@ -193,8 +176,6 @@
  }
  .btn-icon-plus{
     position: absolute;
-    /* left: 10px;
-    top: 6px; */
     margin: 0 auto;
     left: 6px;
     font-size: 25px;
@@ -219,31 +200,6 @@
      width: 15%;
    }
 
-   /* select {
-     -webkit-appearance: none;
-     -moz-appearance: none;
-     -o-appearance:none;
-     appearance:none;
-   }
-
-   select.input-lg {
-     height: 50px !important;
-     line-height:25px !important;
-   }
-
-   select + i.fa {
-     float: right;
-     margin-top: -32px;
-     margin-right: 9px;
-
-     pointer-events: none;
-
-     background-color: #FFF;
-       padding-right: 5px;
-   } */
-   /* select option[value="male"]   { background:url('assets/profile/Down_Arrow.svg');   }
-   select option[value="female"] { background:url('assets/profile/Down_Arrow.svg'); }
-   select option[value="others"] { background:url('assets/profile/Down_Arrow.svg'); } */
    .select-options option{
        background-color: white;
    }
@@ -251,7 +207,6 @@
     background-position-x: 90% !important;
    }
    .phone-input{
-       /* color:#B5B5C3; */
        color: #212121;
    }
     .phone-col-ext{
@@ -270,7 +225,6 @@
     background-color: #3699FF;
     border: none;
     width: 127px;
-    /* height: 31px; */
     border-radius: 5px;
     margin-right: 8px;
  }
@@ -278,12 +232,10 @@
     background-color: #E5EAEE;
     border: none;
     width: 127px;
-    /* height: 31px; */
     border-radius: 5px;
  }
  .aria-select-modal{
     height: 37px !important;
-    /* background-color: #F3F6F9 !important; */
     border: none;
     border-radius: 5px;
  }

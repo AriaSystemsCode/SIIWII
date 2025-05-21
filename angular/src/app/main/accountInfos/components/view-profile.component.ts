@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, CreateOrEditAccountInfoDto, SycAttachmentCategoryDto, AccountInfoAppService_oldServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -7,7 +7,6 @@ import { SelectItem } from 'primeng/api';
 import { ImageObject } from '../../accounts/account-shared/models/imageobject';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
-import { PublishAccountService } from '../services/publishAccountService';
 
 
 @Component({

@@ -219,9 +219,7 @@ export class ReviewsListComponent extends AppComponentBase implements OnInit {
       for (let i = 0; i < files.length; i++) {
         const guid = this.guid(); // Generate a unique GUID
         const file = files[i];
-        const correspondingMedia = this.selectedMedia.find(media => media.file === file);
         const isImage = file.type.startsWith("image/");
-        const isVideo = file.type.startsWith("video/");
         // Create a new AppEntityAttachmentDto object
         const att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
         att.fileName = file.name;
