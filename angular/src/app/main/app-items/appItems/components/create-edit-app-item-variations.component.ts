@@ -1104,7 +1104,6 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         // this.setDefaultExtraAttributeForVariationAttachment(this.selectedExtraAttributes[0])
     }
 
-
 combine(index: number, _variation: VariationItemDto, oldAttributes) {
     const currentExtraAttr = this.selectedExtraAttributes[index];
     const totalSelectedExtraAttributes = this.selectedExtraAttributes.length;
