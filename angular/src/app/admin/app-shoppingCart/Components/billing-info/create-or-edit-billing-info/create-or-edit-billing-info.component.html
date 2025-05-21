@@ -28,15 +28,17 @@
       
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <app-address 
+    
         [isCreateOredit]="createOrEditBillingInfo"
-        [showAddBtn] ="(appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual && (appTransactionsForViewDto?.buyerCompanySSIN != '' || appTransactionsForViewDto?.buyerCompanySSIN != null)  ) ? false:true" 
         [contactId]="contactIdApContact"
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
+        [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && isAccManual) ? true : false"
         [showAddressType]="false"
         [currentTab]="currentTab"
-        [appTransactionsForViewDto]="appTransactionsForViewDto"
-        [billingIndexInfo]="1"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                [billingIndexInfo]="1"
+
         [canChange]="canChange"
         [currentTab]="currentTab"
         [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -69,18 +71,16 @@
 
    
     <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
-        <hr class="my-2" />
-
     <app-address  
     [isCreateOredit]="createOrEditBillingInfo"
-    [showAddBtn] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
     [contactId]="contactIdARContact"
     (updateSelectedAddress)="updateArContact($event)"
     [selectedAddressDetails]="arContactSelectedAdd"
     [showAddressType]="false"
     [currentTab]="currentTab"
     [billingIndexInfo]="2"
-    [appTransactionsForViewDto]="appTransactionsForViewDto"
+
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
     [canChange]="canChange"
     [currentTab]="currentTab"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
