@@ -1104,83 +1104,84 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         // this.setDefaultExtraAttributeForVariationAttachment(this.selectedExtraAttributes[0])
     }
 
-combine(index: number, _variation: VariationItemDto, oldAttributes) {
-    const currentExtraAttr = this.selectedExtraAttributes[index];
-    const totalSelectedExtraAttributes = this.selectedExtraAttributes.length;
-    const normalizeCode = (code: string): string => {
-        return code
-            ?.replace(/\s+/g, '')
-            .replace(/-0+/g, '')
-            .replace(/-/g, '')
-            .toUpperCase();
-    };
-    const createNewVariation = (attrLabel: string, attrCode: string, attrId?: number) => {
-        let variation = VariationItemDto.fromJS(_variation);
-        if (!variation.entityExtraData) variation.entityExtraData = [];
-        if (!variation.appItemPriceInfos) variation.appItemPriceInfos = this.getParentProductPrices();
-        if (variation.entityExtraData.length === totalSelectedExtraAttributes) {
-            variation = new VariationItemDto();
-            variation.entityExtraData = [];
-        }
-        const entityExtraData = new AppEntityExtraDataDto({
-            attributeId: currentExtraAttr.attributeId,
-            attributeValue: attrLabel,
-            attributeValueId: attrId,
-            id: 0,
-            entityId: 0,
-            entityObjectTypeCode: currentExtraAttr.entityObjectTypeCode,
-            attributeValueFkName: '0',
-            entityObjectTypeName: '0',
-            entityObjectTypeId: 0,
-            attributeValueFkCode: attrCode || '0',
-            attributeCode: attrCode || '0'
+
+    combine(index: number, _variation: VariationItemDto, oldAttributes) {
+        const currentExtraAttr = this.selectedExtraAttributes[index];
+        const totalSelectedExtraAttributes = this.selectedExtraAttributes.length;
+        const normalizeCode = (code: string): string => {
+            return code
+                ?.replace(/\s+/g, '')
+                .replace(/-0+/g, '')
+                .replace(/-/g, '')
+                .toUpperCase();
+        };
+        const createNewVariation = (attrLabel: string, attrCode: string, attrId?: number) => {
+            let variation = VariationItemDto.fromJS(_variation);
+            if (!variation.entityExtraData) variation.entityExtraData = [];
+            if (!variation.appItemPriceInfos) variation.appItemPriceInfos = this.getParentProductPrices();
+            if (variation.entityExtraData.length === totalSelectedExtraAttributes) {
+                variation = new VariationItemDto();
+                variation.entityExtraData = [];
+            }
+            const entityExtraData = new AppEntityExtraDataDto({
+                attributeId: currentExtraAttr.attributeId,
+                attributeValue: attrLabel,
+                attributeValueId: attrId,
+                id: 0,
+                entityId: 0,
+                entityObjectTypeCode: currentExtraAttr.entityObjectTypeCode,
+                attributeValueFkName: '0',
+                entityObjectTypeName: '0',
+                entityObjectTypeId: 0,
+                attributeValueFkCode: attrCode || '0',
+                attributeCode: attrCode || '0'
+            });
+            variation.entityExtraData.push(entityExtraData);
+            if (index < totalSelectedExtraAttributes - 1) {
+                this.combine(index + 1, variation, oldAttributes);
+            } else {
+                variation.price = this.appItem.price;
+                variation.stockAvailability = 0;
+                variation.id = 0;
+                variation.entityAttachments = [];
+                variation.position = this.variationMatrices.length + 1;
+                variation.code = this.appItem.code || '';
+                for (let i = 0; i < variation.entityExtraData.length; i++) {
+                    variation.code += '-' + (variation.entityExtraData[i].attributeCode || variation.entityExtraData[i].attributeValueFkCode);
+                }
+                const newVariation = VariationItemDto.fromJS(variation);
+                const normalizedNewCode = normalizeCode(newVariation.code);
+                let matchedExisting: any;
+                if (!this.appItem?.id) {
+                    matchedExisting = this.variationMatrices.find(v => normalizeCode(v.code) === normalizedNewCode);
+                } else {
+                    matchedExisting = oldAttributes.find(v => normalizeCode(v.code) === normalizedNewCode);
+                }
+                if (matchedExisting?.stockAvailability > 0) {
+                    newVariation.stockAvailability = matchedExisting.stockAvailability;
+                }
+                const alreadyExists = this.variationMatrices.find(v => normalizeCode(v.code) === normalizedNewCode);
+                if (!alreadyExists) {
+                    this.variationMatrices.push(newVariation);
+                } else {
+                    alreadyExists.entityExtraData = newVariation.entityExtraData;
+                }
+                this.showNewVariation = true;
+            }
+        };
+        currentExtraAttr?.displayedSelectedValues?.forEach(item => {
+            if (!currentExtraAttr.selectedValues?.includes(item?.value) && item?.value !== 0) {
+                currentExtraAttr.selectedValues.push(item.value);
+            }
         });
-        variation.entityExtraData.push(entityExtraData);
-        if (index < totalSelectedExtraAttributes - 1) {
-            this.combine(index + 1, variation, oldAttributes);
-        } else {
-            variation.price = this.appItem.price;
-            variation.stockAvailability = 0;
-            variation.id = 0;
-            variation.entityAttachments = [];
-            variation.position = this.variationMatrices.length + 1;
-            variation.code = this.appItem.code || '';
-            for (let i = 0; i < variation.entityExtraData.length; i++) {
-                variation.code += '-' + (variation.entityExtraData[i].attributeCode || variation.entityExtraData[i].attributeValueFkCode);
-            }
-            const newVariation = VariationItemDto.fromJS(variation);
-            const normalizedNewCode = normalizeCode(newVariation.code);
-            let matchedExisting: any;
-            if (!this.appItem?.id) {
-                matchedExisting = this.variationMatrices.find(v => normalizeCode(v.code) === normalizedNewCode);
-            } else {
-                matchedExisting = oldAttributes.find(v => normalizeCode(v.code) === normalizedNewCode);
-            }
-            if (matchedExisting?.stockAvailability > 0) {
-                newVariation.stockAvailability = matchedExisting.stockAvailability;
-            }
-            const alreadyExists = this.variationMatrices.find(v => normalizeCode(v.code) === normalizedNewCode);
-            if (!alreadyExists) {
-                this.variationMatrices.push(newVariation);
-            } else {
-                alreadyExists.entityExtraData = newVariation.entityExtraData;
-            }
-            this.showNewVariation = true;
-        }
-    };
-    currentExtraAttr?.displayedSelectedValues?.forEach(item => {
-        if (!currentExtraAttr.selectedValues?.includes(item?.value) && item?.value !== 0) {
-            currentExtraAttr.selectedValues.push(item.value);
-        }
-    });
-    currentExtraAttr.selectedValues.forEach(attrId => {
-        let attrOptionData = currentExtraAttr.lookupData?.find(item => item.value == attrId)
-            || currentExtraAttr.lookupData?.find(item => item.code == attrId)
-            || currentExtraAttr.displayedSelectedValues?.find(item => item.value == attrId)
-            || currentExtraAttr.displayedSelectedValues?.find(item => item.code == attrId);
-        createNewVariation(attrOptionData?.label, attrOptionData?.code, attrId);
-    });
-}
+        currentExtraAttr.selectedValues.forEach(attrId => {
+            let attrOptionData = currentExtraAttr.lookupData?.find(item => item.value == attrId)
+                || currentExtraAttr.lookupData?.find(item => item.code == attrId)
+                || currentExtraAttr.displayedSelectedValues?.find(item => item.value == attrId)
+                || currentExtraAttr.displayedSelectedValues?.find(item => item.code == attrId);
+            createNewVariation(attrOptionData?.label, attrOptionData?.code, attrId);
+        });
+    }
 
     setSelectionVariations(){
         this.selectedVaritaions =this.variationMatrices.filter((variation) => {
@@ -2241,19 +2242,20 @@ combine(index: number, _variation: VariationItemDto, oldAttributes) {
 
         if(item){
             
-            if(!(this.appItem?.nonLookupValues.filter(nonLookup =>nonLookup.code==item.code)?.length >=1)) {
+            const isTempId = item.value > 1e10;
+
+            if (!isTempId) {
                 appEntity.id = item.value;
-                this.createOreEditAppEntityModal.show(entityObjectType,appEntity,false)
-            }
-    
-            else {
+                this.createOreEditAppEntityModal.show(entityObjectType, appEntity, false);
+            } else {
                 this._appEntitiesServiceProxy.convertAppLookupLabelDtoToEntityDto(item)
-                .subscribe((result :AppEntityDto) => {
-                    appEntity=result;
-                    appEntity.id = 0;
-                    this.createOreEditAppEntityModal.show(entityObjectType,appEntity,true)
-                }); 
+                    .subscribe((result: AppEntityDto) => {
+                        appEntity = result;
+                        appEntity.id = 0; // Treat as new
+                        this.createOreEditAppEntityModal.show(entityObjectType, appEntity, true);
+                    });
             }
+            
         }
     
         else
