@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using onetouch.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    partial class onetouchDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250429114435_addEntityLogTable")]
+    partial class addEntityLogTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1924,49 +1927,6 @@ namespace onetouch.Migrations
                     b.Property<long?>("PartnerId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("PaymentTermsCashOnDelivery")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PaymentTermsCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("PaymentTermsDiscount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PaymentTermsDiscount2")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("PaymentTermsDiscount2Days")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PaymentTermsDiscountDays")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("PaymentTermsEndOfMonth")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("PaymentTermsEndOfMonthDays")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("PaymentTermsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("PaymentTermsName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaymentTermsNetDueDays")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PaymentTermsNextMonthDay")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PaymentTermsPaymentType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PaymentTermsUseInstallments")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Phone1CountryKey")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -2030,16 +1990,6 @@ namespace onetouch.Migrations
                     b.Property<string>("SSIN")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ShipViaCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("ShipViaId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ShipViaName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("TenantId")
                         .HasColumnType("int");
 
@@ -2066,15 +2016,11 @@ namespace onetouch.Migrations
 
                     b.HasIndex("PartnerId");
 
-                    b.HasIndex("PaymentTermsId");
-
                     b.HasIndex("Phone1TypeId");
 
                     b.HasIndex("Phone2TypeId");
 
                     b.HasIndex("Phone3TypeId");
-
-                    b.HasIndex("ShipViaId");
 
                     b.HasIndex("TenantId");
 
@@ -2313,9 +2259,6 @@ namespace onetouch.Migrations
 
                     b.Property<long>("EntityObjectTypeId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -2592,30 +2535,11 @@ namespace onetouch.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("CreatorUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DeleterUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("EntityCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<long>("EntityId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("EntityObjectStatusCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("EntityObjectStatusId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("EntityObjectTypeCode")
@@ -2625,24 +2549,11 @@ namespace onetouch.Migrations
                     b.Property<long>("EntityObjectTypeId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("LastModifierUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ObjectCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long>("ObjectId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("PartnerCode")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ReadyToBeSent")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("SentDate")
                         .HasColumnType("datetime2");
@@ -2654,11 +2565,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.HasIndex("EntityObjectStatusId");
-
                     b.HasIndex("EntityObjectTypeId");
-
-                    b.HasIndex("ObjectId");
 
                     b.ToTable("AppEntityLog", t =>
                         {
@@ -4136,19 +4043,11 @@ namespace onetouch.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("BranchCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("BranchName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("BranchSSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CompanyCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -4190,10 +4089,6 @@ namespace onetouch.Migrations
                     b.Property<string>("ContactAddressState")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("ContactCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ContactEmail")
                         .HasMaxLength(100)
@@ -4371,19 +4266,11 @@ namespace onetouch.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("BranchCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("BranchName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("BranchSSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CompanyCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -4431,10 +4318,6 @@ namespace onetouch.Migrations
                     b.Property<string>("ContactAddressState")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("ContactCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ContactEmail")
                         .HasMaxLength(100)
@@ -5883,41 +5766,6 @@ namespace onetouch.Migrations
                     b.ToTable("AbpTenants", t =>
                         {
                             t.HasTrigger("AbpTenants_Trigger");
-                        });
-                });
-
-            modelBuilder.Entity("onetouch.Onetouch.ValidationRules.ValidationRule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ErrorMessage")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("nvarchar(254)");
-
-                    b.Property<string>("FieldName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("RuleType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("RuleValue")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ValidationRules", t =>
-                        {
-                            t.HasTrigger("ValidationRules_Trigger");
                         });
                 });
 
@@ -7813,8 +7661,8 @@ namespace onetouch.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Reference")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("RelatedEntityCode")
                         .HasMaxLength(50)
@@ -8111,10 +7959,6 @@ namespace onetouch.Migrations
                         .WithMany("PartnerFkList")
                         .HasForeignKey("PartnerId");
 
-                    b.HasOne("onetouch.AppEntities.AppEntity", "PaymentTermsFk")
-                        .WithMany()
-                        .HasForeignKey("PaymentTermsId");
-
                     b.HasOne("onetouch.AppEntities.AppEntity", "Phone1TypeFk")
                         .WithMany()
                         .HasForeignKey("Phone1TypeId");
@@ -8126,10 +7970,6 @@ namespace onetouch.Migrations
                     b.HasOne("onetouch.AppEntities.AppEntity", "Phone3TypeFk")
                         .WithMany()
                         .HasForeignKey("Phone3TypeId");
-
-                    b.HasOne("onetouch.AppEntities.AppEntity", "ShipViaFk")
-                        .WithMany()
-                        .HasForeignKey("ShipViaId");
 
                     b.Navigation("AccountFk");
 
@@ -8143,15 +7983,11 @@ namespace onetouch.Migrations
 
                     b.Navigation("PartnerFk");
 
-                    b.Navigation("PaymentTermsFk");
-
                     b.Navigation("Phone1TypeFk");
 
                     b.Navigation("Phone2TypeFk");
 
                     b.Navigation("Phone3TypeFk");
-
-                    b.Navigation("ShipViaFk");
                 });
 
             modelBuilder.Entity("onetouch.AppContacts.AppContactAddress", b =>
@@ -8371,29 +8207,15 @@ namespace onetouch.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("onetouch.SystemObjects.SycEntityObjectStatus", "EntityObjectStatusFk")
-                        .WithMany()
-                        .HasForeignKey("EntityObjectStatusId");
-
                     b.HasOne("onetouch.SystemObjects.SycEntityObjectType", "EntityObjectTypeFk")
                         .WithMany()
                         .HasForeignKey("EntityObjectTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("onetouch.SystemObjects.SydObject", "ObjectFk")
-                        .WithMany()
-                        .HasForeignKey("ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("EntityFk");
 
-                    b.Navigation("EntityObjectStatusFk");
-
                     b.Navigation("EntityObjectTypeFk");
-
-                    b.Navigation("ObjectFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityReactionsCount", b =>

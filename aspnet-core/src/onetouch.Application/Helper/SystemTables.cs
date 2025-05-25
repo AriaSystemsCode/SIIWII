@@ -715,5 +715,23 @@ namespace onetouch.Helpers
             return obj.Id;
         }
         //MMT33[End]
+        //MMT-Entity log[Start]
+        public async Task<long> GetEntityObjectStatusSentEntityLog()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "SENT" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetEntityObjectStatusReadyToSendEntityLog()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "READYTOBESENT" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        //MMT-Entity log [End]
     }
 }
