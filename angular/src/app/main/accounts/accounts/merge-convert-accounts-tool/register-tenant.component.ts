@@ -1,13 +1,17 @@
-import { RegisterTenantModel } from '@account/register/register-tenant.model';
 import { Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import {   PasswordComplexitySetting, RegisterTenantOutput, SubscriptionStartType, TenantRegistrationServiceProxy } from '@shared/service-proxies/service-proxies';
+import {
+  PasswordComplexitySetting,
+  RegisterTenantOutput,
+  SubscriptionStartType,
+  TenantRegistrationServiceProxy
+} from '@shared/service-proxies/service-proxies';
+import { RegisterTenantModel } from '@account/register/register-tenant.model';
 import { Patterns } from '@shared/utils/patterns/pattern';
-import { ModalDirective } from "ngx-bootstrap/modal";
+import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
 import { SelectItem } from 'primeng/api';
-
 
 @Component({
   selector: 'app-register-tenant',
@@ -15,73 +19,69 @@ import { SelectItem } from 'primeng/api';
   styleUrls: ['./register-tenant.component.scss']
 })
 export class RegisterTenantComponent extends AppComponentBase implements OnInit {
+  @ViewChild('registerTenantModal', { static: true }) modal: ModalDirective;
+  @Output() register = new EventEmitter<number>();
 
-  constructor(injector: Injector,
+  model: RegisterTenantModel = new RegisterTenantModel();
+  passwordComplexitySetting: PasswordComplexitySetting = new PasswordComplexitySetting();
+  recaptchaSiteKey = AppConsts.recaptchaSiteKey;
+
+  accountTypes: SelectItem[] = [];
+  accountType: string;
+  accountTypeLabel = '';
+
+  registerTenantId = 0;
+  domainPattern = Patterns.domainName;
+  saving = false;
+
+  constructor(
+    injector: Injector,
     private _tenantRegistrationService: TenantRegistrationServiceProxy
   ) {
     super(injector);
   }
 
-  @ViewChild("registerTenantModal", { static: true }) modal: ModalDirective;
+  ngOnInit(): void {}
 
-  @Output() register = new EventEmitter<number>();
-
-  registerTenantId: number = 0;
-  model: RegisterTenantModel = new RegisterTenantModel();
-  domainPattern = Patterns.domainName;
-  passwordComplexitySetting: PasswordComplexitySetting = new PasswordComplexitySetting();
-  saving: boolean = false;
-  recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
-
-  accountType;
-  accountTypes:SelectItem[] = [];
-
-  accountTypeLabel:string="";
-  ngOnInit(): void {
-  }
-
-
-  show() {
+  show(): void {
     this.showMainSpinner();
     this.model = new RegisterTenantModel();
+
     this._tenantRegistrationService.getEditionsForSelect()
-      .pipe(finalize(() => { this.hideMainSpinner(); }))
-      .subscribe((result) => {
-        if (result?.editionsWithFeatures?.length > 0) {
-          var editionIndex = result.editionsWithFeatures.findIndex(x => x.edition.name.toUpperCase() == "STANDARD");
-          if (editionIndex >= 0) {
-            this.model.editionId = result.editionsWithFeatures[editionIndex]?.edition.id;
-            this.model.edition = result.editionsWithFeatures[editionIndex]?.edition;
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe(result => {
+        const editions = result?.editionsWithFeatures ?? [];
+
+        if (editions.length) {
+          const standardEdition = editions.find(x => x.edition.name.toUpperCase() === 'STANDARD');
+          if (standardEdition) {
+            this.model.editionId = standardEdition.edition.id;
+            this.model.edition = standardEdition.edition;
             this.model.subscriptionStartType = SubscriptionStartType.Free;
           }
+
+          this.accountTypes = editions.map(item => ({
+            label: item.edition.displayName,
+            value: item.edition.id
+          }));
         }
-     this.getAccountTypes();
+
         this.modal.show();
       });
   }
 
-   getAccountTypes(){
-    this._tenantRegistrationService.getEditionsForSelect()
-    .subscribe((result) => {
-        for (let i = 0; i < result.editionsWithFeatures.length; i++) {
-            const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
-            const accountTypeValue = result.editionsWithFeatures[i].edition.id;
-            this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
-    }
-    }); 
-} 
-
-  hide() {
+  hide(): void {
     this.register.emit(this.registerTenantId);
     this.modal.hide();
   }
 
-  save() {
+  save(): void {
     this.saving = true;
-    this.model.editionId =Number(this.accountType);
-       this.model.accountType =this.accountType;
+    this.model.editionId = Number(this.accountType);
+    this.model.accountType = this.accountType;
+
     this._tenantRegistrationService.registerTenant(this.model)
-      .pipe(finalize(() => { this.saving = false; }))
+      .pipe(finalize(() => this.saving = false))
       .subscribe((result: RegisterTenantOutput) => {
         this.registerTenantId = result.tenantId;
         this.notify.success(this.l('SuccessfullyRegistered'));
@@ -89,14 +89,8 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
       });
   }
 
-  changeAccountType($event){
-     let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
-
-     if(indx>0)
-     this.accountTypeLabel= this.accountTypes[indx].label.toString().toUpperCase();
-     else
-     this.accountTypeLabel='';
-
-}
-
+  changeAccountType(event: any): void {
+    const selected = this.accountTypes.find(x => x.value === event.value);
+    this.accountTypeLabel = selected ? selected.label.toUpperCase() : '';
+  }
 }

@@ -12,7 +12,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 
 @Component({
     selector: 'createOrEditBranchModal',
-    styleUrls: ['./create-or-edit-branch-modal.component.css', './AccountInfo.component.scss'],
+    styleUrls: ['./create-or-edit-branch-modal.component.scss', './AccountInfo.component.scss'],
     templateUrl: './create-or-edit-branch-modal.component.html'
 })
 export class CreateOrEditBranchModalComponent extends AppComponentBase {

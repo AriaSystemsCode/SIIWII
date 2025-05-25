@@ -3,16 +3,12 @@
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" >
             <div class="kt-portlet kt-portlet-profile" >
                 <div class="kt-portlet__body kt-portlet-profile-portlet__body">
-                    <div class="row" style="padding: 15px 0;">
+                    <div class="row payLeftSec">
                         <div class="col-md-9 col-6">
-                            <p style="color: #464E5F;
-                            font-size: 13px;
-                            font-weight: 600;
-                            margin: 0;">{{"Mypaymentmethods" | localize}}</p>
-                            <p style="    font-size: 12px;
-                            color: #B5B5C3;">{{"ManagePaymentMethods" | localize}}</p>
+                            <p class="myPayment">{{"Mypaymentmethods" | localize}}</p>
+                            <p class="managePay">{{"ManagePaymentMethods" | localize}}</p>
                         </div>
-                        <div class="col-md-3 col-6" style="text-align: right;">
+                        <div class="col-md-3 col-6 rightSec" >
                             <button button class="btn btn-success btn-primary nexus-bg-primary"  (click)="showCreateOrEditPaymentModal()">
                                 <span>{{"addCreditCard" | localize}}</span>
                             </button>

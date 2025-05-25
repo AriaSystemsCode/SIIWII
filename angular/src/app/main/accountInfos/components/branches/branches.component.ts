@@ -7,8 +7,8 @@ import { AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, Branch
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { TreeTable } from 'primeng/treetable';
 import { Observable, Subscription } from 'rxjs';
-import { BranchDetailsDynamicModalComponent } from './branch-details-dynamic-modal.component';
-import { CreateOrEditBranchModalComponent } from './create-or-edit-branch-modal.component';
+import { BranchDetailsDynamicModalComponent } from '../branch-details-dynamic-modal/branch-details-dynamic-modal.component';
+import { CreateOrEditBranchModalComponent } from '../create-or-edit-branch-modal/create-or-edit-branch-modal.component';
 
 @Component({
     selector: 'app-branches',

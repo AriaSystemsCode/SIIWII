@@ -1,14 +1,14 @@
 import { Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountsServiceProxy, AppContactPaymentMethodDto, EntityDto } from '@shared/service-proxies/service-proxies';
-import { CreateOrEditpaymentMethodComponent } from './create-or-edit-payment-method.component';
+import { CreateOrEditpaymentMethodComponent } from '../create-or-edit-payment-method/create-or-edit-payment-method.component';
 import * as moment from 'moment';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 
 @Component({
     selector: 'app-payment-methods-list',
     templateUrl: './payment-methods-list.component.html',
-    styleUrls: ['./payment-methods-list.component.css'],
+    styleUrls: ['./payment-methods-list.component.scss'],
     animations: [appModuleAnimation()],
     encapsulation: ViewEncapsulation.None
 })

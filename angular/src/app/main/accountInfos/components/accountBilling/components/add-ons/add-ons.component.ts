@@ -122,12 +122,12 @@ export class AddOnsComponent extends AppComponentBase implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.showMainSpinner();
-        const mappedCart = this.cart.map((record: any) => {
+        const mappedCart = this.cart.map((item : any) => {
           let addOn = new AddOnsInputDto();
-          addOn.featureCode = record.appSubscriptionPlanDetail?.featureCode;
-          addOn.featureName = record.appSubscriptionPlanDetail?.featureName;
-          addOn.price = record.appSubscriptionPlanDetail?.unitPrice || 0;
-          addOn.qty = record.featureUsedQty || 1;
+          addOn.featureCode = item.appSubscriptionPlanDetail?.featureCode;
+          addOn.featureName = item.appSubscriptionPlanDetail?.featureName;
+          addOn.price = item.appSubscriptionPlanDetail?.unitPrice || 0;
+          addOn.qty = item.featureUsedQty || 1;
           return addOn;
         });
 

@@ -4,39 +4,40 @@ import { SelectItem } from 'primeng/api';
 import { AccountMainFilterEnum } from '../../account-shared/models/accounts-main-filter.enum';
 
 @Component({
-    selector: 'app-my-accounts',
-    templateUrl: './my-accounts.component.html',
-    styleUrls: ['./my-accounts.component.scss']
+  selector: 'app-my-accounts',
+  templateUrl: './my-accounts.component.html',
+  styleUrls: ['./my-accounts.component.scss']
 })
 export class MyAccountsComponent extends AppComponentBase implements OnInit {
-    defaultMainFilter: AccountMainFilterEnum
-    pageMainFilters: SelectItem[]
-    isHost:boolean
-    showMainFiltersOptions = true
-    showAddButton:boolean = true
-    constructor(private injector:Injector) {
-        super(injector)
-    }
+  defaultMainFilter: AccountMainFilterEnum;
+  pageMainFilters: SelectItem[] = [];
+  isHost: boolean;
+  showMainFiltersOptions = true;
+  showAddButton = true;
 
-    ngOnInit(): void {
-        this.isHost = !this.appSession.tenantId;
-        this.definePagesMainFilter()
-    }
-    definePagesMainFilter(){
-        if(this.isHost) {
-            this.pageMainFilters = [
-                { label: this.l('ExternalAccounts'), value: AccountMainFilterEnum.ExternalAccounts }
-            ];
-            this.defaultMainFilter = AccountMainFilterEnum.ExternalAccounts
-        } else {
-            this.pageMainFilters = [
-                { label: this.l('MyAccounts'), value: AccountMainFilterEnum.ManualAndConnectedAccounts },
-                { label: this.l('ManualAccounts'), value: AccountMainFilterEnum.ManualAccounts },
-                { label: this.l('ConnectedAccounts'), value: AccountMainFilterEnum.ConnectedAccounts },
-            ];
-            this.defaultMainFilter = AccountMainFilterEnum.ManualAndConnectedAccounts
-        }
-    }
+  constructor(injector: Injector) {
+    super(injector);
+  }
 
+  ngOnInit(): void {
+    this.isHost = !this.appSession.tenantId;
+    this.initializeMainFilters();
+  }
+
+  private initializeMainFilters(): void {
+    const filters: { labelKey: string; value: AccountMainFilterEnum }[] = this.isHost
+      ? [{ labelKey: 'ExternalAccounts', value: AccountMainFilterEnum.ExternalAccounts }]
+      : [
+          { labelKey: 'MyAccounts', value: AccountMainFilterEnum.ManualAndConnectedAccounts },
+          { labelKey: 'ManualAccounts', value: AccountMainFilterEnum.ManualAccounts },
+          { labelKey: 'ConnectedAccounts', value: AccountMainFilterEnum.ConnectedAccounts }
+        ];
+
+    this.pageMainFilters = filters.map(f => ({
+      label: this.l(f.labelKey),
+      value: f.value
+    }));
+
+    this.defaultMainFilter = filters[0].value;
+  }
 }
- 

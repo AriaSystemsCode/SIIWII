@@ -4,7 +4,7 @@ import { PublishItemOptions } from '@shared/service-proxies/service-proxies';
 import { ModalOptions, BsModalRef } from 'ngx-bootstrap/modal';
 import { Observable, Subscription } from 'rxjs';
 import { ShareListingComponent } from '../components/share-listing.component';
-import { ShareAccountComponent } from '@app/main/accountInfos/components/share-account.component';
+import { ShareAccountComponent } from '@app/main/accountInfos/components/share-account/share-account.component';
 
 @Injectable()
 export class PublishService extends AppComponentBase {

@@ -4,7 +4,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
 import { SelectItem } from 'primeng/api';
-import { ImageObject } from '../../accounts/account-shared/models/imageobject';
+import { ImageObject } from '../../../accounts/account-shared/models/imageobject';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
 

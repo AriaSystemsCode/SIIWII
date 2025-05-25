@@ -16,7 +16,7 @@ import { SelectClassificationDynamicModalComponent } from '@app/classification/s
 import { Router } from '@angular/router';
 import { UpdateLogoService } from '@shared/utils/update-logo.service';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
-import { AccountInfoPageTabs } from '../models/Account-info-page-tabs.enum';
+import { AccountInfoPageTabs } from '../../models/Account-info-page-tabs.enum';
 import { MembersListComponentInputsI } from '@app/main/members-list/models/member-list-component-interface';
 import { ViewMemberProfileComponent } from '@app/main/teamMembers/components/view-member-profile/view-member-profile.component';
 import { NgForm } from '@angular/forms';
@@ -135,7 +135,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         private _route: ActivatedRoute,
         private _AccountsServiceProxy: AccountsServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private _SycAttachmentCategoriesServiceProxy: SycAttachmentCategoriesServiceProxy,
         private _tokenService: TokenService,
         private _BsModalService: BsModalService,
         private _router: Router,

@@ -11,7 +11,6 @@ import { GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 })
 export class ConnectionsCardComponent extends AppComponentBase {
 
-    attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
     @Input('account') account: GetAccountForViewDto
     @Input('singleItemPerRowMode') singleItemPerRowMode: boolean
     @Input('isHost') isHost: boolean
@@ -23,6 +22,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
     @Output() _createRelation: EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
 
     isRecordOwner: boolean
+    attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
 
 
     constructor(

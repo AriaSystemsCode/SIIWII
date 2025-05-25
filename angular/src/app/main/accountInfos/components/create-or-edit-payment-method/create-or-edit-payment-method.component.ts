@@ -3,7 +3,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountsServiceProxy, AppContactPaymentMethodDto, ILookupLabelDto,  } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
-import { PaymentDataService } from '../services/payment-data.service'
+import { PaymentDataService } from '../../services/payment-data.service'
 @Component({
   selector: 'createOrEditPaymentMethod',
   templateUrl: './create-or-edit-payment-method.component.html',
