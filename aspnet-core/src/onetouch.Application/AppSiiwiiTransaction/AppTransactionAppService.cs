@@ -74,6 +74,7 @@ using onetouch.Globals;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
 using MimeKit;
+using onetouch.AppTenantsActivitiesLogs;
 
 
 //using NUglify.Helpers;
@@ -156,7 +157,8 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
-             TimeZoneInfoAppService timeZoneInfoAppService, IRepository<AppEntityLog, long> appEntityLogRepository
+             TimeZoneInfoAppService timeZoneInfoAppService, IRepository<AppEntityLog, long> appEntityLogRepository,
+             IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
