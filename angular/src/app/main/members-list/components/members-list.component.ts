@@ -15,8 +15,8 @@ import { Paginator } from 'primeng/paginator';
 })
 export class MembersListComponent extends AppComponentBase {
     @ViewChild('paginator', { static: true }) paginator: Paginator;
-    @Output() create : EventEmitter<number> = new EventEmitter<number>()
-    @Output() view : EventEmitter<{memberId:number,userId:number}> = new EventEmitter<{memberId:number,userId:number}>()
+    @Output() create: EventEmitter<number> = new EventEmitter<number>()
+    @Output() view: EventEmitter<{ memberId: number, userId: number }> = new EventEmitter<{ memberId: number, userId: number }>()
 
     singleItemPerRowMode: boolean = false
     MemberFilterTypeEnum = MemberFilterTypeEnum
@@ -35,16 +35,15 @@ export class MembersListComponent extends AppComponentBase {
     defaultMainFilter: MemberFilterTypeEnum
     showMainFiltersOptions: boolean
     pageMainFilters: SelectItem[] = [];
-    debounceTimeDelay:number = 1500
-    // instantSearch:boolean = false
+    debounceTimeDelay: number = 1500
 
     filterForm: FormGroup
     isHost: boolean
-    accountId:number
-    title:string
-    canAdd:boolean
-    canView:boolean
-    showActiveStatus:boolean
+    accountId: number
+    title: string
+    canAdd: boolean
+    canView: boolean
+    showActiveStatus: boolean
     get mainFilterCtrl(): AbstractControl { return this.filterForm?.get('mainFilterType') }
     get sortingCtrl(): AbstractControl { return this.filterForm?.get('sorting') }
     get searchCtrl(): AbstractControl { return this.filterForm?.get('search') }
@@ -56,15 +55,14 @@ export class MembersListComponent extends AppComponentBase {
         super(injector);
         this.overridePrimeTableSetting()
     }
-    show(inputs:MembersListComponentInputsI ) {
+    show(inputs: MembersListComponentInputsI) {
         this.showMainSpinner()
         this.loading = true
-        // if(this.accountId && this.members?.length) return
         this.pageMainFilters = inputs.pageMainFilters
         this.defaultMainFilter = inputs.defaultMainFilter
-        if( this.defaultMainFilter == MemberFilterTypeEnum.Profile ) {
+        if (this.defaultMainFilter == MemberFilterTypeEnum.Profile) {
             this.showActiveStatus = true
-        } else if ( this.defaultMainFilter == MemberFilterTypeEnum.MarketPlace || this.defaultMainFilter == MemberFilterTypeEnum.View ) {
+        } else if (this.defaultMainFilter == MemberFilterTypeEnum.MarketPlace || this.defaultMainFilter == MemberFilterTypeEnum.View) {
             this.showActiveStatus = false
         }
         this.showMainFiltersOptions = inputs.showMainFiltersOptions
@@ -94,12 +92,11 @@ export class MembersListComponent extends AppComponentBase {
         let debounceTimeDelay = this.debounceTimeDelay
         const subs = this.filterForm.valueChanges
             .pipe(
-                 debounceTime(debounceTimeDelay ),
+                debounceTime(debounceTimeDelay),
             )
             .subscribe((status) => {
                 if (status) {
-                   // this.getMembers({ rows: this.primengTableHelper.defaultRecordsCountPerPage })
-                   this.getMembers();
+                    this.getMembers();
                 }
             })
         this.subscriptions.push(subs)
@@ -133,9 +130,9 @@ export class MembersListComponent extends AppComponentBase {
     }
 
     getMembers(event?: LazyLoadEvent) {
-        if ( isNaN(this.defaultMainFilter) ) return
+        if (isNaN(this.defaultMainFilter)) return
         if (this.primengTableHelper.shouldResetPaging(event)) {
-           this.paginator.totalRecords = 10;
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
@@ -145,7 +142,7 @@ export class MembersListComponent extends AppComponentBase {
         if (!this.primengTableHelper.predefinedRecordsCountPerPage.length) {
             this.primengTableHelper.predefinedRecordsCountPerPage = [10, 20, 50, 100];
         }
-        
+
         const filters = this.filterForm.value
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner()
@@ -153,23 +150,23 @@ export class MembersListComponent extends AppComponentBase {
         const subs = this._accountsServiceProxy.getAllMembers(
             filters?.search || undefined,
             this.accountId,
-            filters?.mainFilterType?.value ,
+            filters?.mainFilterType?.value,
             filters?.sorting?.value || undefined,
-        this.primengTableHelper.getSkipCount(this.paginator, event),
-        this.primengTableHelper.getMaxResultCount(this.paginator, event)
+            this.primengTableHelper.getSkipCount(this.paginator, event),
+            this.primengTableHelper.getMaxResultCount(this.paginator, event)
         )
-        .pipe(finalize(() => {
-            if (!this.active) this.active = true
-            this.loading = false
-            this.hideMainSpinner()
-            this.primengTableHelper.hideLoadingIndicator();
-        }))
-        .subscribe(result => {
-            this.members = result.items
-            this.primengTableHelper.totalRecordsCount = result.totalCount;
-            this.primengTableHelper.records = result.items;
-            this.paginator.totalRecords = result.totalCount || 0;
-        });
+            .pipe(finalize(() => {
+                if (!this.active) this.active = true
+                this.loading = false
+                this.hideMainSpinner()
+                this.primengTableHelper.hideLoadingIndicator();
+            }))
+            .subscribe(result => {
+                this.members = result.items
+                this.primengTableHelper.totalRecordsCount = result.totalCount;
+                this.primengTableHelper.records = result.items;
+                this.paginator.totalRecords = result.totalCount || 0;
+            });
         this.subscriptions.push(subs)
     }
 
@@ -179,24 +176,16 @@ export class MembersListComponent extends AppComponentBase {
     }
 
     createNewMember() {
-        if(!this.canAdd) return
+        if (!this.canAdd) return
         this.create.emit()
     }
 
-    viewMember(memberId:number,userId:number) {
-        if(!this.canView) return
-        this.view.emit({memberId,userId})
+    viewMember(memberId: number, userId: number) {
+        if (!this.canView) return
+        this.view.emit({ memberId, userId })
     }
 
-    exportToExcel(): void {
-        // this._accountsServiceProxy.getAccountsToExcel(
-        // this.filterText,
-        //     this.appEntityNameFilter,
-        // )
-        // .subscribe(result => {
-        //     this._fileDownloadService.downloadTempFile(result);
-        //  });
-    }
+
 
 
     initFilterForm() {
@@ -207,13 +196,13 @@ export class MembersListComponent extends AppComponentBase {
             sorting: [],
         })
     }
-    handleSearchInput($event ){
+    handleSearchInput($event) {
         this.searchCtrl.setValue($event.target.value)
     }
 
-    hide(){
+    hide() {
         this.active = false
-        this.subscriptions.forEach(subs=>subs.unsubscribe())
+        this.subscriptions.forEach(subs => subs.unsubscribe())
         this.filterForm.reset()
         this.members = []
     }

@@ -14,13 +14,13 @@ import * as moment from 'moment';
     selector: 'app-create-or-edit-member',
     templateUrl: './create-or-edit-member.component.html',
     styleUrls: ['./create-or-edit-member.component.scss'],
-    animations:[appModuleAnimation()]
+    animations: [appModuleAnimation()]
 })
 export class CreateOrEditMemberComponent extends AppComponentBase {
     @ViewChild('createOrEditModal', { static: true }) modal: ModalDirective;
     @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
-    @ViewChild('memberForm', { static : true })  memberForm : NgForm
-    @Output() createOrEditDone = new EventEmitter<{memberId:number,userId:number}>();
+    @ViewChild('memberForm', { static: true }) memberForm: NgForm
+    @Output() createOrEditDone = new EventEmitter<{ memberId: number, userId: number }>();
     memberDto: ContactDto;
 
     branches: TreeNodeOfBranchForViewDto[];
@@ -36,35 +36,35 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     allPhoneTypes: LookupLabelDto[];
     allLanguages: LookupLabelDto[];
     phonelist: Object[] = [];
-    countryFlag = 'eg'
     active = false;
-    phonesLoaded : boolean = false
-    entityObjectType:string ="MANUALACCOUNTCONTACT";
-    joinDate= new Date();
+    phonesLoaded: boolean = false
+    entityObjectType: string = "MANUALACCOUNTCONTACT";
+    joinDate = new Date();
+
+
+    isManualOrExternalContact: boolean = true
+    sycAttachmentCategoryLogo: SycAttachmentCategoryDto
+    sycAttachmentCategoryBanner: SycAttachmentCategoryDto
+
+    selectedBranchId: number
+    selectedBranchName: string
+    
 
     constructor(injector: Injector,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _SycAttachmentCategoriesServiceProxy: SycAttachmentCategoriesServiceProxy,
-        private _BsModalService: BsModalService,
         private _AccountsServiceProxy: AccountsServiceProxy,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
-        private updateLogoService:UpdateLogoService
-        ) {
+        private updateLogoService: UpdateLogoService
+    ) {
         super(injector);
     }
 
-    // public const string Pages_Accounts_Members = "Pages.Accounts.Members";
-    // public const string Pages_Accounts_Members_List = "Pages.Accounts.Members.List";
-    // public const string Pages_Accounts_Member_Create = "Pages.Accounts.Member.Create";
-    // public const string Pages_Accounts_Member_Edit = "Pages.Accounts.Member.Edit";
-    // public const string Pages_Accounts_Member_Delete = "Pages.Accounts.Member.Delete";
-    isManualOrExternalContact : boolean = true
-    sycAttachmentCategoryLogo :SycAttachmentCategoryDto
-    sycAttachmentCategoryBanner :SycAttachmentCategoryDto
 
-    async show(memberId?: number, accId?: number,isManualOrExternalContact?:boolean) {
+
+    async show(memberId?: number, accId?: number, isManualOrExternalContact?: boolean) {
         this.showMainSpinner()
-        if(!this.uploader) this.initUploaders()
+        if (!this.uploader) this.initUploaders()
         this.isManualOrExternalContact = isManualOrExternalContact
 
         await this.getAttachmentCategories()
@@ -85,14 +85,14 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         }
         this.hideMainSpinner()
 
-        this.phonelist.push(new Object(),new Object(),new Object());
+        this.phonelist.push(new Object(), new Object(), new Object());
         if (!this.memberDto.entityAttachments) {
             this.memberDto.entityAttachments = []
         }
 
         this.active = true;
     }
-    setDefaultPublicFieldsToTrue(){
+    setDefaultPublicFieldsToTrue() {
         this.memberDto.phone1IsPublic = this.memberDto.phone1Number || this.memberDto.phone1Ext || this.memberDto.phone1TypeId ? true : false;
         this.memberDto.phone2IsPublic = this.memberDto.phone2Number || this.memberDto.phone2Ext || this.memberDto.phone2TypeId ? true : false;
         this.memberDto.phone3IsPublic = this.memberDto.phone3Number || this.memberDto.phone3Ext || this.memberDto.phone3TypeId ? true : false;
@@ -102,30 +102,30 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
     getLanguages(): void {
         this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
-            const lookupLabelDto : LookupLabelDto = new LookupLabelDto()
+            const lookupLabelDto: LookupLabelDto = new LookupLabelDto()
             lookupLabelDto.label = "None"
             lookupLabelDto.value = null
             this.allLanguages = [];
-            this.allLanguages.push(lookupLabelDto,...result)
+            this.allLanguages.push(lookupLabelDto, ...result)
         });
     }
     getPhoneTypes(): void {
         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
-            const lookupLabelDto : LookupLabelDto = new LookupLabelDto()
+            const lookupLabelDto: LookupLabelDto = new LookupLabelDto()
             lookupLabelDto.label = "None"
             lookupLabelDto.value = null
             this.allPhoneTypes = [];
-            this.allPhoneTypes.push(lookupLabelDto,...result)
+            this.allPhoneTypes.push(lookupLabelDto, ...result)
             this.phonesLoaded = true
         });
     }
-    async getAttachmentCategories(){
-        this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER"]).subscribe((result)=>{
+    async getAttachmentCategories() {
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER"]).subscribe((result) => {
             this.sycAttachmentCategoryLogo = result[0]
             this.sycAttachmentCategoryBanner = result[1]
         })
     }
-    getAttachmentCategory(code:string){
+    getAttachmentCategory(code: string) {
         return this._SycAttachmentCategoriesServiceProxy.getAll(
             undefined,
             code,
@@ -141,37 +141,36 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
             0,
             1,
         )
-        .toPromise();
+            .toPromise();
     }
 
-    async getContactDataForView(memberId){
+    async getContactDataForView(memberId) {
         const result = await this._AccountsServiceProxy.getContactForView(memberId).toPromise()
-        if(result) this.memberDto = result.contact
+        if (result) this.memberDto = result.contact
 
-        if(result?.contact?.joinDate)
-        this.joinDate = moment(result?.contact?.joinDate).toDate();
-    console.log("joindate= "+ this.joinDate)
+        if (result?.contact?.joinDate)
+            this.joinDate = moment(result?.contact?.joinDate).toDate();
 
-        if(result?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + result?.coverUrl
-        if(result?.imageUrl) this.ProfileImg = this.attachmentBaseUrl + '/' + result?.imageUrl
-        this.selectedBranchName =  result?.branchName &&  result?.branchName!='' ?  result?.branchName:'';
-        this.selectedBranchName+=  result?.addressLine1 &&  result?.addressLine1!='' ?   (  this.selectedBranchName !='' ? ' - ' +result?.addressLine1 : result?.addressLine1) :'';
-        this.selectedBranchName+=  result?.addressLine2 &&  result?.addressLine2!='' ?   (  this.selectedBranchName !='' ?  ' , ' +result?.addressLine2 : result?.addressLine2) :'';
-        this.selectedBranchName+=  result?.city &&  result?.city!='' ?   (  this.selectedBranchName !='' ?  ' , ' +result?.city : result?.city) :'';
-        this.selectedBranchName+=  result?.state &&  result?.state!='' ?   (  this.selectedBranchName !='' ?  ' , ' +result?.state : result?.state) :'';
-        this.selectedBranchName+=  result?.zipCode  &&  result?.zipCode !='' ?   (  this.selectedBranchName !='' ?  ' , ' +result?.zipCode  : result?.zipCode ) :'';
-        this.selectedBranchName+=  result?.countryName &&  result?.countryName!='' ?   (  this.selectedBranchName !='' ?  ' , ' +result?.countryName : result?.countryName) :'';
+        if (result?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + result?.coverUrl
+        if (result?.imageUrl) this.ProfileImg = this.attachmentBaseUrl + '/' + result?.imageUrl
+        this.selectedBranchName = result?.branchName && result?.branchName != '' ? result?.branchName : '';
+        this.selectedBranchName += result?.addressLine1 && result?.addressLine1 != '' ? (this.selectedBranchName != '' ? ' - ' + result?.addressLine1 : result?.addressLine1) : '';
+        this.selectedBranchName += result?.addressLine2 && result?.addressLine2 != '' ? (this.selectedBranchName != '' ? ' , ' + result?.addressLine2 : result?.addressLine2) : '';
+        this.selectedBranchName += result?.city && result?.city != '' ? (this.selectedBranchName != '' ? ' , ' + result?.city : result?.city) : '';
+        this.selectedBranchName += result?.state && result?.state != '' ? (this.selectedBranchName != '' ? ' , ' + result?.state : result?.state) : '';
+        this.selectedBranchName += result?.zipCode && result?.zipCode != '' ? (this.selectedBranchName != '' ? ' , ' + result?.zipCode : result?.zipCode) : '';
+        this.selectedBranchName += result?.countryName && result?.countryName != '' ? (this.selectedBranchName != '' ? ' , ' + result?.countryName : result?.countryName) : '';
         this.selectedBranchId = result.contact.parentId;
     }
 
-    onChangejoinDate(){
+    onChangejoinDate() {
         let _joinDate = this.joinDate.toLocaleString();
         this.memberDto.joinDate = moment.utc(_joinDate);
     }
 
     getAccountBranches() {
-        this._AccountsServiceProxy.getBranchForEdit(this.memberDto.accountId).subscribe((rootBranchData)=>{
-            const rootBranch : TreeNodeOfBranchForViewDto = new  TreeNodeOfBranchForViewDto()
+        this._AccountsServiceProxy.getBranchForEdit(this.memberDto.accountId).subscribe((rootBranchData) => {
+            const rootBranch: TreeNodeOfBranchForViewDto = new TreeNodeOfBranchForViewDto()
             rootBranch.expanded = false
             rootBranch.children = undefined
             rootBranch.leaf = false
@@ -197,10 +196,9 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         setTimeout(() => labelElement.onclick = () => { }, 0)
     }
 
-    removeImage($event, t:SycAttachmentCategoryDto, index) {
-        // this.formTouched = true;
+    removeImage($event, t: SycAttachmentCategoryDto, index) {
         let exidtedIndex: number = -1;
-        exidtedIndex = this.memberDto.entityAttachments.findIndex(x => x.attachmentCategoryId == t.id );
+        exidtedIndex = this.memberDto.entityAttachments.findIndex(x => x.attachmentCategoryId == t.id);
         this.memberDto.entityAttachments.splice(exidtedIndex, 1)
 
         if (index == -1) {
@@ -212,8 +210,8 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
             this.coverPhoto = undefined
         }
     }
-    imageBrowseDone($event:ImageUploadComponentOutput,sycAttachmentCategory:SycAttachmentCategoryDto){
-        let exidtedIndex:number=-1;
+    imageBrowseDone($event: ImageUploadComponentOutput, sycAttachmentCategory: SycAttachmentCategoryDto) {
+        let exidtedIndex: number = -1;
         let att: AppEntityAttachmentDto
         let guid = this.guid();
 
@@ -257,22 +255,19 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     //#endregion
     //Branch Methods [Start]
-    selectedBranchId: number
-    selectedBranchName: string
-    currBranchNode
+
     selectBranch() {
         this.getAccountBranches();
     }
 
     branchSelected(Branch) {
-       // this.selectedBranchName = Branch.name;
-        this.selectedBranchName =  Branch?.contactAddresses[0]?.name ?  Branch?.contactAddresses[0]?.name :'';
-        this.selectedBranchName+=  Branch?.contactAddresses[0]?.addressLine1 ?   (  this.selectedBranchName !='' ? ' - ' +Branch?.contactAddresses[0]?.addressLine1 : Branch?.contactAddresses[0]?.addressLine1) :'';
-        this.selectedBranchName+=  Branch?.contactAddresses[0]?.addressLine2 ?   (  this.selectedBranchName !='' ?  ' , ' +Branch?.contactAddresses[0]?.addressLine2 : Branch?.contactAddresses[0]?.addressLine2) :'';
-        this.selectedBranchName+=  Branch?.contactAddresses[0]?.city  ?   (  this.selectedBranchName !='' ?  ' , ' +Branch?.contactAddresses[0]?.city : Branch?.contactAddresses[0]?.city) :'';
-        this.selectedBranchName+=  Branch?.contactAddresses[0]?.state  ?   (  this.selectedBranchName !='' ?  ' , ' +Branch?.contactAddresses[0]?.state : Branch?.contactAddresses[0]?.state) :'';
-        this.selectedBranchName+=  Branch?.contactAddresses[0]?.zipCode  ?   (  this.selectedBranchName !='' ?  ' , ' +Branch?.contactAddresses[0]?.zipCode  : Branch?.contactAddresses[0]?.zipCode ) :'';
-        this.selectedBranchName+=  Branch?.contactAddresses[0]?.countryName  ?   (  this.selectedBranchName !='' ?  ' , ' +Branch?.contactAddresses[0]?.countryName : Branch?.contactAddresses[0]?.countryName) :'';
+        this.selectedBranchName = Branch?.contactAddresses[0]?.name ? Branch?.contactAddresses[0]?.name : '';
+        this.selectedBranchName += Branch?.contactAddresses[0]?.addressLine1 ? (this.selectedBranchName != '' ? ' - ' + Branch?.contactAddresses[0]?.addressLine1 : Branch?.contactAddresses[0]?.addressLine1) : '';
+        this.selectedBranchName += Branch?.contactAddresses[0]?.addressLine2 ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.addressLine2 : Branch?.contactAddresses[0]?.addressLine2) : '';
+        this.selectedBranchName += Branch?.contactAddresses[0]?.city ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.city : Branch?.contactAddresses[0]?.city) : '';
+        this.selectedBranchName += Branch?.contactAddresses[0]?.state ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.state : Branch?.contactAddresses[0]?.state) : '';
+        this.selectedBranchName += Branch?.contactAddresses[0]?.zipCode ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.zipCode : Branch?.contactAddresses[0]?.zipCode) : '';
+        this.selectedBranchName += Branch?.contactAddresses[0]?.countryName ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.countryName : Branch?.contactAddresses[0]?.countryName) : '';
         this.selectedBranchId = Branch.id;
         this.memberDto.parentId = Branch.id;
     }
@@ -283,36 +278,36 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     //Branch Methods [End]
 
 
-    async  SaveMember() {
-        if ( this.uploader.isUploading ) {
+    async SaveMember() {
+        if (this.uploader.isUploading) {
             return this.notify.error(this.l("PleaseWait,SomeAttachmentsAreStillUploading"));
         }
         if (this.isManualOrExternalContact) this.setDefaultPublicFieldsToTrue()
         this.showMainSpinner()
-        if(!this.memberDto.code){
-        let  sequance="";
-        let tenancyName = this.appSession.tenancyName;
+        if (!this.memberDto.code) {
+            let sequance = "";
+            let tenancyName = this.appSession.tenancyName;
 
-        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise()
-        if(getNextEntityCodeRes)
-            sequance=getNextEntityCodeRes;
+            const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise()
+            if (getNextEntityCodeRes)
+                sequance = getNextEntityCodeRes;
 
-       this.memberDto.code= tenancyName+"-C"+sequance;
-          }
+            this.memberDto.code = tenancyName + "-C" + sequance;
+        }
         this._AccountsServiceProxy.createOrEditContact(this.memberDto)
-        .pipe(finalize(()=>this.hideMainSpinner()))
-        .subscribe(result => {
-            const userId = this.memberDto?.userId || result.userId
-            const memberId = this.memberDto?.id || result.id
-            const isMyProfile = this.appSession?.user?.memberId == this.memberDto?.id
-            if(isMyProfile){
-                const profileImage = this.memberDto?.entityAttachments?.filter(item=>item.attachmentCategoryId == this.sycAttachmentCategoryLogo.id )[0]
-                if(profileImage?.guid) {
-                    this.updateLogoService.updateProfilePicture()
+            .pipe(finalize(() => this.hideMainSpinner()))
+            .subscribe(result => {
+                const userId = this.memberDto?.userId || result.userId
+                const memberId = this.memberDto?.id || result.id
+                const isMyProfile = this.appSession?.user?.memberId == this.memberDto?.id
+                if (isMyProfile) {
+                    const profileImage = this.memberDto?.entityAttachments?.filter(item => item.attachmentCategoryId == this.sycAttachmentCategoryLogo.id)[0]
+                    if (profileImage?.guid) {
+                        this.updateLogoService.updateProfilePicture()
+                    }
                 }
-            }
-            this.createOrEditDone.emit({userId:userId,memberId:memberId});
-        });
+                this.createOrEditDone.emit({ userId: userId, memberId: memberId });
+            });
     }
 
     AddPhoneToList() {
@@ -320,13 +315,13 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
 
     removePhoneFromList(i: number) {
-        this.phonelist.splice(i,1)
-        this.memberDto[`phone${i+1}Ext`] = undefined
-        this.memberDto[`phone${i+1}IsPublic`] = undefined
-        this.memberDto[`phone${i+1}CountryKey`] = undefined
-        this.memberDto[`phone${i+1}Number`]= undefined
-        this.memberDto[`phone${i+1}TypeId`] = undefined
-        this.memberDto[`phone${i+1}TypeName`] = undefined
+        this.phonelist.splice(i, 1)
+        this.memberDto[`phone${i + 1}Ext`] = undefined
+        this.memberDto[`phone${i + 1}IsPublic`] = undefined
+        this.memberDto[`phone${i + 1}CountryKey`] = undefined
+        this.memberDto[`phone${i + 1}Number`] = undefined
+        this.memberDto[`phone${i + 1}TypeId`] = undefined
+        this.memberDto[`phone${i + 1}TypeName`] = undefined
     }
 
     hasErrorphoneNumber(e, i: number) {
@@ -337,35 +332,34 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
 
     onExtentionChange(value, i) {
-        this.memberDto[`phone${i+1}Ext`] = value
+        this.memberDto[`phone${i + 1}Ext`] = value
     }
 
-    onPhoneTypeChange($event:{value: number, originalEvent}, i: number) {
+    onPhoneTypeChange($event: { value: number, originalEvent }, i: number) {
         const label = $event?.originalEvent?.target?.innerText
-        // this.memberDto[`phone${i+1}TypeId`] = $event.value
-        this.memberDto[`phone${i+1}TypeName`] = label
+        this.memberDto[`phone${i + 1}TypeName`] = label
     }
 
     onPhoneNumberChange(value, i) {
-        this.memberDto[`phone${i+1}Number`] = value
+        this.memberDto[`phone${i + 1}Number`] = value
     }
 
     onIsPublicChange(value, i) {
-        this.memberDto[`phone${i+1}IsPublic`] = value
+        this.memberDto[`phone${i + 1}IsPublic`] = value
     }
 
     telInputObjectphoneNumber(obj, i: number) {
-        const key = `phone${i+1}CountryKey`
+        const key = `phone${i + 1}CountryKey`
         if (!isNaN(i) && !this.memberDto[key]) {
             this.memberDto[key] = 'us'
             obj.setCountry(this.memberDto[key]);
         }
     }
     onCountryChangephoneNumber(e, i: number) {
-        this.memberDto[`phone${i+1}CountryKey`] = e.iso2
+        this.memberDto[`phone${i + 1}CountryKey`] = e.iso2
     }
 
-    hide(){
+    hide() {
         this.active = false
         this.memberDto = undefined
         this.memberForm?.reset()

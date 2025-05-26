@@ -3,7 +3,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountDto, AccountsServiceProxy, CreateAccountsInputDto, NameValueOfString, SourceAccountEnum, TargetAccountEnum } from '@shared/service-proxies/service-proxies';
 import { SelectItem } from 'primeng/api';
 import { finalize } from 'rxjs/operators';
-import { RegisterTenantComponent } from './register-tenant.component';
+import { RegisterTenantComponent } from '../register-tenant/register-tenant.component';
 
 @Component({
   selector: 'app-merge-convert-accounts-tool',

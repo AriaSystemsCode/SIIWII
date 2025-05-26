@@ -1,7 +1,7 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { SelectItem } from 'primeng/api';
-import { AccountMainFilterEnum } from '../../account-shared/models/accounts-main-filter.enum';
+import { AccountMainFilterEnum } from '../../../account-shared/models/accounts-main-filter.enum';
 
 @Component({
   selector: 'app-my-accounts',

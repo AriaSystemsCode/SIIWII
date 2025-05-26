@@ -15,7 +15,7 @@ import {
     TreeNodeOfGetSycEntityObjectCategoryForViewDto,
     TreeNodeOfGetSycEntityObjectClassificationForViewDto,
     EmailingTemplateServiceProxy,
-    
+
 } from "@shared/service-proxies/service-proxies";
 import { AbpSessionService } from "abp-ng2-module";
 import { AppComponentBase } from "@shared/common/app-component-base";
@@ -38,15 +38,34 @@ import { MainImportService } from "@shared/components/import-steps/services/main
 
 @Component({
     selector: "app-accounts",
-    providers:[MarketplaceAccountsServiceProxy],
+    providers: [MarketplaceAccountsServiceProxy],
     templateUrl: "./accounts.component.html",
     styleUrls: ["./accounts.component.scss"],
     animations: [appModuleAnimation()],
 })
 export class AccountsComponent
     extends AppComponentBase
-    implements OnInit, OnChanges
-{
+    implements OnInit, OnChanges {
+
+    @Input() defaultMainFilter: AccountMainFilterEnum;
+    @Input() showMainFiltersOptions;
+    @Input() showAddButton;
+    @Input() pageMainFilters: SelectItem[] = [];
+    @Input() fromMarketplace;
+    @Input() accountType: string;
+
+    @ViewChild("sendMailModal", { static: true }) sendMailModal: SendMailModalComponent;
+    @ViewChild("dataTable", { static: true }) dataTable: Table;
+    @ViewChild("paginator", { static: true }) paginator: Paginator;
+    @ViewChild("ImportAccountsModal", { static: true })
+
+    ImportAccountsModal: MainImportComponent;
+    mailHeader: string;
+    mailsubject: string;
+    mailbody: string;
+    filterForm: FormGroup;
+    connectionType: string = "All"
+    isHost: boolean;
     singleItemPerRowMode: boolean = false;
 
     showConfirm: boolean = false;
@@ -56,54 +75,25 @@ export class AccountsComponent
     _entityTypeFullName = "onetouch.AppItems.AppItem";
     entityHistoryEnabled = false;
 
-    accounts:GetAccountForViewDto[]=[];
+    accounts: GetAccountForViewDto[] = [];
     sortingOptions: SelectItem[];
     filterVisible = false; // To toggle the filter visibility
     active: boolean = false;
     loading: boolean = false;
-    @Input() defaultMainFilter: AccountMainFilterEnum;
-    @Input() showMainFiltersOptions;
-    @Input() showAddButton;
-
-    @Input() pageMainFilters: SelectItem[] = [];
-
-    @ViewChild("sendMailModal", { static: true })
-    sendMailModal: SendMailModalComponent;
-
-    @ViewChild("dataTable", { static: true }) dataTable: Table;
-    @ViewChild("paginator", { static: true }) paginator: Paginator;
-
-    @ViewChild("ImportAccountsModal", { static: true })
-    ImportAccountsModal: MainImportComponent;
-    mailHeader: string;
-    mailsubject: string;
-    mailbody: string;
-    filterForm: FormGroup;
-    @Input() fromMarketplace;
-    @Input() accountType:string;
-    connectionType:string="All"
-    
-    get mainFilterCtrl(): AbstractControl {
-        return this.filterForm?.get("mainFilterType");
-    }
-    get sortingCtrl(): AbstractControl {
-        return this.filterForm?.get("sorting");
-    }
 
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
-        private _marketplaceAccountsServiceProxy:MarketplaceAccountsServiceProxy,
+        private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
         private _importService: MainImportService,
         private _abpSessionService: AbpSessionService,
         private _formBuilder: FormBuilder,
         private _emailingTemplateAppService: EmailingTemplateServiceProxy,
-       // MarketplaceAccountsModule  
+        // MarketplaceAccountsModule  
     ) {
         super(injector);
         this.overridePrimeTableSetting();
     }
-    isHost: boolean;
     ngOnInit() {
         this.isHost = !this._abpSessionService.tenantId;
         this.defineSortingOptions();
@@ -122,9 +112,17 @@ export class AccountsComponent
         this.applyFiltersOnChange();
     }
 
-      toggleFilter(): void {
-    this.filterVisible = !this.filterVisible;
-  }
+    get mainFilterCtrl(): AbstractControl {
+        return this.filterForm?.get("mainFilterType");
+    }
+    get sortingCtrl(): AbstractControl {
+        return this.filterForm?.get("sorting");
+    }
+
+
+    toggleFilter(): void {
+        this.filterVisible = !this.filterVisible;
+    }
     setMainPageFilter(filter: AccountMainFilterEnum) {
         const selectedfilter = this.pageMainFilters.filter(
             (item) => filter == item.value
@@ -184,7 +182,7 @@ export class AccountsComponent
     }
 
     getAccounts(event?: LazyLoadEvent) {
-        
+
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
@@ -226,7 +224,7 @@ export class AccountsComponent
                 filters.postalCode || undefined,
                 filters?.ssin || undefined,
                 filters?.accountTypeId || undefined,
-                filters?.accountType  || undefined,
+                filters?.accountType || undefined,
                 filters.accountTypes || undefined,
                 filters.statuses || undefined,
                 filters.languages || undefined,
@@ -262,7 +260,7 @@ export class AccountsComponent
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)
             );
         }
-        
+
         apiCall.pipe(
             finalize(() => {
                 this.primengTableHelper.hideLoadingIndicator();
@@ -283,46 +281,36 @@ export class AccountsComponent
 
     askToConfirmDelete($event, account: AccountDto, index: number): void {
 
-      var isConfirmed: Observable<boolean>;
-      isConfirmed   = this.askToConfirm("AreYouSureYouWantToDeleteThisAccount?","AreYouSure");
+        var isConfirmed: Observable<boolean>;
+        isConfirmed = this.askToConfirm("AreYouSureYouWantToDeleteThisAccount?", "AreYouSure");
 
-     isConfirmed.subscribe((res)=>{
+        isConfirmed.subscribe((res) => {
 
-        if(res){
-        this.showMainSpinner();
-                    this._accountsServiceProxy
-                        .delete(account.id)
-                        .pipe(
-                            finalize(() => {
-                                this.hideMainSpinner();
-                            })
-                        )
-                        .subscribe(() => {
-                            this.primengTableHelper.records.splice(index, 1);
-                            this.notify.success(this.l("SuccessfullyDeleted"));
-                        });
-                    }
-    });
-}
-
-
-    exportToExcel(): void {
-        // this._accountsServiceProxy.getAccountsToExcel(
-        // this.filterText,
-        //     this.appEntityNameFilter,
-        // )
-        // .subscribe(result => {
-        //     this._fileDownloadService.downloadTempFile(result);
-        //  });
+            if (res) {
+                this.showMainSpinner();
+                this._accountsServiceProxy
+                    .delete(account.id)
+                    .pipe(
+                        finalize(() => {
+                            this.hideMainSpinner();
+                        })
+                    )
+                    .subscribe(() => {
+                        this.primengTableHelper.records.splice(index, 1);
+                        this.notify.success(this.l("SuccessfullyDeleted"));
+                    });
+            }
+        });
     }
 
+
     showImportAccounts() {
-        let importService=AccountsServiceProxy;
-        let serviceUtilites=AccountsImport;
-        let importStepsInfo:ImportStepInfo[];
-        importStepsInfo= this._importService.getOriginalImportSteps();
-       
-        this.ImportAccountsModal.show(ImportTypes.Accounts,importService,serviceUtilites,['LOGO',"BANNER","IMAGE"],true,importStepsInfo);
+        let importService = AccountsServiceProxy;
+        let serviceUtilites = AccountsImport;
+        let importStepsInfo: ImportStepInfo[];
+        importStepsInfo = this._importService.getOriginalImportSteps();
+
+        this.ImportAccountsModal.show(ImportTypes.Accounts, importService, serviceUtilites, ['LOGO', "BANNER", "IMAGE"], true, importStepsInfo);
     }
 
     connect(account: AccountDto): void {
@@ -418,20 +406,21 @@ export class AccountsComponent
 
     createRelation(account) {
         this._accountsServiceProxy
-                .applyRelationOnProfile(account.account.id,undefined)
-                .pipe(
-                    finalize(() => {;
-                        this.hideMainSpinner();
-                    })
-                )
-                .subscribe((result:string) => {
-                    let accountIndx = this.accounts.findIndex(x=>x.account.id == account.account.id);
-                    if(accountIndx >=0){
-                        this.accounts[accountIndx]=account;
-                        this.accounts[accountIndx].avaliableConnectionName="";
-                        this.accounts[accountIndx].connectionName=this.l(result);
-                    }
-                });
+            .applyRelationOnProfile(account.account.id, undefined)
+            .pipe(
+                finalize(() => {
+                    ;
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe((result: string) => {
+                let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.id);
+                if (accountIndx >= 0) {
+                    this.accounts[accountIndx] = account;
+                    this.accounts[accountIndx].avaliableConnectionName = "";
+                    this.accounts[accountIndx].connectionName = this.l(result);
+                }
+            });
     }
 
 }

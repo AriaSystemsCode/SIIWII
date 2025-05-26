@@ -126,9 +126,7 @@
                             <div class="form-group row">
                                 <label for="JoinDate" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("JoinDate")}}</label>
                                 <div class="col-md-6">
-                                    <!-- <input type="datetime" bsDatepicker id="joinDate" #joinDateCtrl='ngModel' [(ngModel)]="memberDto.joinDate" class="form-control" name="JoinDate" minlength="2" maxlength="100" [placeholder]="'PleaseEnterJoinDate'"
-                                    [readonly]="memberDto?.id >0" [disabled]="memberDto?.id >0"  /> 
-                                      <validation-messages [formCtrl]="joinDateCtrl"></validation-messages> -->
+                                  
                                     <p-calendar
                                     name="JoinDate" 
                                     [(ngModel)]="joinDate"

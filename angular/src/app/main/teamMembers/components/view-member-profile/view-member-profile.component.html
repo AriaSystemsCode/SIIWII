@@ -227,12 +227,7 @@
                                         {{ "SaveChanges" | localize }}
                                     </button>
 
-                                    <button class="btn mb-3 mt-4 editAccount_butn Save_editMember" style="background-color: white;
-    color: #4A0D4A !important;
-    border: 1px solid #EEEEEEEE;
-    height: 38px;
-    width: 118px;
-    border-radius: 6px;" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false">
+                                    <button class="btn mb-3 mt-4 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false">
                                         {{ "Cancel" | localize }}
                                     </button>
                                 </div>

@@ -3,13 +3,10 @@ import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCateg
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
-
-
 import { finalize } from 'rxjs/operators';
 import { ViewMemberProfileComponentInputsI } from '../../models/view-member-profile-model';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Observable } from 'rxjs';
-import { FormsModule } from '@angular/forms';
 import { SelectBranchModalComponent } from '@app/select-branch/select-branch-modal/select-branch-modal.component';
 import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-user-modal.component';
 
@@ -21,17 +18,20 @@ import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-
     animations: [appModuleAnimation()]
 })
 export class ViewMemberProfileComponent extends AppComponentBase implements OnInit {
-
-    editMode = false;
     @ViewChild('nav') slider: NgImageSliderComponent;
-    memberData: ContactForEditDto;
-    newEditMemberInfo: ContactDto;
+    @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
+    @ViewChild("createOrEditUserModal", { static: true })  createOrEditUserModal: CreateOrEditUserModalComponent;
+
     @Input('accountInfoTemp') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
 
     @Output() edit: EventEmitter<number> = new EventEmitter<number>()
     @Output() delete: EventEmitter<number> = new EventEmitter<number>()
 
 
+    
+    editMode = false;
+    memberData: ContactForEditDto;
+    newEditMemberInfo: ContactDto;
     canEdit: boolean;
     canDelete: boolean;
     canView: boolean;
@@ -48,15 +48,12 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     sycAttachmentCategoryLogo: SycAttachmentCategoryDto
     sycAttachmentCategoryBanner: SycAttachmentCategoryDto
 
-    @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
-    @ViewChild("createOrEditUserModal", { static: true })  createOrEditUserModal: CreateOrEditUserModalComponent;
     Editting:boolean =false;
     adminContact:boolean =false;
     constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy) {
         super(injector);
         this.accountInfoTemp = new CreateOrEditAccountInfoDto();
-        //this.accountInfoTemp.entityClassifications = [];
-        //this.accountInfoTemp.entityCategories = [];
+
     }
     ngOnInit() {
         this.getAllAttachmentCategories()
@@ -66,8 +63,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     NoteditInfo = false;
     editMember() {
         this.Editting=true;
-        debugger
-        //this.memberData?.contact.eMailAddress
         if (this.adminContact) {
             this.editInfo = false;
             this.NoteditInfo = true;
@@ -150,8 +145,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
        this.createOrEditUserModal.user = new UserEditDto();
        this.createOrEditUserModal.user.name= this.memberData?.contact?.firstName;
        this.createOrEditUserModal.user.surname=this.memberData?.contact?.lastName;
-    //    this.createOrEditUserModal.user.emailAddress= this.memberData?.contact?.eMailAddress;
-    //    this.createOrEditUserModal.user.phoneNumber=this.memberData?.contact?.phone1Number;
        this.createOrEditUserModal.fromTeamMember=true;
        this.createOrEditUserModal.show()
     }
@@ -165,12 +158,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.newEditMemberInfo.branchName = this.editBranchValue;
         this.newEditMemberInfo.parentId = this.selectedBranchid;
 
-        //accountInfoTemp
-        
             this.editInfo = true;
             this.NoteditInfo = false;
-            //  this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
-
             this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
                 .pipe(finalize(() => {
                     this.hideMainSpinner(); 
