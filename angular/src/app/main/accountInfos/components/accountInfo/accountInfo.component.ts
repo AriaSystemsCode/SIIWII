@@ -22,7 +22,7 @@ import { ViewMemberProfileComponent } from '@app/main/teamMembers/components/vie
 import { NgForm } from '@angular/forms';
 import { CreateOrEditMemberComponent } from '@app/main/teamMembers/components/create-or-edit-member/create-or-edit-member.component';
 import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/view-member-profile-model';
-import { MembersListComponent } from '@app/main/members-list/components/members-list.component';
+import { MembersListComponent } from '@app/main/members-list/components/members-list/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
 

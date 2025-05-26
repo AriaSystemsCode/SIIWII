@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Injector, Input, OnInit, Output } from '@angular/core';
+import { Component, Injector, Input, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
 
 

@@ -4,7 +4,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { debounceTime, finalize } from 'rxjs/operators';
 import { AccountsServiceProxy, GetMemberForViewDto, MemberFilterTypeEnum } from '@shared/service-proxies/service-proxies';
-import { MembersListComponentInputsI } from '../models/member-list-component-interface';
+import { MembersListComponentInputsI } from '../../models/member-list-component-interface';
 import { SelectItem, LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 @Component({

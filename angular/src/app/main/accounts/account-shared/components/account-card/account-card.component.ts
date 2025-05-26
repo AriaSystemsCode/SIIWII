@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, Input, OnChanges, Output, SimpleChan
 import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
+import {  GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-account-card',
@@ -10,7 +10,6 @@ import { AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-prox
   styleUrls: ['./account-card.component.scss']
 })
 export class AccountCardComponent extends AppComponentBase implements OnChanges {
-    attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
     @Input('account') account : GetAccountForViewDto
     @Input('singleItemPerRowMode') singleItemPerRowMode : boolean
     @Input('isHost') isHost : boolean
@@ -21,6 +20,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Output() _createRelation : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
 
     isRecordOwner : boolean
+    attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
     
     constructor(
         injector:Injector,

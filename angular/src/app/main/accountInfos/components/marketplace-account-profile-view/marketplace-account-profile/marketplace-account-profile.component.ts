@@ -16,7 +16,6 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   accountType: string = "";
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
   accountDataForView: AccountDto
-  id: string
   marketPlaceData: GetAccountForViewDto
   activeTabIndex: number = 0;
   loginAccoutType: string = "";
