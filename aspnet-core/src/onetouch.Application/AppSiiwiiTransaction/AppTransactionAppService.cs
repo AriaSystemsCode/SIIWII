@@ -1167,20 +1167,23 @@ namespace onetouch.AppSiiwiiTransaction
                 var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
                 {
+                    var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
                     var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
-                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId).FirstOrDefaultAsync();
+                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
+                    z.EntityObjectStatusId == statusCodeNotSent
+                    ).FirstOrDefaultAsync();
                     if (logExist != null)
                     {
-                        var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                        logExist.EntityObjectStatusId = statusCode;
-                        logExist.EntityObjectStatusCode = "Ready to be Sent";
-                        await _appEntityLogRepository.UpdateAsync(logExist);
+                        
+                        //logExist.EntityObjectStatusId = statusCodeNotSent;
+                        //logExist.EntityObjectStatusCode = "Ready to be Sent";
+                        //await _appEntityLogRepository.UpdateAsync(logExist);
                     }
                     else
                     {
                         logExist = new AppEntityLog();
-                        var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                        logExist.EntityObjectStatusId = statusCode;
+                        //var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        logExist.EntityObjectStatusId = statusCodeNotSent;
                         logExist.EntityObjectStatusCode = "Ready to be Sent";
                         logExist.EntityId = appTrans.Id;
                         logExist.EntityCode = appTrans.Code;
@@ -1722,19 +1725,22 @@ namespace onetouch.AppSiiwiiTransaction
                 var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
                 {
+                    var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
                     var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
-                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId).FirstOrDefaultAsync();
+                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
+                    z.EntityObjectStatusId == statusCode
+                    ).FirstOrDefaultAsync();
                     if (logExist != null)
                     {
-                        var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                        logExist.EntityObjectStatusId = statusCode;
-                        logExist.EntityObjectStatusCode = "Ready to be Sent";
-                        await _appEntityLogRepository.UpdateAsync(logExist);
+                       
+                       // logExist.EntityObjectStatusId = statusCode;
+                       // logExist.EntityObjectStatusCode = "Ready to be Sent";
+                       // await _appEntityLogRepository.UpdateAsync(logExist);
                     }
                     else
                     {
                         logExist = new AppEntityLog();
-                        var statusCode =await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                       // var statusCode =await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
                         logExist.EntityObjectStatusId  = statusCode;
                         logExist.EntityObjectStatusCode= "Ready to be Sent";
                         logExist.EntityId = appTrans.Id;
