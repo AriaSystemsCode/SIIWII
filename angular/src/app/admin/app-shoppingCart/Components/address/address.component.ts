@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit, Input, ViewChild, Output, EventEmitter, SimpleChanges, OnChanges, AfterViewInit } from "@angular/core";
+import { Component, Injector, OnInit, Input, ViewChild, Output, EventEmitter, SimpleChanges, OnChanges, AfterViewInit, OnDestroy } from "@angular/core";
 import { AccountsServiceProxy, AppAddressDto, AppEntitiesServiceProxy, LookupLabelDto, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, ContactAppAddressDto } from "@shared/service-proxies/service-proxies";
 import Swal from 'sweetalert2';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -6,13 +6,15 @@ import { finalize } from 'rxjs/operators';
 import { NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
-
+import {
+    Subscription,
+} from "rxjs";
 @Component({
     selector: "app-address",
     templateUrl: "./address.component.html",
     styleUrls: ["./address.component.scss"],
 })
-export class AddressComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
+export class AddressComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit ,OnDestroy{
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("selectedAddressDetails") selectedAddressDetails;
     @Input("showAddressType") showAddressType: boolean = true;
@@ -48,7 +50,7 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
     @Input("canChange") canChange: boolean = true;
 
     @Input("currentTab") currentTab: number;
-
+ subscriptions: Subscription[] = [];
     constructor(injector: Injector,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -127,214 +129,108 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
             item.postalCode?.toLowerCase().includes(filterVal.toLowerCase()))
         );
     }
-
-    getAddressList(companySsin, branchSsin) {
-
+    private getCurrentRole(): ContactRoleEnum {
+        if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo) {
+          if (this.shipInfoIndex === 1) return ContactRoleEnum.ShipFromContact; // 5
+          if (this.shipInfoIndex === 2) return ContactRoleEnum.ShipToContact;   // 6
+        }
+      
+        if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo) {
+          if (this.billingIndexInfo === 1) return ContactRoleEnum.APContact;   // 4
+          if (this.billingIndexInfo === 2) return ContactRoleEnum.ARContact; // 3
+        }
+      
+        return null;
+      }
+      
+      getAddressList(companySsin: string, branchSsin?: string): void {
+        const role = this.getCurrentRole();
+      
+        if (!role) return;
+      
         if (companySsin) {
-            this._AppTransactionServiceProxy.getCompanyAddresses(companySsin, null).subscribe(result => {
-
-                this.savedAddressesList = null;
-                this.savedAddressesList = result;
-                this.refSavedAddressesList = result;
-                this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin, branchSsin).subscribe(result => {
-
-                    if (result) {
-                        let role;
-
-                        if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex === 2) {
-                            role = 6;
-                        } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo && this.billingIndexInfo === 1) {
-                            role = 4;
-                        }
-
-                        const shIPtOroleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
-                            contact => contact?.contactRole === 6
-                        );
-                        const apRoleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
-                            contact => contact?.contactRole === 4
-                        );
-                        if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo) {
-                            // Filter the result to find the address with addressType 'Shipping'
-                            const shippingAddress = result.find(address => address.addressType === 'Shipping');
-
-
-
-                            if (shippingAddress) {
-                                // Check if the shipping address exists in the savedAddressesList
-                                const matchedAddress = this.savedAddressesList.find(savedAddress =>
-                                    savedAddress.id === shippingAddress.addressId
-                                );
-
-
-                                // If a matching address is found, set it as the selected address
-                                if (matchedAddress) {
-                                    this.addAddressDataToDto(2);
-
-                                    this.selectedAddress = matchedAddress;
-                                    this.selectedAddressDetails = { ...matchedAddress };
-
-                                    this.selectAddress(this.selectedAddress.id);
-                                }
-
-                            }
-
-                        } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo) {
-                            // Filter the result to find the address with addressType 'Billing'
-                            const billingAddress = result.find(address => address.addressType === 'Billing');
-
-
-
-                            if (billingAddress) {
-                                // Check if the billing address exists in the savedAddressesList
-                                const matchedAddress = this.savedAddressesList.find(savedAddress =>
-                                    savedAddress.id === billingAddress.addressId
-                                );
-
-
-
-                                // If a matching address is found, set it as the selected address
-                                if (matchedAddress) {
-                                    this.addAddressDataToDto(1);
-
-                                    this.selectedAddress = matchedAddress;
-                                    this.selectedAddressDetails = { ...matchedAddress };
-
-                                    this.selectAddress(this.selectedAddress.id);
-                                }
-
-                            }
-                        }
-
-                    }
-
-
-                })
-
-                if (this.savedAddressesList.length == 0 && !this.selectedAddress) {
-                    this.showAddBtn = true
-                    this.showAddList = false;
-                    this.selectedAddress = null;
-
-                } else {
-                    this.openAddNewAddForm = false;
-                    this.showAddList = false;
-
-                    this.selectedAddress ? this.selectedAddress.countryName = this.countries.filter(item => item.value === this.selectedAddress['countryId'])[0].label : '';
+          const subs = this._AppTransactionServiceProxy.getCompanyAddresses(companySsin, null).subscribe(result => {
+            this.savedAddressesList = [...result];
+            this.refSavedAddressesList = [...result];
+      
+            this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin, branchSsin).subscribe(defaults => {
+              if (!defaults?.length) return;
+      
+              const roleAddressTypeMap = {
+                [ContactRoleEnum.ShipToContact]: 'Shipping',
+                [ContactRoleEnum.ShipFromContact]: 'Shipping',
+                [ContactRoleEnum.APContact]: 'Billing',
+                [ContactRoleEnum.ARContact]: 'Billing'
+              };
+      
+              const expectedType = roleAddressTypeMap[role];
+              const defaultAddress = defaults.find(addr => addr.addressType === expectedType);
+      
+              if (defaultAddress) {
+                const matched = this.savedAddressesList.find(a => a.id === defaultAddress.addressId);
+                if (matched) {
+                  this.selectedAddress = { ...matched };
+                  this.selectedAddressDetails = { ...matched };
+                  this.selectAddress(this.selectedAddress.id);
+                  this.addAddressDataToDto(role);
                 }
-                this.hideMainSpinner()
-
+              }
             });
-        }
-        else {
-            // this.selectedAddress = null;
-            let role;
-
-            if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex === 2) {
-                role = 6;
-            } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo && this.billingIndexInfo === 1) {
-                role = 4;
-            }
-
-            const shIPtOroleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
-                contact => contact?.contactRole === 6
-            );
-            const apRoleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
-                contact => contact?.contactRole === 4
-            );
-
-
-
-            if (role === 6 && shIPtOroleContact?.contactAddressDetail?.countryCode) {
-                // Set data for role 6 (Shipping)
-                const generatedId = this.generateNewId();
-                this.savedAddressesList[0] = {
-                    ...shIPtOroleContact.contactAddressDetail,
-                    code: shIPtOroleContact.contactAddressCode,
-                    name: shIPtOroleContact.contactAddressName,
-                    id: generatedId
-                };
-                this.refSavedAddressesList[0] = {
-                    ...shIPtOroleContact.contactAddressDetail,
-                    code: shIPtOroleContact.contactAddressCode,
-                    name: shIPtOroleContact.contactAddressName,
-                    id: generatedId
-                };
-                // this.selectedAddress = this.savedAddressesList[0];
-            } else if (role === 4 && shIPtOroleContact?.contactAddressDetail?.countryCode) {
-                // Set data for role 4 (Billing) and handle both Shipping and AP
-                const generatedId = this.generateNewId();
-
-                // Address for role 6 (Shipping)
-                this.savedAddressesList[0] = {
-                    ...shIPtOroleContact.contactAddressDetail,
-                    code: shIPtOroleContact.contactAddressCode,
-                    name: shIPtOroleContact.contactAddressName,
-
-                    id: generatedId
-                };
-                this.refSavedAddressesList[0] = {
-                    ...shIPtOroleContact.contactAddressDetail,
-                    code: shIPtOroleContact.contactAddressCode,
-                    name: shIPtOroleContact.contactAddressName,
-
-                    id: generatedId
-                };
-
-                // Address for role 4 (Billing)
-                if (apRoleContact?.contactAddressDetail?.countryCode) {
-                    const apGeneratedId = this.generateNewId();
-                    this.savedAddressesList[1] = {
-                        ...apRoleContact.contactAddressDetail,
-                        code: apRoleContact.contactAddressCode,
-                        name: apRoleContact.contactAddressName,
-                        id: apGeneratedId
-                    };
-                    this.refSavedAddressesList[1] = {
-                        ...apRoleContact.contactAddressDetail,
-                        code: apRoleContact.contactAddressCode,
-                        name: apRoleContact.contactAddressName,
-                        id: apGeneratedId
-                    };
-                    // this.selectedAddress = this.savedAddressesList[1];
-                } else {
-                    this.selectedAddress = null;
-                }
-            } else if (apRoleContact?.contactAddressDetail?.countryCode) {
-                // Fallback to AP role address if role 6 (Shipping) is not found
-                const apGeneratedId = this.generateNewId();
-                this.savedAddressesList[0] = {
-                    ...apRoleContact.contactAddressDetail,
-                    code: apRoleContact.contactAddressCode,
-                    name: apRoleContact.contactAddressName,
-
-                    id: apGeneratedId
-                };
-                this.refSavedAddressesList[0] = {
-                    ...apRoleContact.contactAddressDetail,
-                    code: apRoleContact.contactAddressCode,
-                    name: apRoleContact.contactAddressName,
-                    id: apGeneratedId
-                };
-                // this.selectedAddress = this.savedAddressesList[0];
+      
+            if (this.savedAddressesList.length === 0 && !this.selectedAddress) {
+              this.showAddBtn = true;
+              this.showAddList = false;
+              this.selectedAddress = null;
             } else {
-                this.selectedAddress = null;
+              this.openAddNewAddForm = false;
+              this.showAddList = false;
+      
+              if (this.selectedAddress?.countryId) {
+                const country = this.countries.find(c => c.value === this.selectedAddress.countryId);
+                if (country) this.selectedAddress.countryName = country.label;
+              }
             }
-
+      
+            this.hideMainSpinner();
+          });
+      
+          this.subscriptions.push(subs);
+        } else {
+          // Fallback to temp local DTO address (manual or new entry)
+          const contact = this.appTransactionsForViewDto?.appTransactionContacts.find(c => c?.contactRole === role);
+          if (contact?.contactAddressDetail?.countryCode) {
+            const fallbackAddress = {
+              ...contact.contactAddressDetail,
+              code: contact.contactAddressCode,
+              name: contact.contactAddressName,
+              id: this.generateNewId()
+            };
+      
+            this.savedAddressesList = [fallbackAddress];
+            this.refSavedAddressesList = [fallbackAddress];
+            // this.selectedAddress = fallbackAddress;
+            this.selectedAddressDetails = fallbackAddress;
+          } else {
+            this.selectedAddress = null;
+          }
         }
-
-    }
+      }
+      
     getAddressTypes() {
-        this._AppEntitiesServiceProxy
+        const subs = this._AppEntitiesServiceProxy
             .getAllAddressTypeForTableDropdown()
             .subscribe((result) => {
                 this.AddressTypesList = result;
             });
+            this.subscriptions.push(subs);
     }
     // get countries
     getCountries() {
-        this._AppEntitiesServiceProxy.getAllCountryForTableDropdown().subscribe(result => {
+        const subs = this._AppEntitiesServiceProxy.getAllCountryForTableDropdown().subscribe(result => {
             this.countries = result;
         });
+        this.subscriptions.push(subs);
+
     }
     discardAddressForm() {
         this.openAddNewAddForm = false;
@@ -373,7 +269,7 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
             },
         }).then((result) => {
             if (result.isConfirmed) {
-                this._accountsServiceProxy.deleteAddress(addressId)
+                const subs =   this._accountsServiceProxy.deleteAddress(addressId)
                     .subscribe((item) => {
                         const index = this.savedAddressesList.findIndex(item => item.id === addressId)
                         this.savedAddressesList.splice(index, 1)
@@ -386,6 +282,8 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
                     }, (err: HttpErrorResponse) => {
                         this.notify.error(err.message)
                     })
+        this.subscriptions.push(subs);
+
             }
         })
 
@@ -406,7 +304,7 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
         this.addressIdForEdit ? this.address.id = this.addressIdForEdit : null;
         let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
 
-        this._accountsServiceProxy.createOrEditAddress(this.address)
+        const subs =    this._accountsServiceProxy.createOrEditAddress(this.address)
             .pipe(finalize(() => { this.saving = false; }))
             .subscribe((value) => {
 
@@ -423,6 +321,8 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
                     this.addressIdForEdit = null;
                 }
             });
+        this.subscriptions.push(subs);
+
     }
     generateNewId(): number {
         return Date.now(); // Generates a unique ID based on the current timestamp
@@ -665,15 +565,19 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
     }
     ngOnInit(): void {
         this.savedAddressesList = [];
-        if (this.selectedAddressDetails) {
-            this.showAddList = false;
-            this.openAddNewAddForm = false;
-            this.selectedAddress = this.selectedAddressDetails;
-        }
+     // Always initialize selectedAddress with fresh input
+     this.selectedAddress = this.selectedAddressDetails ? { ...this.selectedAddressDetails } : null;
+
+     // Reset forms and flags
+     this.openAddNewAddForm = false;
+     this.showAddList = false;
     }
     selectAddressType() {
         this.updateSelectedAddress.emit({ id: this.selectedAddress.id, code: this.selectedAddress.code, typeId: this.addType });
 
+    }
+    ngOnDestroy() {
+        this.emitDestroy();
     }
 
 }

@@ -1,8 +1,8 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { finalize } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
 import * as moment from 'moment';
 @Component({
@@ -10,7 +10,7 @@ import * as moment from 'moment';
   templateUrl: './create-or-add-shipping-information.component.html',
   styleUrls: ['./create-or-add-shipping-information.component.scss']
 })
-export class CreateOrAddShippingInformationComponent extends AppComponentBase  implements OnInit,OnChanges,AfterViewInit{
+export class CreateOrAddShippingInformationComponent extends AppComponentBase  implements OnInit,OnChanges,AfterViewInit,OnDestroy{
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
@@ -21,7 +21,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isshipFromContactsValid: boolean = false;
   isShipToContactsValid: boolean = false;
-  @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
+  @ViewChildren(AddressComponent) addressComponentRefs: QueryList<AddressComponent>;
+  // @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
   loadAddresComponentShipFrom: boolean = false;
   loadAddresComponentShipTo: boolean = false;
   contactIdShipTo: string = '';
@@ -46,6 +47,8 @@ visible: boolean = false;
 cancelBtn: boolean = false;
 saveBtn: boolean = false;
 SuccessMsg: boolean = false;
+ subscriptions: Subscription[] = [];
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -60,15 +63,19 @@ SuccessMsg: boolean = false;
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.loadAddresComponentShipFrom = true;
       this.contactIdShipFrom = this.shipFromData?.compId;
-        if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
+      //   if( this.AddressComponentChild)
+      // this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
   
         
   
       this.contactIdShipTo = this.shipToData?.compId;
       this.loadAddresComponentShipTo = true;
-      if( this.AddressComponentChild)
-      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
+      // if( this.AddressComponentChild)
+      // this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin,null);
+addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin,null);
+
     }  
       
   }
@@ -216,7 +223,7 @@ SuccessMsg: boolean = false;
     this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    const subs =   this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
         //  this.generatOrderReport.emit(true) ;
        this.refreshShoppingCart.emit(true)
@@ -233,6 +240,8 @@ SuccessMsg: boolean = false;
             this.showSaveBtn = false;
         }
       });
+      this.subscriptions.push(subs);
+
   }
   selectShipVia($event) {
     var index = this.shipViaList.findIndex(x => x.value == $event?.value)
@@ -293,15 +302,17 @@ SuccessMsg: boolean = false;
     } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER'){
       accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
     }
-    this._AppTransactionServiceProxy.isManualCompany(accSSin)
+    const subs = this._AppTransactionServiceProxy.isManualCompany(accSSin)
       .subscribe((res) => {
 
         this.isAccManual = res;
    
       })
+      this.subscriptions.push(subs);
+
   }
   loadShipViaList() {
-    this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
+    const subs =  this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
       .subscribe((res) => {
         this.shipViaList = res;
         // debugger
@@ -313,6 +324,8 @@ SuccessMsg: boolean = false;
           this.shipViaValue=this.shipViaList.filter(item=>item.value==this.appTransactionsForViewDto.shipViaId);
         }
       })
+      this.subscriptions.push(subs);
+
   }
   onshowSaveBtn($event) {
     this.showSaveBtn = $event;
@@ -333,8 +346,10 @@ SuccessMsg: boolean = false;
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.contactIdShipFrom = this.shipFromData?.compId;
 
-        if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
+      //   if( this.AddressComponentChild)
+      // this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin,null);
   }
 }
   reloadAddresscomponentShipTo(data) {
@@ -342,9 +357,15 @@ SuccessMsg: boolean = false;
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.contactIdShipTo = this.shipToData?.compId;
 
-  if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
+  // if( this.AddressComponentChild)
+  //   this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
+  const addressComponents = this.addressComponentRefs.toArray();
+addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin,null);
 }
   }
+
+  ngOnDestroy() {
+    this.emitDestroy();
+}
 
 }
