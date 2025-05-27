@@ -597,7 +597,7 @@ namespace onetouch.AppEntities
                     IsHostRecord = appEntity.TenantId == null,
                     HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
                     Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
-                                  (imagesUrl + "-1" + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
+                                  (imagesUrl + (appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId == null ? "-1" : appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
                 })
                 .ToListAsync();
             }
@@ -648,7 +648,7 @@ namespace onetouch.AppEntities
                                   IsHostRecord = o.TenantId == null,
                                   HexaCode = (o.EntityExtraData!=null && o.EntityExtraData.Where(z=>z.AttributeId ==39).FirstOrDefault()!=null) ? o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue:"",
                                   Image = (o.EntityAttachments!= null && o.EntityAttachments.FirstOrDefault() !=null && o.EntityAttachments.FirstOrDefault().AttachmentFk !=null) ? 
-                                  (imagesUrl + "-1" + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
+                                  (imagesUrl + (o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId==null? "-1": o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
         };
 
 
