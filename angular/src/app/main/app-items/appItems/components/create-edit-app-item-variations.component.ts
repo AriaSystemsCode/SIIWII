@@ -2234,19 +2234,20 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
 
         if(item){
             
-            if(!(this.appItem?.nonLookupValues.filter(nonLookup =>nonLookup.code==item.code)?.length >=1)) {
+            const isTempId = item.value > 1e10;
+
+            if (!isTempId) {
                 appEntity.id = item.value;
-                this.createOreEditAppEntityModal.show(entityObjectType,appEntity,false)
-            }
-    
-            else {
+                this.createOreEditAppEntityModal.show(entityObjectType, appEntity, false);
+            } else {
                 this._appEntitiesServiceProxy.convertAppLookupLabelDtoToEntityDto(item)
-                .subscribe((result :AppEntityDto) => {
-                    appEntity=result;
-                    appEntity.id = 0;
-                    this.createOreEditAppEntityModal.show(entityObjectType,appEntity,true)
-                }); 
+                    .subscribe((result: AppEntityDto) => {
+                        appEntity = result;
+                        appEntity.id = 0; // Treat as new
+                        this.createOreEditAppEntityModal.show(entityObjectType, appEntity, true);
+                    });
             }
+            
         }
     
         else
