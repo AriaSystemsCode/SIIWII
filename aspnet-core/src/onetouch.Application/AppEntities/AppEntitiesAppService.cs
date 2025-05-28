@@ -331,7 +331,7 @@ namespace onetouch.AppEntities
                     output.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(appEntity.EntityAttachments);
                     foreach (var item in output.AppEntity.EntityAttachments)
                     {
-                        item.Url = @"attachments/" + -1 + @"/" + item.FileName;
+                        item.Url = @"attachments/" + (appEntity.TenantId==null? "-1": appEntity.TenantId.ToString())+ @"/" + item.FileName;
                     }
                 
                 return output;
