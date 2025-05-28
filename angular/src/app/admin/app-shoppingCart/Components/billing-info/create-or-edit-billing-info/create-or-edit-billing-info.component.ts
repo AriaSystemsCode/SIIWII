@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList } from '@angular/core';
 import { ShoppingCartoccordionTabs } from "../../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -20,7 +20,9 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isContactsValid: boolean = true;
-  @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
+  // @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
+    @ViewChildren(AddressComponent) addressComponentRefs: QueryList<AddressComponent>;
+  
   loadAddresComponentShipFrom: boolean = false;
   loadAddresComponentShipTo: boolean = false;
   contactIdARContact: string = '';
@@ -56,15 +58,11 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 
   ngAfterViewInit() {
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
-    this.loadAddresComponentShipFrom = true;
     this.contactIdApContact = this.apContactdata?.compId;
-      if( this.AddressComponentChild)
-    this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
-
       this.contactIdARContact = this.arContactdata?.compId;
-      this.loadAddresComponentShipTo = true;
-      if( this.AddressComponentChild)
-      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+      addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin,null);
+      addressComponents.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,null);
     }
       
   }
@@ -219,8 +217,8 @@ debugger
         if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
 
     this.contactIdApContact = this.apContactdata?.compId;
-      if( this.AddressComponentChild)
-        this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+      addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin,null);
     }
   }
 
@@ -230,9 +228,8 @@ debugger
     if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
 
     this.contactIdARContact = this.arContactdata?.compId;
-
-    if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+    const addressComponents = this.addressComponentRefs.toArray();
+    addressComponents.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,null);
     }
   }
 

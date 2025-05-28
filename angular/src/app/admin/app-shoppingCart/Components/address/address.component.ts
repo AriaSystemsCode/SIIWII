@@ -142,9 +142,22 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
       
         return null;
       }
+
+      private getRelatedFallbackRole(currentRole: ContactRoleEnum): ContactRoleEnum {
+        switch (currentRole) {
+          case ContactRoleEnum.ShipToContact: return ContactRoleEnum.APContact;
+          case ContactRoleEnum.APContact: return ContactRoleEnum.ShipToContact;
+      
+          case ContactRoleEnum.ShipFromContact: return ContactRoleEnum.ARContact;
+          case ContactRoleEnum.ARContact: return ContactRoleEnum.ShipFromContact;
+      
+          default: return null;
+        }
+      }
       
       getAddressList(companySsin: string, branchSsin?: string): void {
         const role = this.getCurrentRole();
+        const fallbackRole = this.getRelatedFallbackRole(role);
       
         if (!role) return;
       
@@ -177,6 +190,24 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
               }
             });
       
+            // Add fallback address from related contact
+            const fallbackContact = this.appTransactionsForViewDto?.appTransactionContacts.find(c => c?.contactRole === fallbackRole);
+            if (fallbackContact?.contactAddressDetail?.countryCode) {
+              const fallback = {
+                ...fallbackContact.contactAddressDetail,
+                code: fallbackContact.contactAddressCode,
+                name: fallbackContact.contactAddressName,
+                id: this.generateNewId()
+              };
+      
+              // Prevent duplicate fallback by checking existing IDs
+              const alreadyExists = this.savedAddressesList.some(a => a.code === fallback.code && a.name === fallback.name);
+              if (!alreadyExists) {
+                this.savedAddressesList.push(fallback);
+                this.refSavedAddressesList.push(fallback);
+              }
+            }
+      
             if (this.savedAddressesList.length === 0 && !this.selectedAddress) {
               this.showAddBtn = true;
               this.showAddList = false;
@@ -196,7 +227,6 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
       
           this.subscriptions.push(subs);
         } else {
-          // Fallback to temp local DTO address (manual or new entry)
           const contact = this.appTransactionsForViewDto?.appTransactionContacts.find(c => c?.contactRole === role);
           if (contact?.contactAddressDetail?.countryCode) {
             const fallbackAddress = {
@@ -208,13 +238,27 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
       
             this.savedAddressesList = [fallbackAddress];
             this.refSavedAddressesList = [fallbackAddress];
-            // this.selectedAddress = fallbackAddress;
             this.selectedAddressDetails = fallbackAddress;
           } else {
             this.selectedAddress = null;
           }
+      
+          // Add related fallback (manual case)
+          const fallbackContact = this.appTransactionsForViewDto?.appTransactionContacts.find(c => c?.contactRole === fallbackRole);
+          if (fallbackContact?.contactAddressDetail?.countryCode) {
+            const fallback = {
+              ...fallbackContact.contactAddressDetail,
+              code: fallbackContact.contactAddressCode,
+              name: fallbackContact.contactAddressName,
+              id: this.generateNewId()
+            };
+      
+            this.savedAddressesList.push(fallback);
+            this.refSavedAddressesList.push(fallback);
+          }
         }
       }
+      
       
     getAddressTypes() {
         const subs = this._AppEntitiesServiceProxy

@@ -61,17 +61,8 @@ SuccessMsg: boolean = false;
   ngAfterViewInit() {
 
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.loadAddresComponentShipFrom = true;
       this.contactIdShipFrom = this.shipFromData?.compId;
-      //   if( this.AddressComponentChild)
-      // this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
-  
-        
-  
       this.contactIdShipTo = this.shipToData?.compId;
-      this.loadAddresComponentShipTo = true;
-      // if( this.AddressComponentChild)
-      // this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
       const addressComponents = this.addressComponentRefs.toArray();
 addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin,null);
 addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin,null);
@@ -345,9 +336,6 @@ addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToDa
     console.log(this.shipFromData,'this.shipFromData')
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.contactIdShipFrom = this.shipFromData?.compId;
-
-      //   if( this.AddressComponentChild)
-      // this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
       const addressComponents = this.addressComponentRefs.toArray();
 addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin,null);
   }
@@ -357,8 +345,6 @@ addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFrom
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.contactIdShipTo = this.shipToData?.compId;
 
-  // if( this.AddressComponentChild)
-  //   this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
   const addressComponents = this.addressComponentRefs.toArray();
 addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin,null);
 }
