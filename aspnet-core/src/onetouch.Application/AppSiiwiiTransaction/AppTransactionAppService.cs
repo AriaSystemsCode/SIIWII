@@ -71,6 +71,7 @@ using System.Drawing.Imaging;
 using Abp.AutoMapper;
 using Namotion.Reflection;
 using onetouch.Globals;
+using MimeKit;
 
 
 //using NUglify.Helpers;
@@ -125,6 +126,9 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRateRepository;
         private readonly TimeZoneInfoAppService _timeZoneInfoAppService;
         //MMT45
+        //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[Start]
+        private readonly IRepository<AppEntityLog, long> _appEntityLogRepository;
+        //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
@@ -147,7 +151,7 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
-             TimeZoneInfoAppService timeZoneInfoAppService
+             TimeZoneInfoAppService timeZoneInfoAppService, IRepository<AppEntityLog, long> appEntityLogRepository
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
@@ -193,6 +197,9 @@ namespace onetouch.AppSiiwiiTransaction
             _appContactAddressRepository = appContactAddressRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
             _timeZoneInfoAppService = timeZoneInfoAppService;
+            //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[Start]
+            _appEntityLogRepository= appEntityLogRepository;
+            //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -1048,6 +1055,7 @@ namespace onetouch.AppSiiwiiTransaction
                             foreach (var det in header.AppTransactionDetails.Where(z => z.ParentId == null))
                                 await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
                         }
+                       
                     }
                     //Iteration45[Start]
                     appTrans.TimeStamp = DateTime.UtcNow;
@@ -1073,7 +1081,41 @@ namespace onetouch.AppSiiwiiTransaction
 
                    // obj = await _appTransactionsHeaderRepository.UpdateAsync(obj);
                 }
+                //log[start]
+                var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
+                {
+                    var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                    var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
+                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
+                    z.EntityObjectStatusId == statusCodeNotSent
+                    ).FirstOrDefaultAsync();
+                    if (logExist != null)
+                    {
+                        
+                        //logExist.EntityObjectStatusId = statusCodeNotSent;
+                        //logExist.EntityObjectStatusCode = "Ready to be Sent";
+                        //await _appEntityLogRepository.UpdateAsync(logExist);
+                    }
+                    else
+                    {
+                        logExist = new AppEntityLog();
+                        //var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        logExist.EntityObjectStatusId = statusCodeNotSent;
+                        logExist.EntityObjectStatusCode = "Ready to be Sent";
+                        logExist.EntityId = appTrans.Id;
+                        logExist.EntityCode = appTrans.Code;
+                        logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
+                        logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
+                        logExist.PartnerCode = "ARIAERP";
+                        logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
+                        logExist.ObjectId = appTrans.ObjectId;
+                        logExist.ObjectCode="TRANSACTION";
+                        await _appEntityLogRepository.InsertAsync(logExist);
 
+                    }
+                }
+                //log[End]
                 await CurrentUnitOfWork.SaveChangesAsync();
                 return obj.Id;
 
@@ -1585,7 +1627,41 @@ namespace onetouch.AppSiiwiiTransaction
                     if (ent != null)
                         appTrans.PaymentTermsName = ent.Name;
                 }
+                //log[start]
+                var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
+                {
+                    var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                    var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
+                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
+                    z.EntityObjectStatusId == statusCode
+                    ).FirstOrDefaultAsync();
+                    if (logExist != null)
+                    {
+                       
+                       // logExist.EntityObjectStatusId = statusCode;
+                       // logExist.EntityObjectStatusCode = "Ready to be Sent";
+                       // await _appEntityLogRepository.UpdateAsync(logExist);
+                    }
+                    else
+                    {
+                        logExist = new AppEntityLog();
+                       // var statusCode =await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        logExist.EntityObjectStatusId  = statusCode;
+                        logExist.EntityObjectStatusCode= "Ready to be Sent";
+                        logExist.EntityId = appTrans.Id;
+                        logExist.EntityCode = appTrans.Code;
+                        logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
+                        logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
+                        logExist.PartnerCode = "ARIAERP";
+                        logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
+                        logExist.ObjectId = appTrans.ObjectId;
+                        logExist.ObjectCode = "TRANSACTION";
+                        await _appEntityLogRepository.InsertAsync(logExist);
 
+                    }
+                }
+                //log[End]
                 appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -2075,18 +2151,24 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     input.StatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 }
-                if (input.EntityTypeIdFilter == 0)
+                if (input.EntityTypeIdFilter == 0 || input.EntityTypeIdFilter == null)
                 {
                     input.EntityTypeIdFilter = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
                 }
+                //log[Start]
+                var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                var notSentTransactions = _appEntityLogRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId &&
+                z.EntityObjectTypeId == input.EntityTypeIdFilter && z.EntityObjectStatusId == statusCode);
                 var idList = new List<string>();
                 if (!string.IsNullOrEmpty(input.At_Id))
                 {
                     idList = input.At_Id.Split(',').ToList();
                 }
 
-                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
-                    .Include(z => z.AppTransactionDetails)
+                //log[End]
+                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll()
+                    .Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
+                    .Include(z => z.AppTransactionDetails.Where(x => input.hasParentItems == false ? x.ParentId != null : true))
                     .Include(z => z.PaymentTermsFk).ThenInclude(z => z.EntityExtraData)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Name.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
@@ -2103,14 +2185,14 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrEmpty(input.SellerSSIN), e => e.SellerContactSSIN == input.SellerSSIN)
                             .WhereIf(!string.IsNullOrEmpty(input.SellerName), e => e.SellerCompanyName.Contains(input.SellerName))
                             .WhereIf(!string.IsNullOrEmpty(input.BuyerName), e => e.BuyerCompanyName.Contains(input.BuyerName))
-                            .WhereIf(!string.IsNullOrEmpty(input.At_Id), e => idList.Contains(e.Id.ToString()))
-                            .WhereIf(input.Since_Id > 0, e => e.Id > input.Since_Id)
+                           // .WhereIf(input.Since_Id > 0, e => e.Id > input.Since_Id)
                             .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId)
                                         && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
                             ;
 
-
-                var pagedAndFilteredAppTransactions = filteredAppTransactions
+                
+                var pagedAndFilteredAppTransactions = filteredAppTransactions.Join(notSentTransactions,s=>s.Id,sa=>sa.EntityId,
+                     (s, sa) => new { apptransaction = s, log= sa,id=s.Id })
                     .OrderBy(input.Sorting ?? "id asc")
                     .PageBy(input);
 
@@ -2127,19 +2209,19 @@ namespace onetouch.AppSiiwiiTransaction
                 //                          }
                 //                      };
 
-
-                var pagedAndFilteredAppTransactionsRes = from e in pagedAndFilteredAppTransactions.Include(z => z.AppTransactionContacts)
-                                                         .ThenInclude(z => z.ContactAddressFk)
-                                                         .Include(z => z.AppTransactionDetails
-                                                         .Where(x => input.hasParentItems == false ? x.ParentId != null : true))
+                
+                var pagedAndFilteredAppTransactionsRes = from e in pagedAndFilteredAppTransactions//.Include(z => z.apptransaction.AppTransactionContacts)
+                                                        // .ThenInclude(z => z.ContactAddressFk)
+                                                         //.Include(z => z.apptransaction.AppTransactionDetails
+                                                         //.Where(x => input.hasParentItems == false ? x.ParentId != null : true))
                                                          join
                                                          x in _appContactRepository.GetAll().Where(s => s.TenantId == AbpSession.TenantId) on
-                                                         e.SellerCompanySSIN.Trim() equals x.SSIN.Trim()
+                                                         e.apptransaction.SellerCompanySSIN.Trim() equals x.SSIN.Trim()
                                                          join
                                                          s in _appContactRepository.GetAll().Where(s => s.TenantId == AbpSession.TenantId) on
-                                                         e.BuyerCompanySSIN.Trim() equals s.SSIN.Trim() into j
+                                                         e.apptransaction.BuyerCompanySSIN.Trim() equals s.SSIN.Trim() into j
                                                          from a in j.DefaultIfEmpty()
-                                                         select new { Trans = e, TranSellerCode = x.Code, TranBuyerCode = a.Code };
+                                                         select new { Trans = e.apptransaction, TranSellerCode = x.Code, TranBuyerCode = a.Code,Log=e.log };
 
 
 
@@ -2148,12 +2230,17 @@ namespace onetouch.AppSiiwiiTransaction
                 var items = await pagedAndFilteredAppTransactionsRes.ToListAsync();
                 var totalCount = items.DistinctBy(e => e.Trans).Count();
                 var objList = items.DistinctBy(e => e.Trans).ToList();
-
+                var statusSentCode = await _helper.SystemTables.GetEntityObjectStatusSentEntityLog();
+                objList.ForEach(a=>a.Log.EntityObjectStatusId = statusSentCode);
+                objList.ForEach(a => a.Log.EntityObjectStatusCode = "Sent");
+                objList.ForEach(a => a.Log.SentDate = DateTime.Now);
                 // remove parent items from export based on parameter [Begin]
                 if (input.hasParentItems == false)
                 {
                     foreach (var transactions in objList)
                     {
+                      //  transactions.Log.ReadyToBeSent = false;
+                       // transactions.Log.SentDate = DateTime.Now;
                         var parentItems = transactions.Trans.AppTransactionDetails.Where(e => e.ParentId == null).ToList();
                         foreach (var parentItem in parentItems)
                         {
