@@ -36,7 +36,7 @@ import { Console, log } from 'console';
 })
 export class AccountInfoComponent extends AppComponentBase implements OnInit, AfterViewInit {
     @Input('viewMode') viewMode :boolean = false
-    @Input('accountId') accountId :number = this.appSession?.user?.accountId
+    @Input('accountId') accountId: number;
     @Input('accountLevel') accountLevel :AccountLevelEnum = AccountLevelEnum.Profile
     @ViewChild('createOrEditMember',{static:true}) createOrEditMember :CreateOrEditMemberComponent
     @ViewChild('viewMemberProfile',{static:true}) viewMemberProfile :ViewMemberProfileComponent
@@ -164,7 +164,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
     async ngOnInit() {
-        await this.handleComponentMode()
+        if (!this.accountId) {
+            this.accountId = this.appSession?.user?.accountId;
+          }
+        
+         this.handleComponentMode()
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange()
         this.initUploaders();
@@ -472,20 +476,30 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.coverPhoto = this.accountDataForView.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}` : undefined;
     }
     async getAccountDataForView() {
-        this.showMainSpinner()
-        const result = await this._AccountsServiceProxy.getAccountForView(this.accountId,5)
-        .toPromise()
-        .finally(
-            ()=> {
-                this.hideMainSpinner()
-            }
-        )
-        this.isPublished= result ? result.isPublished : false;
-        this.accountDataForView = result ? result.account : undefined
-        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId  ||  this.accountDataForView?.id == this.appSession.user?.accountId 
-        if(this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
-        if(this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
-    }
+        if (!this.accountId || isNaN(this.accountId)) {
+          console.warn('Invalid accountId passed to getAccountForView:', this.accountId);
+          return;
+        }
+      
+        this.showMainSpinner();
+        const result = await this._AccountsServiceProxy.getAccountForView(this.accountId, 5)
+          .toPromise()
+          .finally(() => this.hideMainSpinner());
+      
+        if (result) {
+          this.isPublished = result.isPublished;
+          this.accountDataForView = result.account;
+          this.isRecordOwner = [this.accountDataForView?.partnerId, this.accountDataForView?.id].includes(this.appSession.user?.accountId);
+      
+          if (this.accountDataForView?.logoUrl) {
+            this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
+          }
+          if (this.accountDataForView?.coverUrl) {
+            this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
+          }
+        }
+      }
+      
 
     async getMyAccountDataForView()  {
         let id = this.appSession.user.accountId
