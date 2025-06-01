@@ -27,28 +27,17 @@
         </div>
     
         <div    [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
-            
-    
-    
-    
-    
-    
-            <!-- merge -->
-            <!-- merge -->
             <app-address 
             [appTransactionsForViewDto]="appTransactionsForViewDto"
-         
             [isCreateOredit]="createOrEditshippingInfO"
+            [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
             [contactId]="contactIdShipFrom"
             (updateSelectedAddress)="updateShipFromAddress($event)"
-            [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
-    
             [selectedAddressDetails]="shipFromSelectedAdd"
             [showAddressType]="false"
             [canChange]="canChange"
             [currentTab]="currentTab"
-            [shipInfoIndex]="1"
-           
+            [shipInfoIndex]="1"     
             ></app-address>
         </div>
         <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
@@ -82,19 +71,15 @@
         <hr class="my-2" />
        <app-address 
        [shipInfoIndex]="2"
-      
        [canChange]="canChange"
        [currentTab]="currentTab"
        [appTransactionsForViewDto]="appTransactionsForViewDto"
+       [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
        [isCreateOredit]="createOrEditshippingInfO"
        [contactId]="contactIdShipTo"
        (updateSelectedAddress)="updateShipToAddress($event)"
-       [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) || !((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual) ) ? true : false"
-       [fromSalesRep]="(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual)  ? false : true"
        [selectedAddressDetails]="shipToSelectedAdd"
        [showAddressType]="false"
-       
-    
     
        ></app-address>
     </div>
@@ -179,91 +164,6 @@
     
           
     </div>
-
-    <div    [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
-        <app-address 
-        [appTransactionsForViewDto]="appTransactionsForViewDto"
-        [isCreateOredit]="createOrEditshippingInfO"
-        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
-        [contactId]="contactIdShipFrom"
-        (updateSelectedAddress)="updateShipFromAddress($event)"
-        [selectedAddressDetails]="shipFromSelectedAdd"
-        [showAddressType]="false"
-        [canChange]="canChange"
-        [currentTab]="currentTab"
-        [shipInfoIndex]="1"     
-        ></app-address>
-    </div>
-    <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-        <div class="header p-2 my-2 d-flex  justify-content-between">
-            <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
-            <!--<button [disabled]="(!enableSAveShipTo)" (click)="createOrEditTransaction()"
-             class="continuebtn text-center btn float-right">
-                 {{l("Continue")}}
-            </button>-->
-        </div>
-        <hr class="my-2" />
-        <div class="InfoForm pr-3 thin-scroll">
-            <div class="row ml-1"> 
-                <app-contact  
-                class="w-100"
-                [shipInfoIndex]="2"
-                (loadAddressComponent)="reloadAddresscomponentShipTo($event)"
-                [isCreateOrEdit]="createOrEditshippingInfO"
-                [activeTab]="activeTab"
-                [currentTab]="currentTab"
-                [appTransactionsForViewDto]="appTransactionsForViewDto"
-                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
-                (formValidityChanged)="isContactFormValid($event,2)"
-            ></app-contact>
-            </div>
-        </div>
-       
-   </div>
-   
-   <div   [ngClass]="createOrEditshippingInfO  ?  'd-block' : 'd-none'">
-    <hr class="my-2" />
-   <app-address 
-   [shipInfoIndex]="2"
-   [canChange]="canChange"
-   [currentTab]="currentTab"
-   [appTransactionsForViewDto]="appTransactionsForViewDto"
-   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
-   [isCreateOredit]="createOrEditshippingInfO"
-   [contactId]="contactIdShipTo"
-   (updateSelectedAddress)="updateShipToAddress($event)"
-   [selectedAddressDetails]="shipToSelectedAdd"
-   [showAddressType]="false"
-
-   ></app-address>
-</div>
-
-<div class="row edit-mode " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-    <div class="col-md-6 col-12 mb-4">
-        <label class="label mt-1 mb-1">{{l("Store")}}</label>
-<input type="text" class="form-control w-100" (input)="enterStore()"  [(ngModel)]="storeVal" #store/>
-    </div>
-    <div class="col-md-6 col-12 mb-4">
-        <label class="label mt-1 mb-1">{{l("ShipVia")}}</label>
-        <p-dropdown
-        (onChange)="selectShipVia($event)"
-        id="shipVia"
-        [(ngModel)]="appTransactionsForViewDto.shipViaId"
-        [options]="shipViaList"
-        name="shipVia"
-        styleClass="form-control aria-select"
-        [required]="true"
-        [placeholder]="'PleaseSelect' | localize"
-    >
-    </p-dropdown>
-    <p class="text-danger" *ngIf="!appTransactionsForViewDto.shipViaId">
-       <small>
-         Please select ship via option
-       </small>
-    </p>
-    </div>
-</div>
-
     
     </div>
     
