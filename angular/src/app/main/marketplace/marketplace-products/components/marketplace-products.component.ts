@@ -118,13 +118,13 @@ export class MarketplaceProductsComponent
         this.isSellerIdExists = localStorage.getItem("SellerSSIN")
             ? true
             : false;
-        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
-            this._AppMarketplaceItemsServiceProxy
-                .getAccountImages(localStorage.getItem("SellerSSIN"))
-                .subscribe((res) => {
-                    this.sellerData = res;
-                });
-        }
+            if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
+                this._AppMarketplaceItemsServiceProxy
+                    .getAccountImages(sessionStorage.getItem("SellerSSIN"))
+                    .subscribe((res) => {
+                        this.sellerData = res;
+                    });
+            }
         this.sortingData = [
             { label: "Product Name", value: "name" }, 
             { label: "Product code", value: "manufacturercode" },
