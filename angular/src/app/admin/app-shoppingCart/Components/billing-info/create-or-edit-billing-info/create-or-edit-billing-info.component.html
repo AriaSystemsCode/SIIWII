@@ -28,13 +28,13 @@
       
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <app-address 
+    
         [isCreateOredit]="createOrEditBillingInfo"
         [contactId]="contactIdApContact"
     
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
-        [fromSalesRep] ="appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.' && !isAccManual  ? false:true"
-        [showEditDelBtn]="appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual ?false : true"
+        [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && isAccManual) ? true : false"
         [showAddressType]="false"
         [currentTab]="currentTab"
                     [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -43,7 +43,6 @@
         [canChange]="canChange"
         [currentTab]="currentTab"
         [appTransactionsForViewDto]="appTransactionsForViewDto"
-   
         ></app-address>
     </div>
     

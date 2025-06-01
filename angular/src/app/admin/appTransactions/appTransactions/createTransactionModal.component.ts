@@ -1265,7 +1265,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
 
-
     changeTouchState(event){
         this.orderForm.controls['currencyId'].setValue(event.value)
         
