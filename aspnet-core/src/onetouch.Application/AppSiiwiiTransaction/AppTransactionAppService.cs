@@ -4545,6 +4545,23 @@ namespace onetouch.AppSiiwiiTransaction
         }
 
         //End
+        //I46[Start]
+        public async Task<bool> IsAccountConnected(string accountSSIN)
+        {
+            var account= await _appContactRepository.GetAll()
+                .Where(z => z.TenantId == AbpSession.TenantId && z.SSIN== accountSSIN).FirstOrDefaultAsync();
+            if (account == null)
+            {
+                return false;
+            }
+            else 
+            {
+                return true;
+            }
+        }
+
+       
+        //I46[End]
         //MMT37[Start]
         public async Task<List<ContactInformationOutputDto>> GetAccountConnectedContacts(string filter)
         {
