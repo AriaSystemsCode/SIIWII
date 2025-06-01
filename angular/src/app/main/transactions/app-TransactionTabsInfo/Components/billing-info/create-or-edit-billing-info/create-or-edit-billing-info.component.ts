@@ -1,7 +1,7 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList } from '@angular/core';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { finalize } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
 import * as moment from 'moment';
 import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
@@ -11,7 +11,7 @@ import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCarto
   templateUrl: './create-or-edit-billing-info.component.html',
   styleUrls: ['./create-or-edit-billing-info.component.scss']
 })
-export class CreateOrEditBillingInfoComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
+export class CreateOrEditBillingInfoComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
@@ -24,12 +24,10 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
   @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("ontabChange") ontabChange: EventEmitter<TransactionCartoccordionTabs> = new EventEmitter<TransactionCartoccordionTabs>()
 
-  @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
+  @ViewChildren(AddressComponent) addressComponentRefs: QueryList<AddressComponent>;
 
   isContactsValid: boolean = true;
   transactionCartoccordionTabs = TransactionCartoccordionTabs;
-  loadAddresComponentShipFrom: boolean = false;
-  loadAddresComponentShipTo: boolean = false;
   contactIdARContact: string = '';
   contactIdApContact: string = '';
   addressSelected: boolean = false;
@@ -46,6 +44,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
   isAccManual: boolean = false
   apContactdata;
   arContactdata;
+
+  subscriptions: Subscription[] = [];
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -57,15 +57,11 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
 
   ngAfterViewInit() {
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
-      this.loadAddresComponentShipFrom = true;
       this.contactIdApContact = this.apContactdata?.compId;
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
-
       this.contactIdARContact = this.arContactdata?.compId;
-      this.loadAddresComponentShipTo = true;
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+      addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, null);
+      addressComponents.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin, null);
     }
 
   }
@@ -98,12 +94,13 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
     } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER') {
       accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
     }
-    this._AppTransactionServiceProxy.isManualCompany(accSSin)
+    const subs = this._AppTransactionServiceProxy.isManualCompany(accSSin)
       .subscribe((res) => {
 
         this.isAccManual = res;
 
       })
+    this.subscriptions.push(subs)
   }
   updateTabInfo(addObj, contactRole) {
     let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
@@ -188,7 +185,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
 
   }
   loadpayTermsListListist() {
-    this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('PAYMENT-TERMS')
+    const subs = this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('PAYMENT-TERMS')
       .subscribe((res) => {
         this.payTermsListList = res;
         if (!this.appTransactionsForViewDto.paymentTermsId && this.payTermsListList.length == 1) {
@@ -197,6 +194,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
 
         }
       })
+    this.subscriptions.push(subs)
   }
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
@@ -205,14 +203,11 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
 
 
   reloadAddresscomponentAPContact(data) {
-
     this.apContactdata = data;
-
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
-
       this.contactIdApContact = this.apContactdata?.compId;
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+      addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, null);
     }
   }
 
@@ -220,19 +215,18 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
   reloadAddresscomponentARContact(data) {
     this.arContactdata = data;
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
-
       this.contactIdARContact = this.arContactdata?.compId;
-
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+      addressComponents.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin, null);
     }
   }
 
   createOrEditTransaction() {
     this.showMainSpinner()
+    this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    const subs = this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => {
         this.hideMainSpinner();
         this.refreshShoppingCart.emit(true)
@@ -249,6 +243,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
           }
         }
       });
+    this.subscriptions.push(subs)
   }
   onshowSaveBtn($event) {
     this.showSaveBtn = $event;
@@ -345,6 +340,22 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
     } else {
       this.isContactsValid = false;
     }
+
+  }
+
+  saveDates() {
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
+  ngOnDestroy() {
+    this.unsubscribeToAllSubscriptions();
 
   }
 }

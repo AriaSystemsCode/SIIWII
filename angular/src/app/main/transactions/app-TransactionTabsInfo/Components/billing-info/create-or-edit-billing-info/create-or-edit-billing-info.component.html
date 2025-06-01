@@ -1,10 +1,11 @@
 <div class="position-relative  thin-scroll">
 
     <div>
-        <div class="container-fluid pt-1 mb-3 " *ngIf="createOrEditBillingInfo">
-            <!-- AP Contact Section -->
+        <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
             <div class="header p-2 my-2 d-flex justify-content-between">
                 <h6><span class="headertxt">{{l("APContact")}} : </span></h6>
+
+
             </div>
             <hr class="my-2" />
             <div class="InfoForm pr-3 thin-scroll">
@@ -22,13 +23,13 @@
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
             <app-address [isCreateOredit]="createOrEditBillingInfo" [contactId]="contactIdApContact"
                 (updateSelectedAddress)="updateApContact($event)" [selectedAddressDetails]="apContactSelectedAdd"
+                [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && isAccManual) ? true : false"
                 [showAddressType]="false" [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto" [billingIndexInfo]="1" [canChange]="canChange"
                 [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"></app-address>
         </div>
 
-        <div class="container-fluid pt-1" *ngIf="createOrEditBillingInfo">
-            <!-- AR Contact Section -->
+        <div class="container-fluid pt-1" [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
             <div class="header p-2 my-2 d-flex justify-content-between">
                 <h6><span class="headertxt"> {{l("ARContact")}} : </span></h6>
             </div>
@@ -43,13 +44,9 @@
                         (formValidityChanged)="isContactFormValid($event,2)"></app-contact>
                 </div>
             </div>
-            <hr class="my-2" />
-
-
-
         </div>
 
-        <!-- Payment Terms -->
+
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
             <app-address [isCreateOredit]="createOrEditBillingInfo" [contactId]="contactIdARContact"
                 (updateSelectedAddress)="updateArContact($event)" [selectedAddressDetails]="arContactSelectedAdd"
@@ -57,7 +54,7 @@
                 [appTransactionsForViewDto]="appTransactionsForViewDto" [canChange]="canChange"
                 [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"></app-address>
         </div>
-        <div class="container-fluid pt-1 mb-3 mt-3" *ngIf="createOrEditBillingInfo">
+        <div class="container-fluid pt-1 mb-3 mt-3" [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
             <div class="header p-2 my-2 d-flex justify-content-between">
                 <h6><span class="headertxt">{{l("PaymentInformation")}} : </span></h6>
             </div>
@@ -79,8 +76,8 @@
         </div>
     </div>
 
-    <!-- View Mode -->
-    <div *ngIf="!createOrEditBillingInfo">
+
+    <div [ngClass]="!createOrEditBillingInfo   ?  'd-block' : 'd-none'">
         <app-view-billing-info (showBillingEditMode)="onshowBillingEditMode($event)"
             (onshowSaveBtn)="onshowSaveBtn($event)" [activeTab]="activeTab" [currentTab]="currentTab"
             [contactIdApContact]="contactIdApContact" [contactIdARContact]="contactIdARContact"
@@ -91,7 +88,7 @@
         </app-view-billing-info>
     </div>
 
-    <!-- Footer Buttons -->
+
     <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"

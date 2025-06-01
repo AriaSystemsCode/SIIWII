@@ -1,15 +1,16 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList } from '@angular/core';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { finalize } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
 import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
+import * as moment from 'moment';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
   styleUrls: ['./create-or-add-shipping-information.component.scss']
 })
-export class CreateOrAddShippingInformationComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
+export class CreateOrAddShippingInformationComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
@@ -22,13 +23,11 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   @Input("createOrEditshippingInfO") createOrEditshippingInfO: boolean = true;
   @Input("showSaveBtn") showSaveBtn: boolean = false;
 
-  @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
+  @ViewChildren(AddressComponent) addressComponentRefs: QueryList<AddressComponent>;
 
   transactionCartoccordionTabs = TransactionCartoccordionTabs;
   isshipFromContactsValid: boolean = false;
   isShipToContactsValid: boolean = false;
-  loadAddresComponentShipFrom: boolean = false;
-  loadAddresComponentShipTo: boolean = false;
   contactIdShipTo: string = '';
   contactIdShipFrom: string = '';
   addressSelected: boolean = false;
@@ -48,6 +47,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   shipFromData;
   shipToData;
 
+  subscriptions: Subscription[] = [];
 
 
   constructor(
@@ -62,17 +62,12 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   ngAfterViewInit() {
 
     if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
-      this.loadAddresComponentShipFrom = true;
       this.contactIdShipFrom = this.shipFromData?.compId;
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
-
-
-
       this.contactIdShipTo = this.shipToData?.compId;
-      this.loadAddresComponentShipTo = true;
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
+      const addressComponents = this.addressComponentRefs.toArray();
+      addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, null);
+      addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, null);
+
     }
 
   }
@@ -213,9 +208,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-
+    this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    const subs = this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => {
         this.hideMainSpinner();
         this.refreshShoppingCart.emit(true)
@@ -231,6 +226,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
             this.showSaveBtn = false;
         }
       });
+
+    this.subscriptions.push(subs)
   }
 
   enterStore() {
@@ -294,15 +291,16 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER') {
       accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
     }
-    this._AppTransactionServiceProxy.isManualCompany(accSSin)
+    const subs = this._AppTransactionServiceProxy.isManualCompany(accSSin)
       .subscribe((res) => {
 
         this.isAccManual = res;
 
       })
+    this.subscriptions.push(subs)
   }
   loadShipViaList() {
-    this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
+    const subs = this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
       .subscribe((res) => {
         this.shipViaList = res;
         if (!this.appTransactionsForViewDto.shipViaId && this.shipViaList.length == 1) {
@@ -313,6 +311,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
           this.shipViaValue = this.shipViaList.filter(item => item.value == this.appTransactionsForViewDto.shipViaId);
         }
       })
+    this.subscriptions.push(subs)
   }
   onshowSaveBtn($event) {
     this.showSaveBtn = $event;
@@ -329,25 +328,25 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   }
 
   reloadAddresscomponentShipFrom(data) {
-    this.shipFromData = data;
-    if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
+    this.shipFromData=data;
+    console.log(this.shipFromData,'this.shipFromData')
+    if(this.currentTab == TransactionCartoccordionTabs.ShippingInfo){
       this.contactIdShipFrom = this.shipFromData?.compId;
-
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
-    }
-    this.validateShippingTab();
-
+      const addressComponents = this.addressComponentRefs.toArray();
+addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin,null);
   }
+  this.validateShippingTab();
+
+}
   reloadAddresscomponentShipTo(data) {
-    this.shipToData = data;
-    if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
+  this.shipToData=data;
+    if(this.currentTab == TransactionCartoccordionTabs.ShippingInfo){
       this.contactIdShipTo = this.shipToData?.compId;
 
-      if (this.AddressComponentChild)
-        this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
-    }
-    this.validateShippingTab();
+  const addressComponents = this.addressComponentRefs.toArray();
+addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin,null);
+}
+this.validateShippingTab();
 
   }
 
@@ -366,4 +365,19 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     }
   }
 
+  saveDates() {
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
+  ngOnDestroy() {
+    this.unsubscribeToAllSubscriptions();
+
+  }
 }

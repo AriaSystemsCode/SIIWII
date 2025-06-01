@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
   AppEntitiesServiceProxy,
@@ -25,7 +25,7 @@ import { TransactionCartoccordionTabs } from "../../../enums/TransactionCartocco
   templateUrl: "./order-information.component.html",
   styleUrls: ["./order-information.component.scss"],
 })
-export class OrderInformationComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit {
+export class OrderInformationComponent extends AppComponentBase implements OnInit, OnChanges, AfterViewInit, OnDestroy {
 
   @ViewChild('calendar1') calendar1: Calendar;
   @ViewChild('calendar2') calendar2: Calendar;
@@ -144,16 +144,16 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
   }
 
   initDates(): void {
-    this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
-    this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
-    this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
-    this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
+    this.enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    this.startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    this.availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    this.completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
   }
 
   onReferenceChange() {
     this.appTransactionsForViewDto.reference = this.reference;
   }
-  
+
   openCalendar(calendar: Calendar) {
     calendar.inputfieldViewChild.nativeElement.click();
   }
@@ -161,11 +161,12 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
 
   getAllCurrencies() {
-    this._AppEntitiesServiceProxy
+    const subs = this._AppEntitiesServiceProxy
       .getAllCurrencyForTableDropdown()
       .subscribe((res: any) => {
         this.currencies = res;
       });
+    this.subscriptions.push(subs)
   }
 
   getCodeValue(code: string) {
@@ -303,16 +304,10 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     if (!this.availableDate || this.availableDate <= this.startDate) {
       this.availableDate = this.startDate;
     }
-
-    let enteredDate = this.enteredDate;
-    let startDate = this.startDate;
-    let availableDate = this.availableDate;
-    let completeDate = this.completeDate;
-
-    this.appTransactionsForViewDto.enteredDate = moment(enteredDate);
-    this.appTransactionsForViewDto.startDate = moment(startDate);
-    this.appTransactionsForViewDto.availableDate = moment(availableDate);
-    this.appTransactionsForViewDto.completeDate = moment(completeDate);
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(this.enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(this.startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(this.availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(this.completeDate).format('YYYY-MM-DD'));
 
 
   }
@@ -328,10 +323,10 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    const subs = this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
       .pipe(finalize(() => {
-     
+
       }))
 
       .subscribe((res) => {
@@ -347,7 +342,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
         }
       });
-
+    this.subscriptions.push(subs)
 
   }
 
@@ -515,7 +510,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     });
 
 
-    this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
+    const subs = this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
       .pipe(finalize(() => {
         this.getAppTransactionList();
       }))
@@ -527,7 +522,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
           this.notify.info('Updated Successfully');
         }
       });
-
+    this.subscriptions.push(subs)
     // Reset the flags and form inputs
     this.showExistCat = true;
     this.addSubCat = false;
@@ -710,7 +705,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
       id: isEditing ? this.parentClass.id : undefined,
     });
 
-    this._sycEntityObjectClassificationsServiceProxy.createOrEditForObjectTransaction(classificate)
+    const subs = this._sycEntityObjectClassificationsServiceProxy.createOrEditForObjectTransaction(classificate)
       .pipe(finalize(() => {
         this.getAppTransactionClassList()
 
@@ -725,6 +720,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
         }
 
       });
+    this.subscriptions.push(subs)
     this.showClassBtn = false
     this.addSubClas = false
     this.editSubClass = false
@@ -736,7 +732,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
 
   deleteCategory(cat: any) {
-    this._sycEntityObjectCategoriesServiceProxy.delete(cat.data.sycEntityObjectCategory.id)
+    const subs = this._sycEntityObjectCategoriesServiceProxy.delete(cat.data.sycEntityObjectCategory.id)
       .pipe(finalize(() => {
       }))
       .subscribe(() => {
@@ -745,12 +741,12 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
 
       });
-
+    this.subscriptions.push(subs)
 
   }
 
   deleteClassification(classi: any) {
-    this._sycEntityObjectClassificationsServiceProxy.delete(classi.data.sycEntityObjectClassification.id)
+    const subs = this._sycEntityObjectClassificationsServiceProxy.delete(classi.data.sycEntityObjectClassification.id)
       .pipe(finalize(() => {
       }))
       .subscribe(() => {
@@ -758,7 +754,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
         this.getAppTransactionClassList()
       });
 
-
+    this.subscriptions.push(subs)
 
   }
   cancelCategory() {
@@ -876,6 +872,9 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     }, 0); // Delay to force Angular to re-create the component
   }
 
+  ngOnDestroy() {
+    this.unsubscribeToAllSubscriptions();
 
+  }
 
 }

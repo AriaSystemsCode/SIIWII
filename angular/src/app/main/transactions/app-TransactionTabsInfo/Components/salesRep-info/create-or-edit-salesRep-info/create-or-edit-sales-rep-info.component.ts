@@ -3,6 +3,7 @@ import { AppTransactionServiceProxy, ContactRoleEnum, GetAppTransactionsForViewD
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-create-or-edit-sales-rep-info',
@@ -78,7 +79,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-
+    this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => {
@@ -117,5 +118,15 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   addNewSalesRep() {
     this.salesReps.push(this.salesReps.length);
   }
-
+  saveDates(){
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+  
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
 }
