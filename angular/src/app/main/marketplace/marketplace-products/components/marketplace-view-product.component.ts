@@ -6,6 +6,7 @@ import { animate, style, transition, trigger } from "@node_modules/@angular/anim
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+    AccountsServiceProxy,
     AppEntitiesServiceProxy,
     AppEntityAttachmentDto,
     AppItemForViewDto,
@@ -22,7 +23,7 @@ import {
 import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageService } from "abp-ng2-module";
 import * as moment from "moment";
-import { ConfirmEventType, ConfirmationService } from "primeng/api";
+import {  ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
 
@@ -85,13 +86,14 @@ export class MarketplaceViewProductComponent
     priceLevel :any
     showSpecialPrice: boolean = false;
     languageSettingName  =AppConsts.languageSettingName;
+    IsConnected : boolean = false
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private userClickService: UserClickService,
         private router: Router,
-        private _appTransactionServiceProxy: AppTransactionServiceProxy,
+        private AccountsServiceProxy: AccountsServiceProxy,
         private appItemsAppservice: AppItemsServiceProxy,
         injector: Injector
     ) {
@@ -120,29 +122,51 @@ export class MarketplaceViewProductComponent
     }
     onFilterTextChanged() {
         this.showIconClose = this.filterText.trim() !== '';
-
-
+    
+        if (!this.colorsData || this.colorsData.length === 0) {
+            return;
+        }
+    
         if (!this.filterText) {
-            this.filteredColors = this.colorsData;
+            this.filteredColors = [...this.colorsData];
         } else {
-            const filterTextLower = this.filterText?.toLowerCase();
-
+            const filterTextLower = this.filterText.toLowerCase().trim();
             this.filteredColors = this.colorsData.filter(color =>
-                (color?.colorName && color?.colorName?.toLowerCase()?.includes(filterTextLower)) ||
-                (color?.colorCodeSelectedValues && color?.colorCodeSelectedValues?.toLowerCase()?.includes(filterTextLower))
+                (color?.colorName && color.colorName.toLowerCase().includes(filterTextLower)) ||
+                (color?.colorCodeSelectedValues && color.colorCodeSelectedValues.toLowerCase().includes(filterTextLower))
             );
         }
-
-
+    
+        if (this.filteredColors.length > 0) {
+            this.currentIndex = 0;
+    
+            const firstFilteredCode = this.filteredColors[0]?.colorCodeSelectedValues?.toLowerCase()?.trim();
+            const originalIndex = this.colorsData.findIndex(color =>
+                color?.colorCodeSelectedValues?.toLowerCase()?.trim() === firstFilteredCode
+            );
+    
+           
+            this.isColorView = false
+            this.colorAttachmentForMainIamge = this.colorsData[originalIndex]?.colorImg;
+            this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments;
+           
+        } else {
+            this.currentIndex = 0;
+           
+        }
     }
-
-    clearFilterText(inputElement: HTMLInputElement) {
-        this.filterText = '';
-        this.filteredColors = this.colorsData;
-
-        this.showIconClose = false;
-        inputElement.focus();
-    }
+    
+    
+          clearFilterText(inputElement: HTMLInputElement) {
+            this.filterText = '';
+            this.filteredColors = this.colorsData;
+    
+            this.showIconClose = false;
+            inputElement.focus();
+            this.currentIndex = 0
+            this.setSizes(this.currentIndex);
+            this.scrollIntoView();
+          }
     getProductDetailsForView() {
         this.showMainSpinner();
         this.showEditSpecialPrice = true;
@@ -387,7 +411,7 @@ export class MarketplaceViewProductComponent
 
         else {
             if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[color.colorIndex])) {
-                // this.totalOrderQTY  = this.totalOrderQTY - this.cal
+   
                 let qty = 0;
                 let price = 0;
                 this.orderSummary[i].color.sizes.map((size) => {
@@ -573,8 +597,6 @@ export class MarketplaceViewProductComponent
     }
 
 
-
-
     getBuyerBranche() {
         this._AppTransactionServiceProxy.getAccountBranches(this.buyerDataofPO.buyerCompanySSIN).subscribe(result => {
 
@@ -596,11 +618,7 @@ export class MarketplaceViewProductComponent
     }
 
     addToShoppingCart() {
-
         if (this.isFromSellerRoom) {
-
-
-
             Swal.fire({
                 title: "",
                 text: "Are you sure you want to add ordered quantities to you cart ?",
@@ -667,175 +685,158 @@ export class MarketplaceViewProductComponent
             }
             )
         } else if (this.ismarketPLace) {
-
-            this.getBuyerInfoForPO()
-
-
-
-            this._appTransactionServiceProxy
-                .getNextOrderNumber("PO")
-                .pipe(finalize(() => {
-                    Swal.fire({
-                        title: "",
-                        text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
-                        icon: "info",
-                        showCancelButton: true,
-                        confirmButtonText:
-                            "Yes",
-                        cancelButtonText: "No",
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        backdrop: true,
-                        customClass: {
-                            popup: "popup-class",
-                            icon: "icon-class",
-                            content: "content-class",
-                            actions: "actions-class",
-                            confirmButton: "confirm-button-class2",
-                        },
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-
-
-                            this.showMainSpinner()
-
-
-
-                            this.body = {
-
-                                sellerContactName: null,
-
-                                buyerContactName: this.appSession.user.name,
-                                sellerContactId: null,
-                                buyerContactId: this.appSession.user.id,
-                                sellerContactEmailAddress: null,
-                                buyerContactEmailAddress: this.appSession.user.emailAddress,
-                                buyerContactPhoneNumber: '',
-                                sellerContactPhoneNumber: null,
-                                buyerCompanyName: this.appSession.tenancyName,
-                                sellerCompanyName: this.productData.sellerCompanyName,
-                                enteredByUserRole: "I'm a Buyer",
-                                code: this.orderNo,
-                                transactionType: 1,
-                                sellerContactSSIN: null,
-                                buyerContactSSIN: this.appSession.user.accountId,
-                                sellerCompanySSIN: this.productData.sellerSSIN,
-                                buyerCompanySSIN: this.buyerDataofPO.buyerCompanySSIN,
-                                buyerBranchSSIN: null,
-                                buyerBranchName: '*Main*',
-                                sellerBranchSSIN: null,
-                                sellerBranchName: '*Main*',
-                                completeDate: moment(new Date).format('YYYY-MM-DD'),
-                                enteredDate: moment(new Date).format('YYYY-MM-DD'),
-                                startDate: moment(new Date).format('YYYY-MM-DD'),
-                                availableDate: moment(new Date).format('YYYY-MM-DD'),
-                                reference: "",
-                                priceLevel: "MSRP",
-                                currencyId: this.appSession.tenant.currencyInfoDto.value
-                            };
-
-                            this._AppTransactionServiceProxy
-                                .createOrEdit(this.body)
-                                .pipe(finalize(() => {
-
-
-                                    for (let index = 0; index < this.colorsData?.length; index++) {
-                                        if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
-                                            this.productDetails.variations.map((variation: any) => {
-                                                if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
-                                                    let value = variation?.selectedValues[index];
-                                                    value.edRestAttributes.forEach((attr) => {
-                                                        if (attr.extraAttrName === "SIZE") {
-                                                            attr.values.forEach((sizeValue) => {
-                                                                sizeValue.orderedQty = sizeValue.orderedPrePacks;
-                                                                sizeValue.orderedPrePacks = 0;
-                                                            });
-                                                        }
-                                                    });
+            this._AppTransactionServiceProxy.isAccountConnected(this.productBodyData.sellerSSIN).pipe(
+                finalize(() => {})
+            )
+                .subscribe((res) => {
+                    if(res){
+                        this.getBuyerInfoForPO()
+                        this._AppTransactionServiceProxy
+                            .getNextOrderNumber("PO")
+                            .pipe(finalize(() => {
+                                Swal.fire({
+                                    title: "",
+                                    text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                                    icon: "info",
+                                    showCancelButton: true,
+                                    confirmButtonText:
+                                        "Yes",
+                                    cancelButtonText: "No",
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                    backdrop: true,
+                                    customClass: {
+                                        popup: "popup-class",
+                                        icon: "icon-class",
+                                        content: "content-class",
+                                        actions: "actions-class",
+                                        confirmButton: "confirm-button-class2",
+                                    },
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        this.showMainSpinner()
+                                        this.body = {
+            
+                                            sellerContactName: null,
+            
+                                            buyerContactName: this.appSession.user.name,
+                                            sellerContactId: null,
+                                            buyerContactId: this.appSession.user.id,
+                                            sellerContactEmailAddress: null,
+                                            buyerContactEmailAddress: this.appSession.user.emailAddress,
+                                            buyerContactPhoneNumber: '',
+                                            sellerContactPhoneNumber: null,
+                                            buyerCompanyName: this.appSession.tenancyName,
+                                            sellerCompanyName: this.productData.sellerCompanyName,
+                                            enteredByUserRole: "I'm a Buyer",
+                                            code: this.orderNo,
+                                            transactionType: 1,
+                                            sellerContactSSIN: null,
+                                            buyerContactSSIN: this.appSession.user.accountId,
+                                            sellerCompanySSIN: this.productData.sellerSSIN,
+                                            buyerCompanySSIN: this.buyerDataofPO.buyerCompanySSIN,
+                                            buyerBranchSSIN: null,
+                                            buyerBranchName: '*Main*',
+                                            sellerBranchSSIN: null,
+                                            sellerBranchName: '*Main*',
+                                            completeDate: moment(new Date).format('YYYY-MM-DD'),
+                                            enteredDate: moment(new Date).format('YYYY-MM-DD'),
+                                            startDate: moment(new Date).format('YYYY-MM-DD'),
+                                            availableDate: moment(new Date).format('YYYY-MM-DD'),
+                                            reference: "",
+                                            priceLevel: "MSRP",
+                                            currencyId: this.appSession.tenant.currencyInfoDto.value
+                                        };
+            
+                                        this._AppTransactionServiceProxy
+                                            .createOrEdit(this.body)
+                                            .pipe(finalize(() => {
+            
+            
+                                                for (let index = 0; index < this.colorsData?.length; index++) {
+                                                    if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
+                                                        this.productDetails.variations.map((variation: any) => {
+                                                            if (variation?.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                                                                let value = variation?.selectedValues[index];
+                                                                value.edRestAttributes.forEach((attr) => {
+                                                                    if (attr.extraAttrName === "SIZE") {
+                                                                        attr.values.forEach((sizeValue) => {
+                                                                            sizeValue.orderedQty = sizeValue.orderedPrePacks;
+                                                                            sizeValue.orderedPrePacks = 0;
+                                                                        });
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
                                                 }
+                                     
+            
+                                                let bodyRequest: any = {
+                                                    appItem: this.productDetails,
+                                                };
+                                                this.showMainSpinner();
+                                                this._AppTransactionServiceProxy
+                                                    .addTransactionDetails(
+                                                        localStorage.getItem("transNO"), 'PO',
+                                                        bodyRequest
+                                                    )
+                                                    .pipe(
+                                                        finalize(() => {
+                                                            this.hideMainSpinner();
+                                                     
+                                                            this.goToShowroom()
+                                                        })
+                                                    )
+                                                    .subscribe(async (res) => {
+            
+                                                        this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+            
+                                                    });
+            
+            
+                                            }))
+                                            .subscribe((response: any) => {
+            
+                                                this._AppTransactionServiceProxy
+                                                    .setCurrentUserActiveTransaction(
+                                                        response
+                                                    )
+                                                    .subscribe((res) => {
+            
+                                                        this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+            
+            
+                                                    });
+            
+                                                this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+                                                this.printInfoParam.TransactionId = response;
+                                                this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.body.enteredByUserRole);
+                                                this.printInfoParam.saveToPDF = true;
+                                                this.printInfoParam.tenantId = this.appSession?.tenantId
+                                                this.printInfoParam.userId = this.appSession?.userId
+                                                this.reportUrl = this.printInfoParam.getReportUrl()
+            
+                                                localStorage.setItem("fromSellerRoom", JSON.stringify(true));
+                                                localStorage.setItem("fromMarketPlace", JSON.stringify(false));
+                                                localStorage.setItem("transNO", this.orderNo);
+                                               this.goToShowroom()
                                             });
-                                        }
                                     }
-                         
-
-                                    let bodyRequest: any = {
-                                        appItem: this.productDetails,
-                                    };
-                                    this.showMainSpinner();
-                                    this._AppTransactionServiceProxy
-                                        .addTransactionDetails(
-                                            localStorage.getItem("transNO"), 'PO',
-                                            bodyRequest
-                                        )
-                                        .pipe(
-                                            finalize(() => {
-                                                this.hideMainSpinner();
-                                         
-                                                this.goToShowroom()
-                                            })
-                                        )
-                                        .subscribe(async (res) => {
-
-                                            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-
-                                        });
-
-
-                                }))
-                                .subscribe((response: any) => {
-
-                                    this._AppTransactionServiceProxy
-                                        .setCurrentUserActiveTransaction(
-                                            response
-                                        )
-                                        .subscribe((res) => {
-
-                                            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-
-
-                                        });
-
-
-
-                                    //////
-                                    this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
-                                    this.printInfoParam.TransactionId = response;
-                                    this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.body.enteredByUserRole);
-                                    this.printInfoParam.saveToPDF = true;
-                                    this.printInfoParam.tenantId = this.appSession?.tenantId
-                                    this.printInfoParam.userId = this.appSession?.userId
-                                    this.reportUrl = this.printInfoParam.getReportUrl()
-
-                                    localStorage.setItem("fromSellerRoom", JSON.stringify(true));
-                                    localStorage.setItem("fromMarketPlace", JSON.stringify(false));
-                               
-
-                                    localStorage.setItem("transNO", this.orderNo);
-
-                                   this.goToShowroom()
-
-
-
-
-
-                                });
-                        }
-
-
-
-
-
-
+                                }
+            
+                                )
+            
+                            }))
+                            .subscribe((res: any) => {
+                                this.orderNo = res;
+            
+                            });
+                    } else {
+                        this.IsConnected = true
                     }
-
-                    )
-
-                }))
-                .subscribe((res: any) => {
-                    this.orderNo = res;
-
                 });
+       
 
 
         }
@@ -900,8 +901,6 @@ export class MarketplaceViewProductComponent
 
 
     IsVariationOrdered() {
-
-
         this.appItemsAppservice.isVariationOrdered(this.productDetails?.code).pipe(
             finalize(() => {
 
@@ -913,7 +912,20 @@ export class MarketplaceViewProductComponent
 
     }
 
-
+    connect(accountId): void {
+        this.showMainSpinner();
+        this.AccountsServiceProxy
+            .connect(accountId,null)
+            .pipe(
+                finalize(() => {
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe(() => {
+                this.notify.success(this.l("SuccessfullyConnected"));
+            
+            });
+    }
 
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();

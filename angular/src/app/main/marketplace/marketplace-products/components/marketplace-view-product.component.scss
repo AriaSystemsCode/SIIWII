@@ -631,7 +631,6 @@ h6 {
             }
 
             .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-                /* color: #777 !important; */
                 border: none !important;
                 border-top-right-radius: 0px !important;
                 min-width: 135px !important;
@@ -864,4 +863,16 @@ h6 {
     border-radius: 6px !important;
     padding: 8px 32px !important;
     color: #fff !important;
+}
+.pBtnCancel {
+    color: #4A0D4A !important;
+    border: 1px solid #eee !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    background-color: #fff !important;
+}
+
+p-dialog {
+    border-radius: 20px !important;
+    padding: 20px !important;
 }
