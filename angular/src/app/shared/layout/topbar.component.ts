@@ -47,8 +47,7 @@ import {
 import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { Dropdown } from "primeng/dropdown";
-import { ShoppingCartViewComponentComponent } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
-import { ShoppingCartMode } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartMode";
+import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 
 export enum MarketPlace {
     Accounts,
@@ -157,7 +156,7 @@ export class TopBarComponent
     defaultBuyerLogo: string = "";
     _TransactionType = TransactionType;
     transactionType: string = "";
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
+    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     currencySymbol: string = "";
     visible:boolean =false;
     displaneSel :boolean =false;
@@ -237,6 +236,8 @@ export class TopBarComponent
     }
 
     ngOnInit() {
+        this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
+        this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
         // this._AppTransactionServiceProxy
         // .getRelatedAccounts()
         // .subscribe((res: any) => {
@@ -498,6 +499,11 @@ export class TopBarComponent
         });
     }
 
+    
+    onImageError(event: any, type: 'seller' | 'buyer') {
+      event.target.src = type === 'seller' ? this.defaultSellerLogo : this.defaultBuyerLogo;
+    }
+    
     getShoppingCartInfo(openShoppingCart: boolean = false) {
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
@@ -506,11 +512,6 @@ export class TopBarComponent
                     this.transactionType = "SO";
                 if (this.shoppingCartSummary?.orderType == this._TransactionType?.PurchaseOrder)
                     this.transactionType = "PO";
-
-                if (!this.shoppingCartSummary?.sellerLogo)
-                    this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
-                if (!this.shoppingCartSummary?.buyerLogo)
-                    this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
 
 
                   if(this.shoppingCartSummary?.amount)

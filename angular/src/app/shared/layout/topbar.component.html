@@ -163,22 +163,24 @@
 
                 <li  class="ml-2 nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
-                        [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' +  shoppingCartSummary?.sellerLogo  : defaultSellerLogo "
-                        onerror="this.onerror=null;this.src=defaultSellerLogo"
-                        class="navbar-brand"
-                        (mouseover)="displaneSel = true"
-                        (mouseleave)="displaneSel = false"
-                    />
+                    [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.sellerLogo : defaultSellerLogo"
+                    (error)="onImageError($event, 'seller')"
+                    class="navbar-brand"
+                    (mouseover)="displaneSel = true"
+                    (mouseleave)="displaneSel = false"
+                />
+                
                     <span *ngIf="displaneSel" class="tooltip-text">{{shoppingCartSummary?.sellerName}}</span>
                   </li>
                   <li  class="nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
                     [src]="shoppingCartSummary?.buyerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.buyerLogo : defaultBuyerLogo"
-                    onerror="this.onerror=null;this.src=defaultBuyerLogo"
-                        class="navbar-brand"
-                        (mouseover)="displaneBuy = true"
-                        (mouseleave)="displaneBuy = false"
-                    />
+                    (error)="onImageError($event, 'buyer')"
+                    class="navbar-brand"
+                    (mouseover)="displaneBuy = true"
+                    (mouseleave)="displaneBuy = false"
+                />
+                
                     <span *ngIf="displaneBuy" class="tooltip-text-b">{{shoppingCartSummary?.buyerName}}</span>
                   </li>
                   </ul>
@@ -960,7 +962,7 @@
     </div>
     <!-- Container wrapper -->
 </nav>
-<app-shopping-cart-view-component #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-shopping-cart-view-component>
+<app-transaction-information #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-transaction-information>
 
 <createTransactionModal *ngIf="!isHost"   (modalClose)="closeModal($event)" (refreshShoppingCartData)="getShoppingCartInfo()" [roles]="roles" [modalheaderName]="modalheaderName" [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"   ></createTransactionModal>
 

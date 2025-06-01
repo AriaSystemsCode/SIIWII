@@ -81,6 +81,14 @@ export class MarketplaceProductsComponent
 
     isFromSellerRoom:boolean
     ismarketPLace:boolean
+    items: any[];
+    minimumPrice: number;
+    maximumPrice: number;
+    timeOut: any;
+    onlyAvialbleStock: boolean;
+    appItemListId: any;
+    selectedDepartments: any;
+
     constructor(
         injector: Injector,
         private _router: Router,
@@ -107,16 +115,13 @@ export class MarketplaceProductsComponent
             this.buyerSSIN = JSON.parse(localStorage.getItem("BuyerSSIN"));
         }
    
-        // this.getAllProducts()
-        this.isSellerIdExists = sessionStorage.getItem("SellerSSIN")
+        this.isSellerIdExists = localStorage.getItem("SellerSSIN")
             ? true
             : false;
         if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
             this._AppMarketplaceItemsServiceProxy
-                //.getAccountImages(Number(localStorage.getItem("SellerId")))
-                .getAccountImages(sessionStorage.getItem("SellerSSIN"))
+                .getAccountImages(localStorage.getItem("SellerSSIN"))
                 .subscribe((res) => {
-                    console.log(">> sellerData", res);
                     this.sellerData = res;
                 });
         }
@@ -134,52 +139,12 @@ export class MarketplaceProductsComponent
         ];
         (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
             this.getAllCurrencies();
-        // this.selectedCurrrency =
-        // localStorage.getItem("currencyCode")=="undefined"  || JSON.parse(localStorage.getItem("currencyCode")) === null
-        //         ? this.tenantDefaultCurrency
-        //         : JSON.parse(localStorage.getItem("currencyCode"));
-        // this.currency =
-        // localStorage.getItem("currencyCode")=="undefined"  ||   JSON.parse(localStorage.getItem("currencyCode")) === null
-        //         ? this.tenantDefaultCurrency.code
-        //         : JSON.parse(localStorage.getItem("currencyCode")).code;
+
 
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
-        // init get products on screen initalization
-        // this.showMainSpinner();
-        // this._AppMarketplaceItemsServiceProxy
-        //     .getAll(
-        //         this.contactSSIN,
-        //         localStorage.getItem("SellerSSIN"),
-        //         null, // tenant id
-        //         null,
-        //         false, // false
-        //         this.searchInput, // search text
-        //         null, //null
-        //         null, //null
-        //         null, // null
-        //         [], // depratment
-        //         null,
-        //         null,
-        //         this.seletedOption.value,
-        //         false,
-        //         undefined, //'2022-2-2'
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         [], // ids
-        //         this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
-        //         this.selectedSort.value,
-        //         this.skipCount,
-        //         this.maxResultCount
-        //     )
-        //     .pipe(finalize(() => this.hideMainSpinner()))
-        //     .subscribe((result) => {
-        //         this.items = result.items;
-        //         this.pagesNumber = result.totalCount;
-        //         this.setCurrency();
-        //     });
-        // this.getCurrencyCurrent();
+        
+
 
         this.checkMediaQuery();
         this.getAspectatio();
@@ -211,7 +176,6 @@ export class MarketplaceProductsComponent
             this.selectedDepartments = parsedFilters.selectedDepartments ||  this.selectedDepartments;
             this.minimumPrice = parsedFilters.minimumPrice ||  this.minimumPrice;
             this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
-            // this.seletedOption = { value: parsedFilters.selectedOption } 
             this.onlyAvialbleStock = parsedFilters.onlyAvailableStock || false;
             this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
             this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
@@ -234,7 +198,6 @@ export class MarketplaceProductsComponent
     }
     
     ngOnChanges(changes: SimpleChanges) {
-        debugger
         alert("change")
         document.getElementById("_searchInput").focus();
       }
@@ -242,7 +205,6 @@ export class MarketplaceProductsComponent
         this.breakpointObserver
             .observe(["(max-width: 900px)"])
             .subscribe((state: BreakpointState) => {
-                console.log(">>", state.matches);
                 if (state.matches) {
                     this.isMobile = true;
                 } else {
@@ -253,10 +215,6 @@ export class MarketplaceProductsComponent
 
     getCurrencyCurrent() {
         this._pricingHelperService.getDefaultPricingInstance();
-        console.log(
-            ">>",
-            this._pricingHelperService.getDefaultPricingInstance()
-        );
     }
 
     getAllCurrencies() {
@@ -281,7 +239,6 @@ export class MarketplaceProductsComponent
         ]);
     }
 
-    items: any[];
 
     getAllProducts() {
         this.showMainSpinner();
@@ -313,8 +270,8 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                sessionStorage.getItem("SellerSSIN"),
-                null, // tenant id
+                localStorage.getItem("SellerSSIN"),
+                null,
                 requestParams.appItemListId ||  this.appItemListId,
                 false, // false
                 requestParams.searchText || this.searchInput,
@@ -379,7 +336,6 @@ export class MarketplaceProductsComponent
 
     }
 
-    timeOut: any;
     handleProductSearchText() {
         clearTimeout(this.timeOut);
         this.timeOut = setTimeout(() => {
@@ -402,25 +358,18 @@ export class MarketplaceProductsComponent
     handleSortingChange(data: any) {
         this.getAllProducts();
     }
-    onlyAvialbleStock: boolean;
     swtichStock(value) {
         this.onlyAvialbleStock = value.checked;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
 
     // start filter criteria
-    appItemListId: any;
     selectCatalog(value) {
         this.appItemListId = value.id;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
-    selectedDepartments: any;
+
     selectDepartment(value) {
-        console.log(value);
 
         if (value == null) {
             this.selectedDepartments = [];
@@ -429,62 +378,45 @@ export class MarketplaceProductsComponent
                 value.node.data.sycEntityObjectCategory.id,
             ];
         }
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
 
-    minimumPrice: number;
-    maximumPrice: number;
+
     setPriceFrom(value) {
         this.minimumPrice = value;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
     setPriceTo(value) {
         this.maximumPrice = value;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
 
     startShipData: any;
     setStartShipDate(value) {
         this.startShipData = value;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
 
     endShipData: any;
     setEndtShipDate(value) {
         this.endShipData = value;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
     startSoldOutData: any;
     setStartSoldOutDate(value) {
         this.startSoldOutData = value;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
     endSoldOutData: any;
     setEndSoldOutDate(value) {
         this.endSoldOutData = value;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
 
     brands: [] = [];
     selectBrands(value) {
         this.brands = value;
-        // if (!this.isMobile) {
             this.getAllProducts();
-        // }
     }
 
     resetProducts($event) {
@@ -511,46 +443,12 @@ export class MarketplaceProductsComponent
         this.onlyAvialbleStock = false
         localStorage.removeItem("productFilters");
         this.getAllProducts();
-        // this.showMainSpinner();
-        // this._AppMarketplaceItemsServiceProxy
-        //     .getAll(
-        //         this.contactSSIN,
-        //         localStorage.getItem("SellerSSIN"),
-        //         null, // tenant id
-        //         null,
-        //         false, // false
-        //         this.searchInput, // search text
-        //         null, //null
-        //         null, //null
-        //         null, // null
-        //         [], // depratment
-        //         null,
-        //         null,
-        //         this.seletedOption.value,
-        //         false,
-        //         undefined, //'2022-2-2'
-        //         undefined,
-        //         undefined,
-        //         undefined,
-        //         [], // ids
-        //         this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
-        //         this.selectedSort.value,
-        //         this.skipCount,
-        //         this.maxResultCount
-        //     )
-        //     .pipe(finalize(() => this.hideMainSpinner()))
-        //     .subscribe((result) => {
-        //         this.items = result.items;
-        //         this.pagesNumber = result.totalCount;
-        //         this.setCurrency();
-        //     });
-           
+
     }
 
     ngOnDestroy() {
-        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
-            // localStorage.removeItem("SellerId");
-            sessionStorage.removeItem("SellerSSIN");
+        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
+            localStorage.removeItem("SellerSSIN");
             localStorage.removeItem("BuyerSSIN");
         }
         localStorage.setItem("currencyCode", null);
@@ -568,7 +466,6 @@ export class MarketplaceProductsComponent
 
     applyFilters() {
         this.getAllProducts();
-        //  this.currency = this.selectedCurrrency.code;
         this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
         localStorage.setItem("currencyCode", this.currency);
 

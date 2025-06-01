@@ -102,33 +102,19 @@ import { AppTransactionServiceProxy } from "@shared/service-proxies/service-prox
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PostsModule } from './main/posts/posts.module';
 import { eventsModule } from './main/AppEvent/events.module';
-import { CreateTransactionModal } from "./admin/appTransactions/appTransactions/createTransactionModal.component";
-import { AppTransactionsBrowseComponent } from "./admin/appTransactions/appTransactions/appTransBrowse.component";
-import { ShoppingCartViewComponentComponent } from "./admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
 import { AccordionModule } from "primeng/accordion";
 import { TreeTableModule } from 'primeng/treetable';
-import { SalesOrderComponent } from "./admin/app-shoppingCart/Components/sales-order/sales-order.component";
-import {OrderPreviewComponent} from "./admin/app-shoppingCart/Components/order-preview/order-preview.component";
-import { ContactComponent } from "./admin/app-shoppingCart/Components/contact/contact.component";
 import { TreeSelectModule } from "primeng/treeselect";
 import { CalendarModule } from 'primeng/calendar';
-import { AddressComponent } from "./admin/app-shoppingCart/Components/address/address.component";
-import { CreateOrEditBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/Components/buyer-seller-contact-info/create-or-edit-buyer-seller-contact-info.component";
-import { ViewBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/Components/buyer-seller-contact-info/view-buyer-seller-contact-info.component";
 import { NotesComponent } from "./admin/shared/notes/notes.component";
 import { InteractionsModule } from "./main/interactions/interactions.module";
-import { ViewSalesRepInfoComponent } from "./admin/app-shoppingCart/Components/salesRep-info/view-sales-rep-info.component";
-import { CreateOrEditSalesRepInfoComponent } from "./admin/app-shoppingCart/Components/salesRep-info/create-or-edit-sales-rep-info.component";
-import { ViewShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/view-shipping-information/view-shipping-information.component";
-import { CreateOrAddShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
-import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/create-or-edit-billing-info/create-or-edit-billing-info.component";
-import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
 import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
-import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Components/share-transaction-tab/share-transaction-tab.component";
 import { TabViewModule } from 'primeng/tabview';
 import { SharedDynamicInputsModule } from "@shared/shared-module";
 import { ExtraAttributeDataService } from "./main/app-items/app-item-shared/services/extra-attribute-data.service";
-import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Components/create-or-edit-extra-data/create-or-edit-extra-data.component";
+import { TransactionModule } from "./main/transactions/transaction.module";
+import { NotesModule } from "./admin/shared/notes/notes.module";
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -182,26 +168,9 @@ import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Compone
         SessionTimeoutComponent,
         MenuSearchBarComponent,
         ActiveDelegatedUsersComboComponent,
-        CreateTransactionModal,
-        AppTransactionsBrowseComponent,
-        ShoppingCartViewComponentComponent,
-        SalesOrderComponent,
-        OrderPreviewComponent,
-        CreateOrEditBuyerSellerContactInfoComponent,
-        ViewBuyerSellerContactInfoComponent,
-        ContactComponent,
-        AddressComponent,
-        NotesComponent,
-        CreateOrEditSalesRepInfoComponent,
-        ViewSalesRepInfoComponent,
-        ViewShippingInformationComponent,
-        CreateOrAddShippingInformationComponent,
-        CreateOrEditBillingInfoComponent,
-        ViewBillingInfoComponent,
-        ShareTransactionTabComponent,
-        // mmmm
-        // mmmm
-        CreateOrEditExtraDataComponent
+
+  
+
     ],
     imports: [
         BrowserAnimationsModule,
@@ -246,8 +215,11 @@ import { CreateOrEditExtraDataComponent } from "./admin/app-shoppingCart/Compone
         CalendarModule, TooltipModule,DevExpressDemoModule,
         ChipModule,
         TabViewModule,
-        SharedDynamicInputsModule
+        SharedDynamicInputsModule,
+        NotesModule,
+        TransactionModule
     ],
+
     providers: [
         ImpersonationService,
         LinkedAccountService,

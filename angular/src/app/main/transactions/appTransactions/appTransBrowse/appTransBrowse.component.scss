@@ -1,0 +1,167 @@
+// @import "@app/assets/styles/base/variables";
+
+.list-toolbar-divider {
+    width: 2px;
+    height: 38px;
+    border-left: 1px dashed #B5B5C3 !important;
+}
+
+.searchBtn {
+    padding: 5px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    right: 0px;
+    background-color: transparent;
+
+    img {
+        position: absolute;
+        left: 16px;
+        z-index: 3;
+        width: 20px;
+        height: 20px;
+        top: 10px;
+    }
+}
+
+.m-input {
+    padding-left: 35px;
+}
+
+.searchBtn:hover {
+    border: none;
+    background-color: transparent;
+}
+
+::ng-deep .arrows {
+    .p-icon-wrapper {
+        position: initial !important;
+    }
+
+}
+
+::ng-deep {
+
+    .transBrow {
+        padding-top: 0px !important;
+    }
+
+    .kt-portlet {
+        margin-top: 0px !important;
+    }
+
+    .btn-group>.btn:not(:last-child):not(.dropdown-toggle),
+    .btn-group>.btn-group:not(:last-child)>.btn {
+
+        border-radius: 6px !important;
+
+    }
+
+    .bgPurpleM {
+        border-radius: 10px;
+        background: #4A0D4A !important;
+        color: #FFF !important;
+
+        /* Elevation 2 */
+        box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25);
+    }
+
+    .p-datatable .p-datatable-tbody>tr {
+        border-bottom: 1px solid #EEE;
+        background: #FFF;
+        color: #9E9E9E;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 700;
+    }
+
+    .p-datatable-thead {
+        color: #1B101B !important;
+    }
+
+    .p-datatable .p-sortable-column .p-sortable-column-icon {
+        color: #000 !important;
+    }
+
+    .purpleSortableIcon {
+        .p-icon-wrapper {
+            position: initial !important;
+
+        }
+    }
+}
+
+.top-sec {
+    border: 1px solid #EEE;
+    border-radius: 6px;
+    padding: 16px 20px;
+}
+
+.period-btn {
+
+    width: Hug (150px)px;
+    height: Hug (37px)px;
+    padding: 11px 20px 11px 20px;
+    gap: 10px;
+    border-radius: 8px;
+    background-color: #fff;
+    border: 1px solid rgba(238, 238, 238, 0.933333) !important;
+    color: #4A0D4A;
+    opacity: 0px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.selected-month-btn {
+    background:  #4A0D4A;
+    width: Hug (152px)px;
+    height: Hug (37px)px;
+    padding: 11px 20px 11px 20px;
+    gap: 10px;
+    border-radius: 8px;
+    opacity: 0px;
+    font-size: 16px;
+    font-weight: 700;
+
+    color: #FFFFFF;
+
+}
+
+.selected-year-btn {
+    background: #4A0D4A;
+    width: Hug (152px)px;
+    height: Hug (37px)px;
+    padding: 11px 20px 11px 20px;
+    gap: 10px;
+    border-radius: 8px;
+    opacity: 0px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #FFFFFF;
+
+}
+
+::ng-deep .detailTab {
+    .p-datatable .p-datatable-thead>tr>th {
+        border: 1px solid #E5E5E5 !important;
+        font-weight: 700 !important;
+        color: #1B101B !important;
+        text-align: center;
+
+    }
+
+    .p-datatable .p-datatable-tbody>tr>td {
+        border: 1px solid #E5E5E5 !important;
+        font-weight: 400 !important;
+        text-align: center;
+    }
+}
+
+.itemImg {
+
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+
+}

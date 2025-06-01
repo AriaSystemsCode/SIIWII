@@ -77,9 +77,6 @@ import { AppTenantPlansComponent } from "./appTenantPlans/appTenantPlans/appTena
 import { ViewAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans/view-appTenantPlan-modal.component";
 import { CreateOrEditAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans/create-or-edit-appTenantPlan-modal.component";
 
-import { AppTransactionsComponent } from "./appTransactions/appTransactions/appTransactions.component";
-import { ViewAppTransactionModalComponent } from "./appTransactions/appTransactions/view-appTransaction-modal.component";
-import { CreateOrEditAppTransactionModalComponent } from "./appTransactions/appTransactions/create-or-edit-appTransaction-modal.component";
 
 import { SycPlanServicesComponent } from "./sycPlanServices/sycPlanServices/sycPlanServices.component";
 import { ViewSycPlanServiceModalComponent } from "./sycPlanServices/sycPlanServices/view-sycPlanService-modal.component";
@@ -198,16 +195,6 @@ import { CreateOrEditWebhookSubscriptionModalComponent } from "./webhook-subscri
 import { WebhookSubscriptionDetailComponent } from "./webhook-subscription/webhook-subscription-detail.component";
 import { WebhookEventDetailComponent } from "./webhook-subscription/webhook-event-detail.component";
 import { AppBsModalModule } from "@shared/common/appBsModal/app-bs-modal.module";
-// import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
-// import { CreateOrEditDynamicParameterModalComponent } from './dynamic-entity-parameters/dynamic-parameter/create-or-edit-dynamic-parameter-modal.component';
-// import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
-// import { DynamicParameterValueComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-value/dynamic-parameter-value.component';
-// import { CreateOrEditDynamicParameterValueModalComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-value/create-or-edit-dynamic-parameter-value-modal.component';
-// import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
-// import { CreateEntityDynamicParameterModalComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/create-entity-dynamic-parameter-modal.component';
-// import { EntityDynamicParameterValueComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter-value/entity-dynamic-parameter-value.component';
-// import { ManageEntityDynamicParameterValuesModalComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter-value/manage-entity-dynamic-parameter-values-modal.component';
-// import { EntityDynamicParameterValueManagerComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter-value/entity-dynamic-parameter-value-manager/entity-dynamic-parameter-value-manager.component';
 import { CdkStepperModule } from "@angular/cdk/stepper";
 import { StepperComponent } from "./appAdvertisements/stepper/stepper.component";
 import { EmailingTemplateServiceProxy } from "@shared/service-proxies/service-proxies";
@@ -215,6 +202,8 @@ import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { TreeSelectModule } from 'primeng/treeselect';
+
+
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
@@ -263,12 +252,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
 		ViewValidationRuleModalComponent,
 		CreateOrEditValidationRuleModalComponent,
-		//AppSubscriptionPlanDetailsComponent,
-
-		//ViewAppSubscriptionPlanDetailModalComponent,
-		//CreateOrEditAppSubscriptionPlanDetailModalComponent,
-    // AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent,
-    // AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent,
 		SycCurrencyExchangeRatesComponent,
 
 		ViewSycCurrencyExchangeRatesComponent,
@@ -319,21 +302,12 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         CreateOrEditTicketNoteModalComponent,
         TicketNoteTicketLookupTableModalComponent,
         TicketsComponent,
-
         ViewTicketModalComponent,
         CreateOrEditTicketModalComponent,
-        //AppTenantActivitiesLogComponent,
-
-        //AppTenantActivitiesLogComponent,
         CreateOrEditAppTenantActivityLogComponent,
         AppTenantPlansComponent,
-
         ViewAppTenantPlanModalComponent,
         CreateOrEditAppTenantPlanModalComponent,
-        AppTransactionsComponent,
-
-        ViewAppTransactionModalComponent,
-        CreateOrEditAppTransactionModalComponent,
         SycPlanServicesComponent,
 
         ViewSycPlanServiceModalComponent,
@@ -414,16 +388,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         CreateOrEditWebhookSubscriptionModalComponent,
         WebhookSubscriptionDetailComponent,
         WebhookEventDetailComponent,
-        // DynamicParameterComponent,
-        // CreateOrEditDynamicParameterModalComponent,
-        // DynamicParameterDetailComponent,
-        // DynamicParameterValueComponent,
-        // CreateOrEditDynamicParameterValueModalComponent,
-        // EntityDynamicParameterComponent,
-        // CreateEntityDynamicParameterModalComponent,
-        // EntityDynamicParameterValueComponent,
-        // ManageEntityDynamicParameterValuesModalComponent,
-        // EntityDynamicParameterValueManagerComponent,
         StepperComponent,
 
     ],

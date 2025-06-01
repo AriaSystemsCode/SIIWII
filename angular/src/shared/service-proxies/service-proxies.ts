@@ -25088,6 +25088,61 @@ export class AppTransactionServiceProxy {
     }
 
     /**
+     * @param accountSSIN (optional) 
+     * @return Success
+     */
+    isAccountConnected(accountSSIN: string | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/IsAccountConnected?";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processIsAccountConnected(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processIsAccountConnected(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processIsAccountConnected(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param filter (optional) 
      * @return Success
      */
@@ -83936,6 +83991,8 @@ export class ShoppingCartSummary implements IShoppingCartSummary {
     validateOrder!: ValidateTransaction;
     orderType!: TransactionType;
     currencyCode!: string | undefined;
+    buyerName!: string | undefined;
+    sellerName!: string | undefined;
 
     [key: string]: any;
 
@@ -83966,6 +84023,8 @@ export class ShoppingCartSummary implements IShoppingCartSummary {
             this.validateOrder = _data["validateOrder"];
             this.orderType = _data["orderType"];
             this.currencyCode = _data["currencyCode"];
+            this.buyerName = _data["buyerName"];
+            this.sellerName = _data["sellerName"];
         }
     }
 
@@ -83994,6 +84053,8 @@ export class ShoppingCartSummary implements IShoppingCartSummary {
         data["validateOrder"] = this.validateOrder;
         data["orderType"] = this.orderType;
         data["currencyCode"] = this.currencyCode;
+        data["buyerName"] = this.buyerName;
+        data["sellerName"] = this.sellerName;
         return data;
     }
 }
@@ -84011,6 +84072,8 @@ export interface IShoppingCartSummary {
     validateOrder: ValidateTransaction;
     orderType: TransactionType;
     currencyCode: string | undefined;
+    buyerName: string | undefined;
+    sellerName: string | undefined;
 
     [key: string]: any;
 }
