@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList,ChangeDetectorRef } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList, ChangeDetectorRef } from '@angular/core';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize, Subscription } from 'rxjs';
@@ -210,7 +210,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
       addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, null);
     }
 
-    
+
   }
 
 

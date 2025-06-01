@@ -1323,7 +1323,7 @@ export class TransactionInformationComponent
         'USD',
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
-        // '',
+        '',
         id,
         undefined,
         undefined,
