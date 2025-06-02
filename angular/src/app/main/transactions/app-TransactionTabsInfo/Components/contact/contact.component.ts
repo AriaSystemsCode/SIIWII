@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { AccountBranchDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, PhoneNumberAndtype, SycIdentifierDefinitionsServiceProxy } from "@shared/service-proxies/service-proxies";
+import { AccountBranchDto, AccountsServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, PhoneNumberAndtype, SycIdentifierDefinitionsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { AppComponentBase } from "@shared/common/app-component-base";
-import { TransactionCartoccordionTabs } from "../../../enums/TransactionCartoccordionTabs";
-import { finalize, Subscription } from 'rxjs';
+import { TransactionCartoccordionTabs } from "@app/main/transactions/enums/TransactionCartoccordionTabs";
+
 
 @Component({
     selector: "app-contact",
@@ -22,6 +22,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     @Input("salesRepIndex") salesRepIndex: number = 1;
     @Input("shipInfoIndex") shipInfoIndex: number;
     @Input("billingIndexInfo") billingIndexInfo: number;
+    @Input() addressValid: boolean;
+    @Output() isTempComp = new EventEmitter<boolean>();
+    @Output() validateTempBuyer = new EventEmitter<boolean>();
     @Output("updateAppTransactionsForViewDto") updateAppTransactionsForViewDto = new EventEmitter<GetAppTransactionsForViewDto>();
     @Output() loadAddressComponent = new EventEmitter<object>();
 
@@ -45,9 +48,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     filteredBranches: any[] = []
     createManualComp: boolean = false;
     branchData: any
-    @Input() addressValid: boolean;
-    @Output() isTempComp = new EventEmitter<boolean>();
-    @Output() validateTempBuyer = new EventEmitter<boolean>();
+
     conNew: boolean = false
     comNew: boolean = false
     emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
@@ -56,25 +57,21 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     isCompanyExist: boolean = false
     isBranchExist: boolean = false
     isContactExist: boolean = false
-
-    subscriptions: Subscription[] = [];
     constructor(
         injector: Injector,
 
         private cdr: ChangeDetectorRef,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy
     ) {
         super(injector);
 
     }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
         this.getAppTransactionContactsIndex();
-        this.resetSelectedData()
-        this.setSelectedData()
+
         const value = localStorage.getItem("comNew");
         if (value) this.comNew = Boolean(value);
 
@@ -83,7 +80,23 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
         this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName;
 
-        this.getBranches();
+        await this.getBranches();
+
+        this.resetSelectedData();
+        this.setSelectedData();
+
+
+
+        this.isValidForm();
+
+
+        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
+            this.onClearText();
+        }
+
+        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.ssin) {
+            this.getContacts();
+        }
     }
 
 
@@ -117,6 +130,15 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
 
+    addName(event) {
+        const companyName = event.target.value;
+
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyName = companyName;
+
+
+    }
+
+
 
     createManualCompany(event, type?: string) {
         if (type == 'company') {
@@ -126,6 +148,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.saveManualBranch()
         }
         else if (type == 'contact') {
+
             localStorage.setItem("conNew", JSON.stringify(event?.target?.checked));
 
             this.saveManualContact()
@@ -146,13 +169,13 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         if (getNextEntityCodeRes)
             sequance = getNextEntityCodeRes;
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = sequance;
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // ✅ Add this line!
 
     }
 
     async saveManualBranch() {
         let sequance = "";
-        let tenancyName = this.appSession.tenancyName;
+
 
         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTBRANCH', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
@@ -248,12 +271,14 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.cdr.detectChanges();
         }
         this.getContacts(tempContact);
+
         if (this.loadAddressComponent) {
             this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id });
         }
         this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.contactName || '';
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = new GetContactInformationDto();
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = ''
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName = null
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = event?.email
 
@@ -358,6 +383,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
 
         if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType) {
+
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
             this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
 
@@ -375,7 +401,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     getContacts(tempContact: boolean = false) {
         if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
 
-            const subs = this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, undefined).subscribe(result => {
+            this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, undefined).subscribe(result => {
                 this.allContacts = result;
 
                 if (tempContact && this.allContacts?.length > 0 || (!tempContact && !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactSSIN && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName)) {
@@ -407,13 +433,11 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact);
                 }
             });
-            this.subscriptions.push(subs)
 
         }
         else if (!this.appTransactionsForViewDto.buyerCompanySSIN) {
 
             this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
-
         }
         else {
             this.allContacts = [];
@@ -437,13 +461,18 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     onClearText() {
         if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
-            const subs = this._AppTransactionServiceProxy.getAccountRelatedContactsList(
+
+
+            this._AppTransactionServiceProxy.getAccountRelatedContactsList(
                 this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN,
                 null
             ).subscribe((res: any) => {
+
                 this.filteredContacts = [...res];
+
+
+
             });
-            this.subscriptions.push(subs)
         }
     }
 
@@ -453,6 +482,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = event?.query;
         }
         if (this.allContacts && this.allContacts.length > 0) {
+            // Filtering logic
             const query = event?.query?.toLowerCase();
 
             this.filteredContacts = this.allContacts.filter(contact =>
@@ -460,7 +490,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             );
         } else {
             // Fetch contacts only if required and ensure selections are maintained
-            const subs = this._AppTransactionServiceProxy.getAccountRelatedContactsList(
+            this._AppTransactionServiceProxy.getAccountRelatedContactsList(
                 this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN,
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName
             ).subscribe((res: any) => {
@@ -470,59 +500,54 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     contact.name.toLowerCase().includes(event?.query?.toLowerCase())
                 );
 
+                // Set selected contact based on user input but don't overwrite existing selections
+
 
             });
-            this.subscriptions.push(subs)
         }
         this.isValidForm()
 
     }
 
-    getBranches(): void {
-        const contact = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex];
-        if (contact?.selectedCompany?.accountSSIN) {
-            const subs = this._AppTransactionServiceProxy.getAccountBranches(contact.selectedCompany.accountSSIN).subscribe(
-                (result) => {
-                    this.allBranches = result;
 
-                    if (contact.branchName) {
-                        contact.selectedBranch = this.allBranches?.find(x => x.name === contact.branchName);
-                    } else if (this.allBranches.length === 1) {
-                        contact.selectedBranch = this.allBranches[0];
-                    }
+    getBranches(): Promise<void> {
+        return new Promise(async (resolve) => {
+            const contact = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex];
+            if (contact?.selectedCompany?.accountSSIN) {
 
-                    if (contact.selectedBranch) {
-                        this.getBranchDetails(contact.selectedBranch.id);
-                    } else {
+
+                this._AppTransactionServiceProxy.getAccountBranches(contact.selectedCompany.accountSSIN)
+                    .subscribe(async (result) => {
+                        this.allBranches = result;
+
+                        if (contact.branchName) {
+                            contact.selectedBranch = this.allBranches?.find(x => x.name === contact.branchName);
+                        } else if (this.allBranches.length === 1) {
+                            contact.selectedBranch = this.allBranches[0];
+                        }
+
+                        if (contact.selectedBranch) {
+                            await this.getBranchDetails(contact.selectedBranch.id);
+                        } else {
+                            this.hideMainSpinner();
+                        }
+
+                        if (this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyCode) {
+                            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code =
+                                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode;
+                        }
+
+                        resolve();
+                    }, () => {
                         this.hideMainSpinner();
-                    }
-
-                    if (this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyCode) {
-                        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code =
-                            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].branchCode;
-                    }
-
-                    this.resetSelectedData();
-                    this.setSelectedData();
-                    this.isValidForm();
-
-                    if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
-                        this.onClearText();
-                    }
-
-                    if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.ssin) {
-                        this.getContacts();
-                    }
-                },
-                () => {
-                    this.hideMainSpinner();
-                }
-            );
-            this.subscriptions.push(subs)
-        } else {
-            this.hideMainSpinner();
-            this.isValidForm();
-        }
+                        resolve();
+                    });
+            } else {
+                this.hideMainSpinner();
+                this.isValidForm();
+                resolve();
+            }
+        });
     }
 
 
@@ -536,6 +561,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.tempAccount = false;
         this.tempContact = false;
         this.contactFilterValue = "";
+
         if ((this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN == "0" || !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName) {
             this.tempAccount = true;
             this.companyNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName + "*";
@@ -543,22 +569,22 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.companyFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName;
             this.contactNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName + "*";
 
+
             if (this.companyFilterValue)
                 this.handleCompanySearch(this.companyFilterValue);
         }
         else {
+
             this.tempAccount = false;
             if (this.appTransactionsForViewDto)
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN)
 
             if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
 
-
                 if (this.loadAddressComponent) {
                     this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id });
                 }
             }
-
 
         }
 
@@ -637,14 +663,11 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
                     (this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany == this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) ? this.comNew == false :
                         this.comNew == true) && ((this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany != this.companeyNames?.find(x => x.accountSSIN != this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN)) && (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name == null) ? this.conNew == false : (this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany == this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name != null || this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name != '')) ? this.conNew == false : this.conNew == true)
-            } else if (this.activeTab == this.transactionCartoccordionTabs.orderInfo) {
-                (isValid) = (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName != '') &&
-                    (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '')
             } else {
+
 
                 (isValid) = (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&
                     (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '')
-
 
             }
 
@@ -689,16 +712,14 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.contactFilterValue = "";
         }
 
-        // Reset contact details
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
+
 
         if (event) {
             // Assign new contact details
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = event?.code;
 
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName = event.name;
             this.allPhoneTypes = event?.phoneList;
             if (stop) {
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone || "";
@@ -735,6 +756,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
         this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+
         this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId || null;
         this.isValidForm();
     }
@@ -748,7 +770,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
         setTimeout(() => {
-            const subs = this._AppTransactionServiceProxy
+            this._AppTransactionServiceProxy
                 .getRelatedAccounts(
                     event.query,
                     undefined,
@@ -775,12 +797,11 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     this.companeyNames = [...res.items];
 
                 });
-            this.subscriptions.push(subs)
         }, 1000);
         this.isValidForm();
     }
     handleBranchSearch(event) {
-        const subs = this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
+        this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
             this.allBranches = result;
 
             this.filteredBranches = this.allBranches.filter(contact =>
@@ -789,29 +810,28 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
         });
-        this.subscriptions.push(subs)
         this.isValidForm();
     }
 
-    getBranchDetails(id): void {
-        if (!id || this.branchData?.id === id) {
-            return;
-        }
+    getBranchDetails(id): Promise<void> {
+        return new Promise((resolve) => {
+            if (!id || this.branchData?.id === id) {
+                resolve(); // Important: resolve early
+                return;
+            }
 
-        const subs = this._accountsServiceProxy.getBranchForEdit(id).subscribe(
-            res => {
+            this._accountsServiceProxy.getBranchForEdit(id).subscribe(res => {
                 this.branchData = res;
                 this.extractPhoneTypes(this.branchData, 'changed');
-            },
-            () => {
-            }
-        );
-        this.subscriptions.push(subs)
+                resolve();
+            }, () => {
+                resolve();
+            });
+        });
     }
 
+
     extractPhoneTypes(response: any, changeBranch?: any) {
-
-
         let arr: PhoneNumberAndtype[] = [];
 
         this.allPhoneTypes = [];
@@ -838,6 +858,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         });
 
         this.allPhoneTypes = [...arr];
+
         if (changeBranch == 'changed') {
             this.onchangePhoneType(this.allPhoneTypes[0]);
 
@@ -893,22 +914,19 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     isCodoExist(code: string, filed: string) {
         if (filed == 'company') {
             if (!code) return;
-            const subs = this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
+            this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
                 this.isCompanyExist = result;
             });
-            this.subscriptions.push(subs)
         } else if (filed == 'contact') {
             if (!code) return;
-            const subs2 = this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
+            this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
                 this.isContactExist = result;
             });
-            this.subscriptions.push(subs2)
         } else {
             if (!code) return;
-            const subs3 = this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
+            this._AppTransactionServiceProxy.isCodeAlreadyExists(code).subscribe(result => {
                 this.isBranchExist = result;
             });
-            this.subscriptions.push(subs3)
         }
 
     }
@@ -932,9 +950,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactCode = event?.target?.value.toUpperCase()
     }
 
-    ngOnDestroy() {
-        this.unsubscribeToAllSubscriptions();
 
-    }
 
 }
