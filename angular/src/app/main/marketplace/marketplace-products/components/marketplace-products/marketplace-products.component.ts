@@ -2,32 +2,20 @@
 
 
 import {
-    AfterViewInit,
     Component,
     Injector,
     OnDestroy,
     ViewChild,
-    OnInit,
    SimpleChanges, OnChanges, ViewChildren, ElementRef
 } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import {  Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
-import {
-    AppItemsBrowseComponentFiltersDisplayFlags,
-    AppItemsBrowseComponentStatusesFlags,
-    AppItemsBrowseComponentActionsMenuFlags,
-    AppItemsBrowseInputs,
-} from "@app/main/app-items/app-items-browse/models/app-item-browse-inputs.model";
 import { AppItemBrowseEvents } from "@app/main/app-items/app-items-browse/models/appItems-browse-events";
 import { ActionsMenuEventEmitter } from "@app/main/app-items/app-items-browse/models/ActionsMenuEventEmitter";
 import {
     AppEntitiesServiceProxy,
-    AppItemsServiceProxy,
     AppMarketplaceItemsServiceProxy,
-    ItemsFilterTypesEnum,
 } from "@shared/service-proxies/service-proxies";
-import { SelectItem } from "primeng/api";
-import { BrowseMode } from "@app/main/app-items/app-items-browse/models/BrowseModeEnum";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { PricingHelpersService } from "@app/main/app-items/app-item-shared/services/pricing-helpers.service";
 import { AppSessionService } from "@shared/common/session/app-session.service";
@@ -36,7 +24,7 @@ import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { BreakpointObserver, BreakpointState } from "@angular/cdk/layout";
 import { Paginator } from "primeng/paginator";
-import { ProdcutCardComponent } from "./prodcut-card/prodcut-card.component";
+import { ProdcutCardComponent } from "../prodcut-card/prodcut-card.component";
 @Component({
     selector: "app-marketplace-products",
     templateUrl: "./marketplace-products.component.html",
@@ -47,8 +35,7 @@ import { ProdcutCardComponent } from "./prodcut-card/prodcut-card.component";
 export class MarketplaceProductsComponent
     extends AppComponentBase
     implements OnDestroy , OnChanges  {
-    @ViewChild("AppItemsBrowseComponent")
-    appItemsBrowseComponent: AppItemsComponent;
+    @ViewChild("AppItemsBrowseComponent") appItemsBrowseComponent: AppItemsComponent;
     @ViewChildren(ProdcutCardComponent) ProdcutCardComponent: ProdcutCardComponent;
     isFilterHidden: boolean = false;
     sellerData: any;
@@ -88,7 +75,6 @@ export class MarketplaceProductsComponent
     onlyAvialbleStock: boolean;
     appItemListId: any;
     selectedDepartments: any;
-
     constructor(
         injector: Injector,
         private _router: Router,
@@ -97,7 +83,6 @@ export class MarketplaceProductsComponent
         private _pricingHelperService: PricingHelpersService,
         public datepipe: DatePipe,
         public breakpointObserver: BreakpointObserver,
-        private eleRef: ElementRef
     ) {
         super(injector);
         this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
@@ -115,16 +100,16 @@ export class MarketplaceProductsComponent
             this.buyerSSIN = JSON.parse(localStorage.getItem("BuyerSSIN"));
         }
    
-        this.isSellerIdExists = localStorage.getItem("SellerSSIN")
+        this.isSellerIdExists = sessionStorage.getItem("SellerSSIN")
             ? true
             : false;
-            if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
-                this._AppMarketplaceItemsServiceProxy
-                    .getAccountImages(sessionStorage.getItem("SellerSSIN"))
-                    .subscribe((res) => {
-                        this.sellerData = res;
-                    });
-            }
+        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
+            this._AppMarketplaceItemsServiceProxy
+                .getAccountImages(sessionStorage.getItem("SellerSSIN"))
+                .subscribe((res) => {
+                    this.sellerData = res;
+                });
+        }
         this.sortingData = [
             { label: "Product Name", value: "name" }, 
             { label: "Product code", value: "manufacturercode" },
@@ -151,26 +136,13 @@ export class MarketplaceProductsComponent
        
     }
 
-    getAspectatio() {
-        let sycAttachmentCategoryImage;
-        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
-            result.forEach(item => {
-                if (item.code == "IMAGE") {
-                    sycAttachmentCategoryImage = item
-                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
-                    this.acceptedAspectRatio = Number(width) / Number(height);
-                    return;
-                }
-            });
-        });
-    }
+ 
     ngOnInit() {
         const savedFilters = localStorage.getItem("productFilters");
         
         if (savedFilters) {
             const parsedFilters = JSON.parse(savedFilters);
-    
-          
+        
             this.appItemListId = parsedFilters.appItemListId ||   this.appItemListId;
             this.searchInput = parsedFilters.searchText||    this.searchInput;
             this.selectedDepartments = parsedFilters.selectedDepartments ||  this.selectedDepartments;
@@ -201,6 +173,19 @@ export class MarketplaceProductsComponent
         alert("change")
         document.getElementById("_searchInput").focus();
       }
+      getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.acceptedAspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
+    }
     checkMediaQuery() {
         this.breakpointObserver
             .observe(["(max-width: 900px)"])
@@ -245,7 +230,7 @@ export class MarketplaceProductsComponent
     
         const requestParams = {
             contactSSIN: this.contactSSIN,
-            sellerSSIN: localStorage.getItem("SellerSSIN"),
+            sellerSSIN: sessionStorage.getItem("SellerSSIN"),
             tenantId: null,
             appItemListId: this.appItemListId,
             searchText: this.searchInput,
@@ -270,7 +255,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                localStorage.getItem("SellerSSIN"),
+                sessionStorage.getItem("SellerSSIN"),
                 null,
                 requestParams.appItemListId ||  this.appItemListId,
                 false, // false
@@ -447,8 +432,8 @@ export class MarketplaceProductsComponent
     }
 
     ngOnDestroy() {
-        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
-            localStorage.removeItem("SellerSSIN");
+        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
+            sessionStorage.removeItem("SellerSSIN");
             localStorage.removeItem("BuyerSSIN");
         }
         localStorage.setItem("currencyCode", null);

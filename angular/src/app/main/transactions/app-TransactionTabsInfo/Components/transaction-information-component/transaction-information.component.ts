@@ -1,10 +1,9 @@
 import {
-  Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild
-  , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
-  ChangeDetectorRef,
+  Component, EventEmitter, Injector, OnInit, Output, ViewChild
+  , ViewChildren, QueryList, ViewContainerRef, ComponentFactoryResolver,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AddVariationToInputDto, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, CreateOrEditAppItemDto, CurrencyInfoDto, GetAccountInformationOutputDto, GetAllEntityObjectTypeOutput, GetAppMarketItemForViewDto, GetAppMarketplaceItemDetailForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, LookupLabelDto, MarketplaceExtraDataAttrDto, PagedResultDtoOfGetAccountInformationOutputDto, SycEntityObjectTypesServiceProxy, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import {AppEntitiesServiceProxy,AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAllEntityObjectTypeOutput, GetAppMarketItemForViewDto, GetAppMarketplaceItemDetailForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, SycEntityObjectTypesServiceProxy, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -611,7 +610,7 @@ export class TransactionInformationComponent
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.appTransactionsForViewDto?.sellerCompanySSIN) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         "SellerSSIN",
         JSON.stringify(this.appTransactionsForViewDto?.sellerCompanySSIN)
       );

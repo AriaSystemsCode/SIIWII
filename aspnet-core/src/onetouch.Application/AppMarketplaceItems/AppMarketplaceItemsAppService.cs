@@ -1307,6 +1307,13 @@ namespace onetouch.AppMarketplaceItems
                                && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
                         if (contactSeller != null)
                         {
+                            var marketplaceSellerAccount =  await _appContactRepository.GetAll().Where(a => a.TenantId == null && a.ParentId == null
+                               && a.PartnerId == contactSeller.Id && a.IsProfileData == false && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                            if (marketplaceSellerAccount!=null)
+                            {
+                                output.SellerMarketPlaceAccountId = marketplaceSellerAccount.Id;
+                            }
+
                             output.SellerSSIN = contactSeller.SSIN;
                             output.SellerCompanyName = contactSeller.Name;
                             var contactSellerBranches = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == contactSeller.Id

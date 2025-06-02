@@ -28,6 +28,7 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public string SellerCompanyName { set; get; }
         public string SellerBranchSSIN { set; get; }
         public string SellerBranchName { set; get; }
+        public long SellerMarketPlaceAccountId { set; get; }
         //I46[End]
     }
     public class GetAppMarketplaceItemWithPagedAttributesForViewInput : GetAppItemWithPagedAttributesInput

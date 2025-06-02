@@ -215,9 +215,9 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   applyNeededPropertiesBeforeSaving() {
     this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    this.appTransactionsForViewDto.appTransactionContacts[1].companyCode = this.appTransactionsForViewDto?.appTransactionContacts[1].selectedCompany.code
-    this.appTransactionsForViewDto.appTransactionContacts[1].contactCode = this.appTransactionsForViewDto?.appTransactionContacts[1].selectedContact.code
-    this.appTransactionsForViewDto.appTransactionContacts[1].branchCode = this.appTransactionsForViewDto?.appTransactionContacts[1].selectedBranch.code
+    this.appTransactionsForViewDto.appTransactionContacts[1].companyCode = this.appTransactionsForViewDto?.appTransactionContacts[1]?.selectedCompany?.code
+    this.appTransactionsForViewDto.appTransactionContacts[1].contactCode = this.appTransactionsForViewDto?.appTransactionContacts[1]?.selectedContact?.code
+    this.appTransactionsForViewDto.appTransactionContacts[1].branchCode = this.appTransactionsForViewDto?.appTransactionContacts[1]?.selectedBranch?.code
   }
 
 

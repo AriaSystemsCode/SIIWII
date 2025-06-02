@@ -1,6 +1,5 @@
-import { Component, ElementRef, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { AppItemViewInput } from "@app/main/app-items/app-item-view/models/app-item-view-input";
+import { Component, Injector, OnDestroy, OnInit} from "@angular/core";
+import { Router } from "@angular/router";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 import { animate, style, transition, trigger } from "@node_modules/@angular/animations";
 import { AppConsts } from "@shared/AppConsts";
@@ -9,9 +8,7 @@ import {
     AccountsServiceProxy,
     AppEntitiesServiceProxy,
     AppEntityAttachmentDto,
-    AppItemForViewDto,
     AppItemsServiceProxy,
-    AppMarketplaceItemForViewDto,
     AppMarketplaceItemsServiceProxy,
     AppTransactionServiceProxy,
     CurrencyInfoDto,
@@ -183,6 +180,7 @@ export class MarketplaceViewProductComponent
 
                 if (res?.currencyCode)
                     this.productBodyData.currencyCode = res?.currencyCode;
+              
                 this._AppMarketplaceItemsServiceProxy
                     .getMarketplaceAppItemForView(
                         undefined,
@@ -642,8 +640,6 @@ export class MarketplaceViewProductComponent
             }).then((result) => {
                 if (result.isConfirmed) {
 
-
-                    /////
                     for (let index = 0; index < this.colorsData?.length; index++) {
                         if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
                             this.productDetails.variations.map((variation: any) => {
@@ -846,7 +842,7 @@ export class MarketplaceViewProductComponent
 
     goToShowroom() {
         localStorage.removeItem("productFilters");
-        localStorage.setItem(
+        sessionStorage.setItem(
             "SellerSSIN",
             JSON.stringify(this.productData.sellerSSIN)
         );
@@ -914,10 +910,11 @@ export class MarketplaceViewProductComponent
 
     }
 
-    connect(accountId): void {
+    connect(): void {
+        console.log(this.productData.sellerMarketPlaceAccountId,'mmm')
         this.showMainSpinner();
         this.AccountsServiceProxy
-            .connect(accountId,null)
+            .connect(this.productData.sellerMarketPlaceAccountId,null)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Output, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Injector, Output, Input, SimpleChanges } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppConsts } from '@shared/AppConsts';
 import { AppTransactionServiceProxy, AppPostsServiceProxy, SharingTransactionOptions, TransactionSharingDto, TenantTransactionInfo, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';

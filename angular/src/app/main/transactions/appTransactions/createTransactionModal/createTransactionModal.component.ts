@@ -12,7 +12,6 @@ import { SelectItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
-    FormGroupName,
     Validators,
 } from "@angular/forms";
 import { finalize } from "rxjs";
@@ -178,7 +177,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.buyerCompanySSIN = ''
-        this.sellerCompanySSIN = ''
     }
 
     updateControlState() {
