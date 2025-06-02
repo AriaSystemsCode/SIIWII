@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { AccountBranchDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, PhoneNumberAndtype, SycIdentifierDefinitionsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { TransactionCartoccordionTabs } from "../../../enums/TransactionCartoccordionTabs";
-import { finalize, Subscription } from 'rxjs';
+import {  Subscription } from 'rxjs';
 
 @Component({
     selector: "app-contact",
@@ -14,7 +14,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     companeyNames: any[];
     @Input() showDepartment: boolean = false;
     __selectedPhoneTypeValue: number;
-    @Output() formValidityChanged = new EventEmitter<boolean>();
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("activeTab") activeTab: number;
     @Input("currentTab") currentTab: number;
@@ -22,8 +21,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     @Input("salesRepIndex") salesRepIndex: number = 1;
     @Input("shipInfoIndex") shipInfoIndex: number;
     @Input("billingIndexInfo") billingIndexInfo: number;
+    @Input() addressValid: boolean;
+    @Output() isTempComp = new EventEmitter<boolean>();
+    @Output() validateTempBuyer = new EventEmitter<boolean>();
     @Output("updateAppTransactionsForViewDto") updateAppTransactionsForViewDto = new EventEmitter<GetAppTransactionsForViewDto>();
     @Output() loadAddressComponent = new EventEmitter<object>();
+    @Output() formValidityChanged = new EventEmitter<boolean>();
 
     appTransactionContactsIndex = -1;
 
@@ -45,9 +48,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     filteredBranches: any[] = []
     createManualComp: boolean = false;
     branchData: any
-    @Input() addressValid: boolean;
-    @Output() isTempComp = new EventEmitter<boolean>();
-    @Output() validateTempBuyer = new EventEmitter<boolean>();
+
     conNew: boolean = false
     comNew: boolean = false
     emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
@@ -64,7 +65,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         private cdr: ChangeDetectorRef,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy
     ) {
         super(injector);
@@ -140,8 +140,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     async saveManualAccount() {
         let sequance = "";
-        let tenancyName = this.appSession.tenancyName;
-
         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTCONTACT', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
             sequance = getNextEntityCodeRes;
@@ -152,7 +150,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     async saveManualBranch() {
         let sequance = "";
-        let tenancyName = this.appSession.tenancyName;
 
         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTBRANCH', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
@@ -689,15 +686,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.contactFilterValue = "";
         }
 
-        // Reset contact details
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
 
         if (event) {
             // Assign new contact details
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = event?.code;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName = event.name;
 
             this.allPhoneTypes = event?.phoneList;
             if (stop) {
