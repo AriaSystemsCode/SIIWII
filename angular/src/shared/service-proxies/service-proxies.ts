@@ -77250,6 +77250,7 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
     sellerCompanyName!: string | undefined;
     sellerBranchSSIN!: string | undefined;
     sellerBranchName!: string | undefined;
+    sellerMarketPlaceAccountId!: number;
 
     [key: string]: any;
 
@@ -77273,6 +77274,7 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.sellerBranchSSIN = _data["sellerBranchSSIN"];
             this.sellerBranchName = _data["sellerBranchName"];
+            this.sellerMarketPlaceAccountId = _data["sellerMarketPlaceAccountId"];
         }
     }
 
@@ -77294,6 +77296,7 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["sellerBranchSSIN"] = this.sellerBranchSSIN;
         data["sellerBranchName"] = this.sellerBranchName;
+        data["sellerMarketPlaceAccountId"] = this.sellerMarketPlaceAccountId;
         return data;
     }
 }
@@ -77304,6 +77307,7 @@ export interface IGetAppMarketplaceItemDetailForViewDto {
     sellerCompanyName: string | undefined;
     sellerBranchSSIN: string | undefined;
     sellerBranchName: string | undefined;
+    sellerMarketPlaceAccountId: number;
 
     [key: string]: any;
 }

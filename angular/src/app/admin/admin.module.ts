@@ -6,13 +6,6 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ValidationRulesComponent } from './validationRules/validationRules/validationRules.component';
 import { ViewValidationRuleModalComponent } from './validationRules/validationRules/view-validationRule-modal.component';
 import { CreateOrEditValidationRuleModalComponent } from './validationRules/validationRules/create-or-edit-validationRule-modal.component';
-
-import { AppSubscriptionPlanDetailsComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetails.component';
-import { ViewAppSubscriptionPlanDetailModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/view-appSubscriptionPlanDetail-modal.component';
-import { CreateOrEditAppSubscriptionPlanDetailModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/create-or-edit-appSubscriptionPlanDetail-modal.component';
-// import { AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appSubscriptionPlanHeader-lookup-table-modal.component';
-// import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appFeature-lookup-table-modal.component';
-
 import { SycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/sycCurrencyExchangeRates.component';
 import { ViewSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/view-sycCurrencyExchangeRates.component';
 import { CreateOrEditSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/create-or-edit-sycCurrencyExchangeRates.component';
@@ -21,7 +14,6 @@ import { AppTenantInvoicesComponent } from './appSubscriptionPlans/appTenantInvo
 import { ViewAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/view-appTenantInvoice.component';
 import { CreateOrEditAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/create-or-edit-appTenantInvoice.component';
 
-//import { AppTenantActivitiesLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component';
 import { ViewAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/view-appTenantActivityLog.component';
 import { CreateOrEditAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/create-or-edit-appTenantActivityLog.component';
 
@@ -68,10 +60,6 @@ import { TicketNoteTicketLookupTableModalComponent } from "./autoTaskTicketNotes
 import { TicketsComponent } from "./autoTaskTickets/tickets/tickets.component";
 import { ViewTicketModalComponent } from "./autoTaskTickets/tickets/view-ticket-modal.component";
 import { CreateOrEditTicketModalComponent } from "./autoTaskTickets/tickets/create-or-edit-ticket-modal.component";
-
-//import { AppTenantsActivitiesLogsComponent } from "./app/admin/appSubScriptionPlan/appTenantActivitiesLog/appTenantsActivitiesLogs.component";
-//import { ViewAppTenantsActivitiesLogModalComponent } from "./appTenantsActivitiesLogs/appTenantsActivitiesLogs/view-appTenantsActivitiesLog-modal.component";
-//import { CreateOrEditAppTenantsActivitiesLogModalComponent } from "./appTenantsActivitiesLogs/appTenantsActivitiesLogs/create-or-edit-appTenantsActivitiesLog-modal.component";
 
 import { AppTenantPlansComponent } from "./appTenantPlans/appTenantPlans/appTenantPlans.component";
 import { ViewAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans/view-appTenantPlan-modal.component";
@@ -201,7 +189,6 @@ import { EmailingTemplateServiceProxy } from "@shared/service-proxies/service-pr
 import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
-import { TreeSelectModule } from 'primeng/treeselect';
 
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -260,7 +247,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
 		ViewAppTenantInvoiceComponent,
 		CreateOrEditAppTenantInvoiceComponent,
-		//AppTenantActivitiesLogComponent,
 
 		ViewAppTenantActivityLogComponent,
 		CreateOrEditAppTenantActivityLogComponent,

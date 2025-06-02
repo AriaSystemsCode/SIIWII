@@ -25,7 +25,7 @@ export class SellerDataComponent extends AppComponentBase {
     ngOnInit(): void {
         if (localStorage.getItem("SellerId")) {
             this._AppMarketplaceItemsServiceProxy
-                .getAccountImages(localStorage.getItem("SellerSSIN"))
+                .getAccountImages(sessionStorage.getItem("SellerSSIN"))
                 .subscribe((res) => {
                     this.sellerData = res;
                     this.bannerImg = this.attachmentBaseUrl + '/' + this.sellerData?.bannerImage;
