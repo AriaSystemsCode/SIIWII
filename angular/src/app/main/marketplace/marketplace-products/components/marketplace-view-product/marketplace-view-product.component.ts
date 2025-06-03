@@ -909,13 +909,15 @@ export class MarketplaceViewProductComponent
     }
 
     connect(): void {
-        console.log(this.productData.sellerMarketPlaceAccountId,'mmm')
         this.showMainSpinner();
         this.AccountsServiceProxy
             .connect(this.productData.sellerMarketPlaceAccountId,null)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
+                    this.IsConnected = false;
+                    this.addToShoppingCart()
+
                 })
             )
             .subscribe(() => {
