@@ -147,6 +147,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     }
 
+    async ngOnInit() {
+        await this.handleComponentMode()
+        this.isHost = !this._abpSessionService.tenantId;
+        this.handleRoutingChange()
+        this.initUploaders();
+       this.GetContactDefaults();
+    }
     get isExternalAccount() : boolean {  return this.accountLevel == AccountLevelEnum.External && !this.viewMode}
     get isExternalAccountCreate() : boolean {  return this.isExternalAccount && !Boolean(this.accountId) }
     get isExternalAccountEdit() : boolean {  return this.isExternalAccount && Boolean(this.accountId) }
@@ -163,13 +170,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
-    async ngOnInit() {
-        await this.handleComponentMode()
-        this.isHost = !this._abpSessionService.tenantId;
-        this.handleRoutingChange()
-        this.initUploaders();
-       this.GetContactDefaults();
-    }
 
    paymentTermsId; 
    shipViaId;
