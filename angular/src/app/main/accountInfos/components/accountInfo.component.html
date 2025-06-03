@@ -468,6 +468,7 @@
         [placeholder]="'PleaseSelect' | localize"
         optionLabel="label"
         optionValue="value"
+        (onChange)="changeTouchState()"
     >
     </p-dropdown>
 
@@ -490,6 +491,7 @@
                                             [(ngModel)]="accountInfoTemp.paymentTermsId"
                                             optionLabel="label"
                                             optionValue="value"
+                                            (onChange)="changeTouchState()"
                                         >
                                         </p-dropdown>
                                         </div>

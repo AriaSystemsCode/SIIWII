@@ -688,15 +688,23 @@
 
                                                             <div class="d-flex mb-1 align-items-center">
                                                                 <p
-                                                                    style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important;">
+                                                                    style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important; margin-bottom: 0px;">
                                                                     {{productDetails?.name}}</p>
+                                                                    <div class="type ml-3 pt-2 text-center">
+                                                                        <p class="mb-0" style="white-space: nowrap;"> {{
+                                                                            productDetails?.orderByPrePack === false
+                                                                            ? "By Size"
+                                                                            : "By Prepack"
+                                                                            }}</p>
+                        
+                                                                    </div>
 
                                                             </div>
                                                             <div class="price mb-4">
 
                                                                 <div class="msrp d-flex ">
                                                                     <h5 class="mr-2"
-                                                                        style="color: black !important;font-size: 16px;">
+                                                                        style="color: black !important;font-size: 16px;margin-top: 10px;">
                                                                         MSRP: </h5>
                                                                     <h5>
 
@@ -1764,17 +1772,25 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                     <div
                                                                         class="ssin_price align-items-center justify-content-between">
 
-                                                                        <div class="d-flex mb-1 align-items-center">
+                                                                        <div class="d-flex mb-1 align-items-center ">
                                                                             <p
-                                                                                style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important;">
+                                                                                style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important;margin-bottom: 0px;">
                                                                                 {{productDetails?.name}}</p>
+                                                                                <div class="type ml-3 pt-2 text-center">
+                                                                                    <p class="mb-0" style="white-space: nowrap;"> {{
+                                                                                        productDetails?.orderByPrePack === false
+                                                                                        ? "By Size"
+                                                                                        : "By Prepack"
+                                                                                        }}</p>
+                                    
+                                                                                </div>
 
                                                                         </div>
                                                                         <div class="price mb-4">
 
                                                                             <div class="msrp d-flex ">
                                                                                 <h5 class="mr-2"
-                                                                                    style="color: black !important;font-size: 16px;">
+                                                                                    style="color: black !important;font-size: 16px;margin-top: 10px;">
                                                                                     MSRP: </h5>
                                                                                 <h5>
 
