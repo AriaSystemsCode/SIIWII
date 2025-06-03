@@ -70,10 +70,7 @@ addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToDa
 
     }  
  
-    // merge
-    // merge
 
-      this.saveData()
   }
   ngOnInit() {
     this.isMamualAcc()
@@ -220,7 +217,7 @@ addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToDa
   createOrEditTransaction() {
     
       this.showMainSpinner()
-        this.saveData()
+     
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     const subs =   this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
@@ -379,18 +376,7 @@ this.validateShippingTab();
     this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
-saveData(){
-  this.saveDates()
-      this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-      this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-        .subscribe((res) => {
-          if (res) {
-            this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-       
-          }
-        });
-  
-}
+
 
   validateShippingTab() {
     console.log('Validating Shipping Tab:', {

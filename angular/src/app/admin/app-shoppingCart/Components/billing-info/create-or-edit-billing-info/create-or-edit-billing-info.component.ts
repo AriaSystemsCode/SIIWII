@@ -366,17 +366,7 @@ this.validateBillingTab()
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
 
-  saveData(){
-    this.saveDates()
-    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .subscribe((res) => {
-        if (res) {
-          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-     
-        }
-      });
-  }
+
   updateArContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
     if(addObj){
