@@ -12,6 +12,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public Boolean WithDetails { get; set; }
         public long Since_Id { get; set; }
+        public string At_Id { get; set; }
 
         public string Filter { get; set; }
         public string CodeFilter { get; set; }

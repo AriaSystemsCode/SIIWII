@@ -31,7 +31,7 @@ import { AppCommonModule } from '@app/shared/common/app-common.module';
         CommentsModule,
         FormsModule,
         ReactiveFormsModule,
-        AppCommonModule
+        AppCommonModule,
     ],
     exports:[
         InteractionsComponent,
