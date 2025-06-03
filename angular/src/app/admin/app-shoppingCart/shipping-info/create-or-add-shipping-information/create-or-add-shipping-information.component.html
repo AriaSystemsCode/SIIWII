@@ -27,19 +27,17 @@
     </div>
 
     <div    [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
-        
-
         <app-address 
         [appTransactionsForViewDto]="appTransactionsForViewDto"
         [isCreateOredit]="createOrEditshippingInfO"
+        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
         [contactId]="contactIdShipFrom"
         (updateSelectedAddress)="updateShipFromAddress($event)"
         [selectedAddressDetails]="shipFromSelectedAdd"
         [showAddressType]="false"
         [canChange]="canChange"
         [currentTab]="currentTab"
-        [shipInfoIndex]="1"
-        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
+        [shipInfoIndex]="1"     
         ></app-address>
     </div>
     <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
@@ -73,16 +71,15 @@
     <hr class="my-2" />
    <app-address 
    [shipInfoIndex]="2"
+   [canChange]="canChange"
+   [currentTab]="currentTab"
    [appTransactionsForViewDto]="appTransactionsForViewDto"
+   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
    [isCreateOredit]="createOrEditshippingInfO"
    [contactId]="contactIdShipTo"
    (updateSelectedAddress)="updateShipToAddress($event)"
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
-   [canChange]="canChange"
-   [currentTab]="currentTab"  
-   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
-
 
    ></app-address>
 </div>

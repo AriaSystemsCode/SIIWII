@@ -78,6 +78,7 @@ export class MarketplaceViewProductComponent
     visible: boolean = false;
     priceLevel :any
     showSpecialPrice: boolean = false;
+    languageSettingName  =AppConsts.languageSettingName;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -455,8 +456,8 @@ if(!this.productDetails?.orderByPrePack ){
 
    /*  removeColor(color, i: number) {
         this.currentIndex =
-            this.orderSummary?.length === 0 ? 0 : color?.colorIndex;
-        if (!this.productDetails?.orderByPrePack) {
+            this.orderSummary.length === 0 ? 0 : color.colorIndex;
+            if (!this.productDetails?.orderByPrePack) {
             // this.totalOrderQTY  = this.totalOrderQTY - this.cal
             let qty = 0;
             let price = 0;
@@ -682,8 +683,8 @@ removeSize(sizeIndex: number, size, color, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item,index) => {
             let multiby;
-            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[colorIndex])
-                multiby = item.orderedPrePacks;
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
+                multiby = item?.orderedPrePacks;
 
             else
                 multiby =

@@ -66,7 +66,8 @@
             type="text"/> 
             <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
         </div>
-            <div class="d-flex justify-content-end" *ngIf="showAddBtn && showEditDelBtn">
+
+            <div class="d-flex justify-content-end"   *ngIf="showAddBtn  ">
                 <button class="ml-2 add-new-add-btn" (click)="openAddAddressForm()">
                     <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
                 </button>
@@ -81,7 +82,9 @@
                       name="selectedAdd"  [id]="address.id"/> 
                  <label> {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}{{ address?.addressLine2 ? address?.addressLine2+' ,' : ''}}{{address?.city ? address?.city+' ,' : ''}}{{ address?.state ? address?.state+' ,' : ''}}{{ address?.countryName ? address?.countryName +',' : address?.countryCode ?  address?.countryCode +' ,' : ''}}{{address?.postalCode ? address?.postalCode : ''}}</label>
                 </div>
-                 <div class="p mt-2 d-flex"  *ngIf="showAddBtn && showEditDelBtn">
+
+
+                 <div  class="p mt-2 d-flex"  *ngIf="showAddBtn  ">
                     <button (click)="editAddress(address.id)" class="acBtn">
                         <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/edit-icon.png">
 
