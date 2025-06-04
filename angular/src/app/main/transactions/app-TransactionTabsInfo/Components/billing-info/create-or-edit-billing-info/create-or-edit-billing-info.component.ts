@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList } from '@angular/core';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
@@ -50,7 +50,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-    private _AccountsServiceProxy:AccountsServiceProxy
   ) {
     super(injector);
 
@@ -68,7 +67,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
   }
   ngOnInit() {
     this.isMamualAcc()
-    this.GetContactDefaults()
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
       this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
       let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
@@ -344,18 +342,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
     }
 
   }
-  GetContactDefaults(){
-    this._AccountsServiceProxy.getContactDefaults()
-    .subscribe((res)=>{
-        if(!this.appTransactionsForViewDto.paymentTermsId && res.paymentTermsId){
-          this.appTransactionsForViewDto.paymentTermsId= res.paymentTermsId;
-          this.appTransactionsForViewDto.paymentTermsCode= res.paymentTermsCode;
-        } else if (!res.shipViaId){
-          this.appTransactionsForViewDto.paymentTermsCode =  this.payTermsListList[0].code;
-          this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[0].value;
-        }
-    });
-  }
+
   saveDates() {
     let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
     let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();

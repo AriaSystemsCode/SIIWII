@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChildren, SimpleChanges, OnChanges, AfterViewInit, OnDestroy, QueryList } from '@angular/core';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
@@ -54,7 +54,6 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-    private _AccountsServiceProxy:AccountsServiceProxy
   ) {
     super(injector);
 
@@ -73,7 +72,6 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
 
   }
   ngOnInit() {
-    this.getContactDefaults()
     this.isMamualAcc()
     if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
 
@@ -366,18 +364,7 @@ this.validateShippingTab();
       $event == true ? this.validateShippingTab() : ''
     }
   }
-  getContactDefaults(){
-    this._AccountsServiceProxy.getContactDefaults()
-    .subscribe((res)=>{
-      if(!this.appTransactionsForViewDto.shipViaId && res.shipViaId){
-        this.appTransactionsForViewDto.shipViaId= res.shipViaId;
-        this.appTransactionsForViewDto.shipViaCode= res.shipViaCode;
-      } else if (!res.shipViaId){
-        this.appTransactionsForViewDto.shipViaId = this.shipViaList[0]?.value ;
-        this.appTransactionsForViewDto.shipViaCode = this.shipViaList[0]?.code ;
-      }
-    });
- }
+
   saveDates() {
     let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
     let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
