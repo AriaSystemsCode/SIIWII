@@ -797,9 +797,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     this.handleComponentMode();
 
                 } else {
-                    // return this._router.navigate(['app/main/accounts'])
             this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
-            this.changeTab(AccountInfoPageTabs.ProfileView);
             this.changeTab(AccountInfoPageTabs.ProfileView);
             this.getAccountDataForView()
                 }
