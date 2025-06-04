@@ -748,7 +748,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     saveMyAccount(){
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => { this.saving = false;
-            this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
         }))
             .subscribe(result => {
                
@@ -762,7 +761,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 this.canPublish=true;
                 this.getForEditResult.lastChangesIsPublished = false
                 this.updateLogoService.updateLogo()
-                // this.handleComponentMode();
+                this.handleComponentMode();
                 
                
 
@@ -784,7 +783,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
             .pipe(finalize(() => { this.saving = false;
-            this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
 
             }))
             .subscribe(result => {
@@ -796,12 +794,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 if(this.accountLevel === this.accountLevelEnum.External){
                     this.displaySaveAccount = true;
                     this.getForEditResult.lastChangesIsPublished = false
-                    // this.handleComponentMode();
-            this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
+                    this.handleComponentMode();
 
                 } else {
                     // return this._router.navigate(['app/main/accounts'])
             this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
+            this.changeTab(AccountInfoPageTabs.ProfileView);
 
                 }
             },err=>this.touched = true);
