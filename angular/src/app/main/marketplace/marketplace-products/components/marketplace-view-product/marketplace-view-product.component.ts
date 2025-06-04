@@ -683,11 +683,12 @@ export class MarketplaceViewProductComponent
             }
             )
         } else if (this.ismarketPLace) {
-            this._AppTransactionServiceProxy.isAccountConnected(this.productBodyData.sellerSSIN).pipe(
+            this._AppTransactionServiceProxy.isAccountConnected(this.productData.sellerSSIN).pipe(
                 finalize(() => {})
             )
                 .subscribe((res) => {
-                    if(res){
+                  
+                    if(res == true){
                         this.getBuyerInfoForPO()
                         this._AppTransactionServiceProxy
                             .getNextOrderNumber("PO")
@@ -917,7 +918,7 @@ export class MarketplaceViewProductComponent
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
-                    this.IsConnected = false;
+                    this.IsConnected = false
                     this.addToShoppingCart()
 
                 })
