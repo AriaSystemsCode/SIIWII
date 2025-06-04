@@ -2090,8 +2090,7 @@ namespace onetouch.Accounts
             GetContactDefaultsOutput output = new GetContactDefaultsOutput();
             var paymentTermsId = await _helper.SystemTables.GetEntityObjectTypeId("PAYMENT-TERMS", true);
             var shipViaId = await _helper.SystemTables.GetEntityObjectTypeId("SHIPVIA", true);
-            var defPaymentTerms = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == paymentTermsId && 
-            (z.TenantId == AbpSession.TenantId) && z.IsDefault == true).FirstOrDefaultAsync();
+            var defPaymentTerms = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == paymentTermsId && (z.TenantId == AbpSession.TenantId) && z.IsDefault == true).FirstOrDefaultAsync();
             if (defPaymentTerms != null)
             {
                 output.PaymentTermsId = defPaymentTerms.Id;
@@ -2115,8 +2114,7 @@ namespace onetouch.Accounts
             //var account = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
             //   && a.TenantId == AbpSession.TenantId
             //   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
-            var defShipVia = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == shipViaId &&
-            (z.TenantId == AbpSession.TenantId) && z.IsDefault == true).FirstOrDefaultAsync();
+            var defShipVia = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == shipViaId && (z.TenantId == AbpSession.TenantId) && z.IsDefault == true).FirstOrDefaultAsync();
             if (defShipVia != null)
             {
                 output.ShipViaId = defShipVia.Id;

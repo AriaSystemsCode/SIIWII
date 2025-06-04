@@ -36,7 +36,7 @@ import { Console, log } from 'console';
 })
 export class AccountInfoComponent extends AppComponentBase implements OnInit, AfterViewInit {
     @Input('viewMode') viewMode :boolean = false
-    @Input('accountId') accountId: number;
+    @Input('accountId') accountId :number = this.appSession?.user?.accountId
     @Input('accountLevel') accountLevel :AccountLevelEnum = AccountLevelEnum.Profile
     @ViewChild('createOrEditMember',{static:true}) createOrEditMember :CreateOrEditMemberComponent
     @ViewChild('viewMemberProfile',{static:true}) viewMemberProfile :ViewMemberProfileComponent
@@ -472,30 +472,20 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.coverPhoto = this.accountDataForView.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}` : undefined;
     }
     async getAccountDataForView() {
-        if (!this.accountId || isNaN(this.accountId)) {
-          console.warn('Invalid accountId passed to getAccountForView:', this.accountId);
-          return;
-        }
-      
-        this.showMainSpinner();
-        const result = await this._AccountsServiceProxy.getAccountForView(this.accountId, 5)
-          .toPromise()
-          .finally(() => this.hideMainSpinner());
-      
-        if (result) {
-          this.isPublished = result.isPublished;
-          this.accountDataForView = result.account;
-          this.isRecordOwner = [this.accountDataForView?.partnerId, this.accountDataForView?.id].includes(this.appSession.user?.accountId);
-      
-          if (this.accountDataForView?.logoUrl) {
-            this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
-          }
-          if (this.accountDataForView?.coverUrl) {
-            this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
-          }
-        }
-      }
-      
+        this.showMainSpinner()
+        const result = await this._AccountsServiceProxy.getAccountForView(this.accountId,5)
+        .toPromise()
+        .finally(
+            ()=> {
+                this.hideMainSpinner()
+            }
+        )
+        this.isPublished= result ? result.isPublished : false;
+        this.accountDataForView = result ? result.account : undefined
+        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
+        if(this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
+        if(this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
+    }
 
     async getMyAccountDataForView()  {
         let id = this.appSession.user.accountId
@@ -508,7 +498,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         )
         this.isPublished= result ? result.isPublished : false;
         this.accountDataForView = result ? result.account : undefined
-        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId ||  this.accountDataForView?.id == this.appSession.user?.accountId 
+        this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
         if(this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if(this.accountDataForView.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }
@@ -757,7 +747,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     saveMyAccount(){
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
-        .pipe(finalize(() => { this.saving = false;}))
+        .pipe(finalize(() => { this.saving = false;
+        }))
             .subscribe(result => {
                
                 this.touched = false
@@ -791,7 +782,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
-            .pipe(finalize(() => { this.saving = false;}))
+            .pipe(finalize(() => { this.saving = false;
+
+            }))
             .subscribe(result => {
                 this.notify.info(this.l('SavedSuccessfully'));
                 if( !this.accountInfoTemp.id ){
@@ -802,8 +795,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     this.displaySaveAccount = true;
                     this.getForEditResult.lastChangesIsPublished = false
                     this.handleComponentMode();
+
                 } else {
-                    return this._router.navigate(['app/main/accounts'])
+                    // return this._router.navigate(['app/main/accounts'])
+            this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
+            this.changeTab(AccountInfoPageTabs.ProfileView);
+
                 }
             },err=>this.touched = true);
     }
