@@ -1692,7 +1692,7 @@ namespace onetouch.AppSiiwiiTransaction
                             //I46[Start]
                             await _appTenantActivitiesLogAppService.AddUsageActivityLog("PLACE-ORDER-LINE",
                             appTrans.Name.Trim() + ", Line#" + det.LineNo.ToString().Trim(), det.Id, appTrans.EntityObjectTypeId, appTrans.EntityObjectTypeCode,
-                            det.ManufacturerCode.Trim(), 1);
+                            appTrans.Name.Trim() + ","+det.ManufacturerCode.Trim(), 1);
                             //I46[End]
                         }
                     }
@@ -3533,7 +3533,12 @@ namespace onetouch.AppSiiwiiTransaction
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                List<GetContactInformationDto> returnList = new List<GetContactInformationDto>();
                 var accountId = _appContactRepository.GetAll().Where(z => z.SSIN == accountSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
+                if (accountId == null)
+                {
+                    return returnList;
+                }
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 List<GetContactInformationDto> returnObjectList = new List<GetContactInformationDto>();
                 var accountsList = _appContactRepository.GetAll()
