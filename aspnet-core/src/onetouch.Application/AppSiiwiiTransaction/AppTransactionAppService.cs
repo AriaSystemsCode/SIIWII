@@ -5646,6 +5646,23 @@ namespace onetouch.AppSiiwiiTransaction
                         }
 
                     }
+                    //Extra Data[start]
+                    if (transaction.EntityExtraData != null)
+                    {
+                        marketplaceTransaction.EntityExtraData = new List<AppEntityExtraData>();
+                        foreach (var ext in marketplaceTransaction.EntityExtraData)
+                        {
+                            var extra = new AppEntityExtraData();
+                            extra = ObjectMapper.Map<AppEntityExtraData>(ext);
+                            extra.Id = 0;
+                            extra.EntityId = 0;
+                            extra.EntityFk = null;
+                            extra.EntityCode = marketplaceTransaction.Code;
+                            marketplaceTransaction.EntityExtraData.Add(extra);
+                        }
+
+                    }
+                    //Extra Data[end]
                     if (transaction.EntityClassifications != null)
                     {
                         marketplaceTransaction.EntityClassifications = new List<AppEntityClassification>();
