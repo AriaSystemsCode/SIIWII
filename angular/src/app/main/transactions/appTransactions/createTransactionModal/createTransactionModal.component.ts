@@ -360,7 +360,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             // i'm a sales rep
             this.isSeller = false;
             this.isBuyer = false;
-            this.isBuyerTempAccount = false;
+            // this.isBuyerTempAccount = false;
             this.isCompantIdExist = false;
             this.isSellerCompanyIdExist = false;
             // remove seller values
