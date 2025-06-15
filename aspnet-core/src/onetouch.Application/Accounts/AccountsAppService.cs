@@ -2024,6 +2024,7 @@ namespace onetouch.Accounts
                     contact.PartnerCode = externalAcc.PartnerCode;
                     contact.ParentId = externalAcc.ParentId;
                     contact.ParentCode = externalAcc.ParentCode;
+                    await UpdateConnectedAccountPriceLevel(long.Parse(input.Id.ToString()),input.PriceLevel);
                 }
             }
             //I46[End]
