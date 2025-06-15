@@ -381,33 +381,18 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
       this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
       this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
       this.selctedBradns = parsedFilters.brands;
-      this.getParentDepartments().then(() => {
+      this.getParentDepartments().then(async () => {
         if (selectedDepartmentId) {
-          this.expandAndSelectNode(selectedDepartmentId);
+          await this.expandAndSelectNodeLazy(selectedDepartmentId);
         }
       });
+      
 
 
     } else {
       this.getParentDepartments();
     }
   }
-
-  clearAllFiltrs() {
-    this.resetFilters()
-    this.handleStartPrice.emit('');
-    this.handleEndPrice.emit('');
-    this.handleCatalogSelections.emit('');
-    this.handledeDratmentsTreeSelections.emit(null)
-    this.handleBrandsSelection.emit([]);
-    this.handleEndShipDate.emit(undefined);
-    this.handleStartShipDate.emit(undefined);
-    this.handleEndSoldOutDate.emit(undefined);
-    this.handleSatrtsoldOutDate.emit(undefined);
-    this.clearAll.emit(true);
-
-  }
-
   expandAndSelectNode(targetId: number, nodes: any[] = this.files, parentNode?: any): void {
     if (!nodes) return;
 
@@ -447,6 +432,53 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  clearAllFiltrs() {
+    this.resetFilters()
+    this.handleStartPrice.emit('');
+    this.handleEndPrice.emit('');
+    this.handleCatalogSelections.emit('');
+    this.handledeDratmentsTreeSelections.emit(null)
+    this.handleBrandsSelection.emit([]);
+    this.handleEndShipDate.emit(undefined);
+    this.handleStartShipDate.emit(undefined);
+    this.handleEndSoldOutDate.emit(undefined);
+    this.handleSatrtsoldOutDate.emit(undefined);
+    this.clearAll.emit(true);
+
+  }
+
+  async expandAndSelectNodeLazy(targetId: number, nodes: any[] = this.files, parentNode?: any): Promise<boolean> {
+    for (const node of nodes) {
+      const currentId = node?.data?.sycEntityObjectCategory?.id;
+      
+      // Check if current node matches
+      if (currentId === targetId) {
+        if (parentNode) parentNode.expanded = true;
+        node.expanded = true;
+        this.selectedFile = node;
+        return true;
+      }
+  
+      // Load children if not loaded
+      if (!node.children || node.children.length === 0) {
+        const res = await this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
+          undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+          currentId, true, undefined, undefined, "name", 0, 10
+        ).toPromise();
+        node.children = res.items;
+      }
+  
+      const foundInChildren = await this.expandAndSelectNodeLazy(targetId, node.children, node);
+      if (foundInChildren) {
+        node.expanded = true;
+        if (parentNode) parentNode.expanded = true;
+        return true;
+      }
+    }
+    return false;
+  }
+  
 
 
   ngOnDestroy(): void {
