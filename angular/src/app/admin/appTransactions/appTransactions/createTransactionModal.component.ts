@@ -448,7 +448,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             // i'm a sales rep
             this.isSeller = false;
             this.isBuyer = false;
-            this.isBuyerTempAccount = false;
+            // this.isBuyerTempAccount = false;
             this.isCompantIdExist = false;
             this.isSellerCompanyIdExist = false;
                          // remove seller values
@@ -1265,6 +1265,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
 
+
     changeTouchState(event){
         this.orderForm.controls['currencyId'].setValue(event.value)
         
@@ -1361,4 +1362,5 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.invalidSellerContactEMailAddress = "";
 
     }
+
 }
