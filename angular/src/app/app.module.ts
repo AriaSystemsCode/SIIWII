@@ -114,6 +114,7 @@ import { SharedDynamicInputsModule } from "@shared/shared-module";
 import { ExtraAttributeDataService } from "./main/app-items/app-item-shared/services/extra-attribute-data.service";
 import { TransactionModule } from "./main/transactions/transaction.module";
 import { NotesModule } from "./admin/shared/notes/notes.module";
+import { OverALLRatingReviewsModule } from "./main/overallRating-reviews/overallRating-reviews.module";
 
 @NgModule({
     declarations: [
@@ -217,7 +218,8 @@ import { NotesModule } from "./admin/shared/notes/notes.module";
         TabViewModule,
         SharedDynamicInputsModule,
         NotesModule,
-        TransactionModule
+        TransactionModule,
+        OverALLRatingReviewsModule
     ],
 
     providers: [
