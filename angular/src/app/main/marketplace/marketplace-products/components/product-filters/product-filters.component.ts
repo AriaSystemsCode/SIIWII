@@ -383,7 +383,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
       this.selctedBradns = parsedFilters.brands;
       this.getParentDepartments().then(async () => {
         if (selectedDepartmentId) {
-          await this.expandAndSelectNodeLazy(selectedDepartmentId);
+          await this.expandAndSelectFullPath(selectedDepartmentId);
         }
       });
       
@@ -480,7 +480,58 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
   }
   
 
-
+  async expandAndSelectFullPath(targetId: number) {
+    const pathIds: number[] = [];
+  
+    let currentId = targetId;
+  
+    // Step 1: Collect path from selected to root
+    while (currentId) {
+      pathIds.unshift(currentId); // Add to the beginning
+      const result = await this._sycEntityObjectCategoriesServiceProxy
+        .getSycEntityObjectCategoryForEdit(currentId)
+        .toPromise();
+      currentId = result?.sycEntityObjectCategory?.parentId;
+    }
+  
+    // Step 2: Walk and expand down the tree
+    let currentNodes = this.files;
+    for (const id of pathIds) {
+      const foundNode = await this.expandAndReturnNode(id, currentNodes);
+      if (!foundNode) break;
+      currentNodes = foundNode.children || [];
+    }
+  
+    // Step 3: Select the final node
+    const finalNode = this.findNodeById(this.files, targetId);
+    if (finalNode) {
+      finalNode.expanded = true;
+      this.selectedFile = finalNode;
+    }
+  }
+  async expandAndReturnNode(id: number, nodes: any[]): Promise<any> {
+    for (const node of nodes) {
+      if (node.data?.sycEntityObjectCategory?.id === id) {
+        if (!node.children || node.children.length === 0) {
+          const res = await this._sycEntityObjectCategoriesServiceProxy
+            .getAllChildsWithPaging(
+              undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+              id, true, undefined, undefined, "name", 0, 10
+            ).toPromise();
+          node.children = res.items;
+        }
+        node.expanded = true;
+        return node;
+      }
+  
+      if (node.children && node.children.length > 0) {
+        const found = await this.expandAndReturnNode(id, node.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+    
   ngOnDestroy(): void {
     clearTimeout(this.timeOut);
   }
