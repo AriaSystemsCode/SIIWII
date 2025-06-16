@@ -9,11 +9,13 @@ using Abp.Linq.Extensions;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.PowerShell.Commands;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
 using NPOI.SS.Formula.Functions;
 using NUglify.Helpers;
+using onetouch.AppContacts;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
 using onetouch.AppMarketplaceMessages;
@@ -24,6 +26,7 @@ using onetouch.Authorization;
 using onetouch.Authorization.Roles;
 using onetouch.Authorization.Users;
 using onetouch.Authorization.Users.Dto;
+using onetouch.Configuration;
 using onetouch.Helpers;
 using onetouch.Message.Dto;
 using onetouch.Migrations;
@@ -58,17 +61,28 @@ namespace onetouch.Message
         private readonly IRepository<AppPost, long> _appPostRepo;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
         private readonly IRepository<AppEntityRating, long> _appEntityRatingRepository;
+        private readonly IConfigurationRoot _appConfiguration;
+        private readonly RoleManager _roleManager;
+        private readonly IRepository<AppContact, long> _appContactRepository;
+        private readonly IRepository<AppMarketplaceTransactionHeaders, long> _appMarketplaceTransactionHeaders;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
+            IAppConfigurationAccessor appConfigurationAccessor,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
             IRepository<AppEntityClassification, long> appEntityClassificationRepository,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
-            IRepository<AppEntityRating, long> appEntityRatingRepository
+            IRepository<AppEntityRating, long> appEntityRatingRepository, RoleManager roleManager,
+            IRepository<AppContact, long> appContactRepository,
+            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders
             )
         {
+            _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
+            _appContactRepository = appContactRepository;
+            _roleManager = roleManager;
+            _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntityRatingRepository = appEntityRatingRepository;
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _MessagesRepository = messagesRepository;
@@ -1522,8 +1536,8 @@ namespace onetouch.Message
                     entityTenantId = entity.TenantOwner;
                 }
                 string myAccountSSIN = "";
-                var myAccount = await _appMarketplaceAccounts.GetAll()
-                                   .Where(z => z.OwnerId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+                var myAccount = await _appContactRepository.GetAll()
+                                   .Where(z => z.TenantId == AbpSession.TenantId && z.ParentId == null && z.PartnerId== null && z.IsProfileData == true).FirstOrDefaultAsync();
                 if (myAccount != null)
                 {
                     myAccountSSIN = myAccount.SSIN;
@@ -1564,15 +1578,15 @@ namespace onetouch.Message
                             var tenant = await TenantManager.GetByIdAsync(int.Parse(user.TenantId.ToString()));
                             if (tenant != null)
                             {
-                                var account = await _appMarketplaceAccounts.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                    .Where(z => z.OwnerId == user.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+                                var account = await _appContactRepository.GetAll().Include(z=>z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                    .Where(z => z.TenantId == user.TenantId && z.ParentId == null && z.PartnerId==null && z.IsProfileData==true).FirstOrDefaultAsync();
                                 if (account != null)
                                 {
                                     userCompanySSIN = account.SSIN;
                                     x.Messages.SenderCompanyName = account.Name;
-                                    if (account.EntityAttachments.Count() > 0)
+                                    if (account.EntityFk.EntityAttachments.Count() > 0)
                                     {
-                                        var companyLogo = account.EntityAttachments.Where(z => z.AttachmentCategoryId == logoCategory).FirstOrDefault();
+                                        var companyLogo = account.EntityFk.EntityAttachments.Where(z => z.AttachmentCategoryId == logoCategory).FirstOrDefault();
                                         if (companyLogo != null)
                                         {
                                             x.Messages.ProfilePictureUrl = imagesUrl + "-1" + @"/" + companyLogo.AttachmentFk.Attachment;
@@ -1584,15 +1598,15 @@ namespace onetouch.Message
                         }
                         else
                         {
-                            var account = await _appMarketplaceAccounts.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                            var account = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                                    .Where(z => z.Name == "SIIWII" && z.ParentId == null).FirstOrDefaultAsync();
 
                             if (account != null)
                             {
                                 x.Messages.SenderCompanyName = account.Name;
-                                if (account.EntityAttachments.Count() > 0)
+                                if (account.EntityFk.EntityAttachments.Count() > 0)
                                 {
-                                    var companyLogo = account.EntityAttachments.Where(z => z.AttachmentCategoryId == logoCategory).FirstOrDefault();
+                                    var companyLogo = account.EntityFk.EntityAttachments.Where(z => z.AttachmentCategoryId == logoCategory).FirstOrDefault();
                                     if (companyLogo != null)
                                     {
                                         x.Messages.ProfilePictureUrl = imagesUrl + "-1" + @"/" + companyLogo.AttachmentFk.Attachment;

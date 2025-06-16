@@ -355,10 +355,14 @@ namespace onetouch.Helpers
             return obj.Id;
         }
 
+        //I40-X527[Start]
+        public async Task<long> GetEntityObjectTypeReview()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "REVIEW");
+            return obj.Id;
+        }
+        //I40-X527[End]
 
-
-
-       
 
         public async Task<long> GetEntityObjectStatusUnreadMessageID()
         {

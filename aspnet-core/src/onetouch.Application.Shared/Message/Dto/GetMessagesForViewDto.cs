@@ -7,6 +7,10 @@ namespace onetouch.Message.Dto
   public  class GetMessagesForViewDto
     {
         public MessagesDto Messages { get; set; }
+        public int Rating { get; set; }
+        public bool IsProfileOwner { get; set; } = false;
+        public bool IsUserVerifiedPurchaser { get; set; } = false;
+        public bool IsAccountAdmin { get; set; } = false;
     }
     public class OverAllRatingDto
     {
