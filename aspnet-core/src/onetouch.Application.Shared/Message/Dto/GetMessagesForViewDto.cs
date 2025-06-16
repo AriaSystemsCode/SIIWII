@@ -8,4 +8,14 @@ namespace onetouch.Message.Dto
     {
         public MessagesDto Messages { get; set; }
     }
+    public class OverAllRatingDto
+    {
+        public decimal OverAllRating { get; set; }
+        public long TotalNumberOfRating { get; set; }
+        public decimal OneTotal { get; set; }
+        public decimal TwoTotal { get; set; }
+        public decimal ThreeTotal { get; set; }
+        public decimal FourTotal { get; set; }
+        public decimal FiveTotal { get; set; }
+    }
 }

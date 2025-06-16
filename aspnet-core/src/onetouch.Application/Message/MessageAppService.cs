@@ -56,15 +56,21 @@ namespace onetouch.Message
         private readonly IRepository<AppEntityReactionsCount, long> _appEntityReactionsCount;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
         private readonly IRepository<AppPost, long> _appPostRepo;
+        private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
+        private readonly IRepository<AppEntityRating, long> _appEntityRatingRepository;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
             IRepository<AppEntityClassification, long> appEntityClassificationRepository,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
-            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo
+            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo,
+            IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
+            IRepository<AppEntityRating, long> appEntityRatingRepository
             )
         {
+            _appEntityRatingRepository = appEntityRatingRepository;
+            _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _MessagesRepository = messagesRepository;
             _lookup_MessagesRepository = lookup_MessagesRepository;
             _appEntityRepository = appEntityRepository;
@@ -1310,9 +1316,7 @@ namespace onetouch.Message
             }
         }
         //MMT39
-        private readonly IRepository<AppEntityRating, long> _appEntityRatingRepository;
-
-
+        
         //I40-X527[Start]
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllReviews(GetAllMessagesInput input)
@@ -1716,8 +1720,8 @@ namespace onetouch.Message
                             var tenant = await TenantManager.GetByIdAsync(int.Parse(user.TenantId.ToString()));
                             if (tenant != null)
                             {
-                                var account = await _appMarketplaceAccounts.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                    .Where(z => z.OwnerId == user.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+                               // var account = await _appMarketplaceAccounts.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                 //   .Where(z => z.OwnerId == user.TenantId && z.ParentId == null).FirstOrDefaultAsync();
                             }
                         }
                     }
