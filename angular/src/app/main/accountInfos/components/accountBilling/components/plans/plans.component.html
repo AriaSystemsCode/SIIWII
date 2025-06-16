@@ -118,7 +118,11 @@
 </div>
 
 
-<p-dialog header="Header" [(visible)]="visible" [modal]="true" [style]="{ width: '640px' }" [draggable]="false" >
+<p-dialog header="Header" [(visible)]="visible" [modal]="true"  [style]="{
+  width: '640px',
+  padding: '32px 24px 32px 24px',
+  borderRadius: '20px'
+}" [style.borderRadius]="'20px'" [draggable]="false" >
   <ng-template pTemplate="header">
     <div class="d-flex">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
