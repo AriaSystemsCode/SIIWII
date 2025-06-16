@@ -138,24 +138,25 @@ export class MarketplaceProductsComponent
 
  
     ngOnInit() {
+        
         const savedFilters = localStorage.getItem("productFilters");
         
         if (savedFilters) {
             const parsedFilters = JSON.parse(savedFilters);
-        
+            this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? null;
+            this.selectedCurrrency = parsedFilters.selectedCurrency ?? 'USD';
+            this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
+            
             this.appItemListId = parsedFilters.appItemListId ||   this.appItemListId;
             this.searchInput = parsedFilters.searchText||    this.searchInput;
             this.selectedDepartments = parsedFilters.selectedDepartments ||  this.selectedDepartments;
             this.minimumPrice = parsedFilters.minimumPrice ||  this.minimumPrice;
             this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
-            this.onlyAvialbleStock = parsedFilters.onlyAvailableStock || false;
             this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
             this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
             this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) :   this.startShipData;
             this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) :  this.endShipData;
             this.brands = parsedFilters.brands || this.brands ;
-            this.selectedCurrrency = parsedFilters.selectedCurrency ||  this.selectedCurrrency ;
-            this.selectedSort = parsedFilters.selectedSort || this.selectedSort;
             this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
             this.skipCount = parsedFilters.skipCount ||     this.skipCount;
             this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
@@ -230,27 +231,27 @@ export class MarketplaceProductsComponent
     
         const requestParams = {
             contactSSIN: this.contactSSIN,
-            sellerSSIN: sessionStorage.getItem("SellerSSIN"),
+            sellerSSIN: this.sellerSSIN,
             tenantId: null,
-            appItemListId: this.appItemListId,
-            searchText: this.searchInput,
-            selectedDepartments: this.selectedDepartments,
-            minimumPrice: this.minimumPrice,
-            maximumPrice: this.maximumPrice,
-            selectedOption: this.seletedOption.value, // Add this line
-            onlyAvailableStock: this.onlyAvialbleStock,
-            startSoldOutData: this.startSoldOutData,
-            endSoldOutData: this.endSoldOutData,
-            startShipData: this.startShipData,
-            endShipData: this.endShipData,
-            brands: this.brands,
-            selectedCurrency: this.selectedCurrrency?.code || this.selectedCurrrency,
-            selectedSort: this.selectedSort.value,
+            appItemListId: this.appItemListId || null,
+            searchText: this.searchInput || '',
+            selectedDepartments: this.selectedDepartments || [],
+            minimumPrice: this.minimumPrice || null,
+            maximumPrice: this.maximumPrice || null,
+            selectedOption: this.seletedOption?.value ?? 2,
+            onlyAvailableStock: this.onlyAvialbleStock ?? false,
+            startSoldOutData: this.startSoldOutData || null,
+            endSoldOutData: this.endSoldOutData || null,
+            startShipData: this.startShipData || null,
+            endShipData: this.endShipData || null,
+            brands: this.brands || [],
+            selectedCurrency: this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
+            selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
             maxResultCount: this.maxResultCount
         };
-        // Save to localStorage
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
+        
     
         this._AppMarketplaceItemsServiceProxy
             .getAll(
@@ -425,7 +426,7 @@ export class MarketplaceProductsComponent
         this.skipCount= 0;
         this.maxResultCount= 12;
         this.selectedDepartments =[]
-        this.onlyAvialbleStock = false
+        this.onlyAvialbleStock = null
         localStorage.removeItem("productFilters");
         this.getAllProducts();
 
