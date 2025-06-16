@@ -255,6 +255,27 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return 0;
         }
+
+        public async Task<string> GetTransactionOrderConfirmationUrl(long transactionId)
+        {
+            var transOrg = await _appTransactionsHeaderRepository.GetAll()
+                    .Include(a => a.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                .Where(a => a.Id == transactionId).FirstOrDefaultAsync();
+            if (transOrg != null)
+            {
+                if (transOrg.EntityAttachments != null && transOrg.EntityAttachments.Count > 0)
+                {
+                    string filePath = _appConfiguration[$"Attachment:Path"] + @"\" + (transOrg.TenantId == null ? "-1" : transOrg.TenantId.ToString()) + @"\" + transOrg.EntityAttachments[0].AttachmentFk.Attachment;
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        filePath = _appConfiguration["App:ServerRootAddress"] + _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "") + @"\" + (transOrg.TenantId == null ? "-1" : transOrg.TenantId.ToString()) + @"\" + transOrg.EntityAttachments[0].AttachmentFk.Attachment;
+                        return filePath;
+                        //   viewTrans.EntityAttachments[0].Url = @"attachments/" + (viewTrans.TenantId == null ? -1 : viewTrans.TenantId) + @"/" + viewTrans.EntityAttachments[0].FileName;
+                    }
+                }
+            }
+            return "";
+        }
         public async Task<long> CreateOrEdit(CreateOrEditAppTransactionsDto input)
         {
             long? buyerTenantId = null;
@@ -2156,6 +2177,15 @@ namespace onetouch.AppSiiwiiTransaction
                                 cnt.ContactAddressDetail.ContactEmail = cnt.ContactEmail;
                                 cnt.ContactAddressDetail.ContactPhone = cnt.ContactPhoneNumber;
                             }
+                            if (cnt.BranchSSIN !=null && cnt.BranchName !="*Main*")
+                            {
+                                var branch = _appContactRepository.GetAll().Where(z => z.SSIN == cnt.BranchSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
+                                if (branch != null)
+                                {
+                                    cnt.BranchCode =branch.Code;
+                                }
+                            }
+
                         }
                     }
                     return y;
