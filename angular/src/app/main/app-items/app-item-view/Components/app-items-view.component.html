@@ -489,6 +489,30 @@
                                 ></p>
                             </div>
                         </div>
+
+
+                        <div
+                        *ngIf="appItemForViewDto?.manufacturerCode"
+                        class="pt-4 pb-3 border-bottom"
+                    >
+                        <div class="header">
+                            Manufacture Code
+                        </div>
+                        <div
+                            class="big-scroll"
+                            [ngStyle]="{
+                                'overflow-y': scrollDesc
+                                    ? 'scroll'
+                                    : 'auto',
+                                height: scrollDesc ? '200px' : 'auto'
+                            }"
+                        >
+                            <p
+                                class="m-0"
+                                [innerHTML]="appItemForViewDto?.manufacturerCode"
+                            ></p>
+                        </div>
+                    </div>
                         <div
                             *ngIf="false"
                             class="pt-4 pl-2 pt-4 thin-scroll dropDownVariation"
