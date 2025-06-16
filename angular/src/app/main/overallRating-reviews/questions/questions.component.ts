@@ -2,16 +2,16 @@ import { Component, ElementRef, Injector, Input, OnInit, ViewChild } from '@angu
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AccountDto, AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
-  selector: 'app-all-reviews-list',
-  templateUrl: './all-reviews-list.component.html',
-  styleUrls: ['./all-reviews-list.component.scss']
+  selector: 'app-questions',
+  templateUrl: './questions.component.html',
+  styleUrls: ['./questions.component.scss']
 })
 
 
-export class AllReviewsListComponent extends AppComponentBase implements OnInit {
+export class QuestionsComponent extends AppComponentBase implements OnInit {
   @Input() entityID : number
 
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;

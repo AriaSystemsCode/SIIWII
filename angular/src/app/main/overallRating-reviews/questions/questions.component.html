@@ -1,4 +1,4 @@
-<h4>Reviews</h4>
+<h4>Customer Questions</h4>
 <hr>
 
 <div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
@@ -9,17 +9,7 @@
         style="height: auto; min-height: 100px; resize: none; overflow: hidden;"
         (input)="adjustTextareaHeight($event)"></textarea>
   
-  
-      <div class="rating">
-        <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
-          <i class="fa" [ngClass]="{
-                'fa-star': i + 1 <= selectedRating,
-                'fa-star-half-o': i < selectedRating && i + 1 > selectedRating,
-                'fa-star-o': i + 1 > selectedRating
-              }" (click)="setRating(i + 1)" title="{{ i + 1 }} star"></i>
-        </ng-container>
-  
-      </div>
+
     </div>
   
     <div class="bottomSec d-flex justify-content-between w-100 align-items-center">
@@ -156,16 +146,7 @@
               Purchaser</span>
           </p>
         </div>
-        <div class="d-flex mb-3 align-items-center">
-          <!-- Dynamic Rating Stars -->
-  
-          <div *ngIf="review?.rating != 0" class="position-relative " style="height: 32px;width: 122px;">
-            <span class="stars-container  " style="color: #D4D4D4;">★★★★★</span>
-            <span [style]="
-                    'width :' + review?.rating/5 * 100 + '%'
-                " class="stars-container  fill-s position-absolute top-0 left-0 inline-block ">★★★★★</span>
-          </div>
-        </div>
+   
       </div>
       <p class="subjectTxt">{{review?.messages?.subject}}</p>
       <div class="" [ngClass]="review?.messages?.entityAttachments?.length != 0 ? 'd-flex justify-content-between':''">
@@ -193,7 +174,7 @@
       </div>
       <div class="position-relative d-flex justify-content-between mt-4">
         <app-interactions [relatedEntityId]="review?.messages?.entityId" [entityId]="review?.messages?.entityId"
-          [fromOverview]="true"></app-interactions>
+        ></app-interactions>
   
       </div>
     </div>

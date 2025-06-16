@@ -57,39 +57,7 @@
     color: #555;
   }
   
-  .star-rating {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .stars-outer {
-    position: relative;
-    display: inline-block;
-    font-size: 26px;
-    color: #ccc;
-    line-height: 1;
-  }
-  
-  .stars-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    white-space: nowrap;
-    color: #F6851D;
-    overflow: hidden;
-  }
-  
-  .rating-value {
-    font-size: 1rem;
-    color: #333;
-  }
-  
-  .rating-value {
-    font-size: 1rem;
-    color: #666;
-  }
-  
+
   .review-comment {
     font-size: 1rem;
     line-height: 1.5;
@@ -244,41 +212,7 @@
   
   }
   
-  
-  .rating {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 2rem;
-    color: #ffc107;
-    margin-top: 10px;
-  }
-  
-  .rating i {
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .rating .fa-star-o:before {
-    content: "\f005";
-    color: #E1E1E1;
-  }
-  
-  .rating .fa-star:before {
-    content: "\f005";
-    color: #F6851D;
-  }
-  
-  .rating i:hover,
-  .rating i:hover~i {
-    color: #ff9800;
-  }
-  
-  .rating span {
-    font-size: 1rem;
-    color: #666;
-    margin-left: 10px;
-  }
+
   
   .btnPost {
   
@@ -316,16 +250,7 @@
   .logo {
     margin-right: 1rem;
   }
-  
-  .rating .fa {
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #ffc107;
-  }
-  
-  .rating .fa-star-o {
-    color: #ccc;
-  }
+
   
   .bottomSec .iconImg {
     width: 24px;

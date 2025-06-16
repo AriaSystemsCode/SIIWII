@@ -1,7 +1,7 @@
 import { Component, Injector, Input, OnDestroy, OnInit } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import {  AccountsServiceProxy, MessageServiceProxy } from '@shared/service-proxies/service-proxies';
+import {  AccountsServiceProxy, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -11,19 +11,11 @@ import { finalize } from 'rxjs';
 })
 export class OverallRatingComponent extends AppComponentBase implements OnInit, OnDestroy {
 
-
+  @Input() entityID : number
 
   baseUrl: string = AppConsts.attachmentBaseUrl;
-  // overRating: OverAllRatingDto
-  overRating  = {
-    overAllRating: 20,
-    totalNumberOfRating: 248,
-    fiveTotal: 5,
-    fourTotal: 4,
-    threeTotal: 2,
-    twoTotal: 10,
-    oneTotal: 20
-  }
+  overRating: OverAllRatingDto
+
 
 
 
@@ -36,16 +28,6 @@ export class OverallRatingComponent extends AppComponentBase implements OnInit, 
 
   ngOnInit() {
     this.getOverAllRatings()
-    this.overRating = {
-      overAllRating: 20,
-      totalNumberOfRating: 248,
-      fiveTotal: 5,
-      fourTotal: 4,
-      threeTotal: 2,
-      twoTotal: 10,
-      oneTotal: 20
-    }
-
   }
 
 
@@ -55,23 +37,23 @@ export class OverallRatingComponent extends AppComponentBase implements OnInit, 
 
 
   getOverAllRatings() {
-    // const subs = this.messageServiceProxy
-    //   .getOverAllRatings(
-    //     this.accountDataForView.entityId,
-    //   )
-    //   .pipe(
-    //     finalize(() => {
+    const subs = this.messageServiceProxy
+      .getOverAllRatings(
+        this.entityID,
+      )
+      .pipe(
+        finalize(() => {
 
-    //     })
-    //   )
-    //   .subscribe(
-    //     (result) => {
-    //       this.overRating = result
+        })
+      )
+      .subscribe(
+        (result) => {
+          this.overRating = result
 
-    //     },
+        },
 
-    //   );
-    // this.subscriptions.push(subs);
+      );
+    this.subscriptions.push(subs);
   }
 
 

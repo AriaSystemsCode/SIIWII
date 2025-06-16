@@ -20,9 +20,10 @@ import { OverallRatingComponent } from './overallRatings/overallRating.component
 import { AllReviewsListComponent } from './all-reviews-list/all-reviews-list.component';
 import { DialogModule } from 'primeng/dialog';
 import { InteractionsModule } from '../interactions/interactions.module';
+import { QuestionsComponent } from './questions/questions.component';
 
 @NgModule({
-  declarations: [OverallRatingComponent,AllReviewsListComponent],
+  declarations: [OverallRatingComponent,AllReviewsListComponent,QuestionsComponent],
   imports: [
     CommonModule,
     AppCommonModule,
@@ -42,7 +43,7 @@ import { InteractionsModule } from '../interactions/interactions.module';
     NgImageSliderModule,
  
   ],
-  exports: [OverallRatingComponent,AllReviewsListComponent],
+  exports: [OverallRatingComponent,AllReviewsListComponent,QuestionsComponent],
 
 })
 
