@@ -122,7 +122,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <label class="label mt-2 mb-2">{{l("Code")}}</label>
+                    <label class="label mt-2 mb-2">{{l("Code")}}*</label>
                     <input
                         type="text"
                         placeholder="Adress Code..."
@@ -130,6 +130,9 @@
                         name="addressCode"
                         [(ngModel)]="addressCode"
                         #Code="ngModel"
+                        required
+                        maxlength="6"
+                        minlength="1"
                      
                     />
                 
