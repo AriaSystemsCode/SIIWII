@@ -46,7 +46,7 @@ namespace onetouch.AppSubScriptionPlan
         {
 
             var filteredAppTenantActivitiesLog = _appTenantActivityLogRepository.GetAll()
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.Contains(input.Filter) || e.ActivityType.Contains(input.Filter) || e.AppSubscriptionPlanCode.Contains(input.Filter) || e.UserName.Contains(input.Filter) || e.FeatureCode.Contains(input.Filter) || e.FeatureName.Contains(input.Filter) || e.Reference.Contains(input.Filter) || e.InvoiceNumber.Contains(input.Filter) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.ToUpper().Contains(input.Filter.ToUpper()) || e.ActivityType.ToUpper().Contains(input.Filter.ToUpper()) || e.AppSubscriptionPlanCode.ToUpper().Contains(input.Filter.ToUpper()) || e.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureCode.ToUpper().Contains(input.Filter) || e.FeatureName.ToUpper().Contains(input.Filter.ToUpper()) || e.Reference.ToUpper().Contains(input.Filter.ToUpper()) || e.InvoiceNumber.ToUpper().Contains(input.Filter.ToUpper()) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
                         .WhereIf(input.MinTenantIdFilter != null, e => e.TenantId >= input.MinTenantIdFilter)
                         .WhereIf(input.MaxTenantIdFilter != null, e => e.TenantId <= input.MaxTenantIdFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName.ToUpper().Contains(input.TenantNameFilter.ToUpper()))
