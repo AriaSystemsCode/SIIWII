@@ -403,7 +403,7 @@ namespace onetouch.AppItems
                                {
                                    AppItem = new AppItemDto
                                    {
-                                       ManufacturerCode = (d.ManufacturerCode == null && d.TenantOwner==AbpSession.TenantId? d.Code : d.ManufacturerCode),
+                                       ManufacturerCode = (d.ManufacturerCode == null && (d.TenantOwner == AbpSession.TenantId || d.TenantOwner == null || d.TenantOwner == 0) ? d.Code : d.ManufacturerCode),
                                        Code = d.Code,
                                        Name = d.Name,
                                        Description = d.EntityFk.Notes,
@@ -452,7 +452,7 @@ namespace onetouch.AppItems
                                            Price = o.item.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? o.item.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price: o.item.Price,
                                            //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                                            Id = o.item.Id,
-                                           ManufacturerCode = (o.item.ManufacturerCode == null && o.item.TenantOwner == AbpSession.TenantId ? o.item.Code : o.item.ManufacturerCode),
+                                           ManufacturerCode = (o.item.ManufacturerCode == null && (o.item.TenantOwner == AbpSession.TenantId || o.item.TenantOwner == null || o.item.TenantOwner == 0) ? o.item.Code : o.item.ManufacturerCode),
                                            SSIN = o.item.SSIN,
                                            SharingLevel = o.marketplaceItem != null ? o.marketplaceItem.SharingLevel.ToString() : null,
                                            //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
@@ -484,7 +484,7 @@ namespace onetouch.AppItems
                                            Code = d.Code,
                                            Name = d.Name,
                                            Description = d.EntityFk.Notes,
-                                           ManufacturerCode = (d.ManufacturerCode == null && d.TenantOwner == AbpSession.TenantId ? d.Code : d.ManufacturerCode),
+                                           ManufacturerCode = (d.ManufacturerCode == null && (d.TenantOwner == AbpSession.TenantId || d.TenantOwner==0 || d.TenantOwner==null ) ? d.Code : d.ManufacturerCode),
                                            //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
                                            //Price = d.Price,
                                            Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price : d.Price,
@@ -888,7 +888,7 @@ namespace onetouch.AppItems
 
 
                 var output = new GetAppItemDetailForViewDto { AppItem = ObjectMapper.Map<AppItemForViewDto>(appItem) };
-                if (appItem.ManufacturerCode == null && appItem.TenantOwner == AbpSession.TenantId)
+                if (appItem.ManufacturerCode == null && (appItem.TenantOwner == AbpSession.TenantId || appItem.TenantOwner == null || appItem.TenantOwner ==0))
                 {
                     appItem.ManufacturerCode = appItem.Code;
                 }
