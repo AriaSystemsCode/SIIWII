@@ -540,13 +540,13 @@
                                     <th>Variation Code</th>
                                     <th>Name</th>
                                     <th style="text-align: right !important;">Qty.</th>
-                                    <th #priceHeader pSortableColumn="price" style="text-align: right !important;"  [ngClass]="isReset ? 'Reset':''">Price 
+                                    <th  pSortableColumn="price" style="text-align: right !important;"  [ngClass]="isReset ? 'Reset':''">Price 
                                         <p-sortIcon    *ngIf="sortField != 'price'" class="purpleSortableIcon" field="price"></p-sortIcon>
                                         <i
                     *ngIf="sortField === 'price'"
                     class="pi pi-times"
                     style="cursor: pointer; margin-left: 5px;padding: 5px; width: 20px;  "
-                    (click)="resetPriceSort($event)"
+                    (click)="resetSort($event,'price')"
                     title="Clear sorting"
                   ></i>
                                     </th>
@@ -556,7 +556,7 @@
                                         *ngIf="sortField === 'amount'"
                                         class="pi pi-times"
                                         style="cursor: pointer; margin-left: 5px;padding: 5px; width: 20px;  "
-                                        (click)="resetAmountSort($event)"
+                                        (click)="resetSort($event,'amount')"
                                         title="Clear sorting"
                                       ></i>
                                     </th>

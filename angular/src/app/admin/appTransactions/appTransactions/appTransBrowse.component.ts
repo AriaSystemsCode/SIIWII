@@ -375,26 +375,27 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.getVariationDetail();
     }
 
-    
-    resetPriceSort(event: MouseEvent) {
-        event.stopPropagation(); 
-      if (this.sortField === 'price') {
-        this.sortField = null;
-        this.sortOrder = null;
-      }
-      this.isReset = true
-      this.getVariationDetail()
-    }
-
         
-    resetAmountSort(event: MouseEvent) {
+    resetSort(event: MouseEvent ,field:string) {
         event.stopPropagation(); 
-      if (this.sortField === 'amount') {
+      if (this.sortField === 'amount' && field == 'amount') {
         this.sortField = null;
         this.sortOrder = null;
+        this.isAmountReset = true
+
+      }else if (this.sortField === 'price' && field == 'price'){
+        this.sortField = null;
+        this.sortOrder = null;
+      this.isReset = true
+
       }
-      this.isAmountReset = true
+      
       this.getVariationDetail()
+      if (this.dataDetailTable) {
+        this.dataDetailTable.sortField = null;
+        this.dataDetailTable.sortOrder = null;
+        this.dataDetailTable._sort(); // Force sort reset
+      }
     }
     
 
