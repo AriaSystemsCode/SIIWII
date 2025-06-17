@@ -73,6 +73,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     // filters: any;
     sortField: string | undefined;
     sortOrder: number | undefined;
+    isReset:boolean
+    isAmountReset:boolean
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
@@ -373,5 +375,27 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.getVariationDetail();
     }
 
+    
+    resetPriceSort(event: MouseEvent) {
+        event.stopPropagation(); 
+      if (this.sortField === 'price') {
+        this.sortField = null;
+        this.sortOrder = null;
+      }
+      this.isReset = true
+      this.getVariationDetail()
+    }
+
+        
+    resetAmountSort(event: MouseEvent) {
+        event.stopPropagation(); 
+      if (this.sortField === 'amount') {
+        this.sortField = null;
+        this.sortOrder = null;
+      }
+      this.isAmountReset = true
+      this.getVariationDetail()
+    }
+    
 
 }

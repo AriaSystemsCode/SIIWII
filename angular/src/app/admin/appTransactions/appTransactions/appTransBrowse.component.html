@@ -521,7 +521,7 @@
                         </div>
                         <!--<Primeng-Datatable-End>-->
                     </div>   
-
+               
                     <div class="row align-items-center pt-5 mt-4 detailTab" [ngClass]="showDetails ? 'd-block' : 'd-none'">
                         <p-table
                           #dataDetailTable
@@ -540,13 +540,25 @@
                                     <th>Variation Code</th>
                                     <th>Name</th>
                                     <th style="text-align: right !important;">Qty.</th>
-                                    <th pSortableColumn="price"  style="text-align: right !important;">Price 
-                                        <p-sortIcon class="purpleSortableIcon" field="price"></p-sortIcon>
-
+                                    <th #priceHeader pSortableColumn="price" style="text-align: right !important;"  [ngClass]="isReset ? 'Reset':''">Price 
+                                        <p-sortIcon    *ngIf="sortField != 'price'" class="purpleSortableIcon" field="price"></p-sortIcon>
+                                        <i
+                    *ngIf="sortField === 'price'"
+                    class="pi pi-times"
+                    style="cursor: pointer; margin-left: 5px;padding: 5px; width: 20px;  "
+                    (click)="resetPriceSort($event)"
+                    title="Clear sorting"
+                  ></i>
                                     </th>
-                                    <th pSortableColumn="amount"  style="text-align: right !important;">Amount 
-                                        <p-sortIcon class="purpleSortableIcon" field="amount"></p-sortIcon>
-
+                                    <th pSortableColumn="amount"  style="text-align: right !important;" [ngClass]="isAmountReset ? 'Reset':''">Amount 
+                                        <p-sortIcon   *ngIf="sortField != 'amount'" class="purpleSortableIcon" field="amount"></p-sortIcon>
+                                        <i
+                                        *ngIf="sortField === 'amount'"
+                                        class="pi pi-times"
+                                        style="cursor: pointer; margin-left: 5px;padding: 5px; width: 20px;  "
+                                        (click)="resetAmountSort($event)"
+                                        title="Clear sorting"
+                                      ></i>
                                     </th>
                                 </tr>
                             </ng-template>
