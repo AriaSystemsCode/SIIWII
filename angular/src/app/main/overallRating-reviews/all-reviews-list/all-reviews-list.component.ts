@@ -311,7 +311,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
     this.messages.to = null;
     this.messages.bodyFormat = this.reviewText;
     this.messages.body = this.reviewText;
-    // this.messages.mesasgeObjectType = MesasgeObjectType.Review
+    this.messages.mesasgeObjectType = MesasgeObjectType.Review
     this.messages.relatedEntityId = this.entityID
     this.messages.subject = ''
     this.messageServiceProxy
