@@ -3432,6 +3432,8 @@ namespace onetouch.AppSiiwiiTransaction
                     //
                     await _appTransactionContactsRepository.DeleteAsync(s => s.TransactionId == transactionId);
                     await _appTransactionDetails.DeleteAsync(s => s.TransactionId == transactionId);
+                    await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == transactionId);
+                    await _appEntityClassificationRepository.DeleteAsync(z => z.EntityId == transactionId);
                     await CurrentUnitOfWork.SaveChangesAsync();
                 }
             }
