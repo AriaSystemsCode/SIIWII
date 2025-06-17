@@ -2159,6 +2159,11 @@ namespace onetouch.AppSiiwiiTransaction
                 var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
                 var notSentTransactions = _appEntityLogRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId &&
                 z.EntityObjectTypeId == input.EntityTypeIdFilter && z.EntityObjectStatusId == statusCode);
+                var idList = new List<string>();
+                if (!string.IsNullOrEmpty(input.At_Id))
+                {
+                    idList = input.At_Id.Split(',').ToList();
+                }
 
                 //log[End]
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll()
