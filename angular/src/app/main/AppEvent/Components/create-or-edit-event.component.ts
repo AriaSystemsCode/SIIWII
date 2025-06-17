@@ -393,6 +393,12 @@ this.bsConfig = {
         }
         delete this.event.status
         this.showMainSpinner();
+        if(this.event?.address?.id){
+          var id=  this.event.address.addressId ;
+            this.event.address = new AppEntityAddressDto();
+            this.event.address.addressId = id;
+        }
+
         const subs = this._appEventsServiceProxy
             .createOrEdit(this.event)
             .pipe(finalize(() => this.hideMainSpinner()))
