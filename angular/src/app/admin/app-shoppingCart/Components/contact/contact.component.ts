@@ -704,6 +704,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     
     });
+    // merge
 }
     ngDoCheck() {
         
