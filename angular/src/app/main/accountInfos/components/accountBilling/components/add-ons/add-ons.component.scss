@@ -114,7 +114,7 @@
   }
 
   .p-inputnumber-buttons-stacked .p-inputnumber-button-group .p-button.p-inputnumber-button {
-    width: 18px !important;
+    width: 22px !important;
   }
 
   .p-inputtext {
@@ -141,7 +141,10 @@
     text-align: center !important;
 
   }
-
+  .first-col {
+    color: #1B101B;
+    font-weight: 600;
+  }
   .first-col svg {
     margin-right: 5px;
   }
@@ -300,7 +303,7 @@
 }
 
 .feature {
-  color: #777;
+  color: #1B101B;
   font-size: 12px;
   font-weight: 600;
 
@@ -308,4 +311,15 @@
 
 .measure {
   color: #595959;
+}
+
+.featureCat {
+  color: #1B101B;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.unitss {
+  font-weight: 700;
+  color: #1B101B;
 }
