@@ -173,7 +173,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         const filters = this.filterForm.value;
         this.loading = true;
         this._appTransactionServiceProxy.getAll(
-            false, 0, filters.search,
+            false,0,undefined,filters.search,
             filters.codeFilter, undefined,
             filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
