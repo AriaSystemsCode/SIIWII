@@ -890,7 +890,7 @@ namespace onetouch.AppItems
                 var output = new GetAppItemDetailForViewDto { AppItem = ObjectMapper.Map<AppItemForViewDto>(appItem) };
                 if (appItem.ManufacturerCode == null && (appItem.TenantOwner == AbpSession.TenantId || appItem.TenantOwner == null || appItem.TenantOwner ==0))
                 {
-                    appItem.ManufacturerCode = appItem.Code;
+                    output.AppItem.ManufacturerCode = appItem.Code;
                 }
                 //
                 output.AppItem.AppItemSizesScaleInfo
