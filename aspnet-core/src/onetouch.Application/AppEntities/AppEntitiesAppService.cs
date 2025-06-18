@@ -331,7 +331,7 @@ namespace onetouch.AppEntities
                     output.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(appEntity.EntityAttachments);
                     foreach (var item in output.AppEntity.EntityAttachments)
                     {
-                        item.Url = @"attachments/" + -1 + @"/" + item.FileName;
+                        item.Url = @"attachments/" + (appEntity.TenantId==null? "-1": appEntity.TenantId.ToString())+ @"/" + item.FileName;
                     }
                 
                 return output;
@@ -578,7 +578,7 @@ namespace onetouch.AppEntities
                     IsHostRecord = appEntity.TenantId == null,
                     HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
                     Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
-                                  (imagesUrl + "-1" + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
+                                  (imagesUrl + (appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId == null ? "-1" : appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
                 })
                 .ToListAsync();
             }
@@ -629,7 +629,7 @@ namespace onetouch.AppEntities
                                   IsHostRecord = o.TenantId == null,
                                   HexaCode = (o.EntityExtraData!=null && o.EntityExtraData.Where(z=>z.AttributeId ==39).FirstOrDefault()!=null) ? o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue:"",
                                   Image = (o.EntityAttachments!= null && o.EntityAttachments.FirstOrDefault() !=null && o.EntityAttachments.FirstOrDefault().AttachmentFk !=null) ? 
-                                  (imagesUrl + "-1" + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
+                                  (imagesUrl + (o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId==null? "-1": o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
         };
 
 
@@ -1134,7 +1134,7 @@ namespace onetouch.AppEntities
 
                                 if (newRecord)
                                 {
-                                    var att = new AppAttachment { Name = item.guid == null ? item.DisplayName : item.FileName, Attachment = filename, TenantId = input.TenantId };
+                                    var att = new AppAttachment { Name = item.guid == null ? item.DisplayName : item.FileName, Attachment = filename, TenantId = entity.TenantId };
                                     att = await _appAttachmentRepository.InsertAsync(att);
                                     await CurrentUnitOfWork.SaveChangesAsync();
                                     //entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id });
@@ -1151,9 +1151,9 @@ namespace onetouch.AppEntities
                                     existed.Attributes = item.Attributes;
                                 }
                                 if (input.AttachmentSourceTenantId != null && input.AttachmentSourceTenantId > -2)
-                                { MoveFile(filename, input.AttachmentSourceTenantId, input.TenantId); }
+                                { MoveFile(filename, input.AttachmentSourceTenantId, entity.TenantId); }
                                 else
-                                { MoveFile(filename, AbpSession.TenantId, input.TenantId); }
+                                { MoveFile(filename, AbpSession.TenantId, entity.TenantId); }
                             }
                             else
                             {
