@@ -82,12 +82,6 @@
                     [innerHTML]="item?.appItem?.description | textSubstring: 180">
                 </p>
 
-                <p class="mb-2 pl-3" 
-                style="color: #9E9E9E;"
-                [innerHTML]="item?.appItem?.manufacturerCode ">
-            </p>
-
-
 
                 <div class="share-level" [ngClass]=" { 'share-level-div': singleItemPerRowMode }">
                     <span *ngIf="item?.appItem?.sharingLevel === '1' || item?.appItem?.sharingLevel === '2' ">
