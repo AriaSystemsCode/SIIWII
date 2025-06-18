@@ -172,23 +172,26 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
         const filters = this.filterForm.value;
         this.loading = true;
+        // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false,0,undefined,filters.search,
+            false,0,filters.search,
             filters.codeFilter, undefined,
-            filters.mainFilterType?.id, filters.minCreateDateFilter
+            filters.mainFilterType?.id,filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
-
+            
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter == null ? undefined : filters.statusFilter, false,
-            undefined, undefined, filters.referenceNumberFilter,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter == null ? undefined: filters.statusFilter, false,
+            undefined,undefined,filters.referenceNumberFilter,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
+            // this.dataTable.filters
         ).subscribe(result => {
             this.loading = false;
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
+            // console.log(result.items,'dataaaaaaaaaaaaaaaaaaa')
             this.primengTableHelper.hideLoadingIndicator();
         });
     }
