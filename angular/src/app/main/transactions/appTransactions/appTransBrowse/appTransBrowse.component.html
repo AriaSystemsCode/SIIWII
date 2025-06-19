@@ -505,19 +505,38 @@
                         [totalRecords]="totalRecords">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th>{{l('TransactionType')}}</th>
+                                    <th pSortableColumn="transactionType"   [ngClass]="isTypeReset ? 'Reset':''">{{l('TransactionType')}}      <p-sortIcon   *ngIf="sortField != 'transactionType'" class="purpleSortableIcon" field="transactionType"></p-sortIcon>
+                                        <i
+                                        *ngIf="sortField === 'transactionType'"
+                                        class="pi pi-times"
+                                        style="cursor: pointer; margin-left: 5px;padding: 5px; width: 20px;  "
+                                        (click)="resetSort($event,'transactionType')"
+                                        title="Clear sorting"
+                                      ></i></th>
                                     <th >{{l('Transaction #')}}</th>
                                     <th>Image</th>
                                     <th>Variation Code</th>
                                     <th>Name</th>
                                     <th style="text-align: right !important;">Qty.</th>
-                                    <th pSortableColumn="price"  style="text-align: right !important;">Price 
-                                        <p-sortIcon class="purpleSortableIcon" field="price"></p-sortIcon>
-
+                                    <th  pSortableColumn="price" style="text-align: right !important;"  [ngClass]="isReset ? 'Reset':''">Price 
+                                        <p-sortIcon    *ngIf="sortField != 'price'" class="purpleSortableIcon" field="price"></p-sortIcon>
+                                        <i
+                    *ngIf="sortField === 'price'"
+                    class="pi pi-times"
+                    style="cursor: pointer; margin-left: 5px;padding: 5px; width: 20px;  "
+                    (click)="resetSort($event,'price')"
+                    title="Clear sorting"
+                  ></i>
                                     </th>
-                                    <th pSortableColumn="amount"  style="text-align: right !important;">Amount 
-                                        <p-sortIcon class="purpleSortableIcon" field="amount"></p-sortIcon>
-
+                                    <th pSortableColumn="amount"  style="text-align: right !important;" [ngClass]="isAmountReset ? 'Reset':''">Amount 
+                                        <p-sortIcon   *ngIf="sortField != 'amount'" class="purpleSortableIcon" field="amount"></p-sortIcon>
+                                        <i
+                                        *ngIf="sortField === 'amount'"
+                                        class="pi pi-times"
+                                        style="cursor: pointer; margin-left: 5px;padding: 5px; width: 20px;  "
+                                        (click)="resetSort($event,'amount')"
+                                        title="Clear sorting"
+                                      ></i>
                                     </th>
                                 </tr>
                             </ng-template>
