@@ -320,6 +320,7 @@ export class TransactionInformationComponent
         this.filterForm.reset()
         this.displayedVariations = []
         this.filteredColors = []
+        this.allVariations = [];
         this.getSellerVariations(0, 10, '')
         this.hideMainSpinner();
         this.getLinesData();
