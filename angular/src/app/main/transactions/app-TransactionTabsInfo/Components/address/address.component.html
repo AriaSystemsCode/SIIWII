@@ -119,21 +119,21 @@
 
             <div class="row">
                 <div class="col-12">
-                    <label class="label mt-2 mb-2">{{l("Code")}}</label>
+                    <label class="label mt-2 mb-2">{{l("Code")}} *</label>
                     <input type="text" placeholder="Adress Code..." class="form-control w-100" name="addressCode"
-                        [(ngModel)]="addressCode" #Code="ngModel" />
+                        [(ngModel)]="addressCode" #Code="ngModel" required />
 
                 </div>
                 <div class="col-12">
-                    <label class="label mt-2 mb-2">{{l("Name")}}</label>
+                    <label class="label mt-2 mb-2">{{l("Name")}} *</label>
                     <input type="text" placeholder="Adress Name..." class="form-control w-100" name="name"
-                        [(ngModel)]="name" #Name="ngModel" />
+                        [(ngModel)]="name" #Name="ngModel" required />
 
                 </div>
                 <div class="col-12">
-                    <label class="label mt-2 mb-2">{{l("AddressLineOne")}}</label>
+                    <label class="label mt-2 mb-2">{{l("AddressLineOne")}} *</label>
                     <input type="text" placeholder="Adress Line 1..." class="form-control w-100" name="address1"
-                        [(ngModel)]="address1" #addressOne="ngModel" />
+                        [(ngModel)]="address1" #addressOne="ngModel" required />
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineTow")}}</label>
@@ -141,21 +141,21 @@
                         [(ngModel)]="address2" #addressTwo="ngModel" />
                 </div>
                 <div class="col-12">
-                    <label class="label mt-2 mb-2">{{l("City")}}</label>
+                    <label class="label mt-2 mb-2">{{l("City")}} *</label>
                     <input type="text" placeholder="City..." class="form-control w-100" name="cityAddress"
-                        [(ngModel)]="city" #cityAddress="ngModel" />
+                        [(ngModel)]="city" #cityAddress="ngModel" required/>
                 </div>
                 <div class="col-12">
-                    <label class="label mt-2 mb-2">{{l("State")}}</label>
+                    <label class="label mt-2 mb-2">{{l("State")}} *</label>
                     <input type="text" placeholder="State..." class="form-control w-100" name="State"
-                        [(ngModel)]="state" #AddState="ngModel" />
+                        [(ngModel)]="state" #AddState="ngModel" required />
 
 
                 </div>
                 <div class="col-md-6">
-                    <label class="label mt-2 mb-2">{{l("PostalCode")}} </label>
+                    <label class="label mt-2 mb-2">{{l("PostalCode")}} * </label>
                     <input type="text" placeholder="Postal Code 1..." class="form-control w-100" name="postalCode"
-                        [(ngModel)]="postalCode" #postal_Code="ngModel" pattern="^[a-zA-Z0-9- ]+$" maxlength="20" />
+                        [(ngModel)]="postalCode" #postal_Code="ngModel" required pattern="^[a-zA-Z0-9- ]+$" maxlength="20" />
                 </div>
                 <div class="col-md-6" *ngIf="countries.length>0">
                     <label class="label mt-2 mb-2">{{l("Country")}} </label>
