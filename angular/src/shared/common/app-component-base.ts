@@ -259,18 +259,10 @@ export abstract class AppComponentBase {
             file.withCredentials = false;
         };
 
-        uploader.onSuccessItem = (item, response, status) => {
-            const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-            if (ajaxResponse?.success) {
-                this.notify.info(this.l("UploadSuccessfully"));
-                if (success) {
-                    success(ajaxResponse.result);
-                }
-            } else {
-                if(ajaxResponse?.error?.message)
-                this.message.error(ajaxResponse?.error?.message);
-            }
+        uploader.onCompleteAll = () => {
+            this.notify.info(this.l("UploadSuccessfully"));
         };
+        
 
         const uploaderOptions: Partial<FileUploaderOptions> = {};
         uploaderOptions.authToken = "Bearer " + this.tokenService.getToken();

@@ -2254,36 +2254,47 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         this.createOreEditAppEntityModal.show(entityObjectType,appEntity,false)
     }
 
-    onAddNonLookupValues($event:AppEntityDto){
+    onAddNonLookupValues($event: AppEntityDto) {
         this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
-       .subscribe((nonLookupValues :LookupLabelDto) => {
-         //  this.nonLookupValues.push(nonLookupValues);
-         if(!$event?.id)
-         this.appItem.nonLookupValues.push(nonLookupValues);
-
-         else{
-             let x = this.appItem.nonLookupValues.filter(x=>x.code==nonLookupValues.code);
-             
-             let  extraAttr =
-             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
-             let y = extraAttr.displayedSelectedValues?.filter(x=>x.code==nonLookupValues.code);
-
-
-             if(x && x.length>0)
-              {
-                  x[0].hexaCode=nonLookupValues.hexaCode;
-                  x[0].image=nonLookupValues.image;
-                  x[0].label=nonLookupValues.label;
-                  x[0].value=nonLookupValues.value;
-
-                  y[0].hexaCode=nonLookupValues.hexaCode;
-                  y[0].image=nonLookupValues.image;
-                  y[0].label=nonLookupValues.label;
-                  y[0].value=nonLookupValues.value;
-              }
-         }
-       });  
-    }
+          .subscribe((nonLookupValues: LookupLabelDto) => {
+      
+            // 🟦 Build image URL from attachment if exists
+            if ($event?.entityAttachments?.length > 0) {
+              const attachment = $event.entityAttachments[0];
+              const extension = attachment.fileName?.split('.').pop() || 'png';
+              const tenantId = $event.tenantId ?? -1;
+      
+              nonLookupValues.image = `attachments/${tenantId}/${attachment.guid}.${extension}`;
+            }
+      
+            // 🟩 Find and update value in nonLookupValues list
+            const existing = this.appItem.nonLookupValues.find(x => x.code === nonLookupValues.code);
+            const extraAttr = this.selectedExtraAttributes[this.activeExtraAttributeIndex];
+            const displayedMatch = extraAttr.displayedSelectedValues?.find(x => x.code === nonLookupValues.code);
+      
+            if (existing) {
+              existing.image = nonLookupValues.image;
+              existing.label = nonLookupValues.label;
+              existing.value = nonLookupValues.value;
+              existing.hexaCode = nonLookupValues.hexaCode;
+            }
+      
+            if (displayedMatch) {
+              displayedMatch.image = nonLookupValues.image;
+              displayedMatch.label = nonLookupValues.label;
+              displayedMatch.value = nonLookupValues.value;
+              displayedMatch.hexaCode = nonLookupValues.hexaCode;
+      
+              // 🔄 Trigger UI change
+              extraAttr.displayedSelectedValues = [...extraAttr.displayedSelectedValues];
+            }
+      
+          
+          });
+      }
+      
+      
+      
    async onCreateOrEditDoneHandler(){
       
         const extraAttr =
