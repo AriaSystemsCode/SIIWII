@@ -195,7 +195,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.loading = true;
         // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false,0,filters.search,
+            false,0,undefined,filters.search,
             filters.codeFilter, undefined,
             filters.mainFilterType?.id,filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
