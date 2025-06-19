@@ -162,9 +162,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
     async ngOnInit() {
-        if (!this.accountId) {
+       /*  if (!this.accountId) {
             this.accountId = this.appSession?.user?.accountId;
-          }
+          } */
         
          this.handleComponentMode()
         this.isHost = !this._abpSessionService.tenantId;
@@ -187,6 +187,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             }
             const noSelectedTabs : boolean = isNaN(AccountInfoPageTabs[currentTab])
             const isCreateMode = this.isMyAccountCreate || this.isExternalAccountCreate || this.isManualAccountCreate
+            this.currentTab = AccountInfoPageTabs[currentTab]
+
             if ( noSelectedTabs )  {
                 if(this.isMyAccountEdit || this.isExternalAccountEdit || this.isManualAccountEdit || this.otherAccount ) return this.changeTab(AccountInfoPageTabs.ProfileView)
                 if(isCreateMode) return this.changeTab(AccountInfoPageTabs.ProfileCreateOrEdit)
@@ -602,7 +604,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             const isCreateMode = this.isMyAccountCreate || this.isExternalAccountCreate || this.isManualAccountCreate
             let prevCurrentTab : AccountInfoPageTabs = this.currentTab
             if ( isCreateMode ) {
-                if( this.currentTab !== this.accountInfoPageTabsEnum.ProfileCreateOrEdit && this.currentTab !== this.accountInfoPageTabsEnum.Branches )
+                if( this.currentTab!=undefined  && this.currentTab !== this.accountInfoPageTabsEnum.ProfileCreateOrEdit && this.currentTab !== this.accountInfoPageTabsEnum.Branches )
                 this.notify.warn(this.l("PleaseCompleteAndSaveYourDataFirst"))
                 number = AccountInfoPageTabs.ProfileCreateOrEdit
             }
