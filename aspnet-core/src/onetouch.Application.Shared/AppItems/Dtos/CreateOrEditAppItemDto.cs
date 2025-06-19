@@ -231,7 +231,7 @@ namespace onetouch.AppItems.Dtos
         public virtual DateTime LastModifiedDate { set; get; }
         public virtual long NumberOfSubscribers { set; get; }
         //MMT33-2
-
+        public virtual string ManufacturerCode { set; get; }
     }
 
 
