@@ -3,8 +3,6 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
 import { AppEntitiesServiceProxy, AppFeaturesServiceProxy, AppSubscriptionPlanDetailsServiceProxy, CreateOrEditAppSubscriptionPlanDetailDto, LookupLabelDto, SycEntityObjectStatusDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import * as moment from 'moment';
-
 import { AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent } from './appSubscriptionPlanDetail-appSubscriptionPlanHeader-lookup-table-modal.component';
 import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from './appSubscriptionPlanDetail-appFeature-lookup-table-modal.component';
 
@@ -122,30 +120,33 @@ export class CreateOrEditAppSubscriptionPlanDetailModalComponent extends AppComp
     getNewAppFeatureId() {
         this.appSubscriptionPlanDetail.appFeatureId = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.id;
         this.appFeatureDescription = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.displayName;
-        this._appFeatureProxy.getAppFeatureForView(this.appSubscriptionPlanDetail.appFeatureId )
-        .subscribe(result => {
-            
-            //
-            this.appSubscriptionPlanDetail.featureCode = result.appFeature.code;
-            this.appSubscriptionPlanDetail.unitPrice = result.appFeature.unitPrice;
-            this.appSubscriptionPlanDetail.featureBillingCode = result.appFeature.billingCode;
-            this.appSubscriptionPlanDetail.unitPrice = result.appFeature.unitPrice;
-            this.appSubscriptionPlanDetail.featureCategory = result.appFeature.category;
-            this.appSubscriptionPlanDetail.featurePeriodLimit= result.appFeature.featurePeriodLimit;
-            this.appSubscriptionPlanDetail.isFeatureBillable = result.appFeature.billable;
-            this.appSubscriptionPlanDetail.unitOfMeasurmentCode = result.appFeature.unitOfMeasurementCode;
-            this.appSubscriptionPlanDetail.unitOfMeasurementName = result.appFeature.unitOfMeasurementName;
-            this.appSubscriptionPlanDetail.trackactivity = result.appFeature.trackActivity;
-            this.appSubscriptionPlanDetail.featureDescription = result.appFeature.description;
-            this.appSubscriptionPlanDetail.featureName = result.appFeature.name;
-            this.appSubscriptionPlanDetail.featureStatus =  result.appFeature.featureStatus;
-            this.appSubscriptionPlanDetail.notes = result.appFeature.notes;
-            //
-            this.active = true;
-            this.modal.show();
-        });
-       // this.appSubscriptionPlanDetail.availability = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.;
-    }
+      
+        this._appFeatureProxy.getAppFeatureForView(this.appSubscriptionPlanDetail.appFeatureId)
+          .subscribe(result => {
+            const feature = result.appFeature;
+      
+            this.appSubscriptionPlanDetail.featureCode = feature.code;
+            this.appSubscriptionPlanDetail.unitPrice = feature.unitPrice;
+            this.appSubscriptionPlanDetail.featureBillingCode = feature.billingCode;
+            this.appSubscriptionPlanDetail.featureCategory = feature.category;
+            this.appSubscriptionPlanDetail.featurePeriodLimit = feature.featurePeriodLimit;
+            this.appSubscriptionPlanDetail.isFeatureBillable = feature.billable;
+            this.appSubscriptionPlanDetail.unitOfMeasurmentCode = feature.unitOfMeasurementCode;
+            this.appSubscriptionPlanDetail.unitOfMeasurementName = feature.unitOfMeasurementName;
+            this.appSubscriptionPlanDetail.trackactivity = feature.trackActivity;
+            this.appSubscriptionPlanDetail.featureDescription = feature.description;
+            this.appSubscriptionPlanDetail.featureName = feature.name;
+            this.appSubscriptionPlanDetail.featureStatus = feature.featureStatus;
+            this.appSubscriptionPlanDetail.notes = feature.notes;
+      
+            this.appSubscriptionPlanDetail.availability ??= 'Unlimited';
+      
+            setTimeout(() => {
+              this.modal.show(); 
+            }, 0);
+          });
+      }
+      
 
 
 
