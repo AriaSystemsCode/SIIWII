@@ -68,6 +68,9 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     rowsPerPage: number = 10;
     sortField: string | undefined;
     sortOrder: number | undefined;
+    isReset:boolean
+    isAmountReset:boolean
+    isTypeReset:boolean
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
@@ -350,5 +353,35 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.getVariationDetail();
     }
 
+        
+    resetSort(event: MouseEvent ,field:string) {
+        event.stopPropagation(); 
+      if (this.sortField === 'amount' && field == 'amount') {
+        this.sortField = null;
+        this.sortOrder = null;
+        this.isAmountReset = true
+
+      }else if (this.sortField === 'price' && field == 'price'){
+        this.sortField = null;
+        this.sortOrder = null;
+      this.isReset = true
+
+      }else if (this.sortField === 'transactionType' && field == 'transactionType'){
+        this.sortField = null;
+        this.sortOrder = null;
+      this.isTypeReset = true
+
+      }
+
+      
+      
+      this.getVariationDetail()
+      if (this.dataDetailTable) {
+        this.dataDetailTable.sortField = null;
+        this.dataDetailTable.sortOrder = null;
+        this.dataDetailTable._sort(); // Force sort reset
+      }
+    }
+    
 
 }
