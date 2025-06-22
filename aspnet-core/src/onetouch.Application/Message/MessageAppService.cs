@@ -764,6 +764,59 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<List<GetMessagesForViewDto>> CreateMessage(CreateMessageInput input)
         {
+            //I40-X27[Start]
+            if (input.MesasgeObjectType == MesasgeObjectType.Review)
+            {
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+                    var review = await CreateMarketplaceMessageForSenderUser(input);
+                    if (input.To != null)
+                    {
+                        var wntityObj = await _appEntityRepository.GetAll().Where(z => z.Id == input.RelatedEntityId).FirstOrDefaultAsync();
+                        if (wntityObj != null && wntityObj.TenantOwner != null && wntityObj.TenantOwner != 0)
+                        {
+                            var tenant = await TenantManager.GetByIdAsync(wntityObj.TenantOwner);
+                            if (tenant != null)
+                            {
+                                string userName = "admin@" + tenant.TenancyName;
+                                var adminUser = await UserManager.FindByNameAsync(userName);
+                                if (adminUser != null)
+                                    input.To = adminUser.Id.ToString();
+                                //input.To
+                            }
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(input.To))
+                    {
+                        var user = UserManager.GetUserById(long.Parse(input.To));
+                        if (user != null)
+                        {
+                            if (input.MentionedUsers == null)
+                                input.MentionedUsers = new List<MentionedUserInfo>();
+                            if (input.MentionedUsers.FirstOrDefault(z => z.UserId == user.Id && z.TenantId == long.Parse(user.TenantId.ToString())) == null)
+                                input.MentionedUsers.Add(new MentionedUserInfo { UserId = user.Id, TenantId = long.Parse(user.TenantId.ToString()) });
+                        }
+                    }
+                    if (input.MentionedUsers != null && input.MentionedUsers.Count > 0)
+                    {
+                        foreach (var userId in input.MentionedUsers)
+                        {
+                            CreateMessageForRecieversInput createMessageForRecieversInput = new CreateMessageForRecieversInput();
+                            createMessageForRecieversInput.Messageid = review.Id;
+                            createMessageForRecieversInput.ThreadId = review.ThreadId;
+                            createMessageForRecieversInput.CreateMessageInput = input;
+                            createMessageForRecieversInput.CreateMessageInput.To = userId.UserId.ToString();
+                            string[] toList = new string[1];
+                            toList[0] = userId.UserId.ToString();
+                            createMessageForRecieversInput.UsersList = toList;
+                            await CreateMessageForRecieverUsers(createMessageForRecieversInput);
+                        }
+                    }
+
+                    return GetCommentsForView(review.Id);
+                }
+            }
+            //I40-X27[End]
             //MMT39
             if (input.MesasgeObjectType == MesasgeObjectType.Comment)
             {
