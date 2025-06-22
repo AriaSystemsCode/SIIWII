@@ -133,9 +133,9 @@ namespace onetouch.Message
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MENTION", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeComment)
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD", z => (z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage || z.EntityFk.EntityObjectTypeId == entityObjectTypeComment) &&
-  (z.ParentFKList.Count > 0 || z.ParentId != null || (z.EntityFk.EntityObjectTypeId == entityObjectTypeComment &&  _MessagesRepository.GetAll().Count(x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId) &&
-   x.ThreadId == z.ThreadId && x.EntityFk.EntityObjectTypeId == z.EntityFk.EntityObjectTypeId ) > 0))) // || _MessagesRepository.GetAll().Count(x => x.ThreadId == z.ThreadId) > 0
-                                                                                                                             // Iteration 39 [End]
+  (z.ParentFKList.Count > 0 || z.ParentId != null || (z.EntityFk.EntityObjectTypeId == entityObjectTypeComment && _MessagesRepository.GetAll().Count(x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId) &&
+   x.ThreadId == z.ThreadId && x.EntityFk.EntityObjectTypeId == z.EntityFk.EntityObjectTypeId) > 0))) // || _MessagesRepository.GetAll().Count(x => x.ThreadId == z.ThreadId) > 0
+                                                                                                      // Iteration 39 [End]
 .WhereIf(input.messageTypeIndex == 3 && (!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE"), x => (x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted) && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId))
                                     //xx
                                     .WhereIf(input.messageTypeIndex == 3 && (!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE"), x => x.EntityFk.EntityClassifications.Count(x => x.EntityObjectClassificationId == entityObjectClassStarred) > 0)
@@ -149,8 +149,8 @@ namespace onetouch.Message
                          .WhereIf(string.IsNullOrEmpty(input.MessageCategoryFilter) || input.MessageCategoryFilter.ToUpper() != "THREAD", x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)
            ||
            (x.SenderId == AbpSession.UserId)))
-                         .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD",x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId))
-                         .WhereIf(input.MessageCategoryFilter.ToUpper() != "MESSAGE",r => r.Id == _MessagesRepository.GetAll().Where(rr => rr.ThreadId == r.ThreadId).Max(rr => rr.Id));
+                         .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD", x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId))
+                .WhereIf(input.MessageCategoryFilter.ToUpper() != "MESSAGE",r => r.Id == _MessagesRepository.GetAll().Where(rr => rr.ThreadId == r.ThreadId && rr.TenantId== AbpSession.TenantId).Min(rr => rr.Id));
                 /*.Where(x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)                
            ||
            (x.SenderId == AbpSession.UserId)));*/
