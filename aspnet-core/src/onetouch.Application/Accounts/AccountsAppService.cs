@@ -5308,6 +5308,35 @@ namespace onetouch.Accounts
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<BranchDto> CreateOrEditBranch(BranchDto input)
         {
+            //MMT40[Start]
+            CreateOrEditAccountInfoDto branchObject = new CreateOrEditAccountInfoDto();
+            branchObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(input);
+            branchObject.ReturnId = true;
+            var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
+            if (string.IsNullOrEmpty(branchObject.SSIN))
+            {
+                AppEntity entity = new AppEntity();
+                var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
+                entity.EntityObjectTypeCode = entityParent.EntityObjectTypeCode;
+                var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+                branchObject.SSIN = await
+                    _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
+
+            }
+            var output = await CreateOrEditAccount(branchObject);
+            if (output != null && output.AccountInfo.Id!=null)
+            {
+                var contactBranch = _appContactRepository.FirstOrDefault((long)output.AccountInfo.Id);
+                if (contactBranch != null)
+                {
+                    contactBranch.ParentCode = contactParent.Code;
+                    contactBranch.ParentId = input.ParentId;
+                    contactBranch.AccountId = contactParent.AccountId== null? input.ParentId: contactParent.AccountId;
+                    await _appContactRepository.UpdateAsync(contactBranch);
+                }
+            }
+            return ObjectMapper.Map<BranchDto>(output);
+            //MMT40[End]
             if (input.Id == null || input.Id == 0)
             {
                 return await CreateBranch(input);

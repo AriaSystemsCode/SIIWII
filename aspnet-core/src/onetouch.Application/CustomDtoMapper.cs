@@ -947,6 +947,11 @@ namespace onetouch
             configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap()
                 .ForMember(z=>z.FeatureStatus, z=>z.MapFrom(ss=>ss.EntityObjectStatusCode))
                 .ForMember(z=>z.Category, z=>z.MapFrom(s=>s.CategoryCode));
+            //MMT40[Start]
+            configuration.CreateMap<BranchDto, CreateOrEditAccountInfoDto>()
+                .ForMember(z => z.AccountLevel, z => z.MapFrom(s=> AccountLevelEnum.Manual));
+            configuration.CreateMap<GetAccountInfoForEditOutput, BranchDto>();
+            //MMT40[End]
         }
     }
 }
