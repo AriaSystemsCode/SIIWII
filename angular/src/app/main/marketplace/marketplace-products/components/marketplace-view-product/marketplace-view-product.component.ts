@@ -270,8 +270,16 @@ export class MarketplaceViewProductComponent
         console.log(index,'indexxx')
         this.currentIndex = index;
         this.isColorView = false
-        this.colorAttachmentForMainIamge = this.colorsData[index]?.colorImg;
-        this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
+       // this.colorAttachmentForMainIamge = this.colorsData[index]?.colorImg;
+        // this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
+        const firstFilteredCode = this.filteredColors[0]?.colorCodeSelectedValues?.toLowerCase()?.trim();
+        const originalIndex = this.colorsData.findIndex(color =>
+            color?.colorCodeSelectedValues?.toLowerCase()?.trim() === firstFilteredCode
+        );
+
+        this.colorAttachmentForMainIamge = this.colorsData[originalIndex]?.colorImg;
+        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments;
+
 
     }
     setColorView(value: boolean) {
