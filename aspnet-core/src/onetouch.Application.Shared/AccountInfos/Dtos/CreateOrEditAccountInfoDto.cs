@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using onetouch.AppEntities.Dtos;
 using onetouch.Common;
 using onetouch.AppContacts.Dtos;
+using onetouch.AppItems.Dtos;
 
 namespace onetouch.AccountInfos.Dtos
 {
@@ -111,6 +112,9 @@ namespace onetouch.AccountInfos.Dtos
         public virtual IList<AppContactAddressDto> ContactAddresses { get; set; }
 
         public virtual IList<AppContactPaymentMethodDto> ContactPaymentMethods { get; set; }
+        //MMT40[Start]
+        public virtual IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
+        //MMT40[end]
 
     }
 }

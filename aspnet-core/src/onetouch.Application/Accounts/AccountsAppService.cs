@@ -5331,7 +5331,7 @@ namespace onetouch.Accounts
                 {
                     contactBranch.ParentCode = contactParent.Code;
                     contactBranch.ParentId = input.ParentId;
-                    contactBranch.AccountId = contactParent.AccountId== null? input.ParentId: contactParent.AccountId;
+                    contactBranch.AccountId = contactParent.AccountId== null? input.ParentId:contactParent.AccountId;
                     await _appContactRepository.UpdateAsync(contactBranch);
                 }
             }
