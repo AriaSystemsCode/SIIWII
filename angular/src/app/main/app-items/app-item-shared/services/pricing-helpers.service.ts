@@ -39,9 +39,14 @@ export class PricingHelpersService extends AppComponentBase {
     return row
   }
   setRowValues(prices?:AppItemPriceInfo[]) : MatrixGridSelectItem[] {
+    
+    let languageSettingName  =AppConsts.languageSettingName;
+    let defaultLevel= languageSettingName!='en-GB'? 'MSRP' : 'RRP';
+
     const rowValues : MatrixGridSelectItem[] = [
       new MatrixGridSelectItem({ 
-        label: this.l(this.defaultLevel), 
+       //label: this.l(this.defaultLevel), 
+       label:defaultLevel,
         value: prices ? prices[this.getDefaultPricingIndex(prices)]?.price : 0 
       }),
     ]
@@ -56,8 +61,12 @@ export class PricingHelpersService extends AppComponentBase {
     return rowValues
   }
   setColsValues() : MatrixGridSelectItem[] {
+    let languageSettingName  =AppConsts.languageSettingName;
+    let defaultLevel= languageSettingName!='en-GB'? 'MSRP' : 'RRP';
+
     const colValues : MatrixGridSelectItem[] = [
-      new MatrixGridSelectItem({ label: this.l(this.defaultLevel), value: this.l(this.defaultLevel) }),
+      //new MatrixGridSelectItem({ label: this.l(this.defaultLevel), value: this.l(this.defaultLevel) }),
+      new MatrixGridSelectItem({ label: defaultLevel, value: this.l(this.defaultLevel) }),
     ]
     this.levels.forEach(level => {
       const col = new MatrixGridSelectItem({ label: this.l('PriceLevel{0}', level), value: level })

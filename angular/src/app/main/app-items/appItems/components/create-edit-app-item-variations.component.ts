@@ -1309,8 +1309,9 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             return variation.ssin; 
         });
 
-
-
+        let codesInMatrices1 = new Set(variationMatrices1.map(v => v.code));
+        // Filter variationMatrices2 to exclude items with duplicate codes
+        variationMatrices2 = variationMatrices2.filter(v => !codesInMatrices1.has(v.code));
         this.variationMatrices = [...variationMatrices1, ...variationMatrices2];
     }
 

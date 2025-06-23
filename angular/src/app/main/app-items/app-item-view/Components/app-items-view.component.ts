@@ -856,9 +856,11 @@ export class AppItemsViewComponent
         this.currencyId = this.tenantDefaultCurrency.value;
         this.level = this._pricingHelpersService.defaultLevel;
         // currencies
+        let languageSettingName=AppConsts.languageSettingName;
         this.levels = [
             {
-                label: this._pricingHelpersService.defaultLevel,
+                //label: this._pricingHelpersService.defaultLevel,
+                label: this._pricingHelpersService.defaultLevel=='MSRP' ?( languageSettingName!='en-GB' ? 'MSRP'  : 'RRP' ) : this._pricingHelpersService.defaultLevel,
                 value: this._pricingHelpersService.defaultLevel,
             },
             ...this._pricingHelpersService.levels.map((item) => {
