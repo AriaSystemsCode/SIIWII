@@ -2615,6 +2615,17 @@ namespace onetouch.AppItems
                                     }
 
                                 }
+                                //T-SII-20250618.0003,1 MMT 06/24/2025 clear the color hexa attribute if the color has no hexa color[Start]
+                                else
+                                {
+                                    colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                    if (colorHexa != null)
+                                    {
+                                        colorHexa.AttributeValue = "";
+                                    }
+
+                                }
+                                //T-SII-20250618.0003,1 MMT 06/24/2025 clear the color hexa attribute if the color has no hexa color[Start]
 
                                 var colorNRFlook = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
                                 if (colorNRFlook != null && !string.IsNullOrEmpty(colorNRFlook.AttributeValue))
