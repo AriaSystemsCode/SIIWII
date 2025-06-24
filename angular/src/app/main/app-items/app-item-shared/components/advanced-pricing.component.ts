@@ -10,6 +10,7 @@ import { AppItemPriceInfo, CreateOrEditAppItemDto, CurrencyInfoDto } from '@shar
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import { PricingHelpersService } from '../services/pricing-helpers.service';
+import { AppConsts } from '@shared/AppConsts';
 
 @Component({
   selector: 'app-advanced-pricing',
@@ -105,8 +106,10 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
         currencyRowIndex = this.rows.length - 1
         }
       }
-      const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label == item.code)
-      if(matrixCellIndex > -1) this.rows[currencyRowIndex].rowValues[matrixCellIndex].value = item.price
+     // const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label == item.code)
+    let languageSettingName  =AppConsts.languageSettingName;
+     const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label ==( (item.code =='MSRP' &&  languageSettingName=='en-GB') ? 'RRP' : item.code  ))
+     if(matrixCellIndex > -1) this.rows[currencyRowIndex].rowValues[matrixCellIndex].value = item.price
     })
   }
   addNewCurrency() {

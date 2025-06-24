@@ -1,0 +1,878 @@
+.type {
+
+    padding: 6px 16px;
+
+    border-radius: 6px;
+    border: 1px solid #EEE;
+    background: #F8F8F8;
+    color: #9E9E9E;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    height: 35px;
+
+}
+
+.summary-sec {
+    padding-left: 15px !important;
+}
+
+.details-sec {
+    border-radius: 12px;
+}
+
+.imageSlides {
+    width: 85px;
+    height: 57px;
+    border-radius: 6px 6px 0 0;
+
+    cursor: pointer;
+}
+
+.showRoomLink[disabled] {
+    cursor: not-allowed;
+
+    * {
+        pointer-events: none;
+
+    }
+}
+
+.msrp h5,
+.msrp span {
+    color: #595959 !important;
+}
+
+td {
+    color: black !important;
+    font-weight: bold;
+    vertical-align: initial !important
+}
+
+.textarea.form-control {
+    min-height: 100px !important;
+    padding: 7px !important;
+}
+
+.showRoomLink {
+    max-width: 257px;
+    max-height: 40px;
+    border-radius: 6px;
+    padding: 11px 20px 11px 20px !important;
+    background-color: #4A0D4A;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.description button {
+    white-space: nowrap;
+    height: 46px;
+    border-radius: 6px;
+
+    border: 1px solid rgba(238, 238, 238, 0.93);
+    background: #FFF;
+    box-shadow: 2px 2px 6px 0px rgba(22, 22, 22, 0.05);
+    color: #4A0D4A !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.parent-slider {
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #D9D9D9;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+
+        background: #FFFFFF;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 20px;
+        border: 1px solid #D9D9D9 !important;
+
+
+    }
+}
+
+.slider-container {
+    position: relative;
+    overflow: hidden;
+    gap: 8px;
+    width: 100%;
+
+}
+
+.slider {
+    display: flex;
+    flex-direction: row;
+    transition: transform 0.5s;
+    background-color: transparent !important;
+}
+
+.indicator-btns {
+    background-color: transparent;
+    border: 1px solid #EEE;
+
+    width: 32px;
+    height: 32px;
+    margin-top: 14px;
+    border-radius: 8px;
+    color: #4A0D4A;
+}
+
+.indicator-btns:hover {
+    background-color: #4A0D4A;
+    border: 1px solid;
+
+    width: 32px;
+    height: 32px;
+    margin-top: 14px;
+    border-radius: 8px;
+    color: #fff;
+}
+
+.table {
+    background-color: #fff !important;
+}
+
+.summary {
+    border-radius: 12px;
+    background-color: white;
+
+    .header {
+        background-color: #F8F8F8;
+        color: black;
+        font-weight: bold;
+        padding: 8px 12px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .totals {
+        color: black;
+        background-color: #F8F8F8;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        p {
+            font-weight: 400;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        h6 {
+            font-weight: 600;
+            font-size: 18px;
+        }
+    }
+
+    .orderedSummary {
+        height: 500px;
+        overflow-y: scroll;
+        padding: 7px;
+        padding-right: 0;
+        background-color: #fff;
+
+        .default {
+            background-color: #F8F8F8;
+            align-items: center;
+            padding: 10px;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+        }
+    }
+
+    .orderedSummary::-webkit-scrollbar {
+        width: 8px;
+        /* Set the width of the scrollbar */
+    }
+
+    .orderedSummary::-webkit-scrollbar-thumb {
+        background-color: #888;
+        /* Set the color of the thumb (the draggable part) */
+        border-radius: 6px;
+        /* Set the border radius to round the edges */
+    }
+
+    .orderedSummary::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+        /* Set the color when hovering over the thumb */
+    }
+
+    .orderedSummary::-webkit-scrollbar-track {
+        background-color: #fff;
+        /* Set the color of the track (the non-draggable part) */
+    }
+
+    .orderedSummary::-webkit-scrollbar-track:hover {
+        background-color: #fff;
+        /* Set the color when hovering over the track */
+    }
+
+    .add-btn {
+        background-color: #4A0D4A;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        font-weight: 600;
+        color: #fff;
+        width: 100%;
+        border-radius: 6px;
+
+    }
+}
+
+.close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: solid 1px !important;
+    padding: 13px 9px !important;
+    border-radius: 50% !important;
+
+    i {
+        font-size: 13px !important;
+    }
+}
+
+.imagAndHexaCode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.colorBox {
+    width: 86px;
+    height: 57px;
+    cursor: pointer;
+}
+
+
+
+table th {
+    color: black !important;
+    background-color: #F8F8F8;
+    vertical-align: initial !important;
+    text-align: center !important;
+
+
+}
+
+.summaryTables td {
+    color: #9E9E9E !important;
+    text-align: center !important;
+    vertical-align: initial !important
+}
+
+.p-tabview .p-tabview-nav {
+    margin-bottom: 10px;
+}
+
+.p-tabview .p-tabview-nav li {
+    margin: 0 !important;
+}
+
+::ng-deep {
+
+    .p-tabview .p-tabview-panels {
+        padding: 0 !important;
+        border: none !important;
+        margin-top: 10px !important
+    }
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 4px !important;
+    border: 1px solid black;
+}
+
+.p-tabview .p-tabview-panels {
+    margin-top: 8px !important;
+}
+
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 10px;
+    /* Adjust margin as needed */
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.switch .slider:before {
+    background-color: white;
+}
+
+.switch .slider {
+    border: #aaaaaa solid 1px !important;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #2DC74F !important;
+}
+
+input:not(:checked)+.slider {
+    background-color: #ccc !important;
+    /* Or any other color when not checked */
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #2DC74F;
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+::ng-deep {
+    .p-dialog {
+        border-radius: 20px;
+        border: 1px solid #EEE;
+        background: #FFF;
+        padding: 15px;
+        margin: 10px;
+        box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.15);
+    }
+
+    .p-dialog .p-dialog-header {
+        border: none !important;
+        background: white !important;
+        padding: 0 !important;
+    }
+
+    .p-button-text {
+        button {
+            background-color: #4A0D4A !important;
+            border: none !important;
+            border-radius: 6px !important;
+            padding: 8px 32px;
+        }
+
+    }
+
+    .p-inputnumber-buttons-stacked .p-inputnumber-input {
+        max-width: 133px !important;
+        color: #595959;
+        border: 1px solid #D9D9D9 !important;
+        background: #FFF !important;
+    }
+
+    @media only screen and (max-width: 992px) {
+        .editQty {
+            max-width: 145px;
+        }
+
+        .web {
+            margin-top: 15px;
+        }
+
+        .summaryWeb {
+            display: none;
+        }
+
+        .summaryTab {
+            display: block;
+            margin-top: 25px;
+            padding-right: 20px;
+        }
+
+        .p-tabview-title {
+            font-size: 10px !important;
+        }
+
+    }
+
+    .summary-sec {
+        padding-left: 0 !important;
+    }
+}
+
+
+
+@media only screen and (min-width: 992px) {
+    .editQty {
+        max-width: 267px;
+    }
+
+    .web {
+        margin-top: -50px;
+    }
+
+    .summaryWeb {
+        display: block;
+    }
+
+    .summaryTab {
+        display: none;
+    }
+}
+
+h4,
+h5 {
+    color: #1B101B;
+    font-weight: 500;
+
+}
+
+h6 {
+    color: #1B101B;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+}
+
+.searchBtn {
+    padding: 5px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    right: 0px;
+    background-color: transparent;
+
+    img {
+        position: absolute;
+        left: 16px;
+        z-index: 3;
+        width: 20px;
+        height: 20px;
+        top: 10px;
+    }
+}
+
+.m-input {
+    padding-left: 35px;
+}
+
+.searchBtn:hover {
+    border: none;
+    background-color: transparent;
+}
+
+.clear-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 18px;
+    height: 18px;
+    background: #4A0D4A;
+    text-align: center;
+    border-radius: 2px;
+}
+
+::ng-deep {
+
+    .p-inputnumber-button {
+        background: #F8F8F8 !important;
+        border: 1px solid #F8F8F8 !important;
+    }
+
+    .p-icon-wrapper {
+        color: #777777 !important;
+        fill: #777777 !important;
+    }
+
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        background-color: #4A0D4A !important;
+        border: 1px solid #4A0D4A;
+        border-top-right-radius: 0 !important
+    }
+
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+        box-shadow: none !important;
+    }
+
+    .input-group>.form-control:focus {
+        z-index: 0 !important;
+        border: 1px solid #E2E2E2 !important;
+    }
+
+    @media only screen and (min-width: 575px) and (max-width: 1024px) {
+        .pageHeader {
+            margin-top: 70px !important;
+        }
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 922px) {
+        .left-sec {
+            padding: 0 !important;
+        }
+    }
+
+    @media only screen and (min-width: 1024px) and (max-width: 1250px) {
+
+
+
+        .col-6 {
+            max-width: 40% !important;
+            margin-left: 3px !important;
+
+        }
+    }
+
+    @media only screen and (max-width: 567px) {
+        .showRoomLink {
+            margin-bottom: 5px !important;
+        }
+
+        td {
+            font-size: 10px !important;
+        }
+
+        .editQty {
+            max-width: 145px;
+        }
+
+        .tabView-mob {
+
+            .p-tabview .p-tabview-nav,
+            .p-tabview .p-tabview-nav li {
+                height: 45 !important;
+            }
+        }
+
+        .msrp {
+            font-size: 12px;
+        }
+
+        font-size: 12px;
+
+        .p-inputnumber-buttons-stacked .p-inputnumber-input {
+            width: 140px;
+        }
+
+        table th {
+            white-space: nowrap !important;
+            font-size: 11px !important;
+        }
+
+        .input-custom {
+            max-width: 160px !important;
+        }
+
+        .table-mob {
+            .p-tabview .p-tabview-nav {
+
+                padding: 0 !important;
+            }
+
+            .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+                background-color: #4A0D4A !important
+            }
+
+            .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+                border: none !important;
+                border-top-right-radius: 0px !important;
+                min-width: 135px !important;
+                margin: 0 !important;
+                color: white !important;
+
+            }
+
+            .p-tabview-title {
+                font-size: 10px !important;
+                margin-top: 11px;
+            }
+        }
+
+        .p-tabview .p-tabview-nav {
+
+            border: 1px solid #E2E2E2 !important;
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+            padding: 8px 14px !important;
+            background: #FFF !important;
+            min-height: 35px !important;
+
+            .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+                border-radius: 12px !important;
+                fill: white !important;
+            }
+        }
+
+        .p-tabview .p-tabview-panels {
+            padding: 5px !important;
+        }
+
+        .p-tabview .p-tabview-nav li {
+            margin-right: 65px !important;
+        }
+
+        .tabPanel-custom {
+
+            .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+                width: 80px !important;
+                height: 66px !important;
+                padding: 0 !important;
+                border: none !important;
+
+                svg {
+                    width: 24px !important;
+                    height: 24px !important;
+                    font-size: 10px !important;
+                    margin-top: 10px !important;
+                }
+            }
+        }
+
+
+        .tabPanel-custom {
+            .p-tabview .p-tabview-nav li {
+
+                border-right: 1px solid #eee !important;
+                margin: 0 4px;
+            }
+
+            .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+                width: 100% !important;
+                padding: 0 !important;
+                border: none !important;
+
+                svg {
+                    width: 24px !important;
+                    height: 24px !important;
+                    font-size: 10px !important;
+                    margin-top: 10px !important;
+                }
+            }
+        }
+
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+            width: 66px !important;
+            padding: 0 !important;
+            border: none !important;
+            margin: 0 10px;
+            padding-left: 10px !important;
+
+            svg {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 10px !important;
+                margin-top: 10px !important;
+            }
+
+            .p-tabview .p-tabview-nav li:nth-child(2) .p-tabview-nav-link {
+                border-left: 1px solid #eee !important;
+            }
+        }
+
+        .table-mob {
+
+            .p-tabview .p-tabview-nav li {
+                width: 100% !important;
+                height: 35px !important;
+                margin: 0 !important;
+            }
+
+            .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+                width: 100% !important;
+            }
+        }
+
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .sm-tab {
+            .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+                width: 200px !important;
+                height: 30px !important;
+            }
+
+            .table-mob .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+                width: 182px !important;
+                color: white !important;
+            }
+        }
+
+        .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+            color: #777 !important;
+            border: none !important;
+            border-radius: 6px !important;
+            padding: 0 !important;
+            height: 66px !important;
+            margin: auto !important;
+
+            .tab-header {
+                border-radius: 6px !important;
+                color: white !important;
+                padding: 2px 5px !important;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                svg {
+                    fill: #fff !important;
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+        }
+
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+            box-shadow: none !important;
+        }
+
+        .p-tabview-nav-link {
+            border-top: none !important;
+            border-left: none !important;
+            border-width: 1px !important;
+            border-color: #c8c8c8 !important;
+            background: #FFF !important;
+            color: #777 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            font-size: 14px !important;
+            width: 140px !important;
+            align-items: center !important;
+            fill: #777777 !important;
+
+            svg {
+                fill: #777 !important;
+
+            }
+        }
+    }
+}
+
+.card-body {
+    padding: 2px !important;
+    border-bottom-left-radius: 10.82px !important;
+    border-bottom-right-radius: 10.82px !important;
+    height: 40px;
+    text-align: center;
+    width: 85px;
+    border: 1px solid #EEE;
+}
+
+.seller {
+    font-size: 10px !important;
+    color: #595959;
+    font-weight: 600;
+}
+
+.card-text {
+    font-size: 10px;
+    color: #1B101B;
+    font-weight: 700;
+    margin-top: 3px;
+    margin-bottom: 0;
+}
+
+
+.each-table {
+    border: 1px solid #EEEEEE;
+    border-radius: 6px;
+    margin-bottom: 25px;
+}
+
+.orderHeader {
+    margin: 8px;
+}
+
+.backBtn {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+    gap: 6px;
+    color: #1B101B;
+    background: #FFFFFF;
+    border: 1px solid #EBEBEB;
+    box-shadow: 1px 1px 6px rgba(22, 22, 22, 0.05);
+    border-radius: 6px;
+
+}
+
+.pBtntext {
+    background-color: #4A0D4A !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    color: #fff !important;
+}
+.pBtnCancel {
+    color: #4A0D4A !important;
+    border: 1px solid #eee !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    background-color: #fff !important;
+}
+
+p-dialog {
+    border-radius: 20px !important;
+    padding: 20px !important;
+}

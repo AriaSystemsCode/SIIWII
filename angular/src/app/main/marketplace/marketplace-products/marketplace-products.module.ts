@@ -4,10 +4,9 @@ import { CommonModule } from "@angular/common";
 import { MarketplaceProductsRoutingModule } from "./marketplace-products-routing.module";
 import { AppItemsBrowseModule } from "@app/main/app-items/app-items-browse/app-items-browse.module";
 import { AppItemViewModule } from "@app/main/app-items/app-item-view/app-item-view.module";
-import { MarketplaceProductsComponent } from "./components/marketplace-products.component";
-import { MarketplaceViewProductComponent } from "./components/marketplace-view-product.component";
+import { MarketplaceProductsComponent } from "./components/marketplace-products/marketplace-products.component";
+import { MarketplaceViewProductComponent } from "./components/marketplace-view-product/marketplace-view-product.component";
 import { SellerDataComponent } from "./components/seller-data/seller-data.component";
-import { ProducrFiltersComponent } from "./components/producr-filters/producr-filters.component";
 import { ProdcutCardComponent } from "./components/prodcut-card/prodcut-card.component";
 import { DropdownModule } from "primeng/dropdown";
 import { FormsModule } from "@angular/forms";
@@ -36,7 +35,6 @@ import { UtilsModule } from "@shared/utils/utils.module";
         MarketplaceProductsComponent,
         MarketplaceViewProductComponent,
         SellerDataComponent,
-        ProducrFiltersComponent,
         ProdcutCardComponent,
         ProductFiltersComponent,
         MobileFiltersDialogComponent,

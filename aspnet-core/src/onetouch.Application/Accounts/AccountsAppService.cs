@@ -65,12 +65,26 @@ using Twilio.Rest.Trunking.V1;
 using NUglify.Helpers;
 using Abp.Domain.Entities;
 using onetouch.Attachments;
+using IdentityServer4.Models;
+using NPOI.SS.Formula.Functions;
+using NUglify.JavaScript;
+using Bytescout.Spreadsheet.Structures;
+using System.Diagnostics.Metrics;
+using FluentValidation;
+using onetouch.Onetouch.ValidationRules;
+using Z.Expressions;
+using System.Reflection;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using onetouch.Authorization.Accounts;
 
 namespace onetouch.Accounts
 {
     [AbpAuthorize(AppPermissions.Pages_Accounts)]
     public class AccountsAppService : onetouchAppServiceBase, IAccountsAppService, IExcelImporter<AccountExcelResultsDTO>
     {
+        //i46[Start]
+        public static IUnitOfWorkManager _unitOfWorkManagerValid;
+        //I46[End]
         private readonly TenantManager _tenantManager;
         private readonly IRepository<AppContact, long> _appContactRepository;
         private readonly IRepository<AppEntity, long> _appEntityRepository;
@@ -89,7 +103,7 @@ namespace onetouch.Accounts
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
         private readonly IAppNotifier _appNotifier;
-        private readonly IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels,long> _appMarketplaceAccountsPriceLevelsRepo;
+        private readonly IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> _appMarketplaceAccountsPriceLevelsRepo;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
         private const int MaxProfilPictureBytes = 5242880;
@@ -97,6 +111,7 @@ namespace onetouch.Accounts
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
         private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
+        private readonly IRepository<ValidationRule> _validationRuleRepo;
         private enum CardType
         {
             MasterCard, Visa, AmericanExpress, Discover, JCB
@@ -115,8 +130,10 @@ namespace onetouch.Accounts
             , ISycAttachmentCategoriesAppService sSycAttachmentCategoriesAppService
             , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository, UserManager userManager, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepo,
               SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager,
-              TenantManager tenantManager, IRepository<AppEntityAttachment, long> appEntityAttachmentRepository, IRepository<AppAttachment, long> appAttachmentRepository)
+              TenantManager tenantManager, IRepository<AppEntityAttachment, long> appEntityAttachmentRepository,
+              IRepository<AppAttachment, long> appAttachmentRepository, IRepository<ValidationRule> validationRuleRepo)
         {
+            _validationRuleRepo = validationRuleRepo;
             _appAttachmentRepository = appAttachmentRepository;
             _appEntityAttachmentRepository = appEntityAttachmentRepository;
             _tenantManager = tenantManager;
@@ -140,7 +157,7 @@ namespace onetouch.Accounts
             //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
             _binaryObjectManager = binaryObjectManager;
-            _appMarketplaceAccountsPriceLevelsRepo= appMarketplaceAccountsPriceLevelsRepo;
+            _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
 
         }
@@ -201,7 +218,7 @@ namespace onetouch.Accounts
                             .WhereIf(input.FilterType <= 1 && input.FilterType != 6,
                                 x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId))
                             .WhereIf(input.FilterType == 2 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null && x.PartnerId !=null)
+                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null && x.PartnerId != null)
                                 && (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
                             .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
                                 x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null && x.PartnerId == null))
@@ -242,7 +259,7 @@ namespace onetouch.Accounts
                             .WhereIf(!string.IsNullOrEmpty(input.SSIN), x => x.SSIN == input.SSIN)
                             .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x => x.EntityFk.EntityObjectTypeId == input.AccountTypeId)
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityFk.EntityObjectTypeCode == input.AccountType)
-                            .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0,x=>
+                            .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityFk.EntityObjectTypeId))
                     //.WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0,
                     //    x =>
@@ -287,7 +304,7 @@ namespace onetouch.Accounts
                                         {
                                             AccountTypeString = o.EntityFk.EntityObjectTypeCode,
                                             AccountTypeId = o.EntityFk.EntityObjectTypeId,
-                                            AccountType =  o.EntityFk.EntityObjectTypeCode,
+                                            AccountType = o.EntityFk.EntityObjectTypeCode,
                                             SSIN = o.SSIN,
                                             PriceLevel = o.PriceLevel,
                                             Name = o.Name,
@@ -296,7 +313,7 @@ namespace onetouch.Accounts
                                             ZipCode = o.AppContactAddresses.FirstOrDefault().AddressFk.PostalCode,
                                             AddressLine1 = o.AppContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
                                             CountryName = o.AppContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
-                                            Status = input.FilterType != 1 ? (_appContactRepository.GetAll().Count(x => x.TenantId == null && x.Id == o.PartnerId) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)):
+                                            Status = input.FilterType != 1 ? (_appContactRepository.GetAll().Count(x => x.TenantId == null && x.Id == o.PartnerId) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)) :
                                             (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == o.Id) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)),
                                             Id = o.Id,
                                             IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && o.PartnerId == null,
@@ -313,7 +330,7 @@ namespace onetouch.Accounts
                     var accountsList = await _accounts.ToListAsync();
                     var totalCount = await filteredAccounts.CountAsync();
 
-                   // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
+                    // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
 
                     //foreach (var account in accountsList)
                     //{
@@ -572,7 +589,7 @@ namespace onetouch.Accounts
                 accountDto.PriceLevel = account.PriceLevel;
                 accountDto.AccountTypeId = entity.EntityObjectTypeId;
                 accountDto.AccountType = entity.EntityObjectTypeCode;
-                accountDto.IsManual    = (account.TenantId == AbpSession.TenantId && !account.IsProfileData && account.ParentId == null && account.PartnerId == null);
+                accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData && account.ParentId == null && account.PartnerId == null);
                 accountDto.IsConnected = (account.TenantId == null && !account.IsProfileData && account.ParentId == null);
                 #endregion I31 fill account type from entity type in AppEntities 
 
@@ -608,7 +625,7 @@ namespace onetouch.Accounts
                 var mainBranchSubtotal = _appContactRepository.GetAll()
                             .Include(e => e.ParentFk)
                             .Include(e => e.ParentFkList)
-                          //  .Where(x => x.IsProfileData)
+                            //  .Where(x => x.IsProfileData)
                             .Where(e => e.ParentId != null && e.ParentId == branch.Id && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).Count();
                 branchForViewDto.SubTotal = mainBranchSubtotal;
                 List<TreeNode<BranchForViewDto>> branches = new List<TreeNode<BranchForViewDto>>
@@ -660,6 +677,12 @@ namespace onetouch.Accounts
                     output.IsPublished = true;
                 }
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
+                //I46[Start]
+                output.Account.ShipViaId = account.ShipViaId;
+                output.Account.ShipViaName = account.ShipViaName;
+                output.Account.PaymentTermsId = account.PaymentTermsId;
+                output.Account.PaymentTermsName = account.PaymentTermsName;
+                //I46[End]
                 return output;
             }
         }
@@ -668,29 +691,30 @@ namespace onetouch.Accounts
         public async Task<GetAccountInfoForEditOutput> GetMyAccountForEdit()
         {
             var x = new EntityDto<long>();
-            
+
             x.Id = 0;
             var contact = await DoGetAccountForEdit(x);
 
             var tenant = await _tenantManager.GetByIdAsync(AbpSession.GetTenantId());
 
-            if(tenant != null && contact != null)
-            { var types  = _appEntitiesAppService.GetAllAccountTypesForTableDropdown().Result.ToList();
-                var Edition1 = _appConfiguration[$"Editions:"+ tenant.EditionId.ToString()];
-                
+            if (tenant != null && contact != null)
+            {
+                var types = _appEntitiesAppService.GetAllAccountTypesForTableDropdown().Result.ToList();
+                var Edition1 = _appConfiguration[$"Editions:" + tenant.EditionId.ToString()];
+
                 foreach (var type in types)
                 {
-                    if(type.Value.ToString() == Edition1)
+                    if (type.Value.ToString() == Edition1)
                     {
                         contact.AccountInfo.AccountType = type.Label;
                         contact.AccountInfo.AccountTypeId = type.Value;
                         break;
                     }
                 }
-            
+
             }
 
-            
+
             return contact;
         }
 
@@ -816,13 +840,13 @@ namespace onetouch.Accounts
             return output;
         }
 
-        public async Task Connect(long id,int? tenantId=null)
+        public async Task Connect(long id, int? tenantId = null)
         {
             //I45
             if (tenantId == null)
                 tenantId = AbpSession.TenantId;
             //I45
-            var cancelledStatus=  await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+            var cancelledStatus = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
             AppContact originalContact;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -843,7 +867,7 @@ namespace onetouch.Accounts
                 if (originalContact != null && originalContact.TenantId != null)
                 {
                     originalContact = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
-                .FirstOrDefaultAsync(x => x.TenantId == null && x.PartnerId == id &&  x.EntityFk.EntityObjectStatusId != cancelledStatus);
+                .FirstOrDefaultAsync(x => x.TenantId == null && x.PartnerId == id && x.EntityFk.EntityObjectStatusId != cancelledStatus);
                     id = originalContact.Id;
                 }
                 var existed = await _appContactRepository.GetAll()
@@ -891,7 +915,7 @@ namespace onetouch.Accounts
                         entityDto.TenantId = profileContactofOtherTenant.TenantId;
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
                         var originalEntityFortOtherTenant = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == originalContact.EntityId);
-                       
+
                         ObjectMapper.Map(originalPublishContactFortCurrTenant, contactDto);
 
                         //MMT
@@ -908,7 +932,7 @@ namespace onetouch.Accounts
 
                         //temp solution to test 
                         entityDto.Code = System.Guid.NewGuid().ToString();
-                        
+
                         var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
                         //MMT24
                         if (entity.EntityAttachments != null)
@@ -924,9 +948,9 @@ namespace onetouch.Accounts
                                 attach.EntityId = savedEntity;
                                 attach.EntityFk = null;
                                 attach.AttachmentFk.TenantId = profileContactofOtherTenant.TenantId;
-                                MoveFile(attach.AttachmentFk.Attachment,  -1, profileContactofOtherTenant.TenantId);
+                                MoveFile(attach.AttachmentFk.Attachment, -1, profileContactofOtherTenant.TenantId);
                                 //entityEntityAttachments.Add(attach);
-                                var attachIns = await  _appAttachmentRepository.InsertAsync(attach.AttachmentFk);
+                                var attachIns = await _appAttachmentRepository.InsertAsync(attach.AttachmentFk);
                                 attach.AttachmentId = attachIns.Id;
                                 await _appEntityAttachmentRepository.InsertAsync(attach);
                             }
@@ -946,7 +970,7 @@ namespace onetouch.Accounts
 
                         contactDto.Id = await _appEntitiesAppService.SaveContact(contactDto);
                         //Copy Addresses[Start]
-                        if (originalPublishContactFortCurrTenant.AppContactAddresses!=null && originalPublishContactFortCurrTenant.AppContactAddresses.Count>0)
+                        if (originalPublishContactFortCurrTenant.AppContactAddresses != null && originalPublishContactFortCurrTenant.AppContactAddresses.Count > 0)
                         {
                             foreach (var contactAddress in originalPublishContactFortCurrTenant.AppContactAddresses)
                             {
@@ -983,18 +1007,18 @@ namespace onetouch.Accounts
                                     {
                                         contactDto.ContactAddresses = new List<AppContactAddressDto>();
                                     }
-                                        contactDto.ContactAddresses.Add(new AppContactAddressDto
-                                        {
-                                            AddressTypeId = contactAddress.AddressTypeId,
-                                            AddressTypeIdName = contactAddress.AddressTypeCode,
-                                            Code = address.Code,
-                                            AddressId = address.Id,
-                                            AccountId = contactDto.Id,
-                                            ContactId = contactDto.Id
-                                        });
-                                    
-                                   
-                                  //  contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                                    contactDto.ContactAddresses.Add(new AppContactAddressDto
+                                    {
+                                        AddressTypeId = contactAddress.AddressTypeId,
+                                        AddressTypeIdName = contactAddress.AddressTypeCode,
+                                        Code = address.Code,
+                                        AddressId = address.Id,
+                                        AccountId = contactDto.Id,
+                                        ContactId = contactDto.Id
+                                    });
+
+
+                                    //  contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
                                     await _appContactAddressRepository.InsertAsync(newContactAddress);
                                     await CurrentUnitOfWork.SaveChangesAsync();
                                 }
@@ -1094,7 +1118,7 @@ namespace onetouch.Accounts
                                 newContactAddress.AddressCode = contactAddress.AddressCode;
                                 newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
                                 newContactAddress.ContactCode = contactAddress.ContactCode;
-                                
+
                                 contactDto2.ContactAddresses.Add(new AppContactAddressDto
                                 {
                                     AddressTypeId = contactAddress.AddressTypeId,
@@ -1181,7 +1205,7 @@ namespace onetouch.Accounts
                                 //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
                                 string accProfileUrl = _appConfiguration["App:ClientRootAddress"] + "app/main/account/view/" + originalPublishContactFortCurrTenant.Id.ToString() + "?tab=ProfileView";
                                 await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(profileContactofOtherTenant.TenantId, adminUser.Id),
-                                    "Tenant <a href=\"" + accProfileUrl +"\">" + myTenantObject.Name + "</a> has been connected to you", 
+                                    "Tenant <a href=\"" + accProfileUrl + "\">" + myTenantObject.Name + "</a> has been connected to you",
                                     Abp.Notifications.NotificationSeverity.Info, new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
                                 //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
                             }
@@ -1189,7 +1213,7 @@ namespace onetouch.Accounts
                     }
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
                     //Contact[start]
-                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                     var contactsInfo = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
                                  x.ParentId == id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
@@ -1251,7 +1275,7 @@ namespace onetouch.Accounts
                                              .Include(x => x.EntityExtraData)
                                              .AsNoTracking()
                                              .FirstOrDefaultAsync(x => x.Id == contactObj.EntityId);
-                       // AppEntityDto entityDto = new AppEntityDto();
+                        // AppEntityDto entityDto = new AppEntityDto();
                         AppEntityDto contactEntityDto = new AppEntityDto();
                         ObjectMapper.Map(contactEntity, contactEntityDto);
                         contactEntityDto.Id = 0;
@@ -1359,7 +1383,7 @@ namespace onetouch.Accounts
             //}
             //var publishAccountContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && 
             //x.Id == branchesPublishedParentContact.AccountId && x.ParentId == null);
-            if (branchesPublishedParentContact == null )
+            if (branchesPublishedParentContact == null)
             { return; }
             if ((branchesPublishedParentContact.AccountId == null && branchesPublishedParentContact.ParentId == null))
             {
@@ -1452,7 +1476,7 @@ namespace onetouch.Accounts
 
                 var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Id)).ToList();
                 //Copy Addresses[Start]
-                if (contact.AppContactAddresses!= null && contact.AppContactAddresses.Count>0)
+                if (contact.AppContactAddresses != null && contact.AppContactAddresses.Count > 0)
                 {
                     foreach (var contactAddress in contact.AppContactAddresses)
                     {
@@ -1460,7 +1484,7 @@ namespace onetouch.Accounts
                         AppAddress address = new AppAddress();
                         if (savedAddress != null)
                         {
-                            var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z=>z.Code== savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == contactDto.Id);
+                            var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == contactDto.Id);
                             if (addressCon == null)
                             {
                                 ObjectMapper.Map(savedAddress, address);
@@ -1470,7 +1494,8 @@ namespace onetouch.Accounts
                                 address = await _appAddressRepository.InsertAsync(address);
                                 await CurrentUnitOfWork.SaveChangesAsync();
                             }
-                            else {
+                            else
+                            {
                                 address = addressCon;
                             }
                             AppContactAddress newContactAddress = new AppContactAddress();
@@ -1481,20 +1506,20 @@ namespace onetouch.Accounts
                             if (contactDto.ContactAddresses == null)
                                 contactDto.ContactAddresses = new List<AppContactAddressDto>();
                             contactDto.ContactAddresses.Add(new AppContactAddressDto
-                                {
-                                    AddressTypeId = contactAddress.AddressTypeId,
-                                    AddressTypeIdName = contactAddress.AddressTypeCode,
-                                    Code = address.Code,
-                                    AddressId = address.Id,
-                                    AccountId = contactDto.Id,
-                                    ContactId = contactDto.Id
-                                });
+                            {
+                                AddressTypeId = contactAddress.AddressTypeId,
+                                AddressTypeIdName = contactAddress.AddressTypeCode,
+                                Code = address.Code,
+                                AddressId = address.Id,
+                                AccountId = contactDto.Id,
+                                ContactId = contactDto.Id
+                            });
                             // 
-                           // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                            // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
                             await _appContactAddressRepository.InsertAsync(newContactAddress);
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
-                    } 
+                    }
                 }
                 //Copy Addresses [End]
                 //foreach (var contactAddress in contact.AppContactAddresses)
@@ -1531,7 +1556,7 @@ namespace onetouch.Accounts
                 //    newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
                 //    if (contactDto.ContactAddresses == null)
                 //        contactDto.ContactAddresses = new List<AppContactAddressDto>();
-                    
+
                 //    contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id });
                 //    //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
                 //    //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
@@ -1612,7 +1637,7 @@ namespace onetouch.Accounts
                 long? otherTenantId = null;
                 long? partnerId = null;
                 var existed = await _appContactRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.PartnerId == id && x.TenantId==AbpSession.TenantId);
+                .FirstOrDefaultAsync(x => x.PartnerId == id && x.TenantId == AbpSession.TenantId);
                 if (existed == null)
                 {
                     existed = await _appContactRepository.GetAll()
@@ -1625,30 +1650,30 @@ namespace onetouch.Accounts
                 if (existed != null)
                 {
                     partnerId = existed.PartnerId;
-                    var otherTenantPublished = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.ParentId == null && x.Id== existed.PartnerId);
+                    var otherTenantPublished = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.ParentId == null && x.Id == existed.PartnerId);
                     if (otherTenantPublished != null)
                     {
-                        var otherTenantOrgin= await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId != null && x.IsProfileData == true && x.ParentId == null && x.Id == otherTenantPublished.PartnerId);
+                        var otherTenantOrgin = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId != null && x.IsProfileData == true && x.ParentId == null && x.Id == otherTenantPublished.PartnerId);
                         if (otherTenantOrgin != null)
                             otherTenantId = otherTenantOrgin.TenantId;
                     }
                 }
                 else { return; }
-                
+
                 var originalContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
                 var originalPublishContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == originalContactFortCurrTenant.Id);
-                var originalConnectRecordFortOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId== otherTenantId && x.PartnerId == originalPublishContactFortCurrTenant.Id);
-                
+                var originalConnectRecordFortOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == otherTenantId && x.PartnerId == originalPublishContactFortCurrTenant.Id);
+
                 if (existed != null)
                 {
-                   
+
                     //Mariam[Start]
                     var contactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == existed.Id).ToList();
                     foreach (var contactRec in contactsInfo)
                     {
                         await _appEntityRepository.DeleteAsync(contactRec.EntityId);
                         await _appContactRepository.DeleteAsync(contactRec.Id);
-                        await _appAddressRepository.DeleteAsync(z=>z.AccountId == existed.Id);
+                        await _appAddressRepository.DeleteAsync(z => z.AccountId == existed.Id);
                     }
                     if (originalConnectRecordFortOtherTenant != null)
                     {
@@ -1719,9 +1744,9 @@ namespace onetouch.Accounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-               
 
-                    var account = await _appContactRepository.GetAll().Where(e => e.Id == id).FirstOrDefaultAsync();
+
+                var account = await _appContactRepository.GetAll().Where(e => e.Id == id).FirstOrDefaultAsync();
                 if (account != null)
                 {
                     if (!string.IsNullOrEmpty(priceLevel)) { account.PriceLevel = priceLevel; }
@@ -1734,7 +1759,7 @@ namespace onetouch.Accounts
                     var myAccountPublish = await _appContactRepository.GetAll().Where(e => e.TenantId == null && e.PartnerId == myAccountProfile.Id && e.ParentId == null && e.IsProfileData == false).FirstOrDefaultAsync();
                     if (myAccountPublish != null)
                     {
-                        
+
                         var marketplacePriceLevel = await _appMarketplaceAccountsPriceLevelsRepo.GetAll()
                             .FirstOrDefaultAsync(a => a.ConnectedAccountSSIN == account.SSIN && a.AccountSSIN == myAccountPublish.SSIN);
                         if (marketplacePriceLevel != null)
@@ -1743,7 +1768,8 @@ namespace onetouch.Accounts
                             await _appMarketplaceAccountsPriceLevelsRepo.UpdateAsync(marketplacePriceLevel);
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
-                        else {
+                        else
+                        {
                             AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels newPriceLevel = new AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels();
                             newPriceLevel.AccountSSIN = myAccountPublish.SSIN;
                             newPriceLevel.ConnectedAccountSSIN = account.SSIN;
@@ -1757,10 +1783,67 @@ namespace onetouch.Accounts
                 return true;
             }
         }
+        //I46[Start]
+        public static bool IsExtisting(string code)
+        {
+            var x = _unitOfWorkManagerValid.Current.GetDbContext<onetouchDbContext>(null, null);
+            var appItemExist = x.AppItems.Where(r => r.Code == code).FirstOrDefault();
+            if (appItemExist != null)
+            {
+                return false;
+            }
+            return true;
 
+        }
+        //I46
+        public FluentValidation.Results.ValidationResult ValidateContact(CreateOrEditAccountInfoDto input)
+        {
+            _unitOfWorkManagerValid = UnitOfWorkManager;
+            var validator = new DynamicValidator<CreateOrEditAccountInfoDto>(_validationRuleRepo,typeof(AccountsAppService));
+            var result = validator.Validate(input);
+            return result;
+        }
+        public async Task<List<AppContactValidationInputDTO>> ValidateContactData(List<AppContactValidationInputDTO> input)
+        {
+            foreach (var item in input)
+            {
+
+                item.ErrorMessages = new List<string>();
+                var validationRes = ValidateContact(ObjectMapper.Map<CreateOrEditAccountInfoDto>(item));
+                if (!validationRes.IsValid)
+                {
+                    foreach (var vldRes in validationRes.Errors)
+                    {
+                        item.ErrorMessages.Add(vldRes.ErrorMessage);
+                    }
+                }
+            
+            }
+            return input;
+        }
+        //I46[End]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<GetAccountInfoForEditOutput> CreateOrEditAccount(CreateOrEditAccountInfoDto input)
         {
+            //I46[Start]
+            List<AppContactValidationInputDTO> validateInput = new List<AppContactValidationInputDTO>();
+            validateInput.Add(ObjectMapper.Map<AppContactValidationInputDTO>(input));
+            var returnList = await ValidateContactData(validateInput);
+            if (returnList != null && returnList.Count > 0)
+            {
+                string errorList = "";
+                foreach (var item in returnList)
+                {
+                    foreach (var err in item.ErrorMessages)
+                    {
+                        errorList += err + "\n";
+                    }
+
+                }
+                if (!string.IsNullOrEmpty(errorList))
+                    throw new UserFriendlyException(errorList);
+            }
+            //I46[End]
             if (input.UseDTOTenant == false)
             {
                 if (input.AccountLevel == AccountLevelEnum.Profile)
@@ -1777,7 +1860,7 @@ namespace onetouch.Accounts
             if (input.AccountLevel == AccountLevelEnum.Profile)
             {
                 contactOriginal = await _appContactRepository.FirstOrDefaultAsync(x => x.IsProfileData & x.ParentId == null);
-                
+
                 var tenantObj = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
                 if (tenantObj != null) { tenantObj.Name = input.Name; }
 
@@ -1790,15 +1873,16 @@ namespace onetouch.Accounts
             if (string.IsNullOrEmpty(input.Code))
                 input.Code = System.Guid.NewGuid().ToString();
 
-            
+
 
             var contactObjectId = await _helper.SystemTables.GetObjectContactId();
 
             var partnerEntityObjectTypeId = input.AccountTypeId;
             var partnerEntityObjectTypeCode = input.AccountType;
             if (partnerEntityObjectTypeId == null || input.AccountTypeId < 1)
-            {  var  partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
-                 partnerEntityObjectTypeId = partnerEntityObjectType.Id;
+            {
+                var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+                partnerEntityObjectTypeId = partnerEntityObjectType.Id;
                 partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
             }
 
@@ -1820,12 +1904,80 @@ namespace onetouch.Accounts
             {
                 entity.TenantId = AbpSession.TenantId;
             }
- 
+
             entity.Code = input.Code;
 
             AppContactDto contact = new AppContactDto();
             //var contactSavedId = contact.Id;
             ObjectMapper.Map(input, contact);
+            //I46[Start]
+            if (input.ShipViaId != null)
+            {
+                contact.ShipViaId = input.ShipViaId;
+                var ent = await _appEntityRepository.GetAll().Where(z => z.Id == input.ShipViaId).FirstOrDefaultAsync();
+                if (ent != null)
+                {
+                    contact.ShipViaName = ent.Name;
+                    contact.ShipViaCode = ent.Code;
+                }
+            }
+            if (input.PaymentTermsId != null)
+            {
+                contact.PaymentTermsId = input.PaymentTermsId;
+                var ent = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Id == input.PaymentTermsId).FirstOrDefaultAsync();
+                if (ent != null)
+                {
+                    contact.PaymentTermsName = ent.Name;
+                    contact.PaymentTermsCode = ent.Code;
+                    if (ent.EntityExtraData != null && ent.EntityExtraData.Count() > 0)
+                    {
+                        var disc = ent.EntityExtraData.Where(z => z.AttributeId == 30).FirstOrDefault();
+                        if (disc != null && !string.IsNullOrEmpty(disc.AttributeValue))
+                            contact.PaymentTermsDiscount = decimal.Parse(disc.AttributeValue.ToString());
+
+                        var discDays = ent.EntityExtraData.Where(z => z.AttributeId == 31).FirstOrDefault();
+                        if (discDays != null && !string.IsNullOrEmpty(discDays.AttributeValue))
+                            contact.PaymentTermsDiscountDays = int.Parse(discDays.AttributeValue.ToString());
+
+                        var eom = ent.EntityExtraData.Where(z => z.AttributeId == 32).FirstOrDefault();
+                        if (disc != null && !string.IsNullOrEmpty(disc.AttributeValue))
+                            contact.PaymentTermsEndOfMonth = bool.Parse(eom.AttributeValue.ToString());
+
+                        var eomDays = ent.EntityExtraData.Where(z => z.AttributeId == 33).FirstOrDefault();
+                        if (eom != null && !string.IsNullOrEmpty(eomDays.AttributeValue))
+                            contact.PaymentTermsEndOfMonthDays = int.Parse(eomDays.AttributeValue.ToString());
+
+                        var netDueDays = ent.EntityExtraData.Where(z => z.AttributeId == 34).FirstOrDefault();
+                        if (netDueDays != null && !string.IsNullOrEmpty(netDueDays.AttributeValue))
+                            contact.PaymentTermsNetDueDays = int.Parse(netDueDays.AttributeValue.ToString());
+
+                        var disc2 = ent.EntityExtraData.Where(z => z.AttributeId == 35).FirstOrDefault();
+                        if (disc2 != null && !string.IsNullOrEmpty(disc2.AttributeValue))
+                            contact.PaymentTermsDiscount2 = decimal.Parse(disc2.AttributeValue.ToString());
+
+                        var disc2Days = ent.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
+                        if (disc2Days != null && !string.IsNullOrEmpty(disc2Days.AttributeValue))
+                            contact.PaymentTermsDiscount2Days = int.Parse(disc2Days.AttributeValue.ToString());
+
+                        var cod = ent.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
+                        if (cod != null && !string.IsNullOrEmpty(cod.AttributeValue))
+                            contact.PaymentTermsCashOnDelivery = bool.Parse(cod.AttributeValue.ToString());
+
+                        var useInstallment = ent.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
+                        if (useInstallment != null && !string.IsNullOrEmpty(useInstallment.AttributeValue))
+                            contact.PaymentTermsUseInstallments = bool.Parse(useInstallment.AttributeValue.ToString());
+
+                        var nextMonthDays = ent.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
+                        if (nextMonthDays != null && !string.IsNullOrEmpty(nextMonthDays.AttributeValue))
+                            contact.PaymentTermsNextMonthDay = int.Parse(nextMonthDays.AttributeValue.ToString());
+
+                        var payType = ent.EntityExtraData.Where(z => z.AttributeId == 40).FirstOrDefault();
+                        if (payType != null && !string.IsNullOrEmpty(payType.AttributeValue))
+                            contact.PaymentTermsPaymentType = payType.AttributeValue;
+                    }
+                }
+            }
+            //I46[End]
             //contact.Id = contactSavedId;
 
             #region stop phone update from here as it overrider by saving in branch update method...
@@ -1847,7 +1999,7 @@ namespace onetouch.Accounts
 
             //contact.AccountType = "";
             //if (input.AccountType.Count > 0)
-              //  contact.AccountType = input.AccountType.JoinAsString(";");
+            //  contact.AccountType = input.AccountType.JoinAsString(";");
 
             contact.IsProfileData = input.AccountLevel == AccountLevelEnum.Profile;
 
@@ -1861,14 +2013,29 @@ namespace onetouch.Accounts
             entity.Id = contactOriginal == null ? 0 : contactOriginal.EntityId;
 
             contact.Id = contactOriginal == null ? 0 : contactOriginal.Id;
-
+            //I46[Start]
+            if (input.AccountLevel == AccountLevelEnum.External && input.Id != 0)
+            {
+                var externalAcc = await _appContactRepository.GetAll()
+                    .Where(z => z.TenantId == AbpSession.TenantId && z.Id == input.Id).FirstOrDefaultAsync();
+                if (externalAcc != null)
+                {
+                    contact.PartnerId = externalAcc.PartnerId;
+                    contact.PartnerCode = externalAcc.PartnerCode;
+                    contact.ParentId = externalAcc.ParentId;
+                    contact.ParentCode = externalAcc.ParentCode;
+                    await UpdateConnectedAccountPriceLevel(long.Parse(input.Id.ToString()),input.PriceLevel);
+                }
+            }
+            //I46[End]
 
             var isManual = (contact.TenantId == AbpSession.TenantId && !contact.IsProfileData && contact.ParentId == null && contact.PartnerId == null);
             if (string.IsNullOrEmpty(input.SSIN))
-            {if (isManual)
+            {
+                if (isManual)
                 {
                     var profileSSIN = "";
-                    var accountInfo = await _appContactRepository.GetAll().Include(e=> e.EntityFk)
+                    var accountInfo = await _appContactRepository.GetAll().Include(e => e.EntityFk)
                   //MyAccount case
                   .WhereIf(input == null || input.Id == 0,
                       x => x.IsProfileData && x.ParentId == null && x.TenantId == AbpSession.TenantId)
@@ -1881,13 +2048,14 @@ namespace onetouch.Accounts
                         {
                             AppEntityDto accountInfoEntity = new AppEntityDto();
                             ObjectMapper.Map(accountInfo.EntityFk, accountInfoEntity);
-                            profileSSIN = await _helper.SystemTables.GenerateSSIN(contactObjectId, accountInfoEntity); }
+                            profileSSIN = await _helper.SystemTables.GenerateSSIN(contactObjectId, accountInfoEntity);
+                        }
 
                         if (!string.IsNullOrEmpty(profileSSIN))
                         {
                             accountInfo.EntityFk.SSIN = profileSSIN;
                             await _appEntityRepository.UpdateAsync(accountInfo.EntityFk);
-                            input.SSIN = profileSSIN + "-" + contact.Code; 
+                            input.SSIN = profileSSIN + "-" + contact.Code;
                         }
                     }
                 }
@@ -1917,6 +2085,62 @@ namespace onetouch.Accounts
             return await GetAccountForEdit(new EntityDto<long> { Id = newId });
 
         }
+        //I46[Start]
+        public async Task<GetContactDefaultsOutput> GetContactDefaults()
+        {
+            GetContactDefaultsOutput output = new GetContactDefaultsOutput();
+            var paymentTermsId = await _helper.SystemTables.GetEntityObjectTypeId("PAYMENT-TERMS", true);
+            var shipViaId = await _helper.SystemTables.GetEntityObjectTypeId("SHIPVIA", true);
+            var defPaymentTerms = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == paymentTermsId && (z.TenantId == AbpSession.TenantId) && z.IsDefault == true).FirstOrDefaultAsync();
+            if (defPaymentTerms != null)
+            {
+                output.PaymentTermsId = defPaymentTerms.Id;
+                output.PaymentTermsCode = defPaymentTerms.Code;
+                output.PaymentTermsName = defPaymentTerms.Name;
+            }
+            else
+            {
+                var firstObject = await _appEntityRepository.GetAll()
+                                    .Where(z => z.EntityObjectTypeId == paymentTermsId && (z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
+                if (firstObject != null)
+                {
+                    firstObject.IsDefault = true;
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    output.PaymentTermsId = firstObject.Id;
+                    output.PaymentTermsCode = firstObject.Code;
+                    output.PaymentTermsName = firstObject.Name;
+                }
+
+            }
+            //var account = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
+            //   && a.TenantId == AbpSession.TenantId
+            //   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+            var defShipVia = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == shipViaId && (z.TenantId == AbpSession.TenantId) && z.IsDefault == true).FirstOrDefaultAsync();
+            if (defShipVia != null)
+            {
+                output.ShipViaId = defShipVia.Id;
+                output.ShipViaCode = defShipVia.Code;
+                output.ShipViaName = defShipVia.Name;
+
+            }
+            else
+            {
+                var firstObject = await _appEntityRepository.GetAll()
+                                    .Where(z => z.EntityObjectTypeId == shipViaId && (z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
+                if (firstObject != null)
+                {
+                    firstObject.IsDefault = true;
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    output.ShipViaId = firstObject.Id;
+                    output.ShipViaCode = firstObject.Code;
+                    output.ShipViaName = firstObject.Name;
+                }
+
+            }
+            return output;
+
+        }
+        //I46[End]
         //MARIAM
         private async Task CreateAdminContact()
         {
@@ -1985,18 +2209,18 @@ namespace onetouch.Accounts
                         }
                         //xx
                         //XX
-                        
-                            var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
-                                         x.ParentId != null).ToList(); // First level of branches
-                            if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
+
+                        var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
+                                     x.ParentId != null).ToList(); // First level of branches
+                        if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
+                        {
+                            foreach (var publishedBranchMember in publishedbranchesandMemebers)
                             {
-                                foreach (var publishedBranchMember in publishedbranchesandMemebers)
-                                {
-                                    publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                                }
-                                await CurrentUnitOfWork.SaveChangesAsync();
+                                publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
                         }
-                        
+
                         //XX
                         //xx
                     }
@@ -2130,31 +2354,38 @@ namespace onetouch.Accounts
                             newContactAddress.ContactCode = contactAddress.ContactCode;
                             if (contactDto.ContactAddresses == null)
                                 contactDto.ContactAddresses = new List<AppContactAddressDto>();
-                            contactDto.ContactAddresses.Add(new AppContactAddressDto {AddressTypeId = contactAddress.AddressTypeId, 
-                                AddressTypeIdName = contactAddress.AddressTypeCode, Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                            contactDto.ContactAddresses.Add(new AppContactAddressDto
+                            {
+                                AddressTypeId = contactAddress.AddressTypeId,
+                                AddressTypeIdName = contactAddress.AddressTypeCode,
+                                Code = address.Code,
+                                AddressId = address.Id,
+                                AccountId = contactDto.Id,
+                                ContactId = contactDto.Id
+                            });
                             //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
                             //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
                             await _appContactAddressRepository.InsertAsync(newContactAddress);
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
                     }
-                    
+
                     //Mariam -Publish Account related branches [Start]
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                    
+
                     var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.AccountId == contact.Id &&
                                      x.ParentId == contact.Id && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
 
                     //XX
                     if (publishContact != null)
                     {
-                        var publishedbranches = _appContactRepository.GetAll().Include(z=>z.EntityFk).Where(x => x.TenantId==null && x.AccountId == publishContact.Id &&
+                        var publishedbranches = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishContact.Id &&
                                      x.ParentId == publishContact.Id && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
-                        if (publishedbranches!=null && publishedbranches.Count()>0)
+                        if (publishedbranches != null && publishedbranches.Count() > 0)
                         {
                             foreach (var publishedBranch in publishedbranches)
                             {
-                                var existingBranch = branchInfo.Where(z=>z.Code== publishedBranch.Code && z.SSIN == publishedBranch.SSIN).FirstOrDefault();
+                                var existingBranch = branchInfo.Where(z => z.Code == publishedBranch.Code && z.SSIN == publishedBranch.SSIN).FirstOrDefault();
                                 if (existingBranch == null)
                                 {
                                     publishedBranch.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
@@ -2320,7 +2551,7 @@ namespace onetouch.Accounts
                             AddressId = address.Id,
                             AccountId = contactDto.Id,
                             ContactId = contactDto.Id
-                            
+
                         });
                         //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
                         //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
@@ -3608,7 +3839,7 @@ namespace onetouch.Accounts
                 entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
                 entity.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
-               
+
             }
             //MMT37
             //Mariam[End]
@@ -3887,14 +4118,15 @@ namespace onetouch.Accounts
             }
             //MMT37
             var contactObjectOrg = await _appContactRepository.GetAll().Where(x => x.Id == contact.Id).FirstOrDefaultAsync();
-            if (contactObjectOrg == null  || string.IsNullOrEmpty(contactObjectOrg.SSIN))
+            if (contactObjectOrg == null || string.IsNullOrEmpty(contactObjectOrg.SSIN))
             {
                 entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
                 entity.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
                 contact.SSIN = entity.SSIN;
             }
-            else {
+            else
+            {
                 entity.SSIN = contactObjectOrg.SSIN;
                 contact.SSIN = contactObjectOrg.SSIN;
             }
@@ -3909,9 +4141,9 @@ namespace onetouch.Accounts
                 if (logoAttach != null && !string.IsNullOrEmpty(logoAttach.FileName))
                 {
                     if (!string.IsNullOrEmpty(logoAttach.guid))
-                    await UpdateProfilePicture(logoAttach.guid + "." + logoAttach.FileName.Split('.')[1], long.Parse(input.UserId.ToString()));
+                        await UpdateProfilePicture(logoAttach.guid + "." + logoAttach.FileName.Split('.')[1], long.Parse(input.UserId.ToString()));
                     else
-                        await UpdateProfilePicture( logoAttach.FileName, long.Parse(input.UserId.ToString()));
+                        await UpdateProfilePicture(logoAttach.FileName, long.Parse(input.UserId.ToString()));
                 }
             }
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
@@ -4083,7 +4315,7 @@ namespace onetouch.Accounts
             //MMT37
             if (string.IsNullOrEmpty(entity.SSIN))
             {
-                entity.EntityObjectTypeCode= entityParent.EntityObjectTypeCode;
+                entity.EntityObjectTypeCode = entityParent.EntityObjectTypeCode;
                 var contactObjectId = await _helper.SystemTables.GetObjectContactId();
                 entity.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
@@ -4122,9 +4354,15 @@ namespace onetouch.Accounts
             {
                 if (contact.AppContactAddresses.Count(x => x.AddressTypeId == item.AddressTypeId) == 0)
                 {
-                    contact.AppContactAddresses.Add(new AppContactAddress { ContactId = input.Id, AddressTypeId = item.AddressTypeId, AddressId = item.AddressId,
-                    AddressCode = item.Code,AddressTypeCode = item.AddressTypeIdName,ContactCode = input.Code
-                });
+                    contact.AppContactAddresses.Add(new AppContactAddress
+                    {
+                        ContactId = input.Id,
+                        AddressTypeId = item.AddressTypeId,
+                        AddressId = item.AddressId,
+                        AddressCode = item.Code,
+                        AddressTypeCode = item.AddressTypeIdName,
+                        ContactCode = input.Code
+                    });
                 }
                 else
                 {
@@ -4402,6 +4640,461 @@ namespace onetouch.Accounts
 
             return value;
         }
+        //I46[Start]
+        public async Task<List<ImportContactReturnDto>> ValidateImportContactData(AccountExcelDto accountExcelDto)
+        {
+            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = null;
+            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = null;
+            List<LookupLabelDto> addressTypes = null;
+            List<LookupLabelDto> phoneTypes = null;
+            List<CurrencyInfoDto> currencyIds = null;
+            List<LookupLabelDto> languageIds = null;
+            List<LookupLabelDto> DeptIds = null;
+            List<LookupLabelDto> countries = null;
+            addressTypes = await _appEntitiesAppService.GetAllAddressTypeForTableDropdown();
+            departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
+            countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
+            phoneTypes = await _appEntitiesAppService.GetAllPhoneTypeForTableDropdown();
+            classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForContact();
+
+            //get currency types
+            currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+            //get language types            
+            languageIds = await _appEntitiesAppService.GetAllLanguageForTableDropdown();
+            List<ImportContactReturnDto> returnList = new List<ImportContactReturnDto>();
+            if (string.IsNullOrEmpty(accountExcelDto.Code))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Code: Should Have a Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (string.IsNullOrEmpty(accountExcelDto.Name))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Name: Should Have a Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Website) && !_helper.ExcelHelper.IsValidWebsite(accountExcelDto.Website))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Website: Not Valid Website Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Email Address: Not Valid Email Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+            AccountExcelAccountType accountExcelAccountType;
+            AccountExcelRecordType accountExcelRecordType;
+            if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Record Type: Should Be Account|Branch|Contact.",
+                    ErrorType = "Stopper"
+                });
+            }
+            if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Account Type: Should Be Seller|Buyer|Both.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+
+            #region phone validation
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
+                !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
+                !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Phone 1: Phone 1 Is Filled With a InValid Phone# and Code.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Phone 1: Phone 1 Type is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
+               !string.IsNullOrEmpty(accountExcelDto.Phone2Number) &&
+               !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone2Code + accountExcelDto.Phone2Number))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Phone 2: Phone 2 Is Filled With a InValid Phone# and Code.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Phone 2: Phone 2 Type is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
+                !string.IsNullOrEmpty(accountExcelDto.Phone3Number) &&
+                !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone3Code + accountExcelDto.Phone3Number))
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Phone 3: Phone 3 Is Filled With a InValid Phone# and Code.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone3Type) && GetTypeId(accountExcelDto.Phone3Type, phoneTypes) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Phone 3: Phone 3 Type is InValid.",
+                    ErrorType = "Stopper"
+                });
+
+            }
+
+
+            #endregion phone validation
+
+            // #region check address 
+            bool AddressTypeFound = false;
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Address1Type) && GetTypeId(accountExcelDto.Address1Type, addressTypes) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 1 Type: Address Type is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+            else { AddressTypeFound = true; }
+
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Address2Type) && GetTypeId(accountExcelDto.Address2Type, addressTypes) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 2 Type: Address Type is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+            else { AddressTypeFound = true; }
+            if (!string.IsNullOrEmpty(accountExcelDto.Address3Type) && GetTypeId(accountExcelDto.Address3Type, addressTypes) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 3 Type: Address Type is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+            else { AddressTypeFound = true; }
+            if (!string.IsNullOrEmpty(accountExcelDto.Address4Type) && GetTypeId(accountExcelDto.Address4Type, addressTypes) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 4 Type: Address Type is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+            else { AddressTypeFound = true; }
+
+            if (!AddressTypeFound)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address Type: At Least One Address Type Should Be Valid.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Address1Country) && GetTypeId(accountExcelDto.Address1Country, countries) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 1 Country: Country Code is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Address2Country) && GetTypeId(accountExcelDto.Address2Country, countries) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 2 Country: Country Code is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Address3Country) && GetTypeId(accountExcelDto.Address3Country, countries) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 3 Country: Country Code is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Address4Country) && GetTypeId(accountExcelDto.Address4Country, countries) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 4 Country: Country Code is InValid.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if ((!string.IsNullOrEmpty(accountExcelDto.Address1City) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1State) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address1Type)) &&
+                (string.IsNullOrEmpty(accountExcelDto.Address1City) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1State) ||
+                string.IsNullOrEmpty(accountExcelDto.Address1Type))
+                )
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 1 : Address 1 Field Should be All Filled or Removed.",
+                    ErrorType = "Stopper"
+                });
+
+            }
+
+            if ((!string.IsNullOrEmpty(accountExcelDto.Address2City) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Type)) &&
+                !(string.IsNullOrEmpty(accountExcelDto.Address2City) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
+                !string.IsNullOrEmpty(accountExcelDto.Address2Type))
+                )
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 2 : Address 2 Field Should be All Filled or Removed.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if ((!string.IsNullOrEmpty(accountExcelDto.Address3City) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3State) ||
+                                !string.IsNullOrEmpty(accountExcelDto.Address3Type)) &&
+                                (string.IsNullOrEmpty(accountExcelDto.Address3City) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3State) ||
+                                string.IsNullOrEmpty(accountExcelDto.Address3Type))
+                                )
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 3 : Address 3 Field Should be All Filled or Removed.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if ((!string.IsNullOrEmpty(accountExcelDto.Address4City) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4State) ||
+                           !string.IsNullOrEmpty(accountExcelDto.Address4Type)) &&
+                           (string.IsNullOrEmpty(accountExcelDto.Address4City) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4State) ||
+                           string.IsNullOrEmpty(accountExcelDto.Address4Type))
+                           )
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Address 4 : Address 4 Field Should be All Filled or Removed.",
+                    ErrorType = "Stopper"
+                });
+            }
+            #region currency && language validation
+            if (!string.IsNullOrEmpty(accountExcelDto.Language) && GetTypeId(accountExcelDto.Language, languageIds) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Language: Should Have a Valid Language Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Currency) && GetTypeId(accountExcelDto.Currency, ObjectMapper.Map<List<LookupLabelDto>>(currencyIds)) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Currency: Should Have a Valid Currency Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+            #endregion currency && language validation
+
+            #region Class && department validation
+            if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification1) && GetClassId(accountExcelDto.BusinessClassification1, classIds) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Business Classification 1: Should Have a Valid Business Classification  Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification2) && GetClassId(accountExcelDto.BusinessClassification2, classIds) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Business Classification 2: Should Have a Valid Business Classification  Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification3) && GetClassId(accountExcelDto.BusinessClassification3, classIds) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Business Classification 3: Should Have a Valid Business Classification  Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Department1) && GetDepartmentId(accountExcelDto.Department1, departmentIds) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Department 1: Should Have a Valid Product Department  Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Department2) && GetDepartmentId(accountExcelDto.Department2, departmentIds) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Department 2: Should Have a Valid Product Department  Value.",
+                    ErrorType = "Stopper"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(accountExcelDto.Department3) && GetDepartmentId(accountExcelDto.Department3, departmentIds) == 0)
+            {
+                returnList.Add(new ImportContactReturnDto
+                {
+                    RecordKey = accountExcelDto.Code,
+                    ErrorMessage = "Department 3: Should Have a Valid Product Department  Value.",
+                    ErrorType = "Stopper"
+                });
+
+            }
+            #endregion Class && department validation
+            return returnList;
+        }
+        //I46[End]
         //MMT22
         public async Task<AccountExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         //public async Task<AccountExcelResultsDTO> ValidateAccountsExcel(string guidFile, string[] imagesList)
@@ -4452,7 +5145,8 @@ namespace onetouch.Accounts
                             ds.Tables[0].Columns[icounter].ColumnName = fieldName;
                         }
                         catch (Exception ex)
-                        { var x = 0;
+                        {
+                            var x = 0;
                             var y = 0;
                         }
                     }
@@ -4554,7 +5248,7 @@ namespace onetouch.Accounts
                         accountExcelRecordErrorDTO.ExcelDto = accountExcelDto;
                         string recordErrorMEssage = "Wrong data in this " + accountExcelRecordErrorDTO.RecordType + ". check this record in the sheet and update";
 
-                        #region check images
+                        #region check images.
                         bool hasError = false;
                         if (imagesList != null)
                         {
@@ -4648,27 +5342,27 @@ namespace onetouch.Accounts
                             recordErrorMEssage = "Duplicated " + accountExcelRecordErrorDTO.RecordType;
                         }
 
-                        AccountExcelRecordType accountExcelRecordType;
-                        AccountExcelAccountType accountExcelAccountType;
+                        //AccountExcelRecordType accountExcelRecordType;
+                        //AccountExcelAccountType accountExcelAccountType;
 
-                        if (string.IsNullOrEmpty(accountExcelDto.Code)) { accountExcelRecordErrorDTO.FieldsErrors.Add("Code: Should Have a Value."); hasError = true; }
-                        if (string.IsNullOrEmpty(accountExcelDto.Name)) { accountExcelRecordErrorDTO.FieldsErrors.Add("Name: Should Have a Value."); hasError = true; }
-                        if (!string.IsNullOrEmpty(accountExcelDto.Website) && !_helper.ExcelHelper.IsValidWebsite(accountExcelDto.Website))
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Website: Not Valid Website Value."); hasError = true; }
+                        //if (string.IsNullOrEmpty(accountExcelDto.Code)) { accountExcelRecordErrorDTO.FieldsErrors.Add("Code: Should Have a Value."); hasError = true; }
+                        //if (string.IsNullOrEmpty(accountExcelDto.Name)) { accountExcelRecordErrorDTO.FieldsErrors.Add("Name: Should Have a Value."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Website) && !_helper.ExcelHelper.IsValidWebsite(accountExcelDto.Website))
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Website: Not Valid Website Value."); hasError = true; }
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Email Address: Not Valid Email Value."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Email Address: Not Valid Email Value."); hasError = true; }
 
-                        #endregion code, name, email and website validation
+                        //#endregion code, name, email and website validation
 
-                        #region check record type
-                        if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Record Type: Should Be Account|Branch|Contact."); hasError = true; }
+                        //#region check record type
+                        //if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Record Type: Should Be Account|Branch|Contact."); hasError = true; }
 
-                        if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
-                        {
-                            accountExcelRecordErrorDTO.FieldsErrors.Add("Account Type: Should Be Seller|Buyer|Both."); hasError = true;
-                        }
+                        //if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
+                        //{
+                        //    accountExcelRecordErrorDTO.FieldsErrors.Add("Account Type: Should Be Seller|Buyer|Both."); hasError = true;
+                        //}
                         if (accountExcelDto.RecordType == AccountExcelRecordType.Branch.ToString() && result.Where(r => r.Code == accountExcelDto.ParentCode && r.RecordType == AccountExcelRecordType.Account.ToString()).ToList().Count() == 0)
                         {
                             accountExcelRecordErrorDTO.FieldsErrors.Add("Parent Code: Branch Parent Should Be Of Account Type."); hasError = true;
@@ -4680,189 +5374,201 @@ namespace onetouch.Accounts
                         }
                         #endregion check record type
 
-                        #region phone validation
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
-                            !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
-                            !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Is Filled With a InValid Phone# and Code."); hasError = true; }
+                        //I46[Start]
+                        var validationList = await ValidateImportContactData(accountExcelDto);
+                        if (validationList != null && validationList.Count > 0)
+                        {
+                            foreach (var err in validationList)
+                            {
+                                accountExcelRecordErrorDTO.FieldsErrors.Add(err.ErrorMessage);
+                                hasError = true;
+                            }
+                        }
+                        //I46 [End]
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Type is InValid."); hasError = true; }
+                        //#region phone validation
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
+                        //    !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
+                        //    !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Is Filled With a InValid Phone# and Code."); hasError = true; }
 
-
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
-                           !string.IsNullOrEmpty(accountExcelDto.Phone2Number) &&
-                           !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone2Code + accountExcelDto.Phone2Number))
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Is Filled With a InValid Phone# and Code."); hasError = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Type is InValid."); hasError = true; }
-
-
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
-                            !string.IsNullOrEmpty(accountExcelDto.Phone3Number) &&
-                            !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone3Code + accountExcelDto.Phone3Number))
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 3: Phone 3 Is Filled With a InValid Phone# and Code."); hasError = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone3Type) && GetTypeId(accountExcelDto.Phone3Type, phoneTypes) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 3: Phone 3 Type is InValid."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Type is InValid."); hasError = true; }
 
 
-                        #endregion phone validation
 
-                        #region check address 
-                        bool AddressTypeFound = false;
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
+                        //   !string.IsNullOrEmpty(accountExcelDto.Phone2Number) &&
+                        //   !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone2Code + accountExcelDto.Phone2Number))
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Is Filled With a InValid Phone# and Code."); hasError = true; }
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address1Type) && GetTypeId(accountExcelDto.Address1Type, addressTypes) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 Type: Address Type is InValid."); hasError = true; }
-                        else
-                        { AddressTypeFound = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address2Type) && GetTypeId(accountExcelDto.Address2Type, addressTypes) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 Type: Address Type is InValid."); hasError = true; }
-                        else
-                        { AddressTypeFound = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address3Type) && GetTypeId(accountExcelDto.Address3Type, addressTypes) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 Type: Address Type is InValid."); hasError = true; }
-                        else
-                        { AddressTypeFound = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address4Type) && GetTypeId(accountExcelDto.Address4Type, addressTypes) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 Type: Address Type is InValid."); hasError = true; }
-                        else
-                        { AddressTypeFound = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address1Country) && GetTypeId(accountExcelDto.Address1Country, countries) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 Country: Country Code is InValid."); hasError = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address2Country) && GetTypeId(accountExcelDto.Address2Country, countries) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 Country: Country Code is InValid."); hasError = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address3Country) && GetTypeId(accountExcelDto.Address3Country, countries) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 Country: Country Code is InValid."); hasError = true; }
-
-                        if (!string.IsNullOrEmpty(accountExcelDto.Address4Country) && GetTypeId(accountExcelDto.Address4Country, countries) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 Country: Country Code is InValid."); hasError = true; }
-
-                        if (!AddressTypeFound)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address Type: At Least One Address Type Should Be Valid."); hasError = true; }
-
-                        if ((!string.IsNullOrEmpty(accountExcelDto.Address1City) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1State) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address1Type)) &&
-                            (string.IsNullOrEmpty(accountExcelDto.Address1City) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1State) ||
-                            string.IsNullOrEmpty(accountExcelDto.Address1Type))
-                            )
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 : Address 1 Field Should be All Filled or Removed."); hasError = true; }
-
-                        if ((!string.IsNullOrEmpty(accountExcelDto.Address2City) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Type)) &&
-                            !(string.IsNullOrEmpty(accountExcelDto.Address2City) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
-                            !string.IsNullOrEmpty(accountExcelDto.Address2Type))
-                            )
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 : Address 2 Field Should be All Filled or Removed."); hasError = true; }
-
-                        if ((!string.IsNullOrEmpty(accountExcelDto.Address3City) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3State) ||
-                                            !string.IsNullOrEmpty(accountExcelDto.Address3Type)) &&
-                                            (string.IsNullOrEmpty(accountExcelDto.Address3City) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3State) ||
-                                            string.IsNullOrEmpty(accountExcelDto.Address3Type))
-                                            )
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 : Address 3 Field Should be All Filled or Removed."); hasError = true; }
-
-                        if ((!string.IsNullOrEmpty(accountExcelDto.Address4City) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4State) ||
-                                       !string.IsNullOrEmpty(accountExcelDto.Address4Type)) &&
-                                       (string.IsNullOrEmpty(accountExcelDto.Address4City) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4State) ||
-                                       string.IsNullOrEmpty(accountExcelDto.Address4Type))
-                                       )
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 : Address 4 Field Should be All Filled or Removed."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Type is InValid."); hasError = true; }
 
 
-                        #endregion check address 
 
-                        #region currency && language validation
-                        if (!string.IsNullOrEmpty(accountExcelDto.Language) && GetTypeId(accountExcelDto.Language, languageIds) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Language: Should Have a Valid Language Value."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
+                        //    !string.IsNullOrEmpty(accountExcelDto.Phone3Number) &&
+                        //    !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone3Code + accountExcelDto.Phone3Number))
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 3: Phone 3 Is Filled With a InValid Phone# and Code."); hasError = true; }
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.Currency) && GetTypeId(accountExcelDto.Currency, ObjectMapper.Map<List<LookupLabelDto>>(currencyIds)) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Currency: Should Have a Valid Currency Value."); hasError = true; }
-                        #endregion currency && language validation
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Phone3Type) && GetTypeId(accountExcelDto.Phone3Type, phoneTypes) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 3: Phone 3 Type is InValid."); hasError = true; }
 
-                        #region Class && department validation
-                        if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification1) && GetClassId(accountExcelDto.BusinessClassification1, classIds) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 1: Should Have a Valid Business Classification  Value."); hasError = true; }
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification2) && GetClassId(accountExcelDto.BusinessClassification2, classIds) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 2: Should Have a Valid Business Classification  Value."); hasError = true; }
+                        //#endregion phone validation
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification3) && GetClassId(accountExcelDto.BusinessClassification3, classIds) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 3: Should Have a Valid Business Classification  Value."); hasError = true; }
+                        //#region check address 
+                        //bool AddressTypeFound = false;
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.Department1) && GetDepartmentId(accountExcelDto.Department1, departmentIds) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Department 1: Should Have a Valid Product Department  Value."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address1Type) && GetTypeId(accountExcelDto.Address1Type, addressTypes) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 Type: Address Type is InValid."); hasError = true; }
+                        //else
+                        //{ AddressTypeFound = true; }
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.Department2) && GetDepartmentId(accountExcelDto.Department2, departmentIds) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Department 2: Should Have a Valid Product Department  Value."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address2Type) && GetTypeId(accountExcelDto.Address2Type, addressTypes) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 Type: Address Type is InValid."); hasError = true; }
+                        //else
+                        //{ AddressTypeFound = true; }
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.Department3) && GetDepartmentId(accountExcelDto.Department3, departmentIds) == 0)
-                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Department 3: Should Have a Valid Product Department  Value."); hasError = true; }
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address3Type) && GetTypeId(accountExcelDto.Address3Type, addressTypes) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 Type: Address Type is InValid."); hasError = true; }
+                        //else
+                        //{ AddressTypeFound = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address4Type) && GetTypeId(accountExcelDto.Address4Type, addressTypes) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 Type: Address Type is InValid."); hasError = true; }
+                        //else
+                        //{ AddressTypeFound = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address1Country) && GetTypeId(accountExcelDto.Address1Country, countries) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 Country: Country Code is InValid."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address2Country) && GetTypeId(accountExcelDto.Address2Country, countries) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 Country: Country Code is InValid."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address3Country) && GetTypeId(accountExcelDto.Address3Country, countries) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 Country: Country Code is InValid."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Address4Country) && GetTypeId(accountExcelDto.Address4Country, countries) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 Country: Country Code is InValid."); hasError = true; }
+
+                        //if (!AddressTypeFound)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address Type: At Least One Address Type Should Be Valid."); hasError = true; }
+
+                        //if ((!string.IsNullOrEmpty(accountExcelDto.Address1City) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1State) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address1Type)) &&
+                        //    (string.IsNullOrEmpty(accountExcelDto.Address1City) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1State) ||
+                        //    string.IsNullOrEmpty(accountExcelDto.Address1Type))
+                        //    )
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 : Address 1 Field Should be All Filled or Removed."); hasError = true; }
+
+                        //if ((!string.IsNullOrEmpty(accountExcelDto.Address2City) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Type)) &&
+                        //    !(string.IsNullOrEmpty(accountExcelDto.Address2City) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
+                        //    !string.IsNullOrEmpty(accountExcelDto.Address2Type))
+                        //    )
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 : Address 2 Field Should be All Filled or Removed."); hasError = true; }
+
+                        //if ((!string.IsNullOrEmpty(accountExcelDto.Address3City) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3State) ||
+                        //                    !string.IsNullOrEmpty(accountExcelDto.Address3Type)) &&
+                        //                    (string.IsNullOrEmpty(accountExcelDto.Address3City) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3State) ||
+                        //                    string.IsNullOrEmpty(accountExcelDto.Address3Type))
+                        //                    )
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 : Address 3 Field Should be All Filled or Removed."); hasError = true; }
+
+                        //if ((!string.IsNullOrEmpty(accountExcelDto.Address4City) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4State) ||
+                        //               !string.IsNullOrEmpty(accountExcelDto.Address4Type)) &&
+                        //               (string.IsNullOrEmpty(accountExcelDto.Address4City) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4State) ||
+                        //               string.IsNullOrEmpty(accountExcelDto.Address4Type))
+                        //               )
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 : Address 4 Field Should be All Filled or Removed."); hasError = true; }
+
+
+                        //#endregion check address 
+
+                        //#region currency && language validation
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Language) && GetTypeId(accountExcelDto.Language, languageIds) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Language: Should Have a Valid Language Value."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Currency) && GetTypeId(accountExcelDto.Currency, ObjectMapper.Map<List<LookupLabelDto>>(currencyIds)) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Currency: Should Have a Valid Currency Value."); hasError = true; }
+                        //#endregion currency && language validation
+
+                        //#region Class && department validation
+                        //if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification1) && GetClassId(accountExcelDto.BusinessClassification1, classIds) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 1: Should Have a Valid Business Classification  Value."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification2) && GetClassId(accountExcelDto.BusinessClassification2, classIds) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 2: Should Have a Valid Business Classification  Value."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification3) && GetClassId(accountExcelDto.BusinessClassification3, classIds) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 3: Should Have a Valid Business Classification  Value."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Department1) && GetDepartmentId(accountExcelDto.Department1, departmentIds) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Department 1: Should Have a Valid Product Department  Value."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Department2) && GetDepartmentId(accountExcelDto.Department2, departmentIds) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Department 2: Should Have a Valid Product Department  Value."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(accountExcelDto.Department3) && GetDepartmentId(accountExcelDto.Department3, departmentIds) == 0)
+                        //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Department 3: Should Have a Valid Product Department  Value."); hasError = true; }
                         #endregion Class && department validation
 
                         if (hasError)
@@ -4890,6 +5596,8 @@ namespace onetouch.Accounts
                         //accountExcelResultsDTO.ExcelRecords.Add(expando);
                         //MMT22
                     }
+                    //test
+                    await ImportContact(result, ExcelRecordRepeateHandler.CreateACopy);
 
                     #region if parent failed then children are failed
                     List<AccountExcelRecordDTO> resultSorted = accountExcelResultsDTO.ExcelRecords.OrderBy(r => r.ParentCode).ThenBy(r => r.Code).ToList();
@@ -4906,7 +5614,7 @@ namespace onetouch.Accounts
 
                     accountExcelResultsDTO.TotalPassedRecords = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Passed.ToString() || r.Status == ExcelRecordStatus.Warning.ToString()).Count();
                     accountExcelResultsDTO.TotalFailedRecords = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Failed.ToString()).Count();
-                    #endregion Excel validateion rules only.
+                    //#endregion Excel validateion rules only.
 
                     #region update the excel sheet with errors
                     // Create new Spreadsheet
@@ -4976,7 +5684,7 @@ namespace onetouch.Accounts
                     accountExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath = accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44301/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
+                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44302/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath = accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"Templates:AccountExcelLogFileName"];
 
@@ -4998,7 +5706,7 @@ namespace onetouch.Accounts
             for (int i = 1; i < 1000; i++)
             {
                 string newCode = code + i.ToString();
-                AppContact account = _appContactRepository.GetAll().Where(r =>r.EntityFk.EntityObjectTypeId == entityObjectTypeId && r.Code == newCode).FirstOrDefault();
+                AppContact account = _appContactRepository.GetAll().Where(r => r.EntityFk.EntityObjectTypeId == entityObjectTypeId && r.Code == newCode).FirstOrDefault();
                 if (account != null && account.Code == newCode)
                 { }
                 else { return newCode; }
@@ -5150,12 +5858,12 @@ namespace onetouch.Accounts
                 IList<AppAddressDto> addresses = await GetAllAccountAddresses(AccountId);
 
                 List<AppAddressDto> appAddressDto = addresses.Where(r => r.Code == address.Code &&
-                        r.Name.TrimEnd().ToUpper() == address.Name.TrimEnd().ToUpper() &&
-                        r.AddressLine1.TrimEnd().ToUpper() == address.AddressLine1.TrimEnd().ToUpper() &&
-                        r.AddressLine2.TrimEnd().ToUpper() == address.AddressLine2.TrimEnd().ToUpper() &&
-                        r.City.TrimEnd().ToUpper() == address.City.TrimEnd().ToUpper() &&
-                        r.State.TrimEnd().ToUpper() == address.State.TrimEnd().ToUpper() &&
-                        r.PostalCode.TrimEnd().ToUpper() == address.PostalCode.TrimEnd().ToUpper() &&
+                        //r.Name.TrimEnd().ToUpper() == address.Name.TrimEnd().ToUpper() &&
+                        //r.AddressLine1.TrimEnd().ToUpper() == address.AddressLine1.TrimEnd().ToUpper() &&
+                       // r.AddressLine2.TrimEnd().ToUpper() == address.AddressLine2.TrimEnd().ToUpper() &&
+                      //  r.City.TrimEnd().ToUpper() == address.City.TrimEnd().ToUpper() &&
+                      //  r.State.TrimEnd().ToUpper() == address.State.TrimEnd().ToUpper() &&
+                      //  r.PostalCode.TrimEnd().ToUpper() == address.PostalCode.TrimEnd().ToUpper() &&
                         GetTypeId(address.CountryIdName, countries) > 0).ToList();
 
                 if (appAddressDto.Count == 0) //|| AccountId == 0)
@@ -5183,6 +5891,23 @@ namespace onetouch.Accounts
                 {
                     address.AddressId = appAddressDto[0].Id;
                     address.AccountId = AccountId;
+                    //T-SII-20250129.0001,1 MMT 03/02/2023 Address is not updated while importing[Start]
+                    AppAddressDto addressDto = new AppAddressDto();
+                    addressDto.Name = address.Name;
+                    addressDto.TenantId = AbpSession.TenantId;
+                    addressDto.AddressLine1 = address.AddressLine1;
+                    addressDto.AddressLine2 = address.AddressLine2;
+                    addressDto.Code = address.Code;
+                    addressDto.City = address.City;
+                    addressDto.State = address.State;
+                    addressDto.PostalCode = address.PostalCode;
+                    if (string.IsNullOrEmpty(address.CountryIdName)) address.CountryIdName = "USA";
+                    var countryId = GetTypeId(address.CountryIdName, countries);
+                    addressDto.CountryId = countryId == 0 ? null : countryId;
+                    addressDto.AccountId = AccountId;
+                    addressDto.Id = appAddressDto[0].Id;
+                    var appAddressDtoRet = await CreateOrEditAddress(addressDto);
+                    //T-SII-20250129.0001,1 MMT 03/02/2023 Address is not updated while importing[End]
                     return address.AddressId;
                 }
             }
@@ -5337,14 +6062,100 @@ namespace onetouch.Accounts
             #endregion add titles
 
         }
+        //I46[start]
+        public async Task<List<ImportContactReturnDto>> ImportContact(List<AccountExcelDto> contactExcelDtoList, ExcelRecordRepeateHandler repeatHandler)
+        {
+            AccountExcelResultsDTO saveExcelinput = new AccountExcelResultsDTO();
+            saveExcelinput.CodesFromList = new List<string>();
+            saveExcelinput.ToList = new List<int>();
+            saveExcelinput.FromList = new List<int>();
+            saveExcelinput.ErrorMessage = "";
+            saveExcelinput.ExcelRecords = new List<AccountExcelRecordDTO>();
+            saveExcelinput.RepreateHandler = repeatHandler;
+            saveExcelinput.To = contactExcelDtoList.Count;
+            saveExcelinput.From = 0;
+            List<ImportContactReturnDto> returnList = new List<ImportContactReturnDto>();
+            foreach (var excelDto in contactExcelDtoList)
+            {
+                if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                    continue;
+                long id = 0;
+                bool canBeSaved = true;
+                var list = await ValidateImportContactData(excelDto);
+                if (list != null && list.Count > 0)
+                {
+                    foreach (var err in list)
+                    {
+                        returnList.Add(err);
+                        canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
+                        //if (err.ErrorType == "Duplication")
+                         //   id = long.Parse(err.Id.ToString());
+                    }
+                }
+                if (canBeSaved == true)
+                {
+                    //MapperConfiguration configuration;
+                    //configuration = new MapperConfiguration(a => { a.AddProfile(new AccountExcelDtoProfile()); });
+                    //IMapper mapper;
+                    //mapper = configuration.CreateMapper();
+                    //List<AccountExcelDto> result;
+                    //result = mapper.Map<List<AccountExcelDto>, List<AccountExcelDto>>(contactExcelDtoList);
 
+
+
+
+                    //AccountExcelDto importInputDto;
+                    //// try
+                    //{
+                    //    // DataRow dr = mapper.Map<ImportItemInputDto, DataRow>(excelDto); 
+                    //    importItemInputDto = mapper.Map<ImportItemInputDto, AccountExcelDto>(excelDto);
+                    //    importItemInputDto.Id = id;
+                    //}
+                    // catch (Exception exObj)
+                    //  {
+                    //      throw new UserFriendlyException("This Excel file format is invalid");
+                    // }
+
+                    saveExcelinput.ExcelRecords.Add(new AccountExcelRecordDTO
+                    {
+                        Code = excelDto.Code,
+                        ExcelDto = excelDto,
+                        RecordType = excelDto.RecordType,
+                        Status = ""
+                    });
+                    var children = contactExcelDtoList.Where(z => z.ParentCode == excelDto.Code).ToList();
+                    if (children != null && children.Count > 0)
+                    {
+                        foreach (var child in children)
+                        {
+                            //AppItemExcelDto importItemInputDtoChild;
+                            //importItemInputDtoChild = mapper.Map<ImportItemInputDto, AppItemExcelDto>(child);
+                            //importItemInputDto.Id = id;
+
+
+                            saveExcelinput.ExcelRecords.Add(new AccountExcelRecordDTO
+                            {
+                                Code = child.Code,
+                                ExcelDto = child,
+                                RecordType = child.RecordType,
+                                Status = ""
+                            });
+                        }
+                    }
+
+                }
+            }
+            await SaveFromExcel(saveExcelinput);
+            return returnList;
+        }
+        //I46[End]
         //MMT
         //public async Task<AccountExcelLogDto> SaveAccountFromExcel(AccountExcelResultsDTO accountExcelResultsDTO)
         public async Task<ExcelLogDto> SaveFromExcel(AccountExcelResultsDTO accountExcelResultsDTO)
         //MMT2
         {
             #region get lists
-
+            
             // get not failed recoreds
             List<AccountExcelDto> result = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
@@ -5420,12 +6231,13 @@ namespace onetouch.Accounts
                 List<CreateOrEditAccountInfoDto> resultAccount = mapperAccount.Map<List<AccountExcelDto>, List<CreateOrEditAccountInfoDto>>(accountsResult);
                 //xx
                 var accountList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).ToList()
-                                   join s in resultAccount on o.Code equals s.Code select o).ToList();
+                                   join s in resultAccount on o.Code equals s.Code
+                                   select o).ToList();
                 //xx
                 foreach (CreateOrEditAccountInfoDto createOrEditAccountInfoDto in resultAccount)
                 {
-                    AppContact account = accountList.FirstOrDefault(a=>a.Code== createOrEditAccountInfoDto.Code);
-                        //_appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId  && r.Code == createOrEditAccountInfoDto.Code).FirstOrDefault();
+                    AppContact account = accountList.FirstOrDefault(a => a.Code == createOrEditAccountInfoDto.Code);
+                    //_appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId  && r.Code == createOrEditAccountInfoDto.Code).FirstOrDefault();
                     string code = createOrEditAccountInfoDto.Code;
                     string oldCode = createOrEditAccountInfoDto.Code;
                     long entId = 0;
@@ -5450,9 +6262,9 @@ namespace onetouch.Accounts
                     }
 
                     //XXa
-                    
+
                     AppContact accountContact = new AppContact();
-                    accountContact.AccountId =null;
+                    accountContact.AccountId = null;
                     accountContact.Id = 0;
                     if (createOrEditAccountInfoDto.Id != null && createOrEditAccountInfoDto.Id > 0)
                     {
@@ -5472,14 +6284,14 @@ namespace onetouch.Accounts
                     accountContact.CurrencyId = createOrEditAccountInfoDto.CurrencyId;
                     accountContact.EMailAddress = createOrEditAccountInfoDto.EMailAddress;
                     accountContact.Phone2Number = createOrEditAccountInfoDto.Phone2Number;
-                    accountContact.Phone1Number= createOrEditAccountInfoDto.Phone1Number;
+                    accountContact.Phone1Number = createOrEditAccountInfoDto.Phone1Number;
                     accountContact.Phone3Number = createOrEditAccountInfoDto.Phone3Number;
                     accountContact.IsProfileData = createOrEditAccountInfoDto.AccountLevel == AccountLevelEnum.Profile;
                     accountContact.LanguageId = createOrEditAccountInfoDto.LanguageId;
                     accountContact.Phone1Ext = createOrEditAccountInfoDto.Phone1Ex;
                     accountContact.Phone2Ext = createOrEditAccountInfoDto.Phone2Ex;
                     accountContact.Phone3Ext = createOrEditAccountInfoDto.Phone3Ex;
-                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId == 0 ? null : createOrEditAccountInfoDto.Phone1TypeId; 
+                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId == 0 ? null : createOrEditAccountInfoDto.Phone1TypeId;
                     accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId == 0 ? null : createOrEditAccountInfoDto.Phone2TypeId;
                     accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId == 0 ? null : createOrEditAccountInfoDto.Phone3TypeId;
                     accountContact.PriceLevel = createOrEditAccountInfoDto.PriceLevel;
@@ -5491,8 +6303,8 @@ namespace onetouch.Accounts
                     accountContact.EntityFk.Code = createOrEditAccountInfoDto.Code;
                     accountContact.EntityFk.Name = createOrEditAccountInfoDto.Name;
                     accountContact.EntityFk.Notes = createOrEditAccountInfoDto.Notes;
-                    accountContact.EntityFk.ObjectId =contactObjectId;
-                    accountContact.EntityFk.EntityObjectTypeId = partnerEntityObjectTypeId ;
+                    accountContact.EntityFk.ObjectId = contactObjectId;
+                    accountContact.EntityFk.EntityObjectTypeId = partnerEntityObjectTypeId;
                     accountContact.EntityFk.EntityObjectTypeCode = partnerEntityObjectTypeCode;
                     accountContact.EntityFk.EntityObjectTypeFk = partnerEntityObjectType;
                     accountContact.EntityFk.EntityCategories = ObjectMapper.Map<List<AppEntityCategory>>(createOrEditAccountInfoDto.EntityCategories);
@@ -5500,13 +6312,13 @@ namespace onetouch.Accounts
                     //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
                     if (string.IsNullOrEmpty(createOrEditAccountInfoDto.SSIN))
                     {
-                        accountContact.EntityFk.SSIN = await 
+                        accountContact.EntityFk.SSIN = await
                             _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(accountContact.EntityFk));
                         accountContact.SSIN = accountContact.EntityFk.SSIN;
                     }
                     //accountContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(createOrEditAccountInfoDto.ContactAddresses);
                     accountContact.ParentFkList = new List<AppContact>();
-                    
+
                     //XXa
                     foreach (var address in createOrEditAccountInfoDto.ContactAddresses)
                     {
@@ -5522,7 +6334,7 @@ namespace onetouch.Accounts
                     {
                         accountContact.AppContactAddresses.Add(new AppContactAddress
                         {
-                            AddressFk =address.AddressFk,
+                            AddressFk = address.AddressFk,
                             ContactFk = accountContact,
                             AddressId = address.AddressId,
                             AddressCode = address.AddressCode,
@@ -5549,7 +6361,7 @@ namespace onetouch.Accounts
                     && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To
                     ).OrderBy(r => r.ParentCode).ToList();
 
-                    
+
 
                     foreach (var branch in resultExcelAccBranchOnly)
                     {
@@ -5557,7 +6369,7 @@ namespace onetouch.Accounts
                         try
                         {
                             //var BranchParent = _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId && r.Code == branch.ParentCode).FirstOrDefault();
-                            var BranchParent = accountList.FirstOrDefault(r=>r.Code == branch.ParentCode);
+                            var BranchParent = accountList.FirstOrDefault(r => r.Code == branch.ParentCode);
                             if (BranchParent != null)
                             {
                                 branch.ParentId = BranchParent.Id;
@@ -5579,10 +6391,10 @@ namespace onetouch.Accounts
                     foreach (BranchDto branchDto in resultBranchDtoA)
                     {
                         string oldSSIN = "";
-                        if(true)// (branchDto.ParentId > 0)&& r.ParentCode== oldCode
+                        if (true)// (branchDto.ParentId > 0)&& r.ParentCode== oldCode
                         {
                             AppContact accountA = accountBranchList.FirstOrDefault(r => r.Code == branchDto.Code); //_appContactRepository.GetAll().AsNoTracking().Include(z => z.EntityFk)
-                                //.Where(r => r.Code == branchDto.Code && r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId ).FirstOrDefault();
+                                                                                                                   //.Where(r => r.Code == branchDto.Code && r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId ).FirstOrDefault();
                             string codeA = branchDto.Code;
                             string oldBranchCode = branchDto.Code;
                             long? accountId = null;
@@ -5609,22 +6421,22 @@ namespace onetouch.Accounts
                             }
                             //branchDto.AccountId = branchDto.ParentId;
                             foreach (var address in branchDto.ContactAddresses)
-                            { 
-                                
-                                address.AccountId =branchDto.AccountId!=null?(long)branchDto.AccountId:0;
-                               // var addressObj = ObjectMapper.Map<AppAddress>(address);
-                                
+                            {
+
+                                address.AccountId = branchDto.AccountId != null ? (long)branchDto.AccountId : 0;
+                                // var addressObj = ObjectMapper.Map<AppAddress>(address);
+
                                 var addressId = await AddAddress(address.AccountId, address, countries);
                                 if (addressId != null)
-                                 address.AddressId = addressId;
+                                    address.AddressId = addressId;
                             }
                             //xxxxx
-                           
+
                             //xxb
                             AppContact branchContact = new AppContact();
                             branchContact.SSIN = oldSSIN;
                             branchContact.AccountId = null;//accountContact.Id;
-                            branchContact.ParentId = accountContact.Id; 
+                            branchContact.ParentId = accountContact.Id;
                             branchContact.AccountType = accountContact.AccountType;
                             branchContact.AccountTypeId = accountContact.AccountTypeId;
                             List<AppContactAddress> bAddress = new List<AppContactAddress>();
@@ -5633,9 +6445,14 @@ namespace onetouch.Accounts
                             foreach (var address in bAddress)
                             {
                                 branchContact.AppContactAddresses.Add(new AppContactAddress
-                                { AddressFk =  address.AddressFk ,ContactFk = branchContact,
-                                    AddressId = address.AddressId, AddressCode = address.AddressCode, ContactCode = branchContact.Code,
-                                    ContactId = branchContact.Id, AddressTypeId = address.AddressTypeId 
+                                {
+                                    AddressFk = address.AddressFk,
+                                    ContactFk = branchContact,
+                                    AddressId = address.AddressId,
+                                    AddressCode = address.AddressCode,
+                                    ContactCode = branchContact.Code,
+                                    ContactId = branchContact.Id,
+                                    AddressTypeId = address.AddressTypeId
                                 });
                             }
                             branchContact.AccountId = null;//accountContact.Id; 
@@ -5650,7 +6467,7 @@ namespace onetouch.Accounts
                             branchContact.Name = branchDto.Name;
                             branchContact.TradeName = branchDto.TradeName;
                             branchContact.TenantId = AbpSession.TenantId;
-                            branchContact.CurrencyId = string.IsNullOrEmpty(branchDto.CurrencyId.ToString()) || branchDto.CurrencyId ==0 ?  null : branchDto.CurrencyId;
+                            branchContact.CurrencyId = string.IsNullOrEmpty(branchDto.CurrencyId.ToString()) || branchDto.CurrencyId == 0 ? null : branchDto.CurrencyId;
                             branchContact.EMailAddress = branchDto.EMailAddress;
                             branchContact.Phone2Number = branchDto.Phone2Number;
                             branchContact.Phone1Number = branchDto.Phone1Number;
@@ -5676,8 +6493,8 @@ namespace onetouch.Accounts
                             branchContact.EntityFk.EntityObjectTypeId = partnerEntityObjectTypeId;
                             branchContact.EntityFk.EntityObjectTypeCode = partnerEntityObjectTypeCode;
                             branchContact.EntityFk.EntityObjectTypeFk = partnerEntityObjectType;
-                            branchContact.EntityFk.EntityCategories =accountContact.EntityFk.EntityCategories;
-                            branchContact.EntityFk.EntityAttachments =accountContact.EntityFk.EntityAttachments;
+                            branchContact.EntityFk.EntityCategories = accountContact.EntityFk.EntityCategories;
+                            branchContact.EntityFk.EntityAttachments = accountContact.EntityFk.EntityAttachments;
                             //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
                             if (string.IsNullOrEmpty(branchContact.SSIN))
                             {
@@ -5685,9 +6502,9 @@ namespace onetouch.Accounts
                                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(branchContact.EntityFk));
                                 branchContact.SSIN = branchContact.EntityFk.SSIN;
                             }
-                           // branchContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(branchDto.ContactAddresses);
-                           
-                           
+                            // branchContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(branchDto.ContactAddresses);
+
+
                             accountContact.ParentFkList.Add(branchContact);
                             branchContact.ParentFkList = new List<AppContact>();
                             //xxb
@@ -5726,8 +6543,8 @@ namespace onetouch.Accounts
                             List<ContactDto> resultContactAcc = mapperContactAcc.Map<List<AccountExcelDto>, List<ContactDto>>(contactsExcelOnlyResultAcc);
                             //XXX
                             var accountContactTeamList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToList()
-                                                     join s in resultContactAcc on o.Code equals s.Code
-                                                     select o).ToList();
+                                                          join s in resultContactAcc on o.Code equals s.Code
+                                                          select o).ToList();
                             //XXX
                             foreach (ContactDto personDto in resultContactAcc)
                             {
@@ -5742,8 +6559,8 @@ namespace onetouch.Accounts
                                     string codeT = personDto.Code;
                                     string oldPersonCode = personDto.Code;
                                     long entityId = 0;
-                                    if (accountTeam!=null)
-                                       oldTMSSIN = accountTeam.SSIN;
+                                    if (accountTeam != null)
+                                        oldTMSSIN = accountTeam.SSIN;
 
                                     if (accountTeam != null && accountTeam.Id > 0)
                                     {
@@ -5790,7 +6607,7 @@ namespace onetouch.Accounts
                                     teamContact.Name = personDto.Name;
                                     teamContact.TradeName = personDto.TradeName;
                                     teamContact.TenantId = AbpSession.TenantId;
-                                    teamContact.CurrencyId = string.IsNullOrEmpty(personDto.CurrencyId.ToString()) || personDto.CurrencyId==0 ? null : personDto.CurrencyId;
+                                    teamContact.CurrencyId = string.IsNullOrEmpty(personDto.CurrencyId.ToString()) || personDto.CurrencyId == 0 ? null : personDto.CurrencyId;
                                     teamContact.EMailAddress = personDto.EMailAddress;
                                     teamContact.Phone2Number = personDto.Phone2Number;
                                     teamContact.Phone1Number = personDto.Phone1Number;
@@ -5854,8 +6671,8 @@ namespace onetouch.Accounts
                             //XXTM
                         }
                     }
-                   
-                            //XXXB
+
+                    //XXXB
                     //        var retAccount = await CreateOrEditAccount(createOrEditAccountInfoDto);
                     //try
                     //{
@@ -5881,13 +6698,69 @@ namespace onetouch.Accounts
                     //catch (Exception ex) { }
 
                 }
-
+                
                 var con = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
                 // {
-              //  var oldChange = con.ChangeTracker.AutoDetectChangesEnabled;
-             //   con.ChangeTracker.AutoDetectChangesEnabled = false;
-                    try
+                //  var oldChange = con.ChangeTracker.AutoDetectChangesEnabled;
+                //   con.ChangeTracker.AutoDetectChangesEnabled = false;
+                try
+                {
+                    if (accountsList.Count > 0)
+                        con.AppContacts.AddRange(accountsList);
+
+                    if (accountsListUpdated.Count > 0)
+                        con.AppContacts.UpdateRange(accountsListUpdated);
+
+                    await con.SaveChangesAsync();
+
+                    // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
+                    // ac  ol6tttttt5countsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
+
+                    foreach (var acc in accountsList)
                     {
+                        //xx
+                        foreach (var z in acc.AppContactAddresses)
+                        {
+                            if (z.AddressFk!=null)
+                            z.AddressFk.AccountId = acc.Id;
+                        }
+                        //xx
+                        foreach (var br in acc.ParentFkList)
+                        {
+                            //xx
+                            foreach (var z in br.AppContactAddresses)
+                            {
+                                if (z.AddressFk != null)
+                                    z.AddressFk.AccountId = acc.Id;
+                            }
+                            //xx
+                            br.AccountId = acc.Id;
+                            foreach (var cont in br.ParentFkList)
+                            {
+                                //xx
+                                foreach (var z in cont.AppContactAddresses)
+                                {
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
+                                }
+                                //xx
+                                cont.AccountId = acc.Id;
+                            }
+                        }
+
+                    }
+                    con.AppContacts.UpdateRange(accountsList);
+                    await con.SaveChangesAsync();
+                    // accountContact
+
+                }
+                catch (Exception expt)
+                {
+
+                    using (var dbContextTransaction = con.Database.BeginTransaction())
+                    {
+
+                        //x.AppContacts.AddRange(accountsList);
                         if (accountsList.Count > 0)
                             con.AppContacts.AddRange(accountsList);
 
@@ -5895,61 +6768,26 @@ namespace onetouch.Accounts
                             con.AppContacts.UpdateRange(accountsListUpdated);
 
                         await con.SaveChangesAsync();
-
-                    // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
-                    // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
-
-                    foreach (var acc in accountsList)
-                    {
-                        foreach (var br in acc.ParentFkList)
+                        foreach (var acc in accountsList)
                         {
-                            br.AccountId = acc.Id;
-                            foreach (var cont in br.ParentFkList)
+                            foreach (var br in acc.ParentFkList)
                             {
-                                cont.AccountId = acc.Id;
-                            }
-                        }
-
-                    }
-                    con.AppContacts.UpdateRange(accountsList);
-                        await con.SaveChangesAsync();
-                        // accountContact
-
-                    }
-                    catch (Exception expt)
-                    {
-                        
-                        using (var dbContextTransaction = con.Database.BeginTransaction())
-                        {
-
-                            //x.AppContacts.AddRange(accountsList);
-                            if (accountsList.Count > 0)
-                                con.AppContacts.AddRange(accountsList);
-
-                            if (accountsListUpdated.Count > 0)
-                                con.AppContacts.UpdateRange(accountsListUpdated);
-
-                            await con.SaveChangesAsync();
-                            foreach (var acc in accountsList)
-                            {
-                                foreach (var br in acc.ParentFkList)
+                                br.AccountId = acc.Id;
+                                foreach (var cont in br.ParentFkList)
                                 {
-                                    br.AccountId = acc.Id;
-                                    foreach (var cont in br.ParentFkList)
-                                    {
-                                        cont.AccountId = acc.Id;
-                                    }
+                                    cont.AccountId = acc.Id;
                                 }
-
                             }
-                            con.AppContacts.UpdateRange(accountsList);
-                            await con.SaveChangesAsync();
-                            dbContextTransaction.Commit();
+
                         }
-                   //  con.ChangeTracker.AutoDetectChangesEnabled= oldChange;
+                        con.AppContacts.UpdateRange(accountsList);
+                        await con.SaveChangesAsync();
+                        dbContextTransaction.Commit();
+                    }
+                    //  con.ChangeTracker.AutoDetectChangesEnabled= oldChange;
                     // }
                 }
-                return accountExcelResultsDTO.ExcelLogDTO; 
+                return accountExcelResultsDTO.ExcelLogDTO;
                 #endregion add accounts
 
                 #region add branchs
@@ -5998,7 +6836,7 @@ namespace onetouch.Accounts
                                     branchDto.Id = account.Id;
                                     break;
                                 case ExcelRecordRepeateHandler.CreateACopy: // override
-                                  //  branchDto.Code = GetAccountCopyCode(code);
+                                                                            //  branchDto.Code = GetAccountCopyCode(code);
                                     break;
                                 default:
                                     break;
@@ -6010,7 +6848,7 @@ namespace onetouch.Accounts
                             address.AccountId = (long)branchDto.AccountId;
                             await AddAddress((long)branchDto.AccountId, address, countries);
                         }
-                      
+
                         var contact = await CreateOrEditBranch(branchDto);
 
                         try
@@ -6085,7 +6923,7 @@ namespace onetouch.Accounts
                                     personDto.Id = account.Id;
                                     break;
                                 case ExcelRecordRepeateHandler.CreateACopy: // override
-                                 //   personDto.Code = GetAccountCopyCode(code);
+                                                                            //   personDto.Code = GetAccountCopyCode(code);
                                     break;
                                 default:
                                     break;
@@ -7919,8 +8757,177 @@ namespace onetouch.Accounts
             return appContactAddressDtos;
 
         }
-       
+
 
     }
+    //i46-poc
+    //public class DynamicValidator<T> : AbstractValidator<T>
+    //{
+        
+    //    public DynamicValidator(IRepository<ValidationRule> validationRuleRepo, T callingClass)
+    //    {
+            
+    //        var entityName = typeof(T).Name;
+    //        var rules = validationRuleRepo.GetAll().ToList();
 
+    //        //foreach (var rule in rules)
+    //        //{
+    //        //    var property = typeof(T).GetProperty(rule.FieldName.TrimEnd());
+
+    //        //    if (property == null)
+    //        //        throw new InvalidOperationException($"Property '{rule.FieldName}' not found on entity ");
+
+    //        //    var expression = CreateExpression(property);
+    //        //    ApplyRule(expression, rule, property);
+    //        //}
+    //        foreach (var rule in rules)
+    //        {
+    //            var property = typeof(T).GetProperty(rule.FieldName.TrimEnd());
+    //            if (property == null)
+    //                continue;
+    //                //throw new InvalidOperationException($"Property '{rule.FieldName.TrimEnd()}' not found.");
+
+    //            if (property.PropertyType == typeof(int))
+    //            {
+    //                var expression = CreateExpression<int>(property);
+    //                ApplyRule(expression, rule, callingClass);
+    //            }
+    //            else if (property.PropertyType == typeof(string))
+    //            {
+    //                var expression = CreateExpression<string>(property);
+    //                ApplyRule(expression, rule, callingClass);
+    //            }
+    //            else if (property.PropertyType == typeof(decimal))
+    //            {
+    //                var obj = this;
+    //                var expression = CreateExpression<decimal>(property);
+    //                ApplyRule(expression, rule, callingClass);
+    //                //var rulev = rule.RuleValue.Replace(rule.FieldName.TrimEnd(), "x." + rule.FieldName.TrimEnd());
+    //                //var rList = Eval.Execute("{0}.Where(x => {1})", "x", rulev);
+    //                // var expressionv = CreateExpression<TProperty>(rulev);
+    //                //RuleFor<TProperty>(expression).Must(expressionv).WithMessage(rule.ErrorMessage);
+    //            }
+    //            // Add more type checks as needed
+    //        }
+    //    }
+    //    private System.Linq.Expressions.Expression<Func<T, TProperty>> CreateExpression<TProperty>(PropertyInfo property)
+    //    {
+    //        var parameter = System.Linq.Expressions.Expression.Parameter(typeof(T), "x");
+    //        var propertyAccess = System.Linq.Expressions.Expression.Property(parameter, property);
+    //        var lambda = System.Linq.Expressions.Expression.Lambda<Func<T, TProperty>>(propertyAccess, parameter);
+    //        return lambda;//.Compile();
+    //    }
+    //    private bool TryConvertValue(string value, Type targetType, out object convertedValue)
+    //    {
+    //        convertedValue = null;
+    //        try
+    //        {
+    //            if (targetType == typeof(int))
+    //                convertedValue = int.Parse(value);
+    //            else if (targetType == typeof(double))
+    //                convertedValue = double.Parse(value);
+    //            else if (targetType == typeof(decimal))
+    //                convertedValue = decimal.Parse(value);
+    //            else if (targetType == typeof(DateTime))
+    //                convertedValue = DateTime.Parse(value);
+    //            else
+    //                return false;
+
+    //            return true;
+    //        }
+    //        catch
+    //        {
+    //            return false;
+    //        }
+    //    }
+    //    private void ApplyRule<TProperty>(System.Linq.Expressions.Expression<Func<T, TProperty>> expression, ValidationRule rule,T callingClass)
+    //    {
+    //        switch (rule.RuleType)
+    //        {
+    //            case "Nullable":
+    //                RuleFor<TProperty>(expression).NotNull().WithMessage(rule.ErrorMessage);
+    //                break;
+    //            case "NotEmpty":
+    //                RuleFor<TProperty>(expression).NotEmpty().WithMessage(rule.ErrorMessage);
+    //                break;
+
+    //            case "MaxLength":
+    //                if (typeof(TProperty) == typeof(string) && int.TryParse(rule.RuleValue, out var maxLength))
+    //                    RuleFor<TProperty>(expression).Must(x => x.ToString().Length <= maxLength).WithMessage(rule.ErrorMessage);
+    //                break;
+    //            case "MinLength":
+    //                if (typeof(TProperty) == typeof(string) && int.TryParse(rule.RuleValue, out var minLength))
+    //                    RuleFor<TProperty>(expression).Must(x => x.ToString().Length >= minLength).WithMessage(rule.ErrorMessage);
+    //                break;
+    //            case "GreaterThan":
+    //                if (TryConvertValue(rule.RuleValue, typeof(TProperty), out var minValue))
+    //                {
+    //                    var greaterThanMethod = typeof(DefaultValidatorOptions)
+    //                        .GetMethods()
+    //                        .First(m => m.Name == "GreaterThan" && m.GetParameters().Length == 1)
+    //                        .MakeGenericMethod(typeof(TProperty));
+
+    //                    var ruleBuilder = RuleFor(expression);
+    //                    greaterThanMethod.Invoke(ruleBuilder, new[] { minValue });
+    //                    // ruleBuilder;//.WithMessage(rule.ErrorMessage);
+    //                }
+    //                break;
+    //            case "Custom":
+    //                RuleFor(expression).Custom((z, context) =>
+    //                {
+    //                    //var i = z;
+    //                    //  var c = context.InstanceToValidate;
+    //                    var x = context.InstanceToValidate;
+    //                    var rulev = rule.RuleValue.Replace(rule.FieldName.TrimEnd(), "x." + rule.FieldName.TrimEnd());
+    //                    var returnVal = Eval.Execute(rulev, new { x = context.InstanceToValidate });
+    //                    if (!bool.Parse(returnVal.ToString()))
+    //                    {
+    //                        context.AddFailure(rule.ErrorMessage);
+    //                    }
+    //                });
+    //                // if (typeof(TProperty) == typeof(string))
+    //                // {
+    //                // var rulev = rule.RuleValue.Replace(rule.FieldName.TrimEnd(), "x." + rule.FieldName.TrimEnd());
+    //                //var rList = Eval.Execute("{0}.Where(x => {1})", expression, rulev);
+    //                //var expressionv = CreateExpression<TProperty>(rulev);
+    //                //RuleFor<TProperty>(expression).Must(expressionv).WithMessage(rule.ErrorMessage);
+    //                // }
+    //                break;
+    //            case "Function":
+    //                RuleFor(expression).Custom((z, contextt) =>
+    //                {
+    //                    var context = new EvalContext();
+    //                    // Clear all existing registrations to start fresh
+    //                    context.UnregisterAll();
+    //                    // Limit iterations to prevent infinite loops
+    //                    context.MaxLoopIteration = 5;
+    //                    // Enable safe mode for restricted code execution
+    //                    // context.SafeMode = true;
+    //                    // Register default aliases and the necessary types
+    //                    context.RegisterDefaultAliasSafe();
+    //                    context.ForceCharAsString = true;
+    //                    context.UseCache = false;
+    //                    context.UseTypeBeforeDynamic = true;
+    //                    context.RegisterStaticMethod(callingClass.GetType());
+    //                    //context.RegisterType(typeof(AppItemsAppService));
+    //                    var rulev = rule.RuleValue.Replace(rule.FieldName.TrimEnd(), "x." + rule.FieldName.TrimEnd());
+    //                    var returnVal = context.Execute(rulev, new { x = contextt.InstanceToValidate });
+
+
+
+    //                    // var x = context.InstanceToValidate;
+
+    //                    //var returnVal = Eval.Execute<bool>("onetouch.AppItems.AppItemsAppService." + rulev, new { x = context.InstanceToValidate });
+    //                    if (!bool.Parse(returnVal.ToString()))
+    //                    {
+    //                        contextt.AddFailure(rule.ErrorMessage);
+    //                    }
+    //                });
+    //                break;
+
+    //            default:
+    //                throw new NotSupportedException($"Rule type '{rule.RuleType}' is not supported.");
+    //        }
+    //    }
+    //}
 }

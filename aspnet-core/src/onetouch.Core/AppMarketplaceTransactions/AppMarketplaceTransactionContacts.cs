@@ -73,6 +73,13 @@ namespace onetouch.AppMarketplaceTransactions
 
         //[ForeignKey("ContactAddressCountryId")]
         //public virtual AppEntity ContactAddressCountryFk { get; set; }
-
+        //I46[Start]
+        [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
+        public virtual string BranchCode { get; set; }
+        [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
+        public virtual string CompanyCode { get; set; }
+        [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
+        public virtual string ContactCode { get; set; }
+        //I46[End]
     }
 }

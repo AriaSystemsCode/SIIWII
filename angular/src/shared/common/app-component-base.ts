@@ -254,30 +254,19 @@ export abstract class AppComponentBase {
         const uploader = new FileUploader({
             url: AppConsts.remoteServiceBaseUrl + url,
         });
-
         uploader.onAfterAddingFile = (file) => {
             file.withCredentials = false;
         };
-
-        uploader.onSuccessItem = (item, response, status) => {
-            const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-            if (ajaxResponse?.success) {
-                this.notify.info(this.l("UploadSuccessfully"));
-                if (success) {
-                    success(ajaxResponse.result);
-                }
-            } else {
-                if(ajaxResponse?.error?.message)
-                this.message.error(ajaxResponse?.error?.message);
-            }
+        uploader.onCompleteAll = () => {
+            this.notify.info(this.l("UploadSuccessfully"));
         };
-
         const uploaderOptions: Partial<FileUploaderOptions> = {};
         uploaderOptions.authToken = "Bearer " + this.tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
         uploader.setOptions(uploaderOptions as FileUploaderOptions);
         return uploader;
     }
+
     createCustomUploader(
         url?: string,
         success?: (result: any) => void

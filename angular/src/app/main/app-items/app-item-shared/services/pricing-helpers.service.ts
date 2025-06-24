@@ -2,6 +2,7 @@ import { Injectable, Injector } from '@angular/core';
 import { MatrixGridColumns } from '@app/shared/common/matrix-grid/models/MatrixGridColumns';
 import { MatrixGridRows } from '@app/shared/common/matrix-grid/models/MatrixGridRows';
 import { MatrixGridSelectItem } from '@app/shared/common/matrix-grid/models/MatrixGridSelectItem';
+import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppItemPriceInfo, CurrencyInfoDto, IAppItemPriceInfo } from '@shared/service-proxies/service-proxies';
 
@@ -10,7 +11,7 @@ import { AppItemPriceInfo, CurrencyInfoDto, IAppItemPriceInfo } from '@shared/se
 })
 export class PricingHelpersService extends AppComponentBase {
   levels: string[] = ['A', 'B', 'C', 'D']
-  defaultLevel:string = 'MSRP'
+  defaultLevel:string="MSRP" ;
   constructor(private injector: Injector) {
     super(injector);
   }
@@ -38,9 +39,14 @@ export class PricingHelpersService extends AppComponentBase {
     return row
   }
   setRowValues(prices?:AppItemPriceInfo[]) : MatrixGridSelectItem[] {
+    
+    let languageSettingName  =AppConsts.languageSettingName;
+    let defaultLevel= languageSettingName!='en-GB'? 'MSRP' : 'RRP';
+
     const rowValues : MatrixGridSelectItem[] = [
       new MatrixGridSelectItem({ 
-        label: this.l(this.defaultLevel), 
+       //label: this.l(this.defaultLevel), 
+       label:defaultLevel,
         value: prices ? prices[this.getDefaultPricingIndex(prices)]?.price : 0 
       }),
     ]
@@ -55,8 +61,12 @@ export class PricingHelpersService extends AppComponentBase {
     return rowValues
   }
   setColsValues() : MatrixGridSelectItem[] {
+    let languageSettingName  =AppConsts.languageSettingName;
+    let defaultLevel= languageSettingName!='en-GB'? 'MSRP' : 'RRP';
+
     const colValues : MatrixGridSelectItem[] = [
-      new MatrixGridSelectItem({ label: this.l(this.defaultLevel), value: this.l(this.defaultLevel) }),
+      //new MatrixGridSelectItem({ label: this.l(this.defaultLevel), value: this.l(this.defaultLevel) }),
+      new MatrixGridSelectItem({ label: defaultLevel, value: this.l(this.defaultLevel) }),
     ]
     this.levels.forEach(level => {
       const col = new MatrixGridSelectItem({ label: this.l('PriceLevel{0}', level), value: level })

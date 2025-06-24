@@ -115,7 +115,7 @@
 
 .attachImage img {
     width: 76.5px;
-    // height: 106.5px;
+    height: 104.5px;
     cursor: pointer;
 }
 
@@ -259,7 +259,7 @@
 
     }
     .ratio-qty.w-100{
-        width: 26.3vw !important;
+        width: 404px !important;
 
     }
     .ratio-lable {
@@ -317,7 +317,11 @@
         padding-top: 3px;
     }
 }
-
+::ng-deep {
+    .p-carousel-items-container {
+        margin-right: -6px !important;
+    }
+}
 .last-updated{
     p{
         font-size: 12px ;
@@ -327,6 +331,13 @@
 .colorBox
 {
     width: 76.5px !important;
-    height: 106.5px !important;
+    height: 104.5px !important;
     cursor: pointer !important;
+}
+
+
+::ng-deep {
+    .p-carousel-items-container {
+        margin-right: -6px !important;
+    }
 }

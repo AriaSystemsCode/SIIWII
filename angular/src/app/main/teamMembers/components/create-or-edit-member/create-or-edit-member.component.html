@@ -55,6 +55,26 @@
                                 >
                                 </app-image-upload>
                             </div>
+
+                            <div class="form-group row">
+                                <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("Code")}}
+                                </label>
+                                <div class="col-md-8">
+                                    <app-codes *ngIf="!(memberDto?.id>0)" [objectType]="entityObjectType" [editMode]=false
+                                        classes="bg-white" [code]="memberDto?.code"
+                                        placeHolder="{{ 'Contact Code' | localize}}" (getCodeValue)="getCodeValue($event)"  [maxlength]="12">
+                                    </app-codes>
+                                    <app-codes *ngIf="memberDto?.id>0" [objectType]="entityObjectType" [readonly]="true"
+                                        [editMode]=true classes="bg-white" [code]="memberDto?.code"
+                                        placeHolder="{{ 'Contact Code' | localize}}"
+                                        (getCodeValue)="getCodeValue($event)"
+                                        [maxlength]="12"></app-codes>
+
+                                </div>
+                            </div>
+
                             <!--First Name -->
                             <div class="form-group row">
                                 <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -188,8 +208,8 @@
                                         [(ngModel)]="memberDto['phone'+(i+1)+'Number']"
                                     />
                                 </div>
-                                <div class="col-sm-1">
-                                        <input type="text" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
+                                <div class="">
+                                        <input type="text" style="width: 110px;" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
                                         minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ext']" />
                                 </div>
                                 <div class="col-sm-2" *ngIf="!isManualOrExternalContact">

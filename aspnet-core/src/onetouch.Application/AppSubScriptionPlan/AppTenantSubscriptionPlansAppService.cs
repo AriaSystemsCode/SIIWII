@@ -44,11 +44,12 @@ namespace onetouch.AppSubScriptionPlan
         {
 
             var filteredAppTenantSubscriptionPlans = _appTenantSubscriptionPlanRepository.GetAll()
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.Contains(input.Filter) || e.SubscriptionPlanCode.Contains(input.Filter) || e.BillingPeriod.Contains(input.Filter))
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName == input.TenantNameFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.ToUpper().Contains(input.Filter.ToUpper()) ||
+                        e.SubscriptionPlanCode.ToUpper().Contains(input.Filter.ToUpper()) || e.BillingPeriod.ToUpper().Contains(input.Filter.ToUpper()))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName.ToUpper().Contains(input.TenantNameFilter.ToUpper()))
                         .WhereIf(input.MinAppSubscriptionHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId >= input.MinAppSubscriptionHeaderIdFilter)
                         .WhereIf(input.MaxAppSubscriptionHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId <= input.MaxAppSubscriptionHeaderIdFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.SubscriptionPlanCodeFilter), e => e.SubscriptionPlanCode == input.SubscriptionPlanCodeFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.SubscriptionPlanCodeFilter), e => e.SubscriptionPlanCode.ToUpper().Contains(input.SubscriptionPlanCodeFilter.ToUpper()))
                         .WhereIf(input.MinCurrentPeriodStartDateFilter != null, e => e.CurrentPeriodStartDate >= input.MinCurrentPeriodStartDateFilter)
                         .WhereIf(input.MaxCurrentPeriodStartDateFilter != null, e => e.CurrentPeriodStartDate <= input.MaxCurrentPeriodStartDateFilter)
                         .WhereIf(input.MinCurrentPeriodEndDateFilter != null, e => e.CurrentPeriodEndDate >= input.MinCurrentPeriodEndDateFilter)

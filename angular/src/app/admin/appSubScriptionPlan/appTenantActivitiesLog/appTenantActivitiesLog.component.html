@@ -16,8 +16,7 @@
                     <div class="kt-subheader__toolbar">
                         <div class="kt-subheader__wrapper">
             				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
-               <!--  <button (click)="createAppTenantActivityLog()" 
-            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantActivityLog")}}</button> -->
+
                         </div>
                     </div>
                   </div>
@@ -35,7 +34,7 @@
                                     <div class="input-group">
                                         <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
                                         <span class="input-group-btn">
-                                            <button (click)="getAppTenantActivitiesLog()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                            <button (click)="getAppTenantActivitiesLog()" class="btn searchBtn" type="submit"><i class="flaticon-search-1"></i></button>
                                         </span>
                                     </div>
                                 </div>
@@ -252,7 +251,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="activityDateTime">
@@ -263,7 +262,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="featureCode">
@@ -274,7 +273,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="featureName">
@@ -285,7 +284,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="reference">
@@ -296,7 +295,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="consumedQty">
@@ -307,7 +306,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="remainingQty">
@@ -318,7 +317,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="billable">
@@ -329,7 +328,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="price">
@@ -340,7 +339,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="amount">
@@ -351,7 +350,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="invoiceNumber">
@@ -364,7 +363,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="invoiceDate">
@@ -376,7 +375,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="tenantId" *ngIf="isHostLogged">
@@ -387,7 +386,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="tenantName" *ngIf="isHostLogged">
@@ -398,7 +397,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="userId" *ngIf="isHostLogged">
@@ -409,7 +408,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="activityType" *ngIf="isHostLogged">
@@ -420,7 +419,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="appSubscriptionPlanHeaderId" *ngIf="isHostLogged">
@@ -431,7 +430,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="appSubscriptionPlanCode" *ngIf="isHostLogged">
@@ -443,7 +442,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="userName">
@@ -456,7 +455,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="invoiced" *ngIf="isHostLogged">
@@ -468,7 +467,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="qty" *ngIf="isHostLogged">
@@ -485,7 +484,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="month" *ngIf="isHostLogged">
@@ -496,7 +495,7 @@
                                     font-size: 12px;
                                     font-weight: 600;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;
                                     color:#1B101B;" pSortableColumn="year" *ngIf="isHostLogged">
@@ -508,48 +507,19 @@
                             </ng-template>                           
 							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
                                 <tr>  
-                                  <!--  <td style="width: 130px">
-                                       <div class="btn-group dropdown" dropdown container="body">
-                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
-                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
-                                            </button>
-												<ul class="dropdown-menu"  *dropdownMenu>
-										    <li>
-                                                <a
-			[routerLink]="['/app/admin/appSubScriptionPlan/appTenantActivitiesLog/view']" [queryParams]="{id: record.appTenantActivityLog.id}">
-  {{l('View')}}	
-</a>
-                                            </li>
-												<li>
-                                                 <a
-			[routerLink]="['/app/admin/appSubScriptionPlan/appTenantActivitiesLog/createOrEdit']" [queryParams]="{id: record.appTenantActivityLog.id}">
-  {{l('Edit')}}	
-</a>												
-                                                </li>
-												<li>
-											        <a  href="javascript:;"
-														(click)="deleteAppTenantActivityLog(record.appTenantActivityLog)">{{l('Delete')}}</a>
-												</li>
-                                                <li>
-                                                    <a href="javascript:;" *ngIf="entityHistoryEnabled"  
-                                                       (click)="showHistory(record.appTenantActivityLog)">{{l('History')}}</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>!-->
-                                    <td style="width:150px;font-family: Poppins;
+                              
+                                 <td style="width:150px;font-family: Poppins;
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
-										<!-- <span class="ui-column-title"> {{l('ActivityDateTime')}}</span> -->
                                         <span *ngIf="record.appTenantActivityLog.activityDateTime" style="width:150px;font-family: Poppins;
                                         font-size: 12px;
                                         font-weight: 500;
                                         line-height: 18px;
-                                        text-align: left;
+                                        text-align: center;
                                         text-underline-position: from-font;
                                         text-decoration-skip-ink: none;color:#595959;" >
 										{{formatDate(record.appTenantActivityLog.activityDateTime)}}
@@ -560,7 +530,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('FeatureCode')}}</span> -->
@@ -570,7 +540,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('FeatureName')}}</span> -->
@@ -580,7 +550,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('Reference')}}</span> -->
@@ -590,7 +560,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('ConsumedQty')}}</span> -->
@@ -600,7 +570,7 @@
                                 font-size: 12px;
                                 font-weight: 500;
                                 line-height: 18px;
-                                text-align: left;
+                                text-align: center;
                                 text-underline-position: from-font;
                                 text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('RemainingQty')}}</span> -->
@@ -610,7 +580,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
 										<!-- <span class="ui-column-title"> {{l('Billable')}}</span> -->
@@ -621,7 +591,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('Price')}}</span> -->
@@ -631,7 +601,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('Amount')}}</span> -->
@@ -641,7 +611,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
                                         <!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
@@ -651,7 +621,7 @@
                                 font-size: 12px;
                                 font-weight: 500;
                                 line-height: 18px;
-                                text-align: left;
+                                text-align: center;
                                 text-underline-position: from-font;
                                 text-decoration-skip-ink: none;color:#595959;" >
                                     <!-- <span class="ui-column-title"> {{l('InvoiceDate')}}</span> -->
@@ -664,7 +634,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('TenantId')}}</span> -->
@@ -675,7 +645,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('TenantName')}}</span> -->
@@ -685,7 +655,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('UserId')}}</span> -->
@@ -695,7 +665,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('ActivityType')}}</span> -->
@@ -705,7 +675,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('AppSubscriptionPlanHeaderId')}}</span> -->
@@ -715,7 +685,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('AppSubscriptionPlanCode')}}</span> -->
@@ -726,7 +696,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" >
 											<!-- <span class="ui-column-title"> {{l('UserName')}}</span> -->
@@ -738,7 +708,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 										<!-- <span class="ui-column-title"> {{l('Invoiced')}}</span> -->
@@ -750,7 +720,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('Qty')}}</span> -->
@@ -764,7 +734,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('CreditOrUsage')}}</span> -->
@@ -774,7 +744,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;"  *ngIf="isHostLogged" >
 											<!-- <span class="ui-column-title"> {{l('Month')}}</span> -->
@@ -784,7 +754,7 @@
                                     font-size: 12px;
                                     font-weight: 500;
                                     line-height: 18px;
-                                    text-align: left;
+                                    text-align: center;
                                     text-underline-position: from-font;
                                     text-decoration-skip-ink: none;color:#595959;" *ngIf="isHostLogged">
 											<!-- <span class="ui-column-title"> {{l('Year')}}</span> -->
@@ -798,25 +768,18 @@
 						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
                             {{l('NoData')}}
                         </div>
-                        <div class="primeng-paging-container">
-                            <!-- <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
-                                         #paginator
-                                         (onPageChange)="getAppTenantActivitiesLog($event)"
-                                         [totalRecords]="primengTableHelper.totalRecordsCount"
-                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
-                                         [showCurrentPageReport]="true"
-                                         [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
-                            >
-                            </p-paginator> -->
+                        <div class="primeng-paging-container d-flex justify-content-between align-items-center">
+                            <span style="color: #595959;">
+                          Showing    {{primengTableHelper.totalRecordsCount < 10 ? primengTableHelper.totalRecordsCount : first+rows}} of   {{ primengTableHelper.totalRecordsCount}} data
+                            </span>
+                            
                             <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
                                          #paginator
                                          (onPageChange)="getAppTenantActivitiesLog($event)"
                                          [totalRecords]="primengTableHelper.totalRecordsCount"
                                          [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
                             </p-paginator>
-                            <span class="total-records-count">
-                                {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
-                            </span>
+                      
                         </div>
                     </div>
                     <!--<Primeng-Datatable-End>-->

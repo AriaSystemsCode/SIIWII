@@ -1,0 +1,52 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #validationRuleForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="validationRule.id">{{l("EditValidationRule")}}</span>
+                        <span *ngIf="!validationRule.id">{{l("CreateNewValidationRule")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                 
+
+
+								<div class="form-group">
+									<label for="ValidationRule_FieldName">{{l("FieldName")}} *</label>
+									<input type="text" #ValidationRule_FieldName="ngModel" id="ValidationRule_FieldName" class="form-control" [(ngModel)]="validationRule.fieldName" name="FieldName"   minlength="10"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="ValidationRule_FieldName"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="ValidationRule_RuleType">{{l("RuleType")}} *</label>
+									<input type="text" #ValidationRule_RuleType="ngModel" id="ValidationRule_RuleType" class="form-control" [(ngModel)]="validationRule.ruleType" name="RuleType"   minlength="5"  maxlength="20"  required/>
+								    <validation-messages [formCtrl]="ValidationRule_RuleType"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="ValidationRule_RuleValue">{{l("RuleValue")}}</label>
+									<input type="text" #ValidationRule_RuleValue="ngModel" id="ValidationRule_RuleValue" class="form-control" [(ngModel)]="validationRule.ruleValue" name="RuleValue"   minlength="0"  maxlength="50" />
+								    <validation-messages [formCtrl]="ValidationRule_RuleValue"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="ValidationRule_ErrorMessage">{{l("ErrorMessage")}} *</label>
+									<input type="text" #ValidationRule_ErrorMessage="ngModel" id="ValidationRule_ErrorMessage" class="form-control" [(ngModel)]="validationRule.errorMessage" name="ErrorMessage"   minlength="0"  maxlength="254"  required/>
+								    <validation-messages [formCtrl]="ValidationRule_ErrorMessage"></validation-messages>
+								</div>
+					
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!validationRuleForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

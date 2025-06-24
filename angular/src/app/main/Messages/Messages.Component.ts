@@ -28,6 +28,8 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { finalize } from "rxjs/operators";
 import { AddCommentComponent } from "../comments/components/add-comment/add-comment.component";
+import { ConsoleLogger } from "@node_modules/@microsoft/signalr/dist/esm/Utils";
+import { Console } from "console";
 @Component({
     templateUrl: "./Messages.component.html",
     styleUrls: ["./Messages.component.scss"],
@@ -73,6 +75,11 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     highlightFirstMsg: boolean;
     displayMessageDetails: boolean = false;
     messageCategoryFilter: string = "MESSAGE";
+    showAllMessages: boolean = false;
+    maxVisibleMessages: number = 2;
+
+    replyingToMessage: MessagesDto;
+
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -100,18 +107,51 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             });
         // this.scrollToBottom();
     }
-    /*  ngAfterViewChecked() {
-        this.scrollToBottom();
-    }
-    scrollToBottom(): void {
-        try {
-            this.containerdetails.nativeElement.scrollTop =
-                this.containerdetails.nativeElement.scrollHeight;
-        } catch (err) {}
-    } */
+
+        expandedMessageId: number | null = null;
+        maxChars = 410; // Max characters before truncation
+        maxLines = 3;   // Max rows before truncation
+      
+        toggleMessage(messageId: number) {
+          this.expandedMessageId = this.expandedMessageId === messageId ? null : messageId;
+        }
+      
+        truncateContent(htmlContent: string, messageId: number): string {
+          if (this.expandedMessageId === messageId) {
+            return htmlContent; // Show full message
+          }
+      
+          // Parse HTML content
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlContent, 'text/html');
+          const paragraphs = Array.from(doc.body.querySelectorAll('p'));
+      
+          let truncatedContent = '';
+      
+          // Scenario 1: More than 4 paragraphs (rows)
+          if (paragraphs.length > this.maxLines) {
+            truncatedContent = paragraphs.slice(0, this.maxLines).map(p => p.outerHTML).join('') + '...';
+            return truncatedContent;
+          }
+      
+          // Scenario 2: More than 100 characters
+          const textContent = doc.body.textContent || '';
+          if (textContent.length > this.maxChars) {
+            return textContent.substring(0, this.maxChars) + '...';
+          }
+      
+          return htmlContent; // If neither case applies, return original content
+        }
+        toggleMessages() {
+            this.showAllMessages = !this.showAllMessages;
+        }
+    
+        get visibleMessages() {
+            return this.showAllMessages ? this.messagesDetails : this.messagesDetails.slice(0, this.maxVisibleMessages);
+        }
     newCommentAddedHandler(event){
       //  this.selectMessage(this.messagesDetails[0].messages);
-        this.getMesssage();
+        // this.getMesssage();
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
@@ -144,7 +184,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.skipCount,
                 this.maxResultCount
             )
-            .pipe(finalize(() => {  this.hideMainSpinner(); }))
+            .pipe(finalize(() => {  this.hideMainSpinner();
+             
+             }))
             .subscribe((result) => {
                 if (search == true) {
                     this.messages = [];
@@ -206,16 +248,17 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                     this.totalCount = result.totalCount;
 
                     // this.totalUnread = result.totalUnread
-                    this._MessageServiceProxy.getUnreadCounts('MESSAGE').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('MESSAGE')?.subscribe((result) => {
                         this.totalPrimaryUnread = result;
                     });
 
-                    this._MessageServiceProxy.getUnreadCounts('THREAD').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('THREAD')?.subscribe((result) => {
                         this.totalUpdatesUnread = result;
                     });
                     this._MessageServiceProxy.getUnreadCounts('MENTION').subscribe((result) => {
-                        this.totalMentionUnRead = result;
+                        this.totalMentionUnRead = result ?? 0; // If result is null/undefined, use 0
                     });
+                    
                     this.itemsToShow = this.messages.slice(
                         0,
                         this.noOfItemsToShowInitially
@@ -267,6 +310,28 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             element.classList.remove("active-tab");
         });
     }
+    prevPage(): void {
+        if (this.skipCount > 0) {
+            this.skipCount -= this.itemsToLoad;
+            this.noOfItemsToShowInitially -= this.itemsToLoad;
+            this.getMesssage();
+            this.itemsToShow = this.messages;
+            this.isFullListDisplayed = false;
+        }
+    }
+    
+    nextPage(): void {
+        if (this.noOfItemsToShowInitially < this.totalCount) {
+            this.maxResultCount = this.itemsToLoad;
+            this.skipCount = this.noOfItemsToShowInitially;
+            this.noOfItemsToShowInitially += this.itemsToLoad;
+            this.getMesssage();
+            this.itemsToShow = this.messages;
+        } else {
+            this.isFullListDisplayed = true;
+        }
+    }
+    
 
     onScroll(): void {
         if (this.noOfItemsToShowInitially < this.totalCount) {
@@ -296,14 +361,17 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
         
     }
+
+ 
+      
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
         this.showSideBar=false;
-        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
+        this.showHideSideBarTitle = !this.showSideBar ? "Show Data" : "Hide Data";
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
         this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);
-
+       
         this._MessageServiceProxy
             .getMessagesForView(message.id)
             .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
@@ -322,7 +390,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
 
 // set message Subject [End]
                 
-                if(this.messageCategoryFilter=='MENTION'){
+                if(this.messageCategoryFilter=='MENTION' || this.messageCategoryFilter=='THREAD'){
                     setTimeout(()=>{
                         this.focusAddComment();
 
@@ -465,5 +533,22 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     isActive(message: MessagesDto, index: number): boolean {
         if (this.highlightFirstMsg && index == 0) return true;
         else return this.selectedMessage === message.id;
+    }
+
+    refreshData(event){
+        console.log(event,'eventevent')
+        if(event){
+         
+
+            // this.messageCategoryFilter = 'THREAD';
+            this.messages = [];
+            this.messagesDetails = null;
+            this.getMesssage();
+        }
+    }
+    ngOnDestroy() {
+      
+            localStorage.removeItem("messageView");
+      
     }
 }

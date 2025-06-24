@@ -1,0 +1,93 @@
+import { Component, Injector, Input, OnInit, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import { AppTransactionServiceProxy, ContactRoleEnum, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
+import { finalize } from 'rxjs';
+import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
+
+@Component({
+  selector: 'app-view-sales-rep-info',
+  templateUrl: './view-sales-rep-info.component.html',
+  styleUrls: ['./view-sales-rep-info.component.scss']
+})
+export class ViewSalesRepInfoComponent extends AppComponentBase
+  implements OnInit {
+
+
+  @Input("createOrEditSalesRepInfo") createOrEditSalesRepInfo: boolean;
+  @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
+  @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
+  @Input("canChange") canChange: boolean = true;
+
+  @Output("showSalesRepEditMode") showSalesRepEditMode: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+  transactionCartoccordionTabs = TransactionCartoccordionTabs;
+  salesRepIndex = 1;
+  salesReps: any[];
+
+
+
+  constructor(
+    injector: Injector,
+    private _AppTransactionServiceProxy: AppTransactionServiceProxy
+  ) {
+    super(injector);
+  }
+  ngOnInit(): void {
+
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.salesReps = [];
+    this.salesReps.push(1);
+
+    var SalesRep1Index = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.SalesRep1);
+    var SalesRep2Index = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.SalesRep2);
+
+    if (SalesRep1Index >= 0)
+      this.addNewSalesRep();
+
+    if (SalesRep2Index >= 0)
+      this.addNewSalesRep();
+  }
+
+  addNewSalesRep() {
+    this.salesReps.push(this.salesReps.length);
+  }
+
+
+  onUpdateAppTransactionsForViewDto($event) {
+    this.appTransactionsForViewDto = $event;
+  }
+
+
+
+  showEditMode() {
+    this.createOrEditSalesRepInfo = true;
+    this.onshowSaveBtn.emit(true);
+    this.showSalesRepEditMode.emit(true);
+  }
+
+
+
+
+  createOrEditTransaction() {
+    this.showMainSpinner();
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
+      .subscribe((res) => {
+        if (res) {
+          this.onshowSaveBtn.emit(false);
+        }
+      });
+  }
+
+  isContactFormValid(value) {
+    if (this.activeTab == this.transactionCartoccordionTabs.SalesRepInfo)
+      this.isContactsValid.emit(value)
+  }
+
+}

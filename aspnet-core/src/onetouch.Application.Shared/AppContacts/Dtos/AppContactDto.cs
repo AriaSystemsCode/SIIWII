@@ -1,6 +1,9 @@
 ﻿using Abp.Application.Services.Dto;
+using onetouch.SystemObjects;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace onetouch.AppContacts.Dtos
@@ -73,8 +76,26 @@ namespace onetouch.AppContacts.Dtos
 		public virtual long? AccountId { get; set; }
 		//Mariam
 		public virtual IList<AppContactAddressDto> ContactAddresses { get; set; }
-
-	}
+        //I46[Start]
+        public virtual long? ShipViaId { get; set; }
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { get; set; }
+        public virtual string ShipViaCode { get; set; }
+        public virtual long? PaymentTermsId { get; set; }
+        public virtual string PaymentTermsCode { get; set; }
+        public virtual decimal PaymentTermsDiscount { get; set; }
+        public virtual int PaymentTermsDiscountDays { get; set; }
+        public virtual decimal PaymentTermsDiscount2 { get; set; }
+        public virtual int PaymentTermsDiscount2Days { get; set; }
+        public virtual bool PaymentTermsCashOnDelivery { get; set; }
+        public virtual bool PaymentTermsUseInstallments { get; set; }
+        public virtual int PaymentTermsNextMonthDay { get; set; }
+        public virtual string PaymentTermsPaymentType { get; set; }
+        public virtual bool PaymentTermsEndOfMonth { get; set; }
+        public virtual int PaymentTermsEndOfMonthDays { get; set; }
+        public virtual int PaymentTermsNetDueDays { get; set; }
+        //I46[End]
+    }
 
 	public enum PriceLevel
 	{

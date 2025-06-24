@@ -1,19 +1,11 @@
 <div class="d-flex seller-data web">
 
-
-    <!--  <div class="banner w-75">
-        <img
-            [src]="attachmentBaseUrl + '/' + sellerData?.bannerImage"
-            class="img-fluid w-100 h-100"
-            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-        />
-    </div> -->
     <div class=" w-100" #viewProfileCover>
         <app-image-display [image]="bannerImg" [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-             [staticHeight]="viewProfileCover?.offsetHeight" [classList]="'img-cover'" [staticWidth]="1330">
+            [staticHeight]="viewProfileCover?.offsetHeight" [classList]="'img-cover'" [staticWidth]="1330">
 
         </app-image-display>
-    
+
     </div>
     <div class="logo-name w-25 position-absolute">
         <img [src]="attachmentBaseUrl + '/' + sellerData?.logoImage"

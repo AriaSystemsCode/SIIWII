@@ -30,6 +30,7 @@
                             <button class="btn        text-capitalize mr-2" type="submit" [buttonBusy]="saving"
                                 [busyText]="l('SavingWithThreeDot')"
                                 *ngIf="productForm.touched || formTouched  || listingMode !==1"
+                                [disabled]="appItem?.variationItems?.length <1"
                                 style="border-radius: 5px;
                                 background-color: #4A0D4A !important;
                                 border: #4A0D4A !important;color: white;">
@@ -438,7 +439,7 @@
                                 <div class="row mr-5 pr-5">
                                     <h6 class="font-weight-bold pt-3 pr-2">
                                         <span class="text-danger">*</span>
-                                        {{ 'MSRP' | localize}}
+                                        {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP" | localize}}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
                                         <span
@@ -506,9 +507,10 @@
                             <div class="col-10 pl-4 ml-4 mt-4">
                                 <span>
                                     <input type="checkbox" [(ngModel)]="sellVariationChecked" name="showVariationsBtn"
+                                    
                                         (ngModelChange)="askToRemoveAllVariations($event)"
                                         style="background-color: #EEEEEE !important;
-                                        border: none !important"/>
+                                        border: none !important;pointer-events: none;"/>
                                 </span>
                                 <span>
                                     {{'PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct' | localize}}.
@@ -525,8 +527,12 @@
                             *ngIf="!(!appItem?.variationItems?.length  && listingMode !== undefined)">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <h6 class="font-weight-bold">
-                                    {{ 'Variations' | localize}}
+                                    <span class="text-danger">*</span>    {{ 'Variations' | localize}}
+                                    <span style="color: #5F6368;font-size: 11px;margin-left: 20px;">
+                                         ( Variation required to save)
+                                    </span>
                                 </h6>
+                              
                             </div>
                             <div class="col" *ngIf="!appItem?.variationItems?.length">
                                 <div class="d-flex align-items-center">
