@@ -320,6 +320,7 @@ export class TransactionInformationComponent
         this.filterForm.reset()
         this.displayedVariations = []
         this.filteredColors = []
+        this.allVariations = [];
         this.getSellerVariations(0, 10, '')
         this.hideMainSpinner();
         this.getLinesData();
@@ -342,13 +343,12 @@ export class TransactionInformationComponent
     this.addLine = true;
     this.addNewLinebtn = true;
     this.showAddLine = false;
-    this.filterForm.value.reset()
+    this.filterForm.reset()
     this.displayedVariations = []
     this.filteredColors = []
-    this.filterForm.controls['selectedVariation'].reset()
     this.getSellerVariations(0, 10, '')
-    this.getShoppingCartData();
-
+    this.hideMainSpinner();
+    this.filterForm.controls['selectedVariation'].reset()
 
   }
 
@@ -902,15 +902,27 @@ export class TransactionInformationComponent
     }
   }
   hide() {
+    
     this.resetData();
     this.modal.hide();
+       this.displayColordata = false
+    this.displayProductdata = false
+    this.displaysizesdata = false
+    this.addLine = true;
+    this.addNewLinebtn = true;
+    this.showAddLine = false;
+    this.filterForm.reset()
+    this.displayedVariations = []
+    this.filteredColors = []
+    this.allVariations = [];
+    this.filterForm.controls['selectedVariation'].reset()
     let indx = -1;
     indx = this.minimizedOrders?.findIndex(x => x.orderId == this.appTransactionsForViewDto?.id);
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
     this.userClickService.userClicked("refreshShoppingInfoInTopbar");
     this.hideShoppingCartModal.emit(true);
-
+ 
   }
 
   minimizedOrders: any[] = [];

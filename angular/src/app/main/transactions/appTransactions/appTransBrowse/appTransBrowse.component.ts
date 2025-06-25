@@ -68,9 +68,11 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     rowsPerPage: number = 10;
     sortField: string | undefined;
     sortOrder: number | undefined;
-    isReset:boolean
-    isAmountReset:boolean
-    isTypeReset:boolean
+    isAmountReset :boolean
+    isReset :boolean
+    isTypeReset :boolean
+
+
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
@@ -352,8 +354,6 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.getAppTransactions();
         this.getVariationDetail();
     }
-
-        
     resetSort(event: MouseEvent ,field:string) {
         event.stopPropagation(); 
       if (this.sortField === 'amount' && field == 'amount') {

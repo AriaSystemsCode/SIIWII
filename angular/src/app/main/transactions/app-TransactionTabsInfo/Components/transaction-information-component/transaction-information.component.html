@@ -23,7 +23,7 @@
             <div class="row topheader">
                 <div class="">
                     <div class="row bg-white  m-3 p-2  pl-4" style="border-radius: 4px;min-width: 270px;">
-                        Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{transactionType}} &nbsp; &nbsp; >
+                        Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{appTransactionsForViewDto?.transactionType == 0 ? 'Sales Order':'Purchase Order'}} &nbsp; &nbsp; >
                         &nbsp; &nbsp;
                         {{transactionCode}}
                     </div>

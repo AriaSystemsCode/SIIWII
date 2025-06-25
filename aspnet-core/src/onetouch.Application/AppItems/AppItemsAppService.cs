@@ -5589,7 +5589,7 @@ namespace onetouch.AppItems
             return returnCategory;
         }
         
-        public async Task<List<ImportItemReturnDto>> ImportItem(List<ImportItemInputDto> itemExcelDtoList, ExcelRecordRepeateHandler repeatHandler)
+        public async Task<List<ImportItemReturnDto>> ImportItem(List<ImportItemInputDto> itemExcelDtoList, string repeatHandler)
         {
             AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
             saveExcelinput.CodesFromList = new List<string>();
@@ -5597,7 +5597,7 @@ namespace onetouch.AppItems
             saveExcelinput.FromList = new List<int>();
             saveExcelinput.ErrorMessage = "";
             saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
-            saveExcelinput.RepreateHandler = repeatHandler;
+            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString()); 
             saveExcelinput.To = 0;
             saveExcelinput.From = 0;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();

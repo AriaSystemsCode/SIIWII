@@ -141,21 +141,21 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
       this.selectedClassificationsShow = [...(this.appTransactionsForViewDto.entityClassificationsNames?.items || [])];
       this.showSaveBtn = false;
     }
-    
+
     if (this.appTransactionsForViewDto?.entityCategories) {
       this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-      if(this.appTransactionsForViewDto.entityCategoriesNames?.items.length > 0){
-          this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
+      if (this.appTransactionsForViewDto.entityCategoriesNames?.items.length > 0) {
+        this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
 
       }
-  }
-  if (this.appTransactionsForViewDto?.entityClassifications) {
+    }
+    if (this.appTransactionsForViewDto?.entityClassifications) {
       this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-      if(this.appTransactionsForViewDto.entityClassificationsNames?.items.length >0){
-          this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
+      if (this.appTransactionsForViewDto.entityClassificationsNames?.items.length > 0) {
+        this.selectedClassificationsShow = [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
 
       }
-  }
+    }
   }
 
   initDates(): void {
@@ -490,6 +490,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     });
 
  
+
     this.appTransactionsForViewDto.entityCategoriesNames.totalCount = this.selectedCategories.length;
     this.appTransactionsForViewDto.entityCategoriesNames.items = this.selectedCategories.map(item => item.entityObjectCategoryName || '');
     this.showExistCat = false;

@@ -76,6 +76,7 @@ using Z.Expressions;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using onetouch.Authorization.Accounts;
+using onetouch.AppSiiwiiTransaction.Dtos;
 
 namespace onetouch.Accounts
 {
@@ -5597,7 +5598,7 @@ namespace onetouch.Accounts
                         //MMT22
                     }
                     //test
-                    await ImportContact(result, ExcelRecordRepeateHandler.CreateACopy);
+                    await ImportContact(result, "CreateACopy");
 
                     #region if parent failed then children are failed
                     List<AccountExcelRecordDTO> resultSorted = accountExcelResultsDTO.ExcelRecords.OrderBy(r => r.ParentCode).ThenBy(r => r.Code).ToList();
@@ -6063,7 +6064,7 @@ namespace onetouch.Accounts
 
         }
         //I46[start]
-        public async Task<List<ImportContactReturnDto>> ImportContact(List<AccountExcelDto> contactExcelDtoList, ExcelRecordRepeateHandler repeatHandler)
+        public async Task<List<ImportContactReturnDto>> ImportContact(List<AccountExcelDto> contactExcelDtoList, string repeatHandler)
         {
             AccountExcelResultsDTO saveExcelinput = new AccountExcelResultsDTO();
             saveExcelinput.CodesFromList = new List<string>();
@@ -6071,7 +6072,7 @@ namespace onetouch.Accounts
             saveExcelinput.FromList = new List<int>();
             saveExcelinput.ErrorMessage = "";
             saveExcelinput.ExcelRecords = new List<AccountExcelRecordDTO>();
-            saveExcelinput.RepreateHandler = repeatHandler;
+            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString()) ;
             saveExcelinput.To = contactExcelDtoList.Count;
             saveExcelinput.From = 0;
             List<ImportContactReturnDto> returnList = new List<ImportContactReturnDto>();
