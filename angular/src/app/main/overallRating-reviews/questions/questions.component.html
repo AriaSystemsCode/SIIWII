@@ -1,6 +1,10 @@
 <h4>Customer Questions</h4>
 <hr>
-
+<div *ngIf="totalCount > 0" class="review-summary mb-3">
+  <h5 class="font-weight-bold">
+    {{ questions.length }} over {{ totalCount }} {{ 'Results Of' | localize }} "{{ 'Customers   Questions' | localize }}"
+  </h5>
+</div>
 <div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
     <div class="topSec w-100 d-flex align-items-start position-relative">
       <img style="height: 30px;" src="assets/common/images/default-profile-picture.png" class="rounded-circle logo" />
@@ -8,7 +12,7 @@
       <textarea class="form-control  border-0" placeholder="Add your Question" [(ngModel)]="questionText"
         style="height: auto; min-height: 65px; resize: none; overflow: hidden;"
         (input)="adjustTextareaHeight($event)"></textarea>
-        <div class="bottomSec d-flex justify-content-between  align-items-center">
+        <div class="bottomSec d-md-flex d-none justify-content-between  align-items-center">
           <div class="d-flex position-relative align-items-center">
          <hr class="vertical-line">
 
@@ -41,7 +45,35 @@
     </div>
 
   
+    <div class=" d-flex  d-md-none justify-content-between  align-items-center w-100">
+      <div class="d-flex position-relative align-items-center ">
+   
+
+        <!-- Image Input -->
+
+        <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput />
+        <img src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
+          (click)="imageInput.click()" />
   
+        <!-- Video Input -->
+        <input type="file" accept="video/*" (change)="onVideoSelected($event)" hidden #videoInput />
+        <img src="assets/placeholders/vAttach.png" class="mr-2 iconImg" alt="Video Attach" (click)="videoInput.click()" />
+  
+        <!-- Emoji Picker -->
+        <img class="emoji-btn mr-2 iconImg" (click)="toggleEmojiPicker()" src="assets/placeholders/emojsIcons.png"
+          alt="Emoji Picker" />
+        <div class="emoji-picker" *ngIf="isEmojiPickerOpen">
+          <div class="emoji-grid">
+            <span *ngFor="let emoji of emojis" class="emoji-item" (click)="addEmoji(emoji)">
+              {{ emoji }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+  
+      <button class="btnPost" (click)="isUserReviewedEntityBefore()">Post</button>
+    </div>
   
     <!-- Media Preview -->
     <div *ngIf="selectedMedia?.length > 0" class="media-preview">
