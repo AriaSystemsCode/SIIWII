@@ -23406,6 +23406,7 @@ export class AppTransactionServiceProxy {
     /**
      * @param withDetails (optional) 
      * @param since_Id (optional) 
+     * @param at_Id (optional) 
      * @param filter (optional) 
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
@@ -23428,7 +23429,7 @@ export class AppTransactionServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, timeZoneValue: string | null | undefined, referenceFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
+    getAll(withDetails: boolean | undefined, since_Id: number | undefined, at_Id: string | null | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, timeZoneValue: string | null | undefined, referenceFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAll?";
         if (withDetails === null)
             throw new Error("The parameter 'withDetails' cannot be null.");
@@ -23438,6 +23439,8 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'since_Id' cannot be null.");
         else if (since_Id !== undefined)
             url_ += "Since_Id=" + encodeURIComponent("" + since_Id) + "&";
+        if (at_Id !== undefined && at_Id !== null)
+            url_ += "At_Id=" + encodeURIComponent("" + at_Id) + "&";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
         if (codeFilter !== undefined && codeFilter !== null)
@@ -24886,6 +24889,7 @@ export class AppTransactionServiceProxy {
      * @param transactionId (optional) 
      * @param withDetails (optional) 
      * @param since_Id (optional) 
+     * @param at_Id (optional) 
      * @param filter (optional) 
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
@@ -24909,7 +24913,7 @@ export class AppTransactionServiceProxy {
      * @param position (optional) 
      * @return Success
      */
-    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, timeZoneValue: string | null | undefined, referenceFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
+    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, at_Id: string | null | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, timeZoneValue: string | null | undefined, referenceFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAppTransactionsForView?";
         if (transactionId === null)
             throw new Error("The parameter 'transactionId' cannot be null.");
@@ -24923,6 +24927,8 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'since_Id' cannot be null.");
         else if (since_Id !== undefined)
             url_ += "Since_Id=" + encodeURIComponent("" + since_Id) + "&";
+        if (at_Id !== undefined && at_Id !== null)
+            url_ += "At_Id=" + encodeURIComponent("" + at_Id) + "&";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
         if (codeFilter !== undefined && codeFilter !== null)
@@ -83297,6 +83303,7 @@ export interface ICreateOrEditAppTransactionsDto {
 export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInputDto {
     withDetails!: boolean;
     since_Id!: number;
+    at_Id!: string | undefined;
     filter!: string | undefined;
     codeFilter!: string | undefined;
     descriptionFilter!: string | undefined;
@@ -83337,6 +83344,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
             }
             this.withDetails = _data["withDetails"];
             this.since_Id = _data["since_Id"];
+            this.at_Id = _data["at_Id"];
             this.filter = _data["filter"];
             this.codeFilter = _data["codeFilter"];
             this.descriptionFilter = _data["descriptionFilter"];
@@ -83375,6 +83383,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
         }
         data["withDetails"] = this.withDetails;
         data["since_Id"] = this.since_Id;
+        data["at_Id"] = this.at_Id;
         data["filter"] = this.filter;
         data["codeFilter"] = this.codeFilter;
         data["descriptionFilter"] = this.descriptionFilter;
@@ -83402,6 +83411,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
 export interface IGetAllAppTransactionsInputDto {
     withDetails: boolean;
     since_Id: number;
+    at_Id: string | undefined;
     filter: string | undefined;
     codeFilter: string | undefined;
     descriptionFilter: string | undefined;

@@ -211,6 +211,9 @@
   .pr-font {
     font-weight: 700;
   }
+  .swal2-styled.swal2-confirm {
+    background-color: #4A0D4A !important;
+  }
 
   .p-dialog {
     border-radius: 20px;
@@ -331,7 +334,7 @@
 
 
 }
-
+// merge
 .custom-p-sil {
   color: #F6851D;
 
@@ -363,10 +366,6 @@
 }
 
 .plan {
-
-
-
-
   height: 50px;
 
   background: #EEEEEE;
