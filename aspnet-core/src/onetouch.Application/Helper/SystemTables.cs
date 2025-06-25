@@ -362,6 +362,13 @@ namespace onetouch.Helpers
             return obj.Id;
         }
         //I40-X527[End]
+        //I48[Start]
+        public async Task<long> GetEntityObjectTypeQuestion()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "QUESTION");
+            return obj.Id;
+        }
+        //I48[End]
 
 
         public async Task<long> GetEntityObjectStatusUnreadMessageID()

@@ -44,6 +44,7 @@ namespace onetouch.Message.Dto
         Message=0,
         Comment=1,
         Review = 2,
+        Question = 3,
     }
     public class MentionedUserInfo
     { 
