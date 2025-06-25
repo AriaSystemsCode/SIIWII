@@ -1702,7 +1702,18 @@ top: 4px;">
                         </div>
                     </div>
 
-
+                    <div class="mb-2 p-2 m-2 bg-white rounded row">
+                        <div class="col-12">
+                       <app-overallRating [overRating]="overRating"  ></app-overallRating>
+           
+                        </div>
+                        <div class="col-12">
+                          <app-all-reviews-list [entityID]="productBodyData.id" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
+                        </div>
+                       </div>
+                       <div class=" p-4 m-2 bg-white rounded">
+                           <app-questions [entityID]="productBodyData.id" ></app-questions>
+                       </div>
 
 
                 </p-tabPanel>
