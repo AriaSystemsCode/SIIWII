@@ -1383,7 +1383,25 @@ namespace onetouch.Message
             }
         }
         //MMT39
-        
+        //I48[Start]
+        [AbpAllowAnonymous]
+        public async Task<double> GetAllReviewsCount(long input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                double returnCount = 0;
+                var filteredMessages = _AppMarketplaceMessagesRepository.GetAll()
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
+                            .WhereIf(input != null && input != 0,
+                                e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == input).Count() > 0 ||
+                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == input).Count() > 0)
+                            .Where(e => e.ParentId == null && e.OriginalMessageId == e.Id);
+                returnCount = await filteredMessages.CountAsync();
+                return returnCount;
+            }
+        }
+        //I48[End]
         //I40-X527[Start]
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllReviews(GetAllMessagesInput input)
@@ -1839,27 +1857,29 @@ namespace onetouch.Message
         public async Task<OverAllRatingDto> GetOverAllRatings(long entityId)
         {
             OverAllRatingDto ratingDto = new OverAllRatingDto();
-
-            ratingDto.TotalNumberOfRating = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId);
-
-            var oneTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 1);
-            var twoTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 2);
-            var threeTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 3);
-            var fourTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 4);
-            var fiveTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 5);
-            if (ratingDto.TotalNumberOfRating > 0)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                ratingDto.OneTotal = (decimal.Parse(oneTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
-                ratingDto.TwoTotal = (decimal.Parse(twoTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
-                ratingDto.ThreeTotal = (decimal.Parse(threeTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
-                ratingDto.FourTotal = (decimal.Parse(fourTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
-                ratingDto.FiveTotal = (decimal.Parse(fiveTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
-                var totalRating = (1 * decimal.Parse(oneTotal.ToString())) + (2 * decimal.Parse(twoTotal.ToString())) +
-                    (3 * decimal.Parse(threeTotal.ToString())) + (4 * decimal.Parse(fourTotal.ToString())) +
-                    (5 * decimal.Parse(fiveTotal.ToString()));
-                ratingDto.OverAllRating = totalRating / decimal.Parse(ratingDto.TotalNumberOfRating.ToString());
+                ratingDto.TotalNumberOfRating = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId);
+
+                var oneTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 1);
+                var twoTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 2);
+                var threeTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 3);
+                var fourTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 4);
+                var fiveTotal = await _appEntityRatingRepository.GetAll().CountAsync(z => z.EntityId == entityId && z.Rating == 5);
+                if (ratingDto.TotalNumberOfRating > 0)
+                {
+                    ratingDto.OneTotal = (decimal.Parse(oneTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
+                    ratingDto.TwoTotal = (decimal.Parse(twoTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
+                    ratingDto.ThreeTotal = (decimal.Parse(threeTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
+                    ratingDto.FourTotal = (decimal.Parse(fourTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
+                    ratingDto.FiveTotal = (decimal.Parse(fiveTotal.ToString()) / decimal.Parse(ratingDto.TotalNumberOfRating.ToString()));
+                    var totalRating = (1 * decimal.Parse(oneTotal.ToString())) + (2 * decimal.Parse(twoTotal.ToString())) +
+                        (3 * decimal.Parse(threeTotal.ToString())) + (4 * decimal.Parse(fourTotal.ToString())) +
+                        (5 * decimal.Parse(fiveTotal.ToString()));
+                    ratingDto.OverAllRating = totalRating / decimal.Parse(ratingDto.TotalNumberOfRating.ToString());
+                }
+                return ratingDto;
             }
-            return ratingDto;
         }
         //I40-X527[End]
     }

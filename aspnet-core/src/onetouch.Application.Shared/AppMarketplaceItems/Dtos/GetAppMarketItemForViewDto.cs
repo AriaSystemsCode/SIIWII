@@ -18,6 +18,10 @@ namespace onetouch.AppMarketplaceItems.Dtos
         //I46[Start]
         public string SellerSSIN { set; get; }
         //I46[End]
+        //I48[Start]
+        public double NumberOfReviews { get; set; }
+        public decimal AverageRating { get; set; }
+        //I48[End]
     }
     public class GetAppMarketplaceItemDetailForViewDto
     {
