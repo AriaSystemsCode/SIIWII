@@ -56,17 +56,17 @@
   </div>
   
   
-  <p *ngIf="reviews?.length == 0" class="text-center">
+  <p *ngIf="questions?.length == 0" class="text-center">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
   
     <span class="noDataTxt">There is no data to show ...</span>
   </p>
   
   
-  <div *ngIf="reviews?.length > 0" class="review-section pb-2">
+  <div *ngIf="questions?.length > 0" class="review-section pb-2">
   
     <!-- Review Card -->
-    <div *ngFor="let review of reviews " class="review-card">
+    <div *ngFor="let review of questions " class="review-card">
       <div class="">
   
         <div class=" pb-md-4 pb-0  d-flex justify-content-between align-items-center">
@@ -179,7 +179,7 @@
       </div>
     </div>
   
-    <button *ngIf="reviews?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all
+    <button *ngIf="questions?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all
       review</button>
   </div>
   

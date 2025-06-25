@@ -17,11 +17,10 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;
 
-  reviews: any[] = []
+  questions: any[] = []
   totalCount: number = 0;
   skipCount: number = 0;
   maxResultCount: number = 3;
-  selectedRating: number = 0;
   reviewText: string = '';
   selectedMedia: { url: string; type: string; file?: File }[] = [];
   messages: CreateMessageInput = new CreateMessageInput();
@@ -50,7 +49,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
   }
 
   ngOnInit() {
-    this.getAllReviws()
+    this.getAllQuestions()
   }
 
   toggleEmojiPicker() {
@@ -64,16 +63,13 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
   }
 
 
-  setRating(rating: number): void {
-    this.selectedRating = rating;
 
-  }
 
   isUserReviewedEntityBefore() {
     // this.showMainSpinner()
     // const subs = this.messageServiceProxy
     //   .isUserReviewedEntityBefore(
-    //     this.accountDataForView?.entityId
+    //     this.entityID
 
     //   )
     //   .pipe(
@@ -86,7 +82,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     //       this.SuccessMsg = true
 
     //     } else {
-          this.postReview()
+    //       this.postQuestion()
     //     }
     //   });
 
@@ -95,13 +91,13 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
 
-  getAllReviws() {
+  getAllQuestions() {
  
 
 
     this.showMainSpinner();
     const subs = this.messageServiceProxy
-      .getAllReviews(
+      .getAllQuestions (
         undefined,
         undefined,
         undefined,
@@ -128,10 +124,10 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
         if (this.skipCount === 0) {
           // Initial load or refresh
-          this.reviews = newReviews;
+          this.questions = newReviews;
         } else {
           // Append new reviews to the existing list
-          this.reviews = [...this.reviews, ...newReviews];
+          this.questions = [...this.questions, ...newReviews];
         }
 
         this.totalCount = result.totalCount; // Update the total count of reviews
@@ -144,9 +140,9 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
   loadMoreReviews(): void {
-    if (this.reviews.length < this.totalCount) {
+    if (this.questions.length < this.totalCount) {
       this.skipCount += this.maxResultCount; // Increment the offset
-      this.getAllReviws(); // Fetch more reviews
+      this.getAllQuestions(); // Fetch more reviews
     }
   }
 
@@ -208,7 +204,6 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
   resetForm(): void {
     this.reviewText = '';
-    this.selectedRating = 0;
     this.selectedMedia = [];
   }
 
@@ -257,7 +252,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
 
-  postReview() {
+  postQuestion() {
 
     this.showMainSpinner();
     if (this.selectedMedia?.length > 0)
@@ -265,7 +260,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     this.messages.to = null;
     this.messages.bodyFormat = this.reviewText;
     this.messages.body = this.reviewText;
-    this.messages.mesasgeObjectType = MesasgeObjectType.Review
+    this.messages.mesasgeObjectType = MesasgeObjectType.Question
     this.messages.relatedEntityId = this.entityID
     this.messages.subject = ''
     this.messageServiceProxy
@@ -273,19 +268,14 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
       .pipe(finalize(() => {
         this.hideMainSpinner();
         this.notify.info(this.l("SendSuccessfully"));
-        this.getAllReviws()
+        this.getAllQuestions()
         this.messages.entityAttachments = [];
 
         this.messages = new CreateMessageInput();
         this.resetForm()
       }))
       .subscribe(() => {
-        this.messageServiceProxy
-          .createUserEntityRating(this.selectedRating, this.entityID)
 
-          .subscribe(() => {
-
-          });
 
       });
   }
