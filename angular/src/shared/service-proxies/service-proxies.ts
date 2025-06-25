@@ -32359,6 +32359,63 @@ export class MessageServiceProxy {
     }
 
     /**
+     * @param input (optional) 
+     * @return Success
+     */
+    getAllReviewsCount(input: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetAllReviewsCount?";
+        if (input === null)
+            throw new Error("The parameter 'input' cannot be null.");
+        else if (input !== undefined)
+            url_ += "input=" + encodeURIComponent("" + input) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllReviewsCount(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllReviewsCount(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetAllReviewsCount(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param filter (optional) 
      * @param bodyFilter (optional) 
      * @param subjectFilter (optional) 
@@ -76611,6 +76668,8 @@ export class GetAppMarketItemForViewDto implements IGetAppMarketItemForViewDto {
     appItem!: AppItemDto;
     selected!: boolean;
     sellerSSIN!: string | undefined;
+    numberOfReviews!: number;
+    averageRating!: number;
 
     [key: string]: any;
 
@@ -76632,6 +76691,8 @@ export class GetAppMarketItemForViewDto implements IGetAppMarketItemForViewDto {
             this.appItem = _data["appItem"] ? AppItemDto.fromJS(_data["appItem"]) : <any>undefined;
             this.selected = _data["selected"];
             this.sellerSSIN = _data["sellerSSIN"];
+            this.numberOfReviews = _data["numberOfReviews"];
+            this.averageRating = _data["averageRating"];
         }
     }
 
@@ -76651,6 +76712,8 @@ export class GetAppMarketItemForViewDto implements IGetAppMarketItemForViewDto {
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["selected"] = this.selected;
         data["sellerSSIN"] = this.sellerSSIN;
+        data["numberOfReviews"] = this.numberOfReviews;
+        data["averageRating"] = this.averageRating;
         return data;
     }
 }
@@ -76659,6 +76722,8 @@ export interface IGetAppMarketItemForViewDto {
     appItem: AppItemDto;
     selected: boolean;
     sellerSSIN: string | undefined;
+    numberOfReviews: number;
+    averageRating: number;
 
     [key: string]: any;
 }
