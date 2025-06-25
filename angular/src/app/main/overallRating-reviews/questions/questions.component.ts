@@ -96,64 +96,9 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
   getAllReviws() {
-    // this.reviews = [
-    //     {
-    //         "messages": {
-    //             "parentFKList": [],
-    //             "hasChildren": false,
-    //             "tenantId": null,
-    //             "senderId": 30725,
-    //             "entityObjectTypeCode": "REVIEW",
-    //             "to": null,
-    //             "cc": null,
-    //             "bcc": null,
-    //             "subject": "",
-    //             "body": "new end",
-    //             "bodyFormat": "new end",
-    //             "sendDate": "2025-01-24T00:06:48.1344467",
-    //             "receiveDate": "2025-01-24T00:06:48.1344467",
-    //             "entityId": 455465,
-    //             "entityCode": null,
-    //             "parentId": null,
-    //             "parentCode": null,
-    //             "threadId": 159,
-    //             "userId": null,
-    //             "senderName": "John Willson",
-    //             "toName": null,
-    //             "isFavorite": false,
-    //             "entityObjectStatusCode": null,
-    //             "entityAttachments": [
-    //                 {
-    //                     "attachmentCategoryId": 4,
-    //                     "attachmentCategoryEnum": 0,
-    //                     "fileName": "a3273754-4a7d-f0a3-4d88-6c19f74fd01b.mp4",
-    //                     "displayName": "750f337c-5970-6d19-8282-4ee7682abd47.mp4",
-    //                     "url": "attachments\\-1\\a3273754-4a7d-f0a3-4d88-6c19f74fd01b.mp4",
-    //                     "guid": null,
-    //                     "attributes": null,
-    //                     "index": 0,
-    //                     "isDefault": false,
-    //                     "id": 234263
-    //                 }
-    //             ],
-    //             "recipientsName": null,
-    //             "mesasgeObjectType": 0,
-    //             "relatedEntityId": 454309,
-    //             "relatedEntityObjectTypeCode": null,
-    //             "relatedEntityObjectTypeDescription": null,
-    //             "relatedEntityCreatorName": null,
-    //             "profilePictureId": "00000000-0000-0000-0000-000000000000",
-    //             "userImage": null,
-    //             "profilePictureUrl": null,
-    //             "senderCompanyName": "Avatar",
-    //             "id": 159
-    //         },
-    //         "rating": 5,
-    //         "isUserVerifiedPurchaser": false,
-    //         "isProfileOwner": false,
-    //         "isAccountAdmin": true
-    //     }
-    // ]
+ 
+
+
     this.showMainSpinner();
     const subs = this.messageServiceProxy
       .getAllReviews(
@@ -164,7 +109,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
         this.entityID,
         undefined,
         undefined,
-        "REVIEW",
+        "QUESTION",
         "",
         this.skipCount,
         this.maxResultCount
@@ -320,7 +265,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     this.messages.to = null;
     this.messages.bodyFormat = this.reviewText;
     this.messages.body = this.reviewText;
-    // this.messages.mesasgeObjectType = MesasgeObjectType.Review
+    this.messages.mesasgeObjectType = MesasgeObjectType.Review
     this.messages.relatedEntityId = this.entityID
     this.messages.subject = ''
     this.messageServiceProxy
