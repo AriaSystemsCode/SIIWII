@@ -265,7 +265,7 @@
 
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center"><p class="mb-0 rateTxt">{{overRating?.overAllRating}} </p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <div class="d-flex align-items-center"><p class="mb-0 rateTxt">{{overRating?.overAllRating | number: '1.2-2' }} </p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M6.31093 21.6915C6.13113 21.8057 5.90292 21.646 5.94863 21.4379L7.42044 14.7403C7.43881 14.6568 7.41118 14.5697 7.34797 14.512L2.40117 9.99757C2.24741 9.85726 2.33352 9.60112 2.54081 9.58217L9.05425 8.98701C9.14379 8.97883 9.2212 8.92119 9.2547 8.83775L11.7779 2.55353C11.8583 2.35319 12.1419 2.35319 12.2224 2.55353L14.7455 8.83775C14.779 8.92119 14.8565 8.97883 14.946 8.98701L21.4594 9.58217C21.6667 9.60112 21.7528 9.85726 21.5991 9.99757L16.6523 14.512C16.5891 14.5697 16.5614 14.6568 16.5798 14.7403L18.0516 21.4379C18.0973 21.646 17.8691 21.8057 17.6893 21.6915L12.1285 18.1605C12.0501 18.1107 11.9501 18.1107 11.8717 18.1605L6.31093 21.6915Z" fill="#FFD233"/>
                                 </svg>  <p class="mb-0 numRate">({{overRating?.totalNumberOfRating}}) reviews</p>
                                 </div>
