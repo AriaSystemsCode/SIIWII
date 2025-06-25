@@ -302,6 +302,11 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
 
 
 
+  sanitizeAttachmentUrl(url: string): string {
+    if (!url) return '';
+    return (this.attachmentBaseUrl + '/' + url).replace(/\\/g, '/');
+  }
+  
 
   postReview() {
 

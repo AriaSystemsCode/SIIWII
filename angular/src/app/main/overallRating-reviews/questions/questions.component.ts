@@ -2,7 +2,8 @@ import { Component, ElementRef, Injector, Input, OnInit, ViewChild } from '@angu
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-questions',
@@ -230,6 +231,14 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     }
   }
 
+  // handleImageUploaded(event: { file: File; base64: string }) {
+  //   this.selectedMedia.push({
+  //     url: event.base64,
+  //     type: 'image',
+  //     file: event.file
+  //   });
+  // }
+  
   onVideoSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
