@@ -21,7 +21,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
   totalCount: number = 0;
   skipCount: number = 0;
   maxResultCount: number = 3;
-  reviewText: string = '';
+  questionText: string = '';
   selectedMedia: { url: string; type: string; file?: File }[] = [];
   messages: CreateMessageInput = new CreateMessageInput();
   attachmentsUploader: FileUploaderCustom;
@@ -58,7 +58,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
   // Add emoji to input text
   addEmoji(emoji: string) {
-    this.reviewText += emoji;
+    this.questionText += emoji;
     this.isEmojiPickerOpen = false; // Close picker after selecting an emoji
   }
 
@@ -82,7 +82,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     //       this.SuccessMsg = true
 
     //     } else {
-    //       this.postQuestion()
+          this.postQuestion()
     //     }
     //   });
 
@@ -203,7 +203,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
   resetForm(): void {
-    this.reviewText = '';
+    this.questionText = '';
     this.selectedMedia = [];
   }
 
@@ -251,6 +251,12 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
 
+  sanitizeAttachmentUrl(url: string): string {
+    if (!url) return '';
+    return (this.attachmentBaseUrl + '/' + url).replace(/\\/g, '/');
+  }
+  
+
 
   postQuestion() {
 
@@ -258,11 +264,12 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     if (this.selectedMedia?.length > 0)
       this.onUploadAttachments()
     this.messages.to = null;
-    this.messages.bodyFormat = this.reviewText;
-    this.messages.body = this.reviewText;
+    this.messages.bodyFormat = this.questionText;
+    this.messages.body = this.questionText;
     this.messages.mesasgeObjectType = MesasgeObjectType.Question
     this.messages.relatedEntityId = this.entityID
     this.messages.subject = ''
+    setTimeout(() => {
     this.messageServiceProxy
       .createMessage(this.messages)
       .pipe(finalize(() => {
@@ -278,5 +285,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
       });
+    }, 800); // ⏱ 2-second delay (2000 milliseconds)
+
   }
 }

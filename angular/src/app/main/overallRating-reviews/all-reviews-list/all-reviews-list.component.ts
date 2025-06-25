@@ -1,8 +1,9 @@
-import { Component, ElementRef, Injector, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AccountDto, AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-all-reviews-list',
@@ -14,6 +15,8 @@ import { AccountDto, AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectTy
 export class AllReviewsListComponent extends AppComponentBase implements OnInit {
   @Input() entityID : number
 
+  @Output() refreshRating : EventEmitter<boolean> = new EventEmitter<boolean>()
+  
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;
 
   reviews: any[] = []
@@ -39,7 +42,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
     '❤️', '💔', '❣️', '💖', '💘', '💞', '💕', '💓', '💗', '💙',
     '👍', '👎', '👏', '🙌', '🙏', '🤝', '💪', '👀', '👋', '🤙'
   ];
-
+  sycAttachmentCategoryImage: SycAttachmentCategoryDto;
 
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
 
@@ -50,8 +53,45 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
 
   ngOnInit() {
     this.getAllReviws()
+        // ✅ Provide fallback/mock image category
+        if (!this.sycAttachmentCategoryImage) {
+          this.sycAttachmentCategoryImage = {
+            id: 1,
+            code: 'IMAGE',
+            name: 'Mock Image Category',
+            description: 'Fake for testing',
+            entityObjectTypeCode: 'MOCK',
+            isStatic: false,
+            maxFileSize: 1048576, // 1 MB
+            acceptMultipleAttachments: true,
+            isSystem: false,
+            displayName: 'Test Category',
+            icon: '',
+            iconPath: '',
+            tenantId: 1
+          } as unknown as SycAttachmentCategoryDto;
+        }
   }
+  testImage: string = '';
 
+  // onImageSelected(event: ImageUploadComponentOutput, attr: any) {
+  //   this.testImage = event.image;
+  
+  //   // ✅ Push image to selectedMedia to be uploaded
+  //   this.selectedMedia.push({
+  //     url: event.image,
+  //     type: 'image',
+  //     file: event.file
+  //   });
+  // }
+  
+  
+  onImageRemoved(attr: any) {
+    this.testImage = '';
+    this.selectedMedia = this.selectedMedia.filter(m => !(m.type === 'image' && m.url === this.testImage));
+  }
+  
+  
   toggleEmojiPicker() {
     this.isEmojiPickerOpen = !this.isEmojiPickerOpen;
   }
@@ -69,90 +109,33 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   }
 
   isUserReviewedEntityBefore() {
-    // this.showMainSpinner()
-    // const subs = this.messageServiceProxy
-    //   .isUserReviewedEntityBefore(
-    //     this.accountDataForView?.entityId
+    this.showMainSpinner()
+    const subs = this.messageServiceProxy
+      .isUserReviewedEntityBefore(
+        this.entityID
 
-    //   )
-    //   .pipe(
-    //     finalize(() => {
-    //       this.hideMainSpinner()
-    //     })
-    //   )
-    //   .subscribe((result) => {
-    //     if (result) {
-    //       this.SuccessMsg = true
+      )
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner()
+        })
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.SuccessMsg = true
 
-    //     } else {
+        } else {
           this.postReview()
-    //     }
-    //   });
+        }
+      });
 
-    // this.subscriptions.push(subs);
+    this.subscriptions.push(subs);
   }
 
 
 
   getAllReviws() {
-    // this.reviews = [
-    //     {
-    //         "messages": {
-    //             "parentFKList": [],
-    //             "hasChildren": false,
-    //             "tenantId": null,
-    //             "senderId": 30725,
-    //             "entityObjectTypeCode": "REVIEW",
-    //             "to": null,
-    //             "cc": null,
-    //             "bcc": null,
-    //             "subject": "",
-    //             "body": "new end",
-    //             "bodyFormat": "new end",
-    //             "sendDate": "2025-01-24T00:06:48.1344467",
-    //             "receiveDate": "2025-01-24T00:06:48.1344467",
-    //             "entityId": 455465,
-    //             "entityCode": null,
-    //             "parentId": null,
-    //             "parentCode": null,
-    //             "threadId": 159,
-    //             "userId": null,
-    //             "senderName": "John Willson",
-    //             "toName": null,
-    //             "isFavorite": false,
-    //             "entityObjectStatusCode": null,
-    //             "entityAttachments": [
-    //                 {
-    //                     "attachmentCategoryId": 4,
-    //                     "attachmentCategoryEnum": 0,
-    //                     "fileName": "a3273754-4a7d-f0a3-4d88-6c19f74fd01b.mp4",
-    //                     "displayName": "750f337c-5970-6d19-8282-4ee7682abd47.mp4",
-    //                     "url": "attachments\\-1\\a3273754-4a7d-f0a3-4d88-6c19f74fd01b.mp4",
-    //                     "guid": null,
-    //                     "attributes": null,
-    //                     "index": 0,
-    //                     "isDefault": false,
-    //                     "id": 234263
-    //                 }
-    //             ],
-    //             "recipientsName": null,
-    //             "mesasgeObjectType": 0,
-    //             "relatedEntityId": 454309,
-    //             "relatedEntityObjectTypeCode": null,
-    //             "relatedEntityObjectTypeDescription": null,
-    //             "relatedEntityCreatorName": null,
-    //             "profilePictureId": "00000000-0000-0000-0000-000000000000",
-    //             "userImage": null,
-    //             "profilePictureUrl": null,
-    //             "senderCompanyName": "Avatar",
-    //             "id": 159
-    //         },
-    //         "rating": 5,
-    //         "isUserVerifiedPurchaser": false,
-    //         "isProfileOwner": false,
-    //         "isAccountAdmin": true
-    //     }
-    // ]
+
     this.showMainSpinner();
     const subs = this.messageServiceProxy
       .getAllReviews(
@@ -309,7 +292,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   
 
   postReview() {
-
+    
     this.showMainSpinner();
     if (this.selectedMedia?.length > 0)
       this.onUploadAttachments()
@@ -319,6 +302,8 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
     this.messages.mesasgeObjectType = MesasgeObjectType.Review
     this.messages.relatedEntityId = this.entityID
     this.messages.subject = ''
+    setTimeout(() => {
+
     this.messageServiceProxy
       .createMessage(this.messages)
       .pipe(finalize(() => {
@@ -329,6 +314,8 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
 
         this.messages = new CreateMessageInput();
         this.resetForm()
+        this.refreshRating.emit(true)
+        
       }))
       .subscribe(() => {
         this.messageServiceProxy
@@ -339,5 +326,6 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
           });
 
       });
+    }, 800); // ⏱ 2-second delay (2000 milliseconds)
   }
 }

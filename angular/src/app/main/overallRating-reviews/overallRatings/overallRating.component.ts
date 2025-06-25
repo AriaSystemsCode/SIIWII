@@ -1,8 +1,8 @@
-import { Component, Injector, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import {  AccountsServiceProxy, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
-import { finalize } from 'rxjs';
+import {   MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
+
 
 @Component({
   selector: 'app-overallRating',
@@ -11,15 +11,11 @@ import { finalize } from 'rxjs';
 })
 export class OverallRatingComponent extends AppComponentBase implements OnInit, OnDestroy {
 
-  @Input() entityID : number
+  @Input() overRating: OverAllRatingDto
 
   baseUrl: string = AppConsts.attachmentBaseUrl;
-  overRating: OverAllRatingDto
 
-
-
-
-  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy
+  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
 
   ) {
     super(injector);
@@ -27,34 +23,16 @@ export class OverallRatingComponent extends AppComponentBase implements OnInit, 
   }
 
   ngOnInit() {
-    this.getOverAllRatings()
+    
   }
 
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges): void {
+
   }
 
 
 
-  getOverAllRatings() {
-    const subs = this.messageServiceProxy
-      .getOverAllRatings(
-        this.entityID,
-      )
-      .pipe(
-        finalize(() => {
-
-        })
-      )
-      .subscribe(
-        (result) => {
-          this.overRating = result
-
-        },
-
-      );
-    this.subscriptions.push(subs);
-  }
 
 
 

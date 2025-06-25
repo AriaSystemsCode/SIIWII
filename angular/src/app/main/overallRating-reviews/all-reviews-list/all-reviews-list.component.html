@@ -2,15 +2,15 @@
 <hr>
 
 <div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
-    <div class="topSec w-100 d-flex align-items-start">
+    <div class="topSec w-100 d-flex align-items-start position-relative">
       <img style="height: 30px;" src="assets/common/images/default-profile-picture.png" class="rounded-circle logo" />
   
-      <textarea class="form-control flex-grow-0 col-lg-9 border-0" placeholder="Add your review" [(ngModel)]="reviewText"
+      <textarea class="form-control  border-0" placeholder="Add your review" [(ngModel)]="reviewText"
         style="height: auto; min-height: 100px; resize: none; overflow: hidden;"
         (input)="adjustTextareaHeight($event)"></textarea>
   
   
-      <div class="rating">
+      <div class="rating" style="position: absolute; right: 10px;top: 10px;">
         <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
           <i class="fa" [ngClass]="{
                 'fa-star': i + 1 <= selectedRating,
@@ -24,10 +24,18 @@
   
     <div class="bottomSec d-flex justify-content-between w-100 align-items-center">
       <div class="d-flex position-relative">
-        <!-- Image Input -->
+   
         <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput />
         <img src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
           (click)="imageInput.click()" />
+          <!-- <app-image-upload
+          [sycAttachmentCategory]="sycAttachmentCategoryImage"
+          [image]="testImage"
+          [fromReview]="true" 
+          (imageBrowseDone)="onImageSelected($event, null)"
+          (removeImage)="onImageRemoved(null)">
+        </app-image-upload> -->
+
   
         <!-- Video Input -->
         <input type="file" accept="video/*" (change)="onVideoSelected($event)" hidden #videoInput />
@@ -60,7 +68,7 @@
         <ng-template #videoTemplate>
           <video controls [src]="media.url" class="media-preview-video"></video>
         </ng-template>
-        <button class="remove-media" (click)="removeMedia(i)">x</button>
+        <button *ngIf="media.url " class="remove-media" (click)="removeMedia(i)">x</button>
       </div>
     </div>
   </div>
@@ -187,7 +195,7 @@
               onerror="this.src='../../assets/common/images/default-profile-picture.png'" class="mr-2 "
               style="height: 125px;width: 100px;border-radius: 6px;" alt="" srcset="">
             <video style="width: 125px;height: 125px;;border-radius: 6px;" *ngIf="attach?.attachmentCategoryId == 4"
-              controls [attr.src]="attachmentBaseUrl + '/' + attach?.url " class="vSec"></video>
+              controls  [attr.src]="sanitizeAttachmentUrl(attach.url)" class="vSec"></video>
           </div>
         </div>
       </div>
