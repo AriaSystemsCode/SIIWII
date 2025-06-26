@@ -1203,11 +1203,6 @@ input:checked + .slider:before {
 }
 
 
-::ng-deep {
-    .p-inputnumber-buttons-stacked .p-inputnumber-input {
-        text-align: end !important;
-    }
-}
 
 .pBtntext {
     background-color: #4A0D4A !important;
