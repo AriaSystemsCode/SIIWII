@@ -194,6 +194,7 @@ export class MarketplaceViewProductComponent
                         this.productBodyData.currencyCode,
                         this.productBodyData.buyerSSIN,
                         this.productBodyData.sellerSSIN,
+                        this.priceLevel,
                         this.productBodyData.id,
                         undefined,
                         undefined,

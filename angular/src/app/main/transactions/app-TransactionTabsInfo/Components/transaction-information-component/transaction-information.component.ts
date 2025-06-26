@@ -352,7 +352,53 @@ export class TransactionInformationComponent
 
   }
 
-
+  onEditPrice(rowNode) {
+    if(rowNode.node.data.added)
+      rowNode.node.data.showEditPrice = false;
+    else {
+    this.showMainSpinner();
+            switch (rowNode.level) {
+              case 0:
+              case 2:
+                this._AppTransactionServiceProxy
+                  .updatePriceByProductLineId(
+                    this.orderId,
+                    rowNode.node.data.lineId,
+                    rowNode.node.data.updatedPrice
+                  )
+                  .subscribe((res) => {
+                    if (res)
+                    this.notify.info("Successfully Updated.");
+                    rowNode.node.data.showEditPrice = false;
+                    rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                    this.getShoppingCartData();
+                    this.hideMainSpinner();
+                  });
+                break;
+                case 1:
+                  this.showMainSpinner();
+                    this._AppTransactionServiceProxy
+                      .updatePriceByProductSSINColor(
+                        this.orderId,
+                        rowNode.node.data.parentId,
+                        rowNode.node.data.colorCode,
+                        rowNode.node.data.colorId,
+                        rowNode.node.data.updatedPrice
+                      )
+                      .subscribe((res) => {
+                        if (res) this.notify.info("Successfully Updated.");
+                        rowNode.node.data.showEditPrice = false;
+                        rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                        this.getShoppingCartData();
+                        this.hideMainSpinner();
+                      });
+                    break;
+       default:
+            break;
+                    }
+    }
+  }
+  
 
   getCommentsRefreshed(event) {
     if (event) {
@@ -483,7 +529,7 @@ export class TransactionInformationComponent
 
     this.temp = temp;
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .pipe(finalize(() => {
         this.hideMainSpinner();
       }))
@@ -954,7 +1000,7 @@ export class TransactionInformationComponent
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames = this.companeyNames;
         this.appTransactionsForViewDto = res;
@@ -1087,7 +1133,7 @@ export class TransactionInformationComponent
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
 
@@ -1334,7 +1380,7 @@ export class TransactionInformationComponent
         'USD',
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
-        // '',
+        '',
         id,
         undefined,
         undefined,
