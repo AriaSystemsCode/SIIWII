@@ -22,6 +22,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @Input() addNewThread:boolean;
     @Input() commentType:any;
     @Input() fromTrans:boolean = false;
+    @Input() fromOverview:boolean = false;
     
     @Input() toName:string = '';
 
