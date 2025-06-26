@@ -10,6 +10,7 @@ import { AppConsts } from "@shared/AppConsts";
 })
 export class ProdcutCardComponent {
     @Input() product;
+    @Input() productCard;
     @Input() currency: string;
     @Input() buyerSSIN: string;
     @Input() sellerSSIN: string;

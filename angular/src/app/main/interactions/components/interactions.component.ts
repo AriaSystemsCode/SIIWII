@@ -27,6 +27,7 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     @Input() commentType:any;
     @Input() comment:any;
     @Input() fromTrans:boolean = false;
+    @Input() fromOverview:boolean;
     showReactionsPopup: boolean = false
     defaultReactionType: Reactions = this._reactionService.defaultReactionType
     currentUserReaction: AppEntityUserReactionDto = new AppEntityUserReactionDto()

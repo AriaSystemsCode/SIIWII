@@ -1,0 +1,237 @@
+<h4>Reviews</h4>
+<hr>
+<div *ngIf="totalCount > 0" class="review-summary mb-3">
+  <h5 class="font-weight-bold">
+    {{ reviews.length }} over {{ totalCount }} {{ 'Results Of' | localize }} "{{ 'Customers Reviews' | localize }}"
+  </h5>
+</div>
+
+<div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
+    <div class="topSec w-100 d-flex align-items-start position-relative">
+      <img style="height: 30px;" src="assets/common/images/default-profile-picture.png" class="rounded-circle logo" />
+  
+      <textarea class="form-control  border-0" placeholder="Add your review" [(ngModel)]="reviewText"
+        style="height: auto; min-height: 100px; resize: none; overflow: hidden;"
+        (input)="adjustTextareaHeight($event)"></textarea>
+  
+  
+      <div class="rating" style="position: absolute; right: 10px;top: 10px;">
+        <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
+          <i class="fa" [ngClass]="{
+                'fa-star': i + 1 <= selectedRating,
+                'fa-star-half-o': i < selectedRating && i + 1 > selectedRating,
+                'fa-star-o': i + 1 > selectedRating
+              }" (click)="setRating(i + 1)" title="{{ i + 1 }} star"></i>
+        </ng-container>
+  
+      </div>
+    </div>
+  
+    <div class="bottomSec d-flex justify-content-between w-100 align-items-center">
+      <div class="d-flex position-relative">
+   
+        <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput />
+        <img src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
+          (click)="imageInput.click()" />
+          <!-- <app-image-upload
+          [sycAttachmentCategory]="sycAttachmentCategoryImage"
+          [image]="testImage"
+          [fromReview]="true" 
+          (imageBrowseDone)="onImageSelected($event, null)"
+          (removeImage)="onImageRemoved(null)">
+        </app-image-upload> -->
+
+  
+        <!-- Video Input -->
+        <input type="file" accept="video/*" (change)="onVideoSelected($event)" hidden #videoInput />
+        <img src="assets/placeholders/vAttach.png" class="mr-2 iconImg" alt="Video Attach" (click)="videoInput.click()" />
+  
+        <!-- Emoji Picker -->
+        <img class="emoji-btn mr-2 iconImg" (click)="toggleEmojiPicker()" src="assets/placeholders/emojsIcons.png"
+          alt="Emoji Picker" />
+        <div class="emoji-picker" *ngIf="isEmojiPickerOpen">
+          <div class="emoji-grid">
+            <span *ngFor="let emoji of emojis" class="emoji-item" (click)="addEmoji(emoji)">
+              {{ emoji }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+  
+      <button class="btnPost" (click)="isUserReviewedEntityBefore()">Post</button>
+    </div>
+  
+  
+  
+    <!-- Media Preview -->
+    <div *ngIf="selectedMedia?.length > 0" class="media-preview">
+      <div *ngFor="let media of selectedMedia; let i = index" class="media-item">
+        <ng-container *ngIf="media.type === 'image'; else videoTemplate">
+          <img [src]="media.url" alt="Selected Image" class="media-preview-image" />
+        </ng-container>
+        <ng-template #videoTemplate>
+          <video controls [src]="media.url" class="media-preview-video"></video>
+        </ng-template>
+        <button *ngIf="media.url " class="remove-media" (click)="removeMedia(i)">x</button>
+      </div>
+    </div>
+  </div>
+  
+  
+  <p *ngIf="reviews?.length == 0" class="text-center">
+    <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+  
+    <span class="noDataTxt">There is no data to show ...</span>
+  </p>
+  
+  
+  <div *ngIf="reviews?.length > 0" class="review-section pb-2">
+  
+    <!-- Review Card -->
+    <div *ngFor="let review of reviews " class="review-card">
+      <div class="">
+  
+        <div class=" pb-md-4 pb-0  d-flex justify-content-between align-items-center">
+          <div class=" mr-4 mr-lg-0 mr-md-0 d-flex align-items-center">
+            <img [src]="attachmentBaseUrl + '/' + review?.messages?.profilePictureUrl"
+              onerror="this.src='../../assets/common/images/default-profile-picture.png'" class="mr-2 rounded-circle"
+              style="height: 32px;width: 32px;" alt="" srcset="">
+            <div>
+              <a class="pt-2 title">
+                {{review?.messages?.senderCompanyName}}
+              </a>
+              <p class="txtby mb-0">by {{review?.messages?.senderName}}</p>
+            </div>
+            <div class="mx-3  align-items-center d-md-flex d-none">
+              <svg *ngIf="review?.isUserVerifiedPurchaser || review?.isAccountAdmin || review?.isProfileOwner" width="16"
+                height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M8 15.5C8.98491 15.5 9.96018 15.306 10.8701 14.9291C11.7801 14.5522 12.6069 13.9997 13.3033 13.3033C13.9997 12.6069 14.5522 11.7801 14.9291 10.8701C15.306 9.96018 15.5 8.98491 15.5 8C15.5 7.01509 15.306 6.03982 14.9291 5.12987C14.5522 4.21993 13.9997 3.39314 13.3033 2.6967C12.6069 2.00026 11.7801 1.44781 10.8701 1.0709C9.96018 0.693993 8.98491 0.5 8 0.5C6.01088 0.5 4.10322 1.29018 2.6967 2.6967C1.29018 4.10322 0.5 6.01088 0.5 8C0.5 9.98912 1.29018 11.8968 2.6967 13.3033C4.10322 14.7098 6.01088 15.5 8 15.5ZM7.80667 11.0333L11.9733 6.03333L10.6933 4.96667L7.11 9.26583L5.25583 7.41083L4.0775 8.58917L6.5775 11.0892L7.2225 11.7342L7.80667 11.0333Z"
+                  fill="#2DC74F" />
+              </svg>
+              <svg *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner"
+                width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M8 0C3.576 0 0 3.576 0 8C0 12.424 3.576 16 8 16C12.424 16 16 12.424 16 8C16 3.576 12.424 0 8 0ZM11.44 11.44C11.366 11.5142 11.2781 11.573 11.1813 11.6131C11.0845 11.6533 10.9808 11.674 10.876 11.674C10.7712 11.674 10.6675 11.6533 10.5707 11.6131C10.4739 11.573 10.386 11.5142 10.312 11.44L8 9.128L5.688 11.44C5.53842 11.5896 5.33554 11.6736 5.124 11.6736C4.91246 11.6736 4.70958 11.5896 4.56 11.44C4.41042 11.2904 4.32638 11.0875 4.32638 10.876C4.32638 10.7713 4.34701 10.6675 4.3871 10.5708C4.42718 10.474 4.48593 10.3861 4.56 10.312L6.872 8L4.56 5.688C4.41042 5.53842 4.32638 5.33554 4.32638 5.124C4.32638 4.91246 4.41042 4.70958 4.56 4.56C4.70958 4.41042 4.91246 4.32638 5.124 4.32638C5.33554 4.32638 5.53842 4.41042 5.688 4.56L8 6.872L10.312 4.56C10.3861 4.48593 10.474 4.42718 10.5708 4.3871C10.6675 4.34701 10.7713 4.32638 10.876 4.32638C10.9807 4.32638 11.0845 4.34701 11.1812 4.3871C11.278 4.42718 11.3659 4.48593 11.44 4.56C11.5141 4.63407 11.5728 4.72199 11.6129 4.81877C11.653 4.91554 11.6736 5.01926 11.6736 5.124C11.6736 5.22874 11.653 5.33246 11.6129 5.42923C11.5728 5.52601 11.5141 5.61393 11.44 5.688L9.128 8L11.44 10.312C11.744 10.616 11.744 11.128 11.44 11.44Z"
+                  fill="#E42B2B" />
+              </svg>
+              <p class="mb-0 mx-2" style="color: #2DC74F;white-space: nowrap;">
+                <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">Verified Purchaser</span>
+                <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">Account Admin</span>
+                <span class="verfiedtxt" *ngIf="review?.isProfileOwner">Profile Owner</span>
+                <span class="notverfiedtxt"
+                  *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">Not
+                  Verified Purchaser</span>
+              </p>
+            </div>
+          </div>
+  
+          <div class="">
+  
+  
+            <h6 class="userName dates d-lg-block d-none">
+  
+              {{review?.messages?.receiveDate | date: 'h:mm a, d MMMM, y'}}
+            </h6>
+            <h6 class="userName dates d-lg-none d-block mb-0">
+  
+              {{review?.messages?.receiveDate | date: 'h:mm a'}}
+            </h6>
+  
+            <h6 class="userName dates d-lg-none d-block">
+  
+              {{review?.messages?.receiveDate | date: 'd MMMM, y'}}
+            </h6>
+          </div>
+  
+  
+        </div>
+        <div class="mx-3  align-items-center d-md-none d-flex">
+          <svg *ngIf="review?.isUserVerifiedPurchaser || review?.isAccountAdmin || review?.isProfileOwner" width="16"
+            height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M8 15.5C8.98491 15.5 9.96018 15.306 10.8701 14.9291C11.7801 14.5522 12.6069 13.9997 13.3033 13.3033C13.9997 12.6069 14.5522 11.7801 14.9291 10.8701C15.306 9.96018 15.5 8.98491 15.5 8C15.5 7.01509 15.306 6.03982 14.9291 5.12987C14.5522 4.21993 13.9997 3.39314 13.3033 2.6967C12.6069 2.00026 11.7801 1.44781 10.8701 1.0709C9.96018 0.693993 8.98491 0.5 8 0.5C6.01088 0.5 4.10322 1.29018 2.6967 2.6967C1.29018 4.10322 0.5 6.01088 0.5 8C0.5 9.98912 1.29018 11.8968 2.6967 13.3033C4.10322 14.7098 6.01088 15.5 8 15.5ZM7.80667 11.0333L11.9733 6.03333L10.6933 4.96667L7.11 9.26583L5.25583 7.41083L4.0775 8.58917L6.5775 11.0892L7.2225 11.7342L7.80667 11.0333Z"
+              fill="#2DC74F" />
+          </svg>
+          <svg *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner" width="16"
+            height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M8 0C3.576 0 0 3.576 0 8C0 12.424 3.576 16 8 16C12.424 16 16 12.424 16 8C16 3.576 12.424 0 8 0ZM11.44 11.44C11.366 11.5142 11.2781 11.573 11.1813 11.6131C11.0845 11.6533 10.9808 11.674 10.876 11.674C10.7712 11.674 10.6675 11.6533 10.5707 11.6131C10.4739 11.573 10.386 11.5142 10.312 11.44L8 9.128L5.688 11.44C5.53842 11.5896 5.33554 11.6736 5.124 11.6736C4.91246 11.6736 4.70958 11.5896 4.56 11.44C4.41042 11.2904 4.32638 11.0875 4.32638 10.876C4.32638 10.7713 4.34701 10.6675 4.3871 10.5708C4.42718 10.474 4.48593 10.3861 4.56 10.312L6.872 8L4.56 5.688C4.41042 5.53842 4.32638 5.33554 4.32638 5.124C4.32638 4.91246 4.41042 4.70958 4.56 4.56C4.70958 4.41042 4.91246 4.32638 5.124 4.32638C5.33554 4.32638 5.53842 4.41042 5.688 4.56L8 6.872L10.312 4.56C10.3861 4.48593 10.474 4.42718 10.5708 4.3871C10.6675 4.34701 10.7713 4.32638 10.876 4.32638C10.9807 4.32638 11.0845 4.34701 11.1812 4.3871C11.278 4.42718 11.3659 4.48593 11.44 4.56C11.5141 4.63407 11.5728 4.72199 11.6129 4.81877C11.653 4.91554 11.6736 5.01926 11.6736 5.124C11.6736 5.22874 11.653 5.33246 11.6129 5.42923C11.5728 5.52601 11.5141 5.61393 11.44 5.688L9.128 8L11.44 10.312C11.744 10.616 11.744 11.128 11.44 11.44Z"
+              fill="#E42B2B" />
+          </svg>
+          <p class="mb-0 mx-2" style="color: #2DC74F;white-space: nowrap;">
+            <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">Verified Purchaser</span>
+            <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">Account Admin</span>
+            <span class="verfiedtxt" *ngIf="review?.isProfileOwner">Profile Owner</span>
+            <span class="notverfiedtxt"
+              *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">Not Verified
+              Purchaser</span>
+          </p>
+        </div>
+        <div class="d-flex mb-3 align-items-center">
+          <!-- Dynamic Rating Stars -->
+  
+          <div *ngIf="review?.rating != 0" class="position-relative " style="height: 32px;width: 122px;">
+            <span class="stars-container  " style="color: #D4D4D4;">★★★★★</span>
+            <span [style]="
+                    'width :' + review?.rating/5 * 100 + '%'
+                " class="stars-container  fill-s position-absolute top-0 left-0 inline-block ">★★★★★</span>
+          </div>
+        </div>
+      </div>
+      <p class="subjectTxt">{{review?.messages?.subject}}</p>
+      <div class="" [ngClass]="review?.messages?.entityAttachments?.length != 0 ? 'd-flex justify-content-between':''">
+        <p class="review-comment txtBody" [ngStyle]="{
+              'width': review?.messages?.entityAttachments?.length !== 0 ? '80%' : '100%',
+            }">
+          {{ review.isExpanded || (review?.messages?.body?.length || 0) <= 900 ? review?.messages?.body :
+            (review?.messages?.body | slice:0:900) + '...' }} <a *ngIf="(review?.messages?.body?.length || 0) > 900"
+            (click)="toggleExpand(review)" class="expand-toggle">
+            {{ review.isExpanded ? 'Show less' : 'Read more' }}
+            </a>
+        </p>
+  
+  
+        <div *ngIf="review?.messages?.entityAttachments?.length">
+          <div *ngFor="let attach of review?.messages?.entityAttachments">
+            <img *ngIf="attach?.attachmentCategoryId == 3" style="width: 100px;height: 125px;border-radius: 6px;"
+              [src]="attachmentBaseUrl + '/' + attach?.url"
+              onerror="this.src='../../assets/common/images/default-profile-picture.png'" class="mr-2 "
+              style="height: 125px;width: 100px;border-radius: 6px;" alt="" srcset="">
+            <video style="width: 125px;height: 125px;;border-radius: 6px;" *ngIf="attach?.attachmentCategoryId == 4"
+              controls  [attr.src]="sanitizeAttachmentUrl(attach.url)" class="vSec"></video>
+          </div>
+        </div>
+      </div>
+      <div class="position-relative d-flex justify-content-between mt-4">
+        <app-interactions [relatedEntityId]="review?.messages?.entityId" [entityId]="review?.messages?.entityId"
+          [fromOverview]="true"></app-interactions>
+  
+      </div>
+    </div>
+  
+    <button *ngIf="reviews?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all
+      review</button>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  <p-dialog [(visible)]="SuccessMsg" [modal]="true" [style]="{ width: '474px' }" [draggable]="false">
+    <div class="d-flex justify-content-center img-hd m-auto">
+      <img src="../../assets/icons/Vector.png">
+    </div>
+    <div class=" con-body">
+      <p class="mb-3 text-center">
+        <span class="msg-text ml-2 ">Only one review is allowed!</span>
+      </p>
+    </div>
+    <div class="d-flex justify-content-center btns mb-3">
+      <button (click)="SuccessMsg = false;resetForm()" label="Ok" class="p-button-text">Ok</button>
+    </div>
+  </p-dialog>
