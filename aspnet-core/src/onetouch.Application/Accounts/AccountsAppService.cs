@@ -4187,39 +4187,41 @@ namespace onetouch.Accounts
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
         protected async Task UpdateProfilePicture(string inputFileToken, long userId)
         {
-            byte[] byteArray;
+            byte[] byteArray=null ;
             try
             {
                 string fileName = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + inputFileToken;
-
+                if(System.IO.File.Exists(fileName))
                 byteArray = System.IO.File.ReadAllBytes(fileName);
             }
             catch (Exception exp)
             {
                 throw new UserFriendlyException("There is no such image file with the name: " + inputFileToken);
             }
-
-            if (byteArray.Length == 0)
+            if (byteArray != null)
             {
-                throw new UserFriendlyException("There is no such image file with the name: " + inputFileToken);
+                if (byteArray.Length == 0)
+                {
+                    throw new UserFriendlyException("There is no such image file with the name: " + inputFileToken);
+                }
+
+                if (byteArray.Length > MaxProfilPictureBytes)
+                {
+                    throw new UserFriendlyException(L("ResizedProfilePicture_Warn_SizeLimit", AppConsts.ResizedMaxProfilPictureBytesUserFriendlyValue));
+                }
+
+                var user = await UserManager.GetUserByIdAsync(userId);
+
+                if (user.ProfilePictureId.HasValue)
+                {
+                    await _binaryObjectManager.DeleteAsync(user.ProfilePictureId.Value);
+                }
+
+                var storedFile = new BinaryObject(AbpSession.TenantId, byteArray);
+                await _binaryObjectManager.SaveAsync(storedFile);
+
+                user.ProfilePictureId = storedFile.Id;
             }
-
-            if (byteArray.Length > MaxProfilPictureBytes)
-            {
-                throw new UserFriendlyException(L("ResizedProfilePicture_Warn_SizeLimit", AppConsts.ResizedMaxProfilPictureBytesUserFriendlyValue));
-            }
-
-            var user = await UserManager.GetUserByIdAsync(userId);
-
-            if (user.ProfilePictureId.HasValue)
-            {
-                await _binaryObjectManager.DeleteAsync(user.ProfilePictureId.Value);
-            }
-
-            var storedFile = new BinaryObject(AbpSession.TenantId, byteArray);
-            await _binaryObjectManager.SaveAsync(storedFile);
-
-            user.ProfilePictureId = storedFile.Id;
         }
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
 
@@ -5683,7 +5685,7 @@ namespace onetouch.Accounts
                     accountExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath = accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44303/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
+                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44308/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath = accountExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
                     accountExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"Templates:AccountExcelLogFileName"];
 
@@ -5857,12 +5859,12 @@ namespace onetouch.Accounts
                 IList<AppAddressDto> addresses = await GetAllAccountAddresses(AccountId);
 
                 List<AppAddressDto> appAddressDto = addresses.Where(r => r.Code == address.Code &&
-                        r.Name.TrimEnd().ToUpper() == address.Name.TrimEnd().ToUpper() &&
-                        r.AddressLine1.TrimEnd().ToUpper() == address.AddressLine1.TrimEnd().ToUpper() &&
-                        r.AddressLine2.TrimEnd().ToUpper() == address.AddressLine2.TrimEnd().ToUpper() &&
-                        r.City.TrimEnd().ToUpper() == address.City.TrimEnd().ToUpper() &&
-                        r.State.TrimEnd().ToUpper() == address.State.TrimEnd().ToUpper() &&
-                        r.PostalCode.TrimEnd().ToUpper() == address.PostalCode.TrimEnd().ToUpper() &&
+                        //r.Name.TrimEnd().ToUpper() == address.Name.TrimEnd().ToUpper() &&
+                        //r.AddressLine1.TrimEnd().ToUpper() == address.AddressLine1.TrimEnd().ToUpper() &&
+                       // r.AddressLine2.TrimEnd().ToUpper() == address.AddressLine2.TrimEnd().ToUpper() &&
+                      //  r.City.TrimEnd().ToUpper() == address.City.TrimEnd().ToUpper() &&
+                      //  r.State.TrimEnd().ToUpper() == address.State.TrimEnd().ToUpper() &&
+                      //  r.PostalCode.TrimEnd().ToUpper() == address.PostalCode.TrimEnd().ToUpper() &&
                         GetTypeId(address.CountryIdName, countries) > 0).ToList();
 
                 if (appAddressDto.Count == 0) //|| AccountId == 0)
@@ -5890,6 +5892,23 @@ namespace onetouch.Accounts
                 {
                     address.AddressId = appAddressDto[0].Id;
                     address.AccountId = AccountId;
+                    //T-SII-20250129.0001,1 MMT 03/02/2023 Address is not updated while importing[Start]
+                    AppAddressDto addressDto = new AppAddressDto();
+                    addressDto.Name = address.Name;
+                    addressDto.TenantId = AbpSession.TenantId;
+                    addressDto.AddressLine1 = address.AddressLine1;
+                    addressDto.AddressLine2 = address.AddressLine2;
+                    addressDto.Code = address.Code;
+                    addressDto.City = address.City;
+                    addressDto.State = address.State;
+                    addressDto.PostalCode = address.PostalCode;
+                    if (string.IsNullOrEmpty(address.CountryIdName)) address.CountryIdName = "USA";
+                    var countryId = GetTypeId(address.CountryIdName, countries);
+                    addressDto.CountryId = countryId == 0 ? null : countryId;
+                    addressDto.AccountId = AccountId;
+                    addressDto.Id = appAddressDto[0].Id;
+                    var appAddressDtoRet = await CreateOrEditAddress(addressDto);
+                    //T-SII-20250129.0001,1 MMT 03/02/2023 Address is not updated while importing[End]
                     return address.AddressId;
                 }
             }

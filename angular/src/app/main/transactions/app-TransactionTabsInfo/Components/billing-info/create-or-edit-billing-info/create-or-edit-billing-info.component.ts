@@ -209,6 +209,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
       const addressComponents = this.addressComponentRefs.toArray();
       addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, null);
     }
+
+
   }
 
 
@@ -219,7 +221,11 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
       const addressComponents = this.addressComponentRefs.toArray();
       addressComponents.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin, null);
     }
+
+
   }
+
+
 
   createOrEditTransaction() {
     this.showMainSpinner()

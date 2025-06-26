@@ -263,7 +263,7 @@ namespace onetouch.AppMarketplaceItems
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (1 / u.ExchangeRate) * exchangeRate) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode=="USD"? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null?
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate):0)))),
                                        Id = o.Id,
@@ -273,14 +273,14 @@ namespace onetouch.AppMarketplaceItems
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (1 / u.ExchangeRate) * exchangeRate) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() !=null? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) >= (decimal)input.MinimumPrice) : true) &&
                                               (input.MaximumPrice != null ? ((decimal)(input.CurrencyCode == null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
                                                (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (1 / u.ExchangeRate) * exchangeRate) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault()!=null? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate):0)))) <= (decimal)input.MaximumPrice) : true),
 
                                        ImageUrl = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
@@ -449,6 +449,33 @@ namespace onetouch.AppMarketplaceItems
                 stopwatch.Start();
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
+
+                    //T-SII-20250221.0004,1 MMT 03/13/2025 - Display the logged in Tenant Product special price[Start]
+                    if (string.IsNullOrEmpty(input.BuyerAccountSSIN) && string.IsNullOrEmpty(input.SellerAccountSSIN))
+                    {
+                        var appItemObj = await _appMarketplaceItem.GetAll().Where(z => z.Id == input.ItemId).FirstOrDefaultAsync();
+                        if (appItemObj != null)
+                        {
+                            if (appItemObj.TenantOwner != AbpSession.TenantId)
+                            {
+                                var accountBuyer = await _appContactRepository.GetAll()
+                                   .Where(z => z.PartnerId == null && z.ParentId == null  && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                                if (accountBuyer != null)
+                                {
+                                    input.BuyerAccountSSIN = accountBuyer.SSIN;
+                                }
+                                var accountSeller= await _appContactRepository.GetAll()
+                                   .Where(z => z.PartnerId == null && z.ParentId == null && z.TenantId == appItemObj.TenantOwner).FirstOrDefaultAsync();
+                                if (accountSeller != null)
+                                {
+                                    input.SellerAccountSSIN = accountSeller.SSIN;
+                                }
+                            }
+                        }
+
+                    }
+                    //T-SII-20250221.0004,1 MMT 03/13/2025 - Display the logged in Tenant Product special price[End]
+
                     string level = "MSRP";
                     if (input.BuyerAccountSSIN != null && input.SellerAccountSSIN != null)
                     {
@@ -464,6 +491,10 @@ namespace onetouch.AppMarketplaceItems
                             level = (buyerAccount.PartnerId == null && !string.IsNullOrEmpty(buyerAccount.PriceLevel) ? buyerAccount.PriceLevel : level);
 
                         }
+                    }
+                    if (!string.IsNullOrEmpty(input.PriceLevel))
+                    {
+                        level = input.PriceLevel;
                     }
 
                     string currencyCode = "";

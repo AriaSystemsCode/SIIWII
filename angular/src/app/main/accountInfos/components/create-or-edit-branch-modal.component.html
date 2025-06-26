@@ -77,10 +77,10 @@
           <div class="row align-items-center">
             <div class="col-md-5">
               <div class="form-group">
-                <label for="branch_TradeName">{{l("TradeName")}} *</label>
+                <label for="branch_TradeName">{{l("TradeName")}} </label>
                 <input type="text" id="branch_TradeName" #tradeNameInput="ngModel"
                   class="form-control form-control-sm aria-input-text" [(ngModel)]="branch.tradeName" name="TradeName"
-                  minlength="2" maxlength="100" required />
+                  minlength="2" maxlength="100"  />
                 <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
               </div>
             </div>

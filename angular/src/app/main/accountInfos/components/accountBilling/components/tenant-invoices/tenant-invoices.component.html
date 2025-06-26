@@ -14,13 +14,7 @@
                               {{l("AppTenantInvoicesHeaderInfo")}}
                           </span>
                       </div>
-                      <!-- <div class="kt-subheader__toolbar">
-                          <div class="kt-subheader__wrapper">
-                              <button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
-                   <button *ngIf="isGranted('Pages.Administration.AppTenantInvoices.Create')" (click)="createAppTenantInvoice()" 
-                          class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantInvoice")}}</button> 
-                          </div>
-                      </div> -->
+                
                     </div>
                   </div>
               
@@ -36,63 +30,14 @@
                                       <div class="input-group">
                                           <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
                                           <span class="input-group-btn">
-                                              <button (click)="getAppTenantInvoices()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                              <button (click)="getAppTenantInvoices()" class="btn searchBtn" type="submit"><i class="flaticon-search-1"></i></button>
                                           </span>
                                       </div>
                                   </div>
                               </div>
                           </div>
-                        <!--  <div class="row" [hidden]="!advancedFiltersAreShown">
-                               <div class="col-md-12">
-                                   <div class="kt-separator kt-separator--border-dashed"></div>
-                               </div>
-  
-  
-                              <div class="col-md-3">
-                                  <div class="form-group">
-                                      <label for="InvoiceNumberFilter">{{l("InvoiceNumber")}}</label>
-                                      <input type="text" class="form-control" id="InvoiceNumberFilter" name="invoiceNumberFilter" [(ngModel)]="invoiceNumberFilter">
-                                  </div>
-                              </div>
-                              <div class="col-md-3">
-                                  <div class="form-group">
-                                      <label  for="MinInvoiceDateFilter">{{l("InvoiceDateRange")}}</label>
-                                      <div class="input-group">
-                                          <input class="form-control m-input" id="MinInvoiceDateFilter" name="MinInvoiceDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MinValue')}}" [(ngModel)]="minInvoiceDateFilter">
-                                          <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
-                                          <input class="form-control m-input" id="MaxInvoiceDateFilter" name="MaxInvoiceDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MaxValue')}}" [(ngModel)]="maxInvoiceDateFilter">
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="col-md-3">
-                                  <div class="form-group">
-                                      <label  for="MinDueDateFilter">{{l("DueDateRange")}}</label>
-                                      <div class="input-group">
-                                          <input class="form-control m-input" id="MinDueDateFilter" name="MinDueDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MinValue')}}" [(ngModel)]="minDueDateFilter">
-                                          <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
-                                          <input class="form-control m-input" id="MaxDueDateFilter" name="MaxDueDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MaxValue')}}" [(ngModel)]="maxDueDateFilter">
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="col-md-3">
-                                  <div class="form-group">
-                                      <label  for="MinPayDateFilter">{{l("PayDateRange")}}</label>
-                                      <div class="input-group">
-                                          <input class="form-control m-input" id="MinPayDateFilter" name="MinPayDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MinValue')}}" [(ngModel)]="minPayDateFilter">
-                                          <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
-                                          <input class="form-control m-input" id="MaxPayDateFilter" name="MaxPayDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MaxValue')}}" [(ngModel)]="maxPayDateFilter">
-                                      </div>
-                                  </div>
-                              </div>
-  
-                          </div>
-                          <div class="row mb-2">
-                              <div class="col-sm-12">
-                                  <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
-                                  <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
-                              </div>
-                          </div> -->
-                      </div> 
+                    
+                        </div> 
                   </form>
   
                   <div class="row align-items-center">
@@ -116,7 +61,7 @@
                                       font-size: 12px;
                                       font-weight: 600;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;
                                       color:#1B101B;" pSortableColumn="invoiceNumber">
@@ -127,7 +72,7 @@
                                       font-size: 12px;
                                       font-weight: 600;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;
                                       color:#1B101B;" pSortableColumn="amount">
@@ -138,7 +83,7 @@
                                       font-size: 12px;
                                       font-weight: 600;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;
                                       color:#1B101B;" pSortableColumn="invoiceDate">
@@ -150,7 +95,7 @@
                                       font-size: 12px;
                                       font-weight: 600;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;
                                       color:#1B101B;" pSortableColumn="dueDate">
@@ -161,7 +106,7 @@
                                       font-size: 12px;
                                       font-weight: 600;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;
                                       color:#1B101B;" pSortableColumn="payDate">
@@ -172,7 +117,7 @@
                                       font-size: 12px;
                                       font-weight: 600;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;
                                       color:#1B101B;">{{l('Actions')}}</th> 
@@ -180,41 +125,12 @@
                               </ng-template>                           
                               <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
                                   <tr>
-                                     <!--  <td style="width: 130px"
-                                          [hidden]="!isGrantedAny('Pages.Administration.AppTenantInvoices.Edit', 'Pages.Administration.AppTenantInvoices.Delete')">
-                                         <div class="btn-group dropdown" dropdown container="body">
-                                              <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
-                                                  <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
-                                              </button>
-                                                  <ul class="dropdown-menu"  *dropdownMenu>
-                                              <li>
-                                                  <a *ngIf="permission.isGranted('Pages.Administration.AppTenantInvoices.Edit')" 
-              [routerLink]="['/app/admin/appSubscriptionPlans/appTenantInvoices/view']" [queryParams]="{id: record.appTenantInvoice.id}">
-    {{l('View')}}	
-  </a>
-                                              </li>
-                                                  <li>
-                                                   <a *ngIf="permission.isGranted('Pages.Administration.AppTenantInvoices.Edit')" 
-              [routerLink]="['/app/admin/appSubscriptionPlans/appTenantInvoices/createOrEdit']" [queryParams]="{id: record.appTenantInvoice.id}">
-    {{l('Edit')}}	
-  </a>												
-                                                  </li>
-                                                  <li>
-                                                      <a  href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.AppTenantInvoices.Delete')"
-                                                          (click)="deleteAppTenantInvoice(record.appTenantInvoice)">{{l('Delete')}}</a>
-                                                  </li>
-                                                  <li>
-                                                      <a href="javascript:;" *ngIf="entityHistoryEnabled"  
-                                                         (click)="showHistory(record.appTenantInvoice)">{{l('History')}}</a>
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </td> -->
-                                      <td style="width:150px;font-family: Poppins;
+                               
+                                    <td style="width:150px;font-family: Poppins;
                                       font-size: 12px;
                                       font-weight: 500;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;color:#595959;">
                                               <!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
@@ -224,7 +140,7 @@
                                           font-size: 12px;
                                           font-weight: 500;
                                           line-height: 18px;
-                                          text-align: left;
+                                          text-align: center;
                                           text-underline-position: from-font;
                                           text-decoration-skip-ink: none;color:#595959;">
                                             <!-- <span class="ui-column-title"> {{l('Amount')}}</span> -->
@@ -234,7 +150,7 @@
                                       font-size: 12px;
                                       font-weight: 500;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;color:#595959;">
                                           <!-- <span class="ui-column-title"> {{l('InvoiceDate')}}</span> -->
@@ -248,7 +164,7 @@
                                       font-size: 12px;
                                       font-weight: 500;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;color:#595959;">
                                           <!-- <span class="ui-column-title"> {{l('DueDate')}}</span> -->
@@ -261,7 +177,7 @@
                                       font-size: 12px;
                                       font-weight: 500;
                                       line-height: 18px;
-                                      text-align: left;
+                                      text-align: center;
                                       text-underline-position: from-font;
                                       text-decoration-skip-ink: none;color:#595959;">
                                           <!-- <span class="ui-column-title"> {{l('PayDate')}}</span> -->
@@ -275,7 +191,7 @@
                                         font-size: 12px;
                                         font-weight: 500;
                                         line-height: 18px;
-                                        text-align: left;
+                                        text-align: center;
                                         text-underline-position: from-font;
                                         text-decoration-skip-ink: none;color:#595959;">
                                          <div  container="body">
@@ -295,25 +211,17 @@
                           <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
                               {{l('NoData')}}
                           </div>
-                          <div class="primeng-paging-container">
-                              <!-- <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
-                                           #paginator
-                                           (onPageChange)="getAppTenantInvoices($event)"
-                                           [totalRecords]="primengTableHelper.totalRecordsCount"
-                                           [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
-                                           [showCurrentPageReport]="true"
-                                           [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
-                              >
-                              </p-paginator> -->
+                          <div class="primeng-paging-container d-flex justify-content-between align-items-center">
+                            <span style="color: #595959;">
+                                Showing    {{ primengTableHelper.totalRecordsCount < 10 ? primengTableHelper.totalRecordsCount : first+rows}} of   {{ primengTableHelper.totalRecordsCount}} data
+                                  </span>
                               <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
                               #paginator
                               (onPageChange)="getAppTenantInvoices($event)"
                               [totalRecords]="primengTableHelper.totalRecordsCount"
                               [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
                  </p-paginator>
-                 <span class="total-records-count">
-                     {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
-                 </span>
+             
                           </div>
                       </div>
                       <!--<Primeng-Datatable-End>-->

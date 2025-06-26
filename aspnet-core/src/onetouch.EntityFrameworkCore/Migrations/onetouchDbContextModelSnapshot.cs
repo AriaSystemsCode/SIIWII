@@ -2584,6 +2584,88 @@ namespace onetouch.Migrations
                         });
                 });
 
+            modelBuilder.Entity("onetouch.AppEntities.AppEntityLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EntityCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("EntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntityObjectStatusCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long?>("EntityObjectStatusId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntityObjectTypeCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("EntityObjectTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ObjectCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("ObjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PartnerCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityId");
+
+                    b.HasIndex("EntityObjectStatusId");
+
+                    b.HasIndex("EntityObjectTypeId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("AppEntityLog", t =>
+                        {
+                            t.HasTrigger("AppEntityLog_Trigger");
+                        });
+                });
+
             modelBuilder.Entity("onetouch.AppEntities.AppEntityReactionsCount", b =>
                 {
                     b.Property<long>("Id")
@@ -8279,6 +8361,39 @@ namespace onetouch.Migrations
                     b.Navigation("EntityFk");
 
                     b.Navigation("EntityObjectTypeFk");
+                });
+
+            modelBuilder.Entity("onetouch.AppEntities.AppEntityLog", b =>
+                {
+                    b.HasOne("onetouch.AppEntities.AppEntity", "EntityFk")
+                        .WithMany()
+                        .HasForeignKey("EntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.SystemObjects.SycEntityObjectStatus", "EntityObjectStatusFk")
+                        .WithMany()
+                        .HasForeignKey("EntityObjectStatusId");
+
+                    b.HasOne("onetouch.SystemObjects.SycEntityObjectType", "EntityObjectTypeFk")
+                        .WithMany()
+                        .HasForeignKey("EntityObjectTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.SystemObjects.SydObject", "ObjectFk")
+                        .WithMany()
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EntityFk");
+
+                    b.Navigation("EntityObjectStatusFk");
+
+                    b.Navigation("EntityObjectTypeFk");
+
+                    b.Navigation("ObjectFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityReactionsCount", b =>

@@ -2295,7 +2295,7 @@ namespace onetouch.AppItems
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
-            if (input.Id == 0 && entity.TenantOwner != null)
+            if (input.Id==0 && entity.TenantOwner!=null && entity.TenantOwner != 0)
             {
                 entity.AttachmentSourceTenantId = -1;
             }
@@ -2387,26 +2387,31 @@ namespace onetouch.AppItems
                 //MMT
                 List<AppEntity> sizesList = new List<AppEntity>();
                 List<AppEntity> colorsList = new List<AppEntity>();
-                foreach (var child in input.VariationItems)
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
-                    var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
-                    if (ext != null && sizesList.FirstOrDefault(z => z.Code == ext.AttributeCode) == null)
+                   
+                    foreach (var child in input.VariationItems)
                     {
-                        var sizesInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == ext.AttributeCode
-                           && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
-                        if (sizesInfo != null)
-                            sizesList.Add(sizesInfo);
-                    }
-                    var extclr = child.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
-                    if (extclr != null && colorsList.FirstOrDefault(z => z.Code == extclr.AttributeCode) == null)
-                    {
-                        var colorInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == extclr.AttributeCode
-                           && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
-                        if (colorInfo != null)
-                            colorsList.Add(colorInfo);
+                        var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
+                        if (ext != null && sizesList.FirstOrDefault(z => z.Code == ext.AttributeCode) == null)
+                        {
+                            var sizesInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == ext.AttributeCode
+                               && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+                            if (sizesInfo != null)
+                                sizesList.Add(sizesInfo);
+                        }
+                        var extclr = child.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
+                        if (extclr != null && colorsList.FirstOrDefault(z => z.Code == extclr.AttributeCode) == null)
+                        {
+                            var colorInfo = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                .Where(z => z.Code == extclr.AttributeCode
+                               && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+                            if (colorInfo != null)
+                                colorsList.Add(colorInfo);
+                        }
                     }
                 }
-
                 //MMT
 
 
@@ -2578,7 +2583,7 @@ namespace onetouch.AppItems
                                     {
                                         var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
 
-                                        if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
+                                      //  if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
                                             {
@@ -2672,7 +2677,7 @@ namespace onetouch.AppItems
                     childEntity.TimeStamp = timeStamp;
                     if (appItemChild.TenantOwner == null)
                         appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
-                    if (input.Id == 0 && childEntity.TenantOwner != null)
+                    if (input.Id == 0 && childEntity.TenantOwner != null && childEntity.TenantOwner != 0)
                     {
                         childEntity.AttachmentSourceTenantId = -1;
                     }
@@ -5485,7 +5490,7 @@ namespace onetouch.AppItems
                 itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
                 itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44303/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
+                // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44308/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
                 itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
                 itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
                 #endregion
@@ -6300,7 +6305,8 @@ namespace onetouch.AppItems
                         Price = appItem.Price,
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceA))
@@ -6322,7 +6328,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceA),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceB))
@@ -6344,7 +6351,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceB),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceC))
@@ -6366,7 +6374,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceC),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 if (string.IsNullOrEmpty(excelDto.PriceD))
@@ -6388,7 +6397,8 @@ namespace onetouch.AppItems
                         Price = decimal.Parse(excelDto.PriceD),
                         CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
                         TenantId = AbpSession.TenantId,
-                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+                        IsDefault = true
                     });
                 }
                 //MMT0311
@@ -7181,7 +7191,8 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
                             Price = appChildItem.Price,
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
-                            TenantId = AbpSession.TenantId
+                            TenantId = AbpSession.TenantId,
+                            IsDefault = true
                         });
                     }
                     //MMT0311
@@ -7204,7 +7215,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceA),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault =true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceB))
@@ -7226,7 +7238,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceB),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault = true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceC))
@@ -7248,7 +7261,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceC),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault = true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceD))
@@ -7270,7 +7284,8 @@ namespace onetouch.AppItems
                             Price = decimal.Parse(item.PriceD),
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
-                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+                            IsDefault = true
                         });
                     }
                     //MMT0311

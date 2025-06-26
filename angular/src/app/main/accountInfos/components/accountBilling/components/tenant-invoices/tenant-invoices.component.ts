@@ -73,6 +73,8 @@ export class TenantInvoicesComponent extends AppComponentBase {
     this._downloadService.download(fullURL,
         name);
 }
+first = 0;
+rows = 0; // default
   getAppTenantInvoices(event?: LazyLoadEvent) {
       if (this.primengTableHelper.shouldResetPaging(event)) {
           this.paginator.changePage(0);
@@ -98,6 +100,9 @@ export class TenantInvoicesComponent extends AppComponentBase {
           this.primengTableHelper.totalRecordsCount = result.totalCount;
           this.primengTableHelper.records = result.items;
           this.primengTableHelper.hideLoadingIndicator();
+          this.first = this.primengTableHelper.getSkipCount(this.paginator, event);
+          this.rows = this.primengTableHelper.getMaxResultCount(this.paginator, event);
+
       });
   }
 

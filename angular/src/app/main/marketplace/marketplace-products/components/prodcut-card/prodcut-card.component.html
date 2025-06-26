@@ -1,9 +1,10 @@
-<div class="card w-100" (click)="viewProduct(product.id)" >
+<div class="card w-100" (click)="viewProduct(product.id)"  #itemCard>
     <img
-        class="img"
+        class="img w-100"
         [src]="attachmentBaseUrl + '/' + product?.imageUrl"
         alt="Card image cap"
         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+        [ngStyle]="{ 'height.px': itemCard.clientWidth / acceptedAspectRatio }"
         />
 
     <div class="card-body">
@@ -19,7 +20,7 @@
         <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
        
         <p class="card-text desc fw-bold" [title]="product?.name">
-            {{ product?.name }}
+            {{ product?.name  | textSubstring: 20 }}
         </p>
 
         <div class="d-flex name-price">

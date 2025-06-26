@@ -5,11 +5,12 @@ import { AddCommentComponent } from '../../../comments/components/add-comment/ad
 import { BlockList } from 'net';
 import { SendMessageModalComponent } from '@app/main/Messages/SendMessage-Modal.Component';
 import * as moment from "moment";
+import { finalize } from '@node_modules/rxjs/dist/types';
 
 @Component({
     selector: 'app-comment-parent',
     templateUrl: './comment-parent.component.html',
-    styleUrls: ['./comment-parent.component.scss']
+    styleUrls: ['./comment-parent.component.scss'],
 })
 export class CommentParentComponent extends AppComponentBase implements AfterViewInit{
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
@@ -20,6 +21,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
     @Input() commentType:any;
+    @Input() fromTrans:boolean = false;
     
     @Input() toName:string = '';
 
@@ -36,13 +38,15 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     creatorUserId : number;
     displayDeleteMessage:boolean=false;
     showRegularComment:boolean=true;
-
+  addReplyScreen: boolean ;
+    currentComment: any;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector,
         private cdr: ChangeDetectorRef
         ) {
             super(_injector)
+
          }
          ngAfterViewInit(): void {
             this.toggleMessageType(this.commentType=='MESSAGE'?2:1)
@@ -115,6 +119,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         }
     }
     getAllComments(){
+        this.showMainSpinner()
         this._messageServiceProxy.getAllComments(
             undefined,
             undefined,
@@ -131,7 +136,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.skipCount += this.maxResultCount
             this.totalCount = res.totalCount
             this.comments.push(...res.items)
-
+        this.hideMainSpinner()
 
         })
     }
@@ -151,12 +156,36 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
  this.cdr.detectChanges();
 //  this.setToName(event)
     }
-  
+    getReply(event){
+        // this.addReplyScreen = event
+        this.cdr.detectChanges();
+    }
+    getMyCom(event){
+      
+        this.addReplyScreen = true
+        if(event){
+            this.addCommentComponent.focusCommentTextArea()
+          
+            this.currentComment = event
+            this.cdr.detectChanges();
+        }
+    
+    }
     refreshAfterSave(event){
       
         if(event){
             this.refreshComments.emit(true)
         }
+        
            }
-         
+
+
+
+
+openReplyScreen(comment: any): void {
+
+                    this.currentComment = comment
+   
+}
+
 }

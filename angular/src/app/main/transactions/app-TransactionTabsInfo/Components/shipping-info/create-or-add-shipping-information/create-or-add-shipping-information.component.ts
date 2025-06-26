@@ -5,6 +5,7 @@ import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
 import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
 import * as moment from 'moment';
+
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
@@ -151,6 +152,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     this.showSaveBtn = false;
   }
   save() {
+
     this.createOrEditshippingInfO = false;
     this.setAddress();
     this.createOrEditTransaction();
@@ -328,25 +330,25 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   }
 
   reloadAddresscomponentShipFrom(data) {
-    this.shipFromData=data;
-    console.log(this.shipFromData,'this.shipFromData')
-    if(this.currentTab == TransactionCartoccordionTabs.ShippingInfo){
+    this.shipFromData = data;
+    console.log(this.shipFromData, 'this.shipFromData')
+    if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
       this.contactIdShipFrom = this.shipFromData?.compId;
       const addressComponents = this.addressComponentRefs.toArray();
-addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin,null);
-  }
-  this.validateShippingTab();
+      addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, null);
+    }
+    this.validateShippingTab();
 
-}
+  }
   reloadAddresscomponentShipTo(data) {
-  this.shipToData=data;
-    if(this.currentTab == TransactionCartoccordionTabs.ShippingInfo){
+    this.shipToData = data;
+    if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
       this.contactIdShipTo = this.shipToData?.compId;
 
-  const addressComponents = this.addressComponentRefs.toArray();
-addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin,null);
-}
-this.validateShippingTab();
+      const addressComponents = this.addressComponentRefs.toArray();
+      addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, null);
+    }
+    this.validateShippingTab();
 
   }
 

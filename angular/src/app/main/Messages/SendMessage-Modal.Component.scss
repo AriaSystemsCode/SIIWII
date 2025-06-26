@@ -31,6 +31,13 @@
     position: absolute;
     bottom: 0;
 
+
+background: #FFFFFF;
+border: 1px solid #EEEEEE;
+box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.1);
+border-radius: 12px;
+
+
 }
 .MessageDialog .Header {
     // width: 534px;
@@ -268,4 +275,31 @@
 
 
 
+}
+
+
+
+.threadDiv {
+    /* Frame 1707478603 */
+
+/* Auto layout */
+display: flex;
+
+align-items: flex-start;
+padding: 12px;
+
+
+background: #4A0D4A;
+border-radius: 8px;
+color: #FFFFFF;
+
+}
+
+
+:host ::ng-deep {
+    p-autocomplete .p-autocomplete .p-inputtext {
+        border: 1px solid #e2e5ec !important;
+        border-top-left-radius: 8px !important;
+        border-bottom-left-radius: 8px
+    }
 }
