@@ -161,11 +161,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
-    async ngOnInit() {
-       /*  if (!this.accountId) {
-            this.accountId = this.appSession?.user?.accountId;
-          } */
-        
+    async ngOnInit() {        
          this.handleComponentMode()
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange()
