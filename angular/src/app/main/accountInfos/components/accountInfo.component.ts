@@ -122,7 +122,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     entityObjectType:string ="TENANTCONTACT";
     accountInfoOldCurrencyId=0;
     changeCurrency:boolean=false;
-
+    sycAttachmentCategoryLogo :SycAttachmentCategoryDto
+    sycAttachmentCategoryBanner :SycAttachmentCategoryDto
+    sycAttachmentCategoryImage :SycAttachmentCategoryDto
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -158,9 +160,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     get isMyAccountEdit() : boolean {  return this.isMyAccount && Boolean(this.accountId) }
 
     get otherAccount() :boolean { return this.viewMode }
-    sycAttachmentCategoryLogo :SycAttachmentCategoryDto
-    sycAttachmentCategoryBanner :SycAttachmentCategoryDto
-    sycAttachmentCategoryImage :SycAttachmentCategoryDto
+  
     async ngOnInit() {        
          this.handleComponentMode()
         this.isHost = !this._abpSessionService.tenantId;
