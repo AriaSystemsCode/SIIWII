@@ -951,6 +951,7 @@ namespace onetouch
             configuration.CreateMap<BranchDto, CreateOrEditAccountInfoDto>()
                 .ForMember(z => z.AccountLevel, z => z.MapFrom(s=> AccountLevelEnum.Manual));
             configuration.CreateMap<GetAccountInfoForEditOutput, BranchDto>();
+            configuration.CreateMap<AppItems.Dtos.ExtraAttribute, AppEntityExtraDataDto>();
             //MMT40[End]
         }
     }
