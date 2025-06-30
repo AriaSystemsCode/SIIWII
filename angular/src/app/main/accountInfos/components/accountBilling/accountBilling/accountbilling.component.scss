@@ -92,3 +92,25 @@
     border-radius: 10px;
 
 }
+
+
+::ng-deep {
+    .p-paginator-icon {
+        color: #4A0D4A !important;
+        margin-right: 4px !important;
+    }
+    .p-paginator .p-dropdown .p-dropdown-label {
+        color: #4A0D4A !important;
+        background-color: #F4F5F7 !important;
+
+    }
+    body p-paginator .p-paginator .p-paginator-first.p-disabled, body p-paginator .p-paginator .p-paginator-next.p-disabled, body p-paginator .p-paginator .p-paginator-prev.p-disabled, body p-paginator .p-paginator .p-paginator-last.p-disabled, body p-paginator .p-paginator body p-paginator .p-paginator .p-paginator-page.p-disabled {
+        background-color: #F4F5F7 !important;
+    }
+    .primeng-datatable-container .primeng-paging-container {
+        background: #F8F8F8 !important;
+    }
+    .primeng-datatable-container .primeng-paging-container .p-paginator .p-dropdown {
+        background-color: #F4F5F7 !important;
+    }
+}

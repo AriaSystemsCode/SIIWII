@@ -19,7 +19,7 @@
         public const int MaxCategoryLength = 50;
 
         public const int MinFeatureDescriptionLength = 0;
-        public const int MaxFeatureDescriptionLength = 50;
+        public const int MaxFeatureDescriptionLength = 250;
 
         public const int MinFeatureStatusLength = 1;
         public const int MaxFeatureStatusLength = 30;
