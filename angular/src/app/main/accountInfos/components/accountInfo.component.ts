@@ -148,7 +148,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     async ngOnInit() {
-        await this.handleComponentMode()
+         this.handleComponentMode()
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange()
         this.initUploaders();
