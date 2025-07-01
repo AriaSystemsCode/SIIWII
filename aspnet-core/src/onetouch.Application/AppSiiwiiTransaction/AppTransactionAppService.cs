@@ -136,9 +136,7 @@ namespace onetouch.AppSiiwiiTransaction
         //I46[Start]
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         //I46[End]
-        //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[Start]
-        private readonly IRepository<AppEntityLog, long> _appEntityLogRepository;
-        //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
+       
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
@@ -162,10 +160,7 @@ namespace onetouch.AppSiiwiiTransaction
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
              TimeZoneInfoAppService timeZoneInfoAppService, IRepository<AppEntityLog, long> appEntityLogRepository,
-             IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
-             TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
-             IRepository<AppEntityLog, long> appEntityLogRepository
-             )
+             IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService)
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
             _accountAppService = accountAppService;
