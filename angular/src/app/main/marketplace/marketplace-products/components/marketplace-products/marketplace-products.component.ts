@@ -75,6 +75,7 @@ export class MarketplaceProductsComponent
     onlyAvialbleStock: boolean;
     appItemListId: any;
     selectedDepartments: any;
+ 
     constructor(
         injector: Injector,
         private _router: Router,
@@ -133,10 +134,8 @@ export class MarketplaceProductsComponent
 
         this.checkMediaQuery();
         this.getAspectatio();
-       
+        
     }
-
- 
     ngOnInit() {
         
         const savedFilters = localStorage.getItem("productFilters");

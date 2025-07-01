@@ -352,7 +352,53 @@ export class TransactionInformationComponent
 
   }
 
-
+  onEditPrice(rowNode) {
+    if(rowNode.node.data.added)
+      rowNode.node.data.showEditPrice = false;
+    else {
+    this.showMainSpinner();
+            switch (rowNode.level) {
+              case 0:
+              case 2:
+                this._AppTransactionServiceProxy
+                  .updatePriceByProductLineId(
+                    this.orderId,
+                    rowNode.node.data.lineId,
+                    rowNode.node.data.updatedPrice
+                  )
+                  .subscribe((res) => {
+                    if (res)
+                    this.notify.info("Successfully Updated.");
+                    rowNode.node.data.showEditPrice = false;
+                    rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                    this.getShoppingCartData();
+                    this.hideMainSpinner();
+                  });
+                break;
+                case 1:
+                  this.showMainSpinner();
+                    this._AppTransactionServiceProxy
+                      .updatePriceByProductSSINColor(
+                        this.orderId,
+                        rowNode.node.data.parentId,
+                        rowNode.node.data.colorCode,
+                        rowNode.node.data.colorId,
+                        rowNode.node.data.updatedPrice
+                      )
+                      .subscribe((res) => {
+                        if (res) this.notify.info("Successfully Updated.");
+                        rowNode.node.data.showEditPrice = false;
+                        rowNode.node.data.price= rowNode.node.data.updatedPrice;
+                        this.getShoppingCartData();
+                        this.hideMainSpinner();
+                      });
+                    break;
+       default:
+            break;
+                    }
+    }
+  }
+  
 
   getCommentsRefreshed(event) {
     if (event) {

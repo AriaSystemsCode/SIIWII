@@ -71,6 +71,7 @@ using System.Drawing.Imaging;
 using Abp.AutoMapper;
 using Namotion.Reflection;
 using onetouch.Globals;
+using MimeKit;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
 using MimeKit;
@@ -129,6 +130,9 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRateRepository;
         private readonly TimeZoneInfoAppService _timeZoneInfoAppService;
         //MMT45
+        //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[Start]
+        private readonly IRepository<AppEntityLog, long> _appEntityLogRepository;
+        //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
         //I46[Start]
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         //I46[End]
@@ -159,6 +163,8 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
              TimeZoneInfoAppService timeZoneInfoAppService, IRepository<AppEntityLog, long> appEntityLogRepository,
              IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
+             TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
+             IRepository<AppEntityLog, long> appEntityLogRepository
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;

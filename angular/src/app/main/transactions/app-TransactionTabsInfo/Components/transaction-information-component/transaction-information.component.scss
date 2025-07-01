@@ -141,8 +141,8 @@ button[disabled] {
         position: absolute;
         color: #555;
         font-size: 28px;
-        top: 25px;
-        right: 12px;
+        top: 5px;
+        right: -9px;
     }
 
     .fieldset {
@@ -1176,9 +1176,7 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-.p-inputnumber-buttons-stacked .p-inputnumber-input {
-    text-align: end !important;
-}
+
 
 .card-body {
     padding: 2px  !important;
@@ -1203,11 +1201,6 @@ input:checked + .slider:before {
 }
 
 
-::ng-deep {
-    .p-inputnumber-buttons-stacked .p-inputnumber-input {
-        text-align: end !important;
-    }
-}
 
 .pBtntext {
     background-color: #4A0D4A !important;

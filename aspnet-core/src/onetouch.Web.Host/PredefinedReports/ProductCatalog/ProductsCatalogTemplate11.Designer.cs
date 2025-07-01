@@ -54,7 +54,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
 
             // Parameters
             this.to = reportInitializer.GetParameter("to");
-            this.muserCountry = reportInitializer.GetParameter("muserCountry");
             this.parameter1 = reportInitializer.GetParameter("parameter1");
             this.mimimumInStockQty = reportInitializer.GetParameter("mimimumInStockQty");
             this.onlyInStockColors = reportInitializer.GetParameter("onlyInStockColors");
@@ -88,6 +87,7 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.selectedKey = reportInitializer.GetParameter("selectedKey");
             this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
             this.attributeTypeId = reportInitializer.GetParameter("attributeTypeId");
+            this.muserCountry = reportInitializer.GetParameter("muserCountry");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -139,7 +139,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.XRControlStyle DetailData3_Odd;
         private DevExpress.XtraReports.UI.XRControlStyle PageInfo;
         private DevExpress.XtraReports.Parameters.Parameter to;
-        private DevExpress.XtraReports.Parameters.Parameter muserCountry;
         private DevExpress.XtraReports.Parameters.Parameter parameter1;
         private DevExpress.XtraReports.Parameters.Parameter mimimumInStockQty;
         private DevExpress.XtraReports.Parameters.Parameter onlyInStockColors;
@@ -173,5 +172,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.Parameters.Parameter selectedKey;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter attributeTypeId;
+        private DevExpress.XtraReports.Parameters.Parameter muserCountry;
     }
 }
