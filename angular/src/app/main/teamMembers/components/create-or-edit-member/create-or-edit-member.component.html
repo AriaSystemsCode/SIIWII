@@ -211,8 +211,31 @@
                         </div>
                     </form>
                 </div>
+
+
+            
+
+
             </div>
+            <p-accordion [multiple]="true" [(activeIndex)]="activeAccordionIndexes" class="mt-3">
+                <p-accordionTab
+                  *ngFor="let usage of usageList; let i = index"
+                  [header]="usage "
+                  [attr.id]="'usage_' + usage">
+                  
+                  <app-dynamicInputs
+                  [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
+                    [entityObjectTypeId]="114"
+                    [entityType]="'Settings'"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                    (extraDataCleared)="onExtraAttributeCleared($event)" (extraDataChanged)="onExtraAttributesChanged($event)"
+                    [fromSetting]="true">
+                  </app-dynamicInputs>
+              
+                </p-accordionTab>
+              </p-accordion>
         </div>
+
     </div>
 </div>
 

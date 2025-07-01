@@ -15,6 +15,8 @@ import { SelectBranchModule } from '@app/select-branch/select-branch.module';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { CalendarModule } from 'primeng/calendar';
 import { AdminModule } from '@app/admin/admin.module';
+import { SharedDynamicInputsModule } from '@shared/shared.module';
+import { AccordionModule } from 'primeng/accordion';
 
 @NgModule({
     declarations: [
@@ -33,7 +35,9 @@ import { AdminModule } from '@app/admin/admin.module';
         FormsModule,
         BsDatepickerModule.forRoot(),
         SelectBranchModule,
-        CalendarModule,AdminModule 
+        CalendarModule,AdminModule ,
+        SharedDynamicInputsModule,
+        AccordionModule
     ],
     exports: [
         CreateOrEditMemberComponent,
