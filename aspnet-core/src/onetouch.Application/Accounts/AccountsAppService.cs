@@ -57,6 +57,7 @@ using onetouch.EmailingTemplates;
 using Abp.Domain.Entities;
 using Stripe;
 using OfficeOpenXml.ConditionalFormatting;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace onetouch.Accounts
 {
@@ -93,6 +94,9 @@ namespace onetouch.Accounts
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
         private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
+        //I40[start]
+        private readonly ISycEntityObjectTypesAppService _sycEntityObjectTypesAppService;
+        //I40[End]
         private enum CardType
         {
             MasterCard, Visa, AmericanExpress, Discover, JCB
@@ -115,7 +119,8 @@ namespace onetouch.Accounts
             , IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
             , ICreateMarketplaceAccount iCreateMarketplaceAccount
             , IEmailingTemplateAppService emailingTemplateAppService
-            , IRepository<onetouch.AppEntities.AppEntitiesRelationship, long> appEntityRelationShipRepository)
+            , IRepository<onetouch.AppEntities.AppEntitiesRelationship, long> appEntityRelationShipRepository,
+              ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
         {
             _emailingTemplateAppService = emailingTemplateAppService;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
@@ -146,6 +151,9 @@ namespace onetouch.Accounts
             _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
             _appEntityRelationShipRepository = appEntityRelationShipRepository;
+            //I40[Start]
+            _sycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
+            //I40[End]
 
         }
         private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
@@ -2192,28 +2200,81 @@ namespace onetouch.Accounts
                                 var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                                 if (account != null)
                                 {
-                                    ContactDto contactDto = new ContactDto();
-                                    contactDto.AccountId = account.Id;
-                                    contactDto.FirstName = adminUser.Name;
-                                    contactDto.LastName = adminUser.Surname;
-                                    contactDto.EMailAddress = adminUser.EmailAddress;
-                                    contactDto.UserId = adminUser.Id;
-                                    contactDto.Name = adminUser.Name + " " + adminUser.Surname;
-                                    contactDto.UserName = adminUser.UserName;
-                                    contactDto.TradeName = "";
-                                    contactDto.ParentId = account.Id;
-                                    contactDto.EntityObjectType = (tenantObj.Edition != null)?tenantObj.Edition.Name: "PERSONAL";
-                                    //temp solution to test 
-                                    //T-SII-20240329.0005 as per Sam and Abdo
-                                    contactDto.Code = System.Guid.NewGuid().ToString();
-                                    //contactDto.Code = "01";
-                                    ContactDto savedContactDto = await CreateOrEditContact(contactDto);
-                                    if (contactDto.EntityObjectType == "PERSONAL")
+                                    //I40[Start]
+                                    //ContactDto contactDto = new ContactDto();
+                                    //contactDto.AccountId = account.Id;
+                                    //contactDto.FirstName = adminUser.Name;
+                                    //contactDto.LastName = adminUser.Surname;
+                                    //contactDto.EMailAddress = adminUser.EmailAddress;
+                                    //contactDto.UserId = adminUser.Id;
+                                    //contactDto.Name = adminUser.Name + " " + adminUser.Surname;
+                                    //contactDto.UserName = adminUser.UserName;
+                                    //contactDto.TradeName = "";
+                                    //contactDto.ParentId = account.Id;
+                                    //contactDto.EntityObjectType = (tenantObj.Edition != null)?tenantObj.Edition.Name: "PERSONAL";
+                                    ////temp solution to test 
+                                    ////T-SII-20240329.0005 as per Sam and Abdo
+                                    //contactDto.Code = System.Guid.NewGuid().ToString();
+                                    ////contactDto.Code = "01";
+                                    //ContactDto savedContactDto = await CreateOrEditContact(contactDto);
+                                    //if (contactDto.EntityObjectType == "PERSONAL")
+                                    //{
+                                    //    //ContactDto savedContactDto = await addex(contactDto);
+                                    //    await ApplyPersonalExtraData(contactDto);
+                                    //}
+                                    CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
+                                    accountDto.Id = 0;
+                                    accountDto.Code = System.Guid.NewGuid().ToString();
+                                    accountDto.Name = adminUser.Name + " " + adminUser.Surname;
+                                    accountDto.TradeName = "";
+                                    accountDto.EMailAddress = adminUser.EmailAddress;
+                                    accountDto.ReturnId = true;
+                                    accountDto.AccountLevel = AccountLevelEnum.Manual;
+                                    accountDto.EntityExtraData = new List<AppEntityExtraDataDto>();
+                                    var entityObjectType = await _sycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode("PERSONAL");
+                                    if (entityObjectType != null && entityObjectType.Count > 0)
                                     {
-                                        //ContactDto savedContactDto = await addex(contactDto);
-                                        await ApplyPersonalExtraData(contactDto);
+                                        var entityTypeObj = entityObjectType.FirstOrDefault();
+                                        if (entityTypeObj != null && entityTypeObj.ExtraAttributes != null && entityTypeObj.ExtraAttributes.ExtraAttributes.Count > 0)
+                                        {
+                                            foreach (var exr in entityTypeObj.ExtraAttributes.ExtraAttributes)
+                                            {
+                                                AppEntityExtraDataDto extraDto = new AppEntityExtraDataDto();
+                                                extraDto = ObjectMapper.Map<AppEntityExtraDataDto>(exr);
+                                                if (exr.Code == "FIRST-NAME")
+                                                {
+                                                    extraDto.AttributeValue = adminUser.Name;
+                                                }
+                                                if (exr.Code == "LAST-NAME")
+                                                {
+                                                    extraDto.AttributeValue = adminUser.Surname;
+                                                }
+                                                if (exr.Code == "USER-NAME")
+                                                {
+                                                    extraDto.AttributeValue = adminUser.UserName;
+                                                }
+                                                if (exr.Code == "USER-ID")
+                                                {
+                                                    extraDto.AttributeValue = adminUser.Id.ToString();
+                                                }
+                                                if (exr.Code == "USER-NAME-IS-PUBLIC")
+                                                {
+                                                    extraDto.AttributeValue = "True";
+                                                }
+                                                if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                                {
+                                                    extraDto.AttributeValue = "True";
+                                                }
+                                                if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                                {
+                                                    extraDto.AttributeValue = "True";
+                                                }
+                                                accountDto.EntityExtraData.Add(extraDto);
+                                            }
+                                        }
                                     }
-
+                                    ContactDto savedContactDto = await CreateOrUpdateContact(accountDto);
+                                    //I40[End]
 
                                 }
                             }
@@ -5114,9 +5175,9 @@ namespace onetouch.Accounts
         }
         //I40[Start]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
-        public async Task<GetAccountInfoForEditOutput> CreateOrUpdateContact(CreateOrEditAccountInfoDto accountDto)
+        public async Task<ContactDto> CreateOrUpdateContact(CreateOrEditAccountInfoDto accountDto)
         {
-            GetAccountInfoForEditOutput returnObject = new GetAccountInfoForEditOutput();
+            ContactDto returnObject = new ContactDto();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             if (string.IsNullOrEmpty(accountDto.SSIN))
             {
@@ -5130,6 +5191,7 @@ namespace onetouch.Accounts
                 accountDto.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
             }
+            accountDto.TenantId = AbpSession.TenantId;
             accountDto.UseDTOTenant = true;
             var output = await CreateOrEditAccount(accountDto);
             if (output != null && output.AccountInfo.Id != null)
@@ -5151,8 +5213,29 @@ namespace onetouch.Accounts
                         await _appContactRepository.UpdateAsync(contact);
                     }
                 }
+                /*var contactObject = await _appContactRepository.GetAll().Include(x => x.AppContactAddresses)
+                    .Where(x => x.Id == contact.Id).FirstOrDefaultAsync();*/
+                //ContactDto contactDtoObj = new ContactDto();
+                ObjectMapper.Map(contact, returnObject);
+                //Publish Contact if the related Account is published
+                //if (input.UserId != null && input.UserId != 0)
+                {
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                    {
+                        var publishContactAccount = await _appContactRepository.GetAll().AsNoTracking()
+                            .Include(x => x.AppContactAddresses)
+                            .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false
+                            && x.PartnerId == contact.AccountId);
+                        if (publishContactAccount != null)
+                        {
+                            await PublishMember(contact.Id);
+                        }
+                    }
+                }
             }
+            
             return returnObject;
+            
         }
         //I40[End]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
