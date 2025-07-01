@@ -679,16 +679,16 @@ namespace onetouch.Accounts
                                    Id = o.Id,
                                    FirstName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue,
                                    SurName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue,
-                                   JobTitle = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue,
+                                   JobTitle = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue==null ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue,
                                    EMailAddress = o.EMailAddress == null ? "" : o.EMailAddress,
                                    AccountName = o.AccountFk.Name,
                                    //MMT222
                                    //JoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null ? DateTime.Now : DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue),
-                                   JoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null ? DateTime.Now : (DateTime.TryParse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue, out jDate) ? DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue) : DateTime.Now),
+                                   JoinDate = (o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue ==null) ? DateTime.Now : (DateTime.TryParse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue, out jDate) ? DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue) : DateTime.Now),
                                    //MMT222
                                    //IsPublicJoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic") == null ? false : bool.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic").AttributeValue),
                                    IsActive = false,
-                                   UserId = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null ? 0 : long.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue),
+                                   UserId = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue ==null ? 0 : long.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue),
                                    ImageUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                             ""
                                             : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment
@@ -2224,7 +2224,9 @@ namespace onetouch.Accounts
                                     //}
                                     CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
                                     accountDto.Id = 0;
-                                    accountDto.Code = System.Guid.NewGuid().ToString();
+                                    //accountDto.Code = System.Guid.NewGuid().ToString();
+                                    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("MANUALACCOUNTCONTACT");
+                                    accountDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
                                     accountDto.Name = adminUser.Name + " " + adminUser.Surname;
                                     accountDto.TradeName = "";
                                     accountDto.EMailAddress = adminUser.EmailAddress;
