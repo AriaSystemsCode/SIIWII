@@ -5112,7 +5112,44 @@ namespace onetouch.Accounts
             }
             //Mariam [End]
         }
+        //I40[Start]
+        [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
+        public async Task<GetAccountInfoForEditOutput> CreateOrUpdateContact(CreateOrEditAccountInfoDto accountDto)
+        {
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            if (string.IsNullOrEmpty(accountDto.SSIN))
+            {
+                AppEntity entity = new AppEntity();
+                entity.EntityObjectTypeId = presonEntityObjectTypeId;
+                //var entityParent = _appEntityRepository.FirstOrDefault(account.EntityId);
+                //entity.EntityObjectTypeCode = "";//entityParent.EntityObjectTypeCode"";
+                var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+                entity.ObjectId = contactObjectId;
+                entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                accountDto.SSIN = await
+                    _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
+            }
+            accountDto.UseDTOTenant = true;
+            var output = await _appAccountsAppService.CreateOrEditAccount(accountDto);
+            if (output != null && output.AccountInfo.Id != null)
+            {
+                var contactObjectId = await _helper.SystemTables.GetObjectContactId();
 
+
+                var contact = await _appContactRepository.GetAll().Include(z => z.EntityFk).Where(z => z.Id == output.AccountInfo.Id).FirstOrDefaultAsync();
+                if (contact != null)
+                {
+                    contact.EntityFk.ObjectId = contactObjectId;
+                    contact.EntityFk.EntityObjectTypeId = presonEntityObjectTypeId;
+                    contact.ParentCode = account.Code;
+                    contact.ParentId = account.Id;
+                    contact.AccountId = account.Id;
+                    await _appContactRepository.UpdateAsync(contact);
+                }
+            }
+
+        }
+        //I40[End]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<ContactDto> CreateOrEditContact(ContactDto input)
         {
