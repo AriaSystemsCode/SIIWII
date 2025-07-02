@@ -489,6 +489,8 @@
                                 ></p>
                             </div>
                         </div>
+
+
                         <div
                             *ngIf="false"
                             class="pt-4 pl-2 pt-4 thin-scroll dropDownVariation"
@@ -786,6 +788,12 @@
                         <h5>{{ "ProductName" | localize }}:</h5>
                         &nbsp;
                         {{ appItemForViewDto?.name }}
+                    </div>
+
+                    <div *ngIf="appItemForViewDto?.manufacturerCode" class="row">
+                        <h5>Manufacture Code:</h5>
+                        &nbsp;
+                        {{ appItemForViewDto?.manufacturerCode }}
                     </div>
                 </div>
             </div>
