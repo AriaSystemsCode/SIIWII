@@ -42,6 +42,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
     '❤️', '💔', '❣️', '💖', '💘', '💞', '💕', '💓', '💗', '💙',
     '👍', '👎', '👏', '🙌', '🙏', '🤝', '💪', '👀', '👋', '🤙'
   ];
+  onlyMsg = false
   sycAttachmentCategoryImage: SycAttachmentCategoryDto;
 
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
@@ -51,6 +52,10 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
 
   }
 
+  stop(){
+    event.stopPropagation()
+    this.onlyMsg = true
+  }
   ngOnInit() {
     this.getAllReviws()
         // ✅ Provide fallback/mock image category
@@ -231,6 +236,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
 
   removeMedia(index: number): void {
     this.selectedMedia.splice(index, 1);
+    this.onlyMsg = false
   }
 
 
@@ -315,6 +321,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
         this.messages = new CreateMessageInput();
         this.resetForm()
         this.refreshRating.emit(true)
+        this.onlyMsg = false
         
       }))
       .subscribe(() => {
@@ -326,6 +333,6 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
           });
 
       });
-    }, 800); // ⏱ 2-second delay (2000 milliseconds)
+    }, 1000); // ⏱ 2-second delay (2000 milliseconds)
   }
 }
