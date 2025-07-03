@@ -31,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex" >
+                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex justify-content-end" >
 
                         <div  *ngIf="showActiveStatus && member?.userId" class="activeStatus">
                             <span class="connected pt-4" *ngIf="member.isActive == true">
@@ -47,9 +47,7 @@
                                 {{'NotActive'| localize }}
                             </span>
                         </div>
-                        <div *ngIf="!member?.userId"  style="position: absolute;
-                        bottom: 0px;
-                        right: 0px;">
+                        <div *ngIf="!member?.userId" >
                             <span class="connected  activeStatus">
                                 <span class="mr-1">
                                     <i
