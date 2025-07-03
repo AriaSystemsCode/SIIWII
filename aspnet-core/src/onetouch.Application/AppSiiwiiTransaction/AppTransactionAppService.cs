@@ -2919,6 +2919,29 @@ namespace onetouch.AppSiiwiiTransaction
                         filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                         await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                         await CurrentUnitOfWork.SaveChangesAsync();
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                        var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == filteredAppTransactions.Id &&
+                        z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == filteredAppTransactions.EntityObjectTypeId &&
+                        z.EntityObjectStatusId == statusCodeNotSent
+                        ).FirstOrDefaultAsync();
+                        if (logExist == null)
+                        {
+                            logExist = new AppEntityLog();
+                            logExist.EntityObjectStatusId = statusCodeNotSent;
+                            logExist.EntityObjectStatusCode = "Ready to be Sent";
+                            logExist.EntityId = filteredAppTransactions.Id;
+                            logExist.EntityCode = filteredAppTransactions.Code;
+                            logExist.EntityObjectTypeId = filteredAppTransactions.EntityObjectTypeId;
+                            logExist.EntityObjectTypeCode = filteredAppTransactions.EntityObjectTypeCode;
+                            logExist.PartnerCode = "ARIAERP";
+                            logExist.TenantId = int.Parse(AbpSession.TenantId.ToString());
+                            logExist.ObjectId = filteredAppTransactions.ObjectId;
+                            logExist.ObjectCode = "TRANSACTION";
+                            await _appEntityLogRepository.InsertAsync(logExist);
+
+                        }
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                     }
                 }
 
@@ -2965,6 +2988,29 @@ namespace onetouch.AppSiiwiiTransaction
                 filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
                 filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                 await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == filteredAppTransactions.Id &&
+                z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == filteredAppTransactions.EntityObjectTypeId &&
+                z.EntityObjectStatusId == statusCodeNotSent
+                ).FirstOrDefaultAsync();
+                if (logExist == null)
+                {
+                    logExist = new AppEntityLog();
+                    logExist.EntityObjectStatusId = statusCodeNotSent;
+                    logExist.EntityObjectStatusCode = "Ready to be Sent";
+                    logExist.EntityId = filteredAppTransactions.Id;
+                    logExist.EntityCode = filteredAppTransactions.Code;
+                    logExist.EntityObjectTypeId = filteredAppTransactions.EntityObjectTypeId;
+                    logExist.EntityObjectTypeCode = filteredAppTransactions.EntityObjectTypeCode;
+                    logExist.PartnerCode = "ARIAERP";
+                    logExist.TenantId = int.Parse(AbpSession.TenantId.ToString());
+                    logExist.ObjectId = filteredAppTransactions.ObjectId;
+                    logExist.ObjectCode = "TRANSACTION";
+                    await _appEntityLogRepository.InsertAsync(logExist);
+
+                }
+                //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                 return true;
             }
         }
@@ -3000,6 +3046,29 @@ namespace onetouch.AppSiiwiiTransaction
                         await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                         //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                         await CurrentUnitOfWork.SaveChangesAsync();
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                        var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                        var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == filteredAppTransactions.Id &&
+                        z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == filteredAppTransactions.EntityObjectTypeId &&
+                        z.EntityObjectStatusId == statusCodeNotSent
+                        ).FirstOrDefaultAsync();
+                        if (logExist == null)
+                        {
+                            logExist = new AppEntityLog();
+                            logExist.EntityObjectStatusId = statusCodeNotSent;
+                            logExist.EntityObjectStatusCode = "Ready to be Sent";
+                            logExist.EntityId = filteredAppTransactions.Id;
+                            logExist.EntityCode = filteredAppTransactions.Code;
+                            logExist.EntityObjectTypeId = filteredAppTransactions.EntityObjectTypeId;
+                            logExist.EntityObjectTypeCode = filteredAppTransactions.EntityObjectTypeCode;
+                            logExist.PartnerCode = "ARIAERP";
+                            logExist.TenantId = int.Parse(AbpSession.TenantId.ToString());
+                            logExist.ObjectId = filteredAppTransactions.ObjectId;
+                            logExist.ObjectCode = "TRANSACTION";
+                            await _appEntityLogRepository.InsertAsync(logExist);
+
+                        }
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                     }
                 }
 
@@ -3066,6 +3135,29 @@ namespace onetouch.AppSiiwiiTransaction
                 //Iteration45[End]
                 await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                 //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
+                //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == filteredAppTransactions.Id &&
+                z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == filteredAppTransactions.EntityObjectTypeId &&
+                z.EntityObjectStatusId == statusCodeNotSent
+                ).FirstOrDefaultAsync();
+                if (logExist == null)
+                {
+                    logExist = new AppEntityLog();
+                    logExist.EntityObjectStatusId = statusCodeNotSent;
+                    logExist.EntityObjectStatusCode = "Ready to be Sent";
+                    logExist.EntityId = filteredAppTransactions.Id;
+                    logExist.EntityCode = filteredAppTransactions.Code;
+                    logExist.EntityObjectTypeId = filteredAppTransactions.EntityObjectTypeId;
+                    logExist.EntityObjectTypeCode = filteredAppTransactions.EntityObjectTypeCode;
+                    logExist.PartnerCode = "ARIAERP";
+                    logExist.TenantId = int.Parse(AbpSession.TenantId.ToString());
+                    logExist.ObjectId = filteredAppTransactions.ObjectId;
+                    logExist.ObjectCode = "TRANSACTION";
+                    await _appEntityLogRepository.InsertAsync(logExist);
+
+                }
+                //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                 return true;
             }
         }
