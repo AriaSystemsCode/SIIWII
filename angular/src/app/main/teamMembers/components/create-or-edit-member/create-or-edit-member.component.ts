@@ -1010,7 +1010,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
     
     getAppItemTypeExtraAttributesById() {
-        this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(723)
+        this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(21)
           .subscribe((res) => {
             if (res?.length > 0) {
               this.allAttributes = res[0]?.extraAttributes.extraAttributes;
