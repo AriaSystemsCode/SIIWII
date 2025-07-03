@@ -120,10 +120,20 @@
 
             <div class="row">
                 <div class="col-12">
-                    <label class="label mt-2 mb-2">{{l("Code")}} *</label>
-                    <input type="text" placeholder="Adress Code..." class="form-control w-100" name="addressCode"
-                        [(ngModel)]="addressCode" #Code="ngModel" maxlength="6" minlength="1" required />
-
+                    <label class="label mt-2 mb-2">{{l("Code")}}*</label>
+                    <input
+                        type="text"
+                        placeholder="Adress Code..."
+                        class="form-control w-100"
+                        name="addressCode"
+                        [(ngModel)]="addressCode"
+                        #Code="ngModel"
+                        required
+                        maxlength="6"
+                        minlength="1"
+                     
+                    />
+                
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Name")}} *</label>
