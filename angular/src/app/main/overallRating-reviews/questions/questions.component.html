@@ -8,9 +8,9 @@
 <div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
     <div class="topSec w-100 d-flex align-items-start position-relative">
       <img style="height: 30px;" src="assets/common/images/default-profile-picture.png" class="rounded-circle logo" />
-  
+  <div class="reviewSection">
       <textarea class="form-control  border-0" placeholder="Add your Question" [(ngModel)]="questionText"
-        style="height: auto; min-height: 65px; resize: none; overflow: hidden;"
+        style="height: auto; min-height: 65px; resize: none; overflow: hidden;border: none !important;max-width: 85%;overflow: auto;"
         (input)="adjustTextareaHeight($event)"></textarea>
         <div class="bottomSec d-md-flex d-none justify-content-between  align-items-center">
           <div class="d-flex position-relative align-items-center">
@@ -18,13 +18,13 @@
 
             <!-- Image Input -->
 
-            <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput />
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput (click)="selectedMedia?.length >= 1 ? stop(): ''" />
             <img src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
-              (click)="imageInput.click()" />
+            (click)="selectedMedia?.length >= 1 ? stop(): imageInput.click()" />
       
             <!-- Video Input -->
-            <input type="file" accept="video/*" (change)="onVideoSelected($event)" hidden #videoInput />
-            <img src="assets/placeholders/vAttach.png" class="mr-2 iconImg" alt="Video Attach" (click)="videoInput.click()" />
+            <input type="file" accept="video/*" (change)="onVideoSelected($event)" hidden #videoInput (click)="selectedMedia?.length >= 1 ? stop(): ''" />
+            <img src="assets/placeholders/vAttach.png" class="mr-2 iconImg" alt="Video Attach"  (click)="selectedMedia?.length >= 1 ? stop(): videoInput.click()" />
       
             <!-- Emoji Picker -->
             <img class="emoji-btn mr-2 iconImg" (click)="toggleEmojiPicker()" src="assets/placeholders/emojsIcons.png"
@@ -39,9 +39,9 @@
           </div>
       
       
-          <button class="btnPost" (click)="isUserReviewedEntityBefore()">Post</button>
+          <button class="btnPost" (click)="isUserReviewedEntityBefore()" [disabled]="questionText === ''">Post</button>
         </div>
-
+      </div>
     </div>
 
   
@@ -51,13 +51,13 @@
 
         <!-- Image Input -->
 
-        <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput />
+        <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput (click)="selectedMedia?.length >= 1 ? stop(): ''" />
         <img src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
-          (click)="imageInput.click()" />
+        (click)="selectedMedia?.length >= 1 ? stop(): imageInput.click()" />
   
         <!-- Video Input -->
-        <input type="file" accept="video/*" (change)="onVideoSelected($event)" hidden #videoInput />
-        <img src="assets/placeholders/vAttach.png" class="mr-2 iconImg" alt="Video Attach" (click)="videoInput.click()" />
+        <input type="file" accept="video/*" (change)="onVideoSelected($event)" hidden #videoInput (click)="selectedMedia?.length >= 1 ? stop(): ''"/>
+        <img src="assets/placeholders/vAttach.png" class="mr-2 iconImg" alt="Video Attach"  (click)="selectedMedia?.length >= 1 ? stop(): videoInput.click()" />
   
         <!-- Emoji Picker -->
         <img class="emoji-btn mr-2 iconImg" (click)="toggleEmojiPicker()" src="assets/placeholders/emojsIcons.png"
@@ -72,12 +72,12 @@
       </div>
   
   
-      <button class="btnPost" (click)="isUserReviewedEntityBefore()">Post</button>
+      <button class="btnPost" (click)="isUserReviewedEntityBefore()"  [disabled]="questionText === ''">Post</button>
     </div>
   
     <!-- Media Preview -->
     <div *ngIf="selectedMedia?.length > 0" class="media-preview">
-      <div *ngFor="let media of selectedMedia; let i = index" class="media-item">
+      <div *ngFor="let media of selectedMedia; let i = index" class="media-item position-relative">
         <ng-container *ngIf="media.type === 'image'; else videoTemplate">
           <img [src]="media.url" alt="Selected Image" class="media-preview-image" />
         </ng-container>
@@ -87,6 +87,7 @@
         <button class="remove-media" (click)="removeMedia(i)">x</button>
       </div>
     </div>
+    <p *ngIf="onlyMsg" class="text-danger">Only one img or one video</p>
   </div>
   
   
@@ -183,10 +184,8 @@
    
       </div>
       <p class="subjectTxt">{{question?.messages?.subject}}</p>
-      <div class="" [ngClass]="question?.messages?.entityAttachments?.length != 0 ? 'd-flex justify-content-between':''">
-        <p class="review-comment txtBody" [ngStyle]="{
-              'width': question?.messages?.entityAttachments?.length !== 0 ? '80%' : '100%',
-            }">
+      <div class="txtBody" >
+        <p class="review-comment " >
           {{ question.isExpanded || (question?.messages?.body?.length || 0) <= 900 ? question?.messages?.body :
             (question?.messages?.body | slice:0:900) + '...' }} <a *ngIf="(question?.messages?.body?.length || 0) > 900"
             (click)="toggleExpand(question)" class="expand-toggle">
@@ -207,14 +206,14 @@
         </div>
       </div>
       <div class="position-relative d-flex justify-content-between mt-4">
-        <app-interactions [relatedEntityId]="question?.messages?.entityId" [entityId]="question?.messages?.entityId"
+        <app-interactions class="w-100"  [relatedEntityId]="question?.messages?.entityId" [entityId]="question?.messages?.entityId"
         ></app-interactions>
   
       </div>
     </div>
   
     <button *ngIf="questions?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all
-      review</button>
+      questions</button>
   </div>
   
   

@@ -39,7 +39,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     '❤️', '💔', '❣️', '💖', '💘', '💞', '💕', '💓', '💗', '💙',
     '👍', '👎', '👏', '🙌', '🙏', '🤝', '💪', '👀', '👋', '🤙'
   ];
-
+  onlyMsg:boolean = false
 
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
 
@@ -52,6 +52,11 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     this.getAllQuestions()
   }
 
+  stop(){
+    event.stopPropagation()
+    this.onlyMsg = true
+  }
+  
   toggleEmojiPicker() {
     this.isEmojiPickerOpen = !this.isEmojiPickerOpen;
   }
@@ -197,6 +202,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
   removeMedia(index: number): void {
+    this.onlyMsg = false
     this.selectedMedia.splice(index, 1);
   }
 
@@ -280,12 +286,13 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
         this.messages = new CreateMessageInput();
         this.resetForm()
+        this.onlyMsg = false
       }))
       .subscribe(() => {
 
 
       });
-    }, 800); // ⏱ 2-second delay (2000 milliseconds)
+    }, 1000); // ⏱ 2-second delay (2000 milliseconds)
 
   }
 }

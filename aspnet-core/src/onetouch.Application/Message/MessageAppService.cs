@@ -1606,6 +1606,7 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<double> GetAllReviewsCount(long input)
         {
+            var reviewType = await _helper.SystemTables.GetEntityObjectTypeReview();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 double returnCount = 0;
@@ -1615,7 +1616,8 @@ namespace onetouch.Message
                             .WhereIf(input != null && input != 0,
                                 e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == input).Count() > 0 ||
                                      e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == input).Count() > 0)
-                            .Where(e => e.ParentId == null && e.OriginalMessageId == e.Id);
+                            .Where(e => e.ParentId == null && e.OriginalMessageId == e.Id 
+                            && e.EntityFk.EntityObjectTypeId== reviewType);
                 returnCount = await filteredMessages.CountAsync();
                 return returnCount;
             }
