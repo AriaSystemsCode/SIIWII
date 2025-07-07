@@ -580,7 +580,7 @@ export class TransactionInformationComponent
   getLinesData() {
     //lines
     
-    if ( (this.showTabs ) || (!this.showTabs && this.activeIndex == 0)) {
+    // if ( (this.showTabs ) || (!this.showTabs && this.activeIndex == 0)) {
       this._AppTransactionServiceProxy
         .getOrderDetailsForView(
           this.orderId,
@@ -609,7 +609,7 @@ export class TransactionInformationComponent
           this.colors = res.colors;
           this.sizes = res.sizes;
         });
-    }
+    // }
   }
 
   // Recursive function to extract only third-level nodes (variations)
