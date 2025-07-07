@@ -859,7 +859,7 @@ namespace onetouch.AppItems
                //MMTCAT
                .Include(x => x.EntityFk).ThenInclude(z => z.EntityCategories).ThenInclude(z => z.EntityObjectCategoryFk)
                .Include(x => x.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
-               .AsNoTracking().Where(x => x.Id == input.ItemId || x.ParentId == input.ItemId).ToListAsync();
+               .AsNoTracking().Where(x => x.Id == input.ItemId || x.ParentId == input.ItemId).OrderBy(z=>z.Code).ToListAsync();
                 //XX
                 var appItem = allItems.Where(z => z.Id == input.ItemId).FirstOrDefault();
                 var varAppItems = allItems.Where(z => z.ParentId == input.ItemId).ToList();
