@@ -1,5 +1,5 @@
 import { BsModalService, ModalDirective } from 'ngx-bootstrap/modal';
-import { AccountsServiceProxy, AppEntitiesServiceProxy, SycAttachmentCategoriesServiceProxy, AppEntityAttachmentDto, TreeNodeOfBranchForViewDto, ContactDto, LookupLabelDto, BranchForViewDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, AppEntityExtraDataDto, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, AppEntitiesServiceProxy, SycAttachmentCategoriesServiceProxy, AppEntityAttachmentDto, TreeNodeOfBranchForViewDto, ContactDto, LookupLabelDto, BranchForViewDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, AppEntityExtraDataDto, GetAppTransactionsForViewDto, CreateOrEditAccountInfoDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { ViewChild, Component, EventEmitter, Injector, Output } from '@angular/core';
 import { SelectBranchModalComponent } from '../../../../select-branch/select-branch-modal/select-branch-modal.component';
@@ -26,7 +26,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
     @ViewChild('memberForm', { static: true }) memberForm: NgForm
     @Output() createOrEditDone = new EventEmitter<{ memberId: number, userId: number }>();
-    memberDto: ContactDto;
+    memberDto: CreateOrEditAccountInfoDto;
 
     branches: TreeNodeOfBranchForViewDto[];
 
@@ -663,7 +663,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         else { // create logic
             this.canCreate = this.permission.isGranted('Pages.Accounts.Member.Create')
             if (!this.canCreate) return this.notify.error("You don't have permission to edit")
-            this.memberDto = new ContactDto()
+            this.memberDto = new CreateOrEditAccountInfoDto()
             this.memberDto.accountId = accId;
         }
         this.hideMainSpinner()
@@ -729,7 +729,8 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     async getContactDataForView(memberId) {
         const result = await this._AccountsServiceProxy.getContactForView(memberId).toPromise()
-        if (result) this.memberDto = result.contact
+        this.memberDto = Object.assign(new CreateOrEditAccountInfoDto(), result.contact);
+
 
         if (result?.contact?.joinDate)
             this.joinDate = moment(result?.contact?.joinDate).toDate();
@@ -877,7 +878,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
             this.memberDto.code = tenancyName + "-C" + sequance;
         }
-        this._AccountsServiceProxy.createOrEditContact(this.memberDto)
+        this._AccountsServiceProxy.createOrUpdateContact(this.memberDto)
             .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe(result => {
                 const userId = this.memberDto?.userId || result.userId
