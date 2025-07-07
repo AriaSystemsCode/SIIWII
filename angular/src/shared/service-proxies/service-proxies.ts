@@ -3409,6 +3409,62 @@ export class AccountsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    createOrUpdateContact(body: CreateOrEditAccountInfoDto | undefined): Observable<ContactDto> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrUpdateContact";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdateContact(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdateContact(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ContactDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ContactDto>;
+        }));
+    }
+
+    protected processCreateOrUpdateContact(response: HttpResponseBase): Observable<ContactDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ContactDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     createOrEditContact(body: ContactDto | undefined): Observable<ContactDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditContact";
         url_ = url_.replace(/[?&]$/, "");
@@ -58801,6 +58857,94 @@ export interface IAppContactPaymentMethodDto {
     [key: string]: any;
 }
 
+export class AppEntityExtraDataDto implements IAppEntityExtraDataDto {
+    entityId!: number;
+    entityObjectTypeId!: number | undefined;
+    entityObjectTypeCode!: string | undefined;
+    entityObjectTypeName!: string | undefined;
+    attributeValueId!: number | undefined;
+    attributeValue!: string | undefined;
+    attributeId!: number;
+    attributeValueFkName!: string | undefined;
+    attributeValueFkCode!: string | undefined;
+    attributeCode!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppEntityExtraDataDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.entityId = _data["entityId"];
+            this.entityObjectTypeId = _data["entityObjectTypeId"];
+            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
+            this.entityObjectTypeName = _data["entityObjectTypeName"];
+            this.attributeValueId = _data["attributeValueId"];
+            this.attributeValue = _data["attributeValue"];
+            this.attributeId = _data["attributeId"];
+            this.attributeValueFkName = _data["attributeValueFkName"];
+            this.attributeValueFkCode = _data["attributeValueFkCode"];
+            this.attributeCode = _data["attributeCode"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppEntityExtraDataDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppEntityExtraDataDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["entityId"] = this.entityId;
+        data["entityObjectTypeId"] = this.entityObjectTypeId;
+        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
+        data["entityObjectTypeName"] = this.entityObjectTypeName;
+        data["attributeValueId"] = this.attributeValueId;
+        data["attributeValue"] = this.attributeValue;
+        data["attributeId"] = this.attributeId;
+        data["attributeValueFkName"] = this.attributeValueFkName;
+        data["attributeValueFkCode"] = this.attributeValueFkCode;
+        data["attributeCode"] = this.attributeCode;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppEntityExtraDataDto {
+    entityId: number;
+    entityObjectTypeId: number | undefined;
+    entityObjectTypeCode: string | undefined;
+    entityObjectTypeName: string | undefined;
+    attributeValueId: number | undefined;
+    attributeValue: string | undefined;
+    attributeId: number;
+    attributeValueFkName: string | undefined;
+    attributeValueFkCode: string | undefined;
+    attributeCode: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
 export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     fileToken!: string | undefined;
     tradeName!: string | undefined;
@@ -58836,6 +58980,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     branches!: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
     contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
+    entityExtraData!: AppEntityExtraDataDto[] | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -58913,6 +59058,11 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 for (let item of _data["contactPaymentMethods"])
                     this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
             }
+            if (Array.isArray(_data["entityExtraData"])) {
+                this.entityExtraData = [] as any;
+                for (let item of _data["entityExtraData"])
+                    this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
             this.id = _data["id"];
         }
     }
@@ -58988,6 +59138,11 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             for (let item of this.contactPaymentMethods)
                 data["contactPaymentMethods"].push(item.toJSON());
         }
+        if (Array.isArray(this.entityExtraData)) {
+            data["entityExtraData"] = [];
+            for (let item of this.entityExtraData)
+                data["entityExtraData"].push(item.toJSON());
+        }
         data["id"] = this.id;
         return data;
     }
@@ -59028,6 +59183,7 @@ export interface ICreateOrEditAccountInfoDto {
     branches: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
     contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
+    entityExtraData: AppEntityExtraDataDto[] | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -66441,94 +66597,6 @@ export interface IAppEntityAddressDto {
     postalCode: string | undefined;
     countryId: number;
     countryIdName: string | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppEntityExtraDataDto implements IAppEntityExtraDataDto {
-    entityId!: number;
-    entityObjectTypeId!: number | undefined;
-    entityObjectTypeCode!: string | undefined;
-    entityObjectTypeName!: string | undefined;
-    attributeValueId!: number | undefined;
-    attributeValue!: string | undefined;
-    attributeId!: number;
-    attributeValueFkName!: string | undefined;
-    attributeValueFkCode!: string | undefined;
-    attributeCode!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppEntityExtraDataDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.entityId = _data["entityId"];
-            this.entityObjectTypeId = _data["entityObjectTypeId"];
-            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
-            this.entityObjectTypeName = _data["entityObjectTypeName"];
-            this.attributeValueId = _data["attributeValueId"];
-            this.attributeValue = _data["attributeValue"];
-            this.attributeId = _data["attributeId"];
-            this.attributeValueFkName = _data["attributeValueFkName"];
-            this.attributeValueFkCode = _data["attributeValueFkCode"];
-            this.attributeCode = _data["attributeCode"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppEntityExtraDataDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppEntityExtraDataDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["entityId"] = this.entityId;
-        data["entityObjectTypeId"] = this.entityObjectTypeId;
-        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
-        data["entityObjectTypeName"] = this.entityObjectTypeName;
-        data["attributeValueId"] = this.attributeValueId;
-        data["attributeValue"] = this.attributeValue;
-        data["attributeId"] = this.attributeId;
-        data["attributeValueFkName"] = this.attributeValueFkName;
-        data["attributeValueFkCode"] = this.attributeValueFkCode;
-        data["attributeCode"] = this.attributeCode;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppEntityExtraDataDto {
-    entityId: number;
-    entityObjectTypeId: number | undefined;
-    entityObjectTypeCode: string | undefined;
-    entityObjectTypeName: string | undefined;
-    attributeValueId: number | undefined;
-    attributeValue: string | undefined;
-    attributeId: number;
-    attributeValueFkName: string | undefined;
-    attributeValueFkCode: string | undefined;
-    attributeCode: string | undefined;
     id: number;
 
     [key: string]: any;
