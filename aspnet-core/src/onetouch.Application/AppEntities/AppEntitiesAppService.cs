@@ -1857,7 +1857,7 @@ namespace onetouch.AppEntities
                                         LastName = o.UserFk.Surname,
                                         TenantId = o.UserFk.TenantId,
                                         //MMT, Iteration#22 changes[End]
-                                        ProfilePictureId = (Guid)o.UserFk.ProfilePictureId
+                                        ProfilePictureId = o.UserFk.ProfilePictureId!=null?(Guid)o.UserFk.ProfilePictureId: o.UserFk.ProfilePictureId
                                     };
 
 
