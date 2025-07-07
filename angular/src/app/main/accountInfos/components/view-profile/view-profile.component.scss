@@ -249,3 +249,31 @@ input{
     display: inline-block;
     margin: 0px 15px;
 }
+
+.main-inner {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+.ng-image-slider .ng-image-slider-container .main{
+    position: relative !important;
+    width: 100% !important;
+}
+.img-div {
+    width: 292px !important;
+}
+.addHight {
+    height: 375px;
+     margin-top: 175px;
+}
+
+.addMg {
+    margin-top: 120px;
+}
+::ng-deep {
+    .ng-image-slider .ng-image-slider-container .main .main-inner .img-div {
+        max-width: 225px !important;
+    }
+    .ng-image-slider .ng-image-slider-container .main .main-inner .img-div img, .ng-image-slider .ng-image-slider-container .main .main-inner .img-div video {
+        margin: 0 !important;
+    }
+}

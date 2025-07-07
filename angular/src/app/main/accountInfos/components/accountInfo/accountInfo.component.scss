@@ -501,6 +501,7 @@ button.btn.btn-outline-secondary.button-border.ng-tns-c374-7 {
    object-fit: contain;
    height: 100%;
    width: 100%;
+   padding: 0;
 }
 
 .image-upload-edit,
@@ -952,4 +953,9 @@ body .p-dropdown .p-dropdown-trigger {
 
 .depts-table thead {
    height: 40px !important;
+}
+
+.view-profile-wrapper .logo-profile {
+   border: 1px solid #6259CE;
+   border-radius: 4px !important;
 }
