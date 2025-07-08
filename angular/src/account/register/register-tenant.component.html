@@ -87,7 +87,7 @@
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
                 <input #firstNameInput="ngModel" class="mb-3 form-control" type="text"
-                [disabled]="model.firstName"
+             
                     [placeholder]="('EnterYourFirstName' | localize )" [(ngModel)]="model.firstName" name="adminFirstName"
                     required /></div>
                     <!-- firstName.length > 0 ? firstName : ('EnterYourFirstName' | localize ) -->
@@ -100,7 +100,7 @@
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
                 <input #lastNameInput="ngModel" class="mb-3 form-control" type="text"
-                [disabled]="model.lastName"
+             
                    [placeholder]="('EnterYourLastName' | localize )" [(ngModel)]="model.lastName" name="adminLastName"
                     required/></div>
                     <!-- lastName.length > 0  ? lastName : ( 'EnterYourLastName' | localize ) -->
