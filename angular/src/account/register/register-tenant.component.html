@@ -96,7 +96,7 @@
                 </span>
             </div>
             <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6">
-                <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{ "lastName" | localize }} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{ "last Name" | localize }} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
                 <input #lastNameInput="ngModel" class="mb-3 form-control" type="text"
@@ -112,7 +112,7 @@
 
 
         <div class="form-group MB20">
-            <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')"> {{"AdminEmailAddressL" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
+            <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')"> {{"Admin Email Address" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')"> {{"PersonalEmailAddressL" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <div class="user_p_relative">
             <img src="../../assets/img/input_icons/letter.png" class="user_icon icon-width">
