@@ -36,8 +36,11 @@
 }
 
 .backBtn{
-    background-color: $bold-color;
-    color: white;
+    color: #4A0D4A !important;
+    font-weight: 500;
+    border-radius: 3px;
+    width: 120px;
+    height: 40px !important;
 }
 
 .submitBtn{
