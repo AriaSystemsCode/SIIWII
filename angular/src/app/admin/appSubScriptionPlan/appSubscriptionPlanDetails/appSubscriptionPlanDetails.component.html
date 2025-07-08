@@ -199,6 +199,10 @@
                                         {{l('AppSubscriptionPlanCode')}}
                                         <p-sortIcon field="appSubscriptionPlanDetail.appSubscriptionPlanHeaderCode"></p-sortIcon>
                                     </th>
+                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderName">
+                                        {{l('SycPlanName')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.appSubscriptionPlanHeaderName"></p-sortIcon>
+                                    </th>
                                     <!-- <th style="width: 150px" pSortableColumn="appFeatureFk.description">
                                         {{l('Description')}}
                                         <p-sortIcon field="appFeatureDescription"></p-sortIcon>
@@ -302,10 +306,10 @@
 												<!-- <span class="ui-column-title"> {{l('')}}</span> -->
 												{{record.appSubscriptionPlanDetail.appSubscriptionPlanHeaderCode}}
 											</td>
-                                    <!-- <td style="width:150px">
-												 <span class="ui-column-title"> {{l('Description')}}</span> 
-												{{record.appFeatureDescription}}
-											</td> -->
+                                     <td style="width:150px">
+												 <!-- <span class="ui-column-title"> {{l('Description')}}</span>  -->
+												{{record.appSubscriptionPlanDetail.appSubscriptionPlanHeaderName}}
+											</td> 
                                     <td style="width:150px">
 											<!-- <span class="ui-column-title"> {{l('FeatureCode')}}</span> -->
 											{{record.appSubscriptionPlanDetail.featureCode}}

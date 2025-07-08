@@ -13,7 +13,12 @@ import { AppConsts } from '@shared/AppConsts';
 @Component({
   selector: 'app-tenant-invoices',
   templateUrl: './tenant-invoices.component.html',
-  styleUrls: ['./tenant-invoices.component.scss']
+  styleUrls: ['./tenant-invoices.component.scss'],
+  styles: [`
+        .p-icon-wrapper {
+            position: initial !important;
+        }
+    `]
 })
 export class TenantInvoicesComponent extends AppComponentBase {
   @ViewChild('entityTypeHistoryModal', { static: true }) entityTypeHistoryModal: EntityTypeHistoryModalComponent;
@@ -61,6 +66,8 @@ export class TenantInvoicesComponent extends AppComponentBase {
     this._downloadService.download(fullURL,
         name);
 }
+first = 0;
+rows = 0; // default
   getAppTenantInvoices(event?: LazyLoadEvent) {
       if (this.primengTableHelper.shouldResetPaging(event)) {
           this.paginator.changePage(0);
@@ -85,6 +92,9 @@ export class TenantInvoicesComponent extends AppComponentBase {
           this.primengTableHelper.totalRecordsCount = result.totalCount;
           this.primengTableHelper.records = result.items;
           this.primengTableHelper.hideLoadingIndicator();
+          this.first = this.primengTableHelper.getSkipCount(this.paginator, event);
+          this.rows = this.primengTableHelper.getMaxResultCount(this.paginator, event);
+
       });
   }
 

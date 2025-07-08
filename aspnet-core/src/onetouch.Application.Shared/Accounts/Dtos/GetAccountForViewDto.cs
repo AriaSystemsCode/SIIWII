@@ -1,6 +1,4 @@
-﻿using System.Security.Policy;
-
-namespace onetouch.Accounts.Dtos
+﻿namespace onetouch.Accounts.Dtos
 {
     public class GetAccountForViewDto
     {
@@ -12,10 +10,11 @@ namespace onetouch.Accounts.Dtos
         public string AvaliableConnectionName { get; set; }
 
 		public string AppEntityName { get; set;}
+        public bool IsSync { get; set; }
 
         //MMT10
         public bool IsPublished { get; set; }
-        public bool IsSync { get; set; }
         //MMT10
+       
     }
 }

@@ -1,6 +1,6 @@
+﻿using onetouch.Onetouch.ValidationRules;
 using onetouch.AppSubscriptionPlans;
 using onetouch.AppSubScriptionPlan;
-using onetouch.AppMarketplaceContacts;
 using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
@@ -59,19 +59,16 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
-        //public virtual DbSet<AppMarketplaceAppContact> AppMarketplaceAppContacts { get; set; }
+        public virtual DbSet<ValidationRule> ValidationRules { get; set; }
 
         public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
 
         public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }
 
+        public virtual DbSet<AppEntityLog> AppEntityLog { get; set; }
         public virtual DbSet<AppEntityRating> AppEntityRatings { get; set; }
 
         public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
-        public virtual DbSet<AppMarketplaceContact> AppMarketplaceContacts { get; set; }
-        public virtual DbSet<AppMarketplaceAddress> AppMarketplaceAddresses  { get; set; }
-        public virtual DbSet<AppMarketplaceContactAddress> AppMarketplaceContactAddress { get; set; }
-
 
         public virtual DbSet<AppSubscriptionPlanHeader> AppSubscriptionPlanHeaders { get; set; }
 
@@ -249,14 +246,10 @@ namespace onetouch.EntityFrameworkCore
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<AppMarketplaceAppContact>(a =>
-            //{
-            //    a.HasIndex(e => new { e.TenantId });
-            //});
             modelBuilder.Entity<AppItemSelector>(a =>
-                       {
-                           a.HasIndex(e => new { e.TenantId });
-                       });
+            {
+                a.HasIndex(e => new { e.TenantId });
+            });
             modelBuilder.Entity<SycSegmentIdentifierDefinition>(s =>
                        {
                            s.HasIndex(e => new { e.TenantId });
@@ -391,11 +384,6 @@ namespace onetouch.EntityFrameworkCore
                        .HasOne(x => x.ParentFk)
                        .WithMany(x => x.ParentFkList)
                        .HasForeignKey(x => x.ParentId);
-
-            modelBuilder.Entity<AppMarketplaceContact>()
-                   .HasOne(x => x.ParentFk)
-                   .WithMany(x => x.ParentFkList)
-                   .HasForeignKey(x => x.ParentId);
 
             modelBuilder.Entity<AppEntityExtraData>()
                .HasOne(x => x.EntityFk)

@@ -73,6 +73,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     highlightFirstMsg: boolean;
     displayMessageDetails: boolean = false;
     messageCategoryFilter: string = "MESSAGE";
+    showAllMessages: boolean = false;
+    maxVisibleMessages: number = 2;
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -109,8 +111,50 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.containerdetails.nativeElement.scrollHeight;
         } catch (err) {}
     } */
+        expandedMessageId: number | null = null;
+        maxChars = 410; // Max characters before truncation
+        maxLines = 3;   // Max rows before truncation
+      
+        toggleMessage(messageId: number) {
+          this.expandedMessageId = this.expandedMessageId === messageId ? null : messageId;
+        }
+      
+        truncateContent(htmlContent: string, messageId: number): string {
+          if (this.expandedMessageId === messageId) {
+            return htmlContent; // Show full message
+          }
+      
+          // Parse HTML content
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlContent, 'text/html');
+          const paragraphs = Array.from(doc.body.querySelectorAll('p'));
+      
+          let truncatedContent = '';
+      
+          // Scenario 1: More than 4 paragraphs (rows)
+          if (paragraphs.length > this.maxLines) {
+            truncatedContent = paragraphs.slice(0, this.maxLines).map(p => p.outerHTML).join('') + '...';
+            return truncatedContent;
+          }
+      
+          // Scenario 2: More than 100 characters
+          const textContent = doc.body.textContent || '';
+          if (textContent.length > this.maxChars) {
+            return textContent.substring(0, this.maxChars) + '...';
+          }
+      
+          return htmlContent; // If neither case applies, return original content
+        }
+        toggleMessages() {
+            this.showAllMessages = !this.showAllMessages;
+        }
+    
+        get visibleMessages() {
+            return this.showAllMessages ? this.messagesDetails : this.messagesDetails.slice(0, this.maxVisibleMessages);
+        }
     newCommentAddedHandler(event){
-        this.selectMessage(this.messagesDetails[0].messages)
+      //  this.selectMessage(this.messagesDetails[0].messages);
+        this.getMesssage();
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
@@ -266,6 +310,28 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             element.classList.remove("active-tab");
         });
     }
+    prevPage(): void {
+        if (this.skipCount > 0) {
+            this.skipCount -= this.itemsToLoad;
+            this.noOfItemsToShowInitially -= this.itemsToLoad;
+            this.getMesssage();
+            this.itemsToShow = this.messages;
+            this.isFullListDisplayed = false;
+        }
+    }
+    
+    nextPage(): void {
+        if (this.noOfItemsToShowInitially < this.totalCount) {
+            this.maxResultCount = this.itemsToLoad;
+            this.skipCount = this.noOfItemsToShowInitially;
+            this.noOfItemsToShowInitially += this.itemsToLoad;
+            this.getMesssage();
+            this.itemsToShow = this.messages;
+        } else {
+            this.isFullListDisplayed = true;
+        }
+    }
+    
 
     onScroll(): void {
         if (this.noOfItemsToShowInitially < this.totalCount) {
@@ -278,9 +344,12 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             this.isFullListDisplayed = true;
         }
     }
+    isCollapsed: { [key: number]: boolean } = {}; // Store collapsed state for each message
 
     clickEventLongMsg(event) {
         this.longmsgId = event;
+        this.isCollapsed[event] = !this.isCollapsed[event];
+
     }
     focusAddComment(){
     if(this.addCommentComponent){
@@ -295,7 +364,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
         this.showSideBar=false;
-        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
+        this.showHideSideBarTitle = !this.showSideBar ? "Show Data" : "Hide Data";
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
         this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);

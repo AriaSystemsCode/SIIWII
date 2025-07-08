@@ -6,6 +6,8 @@ using onetouch.Accounts.Dtos;
 using onetouch.Dto;
 using System.Collections.Generic;
 using onetouch.AccountInfos.Dtos;
+using onetouch.AppContacts;
+using onetouch.Globals.Dtos;
 
 namespace onetouch.Accounts
 {
@@ -45,5 +47,16 @@ namespace onetouch.Accounts
         //I40[Start]
         Task<ContactDto> CreateOrUpdateContact(CreateOrEditAccountInfoDto accountDto);
         //I40[End]
+    
+		Task<AppAddressDto> CreateOrEditAddress(AppAddressDto input);
+		//I45
+		Task Connect(long id, int? tenantId = null);
+        Task<BranchDto> CreateOrEditBranch(BranchDto input);
+		//I45
+		//I46[Start]
+		Task<GetContactDefaultsOutput> GetContactDefaults();
+		Task<List<ImportContactReturnDto>> ImportContact(List<AccountExcelDto> contactExcelDtoList, string repeatHandler);
+		//I46[End]
+
     }
 }

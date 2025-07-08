@@ -1,7 +1,7 @@
 <div [@routerTransition] [ngClass]="{'d-none':displayVariations}">
     <form #productForm="ngForm" (ngSubmit)="saveProduct(productForm)">
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal">
-            <div class="kt-subheader kt-grid__item" *ngIf="!displayVariations">
+            <div class="kt-subheader kt-grid__item ml-5" *ngIf="!displayVariations">
                 <div [class]="containerClass" style="background-color: #EEEEEEEE;">
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
@@ -30,6 +30,7 @@
                             <button class="btn        text-capitalize mr-2" type="submit" [buttonBusy]="saving"
                                 [busyText]="l('SavingWithThreeDot')"
                                 *ngIf="productForm.touched || formTouched  || listingMode !==1"
+                                [disabled]="appItem?.variationItems?.length <1"
                                 style="border-radius: 5px;
                                 background-color: #4A0D4A !important;
                                 border: #4A0D4A !important;color: white;">
@@ -335,7 +336,11 @@
                                 <div class="row pt-3 pb-3 pl-3">
                                     <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ;
     border-radius: 12px !important;" [ngClass]="{'upload':!attachment}"
-                                        *ngFor="let attachment of attachmentsSrcs; index as i">
+                                        *ngFor="let attachment of attachmentsSrcs; index as i"
+                                        (dragover)="onDragOver($event)"
+     (dragleave)="onDragLeave($event)"
+     (drop)="onDrop($event, i)"
+>
                                         <label *ngIf="!attachment"
                                             class="d-flex flex-column justify-content-center h-100 align-items-center"
                                             for="file_{{i}}">
@@ -432,9 +437,9 @@
                             <div class=" ml-4 pl-4 row pt-4" *ngIf="defaultCurrencyMSRPPriceIndex > -1"
                                 style="gap:20px">
                                 <div class="row mr-5 pr-5">
-                                    <h6 class="font-weight-bold">
+                                    <h6 class="font-weight-bold pt-3 pr-2">
                                         <span class="text-danger">*</span>
-                                        {{ 'MSRP' | localize}}
+                                        {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP" | localize}}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
                                         <span
@@ -502,9 +507,10 @@
                             <div class="col-10 pl-4 ml-4 mt-4">
                                 <span>
                                     <input type="checkbox" [(ngModel)]="sellVariationChecked" name="showVariationsBtn"
+                                    
                                         (ngModelChange)="askToRemoveAllVariations($event)"
                                         style="background-color: #EEEEEE !important;
-                                        border: none !important"/>
+                                        border: none !important;pointer-events: none;"/>
                                 </span>
                                 <span>
                                     {{'PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct' | localize}}.
@@ -517,12 +523,16 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
-                        <div class="row align-items-baseline"
+                        <div class="align-items-baseline"
                             *ngIf="!(!appItem?.variationItems?.length  && listingMode !== undefined)">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <h6 class="font-weight-bold">
-                                    {{ 'Variations' | localize}}
+                                    <span class="text-danger">*</span>    {{ 'Variations' | localize}}
+                                    <span style="color: #5F6368;font-size: 11px;margin-left: 20px;">
+                                         ( Variation required to save)
+                                    </span>
                                 </h6>
+                              
                             </div>
                             <div class="col" *ngIf="!appItem?.variationItems?.length">
                                 <div class="d-flex align-items-center">
@@ -580,14 +590,14 @@
                             <p-accordion>
                                 <p-accordionTab>
                                     <ng-template pTemplate="header">
-                                        <div class="d-inline-block custom-header p-3">
+                                        <div class="d-inline-block custom-header p-3 ml-3">
                                             <h6 class="mb-1 font-weight-bold">{{extraAttributeObject.value.header | localize}}</h6>
                                             <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
                                         </div>
                                     </ng-template>
-                                    <div class="row justify-content-center mt-4">
+                                    <div class="row pl-3 mt-4">
                                         <div class="col-lg-8 col-md-10 col">
-                                            <div class="row justify-content-center pt-4">
+                                            <div class="row  pt-4">
                                                 <div class="col-md-6 col-12 mb-4"
                                                     [ngClass]="{ 'd-none' : extraAttr.isSelectedOnVariation && extraAttr.isVariation}"
                                                     *ngFor="let extraAttr of extraAttributeObject.value.extraAttributes">

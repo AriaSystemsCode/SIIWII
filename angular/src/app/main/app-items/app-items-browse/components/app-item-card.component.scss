@@ -22,8 +22,10 @@ $default-font-weight : 400;
    // width: 116px;
     //height: 163px;
     background-size: contain;
-    background-image: url('../../../../../assets/placeholders/card-placeholder.png');
+   // background-image: url('../../../../../assets/placeholders/card-placeholder.png');
+   // background-color: #e4e4e4 !important;
     cursor:pointer;
+    justify-self: center;
 }
 
 .single-item-body {
@@ -110,6 +112,11 @@ a.btn {
 }
 
 
+.share-level-div{
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+}
 .share-level{
     border: 1px solid #EEEEEEEE;
     padding: 5px;

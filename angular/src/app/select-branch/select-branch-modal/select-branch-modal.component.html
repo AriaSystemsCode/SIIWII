@@ -18,7 +18,7 @@
             <div class="modal-content-wrapper" *ngIf="active"  >
                 <div class="modal-header">
                     <h4 class="modal-title" >
-                        <span>{{l("Select Branch")}}</span>
+                        <span>{{l("SelectBranch")}}</span>
                         <p class="desc-menu-item">{{l("SelectFromTheBelowBranches")}}</p>
                     </h4>
                     <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
@@ -32,14 +32,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button [disabled]="saving" type="button" class="btn btn-default btn-gray" style="border-radius: 6px;
-                    color: #4A0D4A !important;
-                    border: 1px solid #EBEBEB !important;
-                    background-color: white !important;" (click)="close()">{{l("Cancel")}}</button>
-                    <button type="submit" (click)="selectBranch()" class="btn btn-primary blue btn-blue"style="border-radius: 6px;
-                    background-color: #4A0D4A !important;
-                    color: white !important;
-                    border: 1px solid #4A0D4A !important;" [disabled]="!selectedBranch" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("select")}}</span></button>
+                    <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" (click)="selectBranch()" class="btn btn-primary blue btn-blue" [disabled]="!selectedBranch" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("select")}}</span></button>
                 </div>
             </div>
         </div>

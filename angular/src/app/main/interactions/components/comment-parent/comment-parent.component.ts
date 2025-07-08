@@ -1,24 +1,29 @@
-import { Component, EventEmitter, Injector, Output, ViewChild ,Input,AfterViewInit} from '@angular/core';
+import { Component, EventEmitter, Injector, Output, ViewChild ,Input,AfterViewInit, ChangeDetectorRef} from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
 import { BlockList } from 'net';
 import { SendMessageModalComponent } from '@app/main/Messages/SendMessage-Modal.Component';
 import * as moment from "moment";
+import { finalize } from '@node_modules/rxjs/dist/types';
 
 @Component({
     selector: 'app-comment-parent',
     templateUrl: './comment-parent.component.html',
-    styleUrls: ['./comment-parent.component.scss']
+    styleUrls: ['./comment-parent.component.scss'],
 })
 export class CommentParentComponent extends AppComponentBase implements AfterViewInit{
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
     @ViewChild("SendMessageModalComponent") SendMessageModalComponent: SendMessageModalComponent
 
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
+    @Output() refreshComments : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
     @Input() commentType:any;
+    @Input() fromTrans:boolean = false;
+    
+    @Input() toName:string = '';
 
     active : boolean = true;
     showDirectMessageComp:boolean=false;
@@ -34,11 +39,15 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     displayDeleteMessage:boolean=false;
     showRegularComment:boolean=true;
     @Input() fromOverview:boolean=false;
+  addReplyScreen: boolean ;
+    currentComment: any;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
-        private _injector : Injector
+        private _injector : Injector,
+        private cdr: ChangeDetectorRef
         ) {
             super(_injector)
+
          }
          ngAfterViewInit(): void {
             this.toggleMessageType(this.commentType=='MESSAGE'?2:1)
@@ -75,6 +84,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.maxResultCount= 5
         }
         
+ 
     show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
      this.reset()
         this.creatorUserId = creatorUserId
@@ -110,6 +120,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         }
     }
     getAllComments(){
+        this.showMainSpinner()
         this._messageServiceProxy.getAllComments(
             undefined,
             undefined,
@@ -126,6 +137,8 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.skipCount += this.maxResultCount
             this.totalCount = res.totalCount
             this.comments.push(...res.items)
+        this.hideMainSpinner()
+
         })
     }
     newCommentAddedHandler($event?:GetMessagesForViewDto){
@@ -138,4 +151,42 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         this.showDirectMessageComp=false;
 
     }
+    getName(event){
+      
+ this.toName = event
+ this.cdr.detectChanges();
+//  this.setToName(event)
+    }
+    getReply(event){
+        // this.addReplyScreen = event
+        this.cdr.detectChanges();
+    }
+    getMyCom(event){
+      
+        this.addReplyScreen = true
+        if(event){
+            this.addCommentComponent.focusCommentTextArea()
+          
+            this.currentComment = event
+            this.cdr.detectChanges();
+        }
+    
+    }
+    refreshAfterSave(event){
+      
+        if(event){
+            this.refreshComments.emit(true)
+        }
+        
+           }
+
+
+
+
+openReplyScreen(comment: any): void {
+
+                    this.currentComment = comment
+   
+}
+
 }

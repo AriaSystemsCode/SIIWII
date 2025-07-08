@@ -1,5 +1,5 @@
-import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto } from '@shared/service-proxies/service-proxies';
+import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import { AccountsServiceProxy, BranchForViewDto, ContactDto, ContactForEditDto, CreateOrEditAccountInfoDto, SycAttachmentCategoryDto, TreeNodeOfBranchForViewDto, UserEditDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -10,12 +10,12 @@ import { Observable } from 'rxjs';
 import { SelectBranchModalComponent } from '@app/select-branch/select-branch-modal/select-branch-modal.component';
 import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-user-modal.component';
 
+
 @Component({
-    selector: 'app-view-member-profile',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './view-member-profile.component.html',
-    styleUrls: ['./view-member-profile.component.scss'],
-    animations: [appModuleAnimation()]
+  selector: 'app-view-member-profile',
+  templateUrl: './view-member-profile.component.html',
+  styleUrls: ['./view-member-profile.component.scss'],
+  animations:[appModuleAnimation()]
 })
 export class ViewMemberProfileComponent extends AppComponentBase implements OnInit {
     @ViewChild('nav') slider: NgImageSliderComponent;
@@ -36,17 +36,18 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     canDelete: boolean;
     canView: boolean;
 
+
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
-    logoPhoto: string
-    coverPhoto: string
-    title: string
-    contactDisplayName: string
+    logoPhoto : string
+    coverPhoto : string
+    title:string
+    contactDisplayName:string
     active = false;
 
     logoDefaultImage = "../../../assets/placeholders/_logo-placeholder.png"
     coverDefaultImage = "../../../assets/placeholders/_default_cover.jpg"
-    sycAttachmentCategoryLogo: SycAttachmentCategoryDto
-    sycAttachmentCategoryBanner: SycAttachmentCategoryDto
+    sycAttachmentCategoryLogo :SycAttachmentCategoryDto
+    sycAttachmentCategoryBanner :SycAttachmentCategoryDto
 
     Editting:boolean =false;
     adminContact:boolean =false;
@@ -55,7 +56,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
     }
-    ngOnInit() {
+    ngOnInit(){
         this.getAllAttachmentCategories()
 
     }
@@ -83,33 +84,30 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             this.edit.emit(memberId);
         }
     }
-    deleteMember() {
-        const memberId: number = this.memberData?.contact?.id;
-        if (isNaN(memberId)) return
+    deleteMember(){
+        const memberId:number =  this.memberData?.contact?.id;
+        if ( isNaN(memberId) ) return
         var isConfirmed: Observable<boolean>;
-        isConfirmed = this.askToConfirm("AreYouSureYouWantToDeleteThisContact?", "AreYouSure");
-
-        isConfirmed.subscribe((res) => {
-            if (res) {
-                this.delete.emit(memberId)
+        isConfirmed   = this.askToConfirm("AreYouSureYouWantToDeleteThisContact?","AreYouSure");
+    
+       isConfirmed.subscribe((res)=>{
+          if(res){
+                    this.delete.emit(memberId)
+                }
             }
-        }
         );
     }
 
-    show(input: ViewMemberProfileComponentInputsI) {
+    show(input : ViewMemberProfileComponentInputsI) {
         this.canDelete = input.canDelete
         this.canEdit = input.canEdit
         this.title = input.title
-        this.editInfo = true;
-        this.NoteditInfo = false;
-        this.Editting=false;
         this.showMainSpinner()
 
         this._AccountsServiceProxy.getContactForView(input.id)
-            .pipe(finalize(() => {
-                this.hideMainSpinner()
-                this.active = true
+        .pipe(finalize(()=>{
+            this.hideMainSpinner()
+            this.active = true
 
             }))
             .subscribe((result) => {
@@ -123,20 +121,20 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
                 if (this.memberData?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + this.memberData?.coverUrl;
             });
     }
-
-    hide() {
+   
+    hide(){
         this.active = false
         this.memberData = undefined
         this.canDelete = undefined
         this.canEdit = undefined
         this.canView = undefined
     }
-
+    
     getAllAttachmentCategories() {
-        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER"]).subscribe((result) => {
-            result.forEach(item => {
-                if (item.code == "LOGO") this.sycAttachmentCategoryLogo = item
-                else if (item.code == "BANNER") this.sycAttachmentCategoryBanner = item
+        this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER"]).subscribe((result)=>{
+            result.forEach(item=>{
+                if(item.code == "LOGO") this.sycAttachmentCategoryLogo = item
+                else if(item.code == "BANNER") this.sycAttachmentCategoryBanner = item
             })
         })
 

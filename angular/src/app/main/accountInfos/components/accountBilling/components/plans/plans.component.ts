@@ -35,7 +35,7 @@ export class PlansComponent extends AppComponentBase {
   }
   monthlyClick() {
     this.showMainSpinner();
-
+// merge
     this.isMonthlyPlan = true;
     this._appSubscriptionPlanHeadersServiceProxy.getAll(
       null, null, 1, null, null, null,
@@ -56,6 +56,8 @@ export class PlansComponent extends AppComponentBase {
 
 
   }
+
+
 
   getUniqueCategories() {
     const allDetails = this.plans.reduce((acc, plan) => {

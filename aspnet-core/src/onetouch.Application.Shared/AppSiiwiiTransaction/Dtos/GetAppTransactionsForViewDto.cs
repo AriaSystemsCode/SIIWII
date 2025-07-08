@@ -21,7 +21,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public virtual bool LastRecord { set; get; } = false;
         public virtual bool FirstRecord { set; get; } = false;
-        public virtual DateTime EnteredDate { set; get; }
+       // public virtual DateTime EnteredDate { set; get; }
         public long CreatorUserId { set; get; }
         public byte[] OrderConfirmationFile { set; get; }
         public virtual List<ContactInformationOutputDto> SharedWithUsers{set; get;}
@@ -39,6 +39,19 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual PagedResultDto<string> EntityCategoriesNames { get; set; }
         public virtual PagedResultDto<string> EntityClassificationsNames { get; set; }
         //End
+        //Iteration45[Start]
+        public virtual bool ShowSync { set; get; } = false;
+        public virtual DateTime LastModifiedDate { set; get; }
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { get; set; }
+        //Iteration45[End]
+        //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[Start]
+        public virtual DateTime CreationDate { set; get; }
+        //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
+        //I46[Start] 
+        public List<ExtraDataAttrDto> ExtraDataAttributes { get; set; }
+       // public List<ExtraDataAttrDto> Additional { get; set; }
+        //I46[End]
     }
 
     //xx
@@ -107,7 +120,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public int EomDays { set; get; }
         public bool Eom { set; get; }
         public int NetDueDays { set; get; }
-       
 
     }
 
@@ -129,6 +141,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public ValidateTransaction ValidateOrder { get; set; }
         public TransactionType OrderType { get; set; }
         public string CurrencyCode { set; get; }
+        public string BuyerName { set; get; }
+        public string SellerName { set; get; }
 
     }
 
@@ -177,6 +191,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public int TenantId { set; get; }
         public string TenantName { set; get; }
         public bool CanBeRemoved { set; get; } = true;
+        public string Code { set; get; }
     }
     public class SharingTransactionOptions
     {
@@ -234,4 +249,28 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public long TransactionId { get; set; }
     }
+    //I45[start]
+    public class TransactionDetailView
+    {
+        public TransactionType TransactionType { set; get; }
+        public string TransactionNumber { get; set; }
+        public string code { get; set; }
+        public string ManufacturerCode { set; get; }
+        public string name { get; set; }
+        public double Qty { get; set; }
+        public decimal Price { get; set; }
+        public decimal Amount { get; set; }
+        public string Image { get; set; }
+        public long ParentId { get; set; }
+        public int LineNo { get; set; }
+
+    }
+    //I45[end]
+    //MMT-OC
+    public class TenantContactRole
+    {
+        public string ContactRole { set; get; }  
+        public string ContactName { set; get; }
+    }
+    //MMT-OC
 }

@@ -1,38 +1,38 @@
 
-<p class="hint m-0 p-0 pl-5 ml-5 mb-5">
+<p class="hint m-0 p-0 mb-3">
         <i class="pr-2 fa fa-bell"></i>   {{ 'AttributesAndOptionsYou’veSelected' | localize}}
 </p>
 
 
-<div class="row pl-5 ml-5 mb-3">
+<div class="row pl-2 mb-3">
     <div class="text-right">{{ 'NumberOfVariations' | localize }}:</div>
     <div class="col text-left font-weight-bold">{{variations?.length}}</div>
 </div>
 <div class="row" *ngFor="let extraAttr of selectedVariations | keyvalue">
-    <div class=" text-right pl-5 ml-5 mb-3" *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE' || extraAttr?.key =='CLOSURE'">
+    <div class=" text-right pl-2 mb-3" *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE' || extraAttr?.key =='CLOSURE'">
         {{extraAttr?.key}}:
     </div>
     <div class="col text-left font-weight-bold   mb-3"  *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE' || extraAttr?.key =='CLOSURE' ">{{extraAttr?.value | arrayToString}}</div>
 </div>
 <div class="row" *ngIf="showPriceRange && minPrice != maxPrice">
-    <div class="text-right pl-5 ml-5 mb-3" >
+    <div class="text-right pl-2 mb-3" >
         {{ 'PriceRangedFrom' | localize }}:
     </div>
     <div class="col text-left font-weight-bold   mb-3    ">
-        {{tenantDefaultCurrency?.symbol}}{{minPrice}} {{'to' | localize}} {{tenantDefaultCurrency?.symbol}}{{maxPrice}}
+        {{tenantDefaultCurrency?.symbol}}{{minPrice  ? minPrice :0}} {{'to' | localize}} {{tenantDefaultCurrency?.symbol}}{{maxPrice?maxPrice:0}}
     </div>
 </div>
 
 <div class="row" *ngIf="showPriceRange && minPrice == maxPrice">
-    <div class="text-right pl-5 ml-5 mb-3" >
+    <div class="text-right pl-2 mb-3" >
         {{ 'Price' | localize }} :
     </div>
     <div class="col text-left font-weight-bold   mb-3    ">
-        {{tenantDefaultCurrency?.symbol}}{{minPrice}}
+        {{tenantDefaultCurrency?.symbol}}{{minPrice ? minPrice: 0 }}
     </div>
 </div>
 <div class="row" *ngIf="stockAvailability">
-    <div class="text-right pl-5 ml-5 mb-3" >
+    <div class="text-right pl-2 mb-3" >
         {{ 'AvailableQuantity' | localize }} :
     </div>
     <div class="col text-left font-weight-bold   mb-3">

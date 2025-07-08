@@ -12,12 +12,18 @@
     text-align: left;
 
 }
+img
+{
+width: 16px;
+height: 16px;
+padding: 0px 0px 0px 0px;
+gap: 0px;
+opacity: 0px;
+background-color:  #4A0D4A;
+}
 
-img {
-    width: 16px;
-    height: 16px;
-    padding: 0px 0px 0px 0px;
-    gap: 0px;
-    opacity: 0px;
-    background-color: #4A0D4A;
+.searchBtn {
+    background: #4A0D4A !important;
+    margin-top: 3px !important;
+    color: #595959 !important;
 }

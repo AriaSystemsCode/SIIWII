@@ -181,6 +181,7 @@
                                 [(ngModel)]="subject"
                                 name="subject"
                                 required
+                            
                             />
                         </div>
                         <div
@@ -295,9 +296,10 @@
                             multiple
                         />
                     </div>
+                  
                     <button
                     type="button"
-                    [class.disabled]="toUsers.length == 0 || subject == ''"
+                    [class.disabled]="toUsers.length == 0 ||  subject.trim() === ''"
                     [disabled]="toUsers.length == 0 || subject == ''"
                     class="sendBtn"
                     (click)="sendMessage()"
@@ -479,6 +481,7 @@
                                     [(ngModel)]="subject"
                                     name="subject"
                                     required
+                                 
                                 />
                             </div>
                             <div
@@ -592,6 +595,7 @@
                                 multiple
                             />
                         </div>
+                  
                         <button
                             type="button"
                             [class.disabled]="toUsers.length == 0 || subject == ''"
@@ -609,9 +613,10 @@
             </div>
     </div>    
 </div>
-<form class="reply-w-direct-message" *ngIf="!modalView" #MessageForm="ngForm" novalidate style="position: relative;">
-    <div class="modal-body">
-        <div class="row">
+<form class="reply-w-direct-message p-0" *ngIf="!modalView" #MessageForm="ngForm" novalidate style="position: relative;">
+    <div class="threadDiv"><h4>Direct Message</h4></div>
+    <div class="modal-body p-2">
+        <div class="row px-2">
             <a
                 href="javascript:;"
                 (click)="showCC()"
@@ -639,7 +644,7 @@
                 </div>
             </div>
             <div
-                class="p-0 sendusers mb-1 col-md-11">
+                class="p-0 sendusers mb-1 col-md-10">
                 <p-autoComplete
                     [style]="{ width: '100%' }"
                     [inputStyle]="{ width: '100%' }"
@@ -748,25 +753,27 @@
 
         <div class="form-group group-input subject-label">
             <div
-                class="InputText row"
+                class="InputText "
                 *ngIf="replyMessageId == 0"
-                style="padding-top: 4px !important; display: flex"
+                style="padding-top: 4px !important;"
             >
                 <span
-                    class="text-input-label subject-label col-md-2"
+                    class="text-input-label subject-label "
                     *ngIf="replyMessageId == 0"
                     >{{ "subject" | localize }}:</span
                 >
-                <div class="col-md-10">
+                <div class="">
                                     <input
                     *ngIf="replyMessageId == 0"
                     class="form-control Input bg-white"
-                    style="padding: 6px; height: 20px !important"
+                    style="padding: 6px; height: 30px !important;    background-color: white !important;
+    border: 1px solid #EEEEEEEE !important;"
                     placeholder=""
                     type="Text"
                     [(ngModel)]="subject"
                     name="subject"
                     required
+               
                 />
                 </div>
 
@@ -808,7 +815,7 @@
         </form>
     </div>
 
-    <div class="attachments-files">
+    <div class="attachments-files p-2">
         <div *ngFor="let item of attachments">
             <div *ngIf="item.type.includes('image')">
                 <img
@@ -879,10 +886,11 @@
             multiple
         />
     </div>
+  
         <button
             type="button"
-            [class.disabled]="toUsers.length == 0 || subject == ''"
-            [disabled]="toUsers.length == 0 || subject == ''"
+            [class.disabled]="toUsers.length == 0 || htmlEditorInput == ''"
+            [disabled]="toUsers.length == 0 || htmlEditorInput == ''"
             class="sendBtn"
             (click)="sendMessage()"
         >

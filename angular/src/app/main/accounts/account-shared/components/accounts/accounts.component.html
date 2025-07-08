@@ -14,33 +14,45 @@
                                                 dropdownToggle>
                                                 <span class="list-toolbar-dropdown-filter-selectedItem" style="font-weight: 700 !important;">
                                                     {{
-                                                    mainFilterCtrl?.value
-                                                    ?.label | localize
+                                                        mainFilterCtrl?.value
+                                                            ?.label | localize
                                                     }}
                                                 </span>
                                             </button>
-                                            <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
-                                                <li *ngFor="
+                                            <ul
+                                                class="dropdown-menu actions-dropdown-menu"
+                                                *dropdownMenu
+                                            >
+                                                <li
+                                                    *ngFor="
                                                         let filter of pageMainFilters
-                                                    ">
-                                                    <a href="javascript:;" (click)="
+                                                    "
+                                                >
+                                                    <a
+                                                        href="javascript:;"
+                                                        (click)="
                                                             mainFilterCtrl.setValue(
                                                                 filter
                                                             )
-                                                        ">
+                                                        "
+                                                    >
                                                         <span>
-                                                            <i [ngClass]="{
+                                                            <i
+                                                                [ngClass]="{
                                                                     'visibility-hidden':
                                                                         mainFilterCtrl
                                                                             ?.value
                                                                             ?.value !=
                                                                         filter?.value
                                                                 }"
-                                                                class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-icon"></i>
-                                                            <span class="list-toolbar-dropdown-title">
+                                                                class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-icon"
+                                                            ></i>
+                                                            <span
+                                                                class="list-toolbar-dropdown-title"
+                                                            >
                                                                 {{
-                                                                filter?.label
-                                                                | localize
+                                                                    filter?.label
+                                                                        | localize
                                                                 }}
                                                             </span>
                                                         </span>
@@ -48,22 +60,37 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                        <div class="list-toolbar-dropdown-filter-selectedItem   text-dark"
-                                        style="font-weight: 700 !important;"
-                                            *ngIf="!showMainFiltersOptions">
+                                        <div
+                                            class="list-toolbar-dropdown-filter-selectedItem font-weight-normal text-dark"
+                                            *ngIf="!showMainFiltersOptions"
+                                        >
                                             {{ mainFilterCtrl?.value?.label | localize }}
                                         </div>
                                     </div>
-                                    <div class="mb-4 mb-md-0 list-toolbar-search">
-                                        <div class="kt-input-icon kt-input-icon--left">
-                                            <input type="text" formControlName="search" class="form-control"
+                                    <div
+                                        class="mb-4 mb-md-0 list-toolbar-search"
+                                    >
+                                        <div
+                                            class="kt-input-icon kt-input-icon--left"
+                                        >
+                                            <input
+                                                type="text"
+                                                formControlName="search"
+                                                class="form-control"
                                                 [placeholder]="
                                                     'SearchWithThreeDot'
                                                         | localize
-                                                " id="generalSearch" />
-                                            <span class="kt-input-icon__icon kt-input-icon__icon--left">
-                                                <span><i class="flaticon2-search-1 icon-md text-primary"
-                                                        style="color: #777777 !important"></i></span>
+                                                "
+                                                id="generalSearch"
+                                            />
+                                            <span
+                                                class="kt-input-icon__icon kt-input-icon__icon--left"
+                                            >
+                                                <span
+                                                    ><i
+                                                        class="flaticon2-search-1 icon-md text-primary"
+                                                    ></i
+                                                ></span>
                                             </span>
                                         </div>
                                     </div>
@@ -77,7 +104,17 @@
                                          
                                         </a>
                                         <ng-container *ngIf="showAddButton">
-                                            <a *ngIf="!this.isHost" [title]="
+                                            <a
+                                                style="
+                                                    padding-right: 3px;
+                                                    padding-left: 9px;
+                                                "
+                                                     class="btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn"
+                                                     [routerLink]="[
+                                                         '/app/main/account/create-manual'
+                                                     ]"
+                                                *ngIf="!this.isHost"
+                                                [title]="
                                                     'AddManualAccount'
                                                         | localize
                                                 "
@@ -88,7 +125,13 @@
                                                 ]">
                                                 <i class="d-inline-block w-100 fas fa-user-plus icon-center"></i>
                                             </a>
-                                            <a *ngIf="this.isHost" [title]="
+                                            <a
+                                                style="
+                                                    padding-right: 3px;
+                                                    padding-left: 9px;
+                                                "
+                                                *ngIf="this.isHost"
+                                                [title]="
                                                     'AddExternalAccount'
                                                         | localize
                                                 "
@@ -96,24 +139,32 @@
                                                 class="btn   text-center toolbar-btn transparent-button"
                                                 [routerLink]="[
                                                     '/app/main/account/create-external'
-                                                ]">
-                                                <i class="d-inline-block w-100 fas fa-user-plus icon-center"></i>
+                                                ]"
+                                            >
+                                                <i
+                                                    class="d-inline-block w-100 fas fa-user-plus icon-center"
+                                                ></i>
                                             </a>
                                             <!-- Iteration-8 -->
-                                            <a (click)="showImportAccounts()" style="
+                                            <a
+                                                (click)="showImportAccounts()"
+                                                style="
                                                     padding-right: 3px;
                                                     padding-left: 9px;
-                                                    
-                                                " [title]="
+                                                "
+                                                [title]="
                                                     'Import Accounts' | localize
-                                                " class="btn   toolbar-btn pr-0 transparent-button">
-                                                <i class="d-inline-block w-100 fa-file-import fas icon-center"
-                                                    style="color: #4a0d4a !important;"></i>
+                                                "
+                                                class="btn btn-hover-primary font-weight-normal toolbar-btn pr-0"
+                                            >
+                                                <i
+                                                    class="d-inline-block w-100 fa-file-import fas icon-center"
+                                                ></i>
                                             </a>
                                             <!-- Iteration-8 -->
                                         </ng-container>
                                     </div>
-                                    <div class=""></div>
+                                    <div class="list-toolbar-divider"></div>
 
                                     <div class="text-center d-flex " style="height: 40px; width: 160px;">
 
@@ -150,8 +201,9 @@
                                             <i class="d-inline-block w-100" [ngClass]="
                                                     singleItemPerRowMode
                                                         ? 'flaticon2-menu'
-                                                        : 'fa fa-bars'
-                                                "></i>
+                                                        : 'fa-bars fas'
+                                                "
+                                            ></i>
                                         </a>
                                     </div>
                                 </div>
@@ -164,62 +216,84 @@
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
                                         {{
-                                        paginator.getPage() *
-                                        primengTableHelper.defaultRecordsCountPerPage
+                                            paginator.getPage() *
+                                                primengTableHelper.defaultRecordsCountPerPage
                                         }}-{{
-                                        paginator.getPage() *
-                                        primengTableHelper.defaultRecordsCountPerPage +
-                                        accounts.length
+                                            paginator.getPage() *
+                                                primengTableHelper.defaultRecordsCountPerPage +
+                                                accounts.length
                                         }}
                                         {{ "over" | localize }}
                                         {{
-                                        primengTableHelper.totalRecordsCount
+                                            primengTableHelper.totalRecordsCount
                                         }}
                                         {{ "ResultsOf" | localize }} "{{
                                         mainFilterCtrl?.value?.label ?  mainFilterCtrl?.value?.label : 'Connections'  | localize
                                         }}"
                                     </div>
                                     <div>
-                                        <div class="btn-group dropdown list-toolbar-dropdown" dropdown>
-                                            <button class="dropdown-toggle btn btn-sm   p-0 sortByDd"
-                                                dropdownToggle>
-                                                <span class="list-toolbar-dropdown-sort-label">
+                                        <div
+                                            class="btn-group dropdown list-toolbar-dropdown"
+                                            dropdown
+                                        >
+                                            <button
+                                                class="dropdown-toggle btn btn-sm font-weight-normal p-0"
+                                                dropdownToggle
+                                            >
+                                                <span
+                                                    class="list-toolbar-dropdown-sort-label"
+                                                >
                                                     {{ "SortBy" | localize }}
                                                 </span>
-                                                <span class="list-toolbar-dropdown-sort-selectedItem">
+                                                <span
+                                                    class="list-toolbar-dropdown-sort-selectedItem"
+                                                >
                                                     {{
-                                                    sortingCtrl?.value
-                                                    ?.label
-                                                    ? ": " +
-                                                    (sortingCtrl
-                                                    ?.value?.label
-                                                    | localize)
-                                                    : ""
+                                                        sortingCtrl?.value
+                                                            ?.label
+                                                            ? ":   " +
+                                                              (sortingCtrl
+                                                                  ?.value?.label
+                                                                  | localize)
+                                                            : ""
                                                     }}
                                                 </span>
                                             </button>
-                                            <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
-                                                <li *ngFor="
+                                            <ul
+                                                class="dropdown-menu actions-dropdown-menu"
+                                                *dropdownMenu
+                                            >
+                                                <li
+                                                    *ngFor="
                                                         let sortOption of sortingOptions
-                                                    " class="list-toolbar-dropdown-item">
-                                                    <a href="javascript:;" (click)="
+                                                    "
+                                                    class="list-toolbar-dropdown-item"
+                                                >
+                                                    <a
+                                                        href="javascript:;"
+                                                        (click)="
                                                             sortingCtrl.setValue(
                                                                 sortOption
                                                             )
-                                                        ">
+                                                        "
+                                                    >
                                                         <span>
-                                                            <i [ngClass]="{
+                                                            <i
+                                                                [ngClass]="{
                                                                     'visibility-hidden':
                                                                         sortOption?.value !=
                                                                         sortingCtrl
                                                                             ?.value
                                                                             ?.value
                                                                 }"
-                                                                class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-item-icon"></i>
-                                                            <span class="list-toolbar-dropdown-item-value">
+                                                                class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-item-icon"
+                                                            ></i>
+                                                            <span
+                                                                class="list-toolbar-dropdown-item-value"
+                                                            >
                                                                 {{
-                                                                sortOption.label
-                                                                | localize
+                                                                    sortOption.label
+                                                                        | localize
                                                                 }}
                                                             </span>
                                                         </span>
@@ -264,28 +338,43 @@
                                             {{ "NoDataFound" | localize }}
                                         </div>
                                     </div>
-                                    <div class="primeng-paging-container custom-paginator">
-                                        <p-paginator [rows]="
-                                                primengTableHelper.defaultRecordsCountPerPage
-                                            " #paginator (onPageChange)="getAccounts($event)" [totalRecords]="
-                                                primengTableHelper.totalRecordsCount
-                                            " [rowsPerPageOptions]="
-                                                primengTableHelper.predefinedRecordsCountPerPage
-                                            ">
-                                        </p-paginator>
-    
-                                        <div class="total-records-count text-right mr-3">
-                                            {{
-                                            l(
-                                            "TotalRecordsCount",
+                                    <div
+                                        class="font-weight-normal mt-5 p-5 text-center w-100"
+                                        *ngIf="accounts.length == 0 && !loading"
+                                    >
+                                        {{ "NoDataFound" | localize }}
+                                    </div>
+                                </div>
+                                <div
+                                    class="primeng-paging-container custom-paginator"
+                                >
+                                    <p-paginator
+                                        [rows]="
+                                            primengTableHelper.defaultRecordsCountPerPage
+                                        "
+                                        #paginator
+                                        (onPageChange)="getAccounts($event)"
+                                        [totalRecords]="
                                             primengTableHelper.totalRecordsCount
+                                        "
+                                        [rowsPerPageOptions]="
+                                            primengTableHelper.predefinedRecordsCountPerPage
+                                        "
+                                    >
+                                    </p-paginator>
+
+                                    <div
+                                        class="total-records-count text-right mr-3"
+                                    >
+                                        {{
+                                            l(
+                                                "TotalRecordsCount",
+                                                primengTableHelper.totalRecordsCount
                                             )
-                                            }}
-                                        </div>
+                                        }}
                                     </div>
                                 </div>
                             </div>
-                           
                         </div>
                     </div>
                 </div>
@@ -294,7 +383,9 @@
         </div>
     </div>
 
-    <sendMailModal #sendMailModal></sendMailModal>
+    <sendMailModal
+        #sendMailModal
+    ></sendMailModal>
     <!-- Iteration-8 -->
     <MainImportModal #ImportAccountsModal (finishImport)="onFinishImport($event)"></MainImportModal>
     <!-- Iteration-8 -->

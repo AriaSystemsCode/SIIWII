@@ -31,7 +31,6 @@ namespace onetouch.MultiTenancy.Dto
 
         public SubscriptionStartType SubscriptionStartType { get; set; }
 
-        public int RelatedTenantId { get; set; } = 0;
         public int? EditionId { get; set; }
         public int? InviterTenantId { get; set; }
 

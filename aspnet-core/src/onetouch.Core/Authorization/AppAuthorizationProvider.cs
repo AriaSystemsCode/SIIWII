@@ -30,11 +30,6 @@ namespace onetouch.Authorization
 
             var pages = context.GetPermissionOrNull(AppPermissions.Pages) ?? context.CreatePermission(AppPermissions.Pages, L("Pages"));
 
-            var appMarketplaceAppContacts = pages.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts, L("AppMarketplaceAppContacts"), multiTenancySides: MultiTenancySides.Tenant);
-            appMarketplaceAppContacts.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts_Create, L("CreateNewAppMarketplaceAppContact"), multiTenancySides: MultiTenancySides.Tenant);
-            appMarketplaceAppContacts.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts_Edit, L("EditAppMarketplaceAppContact"), multiTenancySides: MultiTenancySides.Tenant);
-            appMarketplaceAppContacts.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts_Delete, L("DeleteAppMarketplaceAppContact"), multiTenancySides: MultiTenancySides.Tenant);
-
             var appTenantActivitiesLog = pages.CreateChildPermission(AppPermissions.Pages_AppTenantActivitiesLog, L("AppTenantActivitiesLog"), multiTenancySides: MultiTenancySides.Host);
             appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_AppTenantActivitiesLog_Create, L("CreateNewAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
             appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_AppTenantActivitiesLog_Edit, L("EditAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
@@ -160,6 +155,11 @@ namespace onetouch.Authorization
             pages.CreateChildPermission(AppPermissions.Pages_DemoUiComponents, L("DemoUiComponents"), multiTenancySides: MultiTenancySides.Host);
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
+
+            var validationRules = administration.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules, L("ValidationRules"), multiTenancySides: MultiTenancySides.Host);
+            validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Create, L("CreateNewValidationRule"), multiTenancySides: MultiTenancySides.Host);
+            validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Edit, L("EditValidationRule"), multiTenancySides: MultiTenancySides.Host);
+            validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Delete, L("DeleteValidationRule"), multiTenancySides: MultiTenancySides.Host);
 
             var sycCurrencyExchangeRates = administration.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates, L("SycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
             sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Create, L("CreateNewSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);

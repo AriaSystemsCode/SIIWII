@@ -41,9 +41,7 @@ import { ViewOthersProfileComponent } from './components/view-others-profile/vie
 import { ViewProfileComponent } from './components/view-profile/view-profile.component';
 import { MembersListSharedModule } from '../members-list/members-list-shared.module';
 import { MyMembersModule } from '../teamMembers/my-members.module';
-import { PublishAccountService } from './services/publishAccountService';
 import { PublishService } from '../app-items/app-item-shared/services/publish.service';
-import { ShareAccountComponent } from './components/share-account/share-account.component';
 import { AddOnsComponent } from './components/accountBilling/components/add-ons/add-ons.component';
 import { ActivityLogComponent } from './components/accountBilling/components/activity-log/activity-log.component';
 import { TenantInvoicesComponent } from './components/accountBilling/components/tenant-invoices/tenant-invoices.component';
@@ -53,7 +51,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { TabViewModule } from 'primeng/tabview';
 import { MarketplaceAccountProfileComponent } from './components/marketplace-account-profile-view/marketplace-account-profile/marketplace-account-profile.component';
-import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
 import { OverviewTabComponent } from './components/marketplace-account-profile-view/overview-tab/overview-tab.component';
 import { PostsModule } from '../posts/posts.module';
 import { InteractionsModule } from '../interactions/interactions.module';
@@ -66,6 +63,7 @@ import { ConnectionsCardComponent } from './components/connections-card/connecti
 import { MarketplaceProductsModule } from '../marketplace/marketplace-products/marketplace-products.module';
 import { MediaTabComponent } from './components/marketplace-account-profile-view/Media-tab/media-tab.component';
 import { ReviewsListComponent } from './components/marketplace-account-profile-view/reviews-list/reviews-list.component';
+import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
 
 @NgModule({
     declarations: [
@@ -79,7 +77,6 @@ import { ReviewsListComponent } from './components/marketplace-account-profile-v
         BranchDetailsDynamicModalComponent,
         ViewOthersProfileComponent,
         ViewProfileComponent,
-        ShareAccountComponent,
         AccountBillingComponent,
         AddOnsComponent,
         ActivityLogComponent,
@@ -136,8 +133,7 @@ import { ReviewsListComponent } from './components/marketplace-account-profile-v
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
-        { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
-        PublishAccountService,PublishService
+        { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },PublishService
     ],
     exports:[
         MarketplaceProductsModule,

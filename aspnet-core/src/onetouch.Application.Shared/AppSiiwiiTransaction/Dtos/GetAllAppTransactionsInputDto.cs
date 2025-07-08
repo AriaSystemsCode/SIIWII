@@ -12,6 +12,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public Boolean WithDetails { get; set; }
         public long Since_Id { get; set; }
+        public string At_Id { get; set; }
 
         public string Filter { get; set; }
         public string CodeFilter { get; set; }
@@ -27,6 +28,11 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string BuyerSSIN { get; set; }
         public long StatusId { get; set; }
         public bool fromExport { set; get; } = false;
+        public bool hasParentItems { set; get; } = false;
+        public string? TimeZoneValue { get; set; }
+        //I45
+        public string? ReferenceFilter { get; set; }
+        //I45
     }
   
 }

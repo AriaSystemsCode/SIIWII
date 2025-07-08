@@ -1,7 +1,8 @@
 ...<!-- Navbar -->
 <nav
-    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5 ml-0"
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
+  
 >
     <!-- Container wrapper -->
     <div class="container ml-0 position-md-absolute position-lg-static ">
@@ -28,7 +29,7 @@
         ></button> -->
         <a
         class="navbar-brand pt-0"
-        style="margin-left: 25px;"
+       
         [routerLink]="['/app/main/Home']"
         routerLinkActive="header-link-active"
         (click)="userClick('Home')"
@@ -49,36 +50,55 @@
         </button>
 
         <!-- test nav -->
-        <!-- <a class="navbar-brand pt-0" [routerLink]="['/app/main/Home']" routerLinkActive="header-link-active"
-            (click)="userClick('Home')">
-            <img src="../../../assets/landingPage/Logo_Main.png" class="navbar-brand" />
-        </a> -->
+ 
         <!-- Search form -->
         <form class="input-group pt-3 input-group-form  d-none">
             <div class="position-relative search-bar w-100" *ngIf="showSearch">
                 <div class="input-group mb-3">
-                    <div class="input-group-prepend" style="
+                    <div
+                        class="input-group-prepend"
+                        style="
                             background-color: #ededed;
                             height: 39px;
                             width: 77px;
                             border-radius: 5px;
-                        ">
+                        "
+                    >
                         <div class="btn-group">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" style="width: 77px" type="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button
+                                class="btn btn-secondary btn-sm dropdown-toggle"
+                                style="width: 77px"
+                                type="button"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                            >
                                 All
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div
+                                class="dropdown-menu"
+                                aria-labelledby="dropdownMenuButton"
+                            >
                                 <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="#">Something else here</a>
+                                <a class="dropdown-item" href="#"
+                                    >Another action</a
+                                >
+                                <a class="dropdown-item" href="#"
+                                    >Something else here</a
+                                >
                             </div>
                         </div>
                     </div>
-                    <input type="text" class="form-control" style="background-color: #f3f6f9; height: 39px"
-                        placeholder="What are you looking for…" />
+                    <input
+                        type="text"
+                        class="form-control"
+                        style="background-color: #f3f6f9; height: 39px"
+                        placeholder="What are you looking for…"
+                    />
                 </div>
-                <div class="save-icon" style="
+                <div
+                    class="save-icon"
+                    style="
                         position: absolute;
                         width: 40px;
                         height: 40px;
@@ -90,8 +110,12 @@
                         right: 0px;
                         background-color: #f88011;
                         top: 0px;
-                    ">
-                    <img style="width: 30px; height: 30px" src="../../../assets/landingPage/Iconionic-md-search.png" />
+                    "
+                >
+                    <img
+                        style="width: 30px; height: 30px"
+                        src="../../../assets/landingPage/Iconionic-md-search.png"
+                    />
                 </div>
             </div>
         </form>
@@ -117,14 +141,20 @@
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a *ngIf="'Pages.Marketplace' | permission" class="nav-link active d-flex flex-column text-center"
-                        aria-current="page" [routerLink]="['/app/main/marketplace/']"
-                        [ngClass]="{ 'header-link-active': displayMarketPlace }">
-                        <img src="../../../assets/landingPage/marketPlace.png"
-                            class="navbar-brand _navbar-brand m-auto" />
+                    <a
+                        *ngIf="'Pages.Marketplace' | permission"
+                        class="nav-link active d-flex flex-column text-center"
+                        aria-current="page"
+                        [routerLink]="['/app/main/marketplace/']"
+                        [ngClass]="{ 'header-link-active': displayMarketPlace }"
+                    >
+                        <img
+                            src="../../../assets/landingPage/marketPlace.png"
+                            class="navbar-brand _navbar-brand m-auto"
+                        />
                         <span class="small">{{
                             "Marketplace" | localize
-                            }}</span>
+                        }}</span>
                     </a>
                 </li>
                 <li  class="border-left ml-2 nav-item text-white pt-3 pl-3 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
@@ -133,21 +163,29 @@
 
                 <li  class="ml-2 nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
-                        [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' +  shoppingCartSummary?.sellerLogo  : defaultSellerLogo "
-                        onerror="this.onerror=null;this.src=defaultSellerLogo"
-                        class="navbar-brand"
-                    />
+                    [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.sellerLogo : defaultSellerLogo"
+                    (error)="onImageError($event, 'seller')"
+                    class="navbar-brand"
+                    (mouseover)="displaneSel = true"
+                    (mouseleave)="displaneSel = false"
+                />
+                
+                    <span *ngIf="displaneSel" class="tooltip-text">{{shoppingCartSummary?.sellerName}}</span>
                   </li>
                   <li  class="nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
                     [src]="shoppingCartSummary?.buyerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.buyerLogo : defaultBuyerLogo"
-                    onerror="this.onerror=null;this.src=defaultBuyerLogo"
-                        class="navbar-brand"
-                    />
+                    (error)="onImageError($event, 'buyer')"
+                    class="navbar-brand"
+                    (mouseover)="displaneBuy = true"
+                    (mouseleave)="displaneBuy = false"
+                />
+                
+                    <span *ngIf="displaneBuy" class="tooltip-text-b">{{shoppingCartSummary?.buyerName}}</span>
                   </li>
                   </ul>
 
-            <div class="position-relative pt-3 d-flex flex-column ml-4" style="">
+            <div class="position-relative pt-3 d-flex flex-column ml-4 mr-1"   (click)="getShoppingCartInfo(true)" style="cursor: pointer;">
                 <span
                     class="kt-header__topbar-icon kt-header__topbar-icon--primary"
                 >
@@ -155,11 +193,13 @@
                         src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
                         style="width: 20px; height: 20px; cursor: pointer;"
                         class="m-auto"
-                        (click)="getShoppingCartInfo(true)"
+                      
                         *ngIf="shoppingCartSummary?.shoppingCartId >0"
                     />
                     <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
-                        <span class="kt-badge kt-badge--primary unread-notification-count" style="
+                        <span
+                            class="kt-badge kt-badge--primary unread-notification-count"
+                            style="
                                 top: 5px !important;
                                 right: 10px !important;
                             "
@@ -170,7 +210,7 @@
                 </span>
                 <p *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="text-white mb-0" style="white-space: nowrap;font-size: 10px;">My cart</p>
             </div>
-            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
+            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty"  class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
                 <h5 class="text-white"> {{currencySymbol }} {{shoppingCartSummary?.amount | currency:' ' }}</h5>  
             </div>
 
@@ -181,17 +221,28 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-sm-flex d-none " style="justify-content: space-around;">
                 <div class="border-left text-white  d-md-block  mt-1" style="height: 55px;"></div>
                 <li class="nav-item pl-3 pt-2">
-                    <a class="nav-link active d-flex flex-column text-center" [routerLink]="['/app/main/Messages']"
-                        routerLinkActive="header-link-active">
+                    <a
+                        class="nav-link active d-flex flex-column text-center"
+                        [routerLink]="['/app/main/Messages']"
+                        routerLinkActive="header-link-active"
+                    >
                         <div class="position-relative">
-                            <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
-                                <img src="../../../assets/landingPage/message.png" style="width: 20px; height: 20px"
-                                    class="m-auto" />
+                            <span
+                                class="kt-header__topbar-icon kt-header__topbar-icon--primary"
+                            >
+                                <img
+                                    src="../../../assets/landingPage/message.png"
+                                    style="width: 20px; height: 20px"
+                                    class="m-auto"
+                                />
                                 <div *ngIf="unreadMessageCount">
-                                    <span class="kt-badge kt-badge--primary unread-notification-count" style="
+                                    <span
+                                        class="kt-badge kt-badge--primary unread-notification-count"
+                                        style="
                                             top: 5px !important;
                                             right: 0px !important;
-                                        ">
+                                        "
+                                    >
                                         {{ unreadMessageCount }}
                                     </span>
                                 </div>
@@ -201,9 +252,16 @@
                     </a>
                 </li>
                 <li class="nav-item pl-3 pt-2">
-                    <a class="nav-link active d-flex flex-column text-center" routerLinkActive="header-link-active">
-                        <div headerNotifications class="kt-header__topbar-item dropdown" dropdown
-                            id="header_notification_bar"></div>
+                    <a
+                        class="nav-link active d-flex flex-column text-center"
+                        routerLinkActive="header-link-active"
+                    >
+                        <div
+                            headerNotifications
+                            class="kt-header__topbar-item dropdown"
+                            dropdown
+                            id="header_notification_bar"
+                        ></div>
                         <span class="small">
                             {{ "Notification" | localize }}
                         </span>
@@ -214,7 +272,7 @@
                     <a class="nav-link active d-flex flex-column text-center">
                         <div
                             dropdown
-                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3"
+                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3 "
                             style=" height: 40px; color: white"
                         >
                             <div
@@ -239,7 +297,8 @@
                                         profilePicture
                                             ? profilePicture
                                             : 'assets/common/images/default-profile-picture.png'
-                                    " />
+                                    "
+                                    />
                                     <div>
                                         <!-- <span>{{ userName }}</span> -->
                                         <span>{{ name }}</span>
@@ -247,65 +306,85 @@
                                     </div>
                                 </div>
                             </div>
-                            <div *dropdownMenu
+                            <div
+                                *dropdownMenu
                                 class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-lg"
-                                [attr.aria-label]="l('Languages')">
-                                <ul class="kt-nav kt-margin-t-10 kt-margin-b-10">
-                                    <li class="kt-nav__item text-center">
-                                        <button id="businessAccount" class="pt-2 border-0 createButtons"
-                                            (click)="CreateBusiness_GroupAccount('BUSINESS','Business')"> <img
-                                                src="../../assets/img/input_icons/user-plus.png"
-                                                class="alarmInfo mr-2"><span>{{"CreateBusinessAccount" |
-                                                localize}}</span></button>
-                                        <button id="groupAccount" class="pt-2 border-0 createButtons"
-                                            (click)="CreateBusiness_GroupAccount('GROUP','Group')"> <img
-                                                src="../../assets/img/input_icons/user-plus.png"
-                                                class="alarmInfo mr-2"><span>{{"CreateGroupAccount" |
-                                                localize}}</span></button>
-
-                                    </li>
+                                [attr.aria-label]="l('Languages')"
+                            >
+                                <ul
+                                    class="kt-nav kt-margin-t-10 kt-margin-b-10 menu-tab"
+                                >
                                     <li class="kt-nav__item">
-                                        <a class="kt-nav__link">
-                                            <span class="kt-nav__link-icon mr-2">
-                                                <i *ngIf="isImpersonatedLogin"
-                                                    class="fa fa-reply kt-font-danger mr-2"></i>
-                                                <img *ngIf="profilePicture"
+                                        <a class="kt-nav__link" style="  
+     word-break: break-word;">
+                                            <span
+                                                class="kt-nav__link-icon mr-2"
+                                            >
+                                                <i
+                                                    *ngIf="isImpersonatedLogin"
+                                                    class="fa fa-reply kt-font-danger mr-2"
+                                                ></i>
+                                                <img
+                                                    *ngIf="profilePicture"
                                                     class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle"
-                                                    alt="Pic" [src]="profilePicture" />
+                                                    alt="Pic"
+                                                    [src]="profilePicture"
+                                                />
                                             </span>
                                             <span class="kt-nav__link-text">
-                                                <span *ngIf="
+                                                <span
+                                                    *ngIf="
                                                         isMultiTenancyEnabled &&
                                                         tenancyName
-                                                    " class="tenancy-name">{{ tenancyName }}\</span>{{ userName }}
+                                                    "
+                                                    class="tenancy-name"
+                                                    >{{ tenancyName }}\</span
+                                                >{{ userName }}
                                             </span>
                                             <!-- <small>Site Manager</small> -->
                                         </a>
                                     </li>
                                     <hr *ngIf="isImpersonatedLogin" />
-                                    <li class="kt-nav__item" *ngIf="isImpersonatedLogin">
-                                        <a class="kt-nav__link" (click)="backToMyAccount()">
+                                    <li
+                                        class="kt-nav__item"
+                                        *ngIf="isImpersonatedLogin"
+                                    >
+                                        <a
+                                            class="kt-nav__link"
+                                            (click)="backToMyAccount()"
+                                        >
                                             <span class="kt-nav__link-icon">
-                                                <i class="fa fa-reply kt-font-danger"></i>
+                                                <i
+                                                    class="fa fa-reply kt-font-danger"
+                                                ></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{
-                                                "BackToMyAccount" | localize
+                                                    "BackToMyAccount" | localize
                                                 }}
                                             </span>
                                         </a>
                                     </li>
                                     <hr />
                                     <!--Sara start-->
-                                    <li class="kt-nav__item" *ngIf="appSession.user.memberId">
+                                    <li
+                                        class="kt-nav__item"
+                                        *ngIf="appSession.user.memberId"
+                                    >
                                         <!--  <a class="kt-nav__link" [routerLink]="['/app/main/account']" routerLinkActive="router-link-active"  > -->
                                         <!--  'ViewMemberProfile/:id' -->
-                                        <a class="kt-nav__link" [routerLink]="['/app/main/account']" [queryParams]="{
+                                        <a
+                                            class="kt-nav__link"
+                                            [routerLink]="['/app/main/account']"
+                                            [queryParams]="{
                                                 tab: 'ViewMember',
                                                 memberId:
                                                     appSession.user.memberId,
                                                 userId: appSession.user.id
-                                            }" queryParamsHandling="merge" routerLinkActive="router-link-active">
+                                            }"
+                                            queryParamsHandling="merge"
+                                            routerLinkActive="router-link-active"
+                                        >
                                             <span class="kt-nav__link-icon">
                                                 <i class="far fa-user"></i>
                                             </span>
@@ -327,33 +406,44 @@
                 </li> -->
                                     <!--Sara End-->
                                     <li class="kt-nav__item">
-                                        <a class="kt-nav__link" (click)="showLinkedAccounts()">
+                                        <a
+                                            class="kt-nav__link"
+                                            (click)="showLinkedAccounts()"
+                                        >
                                             <span class="kt-nav__link-icon">
-                                                <i class="flaticon-user-settings"></i>
+                                                <i
+                                                    class="flaticon-user-settings"
+                                                ></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{
-                                                "ManageLinkedAccounts"
-                                                | localize
+                                                    "ManageLinkedAccounts"
+                                                        | localize
                                                 }}
                                             </span>
                                         </a>
                                     </li>
 
                                     <li class="kt-nav__item">
-                                        <a class="kt-nav__link" (click)="changePassword()">
+                                        <a
+                                            class="kt-nav__link"
+                                            (click)="changePassword()"
+                                        >
                                             <span class="kt-nav__link-icon">
                                                 <i class="flaticon-more-v6"></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{
-                                                "ChangePassword" | localize
+                                                    "ChangePassword" | localize
                                                 }}
                                             </span>
                                         </a>
                                     </li>
                                     <li class="kt-nav__item">
-                                        <a class="kt-nav__link" (click)="showLoginAttempts()">
+                                        <a
+                                            class="kt-nav__link"
+                                            (click)="showLoginAttempts()"
+                                        >
                                             <span class="kt-nav__link-icon">
                                                 <i class="flaticon-list"></i>
                                             </span>
@@ -363,44 +453,58 @@
                                         </a>
                                     </li>
                                     <li class="kt-nav__item" *ngIf="false">
-                                        <a class="kt-nav__link" (click)="changeProfilePicture()">
+                                        <a
+                                            class="kt-nav__link"
+                                            (click)="changeProfilePicture()"
+                                        >
                                             <span class="kt-nav__link-icon">
-                                                <i class="flaticon-profile-1"></i>
+                                                <i
+                                                    class="flaticon-profile-1"
+                                                ></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{
-                                                "ChangeProfilePicture"
-                                                | localize
+                                                    "ChangeProfilePicture"
+                                                        | localize
                                                 }}
                                             </span>
                                         </a>
                                     </li>
                                     <li class="kt-nav__item">
-                                        <a class="kt-nav__link" *ngIf="
+                                        <a
+                                            class="kt-nav__link"
+                                            *ngIf="
                                                 !(
                                                     'Pages.Administration.UiCustomization'
                                                     | permission
                                                 )
-                                            " routerLink="admin/ui-customization">
+                                            "
+                                            routerLink="admin/ui-customization"
+                                        >
                                             <span class="kt-nav__link-icon">
                                                 <i class="flaticon-medical"></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{
-                                                "VisualSettings" | localize
+                                                    "VisualSettings" | localize
                                                 }}
                                             </span>
                                         </a>
                                     </li>
                                     <li class="kt-nav__item" *ngIf="false">
-                                        <a class="kt-nav__link" (click)="downloadCollectedData()">
+                                        <a
+                                            class="kt-nav__link"
+                                            (click)="downloadCollectedData()"
+                                        >
                                             <span class="kt-nav__link-icon">
-                                                <i class="flaticon-download"></i>
+                                                <i
+                                                    class="flaticon-download"
+                                                ></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{
-                                                "DownloadCollectedData"
-                                                | localize
+                                                    "DownloadCollectedData"
+                                                        | localize
                                                 }}
                                             </span>
                                         </a>
@@ -408,7 +512,9 @@
                                     <li class="kt-nav__item" *ngIf="false">
                                         <a class="kt-nav__link">
                                             <span class="kt-nav__link-icon">
-                                                <i class="far fa-question-circle"></i>
+                                                <i
+                                                    class="far fa-question-circle"
+                                                ></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{ "Help" | localize }}
@@ -431,9 +537,14 @@
                                     </li>
                                     <hr /> -->
                                     <li class="kt-nav__item">
-                                        <a class="kt-nav__link" (click)="logout()">
+                                        <a
+                                            class="kt-nav__link"
+                                            (click)="logout()"
+                                        >
                                             <span class="kt-nav__link-icon">
-                                                <i class="fas fa-sign-out-alt"></i>
+                                                <i
+                                                    class="fas fa-sign-out-alt"
+                                                ></i>
                                             </span>
                                             <span class="kt-nav__link-text">
                                                 {{ "Logout" | localize }}
@@ -458,23 +569,36 @@
             <!-- Collapsible wrapper -->
 
             <!-- Left links -->
-            <ul class="navbar-nav bottom-navbar ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
-                    <a class="navbar-brand pt-0 navbar-brand-sm" [routerLink]="['/app/main/Home']"
-                        routerLinkActive="header-link-active" (click)="userClick('Home')">
-                        <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand" />
+                    <a
+                        class="navbar-brand pt-0 navbar-brand-sm"
+                        [routerLink]="['/app/main/Home']"
+                        routerLinkActive="header-link-active"
+                        (click)="userClick('Home')"
+                    >
+                        <img
+                            src="../../../assets/landingPage/Home_Footer_Btn.svg"
+                            class="navbar-brand _navbar-brand"
+                        />
                     </a>
                 </li>
                 <li class="nav-item pt-1">
-                    <a *ngIf="'Pages.Marketplace' | permission" class="nav-link active d-flex flex-column text-center"
-                        aria-current="page" [routerLink]="['/app/main/marketplace/']"
-                        [ngClass]="{ 'header-link-active': displayMarketPlace }">
-                        <img src="../../../assets/landingPage/marketPlace.png"
-                            class="navbar-brand _navbar-brand m-auto" />
+                    <a
+                        *ngIf="'Pages.Marketplace' | permission"
+                        class="nav-link active d-flex flex-column text-center"
+                        aria-current="page"
+                        [routerLink]="['/app/main/marketplace/']"
+                        [ngClass]="{ 'header-link-active': displayMarketPlace }"
+                    >
+                        <img
+                            src="../../../assets/landingPage/marketPlace.png"
+                            class="navbar-brand _navbar-brand m-auto"
+                        />
                     </a>
                 </li>
 <li        *ngIf="shoppingCartSummary?.shoppingCartId >0" class="nav-item pt-1">
-    <div class="position-relative pt-3" >
+    <div class="position-relative pt-3"   (click)="getShoppingCartInfo(true)">
         <span
             class="kt-header__topbar-icon kt-header__topbar-icon--primary"
         >
@@ -482,7 +606,7 @@
                 src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
                 style="width: 20px; height: 20px; cursor: pointer;"
                 class="m-auto"
-                (click)="getShoppingCartInfo(true)"
+              
          
             />
             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
@@ -500,19 +624,30 @@
     </div>
 </li>
                 <li class="nav-item pt-2">
-                    <a class="nav-link active d-flex flex-column text-center" [routerLink]="['/app/main/Messages']"
-                        routerLinkActive="header-link-active">
+                    <a
+                        class="nav-link active d-flex flex-column text-center"
+                        [routerLink]="['/app/main/Messages']"
+                        routerLinkActive="header-link-active"
+                    >
                         <div class="position-relative">
-                            <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
-                                <img src="../../../assets/landingPage/message.png" style="width: 20px; height: 20px"
-                                    class="m-auto" />
+                            <span
+                                class="kt-header__topbar-icon kt-header__topbar-icon--primary"
+                            >
+                                <img
+                                    src="../../../assets/landingPage/message.png"
+                                    style="width: 20px; height: 20px"
+                                    class="m-auto"
+                                />
                                 <div *ngIf="unreadMessageCount">
-                                    <span class="kt-badge kt-badge--primary unread-notification-count" style="
+                                    <span
+                                        class="kt-badge kt-badge--primary unread-notification-count"
+                                        style="
                                             top: 5px !important;
                                             right: 0px !important;
-                                        ">
+                                        "
+                                    >
                                         {{ unreadMessageCount }}
-                                        ali ali
+                                     
                                     </span>
                                 </div>
                             </span>
@@ -520,17 +655,38 @@
                     </a>
                 </li>
                 <li class="nav-item pt-2">
-                    <a class="nav-link active d-flex flex-column text-center" routerLinkActive="header-link-active">
+                    <a
+                        class="nav-link active d-flex flex-column text-center"
+                        routerLinkActive="header-link-active"
+                    >
                         <!--   <img
             src="../../../assets/landingPage/notification.png"
             style="width: 20px; height: 20px"
             class="m-auto"
         /> -->
-                        <div headerNotifications class="kt-header__topbar-item dropdown" dropdown
-                            id="header_notification_bar"></div>
+                        <div
+                            headerNotifications
+                            class="kt-header__topbar-item dropdown"
+                            dropdown
+                            id="header_notification_bar"
+                        ></div>
                     </a>
                 </li>
 
+                <li class="nav-item pt-2 ">
+                    <a class="nav-link active d-flex flex-column text-center" (click)="visible = true">
+                        <img
+                        style="width: 25px;"
+                        class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle"
+                        alt="Pic"
+                        [src]="
+                        profilePicture
+                            ? profilePicture
+                            : 'assets/common/images/default-profile-picture.png'
+                    "
+                    />
+                    </a>
+                </li>
                 <!--  <li class="nav-item pt-1">
             <a class="nav-link active d-flex flex-column text-center">
                 <div
@@ -792,8 +948,11 @@
     <!-- Container wrapper -->
 </nav>
 <!-- Navbar -->
-<nav *ngIf="_belowBar" class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5"
-    style="background-color: red; color: white; height: 25px">
+<nav
+    *ngIf="_belowBar"
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5"
+    style="background-color: red; color: white; height: 25px"
+>
     <!-- Container wrapper -->
     <div class="container" style="width: 40%">
         {{ _belowBarMessage }}
@@ -803,10 +962,36 @@
     </div>
     <!-- Container wrapper -->
 </nav>
-<app-shopping-cart-view-component #shoppingCartModal
-    (refreshShoppingCartData)="getShoppingCartInfo()"></app-shopping-cart-view-component>
+<app-transaction-information #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-transaction-information>
 
-<createTransactionModal *ngIf="!isHost" (modalClose)="closeModal($event)"
-    (refreshShoppingCartData)="getShoppingCartInfo()" [roles]="roles" [modalheaderName]="modalheaderName"
-    [orderNo]="orderNo" [fullName]="fullName" [display]="display"></createTransactionModal>
- 
+<createTransactionModal *ngIf="!isHost"   (modalClose)="closeModal($event)" (refreshShoppingCartData)="getShoppingCartInfo()" [roles]="roles" [modalheaderName]="modalheaderName" [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"   ></createTransactionModal>
+
+
+<p-dialog
+    [style]="{ width: '40vw' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
+    [baseZIndex]="10000"
+    [modal]="true"
+    
+    [(visible)]="visible"
+    [draggable]="false"
+    [closable]="true"
+    position="bottom"
+   
+>
+
+
+<div class="kt-nav__item p-4 log-li">
+    <a
+        class="kt-nav__link"
+        (click)="logout();visible = false"
+    >
+        <span class="kt-nav__link-icon">
+        <img              src="../../../assets/icons/log-out-02.svg" alt="" srcset="">
+        </span>
+        <span class="kt-nav__link-text log-txt">
+            {{ "Logout" | localize }}
+        </span>
+    </a>
+</div>
+</p-dialog>

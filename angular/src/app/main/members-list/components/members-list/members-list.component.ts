@@ -96,7 +96,7 @@ export class MembersListComponent extends AppComponentBase {
             )
             .subscribe((status) => {
                 if (status) {
-                    this.getMembers();
+                    this.getMembers({ rows: this.primengTableHelper.defaultRecordsCountPerPage })
                 }
             })
         this.subscriptions.push(subs)
@@ -136,11 +136,9 @@ export class MembersListComponent extends AppComponentBase {
             this.paginator.changePage(0);
             return;
         }
-
-        event.first = event.first ?? 0;
-        event.rows = event.rows ?? this.primengTableHelper.defaultRecordsCountPerPage;
-        if (!this.primengTableHelper.predefinedRecordsCountPerPage.length) {
-            this.primengTableHelper.predefinedRecordsCountPerPage = [10, 20, 50, 100];
+        if(!this.primengTableHelper?.predefinedRecordsCountPerPage  || this.primengTableHelper?.predefinedRecordsCountPerPage?.length ==0 ){
+        this.primengTableHelper.predefinedRecordsCountPerPage = [10, 20,30 ,40];
+        this.paginator.rowsPerPageOptions=this.primengTableHelper.predefinedRecordsCountPerPage;
         }
 
         const filters = this.filterForm.value

@@ -497,6 +497,37 @@ namespace onetouch.Migrations.Seed.Host
             }
             #endregion
             //MMT43[End]
+            //MMT-EntityLog[Start]
+            ObjectCode = "TRANSACTION";
+            codes = "READYTOBESENT,SENT".ToUpper().Split(',');
+            names = "Ready to be Sent,Sent".Split(',');
+            for (int i = 0; i < codes.Length; i++)
+            {
+                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                    r => r.Code == ObjectCode);
+                if (sydObjects != null && sydObjects.Id > 0)
+                {
+                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
+                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
+
+                    if (sydObjects != null && sydObjects.Id > 0 &&
+                        SycEntityObjectStatuses == null)
+                    {
+                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
+                        {
+                            Code = codes[i],
+                            Name = names[i],
+                            ObjectId = sydObjects.Id,
+                            ObjectCode = sydObjects.Code,
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
+
+                        };
+                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            //MMT-EntityLog[End]
 
         }
 

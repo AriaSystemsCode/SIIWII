@@ -82,29 +82,32 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
 
         //Iteration37-MMT[Start]
-        [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
+        //[StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
         public virtual string ContactAddressName { get; set; }
 
-        [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
+      //  [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
         public virtual string ContactAddressLine1 { get; set; }
 
 //        [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
         public virtual string ContactAddressLine2 { get; set; }
 
-        [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
+      //  [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
         public virtual string ContactAddressCity { get; set; }
 
-        [StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
+      //  [StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
         public virtual string ContactAddressState { get; set; }
 
-        [StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
+      //  [StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
         public virtual string ContactAddressPostalCode { get; set; }
 
         public virtual long ContactAddressCountryId { get; set; }
 
-        [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
+       // [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
         public virtual string ContactAddressCountryCode { get; set; }
         //Iteration37-MMT[End]
+        public virtual string BranchCode { get; set; }
+        public virtual string CompanyCode { get; set; }
+        public virtual string ContactCode { get; set; }
 
     }
     public class ContactAppAddressDto : AppAddressDto

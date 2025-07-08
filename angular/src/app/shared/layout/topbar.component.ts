@@ -27,8 +27,6 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
-    AccountsServiceProxy,
-    //sendRegistrationEmail,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -49,10 +47,8 @@ import {
 import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { Dropdown } from "primeng/dropdown";
-import { ShoppingCartViewComponentComponent } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
-import { ShoppingCartMode } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartMode";
-import Swal from 'sweetalert2';
-//import { HttpClient } from '@angular/common/http';
+import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
+
 export enum MarketPlace {
     Accounts,
     Products,
@@ -154,15 +150,17 @@ export class TopBarComponent
     isRoleExist: boolean = false;
     btnLoader: boolean = false;
     modalheaderName: string;
-    showSearch: boolean = false;
+    showSearch:boolean =false;
     shoppingCartSummary: ShoppingCartSummary;
     defaultSellerLogo: string = "";
     defaultBuyerLogo: string = "";
     _TransactionType = TransactionType;
     transactionType: string = "";
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
+    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     currencySymbol: string = "";
-
+    visible:boolean =false;
+    displaneSel :boolean =false;
+    displaneBuy :boolean =false;
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -181,12 +179,7 @@ export class TopBarComponent
         private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private _accountsServiceProxy: AccountsServiceProxy,
-        // private _SendRegistrationEmail:sendRegistrationEmail
-        //private _getRegisterationLinkWithTenantID: EmailingTemplateServiceProxy,
-        // private SucessCreateAccountApi: SucessCreateAccountApi,
-        // private http: HttpClient,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   
     ) {
         super(injector);
 
@@ -243,6 +236,8 @@ export class TopBarComponent
     }
 
     ngOnInit() {
+        this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
+        this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
         // this._AppTransactionServiceProxy
         // .getRelatedAccounts()
         // .subscribe((res: any) => {
@@ -281,8 +276,8 @@ export class TopBarComponent
         this.appSession.user.id;
         this.registerToEvents();
         this.getUnreadMessageCount();
-        if (!this.isHost)
-            this.getShoppingCartInfo();
+        if(!this.isHost)
+          this.getShoppingCartInfo();
 
         this.messageReadService.readMessageSubject$.subscribe((res) => {
             if (res) {
@@ -321,7 +316,7 @@ export class TopBarComponent
         this.userName = this.appSession.user.userName;
         this.name = this.appSession.user.name;
         this.fullName =
-            this.appSession.user.name + ' ' + this.appSession.user.surname;
+            this.appSession.user.name +' '+ this.appSession.user.surname;
         console.log(">>", this.appSession.user);
     }
     closeModal(value: boolean) {
@@ -356,7 +351,7 @@ export class TopBarComponent
         this._userLinkServiceProxy
             .getRecentlyUsedLinkedUsers()
             .subscribe((result) => {
-                this.recentlyLinkedUsers = result.items;
+                this.recentlyLinkedUsers = result?.items;
             });
     }
 
@@ -497,87 +492,44 @@ export class TopBarComponent
     }
     getUnreadMessageCount() {
         this._MessageServiceProxy.getUnreadCounts(null).subscribe((result) => {
-            this.unreadMessageCount = result;
+            if(result){
+                this.unreadMessageCount = result;
+
+            }
         });
     }
 
+    
+    onImageError(event: any, type: 'seller' | 'buyer') {
+      event.target.src = type === 'seller' ? this.defaultSellerLogo : this.defaultBuyerLogo;
+    }
+    
     getShoppingCartInfo(openShoppingCart: boolean = false) {
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
                 this.shoppingCartSummary = res;
-                if (this.shoppingCartSummary.orderType == this._TransactionType.SalesOrder)
+                if (this.shoppingCartSummary?.orderType == this._TransactionType?.SalesOrder)
                     this.transactionType = "SO";
-                if (this.shoppingCartSummary.orderType == this._TransactionType.PurchaseOrder)
+                if (this.shoppingCartSummary?.orderType == this._TransactionType?.PurchaseOrder)
                     this.transactionType = "PO";
 
-                if (!this.shoppingCartSummary.sellerLogo)
-                    this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
-                if (!this.shoppingCartSummary.buyerLogo)
-                    this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
 
-
-                if (this.shoppingCartSummary?.amount)
-                    this.shoppingCartSummary?.amount % 1 == 0 ? this.shoppingCartSummary.amount = parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)) : null;
+                  if(this.shoppingCartSummary?.amount)
+                  this.shoppingCartSummary?.amount % 1 ==0?this.shoppingCartSummary.amount=parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)):null; 
 
                 if (openShoppingCart)
                     this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
 
-                //Currency
-                this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
-                    .subscribe((res: CurrencyInfoDto) => {
-                        this.currencySymbol = res.symbol ? res.symbol : res.code;
-                    });
-
+                     //Currency
+            this._AppEntitiesServiceProxy.getCurrencyInfo(res?.currencyCode)
+            .subscribe((res: CurrencyInfoDto) => {
+                this.currencySymbol = res?.symbol ? res?.symbol : res?.code  ;
             });
 
+            });
+            
     }
-    /////////
 
-
-    CreateBusiness_GroupAccount(accout_type: string, account_name: string): void {
-        debugger
-        let type = accout_type;
-        let accountname = account_name;
-        let email = this.appSession.user.emailAddress;
-        let url =  this.appUrlService.appRootUrl;
-        let tenantName =this.appSession.tenant.name;
-        //let tenantName =this.appSession.tenancyName;
-        let firstName=btoa(this.appSession.user.name);
-        let lastName=btoa(this.appSession.user.surname);
-        let relatedTenantId=this.appSession.tenantId;
-        const htmlTitle: string = `<div class="font-weight-bold"><p class="text-left alarmInfo_title"> <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"/> A registration mail has been Sent to ` + email  + ` </p> </div> `;
-        const htmlContent: string = `<p class="pleaseClick" style="color: #9E9E9E;">*Please Click on the register link in the email in order to create the new  Business | group account. </p> `;
-        var tenantId;
-        if (this.appSession?.tenantId)
-            tenantId = this.appSession?.tenantId?.toString();
-        else tenantId = null;
-        let link = url + "/account/select-edition?editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
-        Swal.fire({
-            title: htmlTitle,
-            html: htmlContent,
-            showCancelButton: false,
-            //cancelButtonText: this.l("No"),
-            confirmButtonText: "okay",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            backdrop: true,
-            customClass: {
-                popup: 'popup_container popup_container_CreateBusiness_GroupAccount',
-                content: 'popup_content',
-                actions: 'popup_actions',
-                confirmButton: 'popp_confirm-button',
-
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                debugger 
-                this._accountsServiceProxy.sendRegistrationEmail(email, tenantId, type, link , tenantName).subscribe(
-                    response => {
-                        console.log('Email sent successfully', response);
-                    })
-            }
-        })
-    }
 }
 
 export interface TopbardropDown {
@@ -586,4 +538,3 @@ export interface TopbardropDown {
     clickHandler: Object;
     displayCondition: boolean;
 }
-

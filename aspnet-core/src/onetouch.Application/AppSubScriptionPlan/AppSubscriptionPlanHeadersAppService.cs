@@ -21,6 +21,7 @@ using Abp.EntityFrameworkCore.Extensions;
 using Org.BouncyCastle.Crypto;
 using onetouch.SystemObjects;
 using onetouch.SystemObjects.Dtos;
+using NUglify.Helpers;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -47,7 +48,7 @@ namespace onetouch.AppSubScriptionPlan
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
 
-                var filteredAppSubscriptionPlanHeaders = _appSubscriptionPlanHeaderRepository.GetAll().IncludeIf( AbpSession.TenantId!=null , z=>z.AppSubscriptionPlanDetails)
+                var filteredAppSubscriptionPlanHeadersFirst = _appSubscriptionPlanHeaderRepository.GetAll()//.IncludeIf( AbpSession.TenantId!=null , z=>z.AppSubscriptionPlanDetails)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Description.Contains(input.Filter) || e.BillingCode.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Name.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Description == input.DescriptionFilter)
                         .WhereIf(input.IsStandardFilter.HasValue && input.IsStandardFilter > -1, e => (input.IsStandardFilter == 1 && e.IsStandard) || (input.IsStandardFilter == 0 && !e.IsStandard))
@@ -62,7 +63,11 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), e => e.Name == input.NameFilter);
 
-                var pagedAndFilteredAppSubscriptionPlanHeaders = filteredAppSubscriptionPlanHeaders
+                var filteredAppSubscriptionPlanHeaders = filteredAppSubscriptionPlanHeadersFirst;
+                if (AbpSession.TenantId != null)
+                    filteredAppSubscriptionPlanHeaders = filteredAppSubscriptionPlanHeadersFirst.Include(z => z.AppSubscriptionPlanDetails).ThenInclude(z=>z.AppFeatureFk).ThenInclude(z=>z.CategoryFk);
+
+                    var pagedAndFilteredAppSubscriptionPlanHeaders = filteredAppSubscriptionPlanHeaders
                     .OrderBy(input.Sorting ?? "id asc")
                     .PageBy(input);
 
@@ -86,6 +91,10 @@ namespace onetouch.AppSubScriptionPlan
                 var totalCount = await filteredAppSubscriptionPlanHeaders.CountAsync();
 
                 var dbList = await appSubscriptionPlanHeaders.ToListAsync();
+                
+                foreach (var head in dbList)
+                    head.AppSubscriptionPlanDetails.ForEach(z => z.FeatureCategory =((z.AppFeatureFk!=null && z.AppFeatureFk.CategoryFk!=null)? z.AppFeatureFk.CategoryFk.Name: z.Category));
+
                 var results = new List<GetAppSubscriptionPlanHeaderForViewDto>();
 
                 foreach (var o in dbList)
@@ -115,7 +124,7 @@ namespace onetouch.AppSubScriptionPlan
                 if (AbpSession.TenantId != null)
                 {
                     var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
-                        .Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodEndDate.Date >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate.Date).FirstOrDefaultAsync();
+                        .Where(z => z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();// && z.CurrentPeriodEndDate.Date >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate.Date
                     if (tenantPlan != null)
                     {
                         var plan = results.Where(z => z.AppSubscriptionPlanHeader.Id == tenantPlan.AppSubscriptionPlanHeaderId).FirstOrDefault();
@@ -123,7 +132,7 @@ namespace onetouch.AppSubScriptionPlan
                             plan.AppSubscriptionPlanHeader.AppTenantSubscriptionPlanId= tenantPlan.Id;
 
                     }
-                          
+                         
                 }
                    // AppTenantSubscriptionPlanId
                 //MMT

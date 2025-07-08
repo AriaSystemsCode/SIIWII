@@ -145,7 +145,7 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     save(): void {
         let input = new CreateOrUpdateUserInput();
         let  sequance="";
-        this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).subscribe
+        this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,this.appSession.tenantId).subscribe
         ((res) => { 
             let tenancyName = this.appSession.tenancyName;
             sequance=res;

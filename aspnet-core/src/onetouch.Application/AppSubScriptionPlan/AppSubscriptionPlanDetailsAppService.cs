@@ -52,8 +52,19 @@ namespace onetouch.AppSubScriptionPlan
         [AllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>> GetAll(GetAllAppSubscriptionPlanDetailsInput input)
         {
+            long? tenantPlan = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                if (AbpSession.TenantId != null)
+                {
+                    var tenantPlanObj = await _appTenantSubscriptionPlanRepository.GetAll()
+                        .Where(z => z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                    if (tenantPlanObj != null)
+                    {
+                        tenantPlan = tenantPlanObj.AppSubscriptionPlanHeaderId;
+                    }
+
+                }
                 var filteredAppSubscriptionPlanDetails = _appSubscriptionPlanDetailRepository.GetAll()
                         .Include(e => e.AppSubscriptionPlanHeaderFk)
                         .Include(e => e.AppFeatureFk)
@@ -77,15 +88,15 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
                         .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
                         .WhereIf(input.AppSubscriptionPlanHeaderFilter!=null, e => e.AppSubscriptionPlanHeaderId == long.Parse(input.AppSubscriptionPlanHeaderFilter.ToString()))
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
-                        //.WhereIf(input.AddFeaturesOnly, e => e.IsAddOn == true);
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter)
+                        .WhereIf(tenantPlan != null, z => z.AppSubscriptionPlanHeaderId == tenantPlan);
 
-                var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
-                    .OrderBy(input.Sorting ?? "id asc")
-                    .PageBy(input);
+                var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails;
+                 //   .OrderBy(input.Sorting ?? "id asc")
+                   // .PageBy(input);
 
                 var appSubscriptionPlanDetails = from o in pagedAndFilteredAppSubscriptionPlanDetails
-                                                 join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
+                                                 //join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll().WhereIf(tenantPlan!=null,z => z.Id== tenantPlan) on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
                                                  join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
                                                  from s1 in j2.DefaultIfEmpty()
                                                      //join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
@@ -113,12 +124,18 @@ namespace onetouch.AppSubScriptionPlan
                                                      Id = o.Id,
                                                      s1.IsAddOn,
                                                      AppFeatureId = o.AppFeatureId,
-                                                     o.AppSubscriptionPlanHeaderId
+                                                     o.AppSubscriptionPlanHeaderId,
+                                                     o.AppSubscriptionPlanHeaderFk
                                                      //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
                                                  };
+                
+                var totalCount = await appSubscriptionPlanDetails.Distinct().CountAsync();
+                if (input.AddFeaturesOnly)
+                    totalCount = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().CountAsync();
 
-                //var totalCount = await filteredAppSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z=>z.isa).CountAsync();
-                var totalCount = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).CountAsync();
+                appSubscriptionPlanDetails= appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input);
+
                 var dbList = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().ToListAsync();
                 var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
 
@@ -147,7 +164,9 @@ namespace onetouch.AppSubScriptionPlan
                             Trackactivity = o.Trackactivity,
                             Id = o.Id,
                             IsAddOn = o.IsAddOn,
-                            AppFeatureId = o.AppFeatureId
+                            AppFeatureId = o.AppFeatureId,
+                            AppSubscriptionPlanHeaderCode = o.AppSubscriptionPlanHeaderFk.Code,
+                            AppSubscriptionPlanHeaderName = o.AppSubscriptionPlanHeaderFk.Name
                         },
                         
                         // AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader,
@@ -336,7 +355,7 @@ namespace onetouch.AppSubScriptionPlan
         [AbpAuthorize(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails)]
         public async Task<PagedResultDto<AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto>> GetAllAppSubscriptionPlanHeaderForLookupTable(GetAllForLookupTableInput input)
         {
-            var query = _lookup_appSubscriptionPlanHeaderRepository.GetAll().WhereIf(
+            var query = _lookup_appSubscriptionPlanHeaderRepository.GetAll().Where(z=>z.IsStandard).WhereIf(
                    !string.IsNullOrWhiteSpace(input.Filter),
                   e => e.Code != null && e.Code.Contains(input.Filter)
                );

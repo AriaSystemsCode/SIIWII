@@ -9,6 +9,8 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { UpdateLogoService } from '@shared/utils/update-logo.service';
 import * as moment from 'moment';
+import { AbpSessionService } from 'abp-ng2-module';
+import { Session } from 'inspector';
 
 @Component({
     selector: 'app-create-or-edit-member',
@@ -288,9 +290,9 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
             let sequance = "";
             let tenancyName = this.appSession.tenancyName;
 
-            const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise()
-            if (getNextEntityCodeRes)
-                sequance = getNextEntityCodeRes;
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,this.appSession.tenantId).toPromise()
+        if(getNextEntityCodeRes)
+            sequance=getNextEntityCodeRes;
 
             this.memberDto.code = tenancyName + "-C" + sequance;
         }
@@ -373,6 +375,10 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         this.coverPhoto = undefined
         this.logoId = undefined
 
+    }
+
+    getCodeValue(code: string) {
+        this.memberDto.code = code;
     }
 }
 

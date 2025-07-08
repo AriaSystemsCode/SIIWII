@@ -103,18 +103,7 @@ namespace onetouch.Features
            IsVisibleOnPricingTable = true,
            TextHtmlColor = value => value == "true" ? "#5cb85c" : "#d9534f"
        };
-            context.Create(
-           "InvitePartnersByType",
-           defaultValue: "true",
-           displayName: L("InvitePartnersByType"),
-           inputType: new CheckboxInputType()
-       )[FeatureMetadata.CustomFeatureKey] = new FeatureMetadata
-       {
-           IsVisibleOnPricingTable = true,
-           TextHtmlColor = value => value == "true" ? "#5cb85c" : "#d9534f"
-       };
-
-
+            
             context.Create(
                    "CreateProductList",
                    defaultValue: "true",

@@ -359,10 +359,10 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
 
     getContactSync() {
-        this._AccountsServiceProxy.getContactSync(this.accountData.id)
-            .subscribe((res: boolean) => {
-                this.isSync = res;
-            });
+        // this._AccountsServiceProxy.getContactSync(this.accountData.id)
+        //     .subscribe((res: boolean) => {
+        //         this.isSync = res;
+        //     });
 
     }
 

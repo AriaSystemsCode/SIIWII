@@ -1,148 +1,235 @@
 <div [@routerTransition]>
     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-
-
-        <div class="kt-subheader kt-grid__item">
-            <div [class]="containerClass">
-                <div class="kt-subheader__main">
-                    <h3 class="kt-subheader__title">
-                        <span>{{l("AppTenantInvoices")}}</span>
-                    </h3>
-                    <span class="kt-subheader__separator kt-subheader__separator--v"></span>
-                    <span class="kt-subheader__desc">
-                        {{l("AppTenantInvoicesHeaderInfo")}}
-                    </span>
-                </div>
-
-            </div>
-        </div>
-
-
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet kt-portlet--mobile">
-                <div class="kt-portlet__body">
-                    <form class="kt-form" autocomplete="off">
-                        <div>
-                            <div class="row align-items-center">
-                                <div class="col-xl-12">
-                                    <div class="form-group m-form__group align-items-center">
-                                        <div class="input-group">
-                                            <input [(ngModel)]="filterText" name="filterText" autoFocus
-                                                class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
-                                                type="text">
-                                            <span class="input-group-btn">
-                                                <button (click)="getAppTenantInvoices()" class="btn btn-primary"
-                                                    type="submit"><i class="flaticon-search-1"></i></button>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </form>
-
-                    <div class="row align-items-center">
-                        <!--<Primeng-Datatable-Start>-->
-                        <div class="primeng-datatable-container col-12" [busyIf]="primengTableHelper.isLoading">
-                            <p-table #dataTable (onLazyLoad)="getAppTenantInvoices($event)"
-                                [value]="primengTableHelper.records"
-                                rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" [scrollable]="true" ScrollWidth="100%"
-                                [responsive]="primengTableHelper.isResponsive"
-                                [resizableColumns]="primengTableHelper.resizableColumns">
-                                <ng-template pTemplate="header">
-                                    <tr>
-
-                                        <th style="width: 150px" pSortableColumn="invoiceNumber">
-                                            {{l('InvoiceNumber')}}
-                                            <p-sortIcon field="appTenantInvoice.invoiceNumber"></p-sortIcon>
-                                        </th>
-                                        <th style="width: 150px" pSortableColumn="amount">
-                                            {{l('Amount')}}
-                                            <p-sortIcon field="appTenantInvoice.amount"></p-sortIcon>
-                                        </th>
-                                        <th style="width: 150px" pSortableColumn="invoiceDate">
-                                            {{l('InvoiceDate')}}
-                                            <p-sortIcon field="appTenantInvoice.invoiceDate"></p-sortIcon>
-                                        </th>
-
-                                        <th style="width: 150px" pSortableColumn="dueDate">
-                                            {{l('DueDate')}}
-                                            <p-sortIcon field="appTenantInvoice.dueDate"></p-sortIcon>
-                                        </th>
-                                        <th style="width: 150px" pSortableColumn="payDate">
-                                            {{l('PayDate')}}
-                                            <p-sortIcon field="appTenantInvoice.payDate"></p-sortIcon>
-                                        </th>
-                                        <th style="width: 130px">{{l('Actions')}}</th>
-                                    </tr>
-                                </ng-template>
-                                <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
-                                    <tr>
-
-                                        <td style="width:150px">
-                                            {{record.appTenantInvoice.invoiceNumber}}
-                                        </td>
-                                        <td style="width:150px">
+    
+    
+                  <div class="kt-subheader kt-grid__item">
+                    <div [class]="containerClass">
+                      <div class="kt-subheader__main">
+                          <h3 class="kt-subheader__title">
+                              <span>{{l("AppTenantInvoices")}}</span>
+                          </h3>
+                          <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                          <span class="kt-subheader__desc">
+                              {{l("AppTenantInvoicesHeaderInfo")}}
+                          </span>
+                      </div>
+                
+                    </div>
+                  </div>
+              
+      
+      <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+          <div class="kt-portlet kt-portlet--mobile">
+              <div class="kt-portlet__body">
+                  <form class="kt-form" autocomplete="off">
+                      <div>
+                          <div class="row align-items-center">
+                              <div class="col-xl-12">
+                                  <div class="form-group m-form__group align-items-center">
+                                      <div class="input-group">
+                                          <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                          <span class="input-group-btn">
+                                              <button (click)="getAppTenantInvoices()" class="btn searchBtn" type="submit"><i class="flaticon-search-1"></i></button>
+                                          </span>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                    
+                        </div> 
+                  </form>
+  
+                  <div class="row align-items-center">
+                      <!--<Primeng-Datatable-Start>-->
+                      <div class="primeng-datatable-container col-12"
+                           [busyIf]="primengTableHelper.isLoading">
+                          <p-table #dataTable
+                                       (onLazyLoad)="getAppTenantInvoices($event)"
+                                       [value]="primengTableHelper.records"
+                                       rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                       [paginator]="false"
+                                       [lazy]="true"
+                                       [scrollable]="true"
+                                       ScrollWidth="100%"
+                                       [responsive]="primengTableHelper.isResponsive"
+                                       [resizableColumns]="primengTableHelper.resizableColumns">
+                              <ng-template pTemplate="header">
+                                  <tr>
+                                      
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="invoiceNumber">
+                                          {{l('InvoiceNumber')}}
+                                          <p-sortIcon field="appTenantInvoice.invoiceNumber"></p-sortIcon>
+                                      </th>
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="amount">
+                                        {{l('Amount')}}
+                                        <p-sortIcon field="appTenantInvoice.amount"></p-sortIcon>
+                                      </th>
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="invoiceDate">
+                                          {{l('InvoiceDate')}}
+                                          <p-sortIcon field="appTenantInvoice.invoiceDate"></p-sortIcon>
+                                      </th>
+                                      
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="dueDate">
+                                          {{l('DueDate')}}
+                                          <p-sortIcon field="appTenantInvoice.dueDate"></p-sortIcon>
+                                      </th>
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="payDate">
+                                          {{l('PayDate')}}
+                                          <p-sortIcon field="appTenantInvoice.payDate"></p-sortIcon>
+                                      </th>
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;">{{l('Actions')}}</th> 
+                                  </tr>
+                              </ng-template>                           
+                              <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                  <tr>
+                               
+                                    <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
+                                              <!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
+                                              {{record.appTenantInvoice.invoiceNumber}}
+                                          </td>
+                                          <td style="width:150px;font-family: Poppins;
+                                          font-size: 12px;
+                                          font-weight: 500;
+                                          line-height: 18px;
+                                          text-align: center;
+                                          text-underline-position: from-font;
+                                          text-decoration-skip-ink: none;color:#595959;">
+                                            <!-- <span class="ui-column-title"> {{l('Amount')}}</span> -->
                                             {{record.appTenantInvoice.amount}}
                                         </td>
-                                        <td style="width:150px">
-                                            <span *ngIf="record.appTenantInvoice.invoiceDate">
-                                                {{record.appTenantInvoice.invoiceDate | momentFormat:'L' }}
-                                            </span>
-                                            <span *ngIf="!record.appTenantInvoice.invoiceDate">-</span>
-                                        </td>
-
-                                        <td style="width:150px">
-                                            <span *ngIf="record.appTenantInvoice.dueDate">
-                                                {{record.appTenantInvoice.dueDate | momentFormat:'L' }}
-                                            </span>
-                                            <span *ngIf="!record.appTenantInvoice.dueDate">-</span>
-                                        </td>
-                                        <td style="width:150px">
-                                            <span *ngIf="record.appTenantInvoice.payDate">
-                                                {{record.appTenantInvoice.payDate | momentFormat:'L' }}
-                                            </span>
-                                            <span *ngIf="!record.appTenantInvoice.payDate">-</span>
-                                        </td>
-
-                                        <td style="width: 130px">
-                                            <div container="body">
-
-                                                <button class="btn download-btn"
-                                                    (click)="downloadFile(record.appTenantInvoice.attachment, record.appTenantInvoice.displayName)">
-                                                    <img src="assets/accounts/download.svg"
-                                                        (click)="downloadFile(record.appTenantInvoice.attachment, record.appTenantInvoice.displayName)" />
-                                                    {{l("Download")}}
-                                                </button>
-                                            </div>
-                                        </td>
-
-                                    </tr>
-
-                                </ng-template>
-                            </p-table>
-                            <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
-                                {{l('NoData')}}
-                            </div>
-                            <div class="primeng-paging-container">
-                                <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage" #paginator
-                                    (onPageChange)="getAppTenantInvoices($event)"
-                                    [totalRecords]="primengTableHelper.totalRecordsCount"
-                                    [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
-                                    [showCurrentPageReport]="true"
-                                    [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount">
-                                </p-paginator>
-                            </div>
-                        </div>
-                        <!--<Primeng-Datatable-End>-->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+                                      <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
+                                          <!-- <span class="ui-column-title"> {{l('InvoiceDate')}}</span> -->
+                                          <span *ngIf="record.appTenantInvoice.invoiceDate">
+                                              {{record.appTenantInvoice.invoiceDate |  momentFormat:'L' }}
+                                          </span>
+                                          <span *ngIf="!record.appTenantInvoice.invoiceDate">-</span>
+                                      </td>
+                                      
+                                      <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
+                                          <!-- <span class="ui-column-title"> {{l('DueDate')}}</span> -->
+                                          <span *ngIf="record.appTenantInvoice.dueDate">
+                                              {{record.appTenantInvoice.dueDate |  momentFormat:'L' }}
+                                          </span>
+                                          <span *ngIf="!record.appTenantInvoice.dueDate">-</span>
+                                      </td>
+                                      <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: center;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
+                                          <!-- <span class="ui-column-title"> {{l('PayDate')}}</span> -->
+                                          <span *ngIf="record.appTenantInvoice.payDate">
+                                              {{record.appTenantInvoice.payDate |  momentFormat:'L' }}
+                                          </span>
+                                          <span *ngIf="!record.appTenantInvoice.payDate">-</span>
+                                      </td>
+ 
+                                        <td style="width:150px;font-family: Poppins;
+                                        font-size: 12px;
+                                        font-weight: 500;
+                                        line-height: 18px;
+                                        text-align: center;
+                                        text-underline-position: from-font;
+                                        text-decoration-skip-ink: none;color:#595959;">
+                                         <div  container="body">
+                                             
+                                              <button class="btn download-btn" 
+                                              (click)="downloadFile(record.appTenantInvoice.attachment, record.appTenantInvoice.displayName)">
+                                                <img src="assets/accounts/download.svg" (click)="downloadFile(record.appTenantInvoice.attachment, record.appTenantInvoice.displayName)"/>
+                                                {{l("Download")}}
+                                              </button>
+                                              </div>
+                                              </td> 
+  
+                                  </tr>
+                                 
+                              </ng-template>
+                          </p-table>
+                          <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                              {{l('NoData')}}
+                          </div>
+                          <div class="primeng-paging-container d-flex justify-content-between align-items-center">
+                            <span style="color: #595959;">
+                                Showing    {{ primengTableHelper.totalRecordsCount < 10 ? primengTableHelper.totalRecordsCount : first+rows}} of   {{ primengTableHelper.totalRecordsCount}} data
+                                  </span>
+                              <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                              #paginator
+                              (onPageChange)="getAppTenantInvoices($event)"
+                              [totalRecords]="primengTableHelper.totalRecordsCount"
+                              [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
+                 </p-paginator>
+             
+                          </div>
+                      </div>
+                      <!--<Primeng-Datatable-End>-->
+                  </div>
+              </div>
+          </div>
+      </div>
+          
+      
+       <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
     </div>
 </div>

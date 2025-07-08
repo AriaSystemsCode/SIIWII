@@ -38,7 +38,7 @@ namespace onetouch.AppMarketplaceItems
       
         public ICollection<AppMarketplaceItemPrices> ItemPricesFkList { get; set; }
         public ICollection<AppMarketplaceItemSizeScalesHeader> ItemSizeScaleHeadersFkList { get; set; }
-        public virtual DateTime TimeStamp { get; set; }
+       // public virtual DateTime TimeStamp { get; set; }
        
        
        

@@ -11,13 +11,20 @@ import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistor
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { AppSessionService } from '@shared/common/session/app-session.service';
+import { DateType } from 'devextreme/ui/date_box';
 
 
 @Component({
     selector: 'app-tenantactivitieslog',
     templateUrl: './appTenantActivitiesLog.component.html',
     encapsulation: ViewEncapsulation.None,
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()], 
+    styles: [`
+        .searchBtn {
+    background: #4A0D4A !important;
+    margin-top: 3px !important;color:#595959;
+}
+    `]
 })
 export class AppTenantActivitiesLogComponent extends AppComponentBase {
 
@@ -102,7 +109,8 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
         let customSettings = (abp as any).custom;
         return this.isGrantedAny('Pages.Administration.AuditLogs') && customSettings.EntityHistory && customSettings.EntityHistory.isEnabled && _.filter(customSettings.EntityHistory.enabledEntities, entityType => entityType === this._entityTypeFullName).length === 1;
     }
-
+    first = 0;
+    rows = 10; // default
     getAppTenantActivitiesLog(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
@@ -154,7 +162,10 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
             this.primengTableHelper.hideLoadingIndicator();
+            this.first = this.primengTableHelper.getSkipCount(this.paginator, event);
+            this.rows = this.primengTableHelper.getMaxResultCount(this.paginator, event);
         });
+
     }
 
     reloadPage(): void {
@@ -231,9 +242,12 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
                 this._fileDownloadService.downloadTempFile(result);
             });
     }
-
-
-
-
-
+    formatDate(input: string )
+    {
+        return moment(input).format('MM/DD/YYYY HH:mm:ss');
+    }
+    
+    
+    
+    
 }

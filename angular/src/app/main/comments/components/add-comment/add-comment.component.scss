@@ -3,12 +3,12 @@
 }
 #commentBody{
     border-radius: 10px;
-    border: 1px solid #F8F8F8;
+    border: 1px solid #EEEEEE;
     resize: none;
     padding: 10px;
     box-shadow: 0 0 3px transparent;
     overflow: hidden;
-    background-color: #F8F8F8;
+    background-color: #FFFF;
     &:focus {
         outline: none !important;
         box-shadow: 0 0 3px #464444;
@@ -31,7 +31,8 @@ button.send-comment-icon {
     border: none;
     outline: none;
     float: right;
-    margin-top: -41px;
+   // margin-top: -41px;
+    margin-top: 3px;
     z-index: 100;
     position: relative;
     background-color: transparent;

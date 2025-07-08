@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Abp.Application.Services.Dto;
 using onetouch.AppEntities.Dtos;
 using onetouch.Sessions.Dto;
+using System.Net;
+using System.Security.Policy;
 
 namespace onetouch.AppSiiwiiTransaction.Dtos
 {
@@ -90,6 +92,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string? Reference { set; get; }
         public virtual DateTime EnteredDate { set; get; }
         //Iteration#42[End]
+        public virtual bool CreateManualAccount { set; get; } = false;
+        public virtual bool CreateManualContact { set; get; } = false;
     }
     public enum OrderCreatorRole
     { 
@@ -112,9 +116,11 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Phone { set; get; }
         public long? PhoneTypeId { get; set; }
         public string PhoneTypeName { set; get; }
+        public string Code { set; get; }
     }
     public class GetContactInformationDto
     {
+        public string Code { set; get; }
         public long Id { set; get; }
         public string Name{set;get;}
         public string Email { set; get; }
@@ -130,4 +136,40 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long? PhoneTypeId { get; set; }
         public string PhoneTypeName { set; get; }
     }
+    //Iteration#45
+    public class VariationInputDto : PagedAndSortedResultRequestDto
+    {
+       public string? VariationCodeFilter { set; get; }
+       public TransactionType? TransactionTypeFilter { set; get; }
+       public string? NameFilter{ set; get; }
+       
+       public string? TransactionNumberFilter { set; get; }
+       public decimal? MinPrice { set; get; }
+       public decimal? MaxPrice { set; get; }
+       public decimal? MinAmount{ set; get; }
+       public decimal? MaxAmount{ set; get; }
+
+    }
+    public class SellerVariationInputDto : PagedAndSortedResultRequestDto
+    { 
+        public string SellerSSIN { set; get; }
+        public string Filter { set; get; }
+        public string ContactSSIN { set; get; }
+        public string CurrencyCode { set; get; }
+    }
+    public class AddVariationToInputDto
+    { 
+        public string VariationSSIN { set; get; }
+        public int Qty { set; get; }
+        public decimal Price { set; get; }
+        public long TransactionId { set; get; }
+        public TransactionType TransactionType { set; get; }
+    }
+    public class AccountDefaultAddressDto
+    {
+        public string AddressType { set; get; }
+        public long AddressId { set; get; }
+
+    }
+    //Iteration45
 }

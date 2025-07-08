@@ -115,6 +115,9 @@ namespace onetouch.AccountInfos.Dtos
         //MMT40[Start]
         public virtual IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
         //MMT40[end]
-
+        //I46[Start]
+        public virtual long? ShipViaId { set; get; }
+        public virtual long? PaymentTermsId { set; get; }
+        //I46[End]
     }
 }

@@ -131,10 +131,13 @@ namespace onetouch.AppItems
             //XX1
             List<AppItem> modifiedItems = new List<AppItem>();
             //xx1
+            //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[Start]
+            var timeStamp = DateTime.Now;
+            //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[Start]
             foreach (var excelDto in result)
             {
                 AppItem appItem = new AppItem();
-                appItem = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                appItem = _appItemRepository.GetAll().Include(x=>x.EntityFk).Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
@@ -146,9 +149,12 @@ namespace onetouch.AppItems
                                .FirstOrDefault();
                            
                 appItem.StockAvailability = long.Parse(excelDto.StockAvailable);
-            
+                //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[Start]
+                appItem.TimeStamp = timeStamp;
+                appItem.EntityFk.TimeStamp = timeStamp;
+                //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[End]
                 appItemModifyList.Add(appItem);
-
+               
             }
 
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
@@ -160,7 +166,7 @@ namespace onetouch.AppItems
                 var parentCodes = result.Select(z => z.ParentCode).Distinct().ToList();
                 foreach (var parent in parentCodes)
                 {
-                    var parentItem = await _appItemRepository.GetAll()//.Include(z => z.EntityFk)
+                    var parentItem = await _appItemRepository.GetAll().Include(x => x.EntityFk)//.Include(z => z.EntityFk)
                         .Include(z => z.ParentFkList.Where(x => string.IsNullOrEmpty(x.Code)))//.ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
                         .Where(z => z.Code == parent && z.ItemType == 0).FirstOrDefaultAsync();
                     if (parentItem != null)
@@ -173,6 +179,10 @@ namespace onetouch.AppItems
                           //  var item = await _appItemRepository.GetAll().Where(z => z.Id == vari.Id).FirstOrDefaultAsync();
                             //if (item != null)
                             {
+                                //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[Start]
+                                parentItem.TimeStamp = timeStamp;
+                                //T-SII-20241011.0001,1 MMT 10/20/2024 - Items - Style Sync button is not being enabled to update ATS on marketplace when stock is updated with import stock availability program[End]
+                                parentItem.EntityFk.TimeStamp = timeStamp;
                                 parentItem.StockAvailability = sumQty;
                                 modifiedItems.Add(parentItem);
                             }
@@ -295,7 +305,7 @@ namespace onetouch.AppItems
                                join i in _appItemRepository.GetAll().AsNoTracking().Include(x => x.ParentFk).Where(x => x.ItemType == 0)
                                on r.Code.Replace(" ", string.Empty) equals i.Code.Replace(" ", string.Empty) into j1
                                from j in j1
-                               select new { item = j, code = j.Code.Replace(" ", string.Empty), parentCode = j.ParentFk.Code };
+                               select new { item = j, code = j.Code.Replace(" ", string.Empty), parentCode = (j.ParentFk !=null ? j.ParentFk.Code : null) };
 
 
                 var resJoin = resJoin1.ToList().OrderBy(z => z.code);

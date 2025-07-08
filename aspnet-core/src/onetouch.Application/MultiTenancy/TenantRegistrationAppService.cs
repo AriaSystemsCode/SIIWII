@@ -134,8 +134,7 @@ namespace onetouch.MultiTenancy
                     sendActivationEmail: true,
                     subscriptionEndDate,
                     isInTrialPeriod,
-                    AppUrlService.CreateEmailActivationUrlFormat(input.TenancyName),input.InviterTenantId ,input.FirstName,input.LastName,
-                    input.RelatedTenantId
+                    AppUrlService.CreateEmailActivationUrlFormat(input.TenancyName),input.InviterTenantId ,input.FirstName,input.LastName
                 );
 
                 var tenant = await TenantManager.GetByIdAsync(tenantId);

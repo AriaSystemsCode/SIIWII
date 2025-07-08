@@ -59,6 +59,52 @@
                                 {{ "NotSpecified" | localize }}
                             </span>
                         </span>
+                        <span *ngIf="account.account.countryName">
+                            , {{account.account.countryName}}
+                        </span>
+                        <span *ngIf="account.account.state">
+                            , {{account.account.state}} ,
+                        </span>
+                        <b class="ml-1">{{ "Zipcode" | localize }}: </b>
+                        <span >
+                             {{ account.account.zipCode ? account.account.zipCode  : "NotSpecified" | localize }}
+                        </span>
+                
+                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex" >
+                        <span >
+                            <button *ngIf="account.account.status == false && !isHost && !isRecordOwner"
+                                class="btn btn-outline-primary mr-2 action-button"
+                                (click)="connect()"
+                                >
+                                {{ "Connect" | localize }}
+                            </button>
+                        </span>
+                        <div  *ngIf="account.account.status !== null ">
+                            <span class="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
+                                <span class="mr-1">
+                                    <i
+                                        class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'Connected' | localize }}
+                            </span>
+                            <span class="text-muted" *ngIf="account.account.status == false && !account.account.isManual && !isHost && false">
+                                <span class="mr-1">
+                                    <i
+                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'NotConnected'| localize }}
+                            </span>
+                            <span class="text-muted" *ngIf="account.account.isManual == true ">
+                                <span class="mr-1">
+                                    <i
+                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{ isHost ? ('ExternalAccount'| localize ) : ('ManualAccount' | localize ) }}
+                            </span>
+                        </div>
                     </div>
                 </div>
 

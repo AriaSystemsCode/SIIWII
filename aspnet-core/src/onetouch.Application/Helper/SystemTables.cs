@@ -12,7 +12,6 @@ using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.AppEntities.Dtos;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.SycIdentifierDefinitions;
-using Castle.MicroKernel.SubSystems.Conversion;
 using onetouch.AppEntities;
 using Microsoft.EntityFrameworkCore;
 
@@ -185,15 +184,15 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "ADVERTISEMENT");
             return obj.Id;
         }
+        public async Task<long> GetEntityObjectTypeName(string TypeName)
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code.ToUpper() == TypeName.ToUpper());
+            return obj.Id;
+        }
 
         public async Task<long> GetEntityObjectTypePersonId()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "PERSONAL");
-            return obj.Id;
-        }
-        public async Task<long> GetEntityObjectTypeName(string TypeName )
-        {
-            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code.ToUpper() == TypeName.ToUpper());
             return obj.Id;
         }
 
@@ -564,6 +563,13 @@ namespace onetouch.Helpers
         //MMT30[Start]
         public async Task<string> GenerateSSIN(long objectTypeId, AppEntityDto appEntity = null)
         {
+            //I45
+            if (appEntity!=null)
+            {
+                if (appEntity.TenantId == null)
+                    appEntity.TenantId = AbpSession.TenantId;
+            }
+            //I45
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 string returnString = "";
@@ -585,7 +591,7 @@ namespace onetouch.Helpers
                                 {
                                     SycCounter sycCounter = null;
                                     if (identifierHeader != null && identifierHeader.IsTenantLevel)
-                                        sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == AbpSession.TenantId).FirstOrDefault();
+                                        sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == (appEntity != null? appEntity.TenantId : AbpSession.TenantId)).FirstOrDefault();
                                     else
                                         sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == null).FirstOrDefault();
 
@@ -603,9 +609,9 @@ namespace onetouch.Helpers
                                         }
                                         else
                                         {
-                                            if (identifierHeader != null && identifierHeader.IsTenantLevel && AbpSession.TenantId != null)
+                                            if (identifierHeader != null && identifierHeader.IsTenantLevel && (appEntity != null ? appEntity.TenantId : AbpSession.TenantId) != null)
                                             {
-                                                sycCounter.TenantId = (int?)AbpSession.TenantId;
+                                                sycCounter.TenantId = (int?)(appEntity != null ? appEntity.TenantId : AbpSession.TenantId);
                                             }
                                             else
                                                 sycCounter.TenantId = null;
@@ -637,7 +643,7 @@ namespace onetouch.Helpers
                                         {
                                             returnString = string.IsNullOrEmpty(returnString) ? returnString : returnString + "-";
 
-                                            string _segmentValue = AbpSession.TenantId.ToString();
+                                            string _segmentValue = (appEntity != null ? appEntity.TenantId.ToString() : AbpSession.TenantId.ToString());
                                             if (segment.SegmentLength > 0)
                                             { _segmentValue = _segmentValue.PadLeft(segment.SegmentLength, '0'); }
                                             returnString += _segmentValue;
@@ -727,5 +733,23 @@ namespace onetouch.Helpers
             return obj.Id;
         }
         //MMT33[End]
+        //MMT-Entity log[Start]
+        public async Task<long> GetEntityObjectStatusSentEntityLog()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "SENT" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetEntityObjectStatusReadyToSendEntityLog()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "READYTOBESENT" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        //MMT-Entity log [End]
     }
 }

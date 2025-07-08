@@ -415,23 +415,25 @@ namespace onetouch.Authorization.Users
             }
             //Mariam[Start]
             
-            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
+            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x =>x.EntityFk.TenantId== AbpSession.TenantId &&  x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
             if (contactEntityExtraData != null)
             {
 
                 var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
-                ContactForEditDto contactView = await _appAccountsAppService.GetContactForView(contact.Id);
-                //I40[Start]
+                if (contact != null)
+                {
+                    ContactForEditDto contactView = await _appAccountsAppService.GetContactForView(contact.Id);
+                    //I40[Start]
                 //ContactDto contactDto = contactView.Contact;//ObjectMapper.Map<ContactDto>(contact);
-                //contactDto.FirstName = input.User.Name;
-                //contactDto.LastName = input.User.Surname;
-                //contactDto.EMailAddress = input.User.EmailAddress;
-                //contactDto.UserId = user.Id;
-                //contactDto.Name = input.User.Name + " " + input.User.Surname;
-                //contactDto.UserName = input.User.UserName;
-                //contactDto.TradeName = "";
-                //contactDto.Code = input.Code;
-                //ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
+                    //contactDto.FirstName = input.User.Name;
+                    //contactDto.LastName = input.User.Surname;
+                    //contactDto.EMailAddress = input.User.EmailAddress;
+                    //contactDto.UserId = user.Id;
+                    //contactDto.Name = input.User.Name + " " + input.User.Surname;
+                    //contactDto.UserName = input.User.UserName;
+                    //contactDto.TradeName = "";
+                    //contactDto.Code = input.Code;
+                    //ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
                 CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
                 accountDto.Id = contact.Id;
                 accountDto.Code = input.Code;
@@ -485,7 +487,7 @@ namespace onetouch.Authorization.Users
                 }
                 ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
                //I40[End]
-
+                }
             }
             //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[Start]
             else

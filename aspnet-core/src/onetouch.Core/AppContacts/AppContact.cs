@@ -9,6 +9,8 @@ using Abp.Domain.Entities;
 using Abp.Auditing;
 using onetouch.AppEntities;
 using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
+using System.Security.Policy;
 
 namespace onetouch.AppContacts
 {
@@ -152,7 +154,33 @@ namespace onetouch.AppContacts
 		public ICollection<AppContactAddress> AppContactAddresses { get; set; }
 
 		public ICollection<AppContactPaymentMethod> AppContactPaymentMethods { get; set; }
+        //I46[Start]
+        public virtual long? ShipViaId { get; set; }
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { get; set; }
+       
+        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
+        public virtual string ShipViaCode { get; set; }
+        [ForeignKey("ShipViaId")]
+        public virtual AppEntity ShipViaFk { get; set; }
+        public virtual long? PaymentTermsId { get; set; }
 
+        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
+        public virtual string PaymentTermsCode { get; set; }
+        [ForeignKey("PaymentTermsId")]
+		public virtual AppEntity PaymentTermsFk { get; set; }
+        public virtual decimal PaymentTermsDiscount { get; set; }
+        public virtual int PaymentTermsDiscountDays { get; set; }
+        public virtual decimal  PaymentTermsDiscount2 { get; set; }
+        public virtual int PaymentTermsDiscount2Days { get; set; }
+        public virtual bool PaymentTermsCashOnDelivery { get; set; }
+        public virtual bool PaymentTermsUseInstallments { get; set; }
+        public virtual int PaymentTermsNextMonthDay { get; set; }
+        public virtual string PaymentTermsPaymentType { get; set; }
 
-	}
+        public virtual bool PaymentTermsEndOfMonth { get; set; }
+        public virtual int PaymentTermsEndOfMonthDays { get; set; }
+        public virtual int PaymentTermsNetDueDays { get; set; }
+        //I46[End]
+    }
 }

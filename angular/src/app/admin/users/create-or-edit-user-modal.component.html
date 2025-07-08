@@ -28,7 +28,6 @@
 
                                     <div class="form-group">
                                         <label for="Surname">{{"Surname" | localize}} *</label>
-                                        <!-- <input id="Surname" #surnameInput="ngModel" type="text" name="Surname" class="form-control" [(ngModel)]="user.surname" required maxlength="64"  [disabled]="fromTeamMember"> -->
                                         <input id="Surname" #surnameInput="ngModel" type="text" name="Surname" class="form-control" [(ngModel)]="user.surname" required maxlength="64">
                                         <validation-messages [formCtrl]="surnameInput"></validation-messages>
                                     </div>
@@ -158,14 +157,8 @@
                     </tabset>
                 </div>
                 <div class="modal-footer">
-                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()" style="border-radius: 6px;
-                    color: #4A0D4A !important;
-                    border: 1px solid #EBEBEB !important;
-                    background-color: white !important;" >{{"Cancel" | localize}}</button>
-                    <button type="submit" class="btn btn-primary" [disabled]="!userForm.form.valid"  style="border-radius: 6px;
-                    background-color: #4A0D4A !important;
-                    color: white !important;
-                    border: 1px solid #4A0D4A !important;" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{"Save" | localize}}</span></button>
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{"Cancel" | localize}}</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!userForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{"Save" | localize}}</span></button>
                 </div>
             </form>
         </div>

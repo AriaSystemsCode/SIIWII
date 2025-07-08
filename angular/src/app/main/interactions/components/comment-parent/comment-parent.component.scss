@@ -1,9 +1,9 @@
 .cart-cont {
-    max-height: 362px;
-    overflow-y: auto;
+    // max-height: 100%;
+    // overflow-y: auto;
     padding: 0 !important;
     &.large-height{
-        max-height: 555px;
+        // max-height: 100%;
 
     }
     app-add-comment:not(.comment-inner app-add-comment) {
@@ -20,7 +20,7 @@
     }
     .toggle-replay-cont:not(.comment-inner .toggle-replay-cont){
         position: absolute;
-        bottom: 5px;
+        bottom: 8px;
         right: 40px;
     }
 
@@ -56,10 +56,15 @@
     }
 }
 :host ::ng-deep .cart-cont .text-wrapper{
-    background-color: #fff;
+  
     border-radius: 4px;
     margin-left: 5px;
     position:relative;
+    background: #FFFFFF;
+    min-height: 140px;
+    border: 1px solid #EEEEEE;
+    box-shadow: 1px 1px 4px rgba(22, 22, 22, 0.25);
+
     }
     :host ::ng-deep .cart-cont  .text-wrapper:before {
         content: "";
@@ -100,8 +105,78 @@
         position:initial !important;
         width: 94%;
         margin: 0 auto;
-        background-color: #e1e1e1;
+        // background-color: #e1e1e1;
         padding: 5px;
         border-radius: 5px;
         margin-top:5px;
     }
+
+
+    .parSec {
+        max-height: 650px;
+        overflow-y: scroll;
+        // scrollbar-width: thin; /* Firefox: Makes the scrollbar thin */
+        // scrollbar-color:  #ffff #EEEEEEEE; /* Firefox: Handle color, track color */
+  
+    }
+
+    .addParSec {
+        max-height: unset;
+        // overflow-y: scroll;
+        // scrollbar-width: thin; /* Firefox: Makes the scrollbar thin */
+        // scrollbar-color:  #ffff #EEEEEEEE; /* Firefox: Handle color, track color */
+  
+    }
+
+
+    /* Target the entire webpage scrollbars */
+
+
+/* For cross-browser compatibility */
+.scrollable-element {
+    scrollbar-width: thin; /* Firefox: Makes the scrollbar thin */
+    scrollbar-color: #EEEEEE #ffff; /* Firefox: Handle color, track color */
+}
+::ng-deep {
+    ::-webkit-scrollbar {
+        width: 8px !important; /* Set the width of the scrollbar */
+    }
+    
+    ::-webkit-scrollbar-thumb {
+    
+      border-radius: 20px;
+      background: #FFF;
+      box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+      
+    }
+    
+    ::-webkit-scrollbar-track {
+        background-color: #D9D9D9 !important; /* Set the color of the track (the non-draggable part) */
+        
+    }
+}
+
+.reply-screen {
+    background-color: #f9f9f9;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 500px;
+    overflow-y: scroll;
+}
+
+.treadTxt{
+ 
+font-weight: 700;
+font-size: 20px;
+line-height: 30px;
+
+color: #1B101B;
+
+
+
+}
+
+.svgC{
+    cursor: pointer;
+}

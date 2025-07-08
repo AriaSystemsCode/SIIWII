@@ -6,10 +6,10 @@
     /// </summary>
     public static class AppPermissions
     {
-        public const string Pages_AppMarketplaceAppContacts = "Pages.AppMarketplaceAppContacts";
-        public const string Pages_AppMarketplaceAppContacts_Create = "Pages.AppMarketplaceAppContacts.Create";
-        public const string Pages_AppMarketplaceAppContacts_Edit = "Pages.AppMarketplaceAppContacts.Edit";
-        public const string Pages_AppMarketplaceAppContacts_Delete = "Pages.AppMarketplaceAppContacts.Delete";
+        public const string Pages_Administration_ValidationRules = "Pages.Administration.ValidationRules";
+        public const string Pages_Administration_ValidationRules_Create = "Pages.Administration.ValidationRules.Create";
+        public const string Pages_Administration_ValidationRules_Edit = "Pages.Administration.ValidationRules.Edit";
+        public const string Pages_Administration_ValidationRules_Delete = "Pages.Administration.ValidationRules.Delete";
 
         public const string Pages_Administration_AppTenantInvoices = "Pages.Administration.AppTenantInvoices";
         public const string Pages_Administration_AppTenantInvoices_Create = "Pages.Administration.AppTenantInvoices.Create";

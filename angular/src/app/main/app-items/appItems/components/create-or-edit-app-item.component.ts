@@ -55,6 +55,7 @@ import { AppEntityDtoWithActions } from "../models/app-entity-dto-with-actions";
 import { PricingHelpersService } from "../../app-item-shared/services/pricing-helpers.service";
 import { ApplyVariationOutput } from "./create-edit-app-item-variations.component";
 import Swal from "sweetalert2";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
     selector: "app-create-or-edit-app-item",
@@ -206,6 +207,26 @@ export class CreateOrEditAppItemComponent
             this.checkAndAddDefaultPriceObject();
         }
         this.getCurrencies();
+        this.getAspectatio();
+
+        this.languageSettingName  =AppConsts.languageSettingName;
+        //this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
+      
+    }
+    languageSettingName;
+    aspectRatio;
+    getAspectatio() {
+        let sycAttachmentCategoryImage;
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "IMAGE") {
+                    sycAttachmentCategoryImage = item
+                    let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                    this.aspectRatio = Number(width) / Number(height);
+                    return;
+                }
+            });
+        });
     }
 
     ngAfterViewInit() {
@@ -526,7 +547,7 @@ let x=  this.appItem.nonLookupValues;
             });
     }
     DropdownSelection = DropdownSelection;
-    sellVariationChecked: boolean;
+    sellVariationChecked: boolean = true;
     askToRemoveAllVariations($event) {
         if (this.sellVariationChecked || !this.appItem?.variationItems?.length)
             return;
@@ -1094,6 +1115,40 @@ let x=  this.appItem.nonLookupValues;
         this.formTouched = true;
     }
 
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      onDragOver(event: DragEvent) {
+        event.preventDefault(); // Required to allow dropping
+        event.stopPropagation();
+      }
+      
+    onDrop(event: DragEvent, index: number) {
+        event.preventDefault();
+        event.stopPropagation();
+      
+        if (event.dataTransfer?.files.length) {
+          const file = event.dataTransfer.files[0];
+      
+          console.log("File dropped:", file);
+      
+          const mockEvent = {
+            target: { files: [file], value: file.name } // Mimicking an input event
+          };
+      
+          this.fileChange(
+            mockEvent as unknown as Event,
+            this.productImageCategory,
+            index,
+            undefined,
+            true
+          );
+        }
+      }
+
+      
     fileChange(
         event,
         attachmentCategory: GetSycAttachmentCategoryForViewDto,
@@ -1103,6 +1158,11 @@ let x=  this.appItem.nonLookupValues;
     ) {
         this.formTouched = true;
         if (event.target.value) {
+
+            //get aspectRatio 
+            if(!aspectRatio)
+                aspectRatio=this.aspectRatio;
+
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
             let { onCropDone, data } = this.openImageCropper(
@@ -1236,6 +1296,43 @@ let x=  this.appItem.nonLookupValues;
             });
     // }
 
+    const hasZeroPrice = this.appItem?.variationItems?.some(variation =>
+        variation.appItemPriceInfos?.some(priceInfo => priceInfo.price == 0)
+    );
+    if (hasZeroPrice) {
+        Swal.fire({
+            title: "",
+            text: "Some variation have zero price continue ?",
+             icon: "info",
+                showCancelButton: true,
+                confirmButtonText:
+                    "Yes",
+                cancelButtonText: "No",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class2",
+            },
+        }).then((result) => {
+            if (!result.isConfirmed) 
+              return;
+
+            else
+            this._saveProuct(form);
+    })
+}
+else
+this._saveProuct(form);
+
+}
+
+
+_saveProuct(form){
         this.submitted = true;
         if (form.form.invalid) {
             form.form.markAllAsTouched();
@@ -1286,7 +1383,7 @@ let x=  this.appItem.nonLookupValues;
                     return this.askToPublish();
                 this.goBack("app/main/products");
             });
-    }
+}
     extraSelectedValuesExtraData() {
         const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
             ...this.extraAttributes.ADDITIONAL.extraAttributes,

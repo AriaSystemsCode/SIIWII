@@ -13,7 +13,7 @@
         >
         </app-views-stats>
     </div>
-    <div (click)="triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0 && !fromOverview" class="pr-5 pr-md-0">
+    <div (click)="fromTrans ? openReplyScreen(comment) :triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0 && !fromOverview" class="pr-5 pr-md-0">
         <app-comments-stats
             [commentsCount]="usersReactionsStats.commentsCount"
             [parentId]="parentId"
@@ -75,7 +75,7 @@
                     {{ parentId ? 'Reply' : 'Comment' | localize}}
                 </a>
             </div>
-            <div *ngIf="parentId && usersReactionsStats?.commentsCount > 0 && !fromOverview" (click)="triggerCommentsList()"  class="pr-5 pr-md-0">
+            <div *ngIf="parentId && usersReactionsStats?.commentsCount > 0 && !fromOverview" (click)="fromTrans ? openReplyScreen(comment) :triggerCommentsList()"  class="pr-5 pr-md-0">
                 <app-comments-stats
                     [commentsCount]="usersReactionsStats.commentsCount"
                     [parentId]="parentId"
@@ -93,6 +93,8 @@
     </div>
 </div>
 
+
+
 <app-comment-parent
 [cartStyle]="cartStyle"
     #commentParentComponent
@@ -101,5 +103,6 @@
     [commentType]="commentType"
     [fromOverview]="fromOverview"
 
+    [toName]="comment?.messages?.toName"
 >
 </app-comment-parent>

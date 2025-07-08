@@ -395,7 +395,8 @@ namespace onetouch.SystemObjects
                                                         {
                                                             Code = o.Code,
                                                             Name = o.Name,
-                                                            Id = o.Id
+                                                            Id = o.Id,
+                                                            ParentId = o.ParentId
                                                         },
                                                         SydObjectName = s1 == null ? "" : s1.Name.ToString(),
                                                         SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
@@ -522,7 +523,7 @@ namespace onetouch.SystemObjects
         //T-SII-20220919.0001,1 MMT 12/20/2022 Add an API to validate if the entered name is already entered before or not[Start]
         public async Task<bool> CategoryNameIsExisting(string categoryName)
         {
-            var objWithSameName = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Name.ToUpper() == categoryName.ToUpper());
+            var objWithSameName = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Name.ToUpper() == categoryName.ToUpper() && x.TenantId==AbpSession.TenantId);
             if (objWithSameName != null)
                 return true;
             return false;

@@ -4,18 +4,17 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppMarketplaceItemsServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
-  selector: 'app-seller-data',
-  templateUrl: './seller-data.component.html',
-  styleUrls: ['./seller-data.component.scss']
+    selector: 'app-seller-data',
+    templateUrl: './seller-data.component.html',
+    styleUrls: ['./seller-data.component.scss']
 })
-export class SellerDataComponent  extends AppComponentBase {
+export class SellerDataComponent extends AppComponentBase {
 
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
-
-    sellerData:any
-
-    sycAttachmentCategoryBanner :SycAttachmentCategoryDto
-    bannerImg:string="";
+    sellerData: any
+    sycAttachmentCategoryBanner: SycAttachmentCategoryDto
+    bannerImg: string = "";
+    
     constructor(
         injector: Injector,
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
@@ -24,25 +23,23 @@ export class SellerDataComponent  extends AppComponentBase {
     }
 
     ngOnInit(): void {
-    if (localStorage.getItem("SellerId")) {
-        this._AppMarketplaceItemsServiceProxy
-            //.getAccountImages(Number(localStorage.getItem("SellerId")))
-            .getAccountImages(localStorage.getItem("SellerSSIN"))
-            .subscribe((res) => {
-                console.log(">> sellerData", res);
-                this.sellerData = res;
-                this.bannerImg=this.attachmentBaseUrl + '/' + this.sellerData?.bannerImage;
-            });
-    }
+        if (localStorage.getItem("SellerId")) {
+            this._AppMarketplaceItemsServiceProxy
+                .getAccountImages(sessionStorage.getItem("SellerSSIN"))
+                .subscribe((res) => {
+                    this.sellerData = res;
+                    this.bannerImg = this.attachmentBaseUrl + '/' + this.sellerData?.bannerImage;
+                });
+        }
 
-this.getAllForAccountInfo();
-}
+        this.getAllForAccountInfo();
+    }
 
 
     getAllForAccountInfo() {
-        this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER","IMAGE"]).subscribe((result)=>{
-            result.forEach(item=>{
-                 if(item.code == "BANNER") this.sycAttachmentCategoryBanner = item
+        this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+            result.forEach(item => {
+                if (item.code == "BANNER") this.sycAttachmentCategoryBanner = item
             });
         })
 

@@ -16,7 +16,7 @@ namespace onetouch.Accounts.Dtos
 
         public string EntityObjectType { get; set; }
 
-        public string Name { get; set; }
+		public string Name { get; set; }
 		
 		public string FirstName { get; set; }
 		

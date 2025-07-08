@@ -43,6 +43,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
                         data: { preload: true },
                         canLoad: [AppRouteGuard]
                     },
+                  
                     {
                         path: 'demo',
                         loadChildren: () => import('app/demos/app-items-multi-selection-demo/app-items-multi-selection-demo.module').then(m => m.AppItemsMultiSelectionDemoModule), //Lazy load admin module
