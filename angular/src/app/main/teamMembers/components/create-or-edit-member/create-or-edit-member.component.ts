@@ -729,6 +729,8 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     async getContactDataForView(memberId) {
         const result = await this._AccountsServiceProxy.getContactForView(memberId).toPromise()
+        if (result) 
+            // this.memberDto = result.contact
         this.memberDto = Object.assign(new CreateOrEditAccountInfoDto(), result.contact);
 
 
@@ -864,36 +866,55 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     async SaveMember() {
         if (this.uploader.isUploading) {
-            return this.notify.error(this.l("PleaseWait,SomeAttachmentsAreStillUploading"));
+          return this.notify.error(this.l("PleaseWait,SomeAttachmentsAreStillUploading"));
         }
-        if (this.isManualOrExternalContact) this.setDefaultPublicFieldsToTrue()
-        this.showMainSpinner()
+      
+        if (this.isManualOrExternalContact) this.setDefaultPublicFieldsToTrue();
+      
+        this.showMainSpinner();
+      
         if (!this.memberDto.code) {
-            let sequance = "";
-            let tenancyName = this.appSession.tenancyName;
-
-            const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise()
-            if (getNextEntityCodeRes)
-                sequance = getNextEntityCodeRes;
-
-            this.memberDto.code = tenancyName + "-C" + sequance;
+          const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise();
+          this.memberDto.code = this.appSession.tenancyName + "-C" + sequance;
         }
-        this._AccountsServiceProxy.createOrUpdateContact(this.memberDto)
-            .pipe(finalize(() => this.hideMainSpinner()))
-            .subscribe(result => {
-                const userId = this.memberDto?.userId || result.userId
-                const memberId = this.memberDto?.id || result.id
-                const isMyProfile = this.appSession?.user?.memberId == this.memberDto?.id
-                if (isMyProfile) {
-                    const profileImage = this.memberDto?.entityAttachments?.filter(item => item.attachmentCategoryId == this.sycAttachmentCategoryLogo.id)[0]
-                    if (profileImage?.guid) {
-                        this.updateLogoService.updateProfilePicture()
-                    }
-                }
-                this.createOrEditDone.emit({ userId: userId, memberId: memberId });
-            });
-    }
-
+      
+        this.memberDto.useDTOTenant = true;
+      
+        // ✅ Create a new DTO instance and assign only the valid fields
+        const cleanDto = new CreateOrEditAccountInfoDto();
+      
+        const allowedKeys = [
+          'fileToken', 'tradeName', 'accountType', 'accountTypeId', 'ssin', 'priceLevel', 'notes', 'website', 'name', 'code',
+          'phone1Number', 'phone1Ex', 'phone2Number', 'phone2Ex', 'phone3Number', 'phone3Ex', 'eMailAddress',
+          'phone1TypeId', 'phone2TypeId', 'phone3TypeId', 'currencyId', 'languageId', 'entityId', 'tenantId',
+          'attachmentSourceTenantId', 'useDTOTenant', 'returnId', 'accountLevel', 'entityCategories', 'entityClassifications',
+          'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods', 'entityExtraData', 'id'
+        ];
+      
+        for (const key of allowedKeys) {
+          cleanDto[key] = this.memberDto[key];
+        }
+      
+        this._AccountsServiceProxy.createOrUpdateContact(cleanDto)
+          .pipe(finalize(() => this.hideMainSpinner()))
+          .subscribe(result => {
+            const userId = this.memberDto?.userId || result.userId;
+            const memberId = this.memberDto?.id || result.id;
+      
+            const isMyProfile = this.appSession?.user?.memberId == this.memberDto?.id;
+            if (isMyProfile) {
+              const profileImage = this.memberDto?.entityAttachments?.find(
+                x => x.attachmentCategoryId === this.sycAttachmentCategoryLogo.id
+              );
+              if (profileImage?.guid) {
+                this.updateLogoService.updateProfilePicture();
+              }
+            }
+      
+            this.createOrEditDone.emit({ userId, memberId });
+          });
+      }
+      
     AddPhoneToList() {
         this.phonelist.push(new Object());
     }
@@ -1120,15 +1141,15 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       
       onExtraAttributesChanged(dataFromChild: any[]) {
    
-        if (!this.appTransactionsForViewDto) {
-          this.appTransactionsForViewDto = new GetAppTransactionsForViewDto();
+        if (!this.memberDto) {
+          this.memberDto = new CreateOrEditAccountInfoDto();
         }
     
-        if (!this.appTransactionsForViewDto.entityExtraData) {
-          this.appTransactionsForViewDto.entityExtraData = [];
+        if (!this.memberDto.entityExtraData) {
+          this.memberDto.entityExtraData = [];
         }
     
-        const existingData = this.appTransactionsForViewDto.entityExtraData;
+        const existingData = this.memberDto.entityExtraData;
     
         // Step 1: Map incoming data cleanly
         const incomingData: AppEntityExtraDataDto[] = dataFromChild.flatMap(attr => {
@@ -1164,14 +1185,14 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         const finalData = [...filteredExistingData, ...cleanIncomingData];
         console.log(finalData,'finalData')
     
-        this.appTransactionsForViewDto.entityExtraData = finalData;
+        this.memberDto.entityExtraData = finalData;
     
       }
     
     
     
       onExtraAttributeCleared(attributeId: number) {
-        const data = this.appTransactionsForViewDto?.entityExtraData;
+        const data = this.memberDto?.entityExtraData;
         if (data && data.length > 0) {
           let index = -1;
           while ((index = data.findIndex(x => x.attributeId === attributeId)) !== -1) {

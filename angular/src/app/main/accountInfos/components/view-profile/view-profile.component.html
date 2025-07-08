@@ -24,8 +24,8 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div #viewProfileCover
-                                        class="view-profile-cover d-flex justify-content-center align-items-center position-relative">
-                                        <app-image-display [image]="coverPhoto"
+                                        class="view-profile-cover d-flex justify-content-center align-items-center position-relative" style="border-radius: 12px;">
+                                        <app-image-display [image]="coverPhoto ?coverPhoto  :'../../assets/placeholders/_logo-placeholder.png'"
                                             [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                             [staticWidth]="viewProfileCover?.offsetWidth">
                                         </app-image-display>
@@ -174,7 +174,7 @@
             </div>
         </div>
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  *ngIf="!personalAccount" [ngClass]="imageObject.length > 0 ? 'addHight':'addMg'">
-            <div class="kt-portlet kt-portlet--mobile kt-slider">
+            <div class="kt-portlet kt-portlet--mobile kt-slider" style="border-radius: 12px;">
                 <div class="kt-portlet__body p-0 " style="background-color: white;" *ngIf="!imageObject || imageObject.length > 0;else noImagesAdded">
                     <!-- <div class="row p-28">
                         <div class="col-md-12">

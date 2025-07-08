@@ -56,7 +56,7 @@
                                 </app-image-upload>
                             </div>
                             <!--First Name -->
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                     <span class="text-danger">*</span>
                                     {{l("FirstName")}}
@@ -65,9 +65,9 @@
                                     <input type="text" id="FirstName" class="form-control" name="FirstName" #FirstNameInput="ngModel" [(ngModel)]="memberDto.firstName" required [placeholder]="'PleaseEnterFirstName' | localize "/>
                                     <validation-messages [formCtrl]="FirstNameInput"></validation-messages>
                                 </div>
-                            </div>
+                            </div> -->
                             <!--Sur Name -->
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label for="SurName" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                     <span class="text-danger">*</span>
                                     {{l("SurName")}}
@@ -76,7 +76,7 @@
                                     <input type="text" id="SurName" class="form-control"  name="SurName" #SurNameInput="ngModel" [(ngModel)]="memberDto.lastName" required [placeholder]="'PleaseEnterSurName' | localize"/>
                                     <validation-messages [formCtrl]="SurNameInput"></validation-messages>
                                 </div>
-                            </div>
+                            </div> -->
                             <!--Email Address-->
                             <div class="form-group row">
                                 <label for="Email" class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -87,10 +87,10 @@
                                     <input type="email" id="Email" class="form-control" name="Email"  #emailAddressInput="ngModel" [(ngModel)]="memberDto.eMailAddress" required [placeholder]="'PleaseEnterEmail' | localize"/>
                                     <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
                                 </div>
-                                <div class="col-md-4" *ngIf="!isManualOrExternalContact">
+                                <!-- <div class="col-md-4" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-3">{{ "IsPublic" | localize }}</span>
                                     <p-inputSwitch name="emailAddressIsPublic" [(ngModel)]="memberDto.emailAddressIsPublic"></p-inputSwitch>
-                                </div>
+                                </div> -->
                             </div>
                             <!--Language -->
                             <div class="form-group row">
@@ -100,10 +100,10 @@
                                 <div class="col-md-6">
                                     <p-dropdown id="language" [options]="allLanguages" styleClass="form-control aria-select" name="Language" [(ngModel)]="memberDto.languageId" ></p-dropdown>
                                 </div>
-                                <div class="col-md-4" *ngIf="!isManualOrExternalContact">
+                                <!-- <div class="col-md-4" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-3">{{ "IsPublic" | localize }}</span>
                                     <p-inputSwitch name="languageIsPublic" [(ngModel)]="memberDto.languageIsPublic" aria-valuenow="true"></p-inputSwitch>
-                                </div>
+                                </div> -->
                             </div>
                             <!--Branch -->
                             <div class="form-group row" *ngIf="memberDto.accountId">
@@ -123,7 +123,7 @@
                                 </div>
                             </div>
                             <!--Join Date -->
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label for="JoinDate" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("JoinDate")}}</label>
                                 <div class="col-md-6">
                                   
@@ -143,7 +143,7 @@
                                     </span>
                                     <p-inputSwitch name="joinDateIsPublic" [(ngModel)]="memberDto.joinDateIsPublic" ></p-inputSwitch>
                                 </div>
-                            </div>
+                            </div> -->
                             <!--User Name -->
                             <div class="form-group row" *ngIf="!isManualOrExternalContact">
                                 <label for="UserName" class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -151,13 +151,13 @@
                                     {{l("UserName")}}
                                 </label>
                                 <div class="col-md-6">
-                                    <input type="text" id="UserName" name="UserName" class="form-control" minlength="2" maxlength="100"
-                                    required #UserNameNameInput="ngModel" [ngModel]="memberDto.userName" [placeholder]="'PleaseEnterUserName' | localize " readonly/>
+                                    <input type="text" id="name" name="name" class="form-control" minlength="2" maxlength="100"
+                                    required #UserNameNameInput="ngModel" [ngModel]="memberDto.name" [placeholder]="'PleaseEnterUserName' | localize " readonly/>
                                     <validation-messages [formCtrl]="UserNameNameInput"></validation-messages>
                                 </div>
                             </div>
                             <!--Job Title -->
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label for="JobTitle" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                     <span class="text-danger">*</span>
                                     {{l("JobTitle")}}
@@ -167,7 +167,7 @@
                                     required #JobTitleInput="ngModel" [(ngModel)]="memberDto.jobTitle" [placeholder]="'PleaseEnterJobTitle' | localize "/>
                                     <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
                                 </div>
-                            </div>
+                            </div> -->
                             <!--Phone -->
                             <div class="form-group row" *ngFor="let item of phonelist ; let i = index" >
                                 <label for="phone" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Phone")}}</label>
@@ -190,10 +190,10 @@
                                         <input type="text" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
                                         minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ext']" />
                                 </div>
-                                <div class="col-sm-2" *ngIf="!isManualOrExternalContact">
+                                <!-- <div class="col-sm-2" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-2">{{ "IsPublic" | localize }}</span>
                                     <p-inputSwitch name="phone{{i+1}}IsPublic" [(ngModel)]="memberDto['phone'+(i+1)+'IsPublic']" ></p-inputSwitch>
-                                </div>
+                                </div> -->
                                 <div class="col-sm-2">
                                     <i type="button" *ngIf="phonelist.length < 3 && i == 0" style="size: 10px;" class="fas fa-plus-circle "  (click)="AddPhoneToList()"> </i>
                                     <i type="button" *ngIf="i > 0" style="size: 10px;" class="fas fa-minus-circle " (click)="removePhoneFromList(i)"> </i>
