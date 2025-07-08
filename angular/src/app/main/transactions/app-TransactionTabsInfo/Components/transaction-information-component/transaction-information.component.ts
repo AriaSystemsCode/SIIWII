@@ -132,6 +132,7 @@ export class TransactionInformationComponent
   extraAttributes: any;
   totalOrderQTY: number = 0;
   totlaOrderPrices: number = 0;
+  priceLevel:any
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -145,6 +146,7 @@ export class TransactionInformationComponent
     private _extraAttributeDataService: ExtraAttributeDataService,
   ) {
     super(injector);
+    this.priceLevel = localStorage.getItem("tempPriceLevel");
 
   }
   ngOnInit(): void {
@@ -1380,7 +1382,7 @@ export class TransactionInformationComponent
         'USD',
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
-        '',
+       this.priceLevel,
         id,
         undefined,
         undefined,
