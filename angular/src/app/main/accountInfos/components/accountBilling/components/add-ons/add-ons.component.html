@@ -5,7 +5,7 @@
       <table *ngFor="let record of addons" class="table table-bordered p-datatable-gridlines">
         <thead>
           <tr>
-            <th colspan="2">{{ record?.appSubscriptionPlanDetail?.featureCategory }}</th>
+            <th colspan="2" class="featureCat">{{ record?.appSubscriptionPlanDetail?.featureCategory }}</th>
           </tr>
         </thead>
         <tbody>
@@ -23,7 +23,7 @@
 
             <td>
               <div class="d-flex flex-column gap-2 justify-content-center" style="align-items: end;">
-                <p>${{ record?.appSubscriptionPlanDetail?.unitPrice }}/ <span class="measure">{{
+                <p class="unitss">${{ record?.appSubscriptionPlanDetail?.unitPrice }}/ <span class="measure">{{
                     record?.appSubscriptionPlanDetail?.unitOfMeasurementName }}</span></p>
                 <button class="btn btn-add" (click)="addToCart(record)" [disabled]="isRecordInCart(record)">
                   {{ isRecordInCart(record) ? 'Added' : 'Add' }}

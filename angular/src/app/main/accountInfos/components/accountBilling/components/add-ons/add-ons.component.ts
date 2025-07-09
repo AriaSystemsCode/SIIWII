@@ -31,9 +31,6 @@ export class AddOnsComponent extends AppComponentBase implements OnInit {
     this.getAppTenantAddOns()
   }
 
-// merge
-
-
   getAppTenantAddOns() {
     this.showMainSpinner();
 
