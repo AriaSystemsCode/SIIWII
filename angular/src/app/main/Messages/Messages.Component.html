@@ -1075,26 +1075,91 @@ margin-right: 6px;"></i>
                     </div>
                     </div>
                     
-                    <div #messageEl id="contentmsg"  class="w-100 d-lg-block d-none" 
-                    [ngClass]="{ Scroll: messagesDetails?.length > 1 }" [scrollTop]="scrolltop">
-                
-                    <div style="position: relative;min-height: 240px;" *ngFor="let messagedetail of messagesDetails; let i = index">
-                        <img [src]="
-                            messagedetail.messages.profilePictureUrl
-                                ? messagedetail.messages.profilePictureUrl
-                                : 'assets/chat/user-chat.png'
-                        " class="rounded-circle mr-3" style="width: 60px; height: 60px; object-fit: cover;" />
-                
-                        <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
-                        <div class="to-block">
-                            <span class="to">{{ "To" | localize }} :</span>
-                            <span>{{ messagedetail.messages.toName }}</span>
-                        </div>
-                        <br />
-                
-                        <div class="message-data">
-                            <span style="color: #595959; position: absolute; font-weight: 500; right: 0; top: 20px;">
-                                {{ messagedetail.messages.sendDate | date:'hh:mm a, MM/dd/yyyy' }}
+                    <div #messageEl id="contentmsg"  class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                        [scrollTop]="scrolltop">
+                        <div style="position: relative" *ngFor="
+                                    let messagedetail of messagesDetails;
+                                    let i = index 
+                                ">
+                            <!-- <div class="btn-group dropdown btn-actions-message" dropdown container="body">
+    
+                                        <button *ngIf="i>0"
+                                            class="dropdown-toggle btn btn-sm btn-primary btn-action btn-actions-message"
+                                            dropdownToggle>
+                                        </button>
+                                        <ul class="dropdown-menu" *dropdownMenu>
+    
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Reply')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Forward')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
+                                            </li>
+                                            <li>
+                                                <a (click)="onClickDeleteMsg(MessagesDetails[0].messages)"
+                                                    class="link-action">{{l('DeleteMessage')}}</a>
+                                            </li>
+    
+                                        </ul>
+                                    </div> -->
+                            <!-- <span class="">
+                                        <img src="assets/message/replay.svg" style="float: right;    width: 13px;
+                                        margin-right: 6px;margin-top: 5px;">
+    
+    
+                                    </span> -->
+                            <img [src]="
+                                        messagedetail.messages.profilePictureUrl
+                                            ? messagedetail.messages
+                                                  .profilePictureUrl
+                                            : 'assets/chat/user-chat.png'
+                                    " class="rounded-circle mr-3" style="
+                                        width: 60px;
+                                        height: 60px;
+                                        object-fit: cover;
+                                    " />
+                            <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
+                            <div class="to-block">
+                                <span class="to">{{ "To" | localize }} :</span>
+                                <span>{{ messagedetail.messages.toName }}
+                                </span>
+                            </div>
+                            <br />
+                            <div class="message-data">
+                                <span style="
+                                            font-size: 10px;
+                                            color: #b5b5c3;
+                                            position: absolute;
+                                            right: 0;
+                                            top: 20px;
+                                        ">{{
+                                    messagedetail.messages.sendDate
+                                    | date: "medium" 
+                                    }}</span>
+                            </div>
+                            <br />
+                            <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="
+                            'Subject: '+messagedetail.messages.subject | safeHtml
+                        " class="msg-bodyformat pl-4  pt-2" 
+                        [ngClass]="{
+                            'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                            'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                          }">
+                </span>
+                <br />
+                            <span [innerHTML]="
+                                        messagedetail.messages.bodyFormat | safeHtml
+                                    " class="msg-bodyformat pl-4" 
+                                    [ngClass]="{
+                                        'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                                        'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                                      }"
+                                       (click)="
+                                        clickEventLongMsg(messagedetail.messages.id)
+                                    ">
                             </span>
                         </div>
                         <br />
@@ -1494,27 +1559,98 @@ margin-right: 6px;"></i>
                         </div>
                     </div>
                 </div>
-                <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails?.length > 1,'d-none': showSideBar}"
-                    [scrollTop]="scrolltop"> 
-                    <div style="position: relative;min-height: 240px;" *ngFor="
-                                let messagedetail of messagesDetails;
-                                let i = index
-                            ">
-                    
-                        <img [src]="
-                                    messagedetail.messages.profilePictureUrl
-                                        ? messagedetail.messages
-                                              .profilePictureUrl
-                                        : 'assets/chat/user-chat.png'
-                                " class="rounded-circle mr-3" style="
-                                    width: 60px;
-                                    height: 60px;
-                                    object-fit: cover;
-                                " />
-                        <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
-                        <div class="to-block">
-                            <span class="to">{{ "To" | localize }} :</span>
-                            <span >{{ messagedetail.messages.toName }}
+                <div class="ml-5">
+
+
+                    <hr class="mt-5" style="border: 1px solid #e7e8ef; opacity: 1" />
+
+
+                    <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                        [scrollTop]="scrolltop"> 
+                        <div style="position: relative" *ngFor="
+                                    let messagedetail of messagesDetails;
+                                    let i = index
+                                ">
+                            <!-- <div class="btn-group dropdown btn-actions-message" dropdown container="body">
+    
+                                        <button *ngIf="i>0"
+                                            class="dropdown-toggle btn btn-sm btn-primary btn-action btn-actions-message"
+                                            dropdownToggle>
+                                        </button>
+                                        <ul class="dropdown-menu" *dropdownMenu>
+    
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Reply')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Forward')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
+                                            </li>
+                                            <li>
+                                                <a (click)="onClickDeleteMsg(MessagesDetails[0].messages)"
+                                                    class="link-action">{{l('DeleteMessage')}}</a>
+                                            </li>
+    
+                                        </ul>
+                                    </div> -->
+                            <!-- <span class="">
+                                        <img src="assets/message/replay.svg" style="float: right;    width: 13px;
+                                        margin-right: 6px;margin-top: 5px;">
+    
+    
+                                    </span> -->
+                            <img [src]="
+                                        messagedetail.messages.profilePictureUrl
+                                            ? messagedetail.messages
+                                                  .profilePictureUrl
+                                            : 'assets/chat/user-chat.png'
+                                    " class="rounded-circle mr-3" style="
+                                        width: 60px;
+                                        height: 60px;
+                                        object-fit: cover;
+                                    " />
+                            <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
+                            <div class="to-block">
+                                <span class="to">{{ "To" | localize }} :</span>
+                                <span >{{ messagedetail.messages.toName }}
+                                </span>
+                            </div>
+                            <br />
+                            <div class="message-data">
+                                <span style="
+                                            font-size: 10px;
+                                            color: #b5b5c3;
+                                            position: absolute;
+                                            right: 0;
+                                            top: 20px;
+                                        ">{{
+                                    messagedetail.messages.sendDate
+                                    | date: "medium" 
+                                    }}</span>
+                            </div>
+                            <br />
+                            <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="'Subject: '+
+                            messagedetail.messages.subject | safeHtml
+                        " class="msg-bodyformat pl-4 pt-2"
+                        [ngClass]="{
+                            'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                            'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                          }">
+                </span>
+                <br />
+
+                            <span [innerHTML]="
+                                        messagedetail.messages.bodyFormat | safeHtml
+                                    " class="msg-bodyformat pl-4"
+                                    [ngClass]="{
+                                        'collapsed': isCollapsed[messagedetail.messages.id]|| messagesDetails.length == 1,
+                                        'long-msg': !isCollapsed[messagedetail.messages.id] &&  messagesDetails.length != 1
+                                      }"
+                                       (click)="
+                                        clickEventLongMsg(messagedetail.messages.id)
+                                    ">
                             </span>
                         </div>
                         <br />

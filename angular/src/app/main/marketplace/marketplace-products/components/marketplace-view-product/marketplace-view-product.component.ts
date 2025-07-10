@@ -14,6 +14,8 @@ import {
     CurrencyInfoDto,
     GetAppMarketplaceItemDetailForViewDto,
     MarketplaceExtraDataAttrDto,
+    MessageServiceProxy,
+    OverAllRatingDto,
     ShoppingCartSummary,
     TransactionType,
 } from "@shared/service-proxies/service-proxies";
@@ -84,6 +86,8 @@ export class MarketplaceViewProductComponent
     showSpecialPrice: boolean = false;
     languageSettingName  =AppConsts.languageSettingName;
     IsConnected : boolean = false
+    overRating: OverAllRatingDto
+    
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -92,6 +96,7 @@ export class MarketplaceViewProductComponent
         private router: Router,
         private AccountsServiceProxy: AccountsServiceProxy,
         private appItemsAppservice: AppItemsServiceProxy,
+         private messageServiceProxy: MessageServiceProxy,
         injector: Injector
     ) {
         super(injector);
@@ -211,6 +216,7 @@ export class MarketplaceViewProductComponent
                     )
                     .pipe(
                         finalize(() => {
+                            this.getOverAllRatings()
                             this.hideMainSpinner();
                         })
                     )
@@ -928,6 +934,38 @@ export class MarketplaceViewProductComponent
             });
     }
 
+    getOverAllRatings() {
+        const subs = this.messageServiceProxy
+          .getOverAllRatings(
+         this.productBodyData.id,
+          )
+          .pipe(
+            finalize(() => {
+    
+            })
+          )
+          .subscribe(
+            (result) => {
+              this.overRating = result
+    
+            },
+    
+          );
+        this.subscriptions.push(subs);
+      }
+
+      refreshRatingFlag = false;
+
+handleRefreshRating(event: boolean) {
+  if (event === true) {
+
+
+  this.getProductDetailsForView()
+  this.getOverAllRatings()
+  }
+}
+
+    
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

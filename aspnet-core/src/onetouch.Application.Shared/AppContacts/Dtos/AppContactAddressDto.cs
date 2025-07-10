@@ -35,5 +35,5 @@ namespace onetouch.AppContacts.Dtos
         public virtual string CountryIdName { get; set; }
         public virtual onetouch.AppContacts.AppAddressDto AddressFk { get; set; }
 
-    }
+	}
 }

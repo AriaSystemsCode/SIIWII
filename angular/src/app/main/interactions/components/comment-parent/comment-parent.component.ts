@@ -41,6 +41,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @Input() fromOverview:boolean=false;
   addReplyScreen: boolean ;
     currentComment: any;
+
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector,
@@ -139,6 +140,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.comments.push(...res.items)
         this.hideMainSpinner()
 
+
         })
     }
     newCommentAddedHandler($event?:GetMessagesForViewDto){
@@ -172,6 +174,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         }
     
     }
+  
     refreshAfterSave(event){
       
         if(event){
@@ -189,4 +192,6 @@ openReplyScreen(comment: any): void {
    
 }
 
-}
+           }
+         
+

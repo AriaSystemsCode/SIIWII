@@ -10,6 +10,7 @@ import { Reactions } from '../../models/Reactions.enum';
 export class ReactionsActionComponent extends AppComponentBase {
     @Input() currentUserReaction : Reactions
     @Input() showCurrentUserReactionText : boolean = true
+    @Input() fromOverview : boolean 
     @Output() reactionChanged : EventEmitter<Reactions> = new EventEmitter<Reactions>()
     @Output() reactionRemoved : EventEmitter<boolean> = new EventEmitter<boolean>()
     showReactionsPopup: boolean = false

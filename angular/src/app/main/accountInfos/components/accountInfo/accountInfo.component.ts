@@ -132,6 +132,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     isRecordOwner: boolean
 
+
     imgCropperModalRef : BsModalRef
 
 
@@ -583,6 +584,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     ! this.accountInfoTemp?.id  ?  this.shipViaId  :  
        result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
             }
+
+       
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
         this.setDefaultPhoneTypes();

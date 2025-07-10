@@ -24,5 +24,9 @@ namespace onetouch.Message
         Task<List<GetMessagesForViewDto>> CreateMessage(CreateMessageInput input);
         string GetUsersNamesByID(string users);
         List<NameValue<string>> GetMessageRecieversName(String UsersIds);
+        //I48[Start]
+        Task<double> GetAllReviewsCount(long input);
+        Task<OverAllRatingDto> GetOverAllRatings(long entityId);
+        //I48[End]
     }
 }

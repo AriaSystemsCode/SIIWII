@@ -2343,19 +2343,14 @@ export class AccountsServiceProxy {
      * @param sync (optional) 
      * @return Success
      */
-    publishProfile(sync: boolean | undefined): Observable<boolean> {
-        let url_ = this.baseUrl + "/api/services/app/Accounts/PublishProfile?";
-        if (sync === null)
-            throw new Error("The parameter 'sync' cannot be null.");
-        else if (sync !== undefined)
-            url_ += "sync=" + encodeURIComponent("" + sync) + "&";
+    publishProfile(): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/PublishProfile";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Accept": "text/plain"
             })
         };
 
@@ -3287,58 +3282,6 @@ export class AccountsServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = ContactForEditDto.fromJS(resultData200);
             return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param accountId (optional) 
-     * @return Success
-     */
-    setAccountSync(accountId: number | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/Accounts/SetAccountSync?";
-        if (accountId === null)
-            throw new Error("The parameter 'accountId' cannot be null.");
-        else if (accountId !== undefined)
-            url_ += "AccountId=" + encodeURIComponent("" + accountId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSetAccountSync(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processSetAccountSync(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processSetAccountSync(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -4804,6 +4747,69 @@ export class AccountsServiceProxy {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ImportContact?";
         if (repeatHandler !== undefined && repeatHandler !== null)
             url_ += "repeatHandler=" + encodeURIComponent("" + repeatHandler) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processImportContact(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processImportContact(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ImportContactReturnDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ImportContactReturnDto[]>;
+        }));
+    }
+
+    protected processImportContact(response: HttpResponseBase): Observable<ImportContactReturnDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ImportContactReturnDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    importContact(body: AccountExcelDto[] | null | undefined): Observable<ImportContactReturnDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/ImportContact";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -28995,135 +29001,6 @@ export class CommonLookupServiceProxy {
 }
 
 @Injectable()
-export class CreateMarketplaceAccountServiceProxy {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
-    }
-
-    /**
-     * @param sSIN (optional) 
-     * @return Success
-     */
-    hideAccount(sSIN: string | null | undefined): Observable<boolean> {
-        let url_ = this.baseUrl + "/api/services/app/CreateMarketplaceAccount/HideAccount?";
-        if (sSIN !== undefined && sSIN !== null)
-            url_ += "SSIN=" + encodeURIComponent("" + sSIN) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processHideAccount(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processHideAccount(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<boolean>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<boolean>;
-        }));
-    }
-
-    protected processHideAccount(response: HttpResponseBase): Observable<boolean> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param sync (optional) 
-     * @param body (optional) 
-     * @return Success
-     */
-    createOrEditMarketplaceAccount(sync: boolean | undefined, body: CreateOrEditMarketplaceAccountInfoDto | undefined): Observable<number> {
-        let url_ = this.baseUrl + "/api/services/app/CreateMarketplaceAccount/CreateOrEditMarketplaceAccount?";
-        if (sync === null)
-            throw new Error("The parameter 'sync' cannot be null.");
-        else if (sync !== undefined)
-            url_ += "sync=" + encodeURIComponent("" + sync) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateOrEditMarketplaceAccount(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateOrEditMarketplaceAccount(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<number>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<number>;
-        }));
-    }
-
-    protected processCreateOrEditMarketplaceAccount(response: HttpResponseBase): Observable<number> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable()
 export class DashboardCustomizationServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -51649,6 +51526,110 @@ export class SystemTablesServiceProxy {
     /**
      * @return Success
      */
+    getEntityObjectTypeReview(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeReview";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeReview(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeReview(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeReview(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeQuestion(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeQuestion";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeQuestion(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeQuestion(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeQuestion(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getEntityObjectStatusUnreadMessageID(): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectStatusUnreadMessageID";
         url_ = url_.replace(/[?&]$/, "");
@@ -60349,7 +60330,6 @@ export class AppContactAddressDto implements IAppContactAddressDto {
     postalCode!: string | undefined;
     countryId!: number;
     countryIdName!: string | undefined;
-    addressFk!: AppAddressDto;
     id!: number;
 
     [key: string]: any;
@@ -60383,7 +60363,6 @@ export class AppContactAddressDto implements IAppContactAddressDto {
             this.postalCode = _data["postalCode"];
             this.countryId = _data["countryId"];
             this.countryIdName = _data["countryIdName"];
-            this.addressFk = _data["addressFk"] ? AppAddressDto.fromJS(_data["addressFk"]) : <any>undefined;
             this.id = _data["id"];
         }
     }
@@ -60415,7 +60394,6 @@ export class AppContactAddressDto implements IAppContactAddressDto {
         data["postalCode"] = this.postalCode;
         data["countryId"] = this.countryId;
         data["countryIdName"] = this.countryIdName;
-        data["addressFk"] = this.addressFk ? this.addressFk.toJSON() : <any>undefined;
         data["id"] = this.id;
         return data;
     }
@@ -60436,7 +60414,6 @@ export interface IAppContactAddressDto {
     postalCode: string | undefined;
     countryId: number;
     countryIdName: string | undefined;
-    addressFk: AppAddressDto;
     id: number;
 
     [key: string]: any;
@@ -64892,6 +64869,466 @@ export interface IAppEntityExtraData {
     attributeValueId: number | undefined;
     attributeValueFk: AppEntity;
     attributeValue: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppEntitiesRelationship implements IAppEntitiesRelationship {
+    entityId!: number;
+    entityFk!: AppEntity;
+    entityCode!: string | undefined;
+    entityTypeCode!: string | undefined;
+    entityTable!: string | undefined;
+    tenantId!: number | undefined;
+    contactId!: number | undefined;
+    contactFk!: AppContact;
+    relatedEntityId!: number;
+    relatedEntityFk!: AppEntity;
+    relatedEntityCode!: string | undefined;
+    relatedEntityTypeCode!: string | undefined;
+    relatedEntityTable!: string | undefined;
+    relatedTenantId!: number | undefined;
+    relatedContactId!: number | undefined;
+    relatedContactFk!: AppContact;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppEntitiesRelationship) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.entityId = _data["entityId"];
+            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
+            this.entityCode = _data["entityCode"];
+            this.entityTypeCode = _data["entityTypeCode"];
+            this.entityTable = _data["entityTable"];
+            this.tenantId = _data["tenantId"];
+            this.contactId = _data["contactId"];
+            this.contactFk = _data["contactFk"] ? AppContact.fromJS(_data["contactFk"]) : <any>undefined;
+            this.relatedEntityId = _data["relatedEntityId"];
+            this.relatedEntityFk = _data["relatedEntityFk"] ? AppEntity.fromJS(_data["relatedEntityFk"]) : <any>undefined;
+            this.relatedEntityCode = _data["relatedEntityCode"];
+            this.relatedEntityTypeCode = _data["relatedEntityTypeCode"];
+            this.relatedEntityTable = _data["relatedEntityTable"];
+            this.relatedTenantId = _data["relatedTenantId"];
+            this.relatedContactId = _data["relatedContactId"];
+            this.relatedContactFk = _data["relatedContactFk"] ? AppContact.fromJS(_data["relatedContactFk"]) : <any>undefined;
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppEntitiesRelationship {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppEntitiesRelationship();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["entityId"] = this.entityId;
+        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
+        data["entityCode"] = this.entityCode;
+        data["entityTypeCode"] = this.entityTypeCode;
+        data["entityTable"] = this.entityTable;
+        data["tenantId"] = this.tenantId;
+        data["contactId"] = this.contactId;
+        data["contactFk"] = this.contactFk ? this.contactFk.toJSON() : <any>undefined;
+        data["relatedEntityId"] = this.relatedEntityId;
+        data["relatedEntityFk"] = this.relatedEntityFk ? this.relatedEntityFk.toJSON() : <any>undefined;
+        data["relatedEntityCode"] = this.relatedEntityCode;
+        data["relatedEntityTypeCode"] = this.relatedEntityTypeCode;
+        data["relatedEntityTable"] = this.relatedEntityTable;
+        data["relatedTenantId"] = this.relatedTenantId;
+        data["relatedContactId"] = this.relatedContactId;
+        data["relatedContactFk"] = this.relatedContactFk ? this.relatedContactFk.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppEntitiesRelationship {
+    entityId: number;
+    entityFk: AppEntity;
+    entityCode: string | undefined;
+    entityTypeCode: string | undefined;
+    entityTable: string | undefined;
+    tenantId: number | undefined;
+    contactId: number | undefined;
+    contactFk: AppContact;
+    relatedEntityId: number;
+    relatedEntityFk: AppEntity;
+    relatedEntityCode: string | undefined;
+    relatedEntityTypeCode: string | undefined;
+    relatedEntityTable: string | undefined;
+    relatedTenantId: number | undefined;
+    relatedContactId: number | undefined;
+    relatedContactFk: AppContact;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppEntityReactionsCount implements IAppEntityReactionsCount {
+    entityId!: number;
+    entityFk!: AppEntity;
+    reactionsCount!: number;
+    entityCommentsCount!: number;
+    viewersCount!: number;
+    likeCount!: number;
+    celebrateCount!: number;
+    loverCount!: number;
+    insightfulCount!: number;
+    curiousCount!: number;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppEntityReactionsCount) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.entityId = _data["entityId"];
+            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
+            this.reactionsCount = _data["reactionsCount"];
+            this.entityCommentsCount = _data["entityCommentsCount"];
+            this.viewersCount = _data["viewersCount"];
+            this.likeCount = _data["likeCount"];
+            this.celebrateCount = _data["celebrateCount"];
+            this.loverCount = _data["loverCount"];
+            this.insightfulCount = _data["insightfulCount"];
+            this.curiousCount = _data["curiousCount"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppEntityReactionsCount {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppEntityReactionsCount();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["entityId"] = this.entityId;
+        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
+        data["reactionsCount"] = this.reactionsCount;
+        data["entityCommentsCount"] = this.entityCommentsCount;
+        data["viewersCount"] = this.viewersCount;
+        data["likeCount"] = this.likeCount;
+        data["celebrateCount"] = this.celebrateCount;
+        data["loverCount"] = this.loverCount;
+        data["insightfulCount"] = this.insightfulCount;
+        data["curiousCount"] = this.curiousCount;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppEntityReactionsCount {
+    entityId: number;
+    entityFk: AppEntity;
+    reactionsCount: number;
+    entityCommentsCount: number;
+    viewersCount: number;
+    likeCount: number;
+    celebrateCount: number;
+    loverCount: number;
+    insightfulCount: number;
+    curiousCount: number;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppEntity implements IAppEntity {
+    tenantId!: number | undefined;
+    name!: string;
+    code!: string | undefined;
+    notes!: string | undefined;
+    entityObjectTypeId!: number;
+    entityObjectTypeFk!: SycEntityObjectType;
+    entityObjectTypeCode!: string | undefined;
+    entityObjectStatusId!: number | undefined;
+    entityObjectStatusFk!: SycEntityObjectStatus;
+    entityObjectStatusCode!: string | undefined;
+    objectId!: number;
+    objectFk!: SydObject;
+    objectCode!: string | undefined;
+    entityCategories!: AppEntityCategory[] | undefined;
+    entityClassifications!: AppEntityClassification[] | undefined;
+    entityAttachments!: AppEntityAttachment[] | undefined;
+    entityAddresses!: AppEntityAddress[] | undefined;
+    entityExtraData!: AppEntityExtraData[] | undefined;
+    entitiesRelationships!: AppEntitiesRelationship[] | undefined;
+    relatedEntitiesRelationships!: AppEntitiesRelationship[] | undefined;
+    appEntityReactionsCount!: AppEntityReactionsCount;
+    tenantOwner!: number;
+    ssin!: string | undefined;
+    timeStamp!: moment.Moment;
+    isDefault!: boolean;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppEntity) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.notes = _data["notes"];
+            this.entityObjectTypeId = _data["entityObjectTypeId"];
+            this.entityObjectTypeFk = _data["entityObjectTypeFk"] ? SycEntityObjectType.fromJS(_data["entityObjectTypeFk"]) : <any>undefined;
+            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
+            this.entityObjectStatusId = _data["entityObjectStatusId"];
+            this.entityObjectStatusFk = _data["entityObjectStatusFk"] ? SycEntityObjectStatus.fromJS(_data["entityObjectStatusFk"]) : <any>undefined;
+            this.entityObjectStatusCode = _data["entityObjectStatusCode"];
+            this.objectId = _data["objectId"];
+            this.objectFk = _data["objectFk"] ? SydObject.fromJS(_data["objectFk"]) : <any>undefined;
+            this.objectCode = _data["objectCode"];
+            if (Array.isArray(_data["entityCategories"])) {
+                this.entityCategories = [] as any;
+                for (let item of _data["entityCategories"])
+                    this.entityCategories!.push(AppEntityCategory.fromJS(item));
+            }
+            if (Array.isArray(_data["entityClassifications"])) {
+                this.entityClassifications = [] as any;
+                for (let item of _data["entityClassifications"])
+                    this.entityClassifications!.push(AppEntityClassification.fromJS(item));
+            }
+            if (Array.isArray(_data["entityAttachments"])) {
+                this.entityAttachments = [] as any;
+                for (let item of _data["entityAttachments"])
+                    this.entityAttachments!.push(AppEntityAttachment.fromJS(item));
+            }
+            if (Array.isArray(_data["entityAddresses"])) {
+                this.entityAddresses = [] as any;
+                for (let item of _data["entityAddresses"])
+                    this.entityAddresses!.push(AppEntityAddress.fromJS(item));
+            }
+            if (Array.isArray(_data["entityExtraData"])) {
+                this.entityExtraData = [] as any;
+                for (let item of _data["entityExtraData"])
+                    this.entityExtraData!.push(AppEntityExtraData.fromJS(item));
+            }
+            if (Array.isArray(_data["entitiesRelationships"])) {
+                this.entitiesRelationships = [] as any;
+                for (let item of _data["entitiesRelationships"])
+                    this.entitiesRelationships!.push(AppEntitiesRelationship.fromJS(item));
+            }
+            if (Array.isArray(_data["relatedEntitiesRelationships"])) {
+                this.relatedEntitiesRelationships = [] as any;
+                for (let item of _data["relatedEntitiesRelationships"])
+                    this.relatedEntitiesRelationships!.push(AppEntitiesRelationship.fromJS(item));
+            }
+            this.appEntityReactionsCount = _data["appEntityReactionsCount"] ? AppEntityReactionsCount.fromJS(_data["appEntityReactionsCount"]) : <any>undefined;
+            this.tenantOwner = _data["tenantOwner"];
+            this.ssin = _data["ssin"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppEntity {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppEntity();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["notes"] = this.notes;
+        data["entityObjectTypeId"] = this.entityObjectTypeId;
+        data["entityObjectTypeFk"] = this.entityObjectTypeFk ? this.entityObjectTypeFk.toJSON() : <any>undefined;
+        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
+        data["entityObjectStatusId"] = this.entityObjectStatusId;
+        data["entityObjectStatusFk"] = this.entityObjectStatusFk ? this.entityObjectStatusFk.toJSON() : <any>undefined;
+        data["entityObjectStatusCode"] = this.entityObjectStatusCode;
+        data["objectId"] = this.objectId;
+        data["objectFk"] = this.objectFk ? this.objectFk.toJSON() : <any>undefined;
+        data["objectCode"] = this.objectCode;
+        if (Array.isArray(this.entityCategories)) {
+            data["entityCategories"] = [];
+            for (let item of this.entityCategories)
+                data["entityCategories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityClassifications)) {
+            data["entityClassifications"] = [];
+            for (let item of this.entityClassifications)
+                data["entityClassifications"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityAttachments)) {
+            data["entityAttachments"] = [];
+            for (let item of this.entityAttachments)
+                data["entityAttachments"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityAddresses)) {
+            data["entityAddresses"] = [];
+            for (let item of this.entityAddresses)
+                data["entityAddresses"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityExtraData)) {
+            data["entityExtraData"] = [];
+            for (let item of this.entityExtraData)
+                data["entityExtraData"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entitiesRelationships)) {
+            data["entitiesRelationships"] = [];
+            for (let item of this.entitiesRelationships)
+                data["entitiesRelationships"].push(item.toJSON());
+        }
+        if (Array.isArray(this.relatedEntitiesRelationships)) {
+            data["relatedEntitiesRelationships"] = [];
+            for (let item of this.relatedEntitiesRelationships)
+                data["relatedEntitiesRelationships"].push(item.toJSON());
+        }
+        data["appEntityReactionsCount"] = this.appEntityReactionsCount ? this.appEntityReactionsCount.toJSON() : <any>undefined;
+        data["tenantOwner"] = this.tenantOwner;
+        data["ssin"] = this.ssin;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppEntity {
+    tenantId: number | undefined;
+    name: string;
+    code: string | undefined;
+    notes: string | undefined;
+    entityObjectTypeId: number;
+    entityObjectTypeFk: SycEntityObjectType;
+    entityObjectTypeCode: string | undefined;
+    entityObjectStatusId: number | undefined;
+    entityObjectStatusFk: SycEntityObjectStatus;
+    entityObjectStatusCode: string | undefined;
+    objectId: number;
+    objectFk: SydObject;
+    objectCode: string | undefined;
+    entityCategories: AppEntityCategory[] | undefined;
+    entityClassifications: AppEntityClassification[] | undefined;
+    entityAttachments: AppEntityAttachment[] | undefined;
+    entityAddresses: AppEntityAddress[] | undefined;
+    entityExtraData: AppEntityExtraData[] | undefined;
+    entitiesRelationships: AppEntitiesRelationship[] | undefined;
+    relatedEntitiesRelationships: AppEntitiesRelationship[] | undefined;
+    appEntityReactionsCount: AppEntityReactionsCount;
+    tenantOwner: number;
+    ssin: string | undefined;
+    timeStamp: moment.Moment;
+    isDefault: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
     id: number;
 
     [key: string]: any;
@@ -91268,456 +91705,6 @@ export interface IGetDefaultEditionNameOutput {
     [key: string]: any;
 }
 
-export enum MarketplaceAccountLevelEnum {
-    Profile = 0,
-    Manual = 1,
-    External = 2,
-}
-
-export class AppMarketplaceAddressDto implements IAppMarketplaceAddressDto {
-    code!: string | undefined;
-    tenantId!: number | undefined;
-    accountId!: number;
-    name!: string | undefined;
-    addressLine1!: string | undefined;
-    addressLine2!: string | undefined;
-    city!: string | undefined;
-    state!: string | undefined;
-    postalCode!: string | undefined;
-    countryId!: number | undefined;
-    countryCode!: string | undefined;
-    countryIdName!: string | undefined;
-    useDTOTenant!: boolean;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppMarketplaceAddressDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.code = _data["code"];
-            this.tenantId = _data["tenantId"];
-            this.accountId = _data["accountId"];
-            this.name = _data["name"];
-            this.addressLine1 = _data["addressLine1"];
-            this.addressLine2 = _data["addressLine2"];
-            this.city = _data["city"];
-            this.state = _data["state"];
-            this.postalCode = _data["postalCode"];
-            this.countryId = _data["countryId"];
-            this.countryCode = _data["countryCode"];
-            this.countryIdName = _data["countryIdName"];
-            this.useDTOTenant = _data["useDTOTenant"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppMarketplaceAddressDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppMarketplaceAddressDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["code"] = this.code;
-        data["tenantId"] = this.tenantId;
-        data["accountId"] = this.accountId;
-        data["name"] = this.name;
-        data["addressLine1"] = this.addressLine1;
-        data["addressLine2"] = this.addressLine2;
-        data["city"] = this.city;
-        data["state"] = this.state;
-        data["postalCode"] = this.postalCode;
-        data["countryId"] = this.countryId;
-        data["countryCode"] = this.countryCode;
-        data["countryIdName"] = this.countryIdName;
-        data["useDTOTenant"] = this.useDTOTenant;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppMarketplaceAddressDto {
-    code: string | undefined;
-    tenantId: number | undefined;
-    accountId: number;
-    name: string | undefined;
-    addressLine1: string | undefined;
-    addressLine2: string | undefined;
-    city: string | undefined;
-    state: string | undefined;
-    postalCode: string | undefined;
-    countryId: number | undefined;
-    countryCode: string | undefined;
-    countryIdName: string | undefined;
-    useDTOTenant: boolean;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppMarketplaceContactAddressDto implements IAppMarketplaceContactAddressDto {
-    accountId!: number;
-    contactId!: number;
-    addressTypeId!: number;
-    addressTypeIdName!: string | undefined;
-    addressId!: number;
-    code!: string | undefined;
-    name!: string | undefined;
-    addressLine1!: string | undefined;
-    addressLine2!: string | undefined;
-    city!: string | undefined;
-    state!: string | undefined;
-    postalCode!: string | undefined;
-    countryId!: number;
-    addressFk!: AppMarketplaceAddressDto;
-    countryIdName!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppMarketplaceContactAddressDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.accountId = _data["accountId"];
-            this.contactId = _data["contactId"];
-            this.addressTypeId = _data["addressTypeId"];
-            this.addressTypeIdName = _data["addressTypeIdName"];
-            this.addressId = _data["addressId"];
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.addressLine1 = _data["addressLine1"];
-            this.addressLine2 = _data["addressLine2"];
-            this.city = _data["city"];
-            this.state = _data["state"];
-            this.postalCode = _data["postalCode"];
-            this.countryId = _data["countryId"];
-            this.addressFk = _data["addressFk"] ? AppMarketplaceAddressDto.fromJS(_data["addressFk"]) : <any>undefined;
-            this.countryIdName = _data["countryIdName"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppMarketplaceContactAddressDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppMarketplaceContactAddressDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["accountId"] = this.accountId;
-        data["contactId"] = this.contactId;
-        data["addressTypeId"] = this.addressTypeId;
-        data["addressTypeIdName"] = this.addressTypeIdName;
-        data["addressId"] = this.addressId;
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["addressLine1"] = this.addressLine1;
-        data["addressLine2"] = this.addressLine2;
-        data["city"] = this.city;
-        data["state"] = this.state;
-        data["postalCode"] = this.postalCode;
-        data["countryId"] = this.countryId;
-        data["addressFk"] = this.addressFk ? this.addressFk.toJSON() : <any>undefined;
-        data["countryIdName"] = this.countryIdName;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppMarketplaceContactAddressDto {
-    accountId: number;
-    contactId: number;
-    addressTypeId: number;
-    addressTypeIdName: string | undefined;
-    addressId: number;
-    code: string | undefined;
-    name: string | undefined;
-    addressLine1: string | undefined;
-    addressLine2: string | undefined;
-    city: string | undefined;
-    state: string | undefined;
-    postalCode: string | undefined;
-    countryId: number;
-    addressFk: AppMarketplaceAddressDto;
-    countryIdName: string | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class CreateOrEditMarketplaceAccountInfoDto implements ICreateOrEditMarketplaceAccountInfoDto {
-    fileToken!: string | undefined;
-    tradeName!: string;
-    accountId!: number | undefined;
-    accountType!: string | undefined;
-    accountTypeId!: number;
-    ssin!: string | undefined;
-    priceLevel!: string | undefined;
-    notes!: string | undefined;
-    website!: string | undefined;
-    name!: string;
-    code!: string | undefined;
-    phone1Number!: string | undefined;
-    phone1Ex!: string | undefined;
-    phone2Number!: string | undefined;
-    phone2Ex!: string | undefined;
-    phone3Number!: string | undefined;
-    phone3Ex!: string | undefined;
-    eMailAddress!: string | undefined;
-    phone1TypeId!: number | undefined;
-    phone2TypeId!: number | undefined;
-    phone3TypeId!: number | undefined;
-    currencyId!: number | undefined;
-    languageId!: number | undefined;
-    entityId!: number | undefined;
-    tenantId!: number | undefined;
-    attachmentSourceTenantId!: number | undefined;
-    useDTOTenant!: boolean;
-    returnId!: boolean;
-    accountLevel!: MarketplaceAccountLevelEnum;
-    entityCategories!: AppEntityCategoryDto[] | undefined;
-    entityClassifications!: AppEntityClassificationDto[] | undefined;
-    entityAttachments!: AppEntityAttachmentDto[] | undefined;
-    branches!: TreeNodeOfBranchForViewDto[] | undefined;
-    contactAddresses!: AppMarketplaceContactAddressDto[] | undefined;
-    contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
-    id!: number | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: ICreateOrEditMarketplaceAccountInfoDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.fileToken = _data["fileToken"];
-            this.tradeName = _data["tradeName"];
-            this.accountId = _data["accountId"];
-            this.accountType = _data["accountType"];
-            this.accountTypeId = _data["accountTypeId"];
-            this.ssin = _data["ssin"];
-            this.priceLevel = _data["priceLevel"];
-            this.notes = _data["notes"];
-            this.website = _data["website"];
-            this.name = _data["name"];
-            this.code = _data["code"];
-            this.phone1Number = _data["phone1Number"];
-            this.phone1Ex = _data["phone1Ex"];
-            this.phone2Number = _data["phone2Number"];
-            this.phone2Ex = _data["phone2Ex"];
-            this.phone3Number = _data["phone3Number"];
-            this.phone3Ex = _data["phone3Ex"];
-            this.eMailAddress = _data["eMailAddress"];
-            this.phone1TypeId = _data["phone1TypeId"];
-            this.phone2TypeId = _data["phone2TypeId"];
-            this.phone3TypeId = _data["phone3TypeId"];
-            this.currencyId = _data["currencyId"];
-            this.languageId = _data["languageId"];
-            this.entityId = _data["entityId"];
-            this.tenantId = _data["tenantId"];
-            this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
-            this.useDTOTenant = _data["useDTOTenant"];
-            this.returnId = _data["returnId"];
-            this.accountLevel = _data["accountLevel"];
-            if (Array.isArray(_data["entityCategories"])) {
-                this.entityCategories = [] as any;
-                for (let item of _data["entityCategories"])
-                    this.entityCategories!.push(AppEntityCategoryDto.fromJS(item));
-            }
-            if (Array.isArray(_data["entityClassifications"])) {
-                this.entityClassifications = [] as any;
-                for (let item of _data["entityClassifications"])
-                    this.entityClassifications!.push(AppEntityClassificationDto.fromJS(item));
-            }
-            if (Array.isArray(_data["entityAttachments"])) {
-                this.entityAttachments = [] as any;
-                for (let item of _data["entityAttachments"])
-                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
-            }
-            if (Array.isArray(_data["branches"])) {
-                this.branches = [] as any;
-                for (let item of _data["branches"])
-                    this.branches!.push(TreeNodeOfBranchForViewDto.fromJS(item));
-            }
-            if (Array.isArray(_data["contactAddresses"])) {
-                this.contactAddresses = [] as any;
-                for (let item of _data["contactAddresses"])
-                    this.contactAddresses!.push(AppMarketplaceContactAddressDto.fromJS(item));
-            }
-            if (Array.isArray(_data["contactPaymentMethods"])) {
-                this.contactPaymentMethods = [] as any;
-                for (let item of _data["contactPaymentMethods"])
-                    this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
-            }
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): CreateOrEditMarketplaceAccountInfoDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateOrEditMarketplaceAccountInfoDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["fileToken"] = this.fileToken;
-        data["tradeName"] = this.tradeName;
-        data["accountId"] = this.accountId;
-        data["accountType"] = this.accountType;
-        data["accountTypeId"] = this.accountTypeId;
-        data["ssin"] = this.ssin;
-        data["priceLevel"] = this.priceLevel;
-        data["notes"] = this.notes;
-        data["website"] = this.website;
-        data["name"] = this.name;
-        data["code"] = this.code;
-        data["phone1Number"] = this.phone1Number;
-        data["phone1Ex"] = this.phone1Ex;
-        data["phone2Number"] = this.phone2Number;
-        data["phone2Ex"] = this.phone2Ex;
-        data["phone3Number"] = this.phone3Number;
-        data["phone3Ex"] = this.phone3Ex;
-        data["eMailAddress"] = this.eMailAddress;
-        data["phone1TypeId"] = this.phone1TypeId;
-        data["phone2TypeId"] = this.phone2TypeId;
-        data["phone3TypeId"] = this.phone3TypeId;
-        data["currencyId"] = this.currencyId;
-        data["languageId"] = this.languageId;
-        data["entityId"] = this.entityId;
-        data["tenantId"] = this.tenantId;
-        data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
-        data["useDTOTenant"] = this.useDTOTenant;
-        data["returnId"] = this.returnId;
-        data["accountLevel"] = this.accountLevel;
-        if (Array.isArray(this.entityCategories)) {
-            data["entityCategories"] = [];
-            for (let item of this.entityCategories)
-                data["entityCategories"].push(item.toJSON());
-        }
-        if (Array.isArray(this.entityClassifications)) {
-            data["entityClassifications"] = [];
-            for (let item of this.entityClassifications)
-                data["entityClassifications"].push(item.toJSON());
-        }
-        if (Array.isArray(this.entityAttachments)) {
-            data["entityAttachments"] = [];
-            for (let item of this.entityAttachments)
-                data["entityAttachments"].push(item.toJSON());
-        }
-        if (Array.isArray(this.branches)) {
-            data["branches"] = [];
-            for (let item of this.branches)
-                data["branches"].push(item.toJSON());
-        }
-        if (Array.isArray(this.contactAddresses)) {
-            data["contactAddresses"] = [];
-            for (let item of this.contactAddresses)
-                data["contactAddresses"].push(item.toJSON());
-        }
-        if (Array.isArray(this.contactPaymentMethods)) {
-            data["contactPaymentMethods"] = [];
-            for (let item of this.contactPaymentMethods)
-                data["contactPaymentMethods"].push(item.toJSON());
-        }
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface ICreateOrEditMarketplaceAccountInfoDto {
-    fileToken: string | undefined;
-    tradeName: string;
-    accountId: number | undefined;
-    accountType: string | undefined;
-    accountTypeId: number;
-    ssin: string | undefined;
-    priceLevel: string | undefined;
-    notes: string | undefined;
-    website: string | undefined;
-    name: string;
-    code: string | undefined;
-    phone1Number: string | undefined;
-    phone1Ex: string | undefined;
-    phone2Number: string | undefined;
-    phone2Ex: string | undefined;
-    phone3Number: string | undefined;
-    phone3Ex: string | undefined;
-    eMailAddress: string | undefined;
-    phone1TypeId: number | undefined;
-    phone2TypeId: number | undefined;
-    phone3TypeId: number | undefined;
-    currencyId: number | undefined;
-    languageId: number | undefined;
-    entityId: number | undefined;
-    tenantId: number | undefined;
-    attachmentSourceTenantId: number | undefined;
-    useDTOTenant: boolean;
-    returnId: boolean;
-    accountLevel: MarketplaceAccountLevelEnum;
-    entityCategories: AppEntityCategoryDto[] | undefined;
-    entityClassifications: AppEntityClassificationDto[] | undefined;
-    entityAttachments: AppEntityAttachmentDto[] | undefined;
-    branches: TreeNodeOfBranchForViewDto[] | undefined;
-    contactAddresses: AppMarketplaceContactAddressDto[] | undefined;
-    contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
-    id: number | undefined;
-
-    [key: string]: any;
-}
-
 export class Widget implements IWidget {
     widgetId!: string | undefined;
     height!: number;
@@ -96314,134 +96301,6 @@ export class GetMaintainanceForEditOutput implements IGetMaintainanceForEditOutp
 
 export interface IGetMaintainanceForEditOutput {
     maintainance: CreateOrEditMaintainanceDto;
-
-    [key: string]: any;
-}
-
-export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountForViewDto {
-    account!: AccountDto;
-    appEntityName!: string | undefined;
-    isPublished!: boolean;
-    allowedAction!: string | undefined;
-    avaliableConnectionName!: string | undefined;
-    connectionName!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IGetMarketplaceAccountForViewDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.account = _data["account"] ? AccountDto.fromJS(_data["account"]) : <any>undefined;
-            this.appEntityName = _data["appEntityName"];
-            this.isPublished = _data["isPublished"];
-            this.allowedAction = _data["allowedAction"];
-            this.avaliableConnectionName = _data["avaliableConnectionName"];
-            this.connectionName = _data["connectionName"];
-        }
-    }
-
-    static fromJS(data: any): GetMarketplaceAccountForViewDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetMarketplaceAccountForViewDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["account"] = this.account ? this.account.toJSON() : <any>undefined;
-        data["appEntityName"] = this.appEntityName;
-        data["isPublished"] = this.isPublished;
-        data["allowedAction"] = this.allowedAction;
-        data["avaliableConnectionName"] = this.avaliableConnectionName;
-        data["connectionName"] = this.connectionName;
-        return data;
-    }
-}
-
-export interface IGetMarketplaceAccountForViewDto {
-    account: AccountDto;
-    appEntityName: string | undefined;
-    isPublished: boolean;
-    allowedAction: string | undefined;
-    avaliableConnectionName: string | undefined;
-    connectionName: string | undefined;
-
-    [key: string]: any;
-}
-
-export class PagedResultDtoOfGetMarketplaceAccountForViewDto implements IPagedResultDtoOfGetMarketplaceAccountForViewDto {
-    totalCount!: number;
-    items!: GetMarketplaceAccountForViewDto[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IPagedResultDtoOfGetMarketplaceAccountForViewDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.totalCount = _data["totalCount"];
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(GetMarketplaceAccountForViewDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): PagedResultDtoOfGetMarketplaceAccountForViewDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PagedResultDtoOfGetMarketplaceAccountForViewDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["totalCount"] = this.totalCount;
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IPagedResultDtoOfGetMarketplaceAccountForViewDto {
-    totalCount: number;
-    items: GetMarketplaceAccountForViewDto[] | undefined;
 
     [key: string]: any;
 }
