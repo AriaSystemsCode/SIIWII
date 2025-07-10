@@ -5669,8 +5669,19 @@ namespace onetouch.AppItems
 
                 }
             }
-            if (saveExcelinput.ExcelRecords.Count>0)
-            await SaveFromExcel(saveExcelinput);
+            if (saveExcelinput.ExcelRecords.Count > 0)
+            {
+                await SaveFromExcel(saveExcelinput);
+                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                string tenancyName = myTenantObject.TenancyName;
+                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                if (adminUser != null)
+                {
+                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                        "Items imported successfully.",
+                        Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                }
+            }
             //I46, MMT 07/08/2025 Save Result to Excel[Start]
             if (returnList.Count > 0)
             {
