@@ -732,7 +732,7 @@ namespace onetouch.AppMarketplaceAccounts
                 appMarketplaceContact.TenantId = null;
                 appMarketplaceContact.Code = input.SSIN;
                 appMarketplaceContact.SSIN = input.SSIN;
-
+                appMarketplaceContact.TimeStamp = DateTime .Now;
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
                 {
                     contactAddress.Id = 0;
