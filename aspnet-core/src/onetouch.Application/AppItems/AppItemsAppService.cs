@@ -78,6 +78,8 @@ using System.Reflection;
 using MimeKit.Tnef;
 using Z.Expressions;
 using onetouch.Migrations;
+using Newtonsoft.Json;
+using System.Drawing;
 
 namespace onetouch.AppItems
 {
@@ -5690,7 +5692,36 @@ namespace onetouch.AppItems
 
                 }
             }
+            if (saveExcelinput.ExcelRecords.Count>0)
             await SaveFromExcel(saveExcelinput);
+            //I46, MMT 07/08/2025 Save Result to Excel[Start]
+            if (returnList.Count > 0)
+            {
+                string attachmentFolder = _appConfiguration[$"APP:ServerRootAddress"] + @"/" +
+                    _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + AbpSession.TenantId.ToString();
+                System.IO.DirectoryInfo dire = new DirectoryInfo(attachmentFolder);
+                //if (!dire.Exists)
+                //    dire.Create();
+                string fileName = "ImportItemResult-" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xlsx";
+                string outFile = attachmentFolder + "//"+ fileName;
+
+                string jsonData = JsonConvert.SerializeObject(returnList);
+                string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
+                _helper.ExcelHelper.ExportJsonToExcel(fileToExport, jsonData);
+                {
+                    var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    string tenancyName = myTenantObject.TenancyName;
+                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    if (adminUser != null)
+                    {
+                        await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                            "Importing Item result can be downloaded from <a href=\"" + outFile + "\" download>" + "here" + "</a>",
+                            Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                    }
+                }
+            }
+            //ExportJsonToExcel
+            //I46, MMT 07/08/2025 Save Result to Excel[End]
             return returnList;
         }
         public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto)
