@@ -78,12 +78,11 @@ namespace onetouch.Message
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IRepository<AppEntityRating, long> appEntityRatingRepository, RoleManager roleManager,
-            IRepository<AppContact, long> appContactRepository,
-            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders
+            IRepository<AppContact, long> appContactRepository
+            
             )
         {
             _roleManager = roleManager;
-            _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appEntityRatingRepository = appEntityRatingRepository;
             _appConfiguration = appConfigurationAccessor.Configuration;
@@ -103,7 +102,7 @@ namespace onetouch.Message
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _AppMarketplaceMessagesRepository = appMarketplaceMessagesRepository;
             _appPostRepo = appPostRepo;
-             _appMarketplaceAccounts=appMarketplaceAccounts;
+            
     }
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)

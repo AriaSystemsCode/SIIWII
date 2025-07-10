@@ -42,7 +42,7 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     tenancyName:string;
     defaultTenancyName:string="SIIWII.NET"; 
     entityObjectType:string ="TENANTCONTACT";
-
+    fromTeamMember:boolean=false;
     constructor(
         injector: Injector,
         private _userService: UserServiceProxy,
@@ -51,7 +51,6 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     ) {
         super(injector);
     }
-
     show(userId?: number): void {
         if (!userId) {
             this.active = true;
@@ -60,7 +59,9 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
         }
 
         this._userService.getUserForEdit(userId).subscribe(userResult => {
+            if(!this.fromTeamMember)
             this.user = userResult.user;
+        
             this.roles = userResult.roles;
             this.tenancyName=userResult.tenancyName;
             this.canChangeUserName = this.user.userName !== AppConsts.userManagement.defaultAdminUserName;

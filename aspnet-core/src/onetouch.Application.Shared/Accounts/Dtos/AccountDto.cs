@@ -9,7 +9,7 @@ namespace onetouch.Accounts.Dtos
     public class AccountDto : EntityDto<long>
     {
 		public string Name { get; set; }
-        public Boolean ShowSync { get; set; }
+        public bool ShowSync { get; set; }
         public int TenantId { get; set; }
         public string Description { get; set; }
 
