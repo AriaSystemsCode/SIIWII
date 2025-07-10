@@ -68,6 +68,8 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppEntityLog> AppEntityLog { get; set; }
         public virtual DbSet<AppMarketplaceContact> AppMarketplaceContacts { get; set; }
+        public virtual DbSet<AppMarketplaceAddress> AppMarketplaceAddresses { get; set; }
+        public virtual DbSet<AppMarketplaceContactAddress> AppMarketplaceContactAddress { get; set; }
         public virtual DbSet<AppEntityRating> AppEntityRatings { get; set; }
 
         public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
@@ -386,6 +388,11 @@ namespace onetouch.EntityFrameworkCore
                        .HasOne(x => x.ParentFk)
                        .WithMany(x => x.ParentFkList)
                        .HasForeignKey(x => x.ParentId);
+
+            modelBuilder.Entity<AppMarketplaceContact>()
+         .HasOne(x => x.ParentFk)
+         .WithMany(x => x.ParentFkList)
+         .HasForeignKey(x => x.ParentId);
 
             modelBuilder.Entity<AppEntityExtraData>()
                .HasOne(x => x.EntityFk)
