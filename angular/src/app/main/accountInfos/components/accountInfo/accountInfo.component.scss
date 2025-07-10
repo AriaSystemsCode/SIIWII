@@ -484,7 +484,7 @@ button.btn.btn-outline-secondary.button-border.ng-tns-c374-7 {
 
 .label-form {
    text-align: right;
-   color: #464E5F;
+   color: #595959;
    font-size: 14px;
    font-weight: 400;
 }
@@ -762,31 +762,20 @@ select {
 
 .button-continue {
    margin-bottom: 12px;
- }
- .precent-profile{
-    text-align: left;
- }
- .title-company{
-   color: #464E5F;
+}
+
+.precent-profile {
+   text-align: left;
+}
+
+.title-company {
+   color: #595959;
    font-size: 15px;
    font-weight: 600;
    margin-bottom: 2px;
- }
- .desc-company{
-font-size: 12px;
-color: #B5B5C3;
- }
- .sidebar-menu-item-img{
-    margin-right: 10px;
- }
- .row-item-title{
-   color: #464E5F;
-   font-size: 13px;
-   font-weight: 800;
-   word-break: break-all;
- }
- .row-item-desc{
-   color: #B5B5C3;
+}
+
+.desc-company {
    font-size: 12px;
    color: #B5B5C3;
 }
@@ -831,7 +820,7 @@ body .tab2 .p-treetable .p-treetable-thead>tr>th,
 body .tab2 .td-tree {
    border: none !important;
    font-size: 16px;
-   color: #464E5F;
+   color: #595959;
 }
 
 body .tab2 .td-tree {
@@ -969,4 +958,9 @@ body .p-dropdown .p-dropdown-trigger {
 .view-profile-wrapper .logo-profile {
    border: 1px solid #6259CE;
    border-radius: 4px !important;
+}
+
+.btn-save {
+   background-color: #4A0D4A;
+   color: #fff;
 }

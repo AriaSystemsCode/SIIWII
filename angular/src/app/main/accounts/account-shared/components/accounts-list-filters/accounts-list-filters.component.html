@@ -1,6 +1,6 @@
 <form [formGroup]="filterForm" >
 
-    <div class="mb-4 pb-5 pt-1 border-dashed-bottom" >
+    <div class="mb-4 pb-5 pt-1 border-bottom lol" >
         <app-multi-selection-filter
             #AccountTypeFilter
             [filterMetaData]="accountTypeFilterMetaData"
@@ -11,7 +11,7 @@
         </app-multi-selection-filter>
     </div>
 
-    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom">
+    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom">
         <app-tree-multi-selection-filter
             #ClassificationFilter
             [filterMetaData]="classificationsFilterMetaData"
@@ -24,7 +24,7 @@
     </div>
 
 
-    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom" >
+    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom" >
         <app-tree-multi-selection-filter
             #CategoryFilter
             [filterMetaData]="categoriesFilterMetaData"
@@ -37,7 +37,7 @@
     </div>
 
 
-    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom" >
+    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom" >
         <app-multi-selection-filter
             #CountryFilter
             [filterMetaData]="countryFilterMetaData"
@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <div class="mt-4 mb-4 pb-5 border-dashed-bottom" >
+    <div class="mt-4 mb-4 pb-5 border-bottom" >
         <h4 class="text-captitalize mb-3">{{"State" | localize}}</h4>
         <div class="d-flex flex-column d-flex flex-wrap filter-group thin-scroll pl-5 pr-4">
             <input type="text" formControlName="state" name="state" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
@@ -72,7 +72,7 @@
     </div>
 
 
-    <div class="mt-4  mb-4 pb-5 pt-3 border-dashed-bottom" >
+    <div class="mt-4  mb-4 pb-5 pt-3 border-bottom" >
         <app-multi-selection-filter
             #AccountStatusFilter
             [filterMetaData]="accountStatusFilterMetaData"
@@ -83,7 +83,7 @@
         </app-multi-selection-filter>
     </div>
 
-    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom" >
+    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom" >
         <app-multi-selection-filter
             #CurrencyFilter
             [filterMetaData]="currencyFilterMetaData"

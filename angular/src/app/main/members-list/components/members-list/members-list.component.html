@@ -21,13 +21,13 @@
                 <div class="kt-portlet__body">
                     <div *ngIf="active">
                         <div class="row" >
-                            <div class="col-12 list-toolbar border-dashed-bottom pb-4">
+                            <div class="col-12 list-toolbar pb-4">
                                 <div class="row mb-3 justify-content-between">
                                     <div class="mb-0 mb-4 mb-md-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
                                             <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 "
                                                 dropdownToggle>
-                                                <span class="list-toolbar-dropdown-filter-selectedItem">
+                                                <span class="list-toolbar-dropdown-filter-selectedItem font-weight-bold">
                                                     {{mainFilterCtrl?.value?.label | localize}}
                                                 </span>
                                             </button>
@@ -48,37 +48,44 @@
                                     </div>
                                     <div class="mb-4 mb-md-0 list-toolbar-search">
                                         <div class="kt-input-icon kt-input-icon--left">
-                                            <input type="text"  (input)="handleSearchInput($event)" class="form-control" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
+                                            <input type="text"  (input)="handleSearchInput($event)" class="form-control" (keydown.enter)="$event.preventDefault()" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
                                             <span class="kt-input-icon__icon kt-input-icon__icon--left">
-                                                <span><i class="flaticon2-search-1 icon-md text-primary"></i></span>
+                                                <span><i class="flaticon2-search-1 icon-md"></i></span>
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="list-toolbar-divider" *ngIf="canAdd"></div>
+                                    <!-- <div class="list-toolbar-divider" *ngIf="canAdd"></div> -->
                                     <div class="mb-4 mb-md-0 text-center" >
                                         <a *ngIf="canAdd" class="btn font-weight-normal pl-2 pr-2 text-center list-toolbar-btn"   (click)="createNewMember()"  >
                                             {{'CreateNewContact' | localize}}
                                         </a> <!-- [routerLink]="['/app/main/member/create-member']" -->
                                     </div>
-                                    <div class="list-toolbar-divider"></div>
+                                    <!-- <div class="list-toolbar-divider"></div> -->
                                     <div class="text-center" >
-                                        <a style="padding-right: 4px;padding-left: 10px;" [title]="'ResetData' | localize" class="btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
-                                            <i  class="d-inline-block w-100 flaticon2-reload icon-center"></i>
+                                        <a style="padding: 5px 3px;padding-right: 0px; background-color: white !important;
+    border: 1px solid white !important;" [title]="'ResetData' | localize" class=" shadowContainer btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
+                                            <img src="../../assets/img/input_icons/repeat.png"
+                                            class="alarmInfo p-2 mr-2" style="border: 1px solid #EEEEEE;border-radius: 6px;     background-color: white !important;">
                                         </a>
-                                        <a style="padding-left: 10px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
+                                        <a style="padding-left: 10px;
+                                        background-color: #4A0D4A !important;
+                                        border-radius: 6px;
+                                        border: 1px solid #4A0D4A !important;
+                                        color: white !important;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="toggleView btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
                                             <i  class="d-inline-block w-100 " [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"></i>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="row justify-content-between">
                                     <div class="font-weight-normal list-toolbar-data-summary" *ngIf="active">
-                                        {{ (paginator.getPage()) * primengTableHelper.defaultRecordsCountPerPage  }}-{{ (paginator.getPage() ) * primengTableHelper.defaultRecordsCountPerPage + members.length  }}
+                                        {{ (paginator?.getPage() ?? 0) * (primengTableHelper?.defaultRecordsCountPerPage ?? 0) + 1 }} - 
+                                        {{ (paginator?.getPage() ?? 0) * (primengTableHelper?.defaultRecordsCountPerPage ?? 0) + (members?.length ?? 0) }}
                                         {{ "over" | localize}}
                                         {{ primengTableHelper.totalRecordsCount }} {{"ResultsOf" | localize }} "{{mainFilterCtrl?.value?.label | localize}}"
                                     </div>
                                     <div>
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown >
-                                            <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 "
+                                            <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 sortByDd"
                                                 dropdownToggle>
                                                 <span class="list-toolbar-dropdown-sort-label">
                                                     {{"SortBy" | localize}}
@@ -107,11 +114,11 @@
                             <div class="col d-flex flex-column justify-content-between">
                                 <div class="row pt-5 pl-2 pr-2">
                                     <div *ngFor="let member of members;index as i;let last = last"
-                                    class="col-12 mb-5 border-dashed-bottom"
+                                    class="col-12 mb-5"
                                     [ngClass]="{
                                         'col-md-12 single-item-per-row-layout' :singleItemPerRowMode,
                                         'col-md-6': !singleItemPerRowMode,
-                                        'border-dashed-bottom pb-5': singleItemPerRowMode && !last
+                                        ' pb-5': singleItemPerRowMode && !last
                                     }">
                                         <app-members-list-card
                                             [member]="member"
@@ -129,12 +136,12 @@
                     <div class="row">
                         <div class="col d-flex flex-column justify-content-between">
                             <div class="primeng-paging-container custom-paginator">
-                                <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
-                                            #paginator
-                                            (onPageChange)="getMembers($event)"
-                                            [totalRecords]="primengTableHelper.totalRecordsCount"
-                                            [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
-                                </p-paginator>
+ <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+             #paginator
+             (onPageChange)="getMembers($event)"
+             [totalRecords]="primengTableHelper.totalRecordsCount"
+             [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
+</p-paginator>
 
                                 <div class="total-records-count text-right mr-3">
                                     {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}

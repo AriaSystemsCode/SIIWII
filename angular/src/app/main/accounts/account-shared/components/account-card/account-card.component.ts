@@ -73,8 +73,9 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
             this.viewProfile()
         }
     }
+
     createRelation(){
-        this._createRelation.emit(this.account);
-      }
+      this._createRelation.emit(this.account);
+    }
 
 }

@@ -34,7 +34,7 @@
                                     </ng-template>
                                 </span>
                             </button>
-                            <button type="submit" class="btn btn-success btn-1bc5bd w-auto ml-4" [buttonBusy]="saving"
+                            <button type="submit" class="btn btn-save btn-1bc5bd w-auto ml-4" [buttonBusy]="saving"
                                 [busyText]="l('SavingWithThreeDot')" (click)="showDialogSaveAccount()"
                                 [disabled]="!accountInfoForm.form.valid || !touched">
                                 <span>{{l("SaveChanges")}}</span>
@@ -486,6 +486,53 @@
                                             </div>
                                         </div>
 
+
+                                        <div class="form-group row">
+                                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                                <span class="text-danger font-weight-bold">*</span>
+                                                {{l("Ship Via")}}
+                                            </label>
+    
+                                        <div class="col-sm-8">
+                                            <p-dropdown
+            id="shipVia"
+            [(ngModel)]="accountInfoTemp.shipViaId"
+            [options]="allShipVia"
+            name="shipVia"
+            styleClass="form-control aria-select"
+            [required]="true"
+            [placeholder]="'PleaseSelect' | localize"
+            optionLabel="label"
+            optionValue="value"
+            (onChange)="changeTouchState()"
+        >
+        </p-dropdown>
+    
+                                        </div>
+                                        </div>
+    
+                                        <div class="form-group row">
+                                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                                <span class="text-danger font-weight-bold">*</span>
+                                                {{l("Payment Terms")}}
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <p-dropdown
+                                                id="payTerms"
+                                                [options]="allPaymentTerms"
+                                                name="payTerms"
+                                                styleClass="form-control aria-select"
+                                                [required]="true"
+                                                [placeholder]="'PleaseSelect' | localize"
+                                                [(ngModel)]="accountInfoTemp.paymentTermsId"
+                                                optionLabel="label"
+                                                optionValue="value"
+                                                (onChange)="changeTouchState()"
+                                            >
+                                            </p-dropdown>
+                                            </div>
+                                            </div>
+
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountSSIN")}}</label>
@@ -530,7 +577,7 @@
                                         <div class="col-md-2  header-block-buttons">
 
 
-                                            <button class="btn btn-primary btn-blue"
+                                            <button class="btn  btn-save"
                                                 (click)="openSelectClassificationsModal()">
 
                                                 <span>{{l("Select")}}</span></button>
@@ -623,7 +670,7 @@
                                         <div class="col-md-2  header-block-buttons">
 
 
-                                            <button class="btn btn-primary btn-blue"
+                                            <button class="btn  btn-save"
                                                 (click)="openSelectCategoriesModal()">
 
                                                 <span>{{l("Select")}}</span></button>

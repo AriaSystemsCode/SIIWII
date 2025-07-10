@@ -1,4 +1,4 @@
-<div [@routerTransition] class="wrapper" >
+<div [@routerTransition] class="wrapper">
     <div *ngIf="accountData" class="view-profile-wrapper">
         <div>
             <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
@@ -24,11 +24,10 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div #viewProfileCover
-                                        class="view-profile-cover d-flex justify-content-center align-items-center position-relative">
-                                        <app-image-display [image]="coverPhoto"
+                                        class="view-profile-cover d-flex justify-content-center align-items-center position-relative" style="border-radius: 12px;">
+                                        <app-image-display [image]="coverPhoto ?coverPhoto  :'../../assets/placeholders/_logo-placeholder.png'"
                                             [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-                                            [staticWidth]="viewProfileCover?.offsetWidth"
-                                            >
+                                            [staticWidth]="viewProfileCover?.offsetWidth">
                                         </app-image-display>
                                         <div class="mr-3 view-profile-action-buttons"
                                             *ngIf="!viewMode&&isNotManualLevel()">
@@ -79,19 +78,22 @@
 
                                         </div>
 
-                                        <div class="d-flex view-profile-action-buttons" *ngIf="accountData.isConnected && showEditConnected">
-                                            <!-- <button class="btn mb-3 mt-4 w-100 btn-success" (click)="this.showEditConnected =false" >
-                                                {{ "Edit" | localize }}
-                                            </button> -->
-                                            <button class="btn mb-3 mt-4 w-100 btn-success" (click)="editAccount()" >
+                                        <div class="d-flex view-profile-action-buttons"
+                                            *ngIf="accountData.isConnected && showEditConnected &&isNotManualLevel()">
+                                            <button class="btn mb-3 mt-4 w-100 btn-save"
+                                                (click)="this.showEditConnected =false">
                                                 {{ "Edit" | localize }}
                                             </button>
                                         </div>
-                                        <div class="d-flex view-profile-action-buttons" *ngIf="accountData.isConnected && !showEditConnected">
-                                            <button class="btn mb-3 mt-4 w-100 btn-success" [disabled]="priceLevel==this.accountData.priceLevel"  (click)="editConnnectedAccount()" >
+                                        <div class="d-flex view-profile-action-buttons"
+                                            *ngIf="accountData.isConnected && !showEditConnected &&isNotManualLevel()">
+                                            <button class="btn mb-3 mt-4 w-100 btn-save"
+                                                [disabled]="priceLevel==this.accountData.priceLevel"
+                                                (click)="editConnnectedAccount()">
                                                 {{ "Save" | localize }}
                                             </button>
-                                            <button class="btn mb-3 mt-4 w-100 btn-danger" (click)="this.showEditConnected =true; this.priceLevel=this.accountData.priceLevel" >
+                                            <button class="btn mb-3 mt-4 w-100 btn-danger"
+                                                (click)="this.showEditConnected =true; this.priceLevel=this.accountData.priceLevel">
                                                 {{ "Undo" | localize }}
                                             </button>
                                         </div>
@@ -99,15 +101,13 @@
 
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-md-2 ">
                                     <div class="dev-logo">
-                                        <app-image-display
-                                            [image]="logoPhoto"
+                                        <app-image-display [image]="logoPhoto ? logoPhoto  :'../../assets/placeholders/_logo-placeholder.png'"
                                             [sycAttachmentCategory]="sycAttachmentCategoryLogo"
-                                            [classList]="'logo-profile'"
-                                            [staticHeight]="74"
-                                        >
+                                            [classList]="'logo-profile'" [staticHeight]="74">
                                         </app-image-display>
                                     </div>
                                 </div>
@@ -116,8 +116,8 @@
                                             {{accountData?.connections}} {{'MembersAreConnected'|localize}}</span></h5>
 
                                     <div *ngIf="!personalAccount">
-                                        <textarea class="thin-scroll w-100" style="
-                                            height: 120px;
+                                        <textarea class="thin-scroll w-100 mt-2" style="
+                                            min-height: 80px;
                                             border: 0;
                                             outline: 0;
                                             overflow-y: scroll;
@@ -131,7 +131,8 @@
                             <hr class="header" *ngIf="!personalAccount">
                             <div class="row" *ngIf="!personalAccount">
                                 <div class="col-md-12">
-                                    <div class="address" *ngIf="accountData?.addressLine1 || accountData?.city || accountData?.state || accountData?.zipCode || accountData?.countryName">
+                                    <div class="address"
+                                        *ngIf="accountData?.addressLine1 || accountData?.city || accountData?.state || accountData?.zipCode || accountData?.countryName">
                                         <img class="icon-address" src="assets/accounts/Address.svg">
 
                                         <p class="title-account" *ngIf="accountData">
@@ -151,10 +152,10 @@
                                                 {{ accountData.state + ', ' }}
                                             </span>
                                             <span *ngIf="accountData && accountData.zipCode">
-                                                {{accountData.zipCode  }}{{accountData.countryName ? ', ' : '' }}
+                                                {{accountData.zipCode }}{{accountData.countryName ? ', ' : '' }}
                                             </span>
                                             <span *ngIf="accountData && accountData.countryName">
-                                                {{ accountData.countryName  }} .
+                                                {{ accountData.countryName }} .
                                             </span>
                                         </p>
                                     </div>
@@ -173,13 +174,17 @@
             </div>
         </div>
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  *ngIf="!personalAccount" [ngClass]="imageObject.length > 0 ? 'addHight':'addMg'">
-            <div class="kt-portlet kt-portlet--mobile kt-slider">
+            <div class="kt-portlet kt-portlet--mobile kt-slider" style="border-radius: 12px;">
                 <div class="kt-portlet__body p-0 " style="background-color: white;" *ngIf="!imageObject || imageObject.length > 0;else noImagesAdded">
                     <!-- <div class="row p-28">
                         <div class="col-md-12">
                             <div class="arrow text-right">
-                                <span class="arrow-dev" (click)="prevImageClick()" ><img src="assets/accounts/Previous.svg" ><span class="arrow arrow-prev" >{{"Previous"|localize}}</span></span>
-                            <span class="arrow-dev" (click)="nextImageClick()"> <span class="arrow arrow-next" >{{"Next"|localize}}</span><img src="assets/accounts/Next.svg" ></span>
+                                <span class="arrow-dev" (click)="prevImageClick()"><img
+                                        src="assets/accounts/Previous.svg"><span
+                                        class="arrow arrow-prev">{{"Previous"|localize}}</span></span>
+                                <span class="arrow-dev" (click)="nextImageClick()"> <span
+                                        class="arrow arrow-next">{{"Next"|localize}}</span><img
+                                        src="assets/accounts/Next.svg"></span>
 
                             </div>
                         </div>
@@ -194,211 +199,182 @@
                 </div>
                 <ng-template #noImagesAdded >
                     <div class="kt-portlet__body p-0 ">
-                    <div class="row">
-                    <div class="col-md-12 pb-3 pt-5 text-center">
-                         <p>{{"Noimagestodisplay" | localize}}</p>
+                        <div class="row">
+                            <div class="col-md-12 pb-3 pt-5 text-center">
+                                <p>{{"Noimagestodisplay" | localize}}</p>
+                            </div>
                         </div>
-                </div>
-            </div>
-            </ng-template>
+                    </div>
+                </ng-template>
             </div>
         </div>
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="!personalAccount">
             <div class="kt-portlet kt-portlet--mobile">
-                <div class="kt-portlet__body p-0">
-                    <div class="row p-28">
-                        <div class="col-4" *ngIf="accountData && accountData.accountType">
-                            <p class="title-dev-slider text-left">{{"AccountType" | localize}}</p>
-                        </div>
-                        <div class="col-4" *ngIf="accountData && accountData.ssin">
-                            <p class="title-dev-slider text-left pl-5">{{"AccountSSIN" | localize}}</p>
-                        </div>
-
-                        <div class="col-4" *ngIf="accountData && accountData.code">
-                            <p class="title-dev-slider text-left">{{"Account Code" | localize}}</p>
-                        </div>
-                    </div>
-
-                    
-                    <div class="row">
-                        <div class="categories col-4 pb-3 pt-2" *ngIf="accountData && accountData.accountType">
-
-                            <div class="account-type">
-                                <p class="title-tag">{{accountData.accountType}}</p>
-                            </div>
-                        </div>
-                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.ssin">
-                            <div class="account-type">
-                                <p class="title-tag">{{accountData.ssin}}</p>
-                            </div>
-                        </div>
-
-                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.code">
-                            <div class="account-type">
-                                <p class="title-tag">{{accountData.code}}</p>
-                            </div>
-                        </div>
-            <!-- <div  class="categories col-3 pb-3 pt-2" *ngIf="accountData && accountData.isConnected && !showEditConnected">
-                <p-dropdown [options]="allPriceLevel" styleClass="form-control aria-select title-dev-slider text-left" [filter]="false"
-                name="PriceLevelId" [(ngModel)]="priceLevel"  [placeholder]="'PleaseSelect' | localize"></p-dropdown>
-
-            </div> -->
-        </div>
-
-            <div class="row p-28">
-               
-                        <div class="col-4" *ngIf="(accountData && accountData.priceLevel && !accountData.isConnected ) ||(accountData  && accountData.isConnected && !showEditConnected) || (accountData  && accountData.isConnected && accountData.priceLevel  && showEditConnected ) ">
-                            <p class="title-dev-slider text-left">{{"PriceLevel" | localize}}</p>
-                        </div>
-
-            <div class="col-4" *ngIf="accountData && accountData.currency">
-                <p class="title-dev-slider text-left">{{"Currency" | localize}}</p>
-            </div>
-            </div>
-
-       
-
- <div class="row">
-    <div class="categories col-4 pb-3 pt-2" *ngIf="(accountData && accountData.priceLevel && !accountData.isConnected ) ||(accountData && accountData.priceLevel && accountData.isConnected && showEditConnected )  ">
-        <div class="account-type">
-            <p class="title-tag">{{accountData.priceLevel}}</p>
-        </div>
-    </div>
-                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.currency">
-                            <div class="account-type">
-                                <p class="title-tag">{{accountData.currency}}</p>
-                            </div>
-                        </div>
-
-                        </div>
-
-
-
-
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body pl-0 py-0 pr-3">
                         <div class="row p-28">
-                            <div class="col-4" *ngIf="accountData && accountData.shipViaName">
-                                <p class="title-dev-slider text-left pl-5">{{"Ship Via" | localize}}</p>
+                            <div class="col-4" *ngIf="accountData && accountData.accountType">
+                                <p class="title-dev-slider text-left">{{"AccountType" | localize}}</p>
                             </div>
-                
-                            <div class="col-4" *ngIf="accountData && accountData.paymentTermsName">
-                                <p class="title-dev-slider text-left">{{"Payment Terms" | localize}}</p>
+                            <div class="col-4" *ngIf="accountData && accountData.ssin">
+                                <p class="title-dev-slider text-left pl-5">{{"AccountSSIN" | localize}}</p>
                             </div>
-                        </div> 
-
+    
+                            <div class="col-4" *ngIf="accountData && accountData.code">
+                                <p class="title-dev-slider text-left">{{"Account Code" | localize}}</p>
+                            </div>
+                        </div>
+    
+                        
                         <div class="row">
-                            <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.shipViaName">
+                            <div class="categories col-4 pb-3 pt-2" *ngIf="accountData && accountData.accountType">
+                                <!-- div class="account-type" *ngFor="let accountType of accountData.accountType;let i=index;">
+                                    <p class="title-tag">{{accountType}}</p>
+                                </div> -->
                                 <div class="account-type">
-                                    <p class="title-tag">{{accountData.shipViaName}}</p>
+                                    <p class="title-tag">{{accountData.accountType}}</p>
+                                </div>
+                            </div>
+                            <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.ssin">
+                                <div class="account-type">
+                                    <p class="title-tag">{{accountData.ssin}}</p>
                                 </div>
                             </div>
     
-                            <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.paymentTermsName">
+                            <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.code">
                                 <div class="account-type">
-                                    <p class="title-tag">{{accountData.paymentTermsName}}</p>
+                                    <p class="title-tag">{{accountData.code}}</p>
                                 </div>
                             </div>
+                <!-- <div  class="categories col-3 pb-3 pt-2" *ngIf="accountData && accountData.isConnected && !showEditConnected">
+                    <p-dropdown [options]="allPriceLevel" styleClass="form-control aria-select title-dev-slider text-left" [filter]="false"
+                    name="PriceLevelId" [(ngModel)]="priceLevel"  [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+    
+                </div> -->
+            </div>
+    
+                <div class="row p-28">
+                   
+                            <div class="col-4" *ngIf="(accountData && accountData.priceLevel && !accountData.isConnected ) ||(accountData  && accountData.isConnected && !showEditConnected) || (accountData  && accountData.isConnected && accountData.priceLevel  && showEditConnected ) ">
+                                <p class="title-dev-slider text-left">{{"PriceLevel" | localize}}</p>
                             </div>
-
+    
+                <div class="col-4" *ngIf="accountData && accountData.currency">
+                    <p class="title-dev-slider text-left">{{"Currency" | localize}}</p>
+                </div>
+                </div>
+    
+           
+    
+     <div class="row">
+        <div class="categories col-4 pb-3 pt-2" *ngIf="(accountData && accountData.priceLevel && !accountData.isConnected ) ||(accountData && accountData.priceLevel && accountData.isConnected && showEditConnected )  ">
+            <div class="account-type">
+                <p class="title-tag">{{accountData.priceLevel}}</p>
+            </div>
+        </div>
+                            <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.currency">
+                                <div class="account-type">
+                                    <p class="title-tag">{{accountData.currency}}</p>
+                                </div>
+                            </div>
+    
+                            </div>
+    
+    
+    
+    
+                            <div class="row p-28">
+                                <div class="col-4" *ngIf="accountData && accountData.shipViaName">
+                                    <p class="title-dev-slider text-left pl-5">{{"Ship Via" | localize}}</p>
+                                </div>
+                    
+                                <div class="col-4" *ngIf="accountData && accountData.paymentTermsName">
+                                    <p class="title-dev-slider text-left">{{"Payment Terms" | localize}}</p>
+                                </div>
+                            </div> 
+    
+                            <div class="row">
+                                <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.shipViaName">
+                                    <div class="account-type">
+                                        <p class="title-tag">{{accountData.shipViaName}}</p>
+                                    </div>
+                                </div>
+        
+                                <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.paymentTermsName">
+                                    <div class="account-type">
+                                        <p class="title-tag">{{accountData.paymentTermsName}}</p>
+                                    </div>
+                                </div>
+                                </div>
+    
+                    </div>
                 </div>
             </div>
         </div>
         <div *ngIf="!personalAccount" [class]="
             containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
-        "
-    >
-        <div class="p-4 seeMoreContainer">
-            <div class="row pl-3">
-                <div>
-                    <h6 class="header">{{ "Departments" | localize }}:</h6>
+        ">
+            <div class="p-4 seeMoreContainer">
+                <div class="row pl-3">
+                    <div>
+                        <h6 class="header emailColor">{{ "Departments" | localize }}:</h6>
+                    </div>
                 </div>
-            </div>
-            <div
-                class="row details pt-4"
-                [ngClass]="{ 'thin-scroll': scrollDepartment }"
-                [ngStyle]="{
+                <div class="row details pt-4" [ngClass]="{ 'thin-scroll': scrollDepartment }" [ngStyle]="{
                     'overflow-y': scrollDepartment ? 'scroll' : 'hidden',
                     height: scrollDepartment
                         ? maxContainerHeight + 'px'
                         : 'auto'
-                }" 
-                *ngIf="accountData?.classfications?.length > 0;else noDepartment"
-            >
-                <div class="col-md-12 pb-3 pt-2">
-                    <div
-                        class="seeMoreData"
-                        *ngFor="let department of accountData?.categories; index as i  "
-                    >
-                        <p class="title-tag">{{ department }}</p>
+                }" *ngIf="accountData?.classfications?.length > 0;else noDepartment">
+                    <div class="col-md-12 pb-3 pt-2">
+                        <div class="seeMoreData" *ngFor="let department of accountData?.categories; index as i  ">
+                            <p class="title-tag">{{ department }}</p>
+                        </div>
                     </div>
+                    <button *ngIf="showLessDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
+                        {{ "Showless" | localize }}
+                    </button>
+                    <button *ngIf="showMoreDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
+                        {{ "showmore" | localize }}
+                    </button>
                 </div>
-                <button
-                    *ngIf="showLessDepartment"
-                    (click)="showDepartment()"
-                    class="btn btn-dark ml-5"
-                >
-                    {{ "Showless" | localize }}
-                </button>
-                <button
-                    *ngIf="showMoreDepartment"
-                    (click)="showDepartment()"
-                    class="btn btn-dark ml-5"
-                >
-                    {{ "showmore" | localize }}
-                </button>
+                <ng-template #noDepartment>
+                    <div class="col-md-12 pb-3 pt-2 text-center">
+                        <p>
+                            {{ "NoDepartmentstodisplay" | localize }}
+                        </p>
+                    </div>
+                </ng-template>
             </div>
-            <ng-template #noDepartment>
-                <div class="col-md-12 pb-3 pt-2 text-center">
-                    <p>
-                        {{ "NoDepartmentstodisplay" | localize }}
-                    </p>
-                </div>
-            </ng-template>
         </div>
         <div *ngIf="!personalAccount" [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
-            "
-        >
+            ">
             <div class="p-4 seeMoreContainer">
                 <div class="row pl-3">
                     <div>
-                        <h6 class="header">
+                        <h6 class="header emailColor">
                             {{ "BusinessClassifications" | localize }}:
                         </h6>
                     </div>
                 </div>
-                <div
-                    class="row details pt-4"
-                    [ngClass]="{ 'thin-scroll': scrollClassification }"
-                    [ngStyle]="{
+                <div class="row details pt-4" [ngClass]="{ 'thin-scroll': scrollClassification }" [ngStyle]="{
                         'overflow-y': scrollClassification
                             ? 'scroll'
                             : 'hidden',
                         height: scrollClassification
                             ? maxContainerHeight + 'px'
                             : 'auto'
-                    }"
-                    *ngIf="accountData?.classfications?.length > 0;  else noClassification"
-                >
+                    }" *ngIf="accountData?.classfications?.length > 0;  else noClassification">
                     <div class="col-md-12 pb-3 pt-2">
-                        <div
-                            class="seeMoreData"
-                            *ngFor="let classification of accountData?.classfications;index as i"
-                        >
+                        <div class="seeMoreData" *ngFor="let classification of accountData?.classfications;index as i">
                             <p class="title-tag">{{ classification }}</p>
                         </div>
                     </div>
-                    <button
-                        *ngIf="showLessClassification"
-                        (click)="showClassification()"
-                        class="btn btn-dark ml-5"
-                    >
+                    <button *ngIf="showLessClassification" (click)="showClassification()" class="btn btn-dark ml-5">
                         {{ "Showless" | localize }}
                     </button>
-                    <button
-                        *ngIf="showMoreClassification"
-                        (click)="showClassification()"
-                        class="btn btn-dark ml-5"
-                    >
+                    <button *ngIf="showMoreClassification" (click)="showClassification()" class="btn btn-dark ml-5">
                         {{ "showmore" | localize }}
                     </button>
                 </div>
@@ -406,7 +382,7 @@
                     <div class="col-md-12 pb-3 pt-2 text-center">
                         <p>
                             {{
-                                "NoBusinessclassificationstodisplay" | localize
+                            "NoBusinessclassificationstodisplay" | localize
                             }}
                         </p>
                     </div>
@@ -426,6 +402,27 @@
                                     | localize}}</p>
                             </div>
                             <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
+                                <h6 class="text-right font-weight-bold mr-3"><img
+                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "FirstName" |
+                                    localize ) + " :"}}</h6>
+
+                                <p *ngIf="!editFirstNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{accountData?.firstName}}</p>
+                                <p *ngIf="editFirstNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editFirstNameValue}}</p>
+                                <input style="color: #595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="firstName"
+                                    #firstNameInput="ngModel" required name="firstName" minlength="2"
+                                    [(ngModel)]="editFirstNameValue"
+                                    [placeholder]="'Please Enter First Name' | localize " required
+                                    [class.hide]="editInfo">
+                                <validation-messages *ngIf="NoteditInfo"
+                                    [formCtrl]="firstNameInput"></validation-messages>
+
+                            </div>
+                            <hr class="header">
+
+                                <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class="text-right font-weight-bold mr-3"><img
                                         src="../../assets/img/input_icons/user.png" class=""> {{ ( "FirstName" |
                                     localize ) + " :"}}</h6>
