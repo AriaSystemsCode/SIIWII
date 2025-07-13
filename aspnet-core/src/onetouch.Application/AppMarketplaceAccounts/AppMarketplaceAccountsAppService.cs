@@ -127,10 +127,10 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
                                 x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 1) > 0,
-                                x => _appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
+                                x => _appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
 
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 2) > 0,
-                                x => (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
+                                x => (_appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
                                 )
                             .WhereIf(input.Classifications != null && input.Classifications.Count(x => x > 0) > 0,
                                 x => _appEntityRepository.GetAll().Include(ec => ec.EntityClassifications).FirstOrDefault(e => e.Id == x.Id).EntityClassifications.Any(a => input.Classifications.Contains(a.EntityObjectClassificationId)))

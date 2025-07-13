@@ -798,6 +798,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 this.updateLogoService.updateLogo()
                 this.handleComponentMode();
 
+                // this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
+                this.changeTab(AccountInfoPageTabs.ProfileView);
+                this.getAccountDataForView()
+
 
 
             }, err => this.touched = true);
