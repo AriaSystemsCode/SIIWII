@@ -489,6 +489,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
       });
     });
 
+ 
 
     this.appTransactionsForViewDto.entityCategoriesNames.totalCount = this.selectedCategories.length;
     this.appTransactionsForViewDto.entityCategoriesNames.items = this.selectedCategories.map(item => item.entityObjectCategoryName || '');

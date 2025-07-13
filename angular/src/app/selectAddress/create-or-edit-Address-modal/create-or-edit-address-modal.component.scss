@@ -251,3 +251,12 @@
 }
 
 /*End Address model*/
+
+
+::ng-deep {
+    .aria-select {
+        .p-overlay {
+            max-width: 300px !important;
+        }
+    }
+}
