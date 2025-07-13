@@ -70140,6 +70140,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
     showSync!: boolean;
     lastModifiedDate!: moment.Moment;
     numberOfSubscribers!: number;
+    manufacturerCode!: string | undefined;
     code!: string | undefined;
     name!: string | undefined;
     entityId!: number;
@@ -70213,6 +70214,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             this.showSync = _data["showSync"];
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.numberOfSubscribers = _data["numberOfSubscribers"];
+            this.manufacturerCode = _data["manufacturerCode"];
             this.code = _data["code"];
             this.name = _data["name"];
             this.entityId = _data["entityId"];
@@ -70348,6 +70350,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
         data["showSync"] = this.showSync;
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["numberOfSubscribers"] = this.numberOfSubscribers;
+        data["manufacturerCode"] = this.manufacturerCode;
         data["code"] = this.code;
         data["name"] = this.name;
         data["entityId"] = this.entityId;
@@ -70468,6 +70471,7 @@ export interface IAppItemForViewDto {
     showSync: boolean;
     lastModifiedDate: moment.Moment;
     numberOfSubscribers: number;
+    manufacturerCode: string | undefined;
     code: string | undefined;
     name: string | undefined;
     entityId: number;
