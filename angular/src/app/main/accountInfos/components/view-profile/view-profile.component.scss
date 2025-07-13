@@ -276,6 +276,10 @@ input{
     .ng-image-slider .ng-image-slider-container .main .main-inner .img-div img, .ng-image-slider .ng-image-slider-container .main .main-inner .img-div video {
         margin: 0 !important;
     }
+    .p-button:enabled:hover {
+        background-color: transparent !important;
+        color: inherit !important;
+    }
 }
 
 

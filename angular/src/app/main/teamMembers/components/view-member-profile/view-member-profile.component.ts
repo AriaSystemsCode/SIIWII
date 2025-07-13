@@ -43,7 +43,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     contactDisplayName: string
     active = false;
 
-    logoDefaultImage = "../../../assets/placeholders/_logo-placeholder.png"
+    logoDefaultImage = "../../../assets/common/images/default-profile-picture.png"
     coverDefaultImage = "../../../assets/placeholders/_default_cover.jpg"
     sycAttachmentCategoryLogo: SycAttachmentCategoryDto
     sycAttachmentCategoryBanner: SycAttachmentCategoryDto
