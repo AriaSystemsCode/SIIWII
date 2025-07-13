@@ -28,8 +28,8 @@ import { Paginator } from 'primeng/paginator';
 
 @Component({
     selector: 'app-account-info',
-    templateUrl: './AccountInfo.component.html',
-    styleUrls: ['./AccountInfo.component.scss'],
+    templateUrl: './accountInfo.component.html',
+    styleUrls: ['./accountInfo.component.scss'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()],
     providers: [MarketplaceAccountsServiceProxy]

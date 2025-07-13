@@ -78,6 +78,7 @@ export class AccountsComponent
     accounts: GetAccountForViewDto[] = [];
     sortingOptions: SelectItem[];
     filterVisible = false; // To toggle the filter visibility
+    filterVisiblelg = true; // To toggle the filter visibility
     active: boolean = false;
     loading: boolean = false;
 
@@ -122,6 +123,7 @@ export class AccountsComponent
 
     toggleFilter(): void {
         this.filterVisible = !this.filterVisible;
+        this.filterVisiblelg  = ! this.filterVisiblelg 
     }
     setMainPageFilter(filter: AccountMainFilterEnum) {
         const selectedfilter = this.pageMainFilters.filter(

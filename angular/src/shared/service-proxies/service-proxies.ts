@@ -1677,6 +1677,63 @@ export class AccountsServiceProxy {
 
     /**
      * @param id (optional) 
+     * @return Success
+     */
+    getContactSync(id: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/getContactSync?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetContactSync(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetContactSync(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processGetContactSync(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
      * @param resultCount (optional) 
      * @return Success
      */
@@ -66272,7 +66329,6 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
     parentCode!: string | undefined;
     accountType!: string | undefined;
     accountTypeId!: number;
-    timeStamp!: moment.Moment;
     isProfileData!: boolean;
     isHidden!: boolean;
     phone1TypeId!: number | undefined;
@@ -66323,6 +66379,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
     appEntityReactionsCount!: AppEntityReactionsCount;
     tenantOwner!: number;
     ssin!: string | undefined;
+    timeStamp!: moment.Moment;
     isDefault!: boolean;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
@@ -66363,7 +66420,6 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
             this.parentCode = _data["parentCode"];
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
-            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.isProfileData = _data["isProfileData"];
             this.isHidden = _data["isHidden"];
             this.phone1TypeId = _data["phone1TypeId"];
@@ -66454,6 +66510,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
             this.appEntityReactionsCount = _data["appEntityReactionsCount"] ? AppEntityReactionsCount.fromJS(_data["appEntityReactionsCount"]) : <any>undefined;
             this.tenantOwner = _data["tenantOwner"];
             this.ssin = _data["ssin"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.isDefault = _data["isDefault"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
@@ -66492,7 +66549,6 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
         data["parentCode"] = this.parentCode;
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
-        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["isProfileData"] = this.isProfileData;
         data["isHidden"] = this.isHidden;
         data["phone1TypeId"] = this.phone1TypeId;
@@ -66583,6 +66639,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
         data["appEntityReactionsCount"] = this.appEntityReactionsCount ? this.appEntityReactionsCount.toJSON() : <any>undefined;
         data["tenantOwner"] = this.tenantOwner;
         data["ssin"] = this.ssin;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["isDefault"] = this.isDefault;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
@@ -66610,7 +66667,6 @@ export interface IAppMarketplaceContact {
     parentCode: string | undefined;
     accountType: string | undefined;
     accountTypeId: number;
-    timeStamp: moment.Moment;
     isProfileData: boolean;
     isHidden: boolean;
     phone1TypeId: number | undefined;
@@ -66661,6 +66717,7 @@ export interface IAppMarketplaceContact {
     appEntityReactionsCount: AppEntityReactionsCount;
     tenantOwner: number;
     ssin: string | undefined;
+    timeStamp: moment.Moment;
     isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;

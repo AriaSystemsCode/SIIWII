@@ -119,7 +119,7 @@
                                 position: absolute;
                                 right: 5px;cursor: auto;">
                                 <img class="pb-1" style="width: 20px;" src="../../assets/accounts/ph_check-bold.png" />
-                                {{ account?.connectionName?.trim() | localize }}
+                                {{ getFormattedConnectionName('connectionName') | localize }}
                             </button>
                         </span>
 
@@ -141,7 +141,7 @@
                                     src="../../assets/accounts/EMPLOYEE.png" />
                                 <img class="pb-1" style="width: 20px;"
                                     *ngIf="account.avaliableConnectionName.toUpperCase().includes('JOIN')"
-                                    src="../../assets/accounts/JOIN.png" /> {{ account?.avaliableConnectionName?.trim()
+                                    src="../../assets/accounts/JOIN.png" /> {{  getFormattedConnectionName('avaliableConnectionName')
                                 | localize }}
                             </button>
                         </span>

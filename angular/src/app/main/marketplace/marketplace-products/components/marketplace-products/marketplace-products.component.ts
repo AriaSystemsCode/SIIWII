@@ -1,9 +1,11 @@
+
+
+
 import {
     Component,
     Injector,
     OnDestroy,
     ViewChild,
-    OnInit,
    SimpleChanges, OnChanges, ViewChildren, ElementRef,
    Input
 } from "@angular/core";
@@ -63,9 +65,8 @@ export class MarketplaceProductsComponent
     sellerSSIN: any;
     buyerSSIN: any;
     contactSSIN:any;
-    @Input() fromMarketAcoount: boolean;
-    @Input() fromOverView: boolean = false
-    @Input() accountDataForView :any
+    acceptedAspectRatio;
+
     isFromSellerRoom:boolean
     ismarketPLace:boolean
     items: any[];
@@ -75,7 +76,9 @@ export class MarketplaceProductsComponent
     onlyAvialbleStock: boolean;
     appItemListId: any;
     selectedDepartments: any;
-    acceptedAspectRatio;
+    @Input() fromMarketAcoount: boolean;
+    @Input() fromOverView: boolean = false
+    @Input() accountDataForView :any
     constructor(
         injector: Injector,
         private _router: Router,
@@ -127,14 +130,17 @@ export class MarketplaceProductsComponent
             this.getAllCurrencies();
 
 
-      
-    }
-  
-
-
-    ngOnInit() {
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
+        
+
+
+        this.checkMediaQuery();
+        this.getAspectatio();
+        
+    }
+    ngOnInit() {
+        
         const savedFilters = localStorage.getItem("productFilters");
         
         if (savedFilters) {
@@ -159,9 +165,6 @@ export class MarketplaceProductsComponent
         }
     
         this.getAllProducts(); // Fetch products using restored filters
-        this.checkMediaQuery();
-
-            this.getAspectatio();
     }
     
     ngAfterViewInit() {
@@ -255,8 +258,8 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView ?.ssin : localStorage.getItem("SellerSSIN"),
-                null, // tenant id
+                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView ?.ssin :  sessionStorage.getItem("SellerSSIN"),
+                null,
                 requestParams.appItemListId ||  this.appItemListId,
                 false, // false
                 requestParams.searchText || this.searchInput,

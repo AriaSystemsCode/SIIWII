@@ -157,10 +157,11 @@
                                 </div>
                             
                             </div>
-                            <div class="d-md-block d-none col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
+                            
+                            <div *ngIf=" filterVisiblelg"   class="d-md-block d-none col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
                                 <app-accounts-list-filters [filterForm]="filterForm" [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
                             </div> 
-                            <div class="col-12 col-md-7 col-lg-9">
+                            <div class="col-12  " [ngClass]="filterVisiblelg ? 'col-lg-9 col-md-7':'col-lg-12 col-md-12'">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
                                         {{
@@ -239,7 +240,9 @@
                                             " class="col-12 mb-5" [ngClass]="{
                                                 'col-md-12 single-item-per-row-layout':
                                                     singleItemPerRowMode,
-                                                'col-lg-6': !singleItemPerRowMode,
+                                                'col-lg-6': !singleItemPerRowMode && filterVisiblelg,
+                                                'col-lg-4':!singleItemPerRowMode && !filterVisiblelg,
+                                                'col-md-6' : !singleItemPerRowMode && !filterVisiblelg,
                                                 ' pb-5':
                                                     singleItemPerRowMode && !last
                                             }">
@@ -303,9 +306,10 @@
 
 
 
-<div *ngIf=" filterVisible" class="overlay d-md-none d-block" (click)="toggleFilter()"></div>
+<div *ngIf=" filterVisible" class="overlay d-md-none d-block" >
 
 <!-- The filter panel -->
 <div class="col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters filter-sm d-block d-md-none" [ngClass]="{'active': filterVisible}">
   <app-accounts-list-filters [filterForm]="filterForm"  [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
+</div>
 </div>
