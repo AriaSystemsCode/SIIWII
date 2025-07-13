@@ -771,7 +771,35 @@ namespace onetouch.Accounts
             return ret;
 
         }
+        public async Task<bool> getContactSync(long id)
+        {
+            var bReturn = false;
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var account = await _appContactRepository.GetAll()
+                .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
+
+
+                if (account != null)
+                {
+                    var publishedRecord = await _appMarketplaceContactRepository.GetAll()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.TenantId == null
+                        && x.IsProfileData == true
+                        && x.IsHidden == false
+                        && x.OwnerId == account.TenantId
+                        && x.SSIN == account.SSIN);
+
+                    if (publishedRecord != null)
+                    {
+                        bReturn = (publishedRecord.LastModificationTime < account.LastModificationTime);
+                    }
+                }
+            }
+            return bReturn;
+        }
 
         public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
         {
