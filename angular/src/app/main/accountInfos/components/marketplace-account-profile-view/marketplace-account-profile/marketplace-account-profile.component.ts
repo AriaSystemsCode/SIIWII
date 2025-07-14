@@ -106,4 +106,23 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       });
   }
 
+  getFormattedConnectionName(connection:string): string | null {
+    if(connection == 'connectionName') {
+        const raw = this.marketPlaceData?.connectionName?.trim();
+        if (!raw || !raw.startsWith('MPAction')) return null;
+      
+        const label = raw.replace('MPAction', '');
+        return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+    } else    if(connection == 'avaliableConnectionName') {
+        const raw = this.marketPlaceData?.avaliableConnectionName?.trim();
+        if (!raw || !raw.startsWith('MPAction')) return null;
+      
+        const label = raw.replace('MPAction', '');
+        return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+    }
+   
+
+    
+  }
+  
 }

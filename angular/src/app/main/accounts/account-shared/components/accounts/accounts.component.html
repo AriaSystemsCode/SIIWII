@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
-                                    <div class="mb-lg-4 mb-0 text-center">
+                                    <div class="mb-lg-4 mb-0 text-center mt-lg-0 mt-3">
                                         <a class="btn   toolbar-btn btn_Primary SendMail"
                                
                                             (click)="showSendMail()">
@@ -115,7 +115,7 @@
                                     </div>
                                     <div class=""></div>
 
-                                    <div class="text-center d-flex " style="height: 40px; width: 160px;">
+                                    <div class="text-center d-flex mt-lg-0 mt-3" style="height: 40px; width: 160px;">
 
                                         <button
                                       
@@ -310,6 +310,6 @@
 
 <!-- The filter panel -->
 <div class="col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters filter-sm d-block d-md-none" [ngClass]="{'active': filterVisible}">
-  <app-accounts-list-filters [filterForm]="filterForm"  [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
+  <app-accounts-list-filters [filterForm]="filterForm"  [fromMarketplace]="fromMarketplace" (click)="toggleFilter()"></app-accounts-list-filters>
 </div>
 </div>

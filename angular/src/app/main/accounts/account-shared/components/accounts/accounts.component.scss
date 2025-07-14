@@ -145,3 +145,18 @@ input[type="radio"]:checked+label {
   margin-left: 10px;
 }
 
+::ng-deep {
+  @media (max-width: 1024px) {
+    .kt-subheader--enabled .kt-content {
+      padding-top: 30px;
+    }
+    .kt-container {
+       padding: 0  !important;
+  }
+  }
+}
+
+.wrapper {
+  padding: 0 !important;
+}
+

@@ -75,7 +75,7 @@
             <img class="pb-1" *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('EMPLOYEE')"
               src="../../assets/accounts/EMPLOYEE.png" />
 
-            {{ marketPlaceData?.avaliableConnectionName?.trim() | localize }}
+            {{ getFormattedConnectionName('avaliableConnectionName') | localize }}
 
 
           </button>
@@ -104,7 +104,7 @@
               src="../../assets/accounts/FOLLOW.png" />
             <img class="pb-1" *ngIf="marketPlaceData?.connectionName?.toUpperCase().includes('EMPLOYEE')"
               src="../../assets/accounts/EMPLOYEE.png" />
-            {{ marketPlaceData?.connectionName?.trim() | localize }}
+            {{ getFormattedConnectionName('connectionName') | localize }}
           </button>
         </div>
       </div>
