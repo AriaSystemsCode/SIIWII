@@ -114,6 +114,15 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     )
   }
 
+  handleRefreshRating(event: boolean) {
+    if (event === true) {
+  
+
+    this.getOverAllRatings()
+    }
+  }
+  
+
 
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();

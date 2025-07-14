@@ -62,8 +62,8 @@ import { PostsTabComponent } from './components/marketplace-account-profile-view
 import { ConnectionsCardComponent } from './components/connections-card/connections-card.component';
 import { MarketplaceProductsModule } from '../marketplace/marketplace-products/marketplace-products.module';
 import { MediaTabComponent } from './components/marketplace-account-profile-view/Media-tab/media-tab.component';
-import { ReviewsListComponent } from './components/marketplace-account-profile-view/reviews-list/reviews-list.component';
 import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
+import { OverALLRatingReviewsModule } from '../overallRating-reviews/overallRating-reviews.module';
 
 @NgModule({
     declarations: [
@@ -85,7 +85,6 @@ import { AccountBillingComponent } from './components/accountBilling/accountBill
         MarketplaceAccountProfileComponent,
         OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent, ConnectionsCardComponent,
         MediaTabComponent,
-        ReviewsListComponent
     ],
     imports: [
         CommonModule,
@@ -127,6 +126,7 @@ import { AccountBillingComponent } from './components/accountBilling/accountBill
         PostsModule,
         InteractionsModule,EventsBrowseModule,AccountSharedModule,
         MarketplaceProductsModule,
+        OverALLRatingReviewsModule
         
         
     ],
