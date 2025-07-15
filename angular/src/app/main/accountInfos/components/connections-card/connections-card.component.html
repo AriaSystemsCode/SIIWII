@@ -19,8 +19,10 @@
         <div>
             <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" class=""
                 [ngClass]="fromOverview ? 'p-1' :'p-0'">
-                <h3 (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                <h3 *ngIf="!fromOverview" (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
                     {{account?.account?.name}}</h3>
+                    <h6 *ngIf="fromOverview" (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                        {{account?.account?.name}}</h6>
                 <div class="info-container d-flex flex-column">
                     <!-- Categories Section -->
                     <div *ngIf="singleItemPerRowMode && account.account.categories"
@@ -158,7 +160,7 @@
                                 'bottom':  singleItemPerRowMode  ? '5px' : 'auto'
                             }">
                                 <img class="pb-1" src="../../assets/accounts/ph_check-bold.png" />
-                                {{ account.connectionName?.trim() | localize }}
+                                {{  getFormattedConnectionName('connectionName') | localize }}
                             </button>
                         </span>
 
@@ -179,7 +181,7 @@
                                     *ngIf="account.avaliableConnectionName.toUpperCase().includes('EMPLOYEE')"
                                     src="../../assets/accounts/EMPLOYEE.png" />
                                 <img class="pb-1" *ngIf="account.avaliableConnectionName.toUpperCase().includes('JOIN')"
-                                    src="../../assets/accounts/JOIN.png" /> {{ account.avaliableConnectionName?.trim() |
+                                    src="../../assets/accounts/JOIN.png" /> {{ getFormattedConnectionName('avaliableConnectionName') |
                                 localize }}
                             </button>
                         </span>

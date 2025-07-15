@@ -52,6 +52,8 @@
   white-space: nowrap;
   position: absolute;
   right: 5px;cursor: auto;
+  bottom: 5px !important;
+  padding: 8px !important;
     img {
       width: 20px;
     }
@@ -71,4 +73,8 @@
 }
 .spanGreyColor {
   color: rgba(158, 158, 158, 1);
+}
+
+.fsS {
+  font-size: 1rem !important;
 }

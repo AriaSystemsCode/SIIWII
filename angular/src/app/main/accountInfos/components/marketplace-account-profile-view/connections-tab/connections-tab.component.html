@@ -9,8 +9,8 @@
 
                             <div *ngIf="accounts  && accounts?.length>0 && accountsTypes && accountsTypes?.length>0 && !fromOverview"
                                 class="row">
-                                <input type="radio" id="all" name="option" [checked]="connectionTypeId ==0" />
-                                <label for="all" (click)="setConnectionType(0)">All</label> <span
+                                <input type="radio" class="inputAll" id="all" name="option" [checked]="connectionTypeId ==0" />
+                                <label for="all" (click)="setConnectionType(0)" class="mr-1">All</label> <span
                                     style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
 
                                 <div *ngFor="let accountsType of accountsTypes; let i = index; let last = last">
@@ -106,7 +106,7 @@
                                                 let account of accounts;
                                                 index as i;
                                                 let last = last
-                                            " class="col-12 " [ngClass]="{
+                                            " class="col-12 px-0" [ngClass]="{
                                                 'col-md-12 single-item-per-row-layout':
                                                     singleItemPerRowMode || fromOverview,
                                                 'col-md-6': !singleItemPerRowMode && !fromOverview,

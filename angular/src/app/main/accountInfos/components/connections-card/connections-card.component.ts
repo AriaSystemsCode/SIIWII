@@ -7,7 +7,7 @@ import { GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 @Component({
     selector: 'app-connections-card',
     templateUrl: './connections-card.component.html',
-    styleUrls: ['../../../accounts/account-shared/components/account-card.component.scss', './connections-card.component.scss']
+    styleUrls: ['../../../accounts/account-shared/components/account-card/account-card.component.scss', './connections-card.component.scss']
 })
 export class ConnectionsCardComponent extends AppComponentBase {
 
@@ -74,6 +74,26 @@ export class ConnectionsCardComponent extends AppComponentBase {
     createRelation() {
         this._createRelation.emit(this.account);
     }
+
+
+    getFormattedConnectionName(connection:string): string | null {
+        if(connection == 'connectionName') {
+            const raw = this.account?.connectionName?.trim();
+            if (!raw || !raw.startsWith('MPAction')) return null;
+          
+            const label = raw.replace('MPAction', '');
+            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+        } else    if(connection == 'avaliableConnectionName') {
+            const raw = this.account?.avaliableConnectionName?.trim();
+            if (!raw || !raw.startsWith('MPAction')) return null;
+          
+            const label = raw.replace('MPAction', '');
+            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+        }
+       
+
+        
+      }
 
 }
 

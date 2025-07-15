@@ -250,7 +250,7 @@ export class MarketplaceProductsComponent
             selectedCurrency: this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
-            maxResultCount: this.maxResultCount
+            maxResultCount: this.fromOverView ? 8 : this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
         
