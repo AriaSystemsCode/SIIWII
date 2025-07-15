@@ -1,5 +1,5 @@
 // <!-- Iteration-8 -->
-import { Input, OnInit, ViewChild } from "@angular/core";
+import { ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { Injector } from "@angular/core";
 import { Component } from "@angular/core";
 import { AppConsts } from "@shared/AppConsts";
@@ -48,6 +48,8 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     @Output() _totalFiles= new EventEmitter<any>(); 
     @Output() _totalSizeMB= new EventEmitter<any>(); 
     @Output() _folderName= new EventEmitter<any>(); 
+    @ViewChild('fileInput') fileInputRef!: ElementRef;
+
 
     
     public constructor(private _downloadService: FileDownloadService,
@@ -200,5 +202,15 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
                 this._downloadService.download(fullURL,
                     this.templateFileName);
             });
+      }
+
+
+      clearFileInput(): void {
+        if (this.fileInputRef?.nativeElement) {
+          this.fileInputRef.nativeElement.value = '';
+        }
+        this.folderName = '';
+        this.totalFiles = 0;
+        this.totalSizeMB = 0;
       }
 }

@@ -42,11 +42,11 @@
 
             <div class="folder-info">
             <div class="folder-details w-100">
-                <div class="folder-name" *ngIf="_remainingFiles">           
+                <div class="folder-name">           
                      <img src="../../../../assets/accounts/importAccounts/solar_folder-bold.png" class="folder-icon mb-1 mr-1"  style="width: 18px ; height: 18px;"/>
-                     Files uploaded : {{_remainingFiles}}  out of   {{_totalFiles}} 
+                     Files uploaded : {{_uploadedFilesCount}}  out of   {{_totalFiles}} 
                 </div>
-                <div class="folder-meta"  *ngIf="_estimatedRemainingTime">
+                <div class="folder-meta">
                     <img src="../../../../assets/accounts/importAccounts/pajamas_timer.png" class="folder-icon mb-1 mr-1" style="width: 18px ; height: 18px;" />
                    Remaining Time : " {{_estimatedRemainingTime}} min
                 </div>

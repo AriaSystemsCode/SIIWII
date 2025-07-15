@@ -18,6 +18,7 @@ export class ProgressComponent implements OnInit {
       @Input() _folder_details;
       @Input() _remainingFiles
       @Input() _estimatedRemainingTime;
+      @Input() _uploadedFilesCount;
       @Output() close = new EventEmitter<boolean>();
       
   constructor() { }

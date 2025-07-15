@@ -379,8 +379,9 @@ export class MainImportComponent
     }
 
     remainingFiles;
-    estimatedRemainingTime;
-    uploadStartTime
+    estimatedRemainingTime= 0 ;
+    uploadStartTime = Date.now();
+    uploadedFilesCount=1;
     callImport(iterationNo: number) {
         //this.progress=(this.uploadingResult.toList[iterationNo]*100/this.uploadingResult.totalRecords);
         if (iterationNo === 0) {
@@ -393,10 +394,12 @@ export class MainImportComponent
 
 
         this.ProgressDetail = this.uploadingResult.codesFromList[iterationNo] + "[" + this.uploadingResult.fromList[iterationNo] + "-" + this.uploadingResult.toList[iterationNo] + "]";
-        this.remainingFiles = this.uploadingResult.totalRecords - toValue;
+    /*     this.remainingFiles = this.uploadingResult.totalRecords - toValue;
 
 
         const uploadedSoFar = toValue;
+        this.uploadedFilesCount = Math.floor(uploadedSoFar);
+
         const now = Date.now();
         const elapsedSeconds = (now - this.uploadStartTime) / 1000;
     
@@ -408,7 +411,7 @@ export class MainImportComponent
         } else {
             this.estimatedRemainingTime = 0;
         }
-
+ */
         
         if (iterationNo < this.uploadingResult.fromList.length) {
             this.uploadingResult.from = this.uploadingResult.fromList[iterationNo]
@@ -504,6 +507,8 @@ export class MainImportComponent
         this.successfullyImportModal.hide();
         this.ProgressModal.hide();
         this.videoModal.hide();
+        if (this.BrowseModal) 
+            this.BrowseModal.clearFileInput();
     }
 
     changeStep() {
@@ -585,6 +590,28 @@ export class MainImportComponent
         
                     this.imagesUploader.onProgressAll = (progress) => {
                         this.progress = Math.ceil((progress.loaded / progress.total) * 100);
+                        
+        var toValue = this.passedImages.length * (progress.loaded / progress.total);
+        if (toValue > 1) { toValue = toValue - 1; }
+        this.remainingFiles = this.uploadingResult.totalRecords - toValue;
+
+
+        const uploadedSoFar = toValue;
+        this.uploadedFilesCount = Math.floor(uploadedSoFar);
+
+        const now = Date.now();
+        const elapsedSeconds = (now - this.uploadStartTime) / 1000;
+    
+        if (uploadedSoFar > 0) {
+            const avgTimePerFile = elapsedSeconds / uploadedSoFar;
+           const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
+           const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
+           this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes); 
+        } else {
+            this.estimatedRemainingTime = 0;
+        }
+
+
                     };
         
                     this.imagesUploader.onErrorItem = (item, response, status) => {

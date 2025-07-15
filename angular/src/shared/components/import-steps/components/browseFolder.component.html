@@ -30,7 +30,7 @@
                 <label for="_input">
                     <img src="../../../../assets/accounts/importAccounts/Vector.png" /><br /><br />
 
-                    <input type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
+                    <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
                         multiple  [disabled]="!isAnyOptionSelected" class="upload-input"                        />
 
                         
