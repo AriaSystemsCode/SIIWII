@@ -28,6 +28,7 @@ import { ImportTypes } from "../models/ImportTypes";
 import { SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
 import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
+import { videoTutorialComponent } from "./videoTutorial.component";
 
 @Component({
     selector: "MainImportModal",
@@ -52,6 +53,7 @@ export class MainImportComponent
     @ViewChild("successfullyImportModal", { static: true })
     successfullyImportModal: successfullyImportComponent;
 
+   
     //Step1
     UploadedFolder: File[] = [];
     imagesName: string[] = [];
@@ -106,6 +108,10 @@ export class MainImportComponent
     importStepsInfo: ImportStepInfo[];
     @Output() finishImport = new EventEmitter<boolean>();
 
+    @ViewChild("videoModal", { static: true })
+    videoModal: videoTutorialComponent;
+    updateLookups:boolean=false;
+    folder_details:boolean=false;
 
     public constructor(
         private _httpClient: HttpClient,
@@ -214,7 +220,7 @@ export class MainImportComponent
                         this.CheckRatio();
                     }, 0);
 
-                    this.ProgressModal.hide();
+                  this.ProgressModal.hide();
                     this.spinnerService.show();
                     this.importServiceProxy
                         .validateExcel(this._guid, this.imagesName)
@@ -252,13 +258,14 @@ export class MainImportComponent
             };
 
             this.uploader.uploadAll();
+            this.folder_details=true;
             this.ProgressModal.show();
             this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
-
-
             this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+            this.folder_details=false;
             this.uploader.onProgressAll = (progress) => {
                 this.progress = progress;
+                
             };
 
             this.uploader.onCompleteAll = () => {
@@ -371,8 +378,14 @@ export class MainImportComponent
             }
     }
 
+    remainingFiles;
+    estimatedRemainingTime;
+    uploadStartTime
     callImport(iterationNo: number) {
         //this.progress=(this.uploadingResult.toList[iterationNo]*100/this.uploadingResult.totalRecords);
+        if (iterationNo === 0) {
+            this.uploadStartTime = Date.now();
+        }
         var toValue = this.uploadingResult.toList[iterationNo];
         if (toValue > 1) { toValue = toValue - 1; }
         //   this.progress = (toValue * 100 / this.uploadingResult.totalRecords);
@@ -380,6 +393,23 @@ export class MainImportComponent
 
 
         this.ProgressDetail = this.uploadingResult.codesFromList[iterationNo] + "[" + this.uploadingResult.fromList[iterationNo] + "-" + this.uploadingResult.toList[iterationNo] + "]";
+        this.remainingFiles = this.uploadingResult.totalRecords - toValue;
+
+
+        const uploadedSoFar = toValue;
+        const now = Date.now();
+        const elapsedSeconds = (now - this.uploadStartTime) / 1000;
+    
+        if (uploadedSoFar > 0) {
+            const avgTimePerFile = elapsedSeconds / uploadedSoFar;
+           const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
+           const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
+           this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes); 
+        } else {
+            this.estimatedRemainingTime = 0;
+        }
+
+        
         if (iterationNo < this.uploadingResult.fromList.length) {
             this.uploadingResult.from = this.uploadingResult.fromList[iterationNo]
             this.uploadingResult.to = this.uploadingResult.toList[iterationNo]
@@ -393,7 +423,7 @@ export class MainImportComponent
 
                     if (iterationNo == this.uploadingResult.fromList.length - 1) {
                         this.spinnerService.hide()
-                        this.ProgressModal.hide();
+                       this.ProgressModal.hide();
                     }
 
                 }))
@@ -473,6 +503,7 @@ export class MainImportComponent
         this.importConfirmationModal.hide();
         this.successfullyImportModal.hide();
         this.ProgressModal.hide();
+        this.videoModal.hide();
     }
 
     changeStep() {
@@ -509,6 +540,8 @@ export class MainImportComponent
             case ImportStepsEnum.successfullyImportModalStep :
                     this.passedImages = [];
                     this.uploadingResult.repreateHandler = this.repreateHandler;
+                    //I44 set  updateLookups
+                    //this.uploadingResult.updateLookups  =this.updateLookups;
         
                     this.uploadUrl = "/Attachment/UploadFiles";
         
@@ -543,9 +576,12 @@ export class MainImportComponent
                     };
         
                     this.ProgressModal.show();
-                    this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
-        
-                    this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+                   // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
+                    this.progressHeader ="Uploading folder contents";
+                    //this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+                    this.folder_details=true;
+
+                    
         
                     this.imagesUploader.onProgressAll = (progress) => {
                         this.progress = Math.ceil((progress.loaded / progress.total) * 100);
@@ -577,5 +613,44 @@ export class MainImportComponent
     onFinishImport($event){
     this.finishImport.emit($event);
     }
+
+    onOpenVideoModal($event){
+        if($event){
+            //I44 call getImportVideo 
+            this.videoModal.show("");
+            //this.spinnerService.show();
+          /* this.importServiceProxy
+          .getImportVideo()
+          .pipe(finalize(() => this.spinnerService.hide()))
+          .subscribe((videoTutorialUrl) => {
+            this.BrowseModal.hide();
+            this.videoModal.show(videoTutorialUrl);
+        }) */
+    }
+    }
+
+    videoTutorialGoBack(){
+        this.hideAllmodal();
+        this.BrowseModal.show(this.importType, this.importService, this.hasImages);
+    }
+
+    onUpdateLookups($event){
+        this.updateLookups=$event;
+    }
+
+    _totalFiles;
+    _totalSizeMB;
+    _folderName;
+    settotalFiles($event){
+        this._totalFiles=$event;
+    }
+
+    settotalSizeMB($event){
+        this._totalSizeMB=$event;
+    }
+
+   setfolderName($event){
+    this._folderName=$event;
+   }
 }
 

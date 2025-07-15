@@ -2,12 +2,23 @@
 <BrowseFolderModal
     #BrowseModal
     (UploadedFolder)="onUploadedFolder($event)"
+    (_openVideoModal)="onOpenVideoModal($event)"
+    (_totalFiles)="settotalFiles($event)"
+    (_totalSizeMB)="settotalSizeMB($event)"
+   (_folderName)="setfolderName($event)"
 ></BrowseFolderModal>
 <app-progress
     #ProgressModal
     [progress]="progress"
     [progressHeader]="progressHeader"
     [ProgressDetail]="ProgressDetail"
+    [_totalFiles]="_totalFiles"
+    [_totalSizeMB]="_totalSizeMB"
+    [_folderName]="_folderName"
+    [_folder_details]="folder_details"
+    [_remainingFiles]="remainingFiles"
+    [_estimatedRemainingTime]="estimatedRemainingTime"
+    (close)="askToClose($event)"
 ></app-progress>
 <uploadStatusModal
     #StatusModal
@@ -51,10 +62,17 @@
     (repreateHandler)="onrepreateHandler($event)"
     (goPrevious)="importConfirmationGoBack()"
     (goNext)="goNext()"
+    (_updateLookups)="onUpdateLookups($event)"
 ></importConfirmationModal>
 <successfullyImportModal
     #successfullyImportModal
     (onDownloadLogFile)="onDownloadLogFile($event)"
     (finishImport)="onFinishImport($event)"
 ></successfullyImportModal>
+
+<videoTutorialModal
+    #videoModal
+    (goPrevious)="videoTutorialGoBack()"
+    (close)="askToClose($event)"
+><videoTutorialModal/>
 <!-- Iteration-8 -->

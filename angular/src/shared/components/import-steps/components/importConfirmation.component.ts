@@ -41,6 +41,10 @@ export class importConfirmationComponent extends AppComponentBase implements OnI
     importType: ImportTypes;
     ImportTypes=ImportTypes;
     hasImages:boolean;
+
+    updateLookups:boolean =false;
+    @Output() _updateLookups = new EventEmitter<boolean>();
+    
     public constructor(
         private _importService: MainImportService,
         injector: Injector) {
@@ -61,6 +65,7 @@ export class importConfirmationComponent extends AppComponentBase implements OnI
         if( this.hasDuplication){
         this.duplicatedOptions = this.convertEnumToSelectItems(ExcelRecordRepeateHandler);
         this.selectedDuplicatedOption = 0;
+        this.updateLookups=false;
         }
         this.modal.show();
     }
@@ -78,6 +83,7 @@ export class importConfirmationComponent extends AppComponentBase implements OnI
 
     import() {
         this.repreateHandler.emit(this.selectedDuplicatedOption);
+        this._updateLookups.emit(this.updateLookups);
         this.goNext.emit();
     }
     convertEnumToSelectItems(_enum: any) { // _enum : of type enum

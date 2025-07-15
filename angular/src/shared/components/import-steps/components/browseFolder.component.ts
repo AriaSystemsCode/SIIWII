@@ -34,6 +34,22 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     importServiceProxy:any;
     hasImages:boolean;
 
+
+    imProductData:boolean=false;
+    imProductImages:boolean=false;
+    isAnyOptionSelected:boolean =false;
+    showUploadModal = false;
+    folderName = 'Main Folder';
+    totalFiles = 0;
+    totalSizeMB = 0;
+    fileevent;
+
+    @Output() _openVideoModal = new EventEmitter<boolean>(); 
+    @Output() _totalFiles= new EventEmitter<any>(); 
+    @Output() _totalSizeMB= new EventEmitter<any>(); 
+    @Output() _folderName= new EventEmitter<any>(); 
+
+    
     public constructor(private _downloadService: FileDownloadService,
         private _BsModalService: BsModalService,
         private injector: Injector) {
@@ -66,35 +82,36 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     }
 
     hide() {
+        this.imProductData=false;
+        this.imProductImages=false;
+        this.isAnyOptionSelected=false;
         this.modal.hide();
     }
 
-    fileChangeEvent(event: any) {
-        let _UploadedFolder = [];
-        for (let index = 0; index < event.target.files.length; index++) {
-            let file = event.target.files[index];
-            if (!(file.webkitRelativePath.split('/').length > 2))
-                _UploadedFolder.push(file);
+    fileChangeEvent(event: Event): void {
+        //I44 prevent show upload folder popup message 
+        event.preventDefault();
+        event.stopPropagation();
+      
+        const input = event.target as HTMLInputElement;
+      
+        this.fileevent=event;
+                if (input.files && input.files.length > 0) {
+          const files = input.files;
+          this.showUploadModal = true;
+          this.totalFiles = files.length;
+          this.totalSizeMB = this.getTotalSizeInMB(files);
+          this.folderName = this.extractFolderName(files[0]);
+          this._totalFiles.emit(this.totalFiles);
+          this._totalSizeMB.emit(this.totalSizeMB);
+          this._folderName.emit(this.folderName);
+          document.body.style.overflow = 'hidden';
+          setTimeout(() => {
+            document.body.style.overflow = '';
+          }, 500);
         }
-        this.UploadedFolder.emit(_UploadedFolder);
-        event.target.value = "";
-
-    }
-
-    downloadTemplate() {
-        this.importServiceProxy
-            .getExcelTemplate(this.itemTypeId)
-            .subscribe((result) => {
-                this.templateUrl = result.excelTemplateFullPath;
-                let attach = AppConsts.attachmentBaseUrl
-                let fullURL = `${attach}/${this.templateUrl}`;
-
-                //let fullURL = `${url}`; // FOR Local Use
-                this._downloadService.download(fullURL,
-                    this.templateFileName);
-            });
-
-    }
+      }
+      
 
     openSelectAppItemTypeModal() {
         let config: ModalOptions = new ModalOptions();
@@ -124,5 +141,64 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
         this.itemTypeId = selected.data.sycEntityObjectType.id;
         this.itemType = selected.data.sycEntityObjectType.name;
     }
+    // <!-- Iteration-8 -->
+
+    onOptionChange(){
+        this.isAnyOptionSelected = this.imProductData || this.imProductImages;
+    }
+
+    openVideoModal(){
+        this._openVideoModal.emit(true);
+    }
+
+    extractFolderName(file: File): string {
+        const pathParts = file.webkitRelativePath.split('/');
+        return pathParts.length > 1 ? pathParts[0] : 'Main Folder';
+      }
+      
+      getTotalSizeInMB(files: FileList): number {
+        let totalBytes = 0;
+        for (let i = 0; i < files.length; i++) {
+          totalBytes += files[i].size;
+        }
+        return +(totalBytes / (1024 * 1024)).toFixed(2); // 2 decimal MB
+      }
+      
+      confirmUpload() {
+        this.showUploadModal = false;
+        // Call your upload method here
+        this.uploadSelectedFiles();
+      }
+      
+      cancelUpload() {
+        this.showUploadModal = false;
+      }
+
+
+      uploadSelectedFiles(){
+        let event = this.fileevent;
+        let _UploadedFolder = [];
+        for (let index = 0; index < event.target.files.length; index++) {
+            let file = event.target.files[index];
+            if (!(file.webkitRelativePath.split('/').length > 2))
+                _UploadedFolder.push(file);
+        }
+        this.UploadedFolder.emit(_UploadedFolder);
+        event.target.value = "";
+
+    }
+
+    downloadTemplate() {
+        this.importServiceProxy
+            .getExcelTemplate(this.itemTypeId)
+            .subscribe((result) => {
+                this.templateUrl = result.excelTemplateFullPath;
+                let attach = AppConsts.attachmentBaseUrl
+                let fullURL = `${attach}/${this.templateUrl}`;
+
+                //let fullURL = `${url}`; // FOR Local Use
+                this._downloadService.download(fullURL,
+                    this.templateFileName);
+            });
+      }
 }
-// <!-- Iteration-8 -->
