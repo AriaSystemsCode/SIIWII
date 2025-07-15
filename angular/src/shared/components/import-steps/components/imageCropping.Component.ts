@@ -13,6 +13,7 @@ import { ImageFile } from "../models/imageFile.model";
 import { MainImportService } from "../services/mainImport.service";
 import { ImportTypes } from "../models/ImportTypes";
 import { SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
+import { autoCropComponent } from "./autoCrop.component";
 
 @Component({
     selector: "imageCroppingModal",
@@ -67,10 +68,22 @@ export class imageCroppingComponent extends AppComponentBase implements OnInit,O
     importType:ImportTypes;
     ImportTypes=ImportTypes;
     sycAttachmentCategory: {[key:string]:SycAttachmentCategoryDto};
+    acceptedAspectRatio;
+    alreadyManualCrop:boolean=false;
+    showAutoCropMsg:boolean=false;
+
+    @Input() imagesList;
+    @Input() imagePassed;
+    @Input() imageFailed; 
+     @Input() failedImagesIndex;
+       @ViewChild("AutoCropModal", { static: true })
+         AutoCropModal: autoCropComponent;
+
     public constructor(
         private _importService:MainImportService,
         injector: Injector) {
         super(injector);
+        this.getAspectatio();
     }
 
     ngOnInit()
@@ -84,6 +97,9 @@ export class imageCroppingComponent extends AppComponentBase implements OnInit,O
         this.autoCrop=autoCrop;
         this._imagePassed=0;
         this._imageFailed=0;
+        this.alreadyManualCrop=false;
+        this.showAutoCropMsg=false;
+        this.finishCropping=false;
         if(imageFailed==0)
         this.finish=true;
     else
@@ -189,6 +205,7 @@ this.imageBase64 = base64;
 
  crop()
  {
+    this.alreadyManualCrop=true;
         this.selectedImage.croppedbase64    =this.croppedImage;
         this.selectedImage.finalStatus=true;
         this.finalImages[this.selectedIndex]=this.selectedImage;
@@ -242,5 +259,54 @@ goPreviousStep()
 }
 
 
+
+getAspectatio() {
+    let sycAttachmentCategoryImage;
+    this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+        result.forEach(item => {
+            if (item.code == "IMAGE") {
+                sycAttachmentCategoryImage = item
+                let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+                this.acceptedAspectRatio = Number(width) / Number(height);
+                return;
+            }
+        });
+    });
 }
-// <!-- Iteration-8 -->
+
+
+onAutoCrop (){
+   if(this.alreadyManualCrop)
+    this.showAutoCropMsg=true;
+
+   else
+   this.autoCropping();
+}
+
+autoCropping(){
+    this.showMainSpinner();
+    this.finish=false;
+   this.AutoCropModal.crop('true');
+}
+
+
+
+onfinalImages($event){
+this.imagesList=$event;
+}
+
+onfinishCropping($event: any) {
+    this.finishCropping = $event;
+    if($event){
+        this.hideMainSpinner();
+         this.finish=true;
+    }
+
+}
+
+
+
+
+
+}
+

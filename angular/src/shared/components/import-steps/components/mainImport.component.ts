@@ -313,7 +313,13 @@ export class MainImportComponent
 
     onautoCrop($event: any) {
         this.autoCrop = $event;
-         this.goNext();
+        if(!this.Previous)
+            this.goNext();
+
+         if( ! (this.finalImages &&  this.finalImages?.length >0 ) )
+         this.finalImages= this.imagesList;
+
+
         if (this.finalImages && this.finalImages.length > 0) {
             this.imageCroppingModal.show(
                 $event,
@@ -501,7 +507,7 @@ export class MainImportComponent
     hideAllmodal(){
         this.BrowseModal.hide();
         this.StatusModal.hide();
-        this.AutoCropModal.hide();
+        //this.AutoCropModal.hide();
         this.imageCroppingModal.hide();
         this.importConfirmationModal.hide();
         this.successfullyImportModal.hide();
@@ -524,18 +530,19 @@ export class MainImportComponent
 
             case ImportStepsEnum.AutoCropModalStep:
                 this.skipAutoCropModal=false;
-                if (!this.AutoCropModal.show(this.importType, this.sycAttachmentCategory)) {
+                // if (!this.AutoCropModal.show(this.importType, this.sycAttachmentCategory)) {
                     this.skipAutoCropModal=true;
                     if (this.Previous) {
                         this.Previous = false;
                        this.goPrevious();
                     } else this.onautoCrop("false");
-                }
+                // }
                 break;
 
             case ImportStepsEnum.imageCroppingModalStep:
                 if (this.skipAutoCropModal && this.Previous) 
-                    this.goPrevious();
+                    //this.goPrevious();
+                      this.onautoCrop("false");
                 break;
 
             case ImportStepsEnum.importConfirmationModalStep:

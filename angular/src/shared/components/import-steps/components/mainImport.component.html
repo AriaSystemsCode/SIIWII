@@ -30,7 +30,7 @@
     (totalFailedRecords)="ontotalFailedRecords($event)"
     (totalPassedRecords)="ontotalPassedRecords($event)"
 ></uploadStatusModal>
-<autoCropModal
+<!-- <autoCropModal
     #AutoCropModal
     [imagesList]="imagesList"
     [imagePassed]="imagePassed"
@@ -40,10 +40,14 @@
     (finalImages)="onfinalImages($event)"
     (finishCropping)="onfinishCropping($event)"
     (close)="askToClose($event)"
-></autoCropModal>
+></autoCropModal> -->
 <imageCroppingModal
     #imageCroppingModal
     [finishCropping]="finishCropping"
+    [imagesList]="imagesList"
+    [imagePassed]="imagePassed"
+    [imageFailed]="imageFailed"
+    [failedImagesIndex]="failedImagesIndex"
     [finalImages]="finalImages"
     (goNext)="goNext()"
     [OnChange]="OnChange"
