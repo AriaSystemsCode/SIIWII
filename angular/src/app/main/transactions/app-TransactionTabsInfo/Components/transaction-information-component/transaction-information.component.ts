@@ -1382,7 +1382,7 @@ export class TransactionInformationComponent
         this.appTransactionsForViewDto?.currencyCode,
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
-       this.priceLevel,
+       this.appTransactionsForViewDto?.priceLevel,
         id,
         undefined,
         undefined,
