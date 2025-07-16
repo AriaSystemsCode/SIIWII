@@ -1379,7 +1379,7 @@ export class TransactionInformationComponent
         undefined,
         undefined,
         undefined,
-        'USD',
+        this.appTransactionsForViewDto?.currencyCode,
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
        this.priceLevel,
