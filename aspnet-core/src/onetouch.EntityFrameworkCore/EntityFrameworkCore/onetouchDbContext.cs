@@ -65,7 +65,7 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }
 
-        // public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLog { get; set; }
+        public virtual DbSet<AppEntityRating> AppEntityRatings { get; set; }
 
         public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
 

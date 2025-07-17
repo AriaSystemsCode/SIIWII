@@ -76,7 +76,11 @@ namespace onetouch.Helpers
         //    var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "PERSON");
         //    return obj.Id;
         //}
-
+        public async Task<long> GetEntityObjectTypeName(string TypeName)
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code.ToUpper() == TypeName.ToUpper());
+            return obj.Id;
+        }
         public async Task<long> GetObjectEventId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "EVENT");
@@ -129,6 +133,13 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
             return obj;
         }
+
+        public async Task<SycEntityObjectType> GetEntityObjectTypeById(long id)
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Id == id);
+            return obj;
+        }
+
         public async Task<long> GetObjectTenantActivityLogId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "TENANTACTIVITYLOG");
@@ -348,7 +359,13 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "COMMENT");
             return obj.Id;
         }
-
+        //I40-X527[Start]
+        public async Task<long> GetEntityObjectTypeReview()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "REVIEW");
+            return obj.Id;
+        }
+        //I40-X527[End]
         public async Task<long> GetEntityObjectTypeMessageID()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "MESSAGE");

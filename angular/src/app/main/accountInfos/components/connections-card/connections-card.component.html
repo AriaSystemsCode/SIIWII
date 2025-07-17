@@ -1,0 +1,192 @@
+<div class="single-item mr-1 row   memberCard_container shadowContainer"
+    [ngClass]="singleItemPerRowMode || fromOverview ?'p-0 no-padding-bottom' :'p-4 extra-padding-bottom'">
+    <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
+        'background-image':
+        account.account.logoUrl ?
+        'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
+        '' , 
+    'height': singleItemPerRowMode ? 'auto'  :  '100px', 
+    'width':  singleItemPerRowMode  ? '200px' : '100px',
+    'border-top-right-radius': fromOverview   ? '0px' : '',
+    'border-bottom-right-radius': fromOverview   ? '0px' : '',
+}" (click)="clickCardHandler()">
+        <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
+    </div>
+    <div class="single-item-body col pr-0" style="width: 176px;" [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}"
+        [ngStyle]="{
+        'padding-left': fromOverview ? '0px' : ''
+      }">
+        <div>
+            <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" class=""
+                [ngClass]="fromOverview ? 'p-1' :'p-0'">
+                <h3 (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                    {{account?.account?.name}}</h3>
+                <div class="info-container d-flex flex-column">
+                    <!-- Categories Section -->
+                    <div *ngIf="singleItemPerRowMode && account.account.categories"
+                        class="d-flex align-items-center mb-1">
+                        <p class="text-dark m-0 product-name">
+                            <b>{{"Categories" | localize}}</b> :
+                        </p>
+                        <span class="d-flex flex-wrap align-items-center">
+                            <span *ngFor="let category of account.account.categories" class="mt-2 categoryName">
+                                {{ category }}
+                            </span>
+                            <span *ngIf="account.account.categories.length === 0" class="mt-2">
+                                {{ "NotSpecified" | localize }}
+                            </span>
+                        </span>
+                    </div>
+
+                    <!-- Classifications Section -->
+                    <div *ngIf="singleItemPerRowMode && account.account.classfications"
+                        class="d-flex align-items-start">
+                        <p class="text-dark m-0 product-name">
+                            <b>{{ "Classifications" | localize }}</b> :
+                        </p>
+                        <span class="d-flex flex-wrap align-items-center">
+                            <span *ngFor="let class of account.account.classfications" class="mt-2 classificationaName">
+                                {{ class }}
+                            </span>
+                            <span *ngIf="account.account.classfications.length === 0" class="mt-2">
+                                {{ "NotSpecified" | localize }}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+
+
+                <div [ngClass]="singleItemPerRowMode?'pt-0 pt-3' : ''">
+                    <!-- Account Type -->
+                    <b class="accountType_label" [ngStyle]="{
+                      'color': singleItemPerRowMode ? 'black' : '#595959','font-size': fromOverview ? '11px':''
+                    }" >
+                        {{ "AccountType" | localize }}:
+                    </b>
+                    <span class="accountType_value  mt-2 ml-2" [ngClass]="fromOverview ? 'p-2' :''">
+                        {{ account.account.accountType || ('NotSpecified' | localize) }}
+                    </span>
+                </div>
+
+
+
+                <div>
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" *ngIf="account.account?.website">
+                        <img src="../../../../../assets/accounts/Ceo.png" />
+                        <span class="spanGreyColor">
+                            <b class="accountType_label pt-4" [ngStyle]="{
+                              'color': singleItemPerRowMode ? 'black' : '#595959'
+                            }" style="min-width: 115px;">
+                                {{ "Ceo :" | localize }}
+                            </b>
+                            <div class="domain-text ml-2" [title]="account?.account?.website"> {{
+                                account?.account?.website | textSubstring : 30 }} </div>
+                        </span>
+                    </div>
+                </div>
+
+
+                <div>
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" [ngStyle]="{
+                    'font-size': fromOverview ? '11px' : ''
+                  }">
+                        <img src="../../../../../assets/accounts/followers.png" [ngStyle]="{
+                    'width': fromOverview ? '15px' : ''
+                  }" />
+                        <span class="spanGreyColor">
+                            {{ account?.account?.connectioncount ? account.account?.connectioncount : '0' }} {{ '
+                            Followers' }}
+                        </span>
+                    </div>
+
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1"
+                        *ngIf="account.account?.description">
+                        <img src="../../../../../assets/accounts/about.png" />
+                        <span class="spanGreyColor">
+                            <b class="accountType_label pt-4" [ngStyle]="{
+                            'color': singleItemPerRowMode ? 'black' : '#595959'
+                          }" style="min-width: 115px;">
+                                {{ "About :" | localize }}
+                            </b>
+                            <div> {{ account?.account?.description | textSubstring : 40 }} </div>
+                        </span>
+                    </div>
+                </div>
+
+
+
+                <div *ngIf="singleItemPerRowMode" class="d-flex align-items-center mb-1">
+                    <!-- Zipcode -->
+                    <b class="zipCode">
+                        {{ "Zipcode" | localize }}:
+                    </b>
+                    <span class="pl-2">
+                        {{ account.account.zipCode ? account.account.zipCode : ("NotSpecified" | localize) }}
+                    </span>
+                </div>
+
+
+            </div>
+
+            <div>
+                <div class="btn-group dropdown" dropdown *ngIf="false">
+                    <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
+                    </button>
+                    <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                        <li>
+                            <a href="javascript:;"
+                                *ngIf="isManual === false                                                                                                                                                                                                      "
+                                (click)="viewProfile()">{{l('ViewProfile')}}</a>
+                        </li>
+
+                        <li>
+                            <a *ngIf="isManual===true" (click)="edit()">{{'Edit' | localize}}</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" *ngIf="isManual === true" (click)="deleteAccount()">{{ 'Delete' |
+                                localize }}</a>
+                        </li>
+
+                    </ul>
+                </div>
+                <div>
+                    <div>
+
+                        <span style="width: 100%; " class="mt-3" *ngIf="account.connectionName">
+                            <button class="btn relation_Status_button" [ngStyle]="{
+                                'bottom':  singleItemPerRowMode  ? '5px' : 'auto'
+                            }">
+                                <img class="pb-1" src="../../assets/accounts/ph_check-bold.png" />
+                                {{ account.connectionName?.trim() | localize }}
+                            </button>
+                        </span>
+
+                        <span  class="mt-3 w-100"
+                            *ngIf="!account.connectionName && account.avaliableConnectionName ">
+                            <button class="btn relation_button" [ngStyle]="{
+                                'bottom':  singleItemPerRowMode || fromOverview  ? '5px' : 'auto',
+                                'padding': fromOverview ? '7px':'',
+                                'font-size' : fromOverview ? '11px':''
+                            }" (click)="createRelation()">
+                                <img class="pb-1"
+                                    *ngIf="account.avaliableConnectionName.toUpperCase().includes('FOLLOW')"
+                                    src="../../assets/accounts/FOLLOW.png" />
+                                <img class="pb-1"
+                                    *ngIf="account.avaliableConnectionName.toUpperCase().includes('CONNECT')"
+                                    src="../../assets/accounts/CONNECT.png" />
+                                <img class="pb-1"
+                                    *ngIf="account.avaliableConnectionName.toUpperCase().includes('EMPLOYEE')"
+                                    src="../../assets/accounts/EMPLOYEE.png" />
+                                <img class="pb-1" *ngIf="account.avaliableConnectionName.toUpperCase().includes('JOIN')"
+                                    src="../../assets/accounts/JOIN.png" /> {{ account.avaliableConnectionName?.trim() |
+                                localize }}
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

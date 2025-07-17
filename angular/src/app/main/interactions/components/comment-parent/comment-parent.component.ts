@@ -37,6 +37,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     displayDeleteMessage:boolean=false;
     showRegularComment:boolean=true;
 
+    @Input() fromOverview:boolean=false;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector,

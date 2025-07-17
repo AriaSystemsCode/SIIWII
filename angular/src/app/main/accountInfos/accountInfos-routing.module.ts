@@ -1,9 +1,10 @@
 import { NgModule, Component } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AccountInfoComponent } from './components/accountInfo.component';
-import { CreateEditExternalAccountComponent } from './components/create-edit-external-account.component';
-import { CreateEditManualAccountComponent } from './components/create-edit-manual-account.component';
-import { ViewOthersProfileComponent } from './components/view-others-profile.component';
+import { AccountInfoComponent } from './components/accountInfo/accountInfo.component';
+import { CreateEditExternalAccountComponent } from './components/create-edit-external-account/create-edit-external-account.component';
+import { CreateEditManualAccountComponent } from './components/create-edit-manual-account/create-edit-manual-account.component';
+import { ViewOthersProfileComponent } from './components/view-others-profile/view-others-profile.component';
+import { MarketplaceAccountProfileComponent } from './components/marketplace-account-profile-view/marketplace-account-profile/marketplace-account-profile.component';
 
 const routes: Routes = [
   { path: '', component: AccountInfoComponent, data: { permission: 'Pages.Accounts' } },
@@ -12,6 +13,7 @@ const routes: Routes = [
   { path: 'edit-manual/:id', component: CreateEditManualAccountComponent, data: { permission: 'Pages.Accounts' } },
   { path: 'edit-external/:id', component: CreateEditExternalAccountComponent, data: { permission: 'Pages.Accounts' } },
   { path: 'view/:id', component: ViewOthersProfileComponent, data: { permission: 'Pages.Accounts' } },
+  { path: 'view-marketplace-acc/:id', component: MarketplaceAccountProfileComponent, data: { permission: 'Pages.Accounts' } },
 ];
 
 @NgModule({

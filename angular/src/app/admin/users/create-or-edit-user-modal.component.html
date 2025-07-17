@@ -27,6 +27,7 @@
 
                                     <div class="form-group">
                                         <label for="Surname">{{"Surname" | localize}} *</label>
+                                        <!-- <input id="Surname" #surnameInput="ngModel" type="text" name="Surname" class="form-control" [(ngModel)]="user.surname" required maxlength="64"  [disabled]="fromTeamMember"> -->
                                         <input id="Surname" #surnameInput="ngModel" type="text" name="Surname" class="form-control" [(ngModel)]="user.surname" required maxlength="64">
                                         <validation-messages [formCtrl]="surnameInput"></validation-messages>
                                     </div>

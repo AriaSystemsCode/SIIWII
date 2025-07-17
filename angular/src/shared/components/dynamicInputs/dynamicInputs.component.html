@@ -2,11 +2,11 @@
     <div class="col-lg-8 col-md-10 col">
         <div class="row  pt-4">
             <!-- //API GetAllWithExtraAttributes -->
-            <div class="col-md-6 col-12 mb-4"
+            <div class="{{fromSetting ? 'col-12' : 'col-md-6'}}  col-12 mb-4"
                 *ngFor="let extraAttr of extraAttributeObject.value.filteredExtraAttributes">
                 <div>
                     <div>
-                        <label>{{extraAttr.name | localize}}</label>
+                        <label class="{{fromSetting ? 'fromSettingLabel':''}}">{{extraAttr.name | localize}}</label>
                     </div>
 
 
@@ -14,7 +14,7 @@
                     <div class="d-flex align-items-center">
 
                         <div class="wide-drop-down d-flex flex-grow-1"
-                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup">
+                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup && !fromSetting">
                             <div class="flex-grow-1 mr-1">
                                 <p-multiSelect (onChange)="onAnyInputChange()"
                                     [options]="extraAttr.paginationSetting.list" [styleClass]="'w-100'"

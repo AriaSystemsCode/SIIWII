@@ -64,6 +64,9 @@ export class SycLandingPageSettingsComponent
             .getAllSliderSettings(SliderEnum.CallToAction, this.CTASliderCode)
             .subscribe((result) => {
                 this.cta.sycLangingPageSetting = result;
+                this.cta.sycLangingPageSetting = this.cta.sycLangingPageSetting.filter(
+                    (item) => item.title?.toLowerCase() !== 'contacts'
+                );
             });
         this.subscriptions.push(subs);
     }

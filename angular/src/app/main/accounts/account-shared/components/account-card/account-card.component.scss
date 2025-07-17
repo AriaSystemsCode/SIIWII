@@ -1,0 +1,155 @@
+@import '../../../../../../assets/styles/base/variables';
+$default-font-weight : 400;
+
+.status  {
+    font-weight: $default-font-weight + 100;
+    i{
+        color:$white;
+        &::before {
+            background-color: $orange-1;
+            border-radius: 50%;
+        }
+    }
+}
+.single-item {
+    min-width: 0;
+}
+.single-item-photo{
+    width: 100px;
+    height: 100px;
+    background-size: cover;
+    border-radius: 5px;
+    cursor:pointer;
+}
+
+.single-item-body {
+    position: relative;
+}
+a.btn {
+    cursor: pointer;
+}
+
+%transition {
+    transition :all 500ms ease-in-out;
+}
+.single-item-per-row-layout
+{
+    @extend %transition;
+    .single-item-body {
+        @extend %transition;
+        h3 {
+            @extend %transition;
+        }
+        p {
+            @extend %transition;
+            span {
+                @extend %transition;
+            }
+        }
+    }
+}
+
+.single-item
+{
+    font-weight:$default-font-weight;
+    .single-item-body {
+        h3 {
+            font-weight: $default-font-weight + 100;
+        }
+        p {
+            span {
+                font-weight: $default-font-weight + 100;
+            }
+        }
+    }
+}
+.product-name {
+    font-weight: $default-font-weight + 100;
+}
+.card-name {
+    cursor:pointer;
+}
+
+.brand-name {
+    font-weight: $default-font-weight + 200
+}
+.dropdown{
+    position: absolute;
+    right: 1rem;
+}
+
+
+.single-row-mode-status {
+    position: absolute;
+    top: 3rem;
+    right: 0;
+}
+.success-icon {
+    font-size: 6px!important;
+    padding: 3px;
+}
+.action-button{
+    padding: 6px 10px!important;
+    margin-top: 7px!important;
+}
+
+.memberCard_container {
+    border: 1px solid #EEEEEE;
+    border-radius: 10px;
+    padding: 10px;
+
+    .card-name {
+        color: #1b101b;
+        font-size: 12px;
+        font-weight: 700 !important;
+    }
+
+    .accountType_label {
+        font-weight: 600;
+        font-size: 14px;
+        color: black;
+    }
+
+    .accountType_value,
+    .connectionName {
+        border: 1px solid #eeeeee;
+        border-radius: 4px;
+        padding: 4px 12px;
+        padding-top: 5px;
+        background: #fbfbfb;
+        color: #1b101b;
+        font-size: 10px;
+        font-weight: 600 !important;
+    }
+
+    .connectionName {
+        color: #4a0d4a !important;
+
+    }
+
+    .relation_button {
+        background-color: #4a0d4a;
+        color: white;
+        border-radius: 6px;
+    }
+
+    .relation_Status_button {
+        background-color: #FBFBFBFB;
+        color: #4A0D4A;
+        border-radius: 6px;
+        border: 1px solid #EEEEEEEE;
+    }
+}
+
+.shadow,
+.shadowContainer {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.no-padding-bottom {
+    padding-bottom: 0px !important;
+}
+
+.extra-padding-bottom {
+    padding-bottom: 50px !important;
+}

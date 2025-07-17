@@ -1,48 +1,54 @@
-<!-- <p>plans works!</p> -->
 <div class="container mb-5">
-    <button id="monthlybtn" [ngClass]="{'period-btn': !isMonthlyPlan, 'selected-month-btn': isMonthlyPlan}"
+  <button id="monthlybtn" [ngClass]="{'period-btn': !isMonthlyPlan, 'selected-month-btn': isMonthlyPlan}"
     (click)="monthlyClick()">
-        Monthly
-    </button>
-    <button id="yearlybtn" [ngClass]="{'period-btn': isMonthlyPlan, 'selected-year-btn': !isMonthlyPlan}"
+    Monthly
+  </button>
+  <button id="yearlybtn" [ngClass]="{'period-btn': isMonthlyPlan, 'selected-year-btn': !isMonthlyPlan}"
     (click)="yearlyClick()">
-        Yearly
-    </button>
+    Yearly
+  </button>
 </div>
-<div class="table-container" >
+<div class="table-container">
   <div style="overflow-x: auto;">
-   
+
     <table class="vertical-header-table fixed-table">
-      
+
       <thead>
-        <tr >
-          <th class="head-pl head-c"  style="font-size: 20px;">Plans</th>
-          <th *ngFor="let plan of plans; let i = index"   [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'selet-plan' :'plan-header'" >
+        <tr>
+          <th class="head-pl head-c" style="font-size: 20px;">Plans</th>
+          <th *ngFor="let plan of plans; let i = index"
+            [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'selet-plan' :'plan-header'">
             <div class="d-flex flex-column">
-              <p [ngClass]="getPlanClass(i)" class="plan-name" [style.fontSize]="getFontSize()">{{ plan?.appSubscriptionPlanHeader?.name }}</p>
-              <button [ngClass]="getPlanBtnClass(i)" (click)="showDialog(plan)" 
-                      [disabled]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null" class="btn">
+              <p [ngClass]="getPlanClass(i)" class="plan-name" style="    white-space: break-spaces;" [style.fontSize]="getFontSize()">{{
+                plan?.appSubscriptionPlanHeader?.name }}</p>
+              <button [ngClass]="getPlanBtnClass(i)" (click)="showDialog(plan)"
+                [disabled]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null" class="btn">
                 {{ plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'Selected' : 'Select'}}
               </button>
             </div>
           </th>
 
-          <th  class="plan-header position-relative">
+          <th class="plan-header position-relative">
             <div class="d-flex flex-column">
-              <p  class="plan-name default-class" style="position: absolute ; top: 25px;left: 50%; transform: translate(-50%, -50%);" [style.fontSize]="getFontSize()">Custom</p>
-              <!-- <p style="font-size: 12px;">
-                For Custom Pricing, Please Contact <a href="mailto:customercare@siiwii.net">Siwii</a>
-              </p> -->
+              <p class="plan-name default-class"
+                style="position: absolute ; top: 25px;left: 50%; transform: translate(-50%, -50%);"
+                [style.fontSize]="getFontSize()">Custom</p>
+
             </div>
           </th>
         </tr>
       </thead>
       <tbody>
-        
+
         <tr>
-          <td class="head-c plan-header"  style="font-size: 20px;" >Prices</td>
-          <td *ngFor="let plan of plans;let i = index" [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header '" class="text-col">
-            <span [ngClass]="getPlanClass(i)" [style.fontSize]="getFontSize()" class="pr-font"> ${{ isMonthlyPlan ? plan?.appSubscriptionPlanHeader?.monthlyPrice ==0 ? 'Free'  : plan?.appSubscriptionPlanHeader?.monthlyPrice : plan?.appSubscriptionPlanHeader?.yearlyPrice == 0 ? 'Free' :  plan?.appSubscriptionPlanHeader?.yearlyPrice }}</span>
+          <td class="head-c plan-header" style="font-size: 20px;">Prices</td>
+          <td *ngFor="let plan of plans;let i = index"
+            [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header '"
+            class="text-col">
+            <span [ngClass]="getPlanClass(i)" [style.fontSize]="getFontSize()" class="pr-font"> ${{ isMonthlyPlan ?
+              plan?.appSubscriptionPlanHeader?.monthlyPrice ==0 ? 'Free' : plan?.appSubscriptionPlanHeader?.monthlyPrice
+              : plan?.appSubscriptionPlanHeader?.yearlyPrice == 0 ? 'Free' :
+              plan?.appSubscriptionPlanHeader?.yearlyPrice }}</span>
           </td>
 
           <td class="plan-header">-</td>
@@ -66,49 +72,46 @@
       <div class="plan">
         <h2 class="text-center">{{ category }}</h2>
       </div>
-  
+
       <table class="vertical-header-table">
         <tbody>
           <tr *ngFor="let feature of getFeaturesByCategory(category); let fIndex = index">
             <td class="head-c plan-header">{{ feature.featureName }}</td>
-          
-            <td *ngFor="let plan of plans; let i = index"
-                [ngClass]="{
+
+            <td *ngFor="let plan of plans; let i = index" [ngClass]="{
                   'last-row-border': rindex === getUniqueCategories().length - 1 && fIndex === getFeaturesByCategory(category).length - 1 && plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null,
                   'seletd-plan': plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null,
                   'plan-header': plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId == null
                 }">
-          
+
               <!-- Check if the feature exists in this plan -->
               <ng-container *ngIf="hasFeature(plan, feature); else noFeature">
                 <!-- Find the matching detail for the feature -->
-                <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails" >
+                <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails">
                   <!-- Display the feature limit if the feature matches -->
                   <span *ngIf="detail?.featureName === feature?.featureName">
                     {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}  {{ detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'MONTHLY' ? '/ '+ 'Month'  : detail?.featureLimit && detail?.featurePeriodLimit?.toUpperCase() == 'YEARLY' ? '/ '+ 'Year': ''  }}
                   </span>
                 </ng-container>
               </ng-container>
-          
+
               <!-- Fallback if the feature is not present in the plan -->
               <ng-template #noFeature>
                 <span class="text-col">-</span>
               </ng-template>
-              
+
             </td>
-          
+
             <td class="plan-header">-</td>
           </tr>
-          
-          
+
+
         </tbody>
       </table>
     </div>
   </div>
-  
-</div>
 
-<!-- </div> -->
+</div>
 
 
 <p-dialog header="Header" [(visible)]="visible" [modal]="true" [style]="{ width: '640px' }" [draggable]="false" >

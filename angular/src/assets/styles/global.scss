@@ -782,4 +782,45 @@ html{
 }
 .kt-subheader .kt-subheader__main {
     margin-left: 18px;
+
+input{
+    background-color: white !important;
+}
+
+searchicon.p-element.p-icon-wrapper {
+    padding: 15px !important;
+}
+
+
+.p-link:focus {
+   box-shadow: none !important;
+}
+
+.kt-scrolltop--on .kt-scrolltop:hover {
+    background-color: #4A0D4A !important;
+}
+
+
+.p-icon-wrapper{
+    right: auto !important;
+}
+
+.marketplaceAccountProfile .tabview-custom .p-tabview-nav {
+    border-bottom: 4px solid #EEEEEE;
+    margin: 5px;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav li{
+    padding-bottom: 5px;
+}
+
+html{
+    overflow: auto !important;
+    overflow-y: auto !important;
+}
 }

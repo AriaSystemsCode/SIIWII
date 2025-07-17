@@ -118,6 +118,8 @@ using onetouch.AppMarketplaceItemLists;
 using onetouch.AppMarketplaceItems.Dtos;
 using onetouch.AppMarketplaceMessages;
 using System.Collections.Generic;
+using onetouch.AppMarketplaceContacts.Dtos;
+using onetouch.AppMarketplaceContacts;
 
 namespace onetouch
 {
@@ -405,6 +407,56 @@ namespace onetouch
                  .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
                  .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
             .ReverseMap();
+
+
+            configuration.CreateMap<CreateOrEditMarketplaceAccountInfoDto, AppContact>()
+                .ForMember(d => d.AccountType, s => s.Ignore())
+                .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
+                .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
+                ;
+
+            configuration.CreateMap<AppContact, CreateOrEditMarketplaceAccountInfoDto>()
+                .ForMember(d => d.AccountType, s => s.Ignore())
+                .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
+                .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
+                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses))
+                ;
+
+            //AppMarketplaceContact
+            configuration.CreateMap<AppMarketplaceAddress, AppAddressDto>().ReverseMap();
+            configuration.CreateMap<AppMarketplaceAddress, AppAddress>().ReverseMap();
+
+            configuration.CreateMap<AppMarketplaceAddressDto, AppAddressDto>().ReverseMap();
+            configuration.CreateMap<AppMarketplaceAddressDto, AppAddress>().ReverseMap();
+            configuration.CreateMap<AppMarketplaceAddressDto, AppMarketplaceAddress>().ReverseMap();
+
+            configuration.CreateMap<AppMarketplaceContactAddressDto, AppContactAddress>();
+            configuration.CreateMap<AppMarketplaceContactAddressDto, AppMarketplaceContactAddress>();
+            configuration.CreateMap<AppContactAddress, AppMarketplaceContactAddress>().ReverseMap();
+
+            configuration.CreateMap<AppContactAddress, AppMarketplaceContactAddressDto>()
+            .ForMember(d => d.AddressFk, s => s.MapFrom(ss => ss.AddressFk));
+
+            configuration.CreateMap<CreateOrEditAccountInfoDto, AppMarketplaceContact>()
+              .ForMember(a => a.Code, b => b.MapFrom(ent => ent.SSIN))
+               ;
+
+            configuration.CreateMap<AppMarketplaceContact, AppContactDto>();
+            configuration.CreateMap<AppMarketplaceContact, onetouch.Accounts.Dtos.AccountDto>();
+            configuration.CreateMap<AppMarketplaceContact, onetouch.AccountInfos.Dtos.BranchDto>();
+            
+            configuration.CreateMap<AppMarketplaceContact, AppContact>()
+            .ForMember(d => d.AppContactAddresses, s => s.MapFrom(ss => ss.ContactAddresses));
+            configuration.CreateMap<AppContact, AppMarketplaceContact>()
+                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses));
+
+            configuration.CreateMap<AppContactAddressDto, AppMarketplaceContactAddress>().ReverseMap();
+
+            configuration.CreateMap<CreateOrEditMarketplaceAccountInfoDto, AppMarketplaceContact>()
+              .ForMember(a => a.Code, b => b.MapFrom(ent => ent.SSIN))
+               ;
+
+
 
             configuration.CreateMap<AppContact, AccountSummaryDto>()
                 .ForMember(d => d.PhoneNumber, s => s.MapFrom(ss => ss.Phone1Number))
@@ -1051,9 +1103,17 @@ namespace onetouch
                 //.ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
               //  .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
                // .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
-                .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
-                ;
+                .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue));
             //I46
+            configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap()
+           .ForMember(z => z.FeatureStatus, z => z.MapFrom(ss => ss.EntityObjectStatusCode))
+           .ForMember(z => z.Category, z => z.MapFrom(s => s.CategoryCode));
+            //MMT40[Start]
+            configuration.CreateMap<BranchDto, CreateOrEditAccountInfoDto>()
+                .ForMember(z => z.AccountLevel, z => z.MapFrom(s=> AccountLevelEnum.Manual));
+            configuration.CreateMap<GetAccountInfoForEditOutput, BranchDto>();
+            configuration.CreateMap<AppItems.Dtos.ExtraAttribute, AppEntityExtraDataDto>();
+            //MMT40[End]
         }
     }
 }

@@ -43,6 +43,7 @@
     <ProjectReference Include="..\onetouch.EntityFrameworkCore\onetouch.EntityFrameworkCore.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="NewFolder\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

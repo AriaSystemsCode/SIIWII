@@ -14,6 +14,9 @@ namespace onetouch.Accounts
     public interface IAccountsAppService : IApplicationService 
     {
         Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input);
+        Task<bool> GetSettingValue(string settingName, string ssin);
+
+        Task<PagedResultDto<GetAccountForViewDto>> GetAllMyConnections(GetAllAccountsInput input);
 
         Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount);
 
@@ -35,8 +38,10 @@ namespace onetouch.Accounts
 		Task DeleteContact(EntityDto input);
 		Task<ContactDto> CreateOrEditContact(ContactDto input);
 		Task<ContactForEditDto> GetContactForView(long input);
-		//Mariam[End]
-		Task<PagedResultDto<LookupAccountOrTenantDto>> GetTenantsWithManualAccounts(GetTenantsWithManualAccounts input);
+        
+        
+        //Mariam[End]
+        Task<PagedResultDto<LookupAccountOrTenantDto>> GetTenantsWithManualAccounts(GetTenantsWithManualAccounts input);
 		Task<PagedResultDto<LookupAccountOrTenantDto>> GetAccountByType(GetAccountsForDropdownInputDto input);
 		Task<long> CreateOrUpdateAccountFromSourceAccount(CreateAccountsInputDto input);
 		Task<AppAddressDto> CreateOrEditAddress(AppAddressDto input);
@@ -49,5 +54,9 @@ namespace onetouch.Accounts
 		Task<List<ImportContactReturnDto>> ImportContact(List<AccountExcelDto> contactExcelDtoList, string repeatHandler);
 		//I46[End]
 
+    
+        //I40[Start]
+        Task<ContactDto> CreateOrUpdateContact(CreateOrEditAccountInfoDto accountDto);
+        //I40[End]
     }
 }

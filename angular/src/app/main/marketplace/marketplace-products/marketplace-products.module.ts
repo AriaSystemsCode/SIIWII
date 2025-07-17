@@ -59,8 +59,9 @@ import { AppCommonModule } from "@app/shared/common/app-common.module";
         CarouselModule,
         InputNumberModule,
         TabViewModule,
-        ConfirmDialogModule,AppCommonModule
+        ConfirmDialogModule,AppCommonModule,
     ],
-    providers:[AppMarketplaceItemsServiceProxy]
+    providers:[AppMarketplaceItemsServiceProxy],
+    exports:[MarketplaceProductsComponent]
 })
 export class MarketplaceProductsModule {}

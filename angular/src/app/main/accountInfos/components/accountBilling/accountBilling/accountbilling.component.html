@@ -6,24 +6,22 @@
     <button id="invoicebtn" [ngClass]= "{'billing-option-btn': !isInvoice, 'billing-option-btn-clicked': isInvoice}"
     class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.InvoicesOption,'invoicebtn')">
         Invoices
-     </button> 
-    <!-- </div> -->
-    <!-- <div  class="absolute-item"> -->
-    <button id="actlogbtn" [ngClass]= "{'billing-option-btn': !isActivityLog, 'billing-option-btn-clicked': isActivityLog}"
-    class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.ActivityLogOption,'actlogbtn')">
+      </button>
+      <button id="actlogbtn"
+        [ngClass]="{'billing-option-btn': !isActivityLog, 'billing-option-btn-clicked': isActivityLog}"
+        class="btn billing-option-btn pull-right"
+        (click)="openbillingpage(billingOptionsTabs.ActivityLogOption,'actlogbtn')">
         Activity Log
-    </button>
-    <!-- </div> -->
-    <!-- <div style="billing-btn-frame" class="absolute-item"> -->
-    <button id="addonbtn" [ngClass]= "{'billing-option-btn': !isAddOn, 'billing-option-btn-clicked': isAddOn}"
-    class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.AddOnsOption,'addonbtn')" >
+      </button>
+
+      <button id="addonbtn" [ngClass]="{'billing-option-btn': !isAddOn, 'billing-option-btn-clicked': isAddOn}"
+        class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.AddOnsOption,'addonbtn')">
         Add-ons
-    </button>
-    <!-- </div> -->
-    <!--<div style="billing-btn-frame" class="absolute-item">-->
-    <button id="planbtn" [ngClass]= "{'billing-option-btn': !isPlan, 'billing-option-btn-clicked': isPlan}" class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.PlansOption,'planbtn')" >
+      </button>
+      <button id="planbtn" [ngClass]="{'billing-option-btn': !isPlan, 'billing-option-btn-clicked': isPlan}"
+        class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.PlansOption,'planbtn')">
         Plans
-    </button>
+      </button>
     </div>
     <!-- <br/>
     <br/>

@@ -2584,6 +2584,54 @@ namespace onetouch.Migrations
                         });
                 });
 
+            modelBuilder.Entity("onetouch.AppEntities.AppEntityRating", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("EntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntityObjectTypeCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("EntityObjectTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntitySSIN")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ObjectCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ObjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserSSIN")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityId");
+
+                    b.HasIndex("EntityObjectTypeId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("AppEntityRatings", t =>
+                        {
+                            t.HasTrigger("AppEntityRatings_Trigger");
+                        });
+                });
+
             modelBuilder.Entity("onetouch.AppEntities.AppEntityReactionsCount", b =>
                 {
                     b.Property<long>("Id")
@@ -8279,6 +8327,33 @@ namespace onetouch.Migrations
                     b.Navigation("EntityFk");
 
                     b.Navigation("EntityObjectTypeFk");
+                });
+
+            modelBuilder.Entity("onetouch.AppEntities.AppEntityRating", b =>
+                {
+                    b.HasOne("onetouch.AppEntities.AppEntity", "EntityFk")
+                        .WithMany()
+                        .HasForeignKey("EntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.SystemObjects.SycEntityObjectType", "EntityObjectTypeFk")
+                        .WithMany()
+                        .HasForeignKey("EntityObjectTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.SystemObjects.SydObject", "ObjectFk")
+                        .WithMany()
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EntityFk");
+
+                    b.Navigation("EntityObjectTypeFk");
+
+                    b.Navigation("ObjectFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityReactionsCount", b =>

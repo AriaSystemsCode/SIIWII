@@ -1,9 +1,13 @@
+
+
+
 import {
     Component,
     Injector,
     OnDestroy,
     ViewChild,
-   SimpleChanges, OnChanges, ViewChildren, ElementRef
+   SimpleChanges, OnChanges, ViewChildren, ElementRef,
+   Input
 } from "@angular/core";
 import {  Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
@@ -61,6 +65,8 @@ export class MarketplaceProductsComponent
     sellerSSIN: any;
     buyerSSIN: any;
     contactSSIN:any;
+    acceptedAspectRatio;
+
     isFromSellerRoom:boolean
     ismarketPLace:boolean
     items: any[];
@@ -70,7 +76,9 @@ export class MarketplaceProductsComponent
     onlyAvialbleStock: boolean;
     appItemListId: any;
     selectedDepartments: any;
-    acceptedAspectRatio;
+    @Input() fromMarketAcoount: boolean;
+    @Input() fromOverView: boolean = false
+    @Input() accountDataForView :any
     constructor(
         injector: Injector,
         private _router: Router,
@@ -157,6 +165,7 @@ export class MarketplaceProductsComponent
         }
     
         this.getAllProducts(); // Fetch products using restored filters
+        console.log(this.accountDataForView,'llll')
     }
     
     ngAfterViewInit() {
@@ -165,7 +174,7 @@ export class MarketplaceProductsComponent
     }
     
     ngOnChanges(changes: SimpleChanges) {
-        alert("change")
+
         document.getElementById("_searchInput").focus();
       }
       getAspectatio() {
@@ -225,7 +234,7 @@ export class MarketplaceProductsComponent
     
         const requestParams = {
             contactSSIN: this.contactSSIN,
-            sellerSSIN: this.sellerSSIN,
+            sellerSSIN:    this.sellerSSIN,
             tenantId: null,
             appItemListId: this.appItemListId || null,
             searchText: this.searchInput || '',
@@ -233,7 +242,7 @@ export class MarketplaceProductsComponent
             minimumPrice: this.minimumPrice || null,
             maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
-            onlyAvailableStock: this.onlyAvialbleStock ?? false,
+            onlyAvailableStock: this.onlyAvialbleStock ?? null,
             startSoldOutData: this.startSoldOutData || null,
             endSoldOutData: this.endSoldOutData || null,
             startShipData: this.startShipData || null,
@@ -242,7 +251,7 @@ export class MarketplaceProductsComponent
             selectedCurrency: this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
-            maxResultCount: this.maxResultCount
+            maxResultCount: this.fromOverView ? 8 : this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
         
@@ -250,7 +259,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                sessionStorage.getItem("SellerSSIN"),
+                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView?.ssin :  sessionStorage.getItem("SellerSSIN"),
                 null,
                 requestParams.appItemListId ||  this.appItemListId,
                 false, // false
