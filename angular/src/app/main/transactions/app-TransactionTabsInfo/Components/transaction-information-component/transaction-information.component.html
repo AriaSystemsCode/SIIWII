@@ -706,7 +706,7 @@
                                                             </div>
                                                             <div class="price mb-4">
 
-                                                                <div class="msrp d-flex ">
+                                                                <div class="msrp d-flex align-items-baseline">
                                                                     <h5 class="mr-2"
                                                                         style="color: black !important;font-size: 16px;margin-top: 10px;">
                                                                         MSRP: </h5>
@@ -1045,7 +1045,7 @@
                                                 <!-- end order by prepack -->
                                             </div>
 
-                                            <div *ngIf="showAddLine" class="d-flex justify-content-between mt-3">
+                                            <div *ngIf="showAddLine" class="d-flex justify-content-end mt-3">
                                                 <button (click)="cancelVariationLine()"
                                                     class="cancelbtn text-center btn float-right">Cancel</button>
                                                 <button [disabled]="filterForm.controls['selectedVariation'].value == ''"

@@ -279,7 +279,8 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
   isSalesOrderValidForm(): boolean {
     // Check if all required fields have values
     const isValid = this.appTransactionsForViewDto?.currencyCode &&
-      this.appTransactionsForViewDto?.currencyExchangeRate &&
+      this.appTransactionsForViewDto?.currencyExchangeRate 
+      &&
       moment(
         this.appTransactionsForViewDto?.enteredDate,
         "YYYY-MM-DD HH:mm:ss",
@@ -335,7 +336,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
   }
 
   createOrEditTransaction() {
-
+    this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const subs = this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
@@ -892,7 +893,17 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
       this.showAppCatCodes = true; // Re-render app-codes after a delay
     }, 0); // Delay to force Angular to re-create the component
   }
+  saveDates() {
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
 
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();
 
