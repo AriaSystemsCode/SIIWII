@@ -331,7 +331,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     syncAccount() {
         this.showMainSpinner();
-        this._AccountsServiceProxy.publishProfile().pipe(
+        this._AccountsServiceProxy.publishProfile(true).pipe(
             finalize(() => this.hideMainSpinner()
             )).subscribe(
                 (response: boolean) => {
@@ -359,10 +359,10 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
 
     getContactSync() {
-        this._AccountsServiceProxy.getContactSync(this.accountData.id)
-            .subscribe((res: boolean) => {
-                this.isSync = res;
-            });
+        // this._AccountsServiceProxy.getContactSync(this.accountData.id)
+        //     .subscribe((res: boolean) => {
+        //         this.isSync = res;
+        //     });
 
     }
 

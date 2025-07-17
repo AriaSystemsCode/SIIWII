@@ -259,7 +259,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView?.ssin :  sessionStorage.getItem("SellerSSIN"),
+                sessionStorage.getItem("SellerSSIN"),
                 null,
                 requestParams.appItemListId ||  this.appItemListId,
                 false, // false

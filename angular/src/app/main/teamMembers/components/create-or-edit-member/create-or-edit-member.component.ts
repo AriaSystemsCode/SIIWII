@@ -876,7 +876,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         this.showMainSpinner();
       
         if (!this.memberDto.code) {
-          const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise();
+          const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,null).toPromise();
           this.memberDto.code = this.appSession.tenancyName + "-C" + sequance;
         }
       

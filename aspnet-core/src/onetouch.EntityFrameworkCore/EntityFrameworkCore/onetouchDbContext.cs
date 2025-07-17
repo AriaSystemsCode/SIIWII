@@ -54,11 +54,15 @@ using onetouch.SycCurrencyExchangeRates;
 using onetouch.AppMarketplaceAccountsPriceLevels;
 using onetouch.AppMarketplaceTransactions;
 using onetouch.AppMarketplaceMessages;
+using onetouch.AppMarketplaceContacts;
 
 namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppMarketplaceContact> AppMarketplaceContacts { set; get; }
+        public virtual DbSet<AppMarketplaceAddress> AppMarketplaceAddresses { get; set; }
+        public virtual DbSet<AppMarketplaceContactAddress> AppMarketplaceContactAddress { get; set; }
         public virtual DbSet<ValidationRule> ValidationRules { get; set; }
 
         public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
@@ -378,6 +382,10 @@ namespace onetouch.EntityFrameworkCore
             });
             modelBuilder.Entity<AppItemPrices>()
             .HasIndex(a => new { a.AppItemId, a.Code, a.CurrencyCode });
+            modelBuilder.Entity<AppMarketplaceContact>()
+                  .HasOne(x => x.ParentFk)
+                  .WithMany(x => x.ParentFkList)
+                  .HasForeignKey(x => x.ParentId);
             //mmt
             modelBuilder.Entity<AppContact>()
                        .HasOne(x => x.ParentFk)

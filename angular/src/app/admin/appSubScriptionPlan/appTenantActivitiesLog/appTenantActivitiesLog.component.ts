@@ -20,9 +20,10 @@ import { DateType } from 'devextreme/ui/date_box';
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()], 
     styles: [`
-        .p-icon-wrapper {
-            position: initial !important;
-        }
+        .searchBtn {
+    background: #4A0D4A !important;
+    margin-top: 3px !important;color:#595959;
+}
     `]
 })
 export class AppTenantActivitiesLogComponent extends AppComponentBase {
@@ -108,7 +109,8 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
         let customSettings = (abp as any).custom;
         return this.isGrantedAny('Pages.Administration.AuditLogs') && customSettings.EntityHistory && customSettings.EntityHistory.isEnabled && _.filter(customSettings.EntityHistory.enabledEntities, entityType => entityType === this._entityTypeFullName).length === 1;
     }
-
+    first = 0;
+    rows = 10; // default
     getAppTenantActivitiesLog(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
@@ -160,7 +162,10 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
             this.primengTableHelper.hideLoadingIndicator();
+            this.first = this.primengTableHelper.getSkipCount(this.paginator, event);
+            this.rows = this.primengTableHelper.getMaxResultCount(this.paginator, event);
         });
+
     }
 
     reloadPage(): void {
@@ -241,13 +246,8 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
     {
         return moment(input).format('MM/DD/YYYY HH:mm:ss');
     }
+
     
     
     
-    
-
-
-
-
-
 }

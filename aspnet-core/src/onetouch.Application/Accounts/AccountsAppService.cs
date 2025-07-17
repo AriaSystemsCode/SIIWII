@@ -556,35 +556,35 @@ namespace onetouch.Accounts
         {
             return true;
         }
-        public string GetAction(string accountTypeCode, bool neeedAction)
-        {
+        //public string GetAction(string accountTypeCode, bool neeedAction)
+        //{
 
-            int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
-            var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
-            var currentTenantEdition = tenant == null ? "Personal" : tenant.Name;
-            currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
-            string action = "";
-            if (!string.IsNullOrEmpty(accountTypeCode))
-            {
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionFOLLOW" : "MPActionFOLLOWED"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
+            //int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
+            //var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
+            //var currentTenantEdition = tenant == null ? "Personal" : tenant.Name;
+            //currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
+            //string action = "";
+            //if (!string.IsNullOrEmpty(accountTypeCode))
+            //{
+            //    if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+            //    if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionFOLLOW" : "MPActionFOLLOWED"; }
+            //    if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionEMPLOY" : " MPActionEMPLOYED"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
+            //    if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionEMPLOY" : " MPActionEMPLOYED"; }
+            //    if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+            //    if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
-
-
-            }
+            //    if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
+            //    if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
+            //    if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
 
 
+            //}
 
-            return action;
-        }
+
+
+        //    return action;
+        //}
 
 
         public string GetAction(string accountTypeCode, string currentTenantEdition, bool needAction = false)
@@ -806,7 +806,35 @@ namespace onetouch.Accounts
 
         }
 
+        public async Task<bool> getContactSync(long id)
+        {
+            var bReturn = false;
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var account = await _appContactRepository.GetAll()
+                .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
+
+
+                if (account != null)
+                {
+                    var publishedRecord = await _appMarketplaceContactRepository.GetAll()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.TenantId == null
+                        && x.IsProfileData == true
+                        && x.IsHidden == false
+                        && x.OwnerId == account.TenantId
+                        && x.SSIN == account.SSIN);
+
+                    if (publishedRecord != null)
+                    {
+                        bReturn = (publishedRecord.LastModificationTime < account.LastModificationTime);
+                    }
+                }
+            }
+            return bReturn;
+        }
         public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
         {
             await CreateAdminContact();

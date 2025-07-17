@@ -74,4 +74,27 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         }
     }
 
+    createRelation(){
+      this._createRelation.emit(this.account);
+    }
+    getFormattedConnectionName(connection:string): string | null {
+        if(connection == 'connectionName') {
+            const raw = this.account?.connectionName?.trim();
+            if (!raw || !raw.startsWith('MPAction')) return null;
+          
+            const label = raw.replace('MPAction', '');
+            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+        } else    if(connection == 'avaliableConnectionName') {
+            const raw = this.account?.avaliableConnectionName?.trim();
+            if (!raw || !raw.startsWith('MPAction')) return null;
+          
+            const label = raw.replace('MPAction', '');
+            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+        }
+       
+
+        
+      }
+      
+
 }
