@@ -1941,11 +1941,11 @@ namespace onetouch.Accounts
                             contact.PaymentTermsDiscountDays = int.Parse(discDays.AttributeValue.ToString());
 
                         var eom = ent.EntityExtraData.Where(z => z.AttributeId == 32).FirstOrDefault();
-                        if (disc != null && !string.IsNullOrEmpty(disc.AttributeValue))
+                        if (eom != null && !string.IsNullOrEmpty(eom.AttributeValue))
                             contact.PaymentTermsEndOfMonth = bool.Parse(eom.AttributeValue.ToString());
 
                         var eomDays = ent.EntityExtraData.Where(z => z.AttributeId == 33).FirstOrDefault();
-                        if (eom != null && !string.IsNullOrEmpty(eomDays.AttributeValue))
+                        if (eomDays != null && !string.IsNullOrEmpty(eomDays.AttributeValue))
                             contact.PaymentTermsEndOfMonthDays = int.Parse(eomDays.AttributeValue.ToString());
 
                         var netDueDays = ent.EntityExtraData.Where(z => z.AttributeId == 34).FirstOrDefault();
