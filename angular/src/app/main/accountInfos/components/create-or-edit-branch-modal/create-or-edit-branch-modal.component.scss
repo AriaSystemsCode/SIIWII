@@ -49,18 +49,34 @@
     width: 140px !important;
  }
  .btn-gray{
-    background-color: #E5EAEE;
-    border: none;
-    width: 127px;
-    border-radius: 5px;
-    padding: 10px !important;
-    width: 140px !important;
+
+padding: 13px 20px;
+width: 91px;
+height: 46px;
+background: #FFFFFF;
+border: 1px solid #EBEBEB;
+box-shadow: 1px 1px 6px rgba(22, 22, 22, 0.05);
+border-radius: 6px;
+color: #4A0D4A;
+
  }
 .modal-title{
     width: 100% !important;
+    span {
+        font-size: 24px;
+        color: #1B101B;
+        font-weight: 700;
+    }
+    p{
+color: #595959;
+font-weight: 500;
+    }
+
 }
 .modal-footer{
-    direction: rtl;
+  display: flex;
+  justify-content: end;
+  gap: 5px;
     background-color: #F4F4F4;
     width: 100%;
     position: fixed;
@@ -229,12 +245,7 @@
     border-radius: 5px;
     margin-right: 8px;
  }
- .btn-gray{
-    background-color: #E5EAEE;
-    border: none;
-    width: 127px;
-    border-radius: 5px;
- }
+
  .aria-select-modal{
     height: 37px !important;
     border: none;
@@ -254,4 +265,38 @@
 }
 .phone-ng2-input-wrapper{
     width: 185px;
+}
+.isPublic {
+ 
+    span {
+        white-space: nowrap;
+        font-weight: 700;
+        font-size: 14px;
+        color: #1B101B;
+    }
+}
+label {
+    white-space: nowrap;
+    font-weight: 700;
+    font-size: 14px;
+    color: #1B101B;
+}
+.bgPurple {
+ 
+padding: 13px 20px;
+
+
+width: 76px;
+height: 46px;
+
+background: #4A0D4A;
+box-shadow: 1px 1px 6px rgba(22, 22, 22, 0.05);
+border-radius: 6px;
+color: #fff;
+
+}
+::ng-deep {
+    .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+        background-color: #2DC74F !important;
+    }
 }

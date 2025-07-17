@@ -314,7 +314,7 @@
 
       </div>
       <hr class="hr">
-      <app-all-reviews-list [entityID]="accountDataForView?.entityId" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
+      <app-all-reviews-list [fromOverview]="true" [entityID]="accountDataForView?.entityId" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
      
     </div>
 

@@ -1183,7 +1183,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     
         // Step 4: Merge clean incoming data
         const finalData = [...filteredExistingData, ...cleanIncomingData];
-        console.log(finalData,'finalData')
+      
     
         this.memberDto.entityExtraData = finalData;
     

@@ -25,16 +25,16 @@
             </div>
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="branch_Name">{{l("Name")}} *</label>
                 <input type="text" id="branch_Name" class="form-control form-control-sm aria-input-text"
                   [(ngModel)]="branch.name" name="Name" minlength="2" maxlength="150" required />
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-8">
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-group">
                     <label for="branch_Code">{{l("Code")}} *</label>
 
@@ -45,9 +45,18 @@
                       (getCodeValue)="getCodeValue($event)" [styles]="stylesObj"></app-codes>
                   </div>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-9 ">
                   <div class="form-group">
-                    <label for="branch_EMailAddress">{{l("EMailAddress")}}</label>
+                    <div class="d-flex justify-content-between">
+                      <label for="branch_EMailAddress">{{l("EMailAddress")}}</label>
+
+
+                      <div class="d-flex isPublic">
+                        <span class="mr-3">{{ "IsPublic" | localize }}</span>
+                        <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
+                      </div>
+          
+                    </div>
                     <div class="input-group mb-3">
                       <div class="input-group-prepend">
                         <span class="input-group-text" style="background-color: #F3F6F9;"><img
@@ -64,9 +73,13 @@
               </div>
 
             </div>
+
+         
+
+
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="branch_TradeName">{{l("TradeName")}} *</label>
                 <input type="text" id="branch_TradeName" #tradeNameInput="ngModel"
@@ -75,9 +88,9 @@
                 <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-8">
               <div class="row align-items-center">
-                <div class="col-md-4 phone-type mt-4">
+                <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
                     <p-dropdown [options]="allPhoneTypes"
                       styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
@@ -85,7 +98,7 @@
                       [style]="{'width':'100%'}"></p-dropdown>
                   </div>
                 </div>
-                <div class="col-md-8 phone-col-ext mt-4">
+                <div class="col-md-6 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
@@ -99,15 +112,21 @@
                       class="form-control form-control-sm aria-input-text phone-input phone-extenstion"
                       [(ngModel)]="branch.phone1Ext" name="Phone1Ex" minlength="1"
                       [placeholder]="'| ' + 'Extension' |localize" maxlength="10" />
+                 
                   </div>
                 </div>
+                <div class=" col-md-3 d-flex justify-content-between align-items-center isPublic">
+                  <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
+                  <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
+                </div>
+            
               </div>
 
             </div>
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
-              <div class="form-group m-form__group">
+            <div class="col-md-4">
+              <div class="form-group ">
                 <label for="AppEntityName5">{{l("Language")}}</label>
                 <p-dropdown [options]="allLanguages" styleClass="form-control  aria-select aria-select-modal"
                   [filter]="false" name="branch.languageId" [(ngModel)]="branch.languageId" [style]="{'width':'100%'}"
@@ -115,9 +134,9 @@
 
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-8">
               <div class="row align-items-center">
-                <div class="col-md-4 phone-type mt-4">
+                <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
                     <p-dropdown [options]="allPhoneTypes"
                       styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
@@ -125,10 +144,10 @@
                       [style]="{'width':'100%'}"></p-dropdown>
                   </div>
                 </div>
-                <div class="col-md-8 phone-col-ext mt-4">
+                <div class="col-md-6 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
                     <div class="phone-ng2-input-wrapper">
-                      <input type="text" class="form-control-sm aria-input-text phone-input" name="Phone2Number"
+                      <input type="text"            class="form-control form-control-sm aria-input-text phone-input" name="Phone2Number"
                         ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                   (ng2TelOutput)="getNumberphone2Number($event)"
                         [(ngModel)]="branch.phone2Number" (intlTelInputObject)="telInputObjectphone2Number($event)"
@@ -140,12 +159,17 @@
                       [placeholder]="'| ' + 'Extension' |localize" />
                   </div>
                 </div>
+                <div class=" col-md-3 d-flex justify-content-between align-items-center isPublic">
+                  <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
+                  <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
+                </div>
               </div>
 
             </div>
+            
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-md-4">
               <div class="form-group m-form__group">
                 <label for="AppEntityName4">{{l("Currency")}}</label>
                 <p-dropdown [options]="allCurrencies" styleClass="form-control aria-select aria-select-modal"
@@ -153,9 +177,9 @@
                   [placeholder]="'Please select' | localize"></p-dropdown>
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-8">
               <div class="row align-items-center">
-                <div class="col-md-4 phone-type mt-4">
+                <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
                     <p-dropdown [options]="allPhoneTypes"
                       styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
@@ -163,7 +187,7 @@
                       [style]="{'width':'100%'}"></p-dropdown>
                   </div>
                 </div>
-                <div class="col-md-8 phone-col-ext mt-4">
+                <div class="col-md-6 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" class="form-control form-control-sm aria-input-text phone-input" ng2TelInput
@@ -177,6 +201,11 @@
                       [(ngModel)]="branch.phone3Ext" name="Phone3Ex" minlength="1"
                       [placeholder]="'| ' + 'Extension' |localize" maxlength="10" />
                   </div>
+                </div>
+
+                <div class=" col-md-3 d-flex justify-content-between align-items-center isPublic">
+                  <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
+                  <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
                 </div>
               </div>
 
@@ -193,7 +222,14 @@
 
 
           <div class="form-group form-group-plus">
+            <div class="d-flex justify-content-between">
             <label for="branch_Address1">{{l("BillingAddress")}}</label>
+
+              <div class="  d-flex justify-content-between align-items-center isPublic">
+                <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
+                <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
+              </div>
+            </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(1)">
             </button>
             <p class="form-control  aria-input-text address-name">
@@ -207,7 +243,14 @@
             </p>
           </div>
           <div class="form-group form-group-plus">
+            <div class="d-flex justify-content-between">
             <label for="branch_Address2">{{l("ShippingAddress")}}</label>
+
+            <div class="  d-flex justify-content-between align-items-center isPublic">
+              <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
+              <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
+            </div>
+          </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(2)">
             </button>
             <p class="form-control  aria-input-text address-name">
@@ -220,8 +263,16 @@
               {{ address2.countryIdName? ' - ' + address2.countryIdName : '' }}
             </p>
           </div>
-          <div class="form-group form-group-plus">
+          <div class="form-group form-group-plus"> 
+            <div class="d-flex justify-content-between">
+
             <label for="branch_Address3">{{l("DistributionAddress")}}</label>
+            
+            <div class="  d-flex justify-content-between align-items-center isPublic">
+              <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
+              <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
+            </div>
+          </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(3)">
             </button>
             <p class="form-control  aria-input-text address-name">
@@ -235,7 +286,14 @@
             </p>
           </div>
           <div class="form-group form-group-plus">
+            <div class="d-flex justify-content-between">
             <label for="branch_Address4">{{l("MailingAddress")}}</label>
+                   
+            <div class="  d-flex justify-content-between align-items-center isPublic">
+              <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
+              <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
+            </div>
+            </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(4)">
             </button>
             <p class="form-control  aria-input-text address-name">

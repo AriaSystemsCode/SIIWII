@@ -14,7 +14,8 @@ import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/imag
 
 export class AllReviewsListComponent extends AppComponentBase implements OnInit {
   @Input() entityID : number
-
+  @Input() fromOverview : boolean
+  
   @Output() refreshRating : EventEmitter<boolean> = new EventEmitter<boolean>()
   
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;

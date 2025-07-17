@@ -12,7 +12,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 
 @Component({
     selector: 'createOrEditBranchModal',
-    styleUrls: ['./create-or-edit-branch-modal.component.scss', './AccountInfo.component.scss'],
+    styleUrls: ['./create-or-edit-branch-modal.component.scss', '../accountInfo/accountInfo.component.scss'],
     templateUrl: './create-or-edit-branch-modal.component.html'
 })
 export class CreateOrEditBranchModalComponent extends AppComponentBase {
@@ -48,7 +48,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     inputObj1: any;
     entityObjectType: string = "TENANTBRANCH";
     stylesObj = {
-        'width': "130px",
+   
         'height': "47px"
     };
     branchCode: string = "";

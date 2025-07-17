@@ -53,10 +53,7 @@
 
 }
 
-.modal-footer {
-    width: 100%;
-    position: fixed;
-}
+
 
 .btn-blue {
     background-color: #3699FF;
@@ -75,14 +72,13 @@
 
 .modal-title {
     width: 100% !important;
+    span {
+        font-size: 24px;
+        color: #1B101B;
+        font-weight: 700;
+    }
 }
 
-.modal-footer {
-    direction: rtl;
-    background-color: #F4F4F4;
-    position: absolute;
-    width: 100%;
-}
 
 .title-tree {
     font: SemiBold 15px/var(--unnamed-line-spacing-23) var(--unnamed-font-family-poppins);
@@ -271,6 +267,8 @@
 }
 
 .modal-footer {
+    display: flex;
+    justify-content: end;
     background-color: #F4F4F4;
     width: 100%;
     position: fixed;

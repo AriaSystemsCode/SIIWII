@@ -152,7 +152,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     editBranchValue: string = '';
     oldEditBranchValue:string="";
     Save_editMember() {
-        debugger
+        
         this.newEditMemberInfo = this.memberData.contact;
         this.newEditMemberInfo.jobTitle = this.editjobTitleValue;
         this.newEditMemberInfo.branchName = this.editBranchValue;
@@ -213,6 +213,19 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     branchSelectionCanceled() {
         this.selectBranchModal.close();
+    }
+    cancel(){
+        this.editjobTitleValue = this.memberData?.contact?.jobTitle;
+        this.editBranchValue =
+            (this.memberData?.branchName ? (this.memberData?.branchName + ' ' + " - ") : '') +
+            (this.memberData?.addressLine1 ? (this.memberData?.addressLine1 + ', ') : '') +
+            (this.memberData?.addressLine2 ? this.memberData?.addressLine2 + ', ' : '') +
+            (this.memberData?.city ? (this.memberData?.city + ', ') : '') +
+            (this.memberData?.state ? (this.memberData?.state + ', ') : '') +
+            (this.memberData?.zipCode ? (this.memberData?.zipCode + ', ') : '') +
+            (this.memberData?.countryName ? (this.memberData?.countryName) : '');
+
+            this.oldEditBranchValue =this.editBranchValue;
     }
 
 }

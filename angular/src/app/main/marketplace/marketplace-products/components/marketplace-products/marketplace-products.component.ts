@@ -165,6 +165,7 @@ export class MarketplaceProductsComponent
         }
     
         this.getAllProducts(); // Fetch products using restored filters
+        console.log(this.accountDataForView,'llll')
     }
     
     ngAfterViewInit() {
@@ -173,7 +174,7 @@ export class MarketplaceProductsComponent
     }
     
     ngOnChanges(changes: SimpleChanges) {
-        alert("change")
+
         document.getElementById("_searchInput").focus();
       }
       getAspectatio() {
@@ -233,7 +234,7 @@ export class MarketplaceProductsComponent
     
         const requestParams = {
             contactSSIN: this.contactSSIN,
-            sellerSSIN: this.sellerSSIN,
+            sellerSSIN:    this.sellerSSIN,
             tenantId: null,
             appItemListId: this.appItemListId || null,
             searchText: this.searchInput || '',
@@ -241,7 +242,7 @@ export class MarketplaceProductsComponent
             minimumPrice: this.minimumPrice || null,
             maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
-            onlyAvailableStock: this.onlyAvialbleStock ?? false,
+            onlyAvailableStock: this.onlyAvialbleStock ?? null,
             startSoldOutData: this.startSoldOutData || null,
             endSoldOutData: this.endSoldOutData || null,
             startShipData: this.startShipData || null,
@@ -258,7 +259,7 @@ export class MarketplaceProductsComponent
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView ?.ssin :  sessionStorage.getItem("SellerSSIN"),
+                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView?.ssin :  sessionStorage.getItem("SellerSSIN"),
                 null,
                 requestParams.appItemListId ||  this.appItemListId,
                 false, // false

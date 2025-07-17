@@ -515,6 +515,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
+
         this.isRecordOwner = [this.accountDataForView?.partnerId, this.accountDataForView?.id].includes(this.appSession.user?.accountId);
         if (this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if (this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
@@ -533,6 +534,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
+
         this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if (this.accountDataForView.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
@@ -562,8 +564,19 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             this.changeTab(this.accountInfoPageTabsEnum.ProfileCreateOrEdit)
             if (!this.accountInfoTemp.languageId) {
 
-                this._AccountsServiceProxy.getMyAccountForEdit().subscribe(result=>{
+                this._AccountsServiceProxy.getMyAccountForEdit().subscribe(async result=>{
                     if(result){
+                        if (!this.accountInfoTemp.code) {
+                            let sequance = "";
+                          
+                
+                        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,this.appSession.tenantId).toPromise()
+                        if(getNextEntityCodeRes)
+                            sequance=getNextEntityCodeRes;
+                
+                            this.accountInfoTemp.code =  sequance;
+                        }
+                
                         this.languageIdName=result.languageName;
                         this.accountInfoTemp.languageId=result.accountInfo.languageId;
                         this.accountInfoTemp.paymentTermsId=  ! this.accountInfoTemp?.id  ?  this.paymentTermsId  :  
@@ -784,7 +797,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
                 this.saving = false;
-                this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
+                if(this.accountInfoTemp?.id && this.accountId ){
+                    this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
+
+                }else {
+                    location.reload()
+                    this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
+                    this.getAccountDataForView()
+                }
             }))
             .subscribe(result => {
 
@@ -810,13 +830,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     async saveExternalOrManualAccount() {
         if (!this.accountInfoTemp.code) {
             let sequance = "";
-            let tenancyName = this.appSession.tenancyName;
+          
 
         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,this.appSession.tenantId).toPromise()
         if(getNextEntityCodeRes)
             sequance=getNextEntityCodeRes;
 
-            this.accountInfoTemp.code = tenancyName + "-M" + sequance;
+            this.accountInfoTemp.code =  sequance;
         }
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
@@ -1351,7 +1371,5 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             maxResultCount + skipCount
         )
     }
-    getCodeValue(code: string) {
-        this.accountInfoTemp.code = code;
-    }
+
 }

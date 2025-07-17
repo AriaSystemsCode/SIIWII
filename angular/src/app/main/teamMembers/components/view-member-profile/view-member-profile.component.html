@@ -236,7 +236,7 @@
                                         {{ "SaveChanges" | localize }}
                                     </button>
 
-                                    <button class="btn mb-3 mt-4 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false">
+                                    <button class="btn mb-3 mt-4 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false;cancel()">
                                         {{ "Cancel" | localize }}
                                     </button>
                                 </div>
