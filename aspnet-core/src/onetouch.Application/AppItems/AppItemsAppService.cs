@@ -73,7 +73,7 @@ using onetouch.AppSubScriptionPlan;
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
-    public class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IExcelImporter<AppItemExcelResultsDTO>
+    public partial class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IExcelImporter<AppItemExcelResultsDTO>
     {
         private readonly IRepository<AppItemsListDetail, long> _appItemsListDetailRepository;
         private readonly IRepository<AppItem, long> _appItemRepository;
@@ -4580,65 +4580,6 @@ namespace onetouch.AppItems
             return x;
 
         }
-
-        public async Task<ExcelTemplateDto> GetImportVideo()
-        {
-            ExcelTemplateDto itemExcelTemplateDto = new ExcelTemplateDto();
-            itemExcelTemplateDto.ExcelTemplatePath = "";
-            try
-            {
-
-                string directory = _appConfiguration[$"Templates:ImportVideo"];
-                if (!System.IO.Directory.Exists(directory))
-                { System.IO.Directory.CreateDirectory(directory); }
-
-                #region delete old files
-                //string[] listFiles = System.IO.Directory.GetFiles(directory);
-
-                //foreach (string file in listFiles)
-                //{
-
-                //    try
-                //    {
-                //        TimeSpan createdSince = (DateTime.Now - System.IO.File.GetCreationTime(file));
-                //        if (createdSince.TotalHours >= 1)
-                //        {
-                //            System.IO.File.Delete(file);
-                //        }
-                //    }
-                //    catch (Exception ex)
-                //    {
-
-                //    }
-                //}
-
-                #endregion delete old files
-
-                #region get new file name
-                string templateFileName = _appConfiguration[$"Templates:ImportVideoAssets"];
-                string newFileName = Path.GetFileName(templateFileName);
-                #endregion get new file name
-
-                string newFilePath = directory + @"\" + newFileName;
-                if (!System.IO.File.Exists(newFilePath))
-                {
-                    System.IO.File.Copy(System.IO.Directory.GetCurrentDirectory() + _appConfiguration[$"Templates:ImportVideoAssets"], newFilePath);
-                }
-
-                itemExcelTemplateDto.ExcelTemplatePath = directory.Replace(_appConfiguration[$"ItemTemplates:ExcelTemplateOmitt"], "").Replace(@"\", "/");
-                itemExcelTemplateDto.ExcelTemplateFile = newFileName;
-                itemExcelTemplateDto.ExcelTemplateFullPath = itemExcelTemplateDto.ExcelTemplatePath + @"/" + itemExcelTemplateDto.ExcelTemplateFile;
-
-
-            }
-            catch (Exception ex)
-            {
-                string xx = ex.Message;
-            }
-
-            return itemExcelTemplateDto;
-        }
-
 
 
         //Mariam[Start]
