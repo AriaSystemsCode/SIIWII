@@ -1053,13 +1053,13 @@ namespace onetouch.AppItems
                             firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
                         var firstItem = varAppItems.FirstOrDefault();
-                        List<string> attributeValues = firstItem.EntityFk.EntityExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
-                        List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
-                        var firstAttributeID = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
+                        List<string> attributeValues = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.EntityObjectTypeCode).Distinct().ToList();
+                        List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.AttributeId.ToString()).Distinct().ToList();
+                        var firstAttributeID = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
                             .FirstOrDefault().ToString();
                         var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
                         var firstAttributeValue = firstItem.EntityFk.EntityExtraData
-                            .WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId))
+                            .WhereIf(!string.IsNullOrEmpty(firstAttributeID), a => a.AttributeId == long.Parse(firstAttributeID))
                             .Where(x=>!string.IsNullOrEmpty(x.EntityObjectTypeCode)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
                         //var firstattributeValues1 = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID1)).Select (z=> z.AttributeValue)).Distinct().ToList ();
                         var firstattributeValues = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
