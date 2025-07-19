@@ -80,7 +80,7 @@ using onetouch.AppSubScriptionPlan;
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
-    public partial class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IExcelImporter<AppItemExcelResultsDTO>
+    public partial class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IAppItemsAppImportService, IExcelImporter<AppItemExcelResultsDTO>
     {
 
         public async Task<ExcelTemplateDto> GetImportVideo()
@@ -140,7 +140,13 @@ namespace onetouch.AppItems
 
             return itemExcelTemplateDto;
         }
+        public async Task<ImportItemInputDto> ValidateExcelV2(string guidFile, string[] imagesList)
+        {
+           var x  = await ValidateExcel(guidFile, imagesList);
 
+            return x;
+        }
 
     }
-}
+
+ }
