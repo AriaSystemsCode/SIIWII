@@ -35,6 +35,10 @@ using System.Reflection.Metadata.Ecma335;
 using onetouch.AccountInfos.Dtos;
 using onetouch.Common;
 using Abp.Collections.Extensions;
+using Microsoft.Extensions.Configuration;
+using NPOI.Util;
+using Stripe;
+using System.Reflection;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -54,6 +58,7 @@ namespace onetouch.AppMarketplaceAccounts
         private readonly IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> _appMarketplaceAccountsPriceLevelsRepo;
         private const int MaxProfilPictureBytes = 5242880;
         private readonly IBinaryObjectManager _binaryObjectManager;
+        
 
         public MarketplaceAccountsAppService(
               IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
@@ -78,6 +83,7 @@ namespace onetouch.AppMarketplaceAccounts
             )
 
         {
+           
             _tenantManager = tenantManager;
             _appContactRepository = appContactRepository;
             _iAccountsAppService = iAccountsAppService;
@@ -545,6 +551,7 @@ namespace onetouch.AppMarketplaceAccounts
         private readonly IRepository<AppEntity, long> _appEntityRepository;
         private readonly Helper _helper;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
+        private readonly IConfigurationRoot _appConfiguration;
         public CreateMarketplaceAccount(IRepository<AppMarketplaceContact
             , long> appMarketplaceContactRepository
             , Helper helper
@@ -555,8 +562,10 @@ namespace onetouch.AppMarketplaceAccounts
             , IRepository<AppContact, long> appContactRepository
             , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository
             , IRepository<AppEntityAttachment, long> appEntityAttachmentsRepository
-            , IRepository<AppAttachment, long> appAttachmentsRepository)
+            , IRepository<AppAttachment, long> appAttachmentsRepository
+            , IAppConfigurationAccessor appConfigurationAccessor)
         {
+            _appConfiguration = appConfigurationAccessor.Configuration;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _helper = helper;
             _appContactRepository = appContactRepository;
@@ -582,7 +591,38 @@ namespace onetouch.AppMarketplaceAccounts
             catch (Exception ex)
             { return false; }
         }
+        //I40-Mariam[Start]
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        {
+            if (sourceTenantId == null) sourceTenantId = -1;
+            if (distinationTenantId == null) distinationTenantId = -1;
 
+            var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
+            var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId);
+            }
+
+            try
+            {
+                System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    System.IO.File.Copy(pathSource.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+                }
+                catch (Exception ex1)
+                {
+
+                }
+            }
+        }
+        //I40-Mariam[End]
         public async Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input, bool sync)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -715,7 +755,9 @@ namespace onetouch.AppMarketplaceAccounts
                 var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
 
-                var foundContactInfo = _appContactRepository.GetAll().Include(e=> e.EntityFk).ThenInclude(e=> e.EntityExtraData).FirstOrDefault(e => e.Id == input.Id);
+                var foundContactInfo = _appContactRepository.GetAll().Include(e=> e.EntityFk).ThenInclude(e=> e.EntityExtraData)
+                    .Include(e => e.EntityFk).ThenInclude(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                    .FirstOrDefault(e => e.Id == input.Id);
 
                 ObjectMapper.Map(input, appMarketplaceContact);
                 appMarketplaceContact.Id = 0;
@@ -757,8 +799,40 @@ namespace onetouch.AppMarketplaceAccounts
 
                     appMarketplaceContact.EntityExtraData.Add(appEntityExtraDto);
                 }
+                //I40 -MMT  -Account Attachment[Start]
+                appMarketplaceContact.EntityAttachments = new List<AppEntityAttachment>();
+                if (foundContactInfo.EntityFk.EntityAttachments != null)
+                {
+                    foreach (var parentAttachObj in foundContactInfo.EntityFk.EntityAttachments)
+                    {
+                        AppEntityAttachment parentAttach = new AppEntityAttachment();
+                        Type type = typeof(AppEntityAttachment);
+                        ConstructorInfo constructor = type.GetConstructors()[0];
+                        PropertyInfo[] properties = type.GetProperties();
+                        object[] constructorArgs = new object[properties.Length];
+                        for (int i = 0; i < properties.Length; i++)
+                        {
+                            parentAttach.GetType().GetProperty(properties[i].Name).SetValue(parentAttach,properties[i].GetValue(parentAttachObj));
+                        }
+                       // parentAttach = (AppEntityAttachment)constructor.Invoke(constructorArgs);
+                        parentAttach.Id = 0;
+                        parentAttach.AttachmentId = 0;
+                        //parentAttach.AttachmentFk.Id = 0;
+                        parentAttach.EntityId = 0;
+                        parentAttach.EntityFk = null;
+                        parentAttach.AttachmentFk = new AppAttachment();
+                        parentAttach.AttachmentFk.TenantId = null;
+                        parentAttach.AttachmentFk.Attachment = parentAttachObj.AttachmentFk.Attachment;
+                        parentAttach.AttachmentFk.Id = 0;
+                        parentAttach.AttachmentFk.Code  = parentAttachObj.AttachmentFk.Code;
+                        parentAttach.AttachmentFk.Name = parentAttachObj.AttachmentFk.Name;
+                        MoveFile(parentAttach.AttachmentFk.Attachment, AbpSession.TenantId, -1);
+                        appMarketplaceContact.EntityAttachments.Add(parentAttach);
+                    }
+                }
+                //I40 -MMT  -Account Attachment[End]
 
-                    long newId = 0;
+                long newId = 0;
                 { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
                 await CurrentUnitOfWork.SaveChangesAsync();
 
@@ -794,7 +868,7 @@ namespace onetouch.AppMarketplaceAccounts
 
         }
 
-
+        
         //public async Task<long> DeleteMarketplaceAccount(long marketplaceAccount)
         //{
         //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
