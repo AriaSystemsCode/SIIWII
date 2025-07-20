@@ -1069,9 +1069,9 @@ namespace onetouch.AppItems
                             firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
                         var firstItem = varAppItems.FirstOrDefault();
-                        List<string> attributeValues = firstItem.EntityFk.EntityExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
-                        List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
-                        var firstAttributeID = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
+                        List<string> attributeValues = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.EntityObjectTypeCode).Distinct().ToList();
+                        List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.AttributeId.ToString()).Distinct().ToList();
+                        var firstAttributeID = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
                             .FirstOrDefault().ToString();
                         var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
                         var firstAttributeValue = firstItem.EntityFk.EntityExtraData
