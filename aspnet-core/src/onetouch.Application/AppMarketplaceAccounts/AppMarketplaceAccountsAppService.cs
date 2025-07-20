@@ -757,6 +757,8 @@ namespace onetouch.AppMarketplaceAccounts
 
                 var foundContactInfo = _appContactRepository.GetAll().Include(e=> e.EntityFk).ThenInclude(e=> e.EntityExtraData)
                     .Include(e => e.EntityFk).ThenInclude(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                    .Include(e => e.EntityFk).ThenInclude(z => z.EntityCategories)
+                    .Include(e => e.EntityFk).ThenInclude(z => z.EntityClassifications)
                     .FirstOrDefault(e => e.Id == input.Id);
 
                 ObjectMapper.Map(input, appMarketplaceContact);
@@ -828,6 +830,44 @@ namespace onetouch.AppMarketplaceAccounts
                         parentAttach.AttachmentFk.Name = parentAttachObj.AttachmentFk.Name;
                         MoveFile(parentAttach.AttachmentFk.Attachment, AbpSession.TenantId, -1);
                         appMarketplaceContact.EntityAttachments.Add(parentAttach);
+                    }
+                }
+                if (foundContactInfo.EntityFk.EntityCategories != null)
+                {
+                    appMarketplaceContact.EntityCategories = new List<AppEntityCategory>();
+                    foreach (var catg in foundContactInfo.EntityFk.EntityCategories)
+                    {
+                        AppEntityCategory category = new AppEntityCategory();
+                        Type type = typeof(AppEntityCategory);
+                        ConstructorInfo constructor = type.GetConstructors()[0];
+                        PropertyInfo[] properties = type.GetProperties();
+                        object[] constructorArgs = new object[properties.Length];
+                        for (int i = 0; i < properties.Length; i++)
+                        {
+                            category.GetType().GetProperty(properties[i].Name).SetValue(category, properties[i].GetValue(catg));
+                        }
+                        category.Id = 0;
+                        category.EntityCode = appMarketplaceContact.Code;
+                        appMarketplaceContact.EntityCategories.Add(category);
+                    }
+                }
+                if (foundContactInfo.EntityFk.EntityClassifications != null)
+                {
+                    appMarketplaceContact.EntityClassifications = new List<AppEntityClassification>();
+                    foreach (var clas in foundContactInfo.EntityFk.EntityClassifications)
+                    {
+                        AppEntityClassification classification = new AppEntityClassification();
+                        Type type = typeof(AppEntityClassification);
+                        ConstructorInfo constructor = type.GetConstructors()[0];
+                        PropertyInfo[] properties = type.GetProperties();
+                        object[] constructorArgs = new object[properties.Length];
+                        for (int i = 0; i < properties.Length; i++)
+                        {
+                            classification.GetType().GetProperty(properties[i].Name).SetValue(classification, properties[i].GetValue(clas));
+                        }
+                        classification.Id = 0;
+                        classification.EntityCode = appMarketplaceContact.Code;
+                        appMarketplaceContact.EntityClassifications.Add(classification);
                     }
                 }
                 //I40 -MMT  -Account Attachment[End]
