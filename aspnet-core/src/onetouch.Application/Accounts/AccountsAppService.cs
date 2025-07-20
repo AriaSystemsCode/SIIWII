@@ -922,12 +922,12 @@ namespace onetouch.Accounts
                 if (output.Account.CoverUrl != null) output.Account.CoverUrl = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.CoverUrl;
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
                 long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
-                !x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
-                if (publishedRecord != null)
-                {
-                    output.IsPublished = true;
-                }
+                //var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
+                //!x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
+                //if (publishedRecord != null)
+                //{
+                //    output.IsPublished = true;
+                //}
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
                 //I46[Start]
                 output.Account.ShipViaId = account.ShipViaId;
@@ -935,6 +935,20 @@ namespace onetouch.Accounts
                 output.Account.PaymentTermsId = account.PaymentTermsId;
                 output.Account.PaymentTermsName = account.PaymentTermsName;
                 //I46[End]
+                var publishedRecord = await _appMarketplaceContactRepository.GetAll()
+                                 .AsNoTracking()
+                                 .FirstOrDefaultAsync(x => x.TenantId == null
+                                 && x.IsProfileData == true
+                                 && x.IsHidden == false
+                                 && x.OwnerId == account.TenantId
+                                 && x.SSIN == account.SSIN);
+                output.IsSync = false;
+                output.IsPublished = false;
+                if (publishedRecord != null)
+                {
+                    output.IsSync = !(publishedRecord.LastModificationTime >= account.LastModificationTime);
+                    output.IsPublished = true;
+                }
                 return output;
             }
         }
