@@ -67,16 +67,16 @@
                                 </div>
                             </div>
                             <!--Sur Name -->
-                            <!-- <div class="form-group row">
+                            <div class="form-group row">
                                 <label for="SurName" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                     <span class="text-danger">*</span>
-                                    {{l("SurName")}}
+                                    {{l("Code")}}
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" id="SurName" class="form-control"  name="SurName" #SurNameInput="ngModel" [(ngModel)]="memberDto.lastName" required [placeholder]="'PleaseEnterSurName' | localize"/>
+                                    <input type="text" id="code" class="form-control"  name="code" #SurNameInput="ngModel" [(ngModel)]="memberDto.code" required [placeholder]="'PleaseEnterSurName' | localize"/>
                                     <validation-messages [formCtrl]="SurNameInput"></validation-messages>
                                 </div>
-                            </div> -->
+                            </div>
                             <!--Email Address-->
                             <div class="form-group row">
                                 <label for="Email" class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -186,7 +186,7 @@
                                         [(ngModel)]="memberDto['phone'+(i+1)+'Number']"
                                     />
                                 </div>
-                                <div class="col-sm-1">
+                                <div class="col-sm-2">
                                         <input type="text" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
                                         minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ext']" />
                                 </div>
@@ -194,7 +194,7 @@
                                     <span class="mr-2">{{ "IsPublic" | localize }}</span>
                                     <p-inputSwitch name="phone{{i+1}}IsPublic" [(ngModel)]="memberDto['phone'+(i+1)+'IsPublic']" ></p-inputSwitch>
                                 </div> -->
-                                <div class="col-sm-2">
+                                <div class="col-sm-1">
                                     <i type="button" *ngIf="phonelist.length < 3 && i == 0" style="size: 10px;" class="fas fa-plus-circle "  (click)="AddPhoneToList()"> </i>
                                     <i type="button" *ngIf="i > 0" style="size: 10px;" class="fas fa-minus-circle " (click)="removePhoneFromList(i)"> </i>
                                 </div>
