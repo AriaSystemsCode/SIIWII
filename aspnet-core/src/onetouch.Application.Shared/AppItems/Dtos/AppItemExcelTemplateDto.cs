@@ -7,7 +7,7 @@ using System.Text;
 using Abp.Extensions;
 namespace onetouch.AppItems.Dtos
 {
-    public class AppItemExcelDto
+    public partial class AppItemExcelDto
     {
         public long Id { get; set; }
         public Int32 rowNumber { get; set; }
