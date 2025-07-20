@@ -359,12 +359,13 @@ button.btn.btn-outline-secondary.button-border.ng-tns-c374-7 {
 }
 
 @media(min-width:1200px) {
-   .kt-portlet-profile {
-      height: 97px;
-   }
+   // .kt-portlet-profile {
+   //    height: 97px;
+   // }
 
    .kt-portlet-profile-portlet__body {
       padding-top: 11px !important;
+      padding-bottom: 0 !important;
    }
 
    .btn-continue {
@@ -725,6 +726,7 @@ select {
 
 .sidebar-grid {
    background-color: #FFFFFF;
+   border-radius: 4px;
 }
 
 .sidebar-item-data {

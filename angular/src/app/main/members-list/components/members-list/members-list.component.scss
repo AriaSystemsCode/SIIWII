@@ -3,7 +3,7 @@
     margin-top: 0!important;
 }
 .toggleView{
-    background-color: $new-primaryColor;
+    // background-color: $new-primaryColor;
 }
 .sortByDd{
     border: 1px solid #d9d9d9;
@@ -14,4 +14,8 @@
 .list-toolbar-btn {
     background-color: #4A0D4A;
     color: #fff !important;
+}
+.list-toolbar-dropdown-filter-selectedItem {
+    font-weight: 700;
+    color: #1B101B;
 }
