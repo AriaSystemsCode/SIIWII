@@ -6,34 +6,51 @@
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body" [ngClass]="fromOverview ? 'p-0':''">
                         <div class="row">
-
-                            <div *ngIf="accounts  && accounts?.length>0 && accountsTypes && accountsTypes?.length>0 && !fromOverview"
-                                class="row">
-                                <input type="radio" class="inputAll" id="all" name="option" [checked]="connectionTypeId ==0" />
-                                <label for="all" (click)="setConnectionType(0)" class="mr-1">All</label> <span
-                                    style="color:rgba(238, 238, 238, 1); width: 2px ; height: 42px;"> | </span>
-
-                                <div *ngFor="let accountsType of accountsTypes; let i = index; let last = last">
-                                    <div
-                                        *ngIf=" (accountsType.code?.toUpperCase() != 'GROUP') || (accountsType.code?.toUpperCase() == 'GROUP'  && accountDataForView?.accountType?.toUpperCase()!= 'GROUP' &&  loginAccoutType?.toUpperCase()!= 'GROUP') ">
-                                        <input type="radio" id="{{accountsType.code}}" name="option" />
-                                        <label for="{{accountsType.code}}"
-                                            (click)="setConnectionType(accountsType.value)">
-                                            {{accountsType.code?.toUpperCase() == 'BUSINESS' ? 'Businesses' :
-                                            accountsType.code?.toUpperCase() == 'GROUP' ? 'Groups' :
-                                            accountsType.code?.toUpperCase() == 'PERSONAL' ? 'People' :
-                                            accountsType.code }}</label>
-                                        <span *ngIf="!last"
-                                            style="color:rgba(238, 238, 238, 1); width: 2px; height: 42px;"> | </span>
-                                    </div>
-                                </div>
-                            </div>
+                            <div *ngIf="accounts?.length > 0 && accountsTypes?.length > 0 && !fromOverview" class="d-flex align-items-center flex-wrap">
+                                <!-- All Button -->
+                                <button
+                                  type="button"
+                                  class="btn btn-sm mx-1"
+                                  [ngClass]="{ 'btPurble': connectionTypeId === 0, 'btn-outline-secondary': connectionTypeId !== 0 }"
+                                  (click)="setConnectionType(0)">
+                                  All
+                                </button>
+                                <span class="separator" *ngIf="accountsTypes.length > 0">|</span>
+                              
+                                <!-- Account Type Buttons -->
+                                <ng-container *ngFor="let accountsType of accountsTypes; let i = index">
+                                  <ng-container *ngIf="accountsType.code?.toUpperCase() !== 'GROUP' || 
+                                                       (accountsType.code?.toUpperCase() === 'GROUP' && accountDataForView?.accountType?.toUpperCase() !== 'GROUP' && loginAccoutType?.toUpperCase() !== 'GROUP')">
+                                    
+                                    <button
+                                      type="button"
+                                      class="btn btn-sm mx-1"
+                                      [ngClass]="{ 
+                                        'btPurble': connectionTypeId === accountsType.value, 
+                                        'btn-outline-secondary': connectionTypeId !== accountsType.value 
+                                      }"
+                                      (click)="setConnectionType(accountsType.value)">
+                                      {{
+                                        accountsType.code?.toUpperCase() === 'BUSINESS' ? 'Businesses' :
+                                        accountsType.code?.toUpperCase() === 'GROUP' ? 'Groups' :
+                                        accountsType.code?.toUpperCase() === 'PERSONAL' ? 'People' :
+                                        accountsType.code
+                                      }}
+                                    </button>
+                              
+                                    <span
+                                      class="separator"
+                                      *ngIf="i < accountsTypes.length - 1 ">|</span>
+                                  </ng-container>
+                                </ng-container>
+                              </div>
+                              
 
 
                             <div class="col-12" [ngClass]="fromOverview ? 'pr-0':''">
                                 <div *ngIf="!fromOverview&&accounts?.length>0"
-                                    class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
+                                    class="d-flex justify-content-between align-items-center my-2">
+                                    <div class="  list-toolbar-data-summary " *ngIf="active">
                                         {{
                                         paginator.getPage() *
                                         primengTableHelper.defaultRecordsCountPerPage
@@ -101,7 +118,7 @@
                                 </div>
                                 <div class="col d-flex flex-column justify-content-between">
 
-                                    <div class="row " [ngClass]="fromOverview ? 'p-0':' pl-5 pr-2'">
+                                    <div class="row " [ngClass]="fromOverview ? 'p-0':' '">
                                         <div *ngFor="
                                                 let account of accounts;
                                                 index as i;

@@ -10,7 +10,7 @@ import {  finalize, Observable } from 'rxjs';
 @Component({
   selector: 'app-connections-tab',
   templateUrl: './connections-tab.component.html',
-  styleUrls: ['../../../accounts/account-shared/components/accounts/accounts.component.scss','./connections-tab.component.scss'],
+  styleUrls: ['../../../../accounts/account-shared/components/accounts/accounts.component.scss','./connections-tab.component.scss'],
   providers:[MarketplaceAccountsServiceProxy]
 })
 export class ConnectionsTabComponent extends AppComponentBase {
