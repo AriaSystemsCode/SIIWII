@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto, GetAllEntityObjectTypeOutput, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -9,6 +9,8 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Observable } from 'rxjs';
 import { SelectBranchModalComponent } from '@app/select-branch/select-branch-modal/select-branch-modal.component';
 import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-user-modal.component';
+import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
+import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 
 @Component({
     selector: 'app-view-member-profile',
@@ -30,7 +32,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     
     editMode = false;
-    memberData: ContactForEditDto;
+    memberData: CreateOrEditAccountInfoDto;
     newEditMemberInfo: ContactDto;
     canEdit: boolean;
     canDelete: boolean;
@@ -50,12 +52,30 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     Editting:boolean =false;
     adminContact:boolean =false;
-    constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy) {
+
+    
+        data:any
+        allAttributes = []; // flat list from API
+        groupedByUsage = {}; // { RECOMMENDED: [], ADDITIONAL: [] }
+        usageList: string[] = []; // for sidebar
+        selectedUsage: string;
+    
+    
+          selectedTransactionTypeData: GetAllEntityObjectTypeOutput =
+            new GetAllEntityObjectTypeOutput();
+            selectedTransTypeData:any
+          extraAttributes: any;
+    
+          activeAccordionIndexes: number[] = [0]; // open first tab by default
+          appTransactionsForViewDto:any
+          hasUnsavedChanges = false;
+    constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,        private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,) {
         super(injector);
         this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
     }
     ngOnInit() {
+        this.getAppItemTypeExtraAttributesById()
         this.getAllAttachmentCategories()
 
     }
@@ -106,21 +126,22 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.Editting=false;
         this.showMainSpinner()
 
-        this._AccountsServiceProxy.getContactForView(input.id)
+        this._AccountsServiceProxy.getAppContactForView(input.id)
             .pipe(finalize(() => {
                 this.hideMainSpinner()
                 this.active = true
 
             }))
             .subscribe((result) => {
+                console.log(result,'coooooooooon')
                 this.memberData = result;
-                this.adminContact =   this.memberData?.contact.userName.includes("admin");
-                const firstName = this.memberData.contact.firstName
-                const lastName = this.memberData.contact.lastName
-                this.contactDisplayName = firstName ? firstName : ""
-                this.contactDisplayName += lastName ? " " + lastName : ""
-                if (this.memberData?.imageUrl) this.logoPhoto = this.attachmentBaseUrl + '/' + this.memberData?.imageUrl;
-                if (this.memberData?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + this.memberData?.coverUrl;
+                // this.adminContact =   this.memberData?.contact.userName.includes("admin");
+                // const firstName = this.memberData.contact.firstName
+                // const lastName = this.memberData.contact.lastName
+                // this.contactDisplayName = firstName ? firstName : ""
+                // this.contactDisplayName += lastName ? " " + lastName : ""
+                // if (this.memberData?.imageUrl) this.logoPhoto = this.attachmentBaseUrl + '/' + this.memberData?.imageUrl;
+                // if (this.memberData?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + this.memberData?.coverUrl;
             });
     }
 
@@ -228,4 +249,85 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             this.oldEditBranchValue =this.editBranchValue;
     }
 
+            
+        defineExtraAttributes() {
+          this.extraAttributes = {};
+        
+          const allAttributes = this.selectedTransTypeData?.extraAttributes?.extraAttributes ?? [];
+        
+          allAttributes.forEach(attr => {
+            const usageKey = attr.usage?.replace(/\s+/g, '_').toUpperCase() || 'DEFAULT';
+        
+            if (!this.extraAttributes[usageKey]) {
+              this.extraAttributes[usageKey] = new CreateEditAppItemExtraAttribute({
+                header: this.l(attr.usage),
+                title: this.l(attr.usage),
+                usageEnum: usageKey as unknown as EExtraAttributeUsage,
+                orderOfDisplay: 1,
+                filteredExtraAttributes: [],
+                extraAttributes: []
+              });
+            }
+        
+            // ✅ Add this if missing
+            if (!attr.paginationSetting) {
+              attr.paginationSetting = {
+                skipCount: 0,
+                maxResultCount: 10,
+                totalCount: 0,
+                list: []
+              };
+            }
+         
+              
+              
+            this.extraAttributes[usageKey].filteredExtraAttributes.push(attr);
+          });
+        
+        }
+        
+        getAppItemTypeExtraAttributesById() {
+            this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(21)
+              .subscribe((res) => {
+                if (res?.length > 0) {
+                  this.allAttributes = res[0]?.extraAttributes.extraAttributes;
+          
+                  // Group attributes by `usage`
+                  this.groupedByUsage = this.groupAttributesByUsage(this.allAttributes);
+                  this.usageList = Object.keys(this.groupedByUsage);
+                  this.selectedUsage = this.usageList[0];
+          
+                  // ✅ Initialize extraAttributes before using it
+                  this.selectedTransTypeData = res[0]; // ensure defineExtraAttributes uses correct data
+                  this.defineExtraAttributes();
+          
+                //   this.loadRecommendedAndAdditionalExtraDataLookupLists();
+        
+                //   setTimeout(() => this.scrollToUsage(this.selectedUsage), 200);
+                }
+              });
+          }
+
+
+
+
+
+
+
+
+
+          groupAttributesByUsage(attrs: any[]): any {
+            return attrs.reduce((acc, attr) => {
+              const usage = attr.usage || 'UNSPECIFIED';
+              if (!acc[usage]) acc[usage] = [];
+              acc[usage].push(attr);
+              return acc;
+            }, {});
+          }
+        
+          selectUsage(usage: string): void {
+            this.selectedUsage = usage;
+          }
+          
+        
 }

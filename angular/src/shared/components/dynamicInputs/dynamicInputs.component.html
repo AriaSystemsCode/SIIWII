@@ -58,7 +58,7 @@
                         </div>
 
                         <div class="flex-grow-1 position-relative"
-                            *ngIf="extraAttr.dataType === 'String' && !extraAttr.isLookup">
+                            *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
                             <input type="text" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
                                 class="form-control" [(ngModel)]="extraAttr.selectedValues"
                                
@@ -95,7 +95,7 @@
                         </div>
 
 
-                        <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'DATE'">
+                        <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                                 [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name"
                                 (ngModelChange)="onAnyInputChange()" appendTo="body" 
