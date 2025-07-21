@@ -44,7 +44,8 @@ namespace onetouch.Accounts
         Task<PagedResultDto<LookupAccountOrTenantDto>> GetTenantsWithManualAccounts(GetTenantsWithManualAccounts input);
 		Task<PagedResultDto<LookupAccountOrTenantDto>> GetAccountByType(GetAccountsForDropdownInputDto input);
 		Task<long> CreateOrUpdateAccountFromSourceAccount(CreateAccountsInputDto input);
-        //I40[Start]
+		//I40[Start]
+		Task<CreateOrEditAccountInfoDto> GetAppContactForView(long input);
         Task<ContactDto> CreateOrUpdateContact(CreateOrEditAccountInfoDto accountDto);
         //I40[End]
     

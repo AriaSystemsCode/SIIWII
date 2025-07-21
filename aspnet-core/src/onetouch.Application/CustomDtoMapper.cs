@@ -1118,6 +1118,12 @@ namespace onetouch
                 .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
                 ;
             //I46
+            //I40[Start]
+            configuration.CreateMap<AppContact, CreateOrEditAccountInfoDto>()
+             .ForMember(d => d.EntityExtraData,s=> s.MapFrom(ss => ss.EntityFk.EntityExtraData))
+             .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments))
+             .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses ))             ;
+            //I40[End]
         }
     }
 }

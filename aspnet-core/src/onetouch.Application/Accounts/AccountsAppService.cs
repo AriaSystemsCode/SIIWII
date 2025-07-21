@@ -700,18 +700,18 @@ namespace onetouch.Accounts
                                select new GetMemberForViewDto()
                                {
                                    Id = o.Id,
-                                   FirstName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue,
-                                   SurName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue,
-                                   JobTitle = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue==null ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue,
+                                   FirstName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue) ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue,
+                                   SurName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue) ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue,
+                                   JobTitle = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue== null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue) ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue,
                                    EMailAddress = o.EMailAddress == null ? "" : o.EMailAddress,
                                    AccountName = o.AccountFk.Name,
                                    //MMT222
                                    //JoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null ? DateTime.Now : DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue),
-                                   JoinDate = (o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue ==null) ? DateTime.Now : (DateTime.TryParse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue, out jDate) ? DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue) : DateTime.Now),
+                                   JoinDate = (o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue)) ? DateTime.Now : (DateTime.TryParse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue, out jDate) ? DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue) : DateTime.Now),
                                    //MMT222
                                    //IsPublicJoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic") == null ? false : bool.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic").AttributeValue),
                                    IsActive = false,
-                                   UserId = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue ==null ? 0 : long.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue),
+                                   UserId = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue ==null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue) ? 0 : long.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue),
                                    ImageUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                             ""
                                             : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment
@@ -2343,7 +2343,8 @@ namespace onetouch.Accounts
             if (input.ReturnId)
             { newId = await _appEntitiesAppService.SaveContact(contact); }
             else
-            { await _appEntitiesAppService.SaveContact(contact); }
+            {
+                newId = await _appEntitiesAppService.SaveContact(contact); }
 
             await CurrentUnitOfWork.SaveChangesAsync();
             await CreateAdminContact();
@@ -3663,6 +3664,8 @@ namespace onetouch.Accounts
         private async Task<bool> PublishMember(long contactId)
         {
             var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contactId && x.IsProfileData == true);
+            if (contact == null)
+                return false;
             var entity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                 .Include(x => x.EntityExtraData)
@@ -4534,6 +4537,23 @@ namespace onetouch.Accounts
                 return output;
             }
         }
+        //I40-[Start]
+        public async Task<CreateOrEditAccountInfoDto> GetAppContactForView(long input)
+        {
+            CreateOrEditAccountInfoDto returnObject = new CreateOrEditAccountInfoDto();
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var contact = await _appContactRepository.GetAll()
+              .Include(x => x.EntityFk.EntityExtraData)
+              .Include(x => x.EntityFk.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+              .Where(x => x.Id == input).FirstOrDefaultAsync();
+               if(contact !=null)
+                returnObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contact);
+
+            }
+            return returnObject;
+        }
+        //I40-[End]
         //Mariam[Start]
         //[AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
@@ -4586,7 +4606,7 @@ namespace onetouch.Accounts
                 .Include(x => x.EntityFk.EntityExtraData)
                 .Include(x => x.EntityFk.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 .Where(x => x.Id == input).FirstOrDefaultAsync();
-
+                
                 var output = new ContactDto();
                 output = ObjectMapper.Map<ContactDto>(contact);
                 output.FirstName = contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null ? "" : contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue;
@@ -4604,34 +4624,43 @@ namespace onetouch.Accounts
                 if (output.JoinDate == new DateTime(1, 1, 1)) output.JoinDate = DateTime.Now;
                 //MMT22
                 output.LanguageIsPublic = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 708) != null &&
-                                          contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 708).AttributeValue != null)
+                                          contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 708).AttributeValue != null &&
+                                          !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 708).AttributeValue))
                                           ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 708).AttributeValue) : true;
                 output.EmailAddressIsPublic = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 709) != null &&
-                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 709).AttributeValue != null)
+                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 709).AttributeValue != null &&
+                    !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 709).AttributeValue))
                     ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 709).AttributeValue) : true;
                 output.Phone1IsPublic = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 710) != null &&
-                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 710).AttributeValue != null)
+                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 710).AttributeValue != null &&
+                    !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 710).AttributeValue))
                     ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 710).AttributeValue) : true;
                 output.Phone2IsPublic = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 711) != null &&
-                                contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 711).AttributeValue != null)
+                                contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 711).AttributeValue != null &&
+                                !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 711).AttributeValue))
                                 ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 711).AttributeValue) : true;
                 output.Phone3IsPublic = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 712) != null &&
-                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 712).AttributeValue != null)
+                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 712).AttributeValue != null &&
+                    !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 712).AttributeValue))
                     ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 712).AttributeValue) : true;
                 output.JoinDateIsPublic = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713) != null &&
-                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713).AttributeValue != null)
+                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713).AttributeValue != null &&
+                    !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713).AttributeValue))
                     ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713).AttributeValue) : true;
                 //  }
                 output.UserId = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) != null &&
-                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue != null)
+                    contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue != null &&
+                    !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue))
                     ? long.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue) : 0;
                 if (output.UserId != 0)
                 {
                     output.UserName = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703) != null &&
-                        contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue != null)
+                        contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue != null &&
+                        !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue))
                         ? contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue : "";
                     output.UserNameIsPublic = (contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714) != null &&
-                        contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714).AttributeValue != null) ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714).AttributeValue) : true;
+                        contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714).AttributeValue != null &&
+                        !string.IsNullOrEmpty(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714).AttributeValue)) ? bool.Parse(contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714).AttributeValue) : true;
                 }
                 if (output.LanguageId != null)
                 {
@@ -5358,6 +5387,7 @@ namespace onetouch.Accounts
             }
             accountDto.TenantId = AbpSession.TenantId;
             accountDto.UseDTOTenant = true;
+            accountDto.AccountLevel = AccountLevelEnum.Manual;
             var output = await CreateOrEditAccount(accountDto);
             if (output != null && output.AccountInfo.Id != null)
             {
@@ -5367,7 +5397,10 @@ namespace onetouch.Accounts
                 var contact = await _appContactRepository.GetAll().Include(z => z.EntityFk).Where(z => z.Id == output.AccountInfo.Id).FirstOrDefaultAsync();
                 if (contact != null)
                 {
-                    var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
+                    var account = _appContactRepository.GetAll()
+                        .WhereIf(accountDto.AccountId != null, z=> z.TenantId == AbpSession.TenantId && z.Id== accountDto.AccountId)
+                        .WhereIf(accountDto.AccountId == null, x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null)
+                        .FirstOrDefault();
                     if (account != null)
                     {
                         contact.EntityFk.ObjectId = contactObjectId;
