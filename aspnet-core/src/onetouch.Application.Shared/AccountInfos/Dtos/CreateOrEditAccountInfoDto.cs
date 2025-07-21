@@ -94,6 +94,9 @@ namespace onetouch.AccountInfos.Dtos
         public long? CurrencyId { get; set; }
 
         public long? LanguageId { get; set; }
+        //I40[Start]
+        public string LanguageCode { get; set; }
+        //I40[End]
         public long? EntityId { get; set; }
         public int? TenantId { get; set; }
         public int? AttachmentSourceTenantId { get; set; }
@@ -119,6 +122,7 @@ namespace onetouch.AccountInfos.Dtos
         //I46[Start]
         public virtual long? ShipViaId { set; get; }
         public virtual long? PaymentTermsId { set; get; }
+        public List<ExtraDataAttrDto> ExtraDataAttributes { get; set; }
         //I46[End]
     }
 }

@@ -92,5 +92,8 @@ namespace onetouch.AppEntities
 		Task<List<LookupLabelDto>> GetAllUOMForTableDropdown();
 		//Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown();
 		//MMT-43
+		//I40[Start]
+		Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId);
+		//I40[End]
     }
 }
