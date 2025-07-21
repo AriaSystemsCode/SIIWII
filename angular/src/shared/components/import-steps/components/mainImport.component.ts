@@ -11,7 +11,7 @@ import { uploadStatusComponent } from "./uploadStatus.component";
 import { ImageFile } from "../models/imageFile.model";
 import { upperCase } from "lodash";
 import { isEmpty } from "lodash";
-import { imageCroppingComponent } from "./imageCropping.Component";
+import { imageCroppingComponent } from "./imageCropping.component";
 import { autoCropComponent } from "./autoCrop.component";
 import { MainImportService } from "../services/mainImport.service";
 import { importConfirmationComponent } from "./importConfirmation.component";
@@ -53,7 +53,7 @@ export class MainImportComponent
     @ViewChild("successfullyImportModal", { static: true })
     successfullyImportModal: successfullyImportComponent;
 
-   
+
     //Step1
     UploadedFolder: File[] = [];
     imagesName: string[] = [];
@@ -102,7 +102,7 @@ export class MainImportComponent
     serviceUtilitesProxy: any;
     serviceUtilites: any;
     sycAttachmentCategory: { [key: string]: SycAttachmentCategoryDto };
-    skipAutoCropModal:boolean;
+    skipAutoCropModal: boolean;
     hasImages: boolean;
     currentStep: ImportStepInfo;
     importStepsInfo: ImportStepInfo[];
@@ -110,8 +110,12 @@ export class MainImportComponent
 
     @ViewChild("videoModal", { static: true })
     videoModal: videoTutorialComponent;
-    updateLookups:boolean=false;
-    folder_details:boolean=false;
+    updateLookups: boolean = false;
+    folder_details: boolean = false;
+    imData: boolean = false;
+    imImages: boolean = false;
+    invalidImport: boolean = false;
+    limitImImages = 100;
 
     public constructor(
         private _httpClient: HttpClient,
@@ -127,13 +131,15 @@ export class MainImportComponent
     }
 
     async show(importType: ImportTypes, importService: any, serviceUtilites: any, attachmetnCategoriesCodes: string[], hasImages: boolean, importStepsInfo: ImportStepInfo[]) {
+       this.invalidImport=false;
         this.importStepsInfo = importStepsInfo;
         this.guids = [];
         this.hasImages = hasImages;
-        this.skipAutoCropModal=false;
-        this.Previous=false;
+        this.skipAutoCropModal = false;
+        this.Previous = false;
         this.sycAttachmentCategory = {};
         if (attachmetnCategoriesCodes) {
+            //i44 only "jpg & png" images
             this.getSycAttachmentCategoriesByCodes(attachmetnCategoriesCodes).subscribe((result) => {
                 result.forEach(attach => {
                     var aspectRatioNumbers = attach.aspectRatio.split(":");
@@ -184,35 +190,108 @@ export class MainImportComponent
         this.UploadedFolder = $event;
         this.uploadUrl = "/Attachment/UploadFiles";
         this.uploader = this.createUploader(this.uploadUrl);
-        for (let i = 0; i < this.UploadedFolder.length; i++) {
-            var file = this.UploadedFolder[i];
+        let hasExcelFile = false;
+        let hasImageFile = false;
+        let invalidImagesCount = 0;
+        let totalImageFiles = 0;
 
-            if (file.type.includes("image") && this.hasImages) {
-                if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "image")) {
-                    this.imagesName.push(file.name.toUpperCase());
-                    var imgFile = new ImageFile();
-                    imgFile.file = file;
-                    this.imagesList.push(imgFile);
-                }
-            }
 
-            if (file.type.includes("sheet")) {
-                this.uploader.addToQueue(new Array<File>(file));
+        if (this.imImages) {
+            let limitUploadImage = this.imData ? this.limitImImages + 1 : this.limitImImages;
+
+            if (this._totalFiles > limitUploadImage) {
+                this.invalidImport = true;
+                Swal.fire(
+                    " ",
+                    "Image files limit is " + this.limitImImages + " files per import session, can not import.",
+                    "error"
+                );
+                return;
             }
         }
-        if (this.uploader.queue.length == 0) {
+
+        for (let i = 0; i < this.UploadedFolder.length; i++) {
+            const file = this.UploadedFolder[i];
+
+            if (this.imData && file.type.includes("sheet")) {
+                hasExcelFile = true;
+                this.uploader.addToQueue(new Array<File>(file));
+            }
+
+            if (this.imImages && file.type.includes("image")) {
+                hasImageFile = true;
+                if (file.type.includes("image") && this.hasImages) {
+                    totalImageFiles++;
+                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "image")) {
+                        this.imagesName.push(file.name.toUpperCase());
+                        var imgFile = new ImageFile();
+                        imgFile.file = file;
+                        this.imagesList.push(imgFile);
+                    }
+                    else
+                        invalidImagesCount++;
+                }
+            }
+        }
+
+
+
+        if (this.imData && !hasExcelFile) {
+            this.invalidImport = true;
+            Swal.fire(
+                " ",
+                "Folder doesn't contain the Import " + ImportTypes[this.importType]  + " Excel Template file, can not import.",
+                "error"
+            );
+            return;
+        }
+
+        if (this.imImages && !hasImageFile) {
+            this.invalidImport = true;
+            Swal.fire(
+                " ",
+                "Folder doesn't contain Image files, can not import.",
+                "error"
+            );
+            return;
+        }
+
+        if(this.imImages){
+            if (invalidImagesCount === totalImageFiles && totalImageFiles > 0) {
+                this.invalidImport = true;
+                Swal.fire(
+                    " ",
+                     "Image format is not supported ,the supported formats are JPG and PNG",
+                    "error"
+                );
+                return;
+            }
+             else if (invalidImagesCount > 0) {
+                Swal.fire(
+                    " ",
+                    "Image files should be of (PNG) or (JPG) formats , all other file formats will be neglected",
+                    "warning"
+                );
+            
+            }
+        }
+
+        if (this.uploader.queue.length == 0 && this.imData) {
+            this.invalidImport = true;
             var _fileName = "";
             _fileName = ImportTypes[this.importType] + ".xlsx";
 
-
             Swal.fire(
                 " ",
-                "Folder not have excel file with name " +
+                "Folder doesn't contain excel file with name " +
                 _fileName +
                 ", can not import.",
                 "error"
             );
-        } else {
+            return;
+        }
+
+        if (!this.invalidImport) {
             this.uploader.onSuccessItem = (item, response, status) => {
                 const ajaxResponse = <IAjaxResponse>JSON.parse(response);
                 if (ajaxResponse?.success) {
@@ -220,7 +299,7 @@ export class MainImportComponent
                         this.CheckRatio();
                     }, 0);
 
-                  this.ProgressModal.hide();
+                    this.ProgressModal.hide();
                     this.spinnerService.show();
                     this.importServiceProxy
                         .validateExcel(this._guid, this.imagesName)
@@ -239,11 +318,11 @@ export class MainImportComponent
                             } else {
                                 this.uploadingResult = result;
                                 this.goNext();
-                                if(this.hasImages){
-                                let ret = this.serviceUtilitesProxy.checkImagesExistance(result, this.imagesList, this.sycAttachmentCategory);
-                                this.imagePassed = ret.imagePassed;
-                                this.imageFailed = ret.imageFailed;
-                                this.failedImagesIndex = ret.failedImagesIndex;
+                                if (this.hasImages) {
+                                    let ret = this.serviceUtilitesProxy.checkImagesExistance(result, this.imagesList, this.sycAttachmentCategory);
+                                    this.imagePassed = ret.imagePassed;
+                                    this.imageFailed = ret.imageFailed;
+                                    this.failedImagesIndex = ret.failedImagesIndex;
                                 }
                             }
                         });
@@ -258,14 +337,14 @@ export class MainImportComponent
             };
 
             this.uploader.uploadAll();
-            this.folder_details=true;
+            this.folder_details = true;
             this.ProgressModal.show();
             this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
             this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
-            this.folder_details=false;
+            this.folder_details = false;
             this.uploader.onProgressAll = (progress) => {
                 this.progress = progress;
-                
+
             };
 
             this.uploader.onCompleteAll = () => {
@@ -313,11 +392,11 @@ export class MainImportComponent
 
     onautoCrop($event: any) {
         this.autoCrop = $event;
-        if(!this.Previous)
+        if (!this.Previous)
             this.goNext();
 
-         if( ! (this.finalImages &&  this.finalImages?.length >0 ) )
-         this.finalImages= this.imagesList;
+        if (!(this.finalImages && this.finalImages?.length > 0))
+            this.finalImages = this.imagesList;
 
 
         if (this.finalImages && this.finalImages.length > 0) {
@@ -356,7 +435,7 @@ export class MainImportComponent
 
         isConfirmed.subscribe((res) => {
             if (res) {
-              this.hideAllmodal();
+                this.hideAllmodal();
             }
         }
         );
@@ -367,27 +446,28 @@ export class MainImportComponent
     }
 
     importConfirmationGoBack() {
-            if (this.skipAutoCropModal || !this.hasImages ) {
-                this.Previous = true;
-                this.goPrevious();
-            }
+        if (this.skipAutoCropModal || !this.hasImages) {
+            this.Previous = true;
+            this.goPrevious();
+        }
 
-            else {
-                this.goPrevious();
-                this.OnChange = !this.OnChange;
-                this.imageCroppingModal.show(
-                    this.autoCrop,
-                    this.finalCountPassed,
-                    this.finalCountFailed,
-                    this.importType, this.sycAttachmentCategory
-                );
-            }
+        else {
+            this.goPrevious();
+            this.OnChange = !this.OnChange;
+            this.imageCroppingModal.show(
+                this.autoCrop,
+                this.finalCountPassed,
+                this.finalCountFailed,
+                this.importType, this.sycAttachmentCategory
+            );
+        }
+        
     }
 
     remainingFiles;
-    estimatedRemainingTime= 0 ;
+    estimatedRemainingTime = 0;
     uploadStartTime = Date.now();
-    uploadedFilesCount=1;
+    uploadedFilesCount = 1;
     callImport(iterationNo: number) {
         //this.progress=(this.uploadingResult.toList[iterationNo]*100/this.uploadingResult.totalRecords);
         if (iterationNo === 0) {
@@ -400,25 +480,25 @@ export class MainImportComponent
 
 
         this.ProgressDetail = this.uploadingResult.codesFromList[iterationNo] + "[" + this.uploadingResult.fromList[iterationNo] + "-" + this.uploadingResult.toList[iterationNo] + "]";
-    /*     this.remainingFiles = this.uploadingResult.totalRecords - toValue;
-
-
-        const uploadedSoFar = toValue;
-        this.uploadedFilesCount = Math.floor(uploadedSoFar);
-
-        const now = Date.now();
-        const elapsedSeconds = (now - this.uploadStartTime) / 1000;
+        /*     this.remainingFiles = this.uploadingResult.totalRecords - toValue;
     
-        if (uploadedSoFar > 0) {
-            const avgTimePerFile = elapsedSeconds / uploadedSoFar;
-           const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
-           const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
-           this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes); 
-        } else {
-            this.estimatedRemainingTime = 0;
-        }
- */
+    
+            const uploadedSoFar = toValue;
+            this.uploadedFilesCount = Math.floor(uploadedSoFar);
+    
+            const now = Date.now();
+            const elapsedSeconds = (now - this.uploadStartTime) / 1000;
         
+            if (uploadedSoFar > 0) {
+                const avgTimePerFile = elapsedSeconds / uploadedSoFar;
+               const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
+               const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
+               this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes); 
+            } else {
+                this.estimatedRemainingTime = 0;
+            }
+     */
+
         if (iterationNo < this.uploadingResult.fromList.length) {
             this.uploadingResult.from = this.uploadingResult.fromList[iterationNo]
             this.uploadingResult.to = this.uploadingResult.toList[iterationNo]
@@ -432,7 +512,7 @@ export class MainImportComponent
 
                     if (iterationNo == this.uploadingResult.fromList.length - 1) {
                         this.spinnerService.hide()
-                       this.ProgressModal.hide();
+                        this.ProgressModal.hide();
                     }
 
                 }))
@@ -504,7 +584,7 @@ export class MainImportComponent
         this.changeStep();
     }
 
-    hideAllmodal(){
+    hideAllmodal() {
         this.BrowseModal.hide();
         this.StatusModal.hide();
         //this.AutoCropModal.hide();
@@ -513,7 +593,7 @@ export class MainImportComponent
         this.successfullyImportModal.hide();
         this.ProgressModal.hide();
         this.videoModal.hide();
-        if (this.BrowseModal) 
+        if (this.BrowseModal)
             this.BrowseModal.clearFileInput();
     }
 
@@ -529,114 +609,114 @@ export class MainImportComponent
                 break;
 
             case ImportStepsEnum.AutoCropModalStep:
-                this.skipAutoCropModal=false;
+                this.skipAutoCropModal = false;
                 // if (!this.AutoCropModal.show(this.importType, this.sycAttachmentCategory)) {
-                    this.skipAutoCropModal=true;
-                    if (this.Previous) {
-                        this.Previous = false;
-                       this.goPrevious();
-                    } else this.onautoCrop("false");
+                this.skipAutoCropModal = true;
+                if (this.Previous) {
+                    this.Previous = false;
+                    this.goPrevious();
+                } else this.onautoCrop("false");
                 // }
                 break;
 
             case ImportStepsEnum.imageCroppingModalStep:
-                if (this.skipAutoCropModal && this.Previous) 
+                if (this.skipAutoCropModal && this.Previous)
                     //this.goPrevious();
-                      this.onautoCrop("false");
+                    this.onautoCrop("false");
                 break;
 
             case ImportStepsEnum.importConfirmationModalStep:
                 this.importConfirmationModal.show(this.importType, this.uploadingResult.hasDuplication, this.hasImages);
-            break;
+                break;
 
-            case ImportStepsEnum.successfullyImportModalStep :
-                    this.passedImages = [];
-                    this.uploadingResult.repreateHandler = this.repreateHandler;
-                    //I44 set  updateLookups
-                    //this.uploadingResult.updateLookups  =this.updateLookups;
-        
-                    this.uploadUrl = "/Attachment/UploadFiles";
-        
-                    this.imagesUploader = this.createUploader(this.uploadUrl);
-        
-                    this.finalImages.forEach((image) => {
-                        if (image.finalStatus) {
-                            let file: File;
-                            if (isEmpty(image.croppedbase64)) file = image.file;
-                            else {
-                                let fileAsBlob = <File>(
-                                    base64ToFile(image.croppedbase64)
-                                );
-                                file = new File([fileAsBlob], image.file.name);
-                            }
-        
-                            image.Guid = this.guid();
-                            this.passedImages.push(file);
-                            this.finalUploadedImages.push(image);
-                            this.guids.push(image.Guid);
+            case ImportStepsEnum.successfullyImportModalStep:
+                this.passedImages = [];
+                this.uploadingResult.repreateHandler = this.repreateHandler;
+                //I44 set  updateLookups
+                //this.uploadingResult.updateLookups  =this.updateLookups;
+
+                this.uploadUrl = "/Attachment/UploadFiles";
+
+                this.imagesUploader = this.createUploader(this.uploadUrl);
+
+                this.finalImages.forEach((image) => {
+                    if (image.finalStatus) {
+                        let file: File;
+                        if (isEmpty(image.croppedbase64)) file = image.file;
+                        else {
+                            let fileAsBlob = <File>(
+                                base64ToFile(image.croppedbase64)
+                            );
+                            file = new File([fileAsBlob], image.file.name);
                         }
-                    });
-        
-                    this.imagesUploader.addToQueue(this.passedImages);
-                    this.imagesUploader.onBuildItemForm = (
-                        fileItem: any,
-                        form: any
-                    ) => {
-                        for (let i = 0; i < this.guids.length; i++) {
-                            form.append("guid" + i, this.guids[i]);
-                        }
-                    };
-        
-                    this.ProgressModal.show();
-                   // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
-                    this.progressHeader ="Uploading folder contents";
-                    //this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
-                    this.folder_details=true;
 
-                    
-        
-                    this.imagesUploader.onProgressAll = (progress) => {
-                        this.progress = Math.ceil((progress.loaded / progress.total) * 100);
-                        
-        var toValue = this.passedImages.length * (progress.loaded / progress.total);
-        if (toValue > 1) { toValue = toValue - 1; }
-        this.remainingFiles = this.uploadingResult.totalRecords - toValue;
+                        image.Guid = this.guid();
+                        this.passedImages.push(file);
+                        this.finalUploadedImages.push(image);
+                        this.guids.push(image.Guid);
+                    }
+                });
+
+                this.imagesUploader.addToQueue(this.passedImages);
+                this.imagesUploader.onBuildItemForm = (
+                    fileItem: any,
+                    form: any
+                ) => {
+                    for (let i = 0; i < this.guids.length; i++) {
+                        form.append("guid" + i, this.guids[i]);
+                    }
+                };
+
+                this.ProgressModal.show();
+                // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
+                this.progressHeader = "Uploading folder contents";
+                //this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+                this.folder_details = true;
 
 
-        const uploadedSoFar = toValue;
-        this.uploadedFilesCount = Math.floor(uploadedSoFar);
 
-        const now = Date.now();
-        const elapsedSeconds = (now - this.uploadStartTime) / 1000;
-    
-        if (uploadedSoFar > 0) {
-            const avgTimePerFile = elapsedSeconds / uploadedSoFar;
-           const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
-           const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
-           this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes); 
-        } else {
-            this.estimatedRemainingTime = 0;
-        }
+                this.imagesUploader.onProgressAll = (progress) => {
+                    this.progress = Math.ceil((progress.loaded / progress.total) * 100);
+
+                    var toValue = this.passedImages.length * (progress.loaded / progress.total);
+                    if (toValue > 1) { toValue = toValue - 1; }
+                    this.remainingFiles = this.uploadingResult.totalRecords - toValue;
 
 
-                    };
-        
-                    this.imagesUploader.onErrorItem = (item, response, status) => {
-                        this.notify.error(this.l("UploadFailed"));
-                    };
-        
-                    this.imagesUploader.onSuccessItem = (item, response, status) => {
-                        const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-        
-                        this.progress = 100;
-        
-                        var ret = this.serviceUtilitesProxy.setImagesGuids(this.uploadingResult, this.finalUploadedImages);
-                        this.uploadingResult = ret;
-                        this.uploadindResultExcelList = this.uploadingResult.excelRecords.slice();
-                        this.callImport(0);
-        
-                    };
-                    this.imagesUploader.uploadAllFiles();
+                    const uploadedSoFar = toValue;
+                    this.uploadedFilesCount = Math.floor(uploadedSoFar);
+
+                    const now = Date.now();
+                    const elapsedSeconds = (now - this.uploadStartTime) / 1000;
+
+                    if (uploadedSoFar > 0) {
+                        const avgTimePerFile = elapsedSeconds / uploadedSoFar;
+                        const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
+                        const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
+                        this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes);
+                    } else {
+                        this.estimatedRemainingTime = 0;
+                    }
+
+
+                };
+
+                this.imagesUploader.onErrorItem = (item, response, status) => {
+                    this.notify.error(this.l("UploadFailed"));
+                };
+
+                this.imagesUploader.onSuccessItem = (item, response, status) => {
+                    const ajaxResponse = <IAjaxResponse>JSON.parse(response);
+
+                    this.progress = 100;
+
+                    var ret = this.serviceUtilitesProxy.setImagesGuids(this.uploadingResult, this.finalUploadedImages);
+                    this.uploadingResult = ret;
+                    this.uploadindResultExcelList = this.uploadingResult.excelRecords.slice();
+                    this.callImport(0);
+
+                };
+                this.imagesUploader.uploadAllFiles();
                 break;
 
             default:
@@ -644,47 +724,54 @@ export class MainImportComponent
         }
     }
 
-    onFinishImport($event){
-    this.finishImport.emit($event);
+    onFinishImport($event) {
+        this.finishImport.emit($event);
     }
 
-    onOpenVideoModal($event){
-        if($event){
+    onOpenVideoModal($event) {
+        if ($event) {
             //I44 call getImportVideo 
             this.videoModal.show("");
-            //this.spinnerService.show();
-          /* this.importServiceProxy
-          .getImportVideo()
-          .pipe(finalize(() => this.spinnerService.hide()))
-          .subscribe((videoTutorialUrl) => {
-            this.BrowseModal.hide();
-            this.videoModal.show(videoTutorialUrl);
-        }) */
-    }
+           //this.spinnerService.show();
+            /* this.importServiceProxy
+            .getImportVideo()
+            .pipe(finalize(() => this.spinnerService.hide()))
+            .subscribe((videoTutorialUrl) => {
+              this.BrowseModal.hide();
+              this.videoModal.show(videoTutorialUrl);
+          }) */
+        }
     }
 
-    videoTutorialGoBack(){
+    videoTutorialGoBack() {
         this.hideAllmodal();
         this.BrowseModal.show(this.importType, this.importService, this.hasImages);
     }
 
-    onUpdateLookups($event){
-        this.updateLookups=$event;
+    onUpdateLookups($event) {
+        this.updateLookups = $event;
     }
 
     _totalFiles;
     _totalSizeMB;
     _folderName;
-    settotalFiles($event){
-        this._totalFiles=$event;
+    settotalFiles($event) {
+        this._totalFiles = $event;
     }
 
-    settotalSizeMB($event){
-        this._totalSizeMB=$event;
+    settotalSizeMB($event) {
+        this._totalSizeMB = $event;
     }
 
-   setfolderName($event){
-    this._folderName=$event;
-   }
+    setfolderName($event) {
+        this._folderName = $event;
+    }
+
+    setImData($event) {
+        this.imData = $event;
+    }
+    setImImages($event) {
+        this.imImages = $event;
+    }
 }
 

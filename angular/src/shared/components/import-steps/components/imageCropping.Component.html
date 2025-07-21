@@ -29,7 +29,8 @@
             <div>
                 <button
                 class="next-btn pointer w-100"
-                (click)="()"
+                (click)="onAutoCrop()"
+                [disabled]="!finish"
             >
             Auto Crop {{ _imagePassed + _imageFailed}} image
             </button>
@@ -271,11 +272,11 @@
 
     <div class="upload-modal" *ngIf="showAutoCropMsg">
         <div class="modal-header">
-          <span class="modal-title pt-2">This action will overwrite all the manual image cropping, Are you sure ?</span>
+          <h4 class="modal-title pt-2">This action will overwrite all the manual image cropping, Are you sure ?</h4>
         </div>
       
       
-        <div class="modal-actions">
+        <div class="modal-actions text-center">
           <button class="confirm-btn" (click)="autoCropping()">Yes</button>
           <button class="cancle-btn ml-3" (click)="showAutoCropMsg=false">No</button>
         </div>

@@ -16,9 +16,6 @@ namespace onetouch.AppItems
     {
         Task<ExcelTemplateDto> GetImportVideo();
         Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUp(GetAllAppItemsInput input);
-        Task<AppItemtExcelRecordDTO> GetAppItemForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
-        Task<long> Create(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
-
 
     }
 }
