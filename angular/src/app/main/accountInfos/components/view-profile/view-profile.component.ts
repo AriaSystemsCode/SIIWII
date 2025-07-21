@@ -109,6 +109,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.getAllForAccountInfo()
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
+        
     }
 
     prevImageClick() {
@@ -367,6 +368,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     isNotManualLevel(): boolean {
+     
         return this.accountLevel !== AccountLevelEnum.Manual;
     }
 

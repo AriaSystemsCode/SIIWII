@@ -1,16 +1,16 @@
 <div [@routerTransition] class="wrapper">
     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pt-0">
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet kt-portlet-profile">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="px-0 bg-white">
+            <div class="kt-portlet kt-portlet-profile mb-0">
                 <div class="kt-portlet__body kt-portlet-profile-portlet__body">
                     <div class="row" style="padding: 15px 0;">
-                        <div class="col-md-9">
-                            <p style="color: #464E5F;
-                            font-size: 13px;
-                            font-weight: 600;
+                        <div class="col-md-9 px-0">
+                            <p style="color: #1B101B;
+                            font-size: 20px;
+                            font-weight: 700;
                             margin: 0;">{{l("OrganizationAddress")}}</p>
                             <p style="    font-size: 12px;
-                            color: #B5B5C3;">{{l("UseOrganizationAddressToAddressAndSubAddress")}}</p>
+                            color: #595959;" class="mb-0">{{l("UseOrganizationAddressToAddressAndSubAddress")}}</p>
                         </div>
                         <div class="col-md-3" *ngIf="!viewMode && accountLevel == 0">
                             <button type="submit" *ngIf="!accountLevel" class="btn btn-secondary btn-b5b5c3"
@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="accountId" class="table-transparent-header table-transparent-rows">
+            <div *ngIf="accountId" class="table-transparent-header table-transparent-rows px-2">
                 <p-treeTable #dataTable [value]="branches" rows="5" [paginator]="false" [lazy]="true"
                     [scrollable]="true" ScrollWidth="100%" [resizableColumns]="true"
                     (onNodeExpand)="getBranches($event)">

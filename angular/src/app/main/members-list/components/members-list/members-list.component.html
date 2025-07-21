@@ -16,7 +16,7 @@
         </div>
 
 
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="px-0">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body">
                     <div *ngIf="active">
@@ -112,9 +112,9 @@
                             </div>
 
                             <div class="col d-flex flex-column justify-content-between">
-                                <div class="row pt-5 pl-2 pr-2">
+                                <div class="row ">
                                     <div *ngFor="let member of members;index as i;let last = last"
-                                    class="col-12 mb-5"
+                                    class="col-12 mb-3"
                                     [ngClass]="{
                                         'col-md-12 single-item-per-row-layout' :singleItemPerRowMode,
                                         'col-md-6': !singleItemPerRowMode,

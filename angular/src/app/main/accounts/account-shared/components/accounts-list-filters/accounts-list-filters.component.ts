@@ -245,8 +245,9 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
         this.subscriptions.push(subs)
     }
 
-    getAccountTypesList(componentRef:{  onListLoadCallback  : Function}){
-        const subs = this._appEntitiesServiceProxy.getAllAccountTypesForTableDropdownWithPaging(
+    getAccountTypesList(componentRef: { onListLoadCallback: Function }) {
+        const subs = this._appEntitiesServiceProxy
+          .getAllAccountTypesForTableDropdownWithPaging(
             undefined,
             undefined,
             undefined,
@@ -258,13 +259,44 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             undefined,
             this.sortBy,
             this.accountTypeFilterMetaData.listSkipCount,
-            this.accountTypeFilterMetaData.listMaxResultCount,!this.fromMarketplace
-        )
-        .subscribe(result => {
-            componentRef.onListLoadCallback(result)
-        });
-        this.subscriptions.push(subs)
-    }
+            10,
+            !this.fromMarketplace
+          )
+          .subscribe(result => {
+            const uniqueCodes = new Set();
+            const filteredItems = [];
+      
+            result.items.forEach(item => {
+              const code = item.code?.toUpperCase();
+      
+              if (['BUSINESS', 'GROUP'].includes(code) && !uniqueCodes.has(code)) {
+                uniqueCodes.add(code);
+                filteredItems.push(item);
+              }
+      
+              if (code === 'PERSONAL' && !uniqueCodes.has('PERSONAL')) {
+                uniqueCodes.add('PERSONAL');
+                // Always show it as "Personal" regardless of original label
+                filteredItems.push({ ...item, label: 'Personal' });
+              }
+      
+              if (item.label?.toUpperCase() === 'PEOPLE' && !uniqueCodes.has('PERSONAL')) {
+                uniqueCodes.add('PERSONAL'); // treat as PERSONAL
+                filteredItems.push({ ...item, label: 'Personal', code: 'PERSONAL' });
+              }
+            });
+      
+            componentRef.onListLoadCallback({
+              totalCount: filteredItems.length,
+              items: filteredItems
+            });
+          });
+      
+        this.subscriptions.push(subs);
+      }
+      
+      
+      
 
     getAccountStatuses(componentRef:{  onListLoadCallback  : Function}){
         const result : PagedResultDtoOfLookupLabelDto = new PagedResultDtoOfLookupLabelDto()
