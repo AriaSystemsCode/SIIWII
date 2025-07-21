@@ -116,7 +116,10 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         if (!this.memberDto.entityAttachments) {
             this.memberDto.entityAttachments = []
         }
-
+        if (!this.memberDto.code) {
+          const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,null).toPromise();
+          this.memberDto.code = sequance;
+        }
         this.active = true;
     }
     setDefaultPublicFieldsToTrue() {
@@ -290,17 +293,43 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         this.getAccountBranches();
     }
 
-    branchSelected(Branch) {
-        this.selectedBranchName = Branch?.contactAddresses[0]?.name ? Branch?.contactAddresses[0]?.name : '';
-        this.selectedBranchName += Branch?.contactAddresses[0]?.addressLine1 ? (this.selectedBranchName != '' ? ' - ' + Branch?.contactAddresses[0]?.addressLine1 : Branch?.contactAddresses[0]?.addressLine1) : '';
-        this.selectedBranchName += Branch?.contactAddresses[0]?.addressLine2 ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.addressLine2 : Branch?.contactAddresses[0]?.addressLine2) : '';
-        this.selectedBranchName += Branch?.contactAddresses[0]?.city ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.city : Branch?.contactAddresses[0]?.city) : '';
-        this.selectedBranchName += Branch?.contactAddresses[0]?.state ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.state : Branch?.contactAddresses[0]?.state) : '';
-        this.selectedBranchName += Branch?.contactAddresses[0]?.zipCode ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.zipCode : Branch?.contactAddresses[0]?.zipCode) : '';
-        this.selectedBranchName += Branch?.contactAddresses[0]?.countryName ? (this.selectedBranchName != '' ? ' , ' + Branch?.contactAddresses[0]?.countryName : Branch?.contactAddresses[0]?.countryName) : '';
-        this.selectedBranchId = Branch.id;
-        this.memberDto.parentId = Branch.id;
+    branchSelected(Branch: any) {
+      const addr = Branch?.contactAddresses?.[0];
+      this.selectedBranchName = '';
+      if (addr) {
+        const parts = [
+          addr.name,
+          addr.addressLine1,
+          addr.addressLine2,
+          addr.city,
+          addr.state,
+          addr.postalCode,
+          addr.countryIdName
+        ];
+        this.selectedBranchName = parts.filter(Boolean).join(' , ');
+      }
+    
+      this.selectedBranchId = Branch.id;
+      this.memberDto.parentId = Branch.id;
+    
+      const branchForView = BranchForViewDto.fromJS({
+        branch: Branch,
+        subTotal: 0,
+        id: Branch.id
+      });
+    
+      const treeNode = new TreeNodeOfBranchForViewDto();
+      treeNode.data = branchForView;
+      treeNode.label = Branch.name || '';
+      treeNode.leaf = true;
+      treeNode.expanded = true;
+      treeNode.children = []; // ✅ empty array instead of [null]
+      treeNode.totalChildrenCount = 0;
+    
+      this.memberDto.branches = [treeNode];
     }
+    
+    
     branchSelectionCanceled() {
         this.selectBranchModal.close();
     }
@@ -366,7 +395,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     removePhoneFromList(i: number) {
         this.phonelist.splice(i, 1)
-        this.memberDto[`phone${i + 1}Ext`] = undefined
+        this.memberDto[`phone${i + 1}Ex`] = undefined
         this.memberDto[`phone${i + 1}IsPublic`] = undefined
         this.memberDto[`phone${i + 1}CountryKey`] = undefined
         this.memberDto[`phone${i + 1}Number`] = undefined

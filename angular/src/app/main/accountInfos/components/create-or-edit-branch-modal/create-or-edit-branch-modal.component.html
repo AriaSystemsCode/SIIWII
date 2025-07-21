@@ -25,14 +25,14 @@
             </div>
           </div>
           <div class="row align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-5">
               <div class="form-group">
                 <label for="branch_Name">{{l("Name")}} *</label>
                 <input type="text" id="branch_Name" class="form-control form-control-sm aria-input-text"
                   [(ngModel)]="branch.name" name="Name" minlength="2" maxlength="150" required />
               </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-7">
               <div class="row">
                 <div class="col-md-3">
                   <div class="form-group">
@@ -51,10 +51,7 @@
                       <label for="branch_EMailAddress">{{l("EMailAddress")}}</label>
 
 
-                      <div class="d-flex isPublic">
-                        <span class="mr-3">{{ "IsPublic" | localize }}</span>
-                        <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-                      </div>
+
           
                     </div>
                     <div class="input-group mb-3">
@@ -79,7 +76,7 @@
 
           </div>
           <div class="row align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-5">
               <div class="form-group">
                 <label for="branch_TradeName">{{l("TradeName")}} *</label>
                 <input type="text" id="branch_TradeName" #tradeNameInput="ngModel"
@@ -88,7 +85,7 @@
                 <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
               </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-7">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -98,13 +95,13 @@
                       [style]="{'width':'100%'}"></p-dropdown>
                   </div>
                 </div>
-                <div class="col-md-6 phone-col-ext mt-4">
+                <div class="col-md-9 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                         [(ngModel)]="branch.phone1Number" name="Phone1Number"
                         (ng2TelOutput)="getNumberphone1Number($event)"
-                        class="form-control form-control-sm aria-input-text phone-input"
+                        class="form-control form-control-sm aria-input-text phone-input phnoeNum"
                         (intlTelInputObject)="telInputObjectphone1Number($event)"
                         (countryChange)="onCountryChangephone1Number($event)" />
                     </div>
@@ -115,17 +112,14 @@
                  
                   </div>
                 </div>
-                <div class=" col-md-3 d-flex justify-content-between align-items-center isPublic">
-                  <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
-                  <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-                </div>
+
             
               </div>
 
             </div>
           </div>
           <div class="row align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-5">
               <div class="form-group ">
                 <label for="AppEntityName5">{{l("Language")}}</label>
                 <p-dropdown [options]="allLanguages" styleClass="form-control  aria-select aria-select-modal"
@@ -134,7 +128,7 @@
 
               </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-7">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -144,10 +138,10 @@
                       [style]="{'width':'100%'}"></p-dropdown>
                   </div>
                 </div>
-                <div class="col-md-6 phone-col-ext mt-4">
+                <div class="col-md-9 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
                     <div class="phone-ng2-input-wrapper">
-                      <input type="text"            class="form-control form-control-sm aria-input-text phone-input" name="Phone2Number"
+                      <input type="text"            class="form-control form-control-sm aria-input-text phone-input phnoeNum" name="Phone2Number"
                         ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                   (ng2TelOutput)="getNumberphone2Number($event)"
                         [(ngModel)]="branch.phone2Number" (intlTelInputObject)="telInputObjectphone2Number($event)"
@@ -159,17 +153,14 @@
                       [placeholder]="'| ' + 'Extension' |localize" />
                   </div>
                 </div>
-                <div class=" col-md-3 d-flex justify-content-between align-items-center isPublic">
-                  <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
-                  <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-                </div>
+       
               </div>
 
             </div>
             
           </div>
           <div class="row align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-5">
               <div class="form-group m-form__group">
                 <label for="AppEntityName4">{{l("Currency")}}</label>
                 <p-dropdown [options]="allCurrencies" styleClass="form-control aria-select aria-select-modal"
@@ -177,7 +168,7 @@
                   [placeholder]="'Please select' | localize"></p-dropdown>
               </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-7">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -187,10 +178,10 @@
                       [style]="{'width':'100%'}"></p-dropdown>
                   </div>
                 </div>
-                <div class="col-md-6 phone-col-ext mt-4">
+                <div class="col-md-9 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
                     <div class="phone-ng2-input-wrapper">
-                      <input type="text" class="form-control form-control-sm aria-input-text phone-input" ng2TelInput
+                      <input type="text" class="form-control form-control-sm aria-input-text phone-input phnoeNum" ng2TelInput
                         [ng2TelInputOptions]="{initialCountry: 'us'}" name="Phone3Number"
                         (ng2TelOutput)="getNumberphone3Number($event)"
                         [(ngModel)]="branch.phone3Number" (intlTelInputObject)="telInputObjectphone3Number($event)"
@@ -203,10 +194,7 @@
                   </div>
                 </div>
 
-                <div class=" col-md-3 d-flex justify-content-between align-items-center isPublic">
-                  <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
-                  <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-                </div>
+     
               </div>
 
             </div>
@@ -222,13 +210,10 @@
 
 
           <div class="form-group form-group-plus">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-start">
             <label for="branch_Address1">{{l("BillingAddress")}}</label>
 
-              <div class="  d-flex justify-content-between align-items-center isPublic">
-                <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
-                <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-              </div>
+
             </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(1)">
             </button>
@@ -243,13 +228,10 @@
             </p>
           </div>
           <div class="form-group form-group-plus">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-start">
             <label for="branch_Address2">{{l("ShippingAddress")}}</label>
 
-            <div class="  d-flex justify-content-between align-items-center isPublic">
-              <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
-              <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-            </div>
+  
           </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(2)">
             </button>
@@ -264,14 +246,11 @@
             </p>
           </div>
           <div class="form-group form-group-plus"> 
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-start">
 
             <label for="branch_Address3">{{l("DistributionAddress")}}</label>
             
-            <div class="  d-flex justify-content-between align-items-center isPublic">
-              <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
-              <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-            </div>
+
           </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(3)">
             </button>
@@ -286,13 +265,10 @@
             </p>
           </div>
           <div class="form-group form-group-plus">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-start">
             <label for="branch_Address4">{{l("MailingAddress")}}</label>
                    
-            <div class="  d-flex justify-content-between align-items-center isPublic">
-              <span class="mr-3 ">{{ "IsPublic" | localize }}</span>
-              <p-inputSwitch name="emailAddressIsPublic" ></p-inputSwitch>
-            </div>
+ 
             </div>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(4)">
             </button>

@@ -142,6 +142,18 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
                 // this.contactDisplayName += lastName ? " " + lastName : ""
                 // if (this.memberData?.imageUrl) this.logoPhoto = this.attachmentBaseUrl + '/' + this.memberData?.imageUrl;
                 // if (this.memberData?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + this.memberData?.coverUrl;
+                const logoAttachment = this.memberData?.entityAttachments?.find(att => att.attachmentCategoryId === 1 && att.url);
+
+                if (logoAttachment) {
+                this.logoPhoto = this.attachmentBaseUrl + '/' + logoAttachment.url;
+                }
+
+                const coverAttachment = this.memberData?.entityAttachments?.find(att => att.attachmentCategoryId === 2 && att.url);
+
+                if (logoAttachment) {
+                this.coverPhoto = this.attachmentBaseUrl + '/' + coverAttachment.url;
+                }
+
             });
     }
 

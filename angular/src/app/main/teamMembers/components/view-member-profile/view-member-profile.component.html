@@ -109,7 +109,7 @@
                                         localize ) + " :" }}</h6>
                                     <p class="text-left " style="color: #595959;">{{memberData?.contact?.lastName}}</p>
                                 </div> -->
-                                <hr class="header">
+                                <!-- <hr class="header">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                                     <h6 class="text-right font-weight-bold mr-3 "> <img
                                             src="../../assets/img/input_icons/outline-work.png" class=""> {{ (
@@ -133,19 +133,19 @@
                                         "JoinDate" | localize ) + " :" }}</h6>
                                     <p class="text-left " style="color: #595959;">
                                         {{memberData?.contact?.joinDate?.toString()| date: 'short'}}</p>
-                                </div>
-                                <hr class="header" *ngIf="memberData?.contact?.emailAddressIsPublic">
+                                </div> -->
+                                <hr class="header" *ngIf="memberData?.extraDataAttributes[11]?.selectedValues?.[memberData.extraDataAttributes[11].selectedValues.length - 1]?.value === 'true'">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2  pl-3"
-                                    *ngIf="memberData?.contact?.emailAddressIsPublic">
+                                *ngIf="memberData?.extraDataAttributes[11]?.selectedValues?.[memberData.extraDataAttributes[11].selectedValues.length - 1]?.value === 'true'">
                                     <h6 class="text-right font-weight-bold mr-3 "><img
                                             src="../../assets/img/input_icons/letter.png" class="">{{ ( "Email" |
                                         localize ) + " :" }}</h6>
-                                    <p class="text-left " style="color: #595959;">{{memberData?.contact?.eMailAddress}}
+                                    <p class="text-left " style="color: #595959;">{{memberData?.eMailAddress}}
                                     </p>
                                 </div>
-                                <hr class="header" *ngIf="memberData?.contact?.languageIsPublic">
+                                <hr class="header" *ngIf="memberData?.extraDataAttributes[6]?.selectedValues?.[memberData.extraDataAttributes[6].selectedValues.length - 1]?.value === 'true'">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
-                                    *ngIf="memberData?.contact?.languageIsPublic">
+                                *ngIf="memberData?.extraDataAttributes[6]?.selectedValues?.[memberData.extraDataAttributes[6].selectedValues.length - 1]?.value === 'true'">
                                     <h6 class="text-right font-weight-bold mr-3 "> <img
                                             src="../../assets/img/input_icons/language.png" class=""> {{ ( "Language" |
                                         localize ) + " :" }}</h6>
@@ -162,27 +162,27 @@
                                         [class.hide]="NoteditInfo"> {{editBranchValue}}</p>
                                     <p   class="text-left old_editBranch" style="color: #595959;"
                                         [class.hide]="NoteditInfo"
-                                        *ngIf=" !editBranchValue &&( memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName)">
-                                        <span *ngIf="memberData?.branchName">
-                                            {{ memberData?.branchName + ' '}}
+                                        *ngIf=" !editBranchValue &&( memberData?.branches != null )">
+                                        <span *ngIf="memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.name">
+                                            {{ memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.name + ' '}}
                                         </span>
-                                        <span *ngIf="memberData?.addressLine1">
-                                            {{ " - " + memberData?.addressLine1 + ', '}}
+                                        <span *ngIf="memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.addressLine1">
+                                            {{ " - " + memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.addressLine1 + ', '}}
                                         </span>
-                                        <span *ngIf="memberData?.addressLine2">
-                                            {{ memberData?.addressLine2 + ', '}}
+                                        <span *ngIf="memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.addressLine2">
+                                            {{ memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.addressLine2 + ', '}}
                                         </span>
-                                        <span *ngIf="memberData?.city">
-                                            {{ memberData?.city + ', '}}
+                                        <span *ngIf="memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.city">
+                                            {{ memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.city + ', '}}
                                         </span>
-                                        <span *ngIf="memberData?.state">
-                                            {{ memberData?.state + ', ' }}
+                                        <span *ngIf="memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.state">
+                                            {{ memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.state + ', ' }}
                                         </span>
-                                        <span *ngIf="memberData?.zipCode">
-                                            {{memberData?.zipCode }}{{memberData?.countryName ? ', ' : '' }}
+                                        <span *ngIf="memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.zipCode">
+                                            {{memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.zipCode }}{{memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.countryName ? ', ' : '' }}
                                         </span>
-                                        <span *ngIf="memberData?.countryName">
-                                            {{ memberData?.countryName }}
+                                        <span *ngIf="memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.countryName">
+                                            {{ memberData?.branches[0]?.data?.branch?.contactAddresses[0]?.countryName }}
                                         </span>
                                     </p>
                                     <div [class.hide]="editInfo">
@@ -196,37 +196,38 @@
                                     </div>
 
                                 </div>
-                                <hr class="header" *ngIf="memberData?.contact?.phone1IsPublic">
+                                <hr class="header" *ngIf="memberData?.extraDataAttributes[7]?.selectedValues?.[memberData.extraDataAttributes[7].selectedValues.length - 1]?.value === 'true'"
+                                >
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
-                                    *ngIf="memberData?.contact?.phone1IsPublic">
+                                *ngIf="memberData?.extraDataAttributes[7]?.selectedValues?.[memberData.extraDataAttributes[7].selectedValues.length - 1]?.value === 'true'">
                                     <h6 class="text-right font-weight-bold mr-3 ">
                                         <img src="../../assets/img/input_icons/phone.png" class=""> {{
-                                        (memberData?.contact?.phone1TypeName ? (memberData?.contact?.phone1TypeName |
+                                        (memberData?.phone1TypeName ? (memberData?.phone1TypeName |
                                         localize) : '') + " " + ( "Number" | localize ) + ' :' }}
                                     </h6>
-                                    <p class="text-left " style="color: #595959;">{{memberData?.contact?.phone1Number}}
+                                    <p class="text-left " style="color: #595959;">{{memberData?.phone1Number}} <span class="phoneExt">{{memberData?.phone1Ex}}</span>
                                     </p>
                                 </div>
-                                <hr class="header" *ngIf="memberData?.contact?.phone2IsPublic">
+                                <hr class="header"    *ngIf="memberData?.extraDataAttributes[9]?.selectedValues?.[memberData.extraDataAttributes[9].selectedValues.length - 1]?.value === 'true'">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
-                                    *ngIf="memberData?.contact?.phone2IsPublic">
+                                *ngIf="memberData?.extraDataAttributes[9]?.selectedValues?.[memberData.extraDataAttributes[9].selectedValues.length - 1]?.value === 'true'">
                                     <h6 class="text-right font-weight-bold mr-3 ">
                                         <img src="../../assets/img/input_icons/phone.png" class=""> {{
                                         (memberData?.contact?.phone2TypeName ? (memberData?.contact?.phone2TypeName |
                                         localize) : '') + " " + ( "Number" | localize ) + ' :' }}
                                     </h6>
-                                    <p class="text-left " style="color: #595959;">{{memberData?.contact?.phone2Number}}
+                                    <p class="text-left " style="color: #595959;">{{memberData?.phone2Number}} <span class="phoneExt">{{memberData?.phone2Ex}}</span>
                                     </p>
                                 </div>
-                                <hr class="header" *ngIf="memberData?.contact?.phone3IsPublic">
+                                <hr class="header"    *ngIf="memberData?.extraDataAttributes[10]?.selectedValues?.[memberData.extraDataAttributes[10].selectedValues.length - 1]?.value === 'true'">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
-                                    *ngIf="memberData?.contact?.phone3IsPublic">
+                                *ngIf="memberData?.extraDataAttributes[10]?.selectedValues?.[memberData.extraDataAttributes[10].selectedValues.length - 1]?.value === 'true'">
                                     <h6 class="text-right font-weight-bold mr-3">
                                         <img src="../../assets/img/input_icons/phone.png" class=""> {{
                                         (memberData?.contact?.phone3TypeName ? (memberData?.contact?.phone3TypeName |
                                         localize) : '') + " " + ( "Number" | localize ) + ' :' }}
                                     </h6>
-                                    <p class="text-left " style="color: #595959;">{{memberData?.contact?.phone3Number}}
+                                    <p class="text-left " style="color: #595959;">{{memberData?.phone3Number}} <span class="phoneExt">{{memberData?.phone3Ex}}</span>
                                     </p>
                                 </div>
                                 <div class="row ml-5">

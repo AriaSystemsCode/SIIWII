@@ -187,8 +187,8 @@
                                     />
                                 </div>
                                 <div class="col-sm-2">
-                                        <input type="text" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
-                                        minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ext']" />
+                                        <input type="text" id="PhoneEx" class="form-control" name="phone{{i+1}}Ex"
+                                        minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ex']" />
                                 </div>
                                 <!-- <div class="col-sm-2" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-2">{{ "IsPublic" | localize }}</span>
@@ -229,7 +229,7 @@
                     [entityType]="'Settings'"
                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                     (extraDataCleared)="onExtraAttributeCleared($event)" (extraDataChanged)="onExtraAttributesChanged($event)"
-                    [fromSetting]="true">
+                  >
                   </app-dynamicInputs>
               
                 </p-accordionTab>

@@ -419,10 +419,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     getAccountTypes(){ 
        this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
       .subscribe((result) => {
-        // this.accountTypes=result;
-               this.accountTypes.push({ label :'Personal' ,value: 'Personal'});
-    this.accountTypes.push({ label :'Business' ,value: 'Business'});
-    this.accountTypes.push({ label :'Group' ,value: 'Group'});
+        this.accountTypes=result;
+    //            this.accountTypes.push({ label :'Personal' ,value: 'Personal'});
+    // this.accountTypes.push({ label :'Business' ,value: 'Business'});
+    // this.accountTypes.push({ label :'Group' ,value: 'Group'});
       }); 
 
   } 

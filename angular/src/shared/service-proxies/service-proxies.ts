@@ -10453,6 +10453,67 @@ export class AppEntitiesServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param entityId (optional) 
+     * @param entityObjectTypeId (optional) 
+     * @return Success
+     */
+    getAppEntityExtraDataWithPaging(entityId: number | undefined, entityObjectTypeId: number | undefined): Observable<PagedResultDtoOfExtraDataAttrDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAppEntityExtraDataWithPaging?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        if (entityObjectTypeId === null)
+            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
+        else if (entityObjectTypeId !== undefined)
+            url_ += "entityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppEntityExtraDataWithPaging(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppEntityExtraDataWithPaging(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
+        }));
+    }
+
+    protected processGetAppEntityExtraDataWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfExtraDataAttrDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfExtraDataAttrDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -61124,6 +61185,314 @@ export interface IAppEntityExtraDataDto {
     [key: string]: any;
 }
 
+export class LookupLabelDto implements ILookupLabelDto {
+    value!: number;
+    label!: string | undefined;
+    code!: string | undefined;
+    stockAvailability!: number | undefined;
+    isHostRecord!: boolean | undefined;
+    hexaCode!: string | undefined;
+    image!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ILookupLabelDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.value = _data["value"];
+            this.label = _data["label"];
+            this.code = _data["code"];
+            this.stockAvailability = _data["stockAvailability"];
+            this.isHostRecord = _data["isHostRecord"];
+            this.hexaCode = _data["hexaCode"];
+            this.image = _data["image"];
+        }
+    }
+
+    static fromJS(data: any): LookupLabelDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LookupLabelDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["value"] = this.value;
+        data["label"] = this.label;
+        data["code"] = this.code;
+        data["stockAvailability"] = this.stockAvailability;
+        data["isHostRecord"] = this.isHostRecord;
+        data["hexaCode"] = this.hexaCode;
+        data["image"] = this.image;
+        return data;
+    }
+}
+
+export interface ILookupLabelDto {
+    value: number;
+    label: string | undefined;
+    code: string | undefined;
+    stockAvailability: number | undefined;
+    isHostRecord: boolean | undefined;
+    hexaCode: string | undefined;
+    image: string | undefined;
+
+    [key: string]: any;
+}
+
+export class EDRestAttributes implements IEDRestAttributes {
+    extraAttrName!: string | undefined;
+    totalCount!: number;
+    extraAttributeId!: number;
+    values!: LookupLabelDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IEDRestAttributes) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.extraAttrName = _data["extraAttrName"];
+            this.totalCount = _data["totalCount"];
+            this.extraAttributeId = _data["extraAttributeId"];
+            if (Array.isArray(_data["values"])) {
+                this.values = [] as any;
+                for (let item of _data["values"])
+                    this.values!.push(LookupLabelDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): EDRestAttributes {
+        data = typeof data === 'object' ? data : {};
+        let result = new EDRestAttributes();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["extraAttrName"] = this.extraAttrName;
+        data["totalCount"] = this.totalCount;
+        data["extraAttributeId"] = this.extraAttributeId;
+        if (Array.isArray(this.values)) {
+            data["values"] = [];
+            for (let item of this.values)
+                data["values"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IEDRestAttributes {
+    extraAttrName: string | undefined;
+    totalCount: number;
+    extraAttributeId: number;
+    values: LookupLabelDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class ExtraDataSelectedValues implements IExtraDataSelectedValues {
+    code!: string | undefined;
+    value!: string | undefined;
+    totalCount!: number;
+    entityAttachments!: AppEntityAttachmentDto[] | undefined;
+    defaultEntityAttachment!: AppEntityAttachmentDto;
+    edRestAttributes!: EDRestAttributes[] | undefined;
+    colorImage!: string | undefined;
+    colorHexaCode!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IExtraDataSelectedValues) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.code = _data["code"];
+            this.value = _data["value"];
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["entityAttachments"])) {
+                this.entityAttachments = [] as any;
+                for (let item of _data["entityAttachments"])
+                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
+            }
+            this.defaultEntityAttachment = _data["defaultEntityAttachment"] ? AppEntityAttachmentDto.fromJS(_data["defaultEntityAttachment"]) : <any>undefined;
+            if (Array.isArray(_data["edRestAttributes"])) {
+                this.edRestAttributes = [] as any;
+                for (let item of _data["edRestAttributes"])
+                    this.edRestAttributes!.push(EDRestAttributes.fromJS(item));
+            }
+            this.colorImage = _data["colorImage"];
+            this.colorHexaCode = _data["colorHexaCode"];
+        }
+    }
+
+    static fromJS(data: any): ExtraDataSelectedValues {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExtraDataSelectedValues();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["code"] = this.code;
+        data["value"] = this.value;
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.entityAttachments)) {
+            data["entityAttachments"] = [];
+            for (let item of this.entityAttachments)
+                data["entityAttachments"].push(item.toJSON());
+        }
+        data["defaultEntityAttachment"] = this.defaultEntityAttachment ? this.defaultEntityAttachment.toJSON() : <any>undefined;
+        if (Array.isArray(this.edRestAttributes)) {
+            data["edRestAttributes"] = [];
+            for (let item of this.edRestAttributes)
+                data["edRestAttributes"].push(item.toJSON());
+        }
+        data["colorImage"] = this.colorImage;
+        data["colorHexaCode"] = this.colorHexaCode;
+        return data;
+    }
+}
+
+export interface IExtraDataSelectedValues {
+    code: string | undefined;
+    value: string | undefined;
+    totalCount: number;
+    entityAttachments: AppEntityAttachmentDto[] | undefined;
+    defaultEntityAttachment: AppEntityAttachmentDto;
+    edRestAttributes: EDRestAttributes[] | undefined;
+    colorImage: string | undefined;
+    colorHexaCode: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ExtraDataAttrDto implements IExtraDataAttrDto {
+    extraAttrUsage!: string | undefined;
+    extraAttrName!: string | undefined;
+    selectedValuesTotalCount!: number;
+    extraAttrDataType!: string | undefined;
+    extraAttributeId!: number;
+    selectedValues!: ExtraDataSelectedValues[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IExtraDataAttrDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.extraAttrUsage = _data["extraAttrUsage"];
+            this.extraAttrName = _data["extraAttrName"];
+            this.selectedValuesTotalCount = _data["selectedValuesTotalCount"];
+            this.extraAttrDataType = _data["extraAttrDataType"];
+            this.extraAttributeId = _data["extraAttributeId"];
+            if (Array.isArray(_data["selectedValues"])) {
+                this.selectedValues = [] as any;
+                for (let item of _data["selectedValues"])
+                    this.selectedValues!.push(ExtraDataSelectedValues.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ExtraDataAttrDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExtraDataAttrDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["extraAttrUsage"] = this.extraAttrUsage;
+        data["extraAttrName"] = this.extraAttrName;
+        data["selectedValuesTotalCount"] = this.selectedValuesTotalCount;
+        data["extraAttrDataType"] = this.extraAttrDataType;
+        data["extraAttributeId"] = this.extraAttributeId;
+        if (Array.isArray(this.selectedValues)) {
+            data["selectedValues"] = [];
+            for (let item of this.selectedValues)
+                data["selectedValues"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IExtraDataAttrDto {
+    extraAttrUsage: string | undefined;
+    extraAttrName: string | undefined;
+    selectedValuesTotalCount: number;
+    extraAttrDataType: string | undefined;
+    extraAttributeId: number;
+    selectedValues: ExtraDataSelectedValues[] | undefined;
+
+    [key: string]: any;
+}
+
 export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     fileToken!: string | undefined;
     tradeName!: string | undefined;
@@ -61147,6 +61516,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     phone3TypeId!: number | undefined;
     currencyId!: number | undefined;
     languageId!: number | undefined;
+    languageCode!: string | undefined;
     entityId!: number | undefined;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
@@ -61163,6 +61533,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     accountId!: number | undefined;
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
+    extraDataAttributes!: ExtraDataAttrDto[] | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -61204,6 +61575,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             this.phone3TypeId = _data["phone3TypeId"];
             this.currencyId = _data["currencyId"];
             this.languageId = _data["languageId"];
+            this.languageCode = _data["languageCode"];
             this.entityId = _data["entityId"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
@@ -61248,6 +61620,11 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             this.accountId = _data["accountId"];
             this.shipViaId = _data["shipViaId"];
             this.paymentTermsId = _data["paymentTermsId"];
+            if (Array.isArray(_data["extraDataAttributes"])) {
+                this.extraDataAttributes = [] as any;
+                for (let item of _data["extraDataAttributes"])
+                    this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
+            }
             this.id = _data["id"];
         }
     }
@@ -61287,6 +61664,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
         data["phone3TypeId"] = this.phone3TypeId;
         data["currencyId"] = this.currencyId;
         data["languageId"] = this.languageId;
+        data["languageCode"] = this.languageCode;
         data["entityId"] = this.entityId;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
@@ -61331,6 +61709,11 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
         data["accountId"] = this.accountId;
         data["shipViaId"] = this.shipViaId;
         data["paymentTermsId"] = this.paymentTermsId;
+        if (Array.isArray(this.extraDataAttributes)) {
+            data["extraDataAttributes"] = [];
+            for (let item of this.extraDataAttributes)
+                data["extraDataAttributes"].push(item.toJSON());
+        }
         data["id"] = this.id;
         return data;
     }
@@ -61359,6 +61742,7 @@ export interface ICreateOrEditAccountInfoDto {
     phone3TypeId: number | undefined;
     currencyId: number | undefined;
     languageId: number | undefined;
+    languageCode: string | undefined;
     entityId: number | undefined;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
@@ -61375,6 +61759,7 @@ export interface ICreateOrEditAccountInfoDto {
     accountId: number | undefined;
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
+    extraDataAttributes: ExtraDataAttrDto[] | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -62188,78 +62573,6 @@ export interface IPagedResultDtoOfGetAccountForViewDto {
     [key: string]: any;
 }
 
-export class LookupLabelDto implements ILookupLabelDto {
-    value!: number;
-    label!: string | undefined;
-    code!: string | undefined;
-    stockAvailability!: number | undefined;
-    isHostRecord!: boolean | undefined;
-    hexaCode!: string | undefined;
-    image!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: ILookupLabelDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.value = _data["value"];
-            this.label = _data["label"];
-            this.code = _data["code"];
-            this.stockAvailability = _data["stockAvailability"];
-            this.isHostRecord = _data["isHostRecord"];
-            this.hexaCode = _data["hexaCode"];
-            this.image = _data["image"];
-        }
-    }
-
-    static fromJS(data: any): LookupLabelDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new LookupLabelDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["value"] = this.value;
-        data["label"] = this.label;
-        data["code"] = this.code;
-        data["stockAvailability"] = this.stockAvailability;
-        data["isHostRecord"] = this.isHostRecord;
-        data["hexaCode"] = this.hexaCode;
-        data["image"] = this.image;
-        return data;
-    }
-}
-
-export interface ILookupLabelDto {
-    value: number;
-    label: string | undefined;
-    code: string | undefined;
-    stockAvailability: number | undefined;
-    isHostRecord: boolean | undefined;
-    hexaCode: string | undefined;
-    image: string | undefined;
-
-    [key: string]: any;
-}
-
 export enum MemberFilterTypeEnum {
     Profile = 0,
     View = 1,
@@ -62596,6 +62909,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     phone3TypeId!: number | undefined;
     currencyId!: number | undefined;
     languageId!: number | undefined;
+    languageCode!: string | undefined;
     entityId!: number | undefined;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
@@ -62612,6 +62926,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     accountId!: number | undefined;
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
+    extraDataAttributes!: ExtraDataAttrDto[] | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -62658,6 +62973,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             this.phone3TypeId = _data["phone3TypeId"];
             this.currencyId = _data["currencyId"];
             this.languageId = _data["languageId"];
+            this.languageCode = _data["languageCode"];
             this.entityId = _data["entityId"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
@@ -62702,6 +63018,11 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             this.accountId = _data["accountId"];
             this.shipViaId = _data["shipViaId"];
             this.paymentTermsId = _data["paymentTermsId"];
+            if (Array.isArray(_data["extraDataAttributes"])) {
+                this.extraDataAttributes = [] as any;
+                for (let item of _data["extraDataAttributes"])
+                    this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
+            }
             this.id = _data["id"];
         }
     }
@@ -62746,6 +63067,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
         data["phone3TypeId"] = this.phone3TypeId;
         data["currencyId"] = this.currencyId;
         data["languageId"] = this.languageId;
+        data["languageCode"] = this.languageCode;
         data["entityId"] = this.entityId;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
@@ -62790,6 +63112,11 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
         data["accountId"] = this.accountId;
         data["shipViaId"] = this.shipViaId;
         data["paymentTermsId"] = this.paymentTermsId;
+        if (Array.isArray(this.extraDataAttributes)) {
+            data["extraDataAttributes"] = [];
+            for (let item of this.extraDataAttributes)
+                data["extraDataAttributes"].push(item.toJSON());
+        }
         data["id"] = this.id;
         return data;
     }
@@ -62819,6 +63146,7 @@ export interface IAppContactValidationInputDTO {
     phone3TypeId: number | undefined;
     currencyId: number | undefined;
     languageId: number | undefined;
+    languageCode: string | undefined;
     entityId: number | undefined;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
@@ -62835,6 +63163,7 @@ export interface IAppContactValidationInputDTO {
     accountId: number | undefined;
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
+    extraDataAttributes: ExtraDataAttrDto[] | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -71828,6 +72157,66 @@ export interface IContactInformationOutputDto {
     [key: string]: any;
 }
 
+export class PagedResultDtoOfExtraDataAttrDto implements IPagedResultDtoOfExtraDataAttrDto {
+    totalCount!: number;
+    items!: ExtraDataAttrDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfExtraDataAttrDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ExtraDataAttrDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfExtraDataAttrDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfExtraDataAttrDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfExtraDataAttrDto {
+    totalCount: number;
+    items: ExtraDataAttrDto[] | undefined;
+
+    [key: string]: any;
+}
+
 export enum ResponceType {
     OTHER = 0,
     INTEREST = 1,
@@ -73371,166 +73760,6 @@ export interface IPagedResultDtoOfGetAppItemForViewDto {
     [key: string]: any;
 }
 
-export class EDRestAttributes implements IEDRestAttributes {
-    extraAttrName!: string | undefined;
-    totalCount!: number;
-    extraAttributeId!: number;
-    values!: LookupLabelDto[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IEDRestAttributes) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.extraAttrName = _data["extraAttrName"];
-            this.totalCount = _data["totalCount"];
-            this.extraAttributeId = _data["extraAttributeId"];
-            if (Array.isArray(_data["values"])) {
-                this.values = [] as any;
-                for (let item of _data["values"])
-                    this.values!.push(LookupLabelDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): EDRestAttributes {
-        data = typeof data === 'object' ? data : {};
-        let result = new EDRestAttributes();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["extraAttrName"] = this.extraAttrName;
-        data["totalCount"] = this.totalCount;
-        data["extraAttributeId"] = this.extraAttributeId;
-        if (Array.isArray(this.values)) {
-            data["values"] = [];
-            for (let item of this.values)
-                data["values"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IEDRestAttributes {
-    extraAttrName: string | undefined;
-    totalCount: number;
-    extraAttributeId: number;
-    values: LookupLabelDto[] | undefined;
-
-    [key: string]: any;
-}
-
-export class ExtraDataSelectedValues implements IExtraDataSelectedValues {
-    code!: string | undefined;
-    value!: string | undefined;
-    totalCount!: number;
-    entityAttachments!: AppEntityAttachmentDto[] | undefined;
-    defaultEntityAttachment!: AppEntityAttachmentDto;
-    edRestAttributes!: EDRestAttributes[] | undefined;
-    colorImage!: string | undefined;
-    colorHexaCode!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IExtraDataSelectedValues) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.code = _data["code"];
-            this.value = _data["value"];
-            this.totalCount = _data["totalCount"];
-            if (Array.isArray(_data["entityAttachments"])) {
-                this.entityAttachments = [] as any;
-                for (let item of _data["entityAttachments"])
-                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
-            }
-            this.defaultEntityAttachment = _data["defaultEntityAttachment"] ? AppEntityAttachmentDto.fromJS(_data["defaultEntityAttachment"]) : <any>undefined;
-            if (Array.isArray(_data["edRestAttributes"])) {
-                this.edRestAttributes = [] as any;
-                for (let item of _data["edRestAttributes"])
-                    this.edRestAttributes!.push(EDRestAttributes.fromJS(item));
-            }
-            this.colorImage = _data["colorImage"];
-            this.colorHexaCode = _data["colorHexaCode"];
-        }
-    }
-
-    static fromJS(data: any): ExtraDataSelectedValues {
-        data = typeof data === 'object' ? data : {};
-        let result = new ExtraDataSelectedValues();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["code"] = this.code;
-        data["value"] = this.value;
-        data["totalCount"] = this.totalCount;
-        if (Array.isArray(this.entityAttachments)) {
-            data["entityAttachments"] = [];
-            for (let item of this.entityAttachments)
-                data["entityAttachments"].push(item.toJSON());
-        }
-        data["defaultEntityAttachment"] = this.defaultEntityAttachment ? this.defaultEntityAttachment.toJSON() : <any>undefined;
-        if (Array.isArray(this.edRestAttributes)) {
-            data["edRestAttributes"] = [];
-            for (let item of this.edRestAttributes)
-                data["edRestAttributes"].push(item.toJSON());
-        }
-        data["colorImage"] = this.colorImage;
-        data["colorHexaCode"] = this.colorHexaCode;
-        return data;
-    }
-}
-
-export interface IExtraDataSelectedValues {
-    code: string | undefined;
-    value: string | undefined;
-    totalCount: number;
-    entityAttachments: AppEntityAttachmentDto[] | undefined;
-    defaultEntityAttachment: AppEntityAttachmentDto;
-    edRestAttributes: EDRestAttributes[] | undefined;
-    colorImage: string | undefined;
-    colorHexaCode: string | undefined;
-
-    [key: string]: any;
-}
-
 export class PagedResultDtoOfExtraDataSelectedValues implements IPagedResultDtoOfExtraDataSelectedValues {
     totalCount!: number;
     items!: ExtraDataSelectedValues[] | undefined;
@@ -73851,82 +74080,6 @@ export interface IVariationItemDto {
     ssin: string | undefined;
     manufacturerCode: string | undefined;
     id: number;
-
-    [key: string]: any;
-}
-
-export class ExtraDataAttrDto implements IExtraDataAttrDto {
-    extraAttrUsage!: string | undefined;
-    extraAttrName!: string | undefined;
-    selectedValuesTotalCount!: number;
-    extraAttrDataType!: string | undefined;
-    extraAttributeId!: number;
-    selectedValues!: ExtraDataSelectedValues[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IExtraDataAttrDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.extraAttrUsage = _data["extraAttrUsage"];
-            this.extraAttrName = _data["extraAttrName"];
-            this.selectedValuesTotalCount = _data["selectedValuesTotalCount"];
-            this.extraAttrDataType = _data["extraAttrDataType"];
-            this.extraAttributeId = _data["extraAttributeId"];
-            if (Array.isArray(_data["selectedValues"])) {
-                this.selectedValues = [] as any;
-                for (let item of _data["selectedValues"])
-                    this.selectedValues!.push(ExtraDataSelectedValues.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): ExtraDataAttrDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ExtraDataAttrDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["extraAttrUsage"] = this.extraAttrUsage;
-        data["extraAttrName"] = this.extraAttrName;
-        data["selectedValuesTotalCount"] = this.selectedValuesTotalCount;
-        data["extraAttrDataType"] = this.extraAttrDataType;
-        data["extraAttributeId"] = this.extraAttributeId;
-        if (Array.isArray(this.selectedValues)) {
-            data["selectedValues"] = [];
-            for (let item of this.selectedValues)
-                data["selectedValues"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IExtraDataAttrDto {
-    extraAttrUsage: string | undefined;
-    extraAttrName: string | undefined;
-    selectedValuesTotalCount: number;
-    extraAttrDataType: string | undefined;
-    extraAttributeId: number;
-    selectedValues: ExtraDataSelectedValues[] | undefined;
 
     [key: string]: any;
 }
@@ -75036,66 +75189,6 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
 export interface IGetAppItemDetailForViewDto {
     appItem: AppItemForViewDto;
     nonLookupValues: LookupLabelDto[] | undefined;
-
-    [key: string]: any;
-}
-
-export class PagedResultDtoOfExtraDataAttrDto implements IPagedResultDtoOfExtraDataAttrDto {
-    totalCount!: number;
-    items!: ExtraDataAttrDto[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IPagedResultDtoOfExtraDataAttrDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.totalCount = _data["totalCount"];
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(ExtraDataAttrDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): PagedResultDtoOfExtraDataAttrDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PagedResultDtoOfExtraDataAttrDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["totalCount"] = this.totalCount;
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IPagedResultDtoOfExtraDataAttrDto {
-    totalCount: number;
-    items: ExtraDataAttrDto[] | undefined;
 
     [key: string]: any;
 }

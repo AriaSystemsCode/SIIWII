@@ -23,6 +23,7 @@ export class dynamicInputs implements OnInit, OnChanges {
   originalValuesMap = new Map<number, any>();
 
   sycAttachmentCategoryImage: SycAttachmentCategoryDto;
+  @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
 
   openCalendar(calendar: any) {
     calendar.overlayVisible = true;
@@ -165,6 +166,10 @@ export class dynamicInputs implements OnInit, OnChanges {
           attr.selectedValues = dtoValue;
         }
         this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
+      }else {
+        if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
+          attr.selectedValues = this.defaultBooleanValue;
+        }
       }
     }
 
