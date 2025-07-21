@@ -35,8 +35,11 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     hasImages:boolean;
 
 
-    imProductData:boolean=false;
-    imProductImages:boolean=false;
+    imData:boolean=false;
+    imImages:boolean=false;
+    @Output() _imData = new EventEmitter<boolean>();
+    @Output() _imImages = new EventEmitter<boolean>();
+
     isAnyOptionSelected:boolean =false;
     showUploadModal = false;
     folderName = 'Main Folder';
@@ -84,8 +87,8 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     }
 
     hide() {
-        this.imProductData=false;
-        this.imProductImages=false;
+        this.imData=false;
+        this.imImages=false;
         this.isAnyOptionSelected=false;
         this.modal.hide();
     }
@@ -146,7 +149,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     // <!-- Iteration-8 -->
 
     onOptionChange(){
-        this.isAnyOptionSelected = this.imProductData || this.imProductImages;
+        this.isAnyOptionSelected = this.imData || this.imImages;
     }
 
     openVideoModal(){
@@ -185,6 +188,9 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
             if (!(file.webkitRelativePath.split('/').length > 2))
                 _UploadedFolder.push(file);
         }
+
+        this._imData.emit(this.imData);
+        this._imImages.emit(this.imImages);
         this.UploadedFolder.emit(_UploadedFolder);
         event.target.value = "";
 

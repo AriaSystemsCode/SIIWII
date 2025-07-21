@@ -14065,6 +14065,311 @@ export class AppItemsServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    getImportVideo(): Observable<ExcelTemplateDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/GetImportVideo";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetImportVideo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetImportVideo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelTemplateDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelTemplateDto>;
+        }));
+    }
+
+    protected processGetImportVideo(response: HttpResponseBase): Observable<ExcelTemplateDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelTemplateDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @param appItemListId (optional) 
+     * @param selectorOnly (optional) 
+     * @param filter (optional) 
+     * @param lastKey (optional) 
+     * @param selectorKey (optional) 
+     * @param priceListId (optional) 
+     * @param arrtibuteFilters (optional) 
+     * @param classificationFilters (optional) 
+     * @param categoryFilters (optional) 
+     * @param scalesFilters (optional) 
+     * @param departmentFilters (optional) 
+     * @param entityObjectTypeId (optional) 
+     * @param minimumPrice (optional) 
+     * @param maximumPrice (optional) 
+     * @param itemType (optional) 
+     * @param listingStatus (optional) 
+     * @param publishStatus (optional) 
+     * @param visibilityStatus (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllLookUp(tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, filterType: ItemsFilterTypesEnum, lastKey: string | null | undefined, selectorKey: string | null | undefined, priceListId: number | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, classificationFilters: number[] | null | undefined, categoryFilters: number[] | null | undefined, scalesFilters: string[] | null | undefined, departmentFilters: number[] | null | undefined, entityObjectTypeId: number | undefined, minimumPrice: number | undefined, maximumPrice: number | undefined, itemType: number | undefined, listingStatus: number | undefined, publishStatus: number | undefined, visibilityStatus: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupAccountOrTenantDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/GetAllLookUp?";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (appItemListId !== undefined && appItemListId !== null)
+            url_ += "AppItemListId=" + encodeURIComponent("" + appItemListId) + "&";
+        if (selectorOnly !== undefined && selectorOnly !== null)
+            url_ += "SelectorOnly=" + encodeURIComponent("" + selectorOnly) + "&";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (filterType === undefined || filterType === null)
+            throw new Error("The parameter 'filterType' must be defined and cannot be null.");
+        else
+            url_ += "FilterType=" + encodeURIComponent("" + filterType) + "&";
+        if (lastKey !== undefined && lastKey !== null)
+            url_ += "LastKey=" + encodeURIComponent("" + lastKey) + "&";
+        if (selectorKey !== undefined && selectorKey !== null)
+            url_ += "SelectorKey=" + encodeURIComponent("" + selectorKey) + "&";
+        if (priceListId === null)
+            throw new Error("The parameter 'priceListId' cannot be null.");
+        else if (priceListId !== undefined)
+            url_ += "PriceListId=" + encodeURIComponent("" + priceListId) + "&";
+        if (arrtibuteFilters !== undefined && arrtibuteFilters !== null)
+            arrtibuteFilters && arrtibuteFilters.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "ArrtibuteFilters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (classificationFilters !== undefined && classificationFilters !== null)
+            classificationFilters && classificationFilters.forEach(item => { url_ += "ClassificationFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (categoryFilters !== undefined && categoryFilters !== null)
+            categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (scalesFilters !== undefined && scalesFilters !== null)
+            scalesFilters && scalesFilters.forEach(item => { url_ += "ScalesFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (departmentFilters !== undefined && departmentFilters !== null)
+            departmentFilters && departmentFilters.forEach(item => { url_ += "departmentFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (entityObjectTypeId === null)
+            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
+        else if (entityObjectTypeId !== undefined)
+            url_ += "EntityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
+        if (minimumPrice === null)
+            throw new Error("The parameter 'minimumPrice' cannot be null.");
+        else if (minimumPrice !== undefined)
+            url_ += "MinimumPrice=" + encodeURIComponent("" + minimumPrice) + "&";
+        if (maximumPrice === null)
+            throw new Error("The parameter 'maximumPrice' cannot be null.");
+        else if (maximumPrice !== undefined)
+            url_ += "MaximumPrice=" + encodeURIComponent("" + maximumPrice) + "&";
+        if (itemType === null)
+            throw new Error("The parameter 'itemType' cannot be null.");
+        else if (itemType !== undefined)
+            url_ += "ItemType=" + encodeURIComponent("" + itemType) + "&";
+        if (listingStatus === null)
+            throw new Error("The parameter 'listingStatus' cannot be null.");
+        else if (listingStatus !== undefined)
+            url_ += "ListingStatus=" + encodeURIComponent("" + listingStatus) + "&";
+        if (publishStatus === null)
+            throw new Error("The parameter 'publishStatus' cannot be null.");
+        else if (publishStatus !== undefined)
+            url_ += "PublishStatus=" + encodeURIComponent("" + publishStatus) + "&";
+        if (visibilityStatus === null)
+            throw new Error("The parameter 'visibilityStatus' cannot be null.");
+        else if (visibilityStatus !== undefined)
+            url_ += "VisibilityStatus=" + encodeURIComponent("" + visibilityStatus) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllLookUp(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfLookupAccountOrTenantDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfLookupAccountOrTenantDto>;
+        }));
+    }
+
+    protected processGetAllLookUp(response: HttpResponseBase): Observable<PagedResultDtoOfLookupAccountOrTenantDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfLookupAccountOrTenantDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param itemId (optional) 
+     * @param getAppItemAttributesInputForCategories_Sorting (optional) 
+     * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
+     * @param getAppItemAttributesInputForCategories_MaxResultCount (optional) 
+     * @param getAppItemAttributesInputForClassifications_Sorting (optional) 
+     * @param getAppItemAttributesInputForClassifications_SkipCount (optional) 
+     * @param getAppItemAttributesInputForClassifications_MaxResultCount (optional) 
+     * @param getAppItemAttributesInputForDepartments_Sorting (optional) 
+     * @param getAppItemAttributesInputForDepartments_SkipCount (optional) 
+     * @param getAppItemAttributesInputForDepartments_MaxResultCount (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAppItemForEditData(itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForEditData?";
+        if (itemId === null)
+            throw new Error("The parameter 'itemId' cannot be null.");
+        else if (itemId !== undefined)
+            url_ += "ItemId=" + encodeURIComponent("" + itemId) + "&";
+        if (getAppItemAttributesInputForCategories_Sorting !== undefined && getAppItemAttributesInputForCategories_Sorting !== null)
+            url_ += "GetAppItemAttributesInputForCategories.Sorting=" + encodeURIComponent("" + getAppItemAttributesInputForCategories_Sorting) + "&";
+        if (getAppItemAttributesInputForCategories_SkipCount === null)
+            throw new Error("The parameter 'getAppItemAttributesInputForCategories_SkipCount' cannot be null.");
+        else if (getAppItemAttributesInputForCategories_SkipCount !== undefined)
+            url_ += "GetAppItemAttributesInputForCategories.SkipCount=" + encodeURIComponent("" + getAppItemAttributesInputForCategories_SkipCount) + "&";
+        if (getAppItemAttributesInputForCategories_MaxResultCount === null)
+            throw new Error("The parameter 'getAppItemAttributesInputForCategories_MaxResultCount' cannot be null.");
+        else if (getAppItemAttributesInputForCategories_MaxResultCount !== undefined)
+            url_ += "GetAppItemAttributesInputForCategories.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForCategories_MaxResultCount) + "&";
+        if (getAppItemAttributesInputForClassifications_Sorting !== undefined && getAppItemAttributesInputForClassifications_Sorting !== null)
+            url_ += "GetAppItemAttributesInputForClassifications.Sorting=" + encodeURIComponent("" + getAppItemAttributesInputForClassifications_Sorting) + "&";
+        if (getAppItemAttributesInputForClassifications_SkipCount === null)
+            throw new Error("The parameter 'getAppItemAttributesInputForClassifications_SkipCount' cannot be null.");
+        else if (getAppItemAttributesInputForClassifications_SkipCount !== undefined)
+            url_ += "GetAppItemAttributesInputForClassifications.SkipCount=" + encodeURIComponent("" + getAppItemAttributesInputForClassifications_SkipCount) + "&";
+        if (getAppItemAttributesInputForClassifications_MaxResultCount === null)
+            throw new Error("The parameter 'getAppItemAttributesInputForClassifications_MaxResultCount' cannot be null.");
+        else if (getAppItemAttributesInputForClassifications_MaxResultCount !== undefined)
+            url_ += "GetAppItemAttributesInputForClassifications.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForClassifications_MaxResultCount) + "&";
+        if (getAppItemAttributesInputForDepartments_Sorting !== undefined && getAppItemAttributesInputForDepartments_Sorting !== null)
+            url_ += "GetAppItemAttributesInputForDepartments.Sorting=" + encodeURIComponent("" + getAppItemAttributesInputForDepartments_Sorting) + "&";
+        if (getAppItemAttributesInputForDepartments_SkipCount === null)
+            throw new Error("The parameter 'getAppItemAttributesInputForDepartments_SkipCount' cannot be null.");
+        else if (getAppItemAttributesInputForDepartments_SkipCount !== undefined)
+            url_ += "GetAppItemAttributesInputForDepartments.SkipCount=" + encodeURIComponent("" + getAppItemAttributesInputForDepartments_SkipCount) + "&";
+        if (getAppItemAttributesInputForDepartments_MaxResultCount === null)
+            throw new Error("The parameter 'getAppItemAttributesInputForDepartments_MaxResultCount' cannot be null.");
+        else if (getAppItemAttributesInputForDepartments_MaxResultCount !== undefined)
+            url_ += "GetAppItemAttributesInputForDepartments.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForDepartments_MaxResultCount) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppItemForEditData(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppItemForEditData(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAppItemForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAppItemForEditOutput>;
+        }));
+    }
+
+    protected processGetAppItemForEditData(response: HttpResponseBase): Observable<GetAppItemForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAppItemForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -71867,6 +72172,19 @@ export interface IAppItemImage {
 }
 
 export class AppItemExcelDto implements IAppItemExcelDto {
+    actions!: string | undefined;
+    imagePreview!: string | undefined;
+    imageIsDefault!: boolean;
+    colorCode!: string | undefined;
+    colorName!: string | undefined;
+    colorHex!: string | undefined;
+    colorImage!: string | undefined;
+    colorSchema!: string | undefined;
+    colorNRF!: string | undefined;
+    sizeName!: string | undefined;
+    sizeScaleOrder!: string | undefined;
+    sizeMarket!: string | undefined;
+    sizeNRF!: string | undefined;
     id!: number;
     rowNumber!: number;
     recordType!: string;
@@ -71925,6 +72243,19 @@ export class AppItemExcelDto implements IAppItemExcelDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.actions = _data["actions"];
+            this.imagePreview = _data["imagePreview"];
+            this.imageIsDefault = _data["imageIsDefault"];
+            this.colorCode = _data["colorCode"];
+            this.colorName = _data["colorName"];
+            this.colorHex = _data["colorHex"];
+            this.colorImage = _data["colorImage"];
+            this.colorSchema = _data["colorSchema"];
+            this.colorNRF = _data["colorNRF"];
+            this.sizeName = _data["sizeName"];
+            this.sizeScaleOrder = _data["sizeScaleOrder"];
+            this.sizeMarket = _data["sizeMarket"];
+            this.sizeNRF = _data["sizeNRF"];
             this.id = _data["id"];
             this.rowNumber = _data["rowNumber"];
             this.recordType = _data["recordType"];
@@ -71993,6 +72324,19 @@ export class AppItemExcelDto implements IAppItemExcelDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["actions"] = this.actions;
+        data["imagePreview"] = this.imagePreview;
+        data["imageIsDefault"] = this.imageIsDefault;
+        data["colorCode"] = this.colorCode;
+        data["colorName"] = this.colorName;
+        data["colorHex"] = this.colorHex;
+        data["colorImage"] = this.colorImage;
+        data["colorSchema"] = this.colorSchema;
+        data["colorNRF"] = this.colorNRF;
+        data["sizeName"] = this.sizeName;
+        data["sizeScaleOrder"] = this.sizeScaleOrder;
+        data["sizeMarket"] = this.sizeMarket;
+        data["sizeNRF"] = this.sizeNRF;
         data["id"] = this.id;
         data["rowNumber"] = this.rowNumber;
         data["recordType"] = this.recordType;
@@ -72050,6 +72394,19 @@ export class AppItemExcelDto implements IAppItemExcelDto {
 }
 
 export interface IAppItemExcelDto {
+    actions: string | undefined;
+    imagePreview: string | undefined;
+    imageIsDefault: boolean;
+    colorCode: string | undefined;
+    colorName: string | undefined;
+    colorHex: string | undefined;
+    colorImage: string | undefined;
+    colorSchema: string | undefined;
+    colorNRF: string | undefined;
+    sizeName: string | undefined;
+    sizeScaleOrder: string | undefined;
+    sizeMarket: string | undefined;
+    sizeNRF: string | undefined;
     id: number;
     rowNumber: number;
     recordType: string;

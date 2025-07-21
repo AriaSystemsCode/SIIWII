@@ -6,7 +6,7 @@
     <div class="modal-dialog modal-lg mb-0">
         <div class="modal-content">
             <div class="modal-header-custom">
-                <h5 class="modal-title font-weight-bold">Import Product Information</h5>
+                <h5 class="modal-title font-weight-bold">Import {{ImportTypes[importType] }} Information</h5>
 
                 <div>
                     <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="hide()" />
@@ -15,13 +15,13 @@
 
                   <div>
                     <label class="option-tab">
-                      <input type="checkbox" [(ngModel)]="imProductData" (change)="onOptionChange()" class="mr-2"/>
-                      <span>Product Data</span>
+                      <input type="checkbox" [(ngModel)]="imData" (change)="onOptionChange()" class="mr-2"/>
+                      <span>{{ ImportTypes[importType] }} Data</span>
                     </label>
                   
                     <label class="option-tab">
-                      <input type="checkbox" [(ngModel)]="imProductImages" (change)="onOptionChange()" class="mr-2"/>
-                      <span>Product Images</span>
+                      <input type="checkbox" [(ngModel)]="imImages" (change)="onOptionChange()" class="mr-2"/>
+                      <span>{{ ImportTypes[importType] }} Images</span>
                     </label>
                   </div>
 
@@ -49,7 +49,7 @@
                 <div class="video-content">
                   <div class="video-text">
                     <h5 class="video-title">
-                      How to Import Product | Variation and Color images File?...
+                      How to Import {{ImportTypes[importType]}} | Variation and Color images File?...
                     </h5>
                     <p class="video-description">
                       Watch a tutorial video for how to organize and rename your file

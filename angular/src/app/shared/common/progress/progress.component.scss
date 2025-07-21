@@ -169,3 +169,17 @@
     white-space: nowrap;
     border: 1px solid #EEEEEEEE;
   }
+
+  .modal-dialog {
+    z-index: 1055;
+    position: relative;
+  }
+  
+  .modal-backdrop {
+    z-index: 1040 !important;
+  }
+  
+  .upload-modal {
+    z-index: 1060 !important;
+    position: relative;
+  }
