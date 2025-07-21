@@ -81,7 +81,7 @@ namespace onetouch.AppItems.Dtos
         public string Code { set; get; }
         public string Value { set; get; }
     }
-    public class AppItemExcelResultsDTO
+    public partial class AppItemExcelResultsDTO
     {
         public ExcelLogDto ExcelLogDTO { get; set; }
         public Int32 TotalRecords { get; set; }

@@ -4,6 +4,10 @@ using Abp.Application.Services.Dto;
 
 namespace onetouch.AppItems.Dtos
 {
+    public partial class AppItemExcelResultsDTO
+    {
+        public bool UpdateColorsToLookUp { get; set; }
+    }
     public class ImportItemInputDto
     {
         [Required(ErrorMessage = "Product Type must have a value.")]
