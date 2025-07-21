@@ -104,7 +104,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         }
     }
     deleteMember() {
-        const memberId: number = this.memberData?.contact?.id;
+        const memberId: number = this.memberData?.id;
         if (isNaN(memberId)) return
         var isConfirmed: Observable<boolean>;
         isConfirmed = this.askToConfirm("AreYouSureYouWantToDeleteThisContact?", "AreYouSure");
@@ -135,7 +135,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             .subscribe((result) => {
                 console.log(result,'coooooooooon')
                 this.memberData = result;
-                // this.adminContact =   this.memberData?.contact.userName.includes("admin");
+                this.adminContact =   this.memberData?.name.includes("admin");
                 // const firstName = this.memberData.contact.firstName
                 // const lastName = this.memberData.contact.lastName
                 // this.contactDisplayName = firstName ? firstName : ""
@@ -176,8 +176,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     }
     CreateUserName() {
        this.createOrEditUserModal.user = new UserEditDto();
-       this.createOrEditUserModal.user.name= this.memberData?.contact?.firstName;
-       this.createOrEditUserModal.user.surname=this.memberData?.contact?.lastName;
+       this.createOrEditUserModal.user.name= this.memberData?.firstName;
+       this.createOrEditUserModal.user.surname=this.memberData?.lastName;
        this.createOrEditUserModal.fromTeamMember=true;
        this.createOrEditUserModal.show()
     }
