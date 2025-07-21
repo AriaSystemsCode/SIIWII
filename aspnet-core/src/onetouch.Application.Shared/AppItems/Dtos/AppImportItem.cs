@@ -75,11 +75,11 @@ namespace onetouch.AppItems.Dtos
         public string SizeNRF { set; get; }
 
         #region Extradata found at
-        //public string MaterialContent { set; get; }
-        //public DateOnly SoldOutDate { set; get; }
-        //public string BrancdCode{ set; get; }
-        //public string BrandName{ set; get; }
-        //public string StartShipDate { set; get; }
+        public string MaterialContent { set; get; }
+        public DateOnly SoldOutDate { set; get; }
+        public string BrancdCode { set; get; }
+        public string BrandName { set; get; }
+        public string StartShipDate { set; get; }
         #endregion Extradata found at
     }
 }

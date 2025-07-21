@@ -78,6 +78,9 @@ using NPOI.OpenXmlFormats.Vml;
 using onetouch.AppSubScriptionPlan;
 using onetouch.Accounts.Dtos;
 using System.Management.Automation.Language;
+using Microsoft.AspNetCore.Http;
+using PayPalCheckoutSdk.Orders;
+using NPOI.HSSF.Util;
 
 namespace onetouch.AppItems
 {
@@ -95,7 +98,7 @@ namespace onetouch.AppItems
                 string directory = _appConfiguration[$"Templates:ImportVideo"];
                 if (!System.IO.Directory.Exists(directory))
                 { System.IO.Directory.CreateDirectory(directory); }
- 
+
                 #region get new file name
                 string templateFileName = _appConfiguration[$"Templates:ImportVideoAssets"];
                 string newFileName = Path.GetFileName(templateFileName);
@@ -122,25 +125,170 @@ namespace onetouch.AppItems
         }
         public async Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUp(GetAllAppItemsInput input)
         {
-            var y = await GetAll( input);
-            List<LookupAccountOrTenantDto> z = new List<LookupAccountOrTenantDto>();
-            foreach(var x in y.Items)
+            var GetAllRet = await GetAll(input);
+            List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
+            foreach (var x in GetAllRet.Items)
             {
-                z.Add(new LookupAccountOrTenantDto { DisplayName=x.AppItem.Code,Id=x.AppItem.Id});
+                lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code, Id = x.AppItem.Id });
 
             }
             return new PagedResultDto<LookupAccountOrTenantDto>(
-                   y.TotalCount,
-                   z
+                   GetAllRet.TotalCount,
+                   lookupAccountOrTenantDtoList
                );
 
         }
-        public async Task<GetAppItemForEditOutput> GetAppItemForEditData(GetAppItemWithPagedAttributesForEditInput input)
+        public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var y = await GetAppItemForEditData( input);
+            var y = await GetAppItemForEdit(input);
+            appItemtExcelRecordDTO.Name = y.AppItem.Name;
+            appItemtExcelRecordDTO.ExcelDto.Price = y.AppItem.Price.ToString();
+            appItemtExcelRecordDTO.ExcelDto.ProductDescription = y.AppItem.Description;
 
-            return y;
+            if (y.AppItem.AppItemPriceInfos.Count > 0)
+            {
+                appItemtExcelRecordDTO.ExcelDto.Currency = y.AppItem.AppItemPriceInfos[0].CurrencyCode;
+            }
+            if (y.AppItem.AppItemSizesScaleInfo.Count > 0)
+            {
+                appItemtExcelRecordDTO.ExcelDto.SizeScaleName = y.AppItem.AppItemSizesScaleInfo[0].Code;
+
+            }
+            if (y.AppItem.VariationItems.Count > 0)
+            {
+                var attributeValuesString = string.Join(",",
+                    y.AppItem.VariationItems
+                        .SelectMany(item => item.EntityExtraData)
+                        .Where(data => data.EntityObjectTypeId == 18 && data.EntityObjectTypeCode == "SIZE")
+                        .Select(data => data.AttributeValue)
+                        .Where(value => !string.IsNullOrWhiteSpace(value))
+                    );
+
+                appItemtExcelRecordDTO.ExcelDto.SizeScaleOrder = attributeValuesString;
+            }
+            if (y.AppItem.EntityExtraData.Count > 0)
+            {
+                var result = y.AppItem.EntityExtraData
+                    .Where(x => x.AttributeId == 662 && !string.IsNullOrWhiteSpace(x.AttributeValue))
+                    .Select(x => x.AttributeValue)
+                    .FirstOrDefault();
+                appItemtExcelRecordDTO.ExcelDto.MaterialContent = result;
+
+                var BrandName = y.AppItem.EntityExtraData
+                   .Where(x => x.EntityId == 86 && x.EntityObjectTypeId == 108 && !string.IsNullOrWhiteSpace(x.AttributeValueFkName))
+                   .Select(x => x.AttributeValueFkName)
+                   .FirstOrDefault();
+                appItemtExcelRecordDTO.ExcelDto.BrandName = BrandName;
+
+                var BrandCode = y.AppItem.EntityExtraData
+                 .Where(x => x.EntityId == 86 && x.EntityObjectTypeId == 108 && !string.IsNullOrWhiteSpace(x.AttributeValueFkName))
+                 .Select(x => x.AttributeValueFkName)
+                 .FirstOrDefault();
+                appItemtExcelRecordDTO.ExcelDto.BrancdCode = BrandCode;
+
+                var SoldOut = y.AppItem.EntityExtraData
+                 .Where(x => x.AttributeId == 661 && !string.IsNullOrWhiteSpace(x.AttributeValue))
+                 .Select(x => x.AttributeValue)
+                 .FirstOrDefault();
+                if (DateOnly.TryParse(SoldOut, out DateOnly date))
+                {
+                    appItemtExcelRecordDTO.ExcelDto.SoldOutDate = date;
+                }
+
+                var StartShipDate = y.AppItem.EntityExtraData
+                 .Where(x => x.AttributeId == 660 && !string.IsNullOrWhiteSpace(x.AttributeValue))
+                 .Select(x => x.AttributeValue)
+                 .FirstOrDefault();
+                if (DateOnly.TryParse(StartShipDate, out DateOnly StartShipDateOut))
+                {
+                    appItemtExcelRecordDTO.ExcelDto.SoldOutDate = StartShipDateOut;
+                }
+
+
+            }
+            if (y.AppItem.EntityClassifications.Items.Count > 0)
+            {
+                appItemtExcelRecordDTO.ExcelDto.ProductClassificationCode = y.AppItem.EntityClassifications.Items[0].EntityObjectClassificationCode;
+                appItemtExcelRecordDTO.ExcelDto.EntityObjectClassificaionID = y.AppItem.EntityClassifications.Items[0].EntityObjectClassificationId;
+                appItemtExcelRecordDTO.ExcelDto.ProductClassificationDescription = y.AppItem.EntityClassifications.Items[0].EntityObjectClassificationName;
+            }
+
+            if (y.AppItem.EntityCategories.Items.Count > 0)
+            {
+                appItemtExcelRecordDTO.ExcelDto.EntityObjectCategoryID = y.AppItem.EntityCategories.Items[0].EntityObjectCategoryId;
+                appItemtExcelRecordDTO.ExcelDto.ProductCategoryCode = y.AppItem.EntityCategories.Items[0].EntityObjectCategoryCode;
+                appItemtExcelRecordDTO.ExcelDto.ProductCategoryDescription = y.AppItem.EntityCategories.Items[0].EntityObjectCategoryName;
+            }
+
+
+            appItemtExcelRecordDTO.ExcelDto.PriceA = y.AppItem.AppItemPriceInfos != null && y.AppItem.AppItemPriceInfos.Any()
+                        ? y.AppItem.AppItemPriceInfos.FirstOrDefault(p => p.Code == "A")?.Price.ToString()
+                        : null;
+            appItemtExcelRecordDTO.ExcelDto.PriceB = y.AppItem.AppItemPriceInfos != null && y.AppItem.AppItemPriceInfos.Any()
+                      ? y.AppItem.AppItemPriceInfos.FirstOrDefault(p => p.Code == "B")?.Price.ToString()
+                      : null;
+            appItemtExcelRecordDTO.ExcelDto.PriceC = y.AppItem.AppItemPriceInfos != null && y.AppItem.AppItemPriceInfos.Any()
+                      ? y.AppItem.AppItemPriceInfos.FirstOrDefault(p => p.Code == "C")?.Price.ToString()
+                      : null;
+            appItemtExcelRecordDTO.ExcelDto.PriceD = y.AppItem.AppItemPriceInfos != null && y.AppItem.AppItemPriceInfos.Any()
+                      ? y.AppItem.AppItemPriceInfos.FirstOrDefault(p => p.Code == "D")?.Price.ToString()
+                      : null;
+
+            return appItemtExcelRecordDTO;
         }
+
+        /* 
+         7- when click final import >> create new API saveFromExcelImages, to [4H] 
+
+         7.2 update exisitng item with new added imge 
+
+         >> create new function save only rows of type images to parent items ( input id) 
+
+         call getItemforEdit(id) >> GetAppItemForEditOutput 
+
+         convert from GetAppItemForEditOutput.AppItemForEditDto to AppItem 
+
+         convert from AppItem to CreateOrEditAppItemDto 
+
+         update attachments array with the new linked image 
+
+         Call CreateOrEditAppItemDto  
+         
+         */
+
+        public async Task<long> Create(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        {
+            var y = await GetAppItemForEdit(input);
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
+            // add the image to the parent
+            if (y.AppItem.EntityAttachments.Count == 0) { y.AppItem.EntityAttachments = new List<AppEntityAttachmentDto>(); }
+            var z = new AppEntityAttachmentDto { AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
+
+            //if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
+            //{
+            //    System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
+            //}
+
+            //try
+            //{
+            //    System.IO.File.Copy(path + @"\" + z.guid + "." + guid.ImageFileName.Split('.')[1], _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
+            //}
+            //catch { }
+
+            y.AppItem.EntityAttachments.Add(z);
+
+
+
+            var item = new GetAppItemForEditOutput { AppItem = ObjectMapper.Map<AppItemForEditDto>(y.AppItem) };
+            CreateOrEditAppItemDto itemUpdate = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
+
+            var x = await DoCreateOrEdit(itemUpdate);
+
+
+            return x;
+        }
+
     }
 
- }
+}
