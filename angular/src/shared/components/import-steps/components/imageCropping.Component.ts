@@ -229,9 +229,9 @@ this._imagePassed+=1;
 
 goNextStep()
 {
-    this.goNext.emit();
     this.finalCountFailed.emit(this._imageFailed);
     this.finalCountPassed.emit(this._imagePassed);
+    this.goNext.emit();
 }
 askToClose()
 {
