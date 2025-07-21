@@ -14277,9 +14277,71 @@ export class AppItemsServiceProxy {
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
+     * @param recordType (optional) 
+     * @param parentCode (optional) 
+     * @param code (optional) 
+     * @param name (optional) 
+     * @param fieldsErrors (optional) 
+     * @param excelDto_Actions (optional) 
+     * @param excelDto_ImagePreview (optional) 
+     * @param excelDto_ImageIsDefault (optional) 
+     * @param excelDto_ColorCode (optional) 
+     * @param excelDto_ColorName (optional) 
+     * @param excelDto_ColorHex (optional) 
+     * @param excelDto_ColorImage (optional) 
+     * @param excelDto_ColorSchema (optional) 
+     * @param excelDto_ColorNRF (optional) 
+     * @param excelDto_SizeName (optional) 
+     * @param excelDto_SizeScaleOrder (optional) 
+     * @param excelDto_SizeMarket (optional) 
+     * @param excelDto_SizeNRF (optional) 
+     * @param excelDto_MaterialContent (optional) 
+     * @param excelDto_SoldOutDate (optional) 
+     * @param excelDto_BrancdCode (optional) 
+     * @param excelDto_BrandName (optional) 
+     * @param excelDto_StartShipDate (optional) 
+     * @param excelDto_Id (optional) 
+     * @param excelDto_rowNumber (optional) 
+     * @param excelDto_ProductClassificationCode (optional) 
+     * @param excelDto_ProductClassificationDescription (optional) 
+     * @param excelDto_ProductCategoryCode (optional) 
+     * @param excelDto_ProductCategoryDescription (optional) 
+     * @param excelDto_Price (optional) 
+     * @param excelDto_PriceA (optional) 
+     * @param excelDto_PriceB (optional) 
+     * @param excelDto_PriceC (optional) 
+     * @param excelDto_PriceD (optional) 
+     * @param excelDto_Currency (optional) 
+     * @param excelDto_ParentCode (optional) 
+     * @param excelDto_ImageType (optional) 
+     * @param excelDto_ImageFolderName (optional) 
+     * @param excelDto_ParentId (optional) 
+     * @param excelDto_ExtraAttributesValues (optional) 
+     * @param excelDto_ExtraAttributes (optional) 
+     * @param excelDto_Images (optional) 
+     * @param excelDto_EntityObjectClassificaionID (optional) 
+     * @param excelDto_EntityObjectCategoryID (optional) 
+     * @param excelDto_SizeScaleName (optional) 
+     * @param excelDto_SizeRatioName (optional) 
+     * @param excelDto_SizeRatioValue (optional) 
+     * @param excelDto_NoOfDim (optional) 
+     * @param excelDto_D1Name (optional) 
+     * @param excelDto_D2Name (optional) 
+     * @param excelDto_D3Name (optional) 
+     * @param excelDto_D1Sizes (optional) 
+     * @param excelDto_D2Sizes (optional) 
+     * @param excelDto_D3Sizes (optional) 
+     * @param excelDto_D1Pos (optional) 
+     * @param excelDto_D2Pos (optional) 
+     * @param excelDto_D3Pos (optional) 
+     * @param excelDto_SizeCode (optional) 
+     * @param status (optional) 
+     * @param errorMessage (optional) 
+     * @param imageType (optional) 
+     * @param image (optional) 
      * @return Success
      */
-    getAppItemForEditData(itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemForEditOutput> {
+    getAppItemForEditData(itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, recordType: string | null | undefined, parentCode: string | null | undefined, code: string | null | undefined, name: string | null | undefined, fieldsErrors: string[] | null | undefined, excelDto_Actions: string | null | undefined, excelDto_ImagePreview: string | null | undefined, excelDto_ImageIsDefault: boolean | undefined, excelDto_ColorCode: string | null | undefined, excelDto_ColorName: string | null | undefined, excelDto_ColorHex: string | null | undefined, excelDto_ColorImage: string | null | undefined, excelDto_ColorSchema: string | null | undefined, excelDto_ColorNRF: string | null | undefined, excelDto_SizeName: string | null | undefined, excelDto_SizeScaleOrder: string | null | undefined, excelDto_SizeMarket: string | null | undefined, excelDto_SizeNRF: string | null | undefined, excelDto_MaterialContent: string | null | undefined, excelDto_SoldOutDate: string | undefined, excelDto_BrancdCode: string | null | undefined, excelDto_BrandName: string | null | undefined, excelDto_StartShipDate: string | null | undefined, excelDto_Id: number | undefined, excelDto_rowNumber: number | undefined, excelDto_RecordType: string, excelDto_ProductType: string, excelDto_ProductClassificationCode: string | null | undefined, excelDto_ProductClassificationDescription: string | null | undefined, excelDto_ProductCategoryCode: string | null | undefined, excelDto_ProductCategoryDescription: string | null | undefined, excelDto_Price: string | null | undefined, excelDto_PriceA: string | null | undefined, excelDto_PriceB: string | null | undefined, excelDto_PriceC: string | null | undefined, excelDto_PriceD: string | null | undefined, excelDto_Currency: string | null | undefined, excelDto_ParentCode: string | null | undefined, excelDto_ImageType: string | null | undefined, excelDto_ImageFolderName: string | null | undefined, excelDto_ParentId: number | undefined, excelDto_ExtraAttributesValues: AppItemImpExtrAttributes[] | null | undefined, excelDto_ExtraAttributes: ExtraAttribute[] | null | undefined, excelDto_Images: AppItemImage[] | null | undefined, excelDto_Code: string, excelDto_Name: string, excelDto_ProductDescription: string, excelDto_EntityObjectClassificaionID: number | null | undefined, excelDto_EntityObjectCategoryID: number | null | undefined, excelDto_SizeScaleName: string | null | undefined, excelDto_SizeRatioName: string | null | undefined, excelDto_SizeRatioValue: string | null | undefined, excelDto_NoOfDim: string | null | undefined, excelDto_D1Name: string | null | undefined, excelDto_D2Name: string | null | undefined, excelDto_D3Name: string | null | undefined, excelDto_D1Sizes: string | null | undefined, excelDto_D2Sizes: string | null | undefined, excelDto_D3Sizes: string | null | undefined, excelDto_D1Pos: string | null | undefined, excelDto_D2Pos: string | null | undefined, excelDto_D3Pos: string | null | undefined, excelDto_SizeCode: string | null | undefined, status: string | null | undefined, errorMessage: string | null | undefined, imageType: string | null | undefined, image: string | null | undefined): Observable<AppItemtExcelRecordDTO> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForEditData?";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
@@ -14325,6 +14387,175 @@ export class AppItemsServiceProxy {
             throw new Error("The parameter 'maxResultCount' cannot be null.");
         else if (maxResultCount !== undefined)
             url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (recordType !== undefined && recordType !== null)
+            url_ += "RecordType=" + encodeURIComponent("" + recordType) + "&";
+        if (parentCode !== undefined && parentCode !== null)
+            url_ += "ParentCode=" + encodeURIComponent("" + parentCode) + "&";
+        if (code !== undefined && code !== null)
+            url_ += "Code=" + encodeURIComponent("" + code) + "&";
+        if (name !== undefined && name !== null)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
+        if (fieldsErrors !== undefined && fieldsErrors !== null)
+            fieldsErrors && fieldsErrors.forEach(item => { url_ += "FieldsErrors=" + encodeURIComponent("" + item) + "&"; });
+        if (excelDto_Actions !== undefined && excelDto_Actions !== null)
+            url_ += "ExcelDto.Actions=" + encodeURIComponent("" + excelDto_Actions) + "&";
+        if (excelDto_ImagePreview !== undefined && excelDto_ImagePreview !== null)
+            url_ += "ExcelDto.ImagePreview=" + encodeURIComponent("" + excelDto_ImagePreview) + "&";
+        if (excelDto_ImageIsDefault === null)
+            throw new Error("The parameter 'excelDto_ImageIsDefault' cannot be null.");
+        else if (excelDto_ImageIsDefault !== undefined)
+            url_ += "ExcelDto.ImageIsDefault=" + encodeURIComponent("" + excelDto_ImageIsDefault) + "&";
+        if (excelDto_ColorCode !== undefined && excelDto_ColorCode !== null)
+            url_ += "ExcelDto.ColorCode=" + encodeURIComponent("" + excelDto_ColorCode) + "&";
+        if (excelDto_ColorName !== undefined && excelDto_ColorName !== null)
+            url_ += "ExcelDto.ColorName=" + encodeURIComponent("" + excelDto_ColorName) + "&";
+        if (excelDto_ColorHex !== undefined && excelDto_ColorHex !== null)
+            url_ += "ExcelDto.ColorHex=" + encodeURIComponent("" + excelDto_ColorHex) + "&";
+        if (excelDto_ColorImage !== undefined && excelDto_ColorImage !== null)
+            url_ += "ExcelDto.ColorImage=" + encodeURIComponent("" + excelDto_ColorImage) + "&";
+        if (excelDto_ColorSchema !== undefined && excelDto_ColorSchema !== null)
+            url_ += "ExcelDto.ColorSchema=" + encodeURIComponent("" + excelDto_ColorSchema) + "&";
+        if (excelDto_ColorNRF !== undefined && excelDto_ColorNRF !== null)
+            url_ += "ExcelDto.ColorNRF=" + encodeURIComponent("" + excelDto_ColorNRF) + "&";
+        if (excelDto_SizeName !== undefined && excelDto_SizeName !== null)
+            url_ += "ExcelDto.SizeName=" + encodeURIComponent("" + excelDto_SizeName) + "&";
+        if (excelDto_SizeScaleOrder !== undefined && excelDto_SizeScaleOrder !== null)
+            url_ += "ExcelDto.SizeScaleOrder=" + encodeURIComponent("" + excelDto_SizeScaleOrder) + "&";
+        if (excelDto_SizeMarket !== undefined && excelDto_SizeMarket !== null)
+            url_ += "ExcelDto.SizeMarket=" + encodeURIComponent("" + excelDto_SizeMarket) + "&";
+        if (excelDto_SizeNRF !== undefined && excelDto_SizeNRF !== null)
+            url_ += "ExcelDto.SizeNRF=" + encodeURIComponent("" + excelDto_SizeNRF) + "&";
+        if (excelDto_MaterialContent !== undefined && excelDto_MaterialContent !== null)
+            url_ += "ExcelDto.MaterialContent=" + encodeURIComponent("" + excelDto_MaterialContent) + "&";
+        if (excelDto_SoldOutDate === null)
+            throw new Error("The parameter 'excelDto_SoldOutDate' cannot be null.");
+        else if (excelDto_SoldOutDate !== undefined)
+            url_ += "ExcelDto.SoldOutDate=" + encodeURIComponent("" + excelDto_SoldOutDate) + "&";
+        if (excelDto_BrancdCode !== undefined && excelDto_BrancdCode !== null)
+            url_ += "ExcelDto.BrancdCode=" + encodeURIComponent("" + excelDto_BrancdCode) + "&";
+        if (excelDto_BrandName !== undefined && excelDto_BrandName !== null)
+            url_ += "ExcelDto.BrandName=" + encodeURIComponent("" + excelDto_BrandName) + "&";
+        if (excelDto_StartShipDate !== undefined && excelDto_StartShipDate !== null)
+            url_ += "ExcelDto.StartShipDate=" + encodeURIComponent("" + excelDto_StartShipDate) + "&";
+        if (excelDto_Id === null)
+            throw new Error("The parameter 'excelDto_Id' cannot be null.");
+        else if (excelDto_Id !== undefined)
+            url_ += "ExcelDto.Id=" + encodeURIComponent("" + excelDto_Id) + "&";
+        if (excelDto_rowNumber === null)
+            throw new Error("The parameter 'excelDto_rowNumber' cannot be null.");
+        else if (excelDto_rowNumber !== undefined)
+            url_ += "ExcelDto.rowNumber=" + encodeURIComponent("" + excelDto_rowNumber) + "&";
+        if (excelDto_RecordType === undefined || excelDto_RecordType === null)
+            throw new Error("The parameter 'excelDto_RecordType' must be defined and cannot be null.");
+        else
+            url_ += "ExcelDto.RecordType=" + encodeURIComponent("" + excelDto_RecordType) + "&";
+        if (excelDto_ProductType === undefined || excelDto_ProductType === null)
+            throw new Error("The parameter 'excelDto_ProductType' must be defined and cannot be null.");
+        else
+            url_ += "ExcelDto.ProductType=" + encodeURIComponent("" + excelDto_ProductType) + "&";
+        if (excelDto_ProductClassificationCode !== undefined && excelDto_ProductClassificationCode !== null)
+            url_ += "ExcelDto.ProductClassificationCode=" + encodeURIComponent("" + excelDto_ProductClassificationCode) + "&";
+        if (excelDto_ProductClassificationDescription !== undefined && excelDto_ProductClassificationDescription !== null)
+            url_ += "ExcelDto.ProductClassificationDescription=" + encodeURIComponent("" + excelDto_ProductClassificationDescription) + "&";
+        if (excelDto_ProductCategoryCode !== undefined && excelDto_ProductCategoryCode !== null)
+            url_ += "ExcelDto.ProductCategoryCode=" + encodeURIComponent("" + excelDto_ProductCategoryCode) + "&";
+        if (excelDto_ProductCategoryDescription !== undefined && excelDto_ProductCategoryDescription !== null)
+            url_ += "ExcelDto.ProductCategoryDescription=" + encodeURIComponent("" + excelDto_ProductCategoryDescription) + "&";
+        if (excelDto_Price !== undefined && excelDto_Price !== null)
+            url_ += "ExcelDto.Price=" + encodeURIComponent("" + excelDto_Price) + "&";
+        if (excelDto_PriceA !== undefined && excelDto_PriceA !== null)
+            url_ += "ExcelDto.PriceA=" + encodeURIComponent("" + excelDto_PriceA) + "&";
+        if (excelDto_PriceB !== undefined && excelDto_PriceB !== null)
+            url_ += "ExcelDto.PriceB=" + encodeURIComponent("" + excelDto_PriceB) + "&";
+        if (excelDto_PriceC !== undefined && excelDto_PriceC !== null)
+            url_ += "ExcelDto.PriceC=" + encodeURIComponent("" + excelDto_PriceC) + "&";
+        if (excelDto_PriceD !== undefined && excelDto_PriceD !== null)
+            url_ += "ExcelDto.PriceD=" + encodeURIComponent("" + excelDto_PriceD) + "&";
+        if (excelDto_Currency !== undefined && excelDto_Currency !== null)
+            url_ += "ExcelDto.Currency=" + encodeURIComponent("" + excelDto_Currency) + "&";
+        if (excelDto_ParentCode !== undefined && excelDto_ParentCode !== null)
+            url_ += "ExcelDto.ParentCode=" + encodeURIComponent("" + excelDto_ParentCode) + "&";
+        if (excelDto_ImageType !== undefined && excelDto_ImageType !== null)
+            url_ += "ExcelDto.ImageType=" + encodeURIComponent("" + excelDto_ImageType) + "&";
+        if (excelDto_ImageFolderName !== undefined && excelDto_ImageFolderName !== null)
+            url_ += "ExcelDto.ImageFolderName=" + encodeURIComponent("" + excelDto_ImageFolderName) + "&";
+        if (excelDto_ParentId === null)
+            throw new Error("The parameter 'excelDto_ParentId' cannot be null.");
+        else if (excelDto_ParentId !== undefined)
+            url_ += "ExcelDto.ParentId=" + encodeURIComponent("" + excelDto_ParentId) + "&";
+        if (excelDto_ExtraAttributesValues !== undefined && excelDto_ExtraAttributesValues !== null)
+            excelDto_ExtraAttributesValues && excelDto_ExtraAttributesValues.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "ExcelDto.ExtraAttributesValues[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (excelDto_ExtraAttributes !== undefined && excelDto_ExtraAttributes !== null)
+            excelDto_ExtraAttributes && excelDto_ExtraAttributes.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "ExcelDto.ExtraAttributes[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (excelDto_Images !== undefined && excelDto_Images !== null)
+            excelDto_Images && excelDto_Images.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "ExcelDto.Images[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (excelDto_Code === undefined || excelDto_Code === null)
+            throw new Error("The parameter 'excelDto_Code' must be defined and cannot be null.");
+        else
+            url_ += "ExcelDto.Code=" + encodeURIComponent("" + excelDto_Code) + "&";
+        if (excelDto_Name === undefined || excelDto_Name === null)
+            throw new Error("The parameter 'excelDto_Name' must be defined and cannot be null.");
+        else
+            url_ += "ExcelDto.Name=" + encodeURIComponent("" + excelDto_Name) + "&";
+        if (excelDto_ProductDescription === undefined || excelDto_ProductDescription === null)
+            throw new Error("The parameter 'excelDto_ProductDescription' must be defined and cannot be null.");
+        else
+            url_ += "ExcelDto.ProductDescription=" + encodeURIComponent("" + excelDto_ProductDescription) + "&";
+        if (excelDto_EntityObjectClassificaionID !== undefined && excelDto_EntityObjectClassificaionID !== null)
+            url_ += "ExcelDto.EntityObjectClassificaionID=" + encodeURIComponent("" + excelDto_EntityObjectClassificaionID) + "&";
+        if (excelDto_EntityObjectCategoryID !== undefined && excelDto_EntityObjectCategoryID !== null)
+            url_ += "ExcelDto.EntityObjectCategoryID=" + encodeURIComponent("" + excelDto_EntityObjectCategoryID) + "&";
+        if (excelDto_SizeScaleName !== undefined && excelDto_SizeScaleName !== null)
+            url_ += "ExcelDto.SizeScaleName=" + encodeURIComponent("" + excelDto_SizeScaleName) + "&";
+        if (excelDto_SizeRatioName !== undefined && excelDto_SizeRatioName !== null)
+            url_ += "ExcelDto.SizeRatioName=" + encodeURIComponent("" + excelDto_SizeRatioName) + "&";
+        if (excelDto_SizeRatioValue !== undefined && excelDto_SizeRatioValue !== null)
+            url_ += "ExcelDto.SizeRatioValue=" + encodeURIComponent("" + excelDto_SizeRatioValue) + "&";
+        if (excelDto_NoOfDim !== undefined && excelDto_NoOfDim !== null)
+            url_ += "ExcelDto.NoOfDim=" + encodeURIComponent("" + excelDto_NoOfDim) + "&";
+        if (excelDto_D1Name !== undefined && excelDto_D1Name !== null)
+            url_ += "ExcelDto.D1Name=" + encodeURIComponent("" + excelDto_D1Name) + "&";
+        if (excelDto_D2Name !== undefined && excelDto_D2Name !== null)
+            url_ += "ExcelDto.D2Name=" + encodeURIComponent("" + excelDto_D2Name) + "&";
+        if (excelDto_D3Name !== undefined && excelDto_D3Name !== null)
+            url_ += "ExcelDto.D3Name=" + encodeURIComponent("" + excelDto_D3Name) + "&";
+        if (excelDto_D1Sizes !== undefined && excelDto_D1Sizes !== null)
+            url_ += "ExcelDto.D1Sizes=" + encodeURIComponent("" + excelDto_D1Sizes) + "&";
+        if (excelDto_D2Sizes !== undefined && excelDto_D2Sizes !== null)
+            url_ += "ExcelDto.D2Sizes=" + encodeURIComponent("" + excelDto_D2Sizes) + "&";
+        if (excelDto_D3Sizes !== undefined && excelDto_D3Sizes !== null)
+            url_ += "ExcelDto.D3Sizes=" + encodeURIComponent("" + excelDto_D3Sizes) + "&";
+        if (excelDto_D1Pos !== undefined && excelDto_D1Pos !== null)
+            url_ += "ExcelDto.D1Pos=" + encodeURIComponent("" + excelDto_D1Pos) + "&";
+        if (excelDto_D2Pos !== undefined && excelDto_D2Pos !== null)
+            url_ += "ExcelDto.D2Pos=" + encodeURIComponent("" + excelDto_D2Pos) + "&";
+        if (excelDto_D3Pos !== undefined && excelDto_D3Pos !== null)
+            url_ += "ExcelDto.D3Pos=" + encodeURIComponent("" + excelDto_D3Pos) + "&";
+        if (excelDto_SizeCode !== undefined && excelDto_SizeCode !== null)
+            url_ += "ExcelDto.SizeCode=" + encodeURIComponent("" + excelDto_SizeCode) + "&";
+        if (status !== undefined && status !== null)
+            url_ += "Status=" + encodeURIComponent("" + status) + "&";
+        if (errorMessage !== undefined && errorMessage !== null)
+            url_ += "ErrorMessage=" + encodeURIComponent("" + errorMessage) + "&";
+        if (imageType !== undefined && imageType !== null)
+            url_ += "imageType=" + encodeURIComponent("" + imageType) + "&";
+        if (image !== undefined && image !== null)
+            url_ += "image=" + encodeURIComponent("" + image) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -14342,14 +14573,14 @@ export class AppItemsServiceProxy {
                 try {
                     return this.processGetAppItemForEditData(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<GetAppItemForEditOutput>;
+                    return _observableThrow(e) as any as Observable<AppItemtExcelRecordDTO>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<GetAppItemForEditOutput>;
+                return _observableThrow(response_) as any as Observable<AppItemtExcelRecordDTO>;
         }));
     }
 
-    protected processGetAppItemForEditData(response: HttpResponseBase): Observable<GetAppItemForEditOutput> {
+    protected processGetAppItemForEditData(response: HttpResponseBase): Observable<AppItemtExcelRecordDTO> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -14360,7 +14591,64 @@ export class AppItemsServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = GetAppItemForEditOutput.fromJS(resultData200);
+            result200 = AppItemtExcelRecordDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: GetAppItemWithPagedAttributesForEditInput | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -72185,6 +72473,11 @@ export class AppItemExcelDto implements IAppItemExcelDto {
     sizeScaleOrder!: string | undefined;
     sizeMarket!: string | undefined;
     sizeNRF!: string | undefined;
+    materialContent!: string | undefined;
+    soldOutDate!: string;
+    brancdCode!: string | undefined;
+    brandName!: string | undefined;
+    startShipDate!: string | undefined;
     id!: number;
     rowNumber!: number;
     recordType!: string;
@@ -72256,6 +72549,11 @@ export class AppItemExcelDto implements IAppItemExcelDto {
             this.sizeScaleOrder = _data["sizeScaleOrder"];
             this.sizeMarket = _data["sizeMarket"];
             this.sizeNRF = _data["sizeNRF"];
+            this.materialContent = _data["materialContent"];
+            this.soldOutDate = _data["soldOutDate"];
+            this.brancdCode = _data["brancdCode"];
+            this.brandName = _data["brandName"];
+            this.startShipDate = _data["startShipDate"];
             this.id = _data["id"];
             this.rowNumber = _data["rowNumber"];
             this.recordType = _data["recordType"];
@@ -72337,6 +72635,11 @@ export class AppItemExcelDto implements IAppItemExcelDto {
         data["sizeScaleOrder"] = this.sizeScaleOrder;
         data["sizeMarket"] = this.sizeMarket;
         data["sizeNRF"] = this.sizeNRF;
+        data["materialContent"] = this.materialContent;
+        data["soldOutDate"] = this.soldOutDate;
+        data["brancdCode"] = this.brancdCode;
+        data["brandName"] = this.brandName;
+        data["startShipDate"] = this.startShipDate;
         data["id"] = this.id;
         data["rowNumber"] = this.rowNumber;
         data["recordType"] = this.recordType;
@@ -72407,6 +72710,11 @@ export interface IAppItemExcelDto {
     sizeScaleOrder: string | undefined;
     sizeMarket: string | undefined;
     sizeNRF: string | undefined;
+    materialContent: string | undefined;
+    soldOutDate: string;
+    brancdCode: string | undefined;
+    brandName: string | undefined;
+    startShipDate: string | undefined;
     id: number;
     rowNumber: number;
     recordType: string;
@@ -72787,6 +73095,134 @@ export interface IProductVariationsType {
     id: number;
     name: string | undefined;
     variationAttributes: VariationAttribute[] | undefined;
+
+    [key: string]: any;
+}
+
+export class GetAppItemAttributesInput implements IGetAppItemAttributesInput {
+    sorting!: string | undefined;
+    skipCount!: number;
+    maxResultCount!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAppItemAttributesInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.sorting = _data["sorting"];
+            this.skipCount = _data["skipCount"];
+            this.maxResultCount = _data["maxResultCount"];
+        }
+    }
+
+    static fromJS(data: any): GetAppItemAttributesInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAppItemAttributesInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["sorting"] = this.sorting;
+        data["skipCount"] = this.skipCount;
+        data["maxResultCount"] = this.maxResultCount;
+        return data;
+    }
+}
+
+export interface IGetAppItemAttributesInput {
+    sorting: string | undefined;
+    skipCount: number;
+    maxResultCount: number;
+
+    [key: string]: any;
+}
+
+export class GetAppItemWithPagedAttributesForEditInput implements IGetAppItemWithPagedAttributesForEditInput {
+    itemId!: number;
+    getAppItemAttributesInputForCategories!: GetAppItemAttributesInput;
+    getAppItemAttributesInputForClassifications!: GetAppItemAttributesInput;
+    getAppItemAttributesInputForDepartments!: GetAppItemAttributesInput;
+    sorting!: string | undefined;
+    skipCount!: number;
+    maxResultCount!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAppItemWithPagedAttributesForEditInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.itemId = _data["itemId"];
+            this.getAppItemAttributesInputForCategories = _data["getAppItemAttributesInputForCategories"] ? GetAppItemAttributesInput.fromJS(_data["getAppItemAttributesInputForCategories"]) : <any>undefined;
+            this.getAppItemAttributesInputForClassifications = _data["getAppItemAttributesInputForClassifications"] ? GetAppItemAttributesInput.fromJS(_data["getAppItemAttributesInputForClassifications"]) : <any>undefined;
+            this.getAppItemAttributesInputForDepartments = _data["getAppItemAttributesInputForDepartments"] ? GetAppItemAttributesInput.fromJS(_data["getAppItemAttributesInputForDepartments"]) : <any>undefined;
+            this.sorting = _data["sorting"];
+            this.skipCount = _data["skipCount"];
+            this.maxResultCount = _data["maxResultCount"];
+        }
+    }
+
+    static fromJS(data: any): GetAppItemWithPagedAttributesForEditInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAppItemWithPagedAttributesForEditInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["itemId"] = this.itemId;
+        data["getAppItemAttributesInputForCategories"] = this.getAppItemAttributesInputForCategories ? this.getAppItemAttributesInputForCategories.toJSON() : <any>undefined;
+        data["getAppItemAttributesInputForClassifications"] = this.getAppItemAttributesInputForClassifications ? this.getAppItemAttributesInputForClassifications.toJSON() : <any>undefined;
+        data["getAppItemAttributesInputForDepartments"] = this.getAppItemAttributesInputForDepartments ? this.getAppItemAttributesInputForDepartments.toJSON() : <any>undefined;
+        data["sorting"] = this.sorting;
+        data["skipCount"] = this.skipCount;
+        data["maxResultCount"] = this.maxResultCount;
+        return data;
+    }
+}
+
+export interface IGetAppItemWithPagedAttributesForEditInput {
+    itemId: number;
+    getAppItemAttributesInputForCategories: GetAppItemAttributesInput;
+    getAppItemAttributesInputForClassifications: GetAppItemAttributesInput;
+    getAppItemAttributesInputForDepartments: GetAppItemAttributesInput;
+    sorting: string | undefined;
+    skipCount: number;
+    maxResultCount: number;
 
     [key: string]: any;
 }
