@@ -68,7 +68,7 @@
                                             <p class="jobTitle-label">{{memberData?.contact?.jobTitle}} </p>
                                             <div class="desc">
                                                 <p>
-                                                    {{memberData?.contact?.notes}}
+                                                    {{memberData?.notes}}
                                                 </p>
                                             </div>
                                         </div>
@@ -93,22 +93,22 @@
                                     <h6 class="text-right font-weight-bold mr-3"><img
                                             src="../../assets/img/input_icons/outline-work.png" class=""> {{ ( "Code" |
                                         localize ) + " :"}}</h6>
-                                    <p class="text-left " style="color: #595959;">{{memberData?.contact?.code}}</p>
+                                    <p class="text-left " style="color: #595959;">{{memberData?.code}}</p>
                                 </div>
                             <hr class="header">
                                 <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                     <h6 class="text-right font-weight-bold mr-3"><img
-                                            src="../../assets/img/input_icons/user.png" class=""> {{ ( "FirstName" |
+                                            src="../../assets/img/input_icons/user.png" class=""> {{ ( "Name" |
                                         localize ) + " :"}}</h6>
-                                    <p class="text-left " style="color: #595959;">{{memberData?.contact?.firstName}}</p>
+                                    <p class="text-left " style="color: #595959;">{{memberData?.name}}</p>
                                 </div>
-                                <hr class="header">
+                                <!-- <hr class="header">
                                 <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                     <h6 class="text-right font-weight-bold mr-3 "><img
                                             src="../../assets/img/input_icons/user.png" class=""> {{ ( "SurName" |
                                         localize ) + " :" }}</h6>
                                     <p class="text-left " style="color: #595959;">{{memberData?.contact?.lastName}}</p>
-                                </div>
+                                </div> -->
                                 <hr class="header">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                                     <h6 class="text-right font-weight-bold mr-3 "> <img
@@ -149,7 +149,7 @@
                                     <h6 class="text-right font-weight-bold mr-3 "> <img
                                             src="../../assets/img/input_icons/language.png" class=""> {{ ( "Language" |
                                         localize ) + " :" }}</h6>
-                                    <p class="text-left " style="color: #595959;">{{memberData?.contact?.languageName}}
+                                    <p class="text-left " style="color: #595959;">{{memberData?.languageName}}
                                     </p>
                                 </div>
                                 <hr class="header">
@@ -244,6 +244,19 @@
 
                         </div>
                     </div>
+                    <ng-container *ngFor="let usage of usageList">
+                        <app-dynamicInputs-view 
+                          [entityData]="memberData"
+                          [extraAttributeObject]="{
+                            value: {
+                              header: usage,
+                              filteredExtraAttributes: groupedByUsage[usage],
+                              extraAttributes: allAttributes
+                            }
+                          }"
+                        ></app-dynamicInputs-view>
+                      </ng-container>
+                      
                 </div>
             </div>
 

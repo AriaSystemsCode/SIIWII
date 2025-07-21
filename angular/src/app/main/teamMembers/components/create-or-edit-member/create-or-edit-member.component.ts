@@ -323,6 +323,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         }
       
         this.memberDto.useDTOTenant = true;
+        console.log(this.memberDto,'kkkkkkk')
       
         // ✅ Create a new DTO instance and assign only the valid fields
         const cleanDto = new CreateOrEditAccountInfoDto();
@@ -332,7 +333,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
           'phone1Number', 'phone1Ex', 'phone2Number', 'phone2Ex', 'phone3Number', 'phone3Ex', 'eMailAddress',
           'phone1TypeId', 'phone2TypeId', 'phone3TypeId', 'currencyId', 'languageId', 'entityId', 'tenantId',
           'attachmentSourceTenantId', 'useDTOTenant', 'returnId', 'accountLevel', 'entityCategories', 'entityClassifications',
-          'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods', 'entityExtraData', 'id','parentId'
+          'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods', 'entityExtraData', 'id', 'parentId', 'accountId'
         ];
       
         for (const key of allowedKeys) {
