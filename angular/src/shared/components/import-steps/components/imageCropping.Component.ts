@@ -286,20 +286,26 @@ onAutoCrop (){
 autoCropping(){
     this.showMainSpinner();
     this.finish=false;
-   this.AutoCropModal.crop('true');
+    this.AutoCropModal.sycAttachmentCategory=this.sycAttachmentCategory;
+   this.AutoCropModal.crop('true'); 
 }
 
 
 
 onfinalImages($event){
 this.imagesList=$event;
+/* if(this.imagesList && this.imagesList?.length>0)
+this.onfinishCropping(true); */
 }
 
 onfinishCropping($event: any) {
     this.finishCropping = $event;
     if($event){
-        this.hideMainSpinner();
+        this.showAutoCropMsg=false;
          this.finish=true;
+         this._imagePassed=this.imageFailed+this.imagePassed;
+         this._imageFailed=0;
+         this.hideMainSpinner();
     }
 
 }
