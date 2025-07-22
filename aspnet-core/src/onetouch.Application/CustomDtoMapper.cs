@@ -575,6 +575,9 @@ namespace onetouch
                 .ForMember(d => d.Phone1TypeId, s => s.MapFrom(ss => ss.Phone1TypeId))
                 .ForMember(d => d.Phone2TypeId, s => s.MapFrom(ss => ss.Phone2TypeId))
                 .ForMember(d => d.Phone3TypeId, s => s.MapFrom(ss => ss.Phone3TypeId))
+                .ForMember(d => d.Phone1TypeName, s => s.MapFrom(ss => ss.Phone1TypeName))
+                .ForMember(d => d.Phone2TypeName, s => s.MapFrom(ss => ss.Phone2TypeName))
+                .ForMember(d => d.Phone3TypeName, s => s.MapFrom(ss => ss.Phone3TypeName))
                 ;
             configuration.CreateMap<AppContactDto, CreateOrEditAccountInfoDto>()
                 .ForMember(d => d.AccountType, s => s.Ignore())
