@@ -129,9 +129,9 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   }
   
   setDefaultPublicFieldsToTrue() {
-    this.memberDto.phone1IsPublic = this.memberDto.phone1Number || this.memberDto.phone1Ext || this.memberDto.phone1TypeId ? true : false;
-    this.memberDto.phone2IsPublic = this.memberDto.phone2Number || this.memberDto.phone2Ext || this.memberDto.phone2TypeId ? true : false;
-    this.memberDto.phone3IsPublic = this.memberDto.phone3Number || this.memberDto.phone3Ext || this.memberDto.phone3TypeId ? true : false;
+    this.memberDto.phone1IsPublic = this.memberDto.phone1Number || this.memberDto.phone1Ex || this.memberDto.phone1TypeId ? true : false;
+    this.memberDto.phone2IsPublic = this.memberDto.phone2Number || this.memberDto.phone2Ex || this.memberDto.phone2TypeId ? true : false;
+    this.memberDto.phone3IsPublic = this.memberDto.phone3Number || this.memberDto.phone3Ex || this.memberDto.phone3TypeId ? true : false;
     this.memberDto.joinDateIsPublic = this.memberDto.joinDate ? true : false;
     this.memberDto.languageIsPublic = this.memberDto.languageId || this.memberDto.languageName ? true : false;
     this.memberDto.emailAddressIsPublic = this.memberDto.eMailAddress ? true : false;
@@ -430,7 +430,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   }
 
   onExtentionChange(value, i) {
-    this.memberDto[`phone${i + 1}Ext`] = value
+    this.memberDto[`phone${i + 1}Ex`] = value
   }
 
   onPhoneTypeChange($event: { value: number, originalEvent }, i: number) {

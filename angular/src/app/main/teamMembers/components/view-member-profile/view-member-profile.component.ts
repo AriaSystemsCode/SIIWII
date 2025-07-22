@@ -129,12 +129,13 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             .pipe(finalize(() => {
                 this.hideMainSpinner()
                 this.active = true
+        this.getAppItemTypeExtraAttributesById()
+
 
             }))
             .subscribe((result) => {
              
                 this.memberData = result;
-        this.getAppItemTypeExtraAttributesById()
 
                 this.adminContact =   this.memberData?.name.includes("admin");
                 // const firstName = this.memberData.contact.firstName

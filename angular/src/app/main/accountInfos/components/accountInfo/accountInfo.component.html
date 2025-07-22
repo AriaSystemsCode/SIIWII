@@ -33,7 +33,7 @@
                             <a *ngIf="touched"  class="btn btnCancel w-auto mr-4 " (click)="resetFormData()"  >
                                 <span>{{l("Cancel")}}</span>
                             </a>
-                            <button  type="submit" class="btn bgPurple btn-1bc5bd w-auto ml-4" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')" (click)="showDialogSaveAccount()"
+                            <button  type="submit" class="btn bgPurple btn-1bc5bd w-auto " [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')" (click)="showDialogSaveAccount()"
                                 [disabled]="!accountInfoForm.form.valid || !touched">
                                 <span>{{l("Save")}}</span>
                             </button>
