@@ -753,10 +753,17 @@ namespace onetouch.Accounts
         }
         private async Task<bool> GetMemberStatus(long userId)
         {
-            var user = await UserManager.GetUserByIdAsync(userId);
-            if (user == null)
+            try
+            {
+                var user = await UserManager.GetUserByIdAsync(userId);
+
+                if (user == null)
+                    return false;
+                return user.IsActive;
+            }
+            catch {
                 return false;
-            return user.IsActive;
+            }
 
         }
         //Mariam[End]
@@ -4701,6 +4708,51 @@ namespace onetouch.Accounts
                     }
                     returnObject.ExtraDataAttributes = new List<ExtraDataAttrDto>();
                     returnObject.ExtraDataAttributes = _appEntitiesAppService.GetAppEntityExtraDataWithPaging(contact.EntityId, contact.EntityFk.EntityObjectTypeId).Result.Items.ToList();
+                    if (returnObject.LanguageId != null)
+                    {
+                        var _lookupAppEntity = await _appEntityRepository.FirstOrDefaultAsync((long)returnObject.LanguageId);
+                        returnObject.LanguageName = _lookupAppEntity.Name.ToString();
+                    }
+
+                    if (returnObject.Phone1TypeId != null)
+                    {
+                        var _lookupAppEntity = await _appEntityRepository.FirstOrDefaultAsync((long)returnObject.Phone1TypeId);
+                        returnObject.Phone1TypeName = _lookupAppEntity.Name.ToString();
+                    }
+
+                    if (returnObject.Phone2TypeId != null)
+                    {
+                        var _lookupAppEntity = await _appEntityRepository.FirstOrDefaultAsync((long)returnObject.Phone2TypeId);
+                        returnObject.Phone2TypeName = _lookupAppEntity.Name.ToString();
+                    }
+
+                    if (returnObject.Phone3TypeId != null)
+                    {
+                        var _lookupAppEntity = await _appEntityRepository.FirstOrDefaultAsync((long)returnObject.Phone3TypeId);
+                        returnObject.Phone3TypeName = _lookupAppEntity.Name.ToString();
+                    }
+                    if (contact.ParentId != null)
+                    {
+                        var branchContact = await _appContactRepository.GetAll()
+                        .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                        .Where(x => x.Id == contact.ParentId).FirstOrDefaultAsync();
+
+                        var branchAddress = branchContact.AppContactAddresses.FirstOrDefault();
+                        if (branchContact != null)
+                            returnObject.BranchName = branchContact.Name;
+                        if (branchAddress != null && branchAddress.AddressFk != null)
+                        {
+                            returnObject.AddressLine1 = branchAddress.AddressFk.AddressLine1;
+                            returnObject.AddressLine2 = branchAddress.AddressFk.AddressLine2;
+                            returnObject.City = branchAddress.AddressFk.City;
+                            returnObject.CountryId = branchAddress.AddressFk.CountryId;
+                            returnObject.CountryName = branchAddress.AddressFk.CountryFk.Name;
+                            returnObject.ZipCode = branchAddress.AddressFk.PostalCode;
+                            returnObject.State = branchAddress.AddressFk.State;
+
+                        }
+                    }
+
                 }
             }
             return returnObject;
@@ -5558,7 +5610,7 @@ namespace onetouch.Accounts
                         contact.EntityFk.ObjectId = contactObjectId;
                         contact.EntityFk.EntityObjectTypeId = presonEntityObjectTypeId;
                         contact.ParentCode = account.Code;
-                        contact.ParentId = account.Id;
+                        contact.ParentId = accountDto.ParentId != null? accountDto.ParentId : account.Id;
                         contact.AccountId = account.Id;
                         await _appContactRepository.UpdateAsync(contact);
                     }

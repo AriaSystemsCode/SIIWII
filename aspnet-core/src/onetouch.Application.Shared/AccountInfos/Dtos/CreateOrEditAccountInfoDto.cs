@@ -95,7 +95,20 @@ namespace onetouch.AccountInfos.Dtos
 
         public long? LanguageId { get; set; }
         //I40[Start]
-        public string LanguageCode { get; set; }
+        public string LanguageName { get; set; }
+        public string Phone1TypeName { get; set; }
+
+        public string Phone2TypeName { get; set; }
+        public string Phone3TypeName { get; set; }
+        public string BranchName { get; set; }
+        public string ZipCode { get; set; }
+        public string State { get; set; }
+        public long CountryId { get; set; }
+        public string CountryName { get; set; }
+        public string City { get; set; }
+        public string AddressLine2 { get; set; }
+        public string AddressLine1 { get; set; }
+        public long? ParentId { get; set; }
         //I40[End]
         public long? EntityId { get; set; }
         public int? TenantId { get; set; }
