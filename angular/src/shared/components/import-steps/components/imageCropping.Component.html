@@ -30,7 +30,11 @@
                 <button
                 class="next-btn pointer w-100"
                 (click)="onAutoCrop()"
-                [disabled]="!finish"
+                [disabled]="_imageFailed ==0"
+                [ngClass]="{
+                    'disabled': _imageFailed ==0,
+                    'disabled-Btn-bg':_imageFailed ==0
+                }" 
             >
             Auto Crop {{ _imagePassed + _imageFailed}} image
             </button>
