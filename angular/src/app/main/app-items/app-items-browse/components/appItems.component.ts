@@ -528,7 +528,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         let serviceUtilites=itemsImport;
         let importStepsInfo:ImportStepInfo[];
         importStepsInfo= this._importService.getOriginalImportSteps();
-
+        //i44 only "jpg & png" images ["IMPORT"]
         this.ImportProductsModal.show(ImportTypes.Items,importService,serviceUtilites,["IMAGE"],true,importStepsInfo);
     }
 

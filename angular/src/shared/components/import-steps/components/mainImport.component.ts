@@ -131,15 +131,15 @@ export class MainImportComponent
     }
 
     async show(importType: ImportTypes, importService: any, serviceUtilites: any, attachmetnCategoriesCodes: string[], hasImages: boolean, importStepsInfo: ImportStepInfo[]) {
-       this.invalidImport=false;
+        this.invalidImport = false;
         this.importStepsInfo = importStepsInfo;
         this.guids = [];
         this.hasImages = hasImages;
         this.skipAutoCropModal = false;
         this.Previous = false;
         this.sycAttachmentCategory = {};
+        this.finalImages = [];
         if (attachmetnCategoriesCodes) {
-            //i44 only "jpg & png" images
             this.getSycAttachmentCategoriesByCodes(attachmetnCategoriesCodes).subscribe((result) => {
                 result.forEach(attach => {
                     var aspectRatioNumbers = attach.aspectRatio.split(":");
@@ -240,7 +240,7 @@ export class MainImportComponent
             this.invalidImport = true;
             Swal.fire(
                 " ",
-                "Folder doesn't contain the Import " + ImportTypes[this.importType]  + " Excel Template file, can not import.",
+                "Folder doesn't contain the Import " + ImportTypes[this.importType] + " Excel Template file, can not import.",
                 "error"
             );
             return;
@@ -256,23 +256,23 @@ export class MainImportComponent
             return;
         }
 
-        if(this.imImages){
+        if (this.imImages) {
             if (invalidImagesCount === totalImageFiles && totalImageFiles > 0) {
                 this.invalidImport = true;
                 Swal.fire(
                     " ",
-                     "Image format is not supported ,the supported formats are JPG and PNG",
+                    "Image format is not supported ,the supported formats are JPG and PNG",
                     "error"
                 );
                 return;
             }
-             else if (invalidImagesCount > 0) {
+            else if (invalidImagesCount > 0) {
                 Swal.fire(
                     " ",
                     "Image files should be of (PNG) or (JPG) formats , all other file formats will be neglected",
                     "warning"
                 );
-            
+
             }
         }
 
@@ -461,7 +461,7 @@ export class MainImportComponent
                 this.importType, this.sycAttachmentCategory
             );
         }
-        
+
     }
 
     remainingFiles;
@@ -611,7 +611,7 @@ export class MainImportComponent
             case ImportStepsEnum.AutoCropModalStep:
                 this.skipAutoCropModal = false;
                 // if (!this.AutoCropModal.show(this.importType, this.sycAttachmentCategory)) {
-                this.skipAutoCropModal = true;
+                //this.skipAutoCropModal = true;
                 if (this.Previous) {
                     this.Previous = false;
                     this.goPrevious();
@@ -623,6 +623,9 @@ export class MainImportComponent
                 if (this.skipAutoCropModal && this.Previous)
                     //this.goPrevious();
                     this.onautoCrop("false");
+
+                if (!this.hasImages && this.Previous)
+                    this.goPrevious();
                 break;
 
             case ImportStepsEnum.importConfirmationModalStep:
@@ -632,8 +635,7 @@ export class MainImportComponent
             case ImportStepsEnum.successfullyImportModalStep:
                 this.passedImages = [];
                 this.uploadingResult.repreateHandler = this.repreateHandler;
-                //I44 set  updateLookups
-                //this.uploadingResult.updateLookups  =this.updateLookups;
+                this.uploadingResult.updateColorsToLookUp = this.updateLookups;
 
                 this.uploadUrl = "/Attachment/UploadFiles";
 
@@ -730,16 +732,15 @@ export class MainImportComponent
 
     onOpenVideoModal($event) {
         if ($event) {
-            //I44 call getImportVideo 
             this.videoModal.show("");
-           //this.spinnerService.show();
-            /* this.importServiceProxy
-            .getImportVideo()
-            .pipe(finalize(() => this.spinnerService.hide()))
-            .subscribe((videoTutorialUrl) => {
-              this.BrowseModal.hide();
-              this.videoModal.show(videoTutorialUrl);
-          }) */
+            this.spinnerService.show();
+            this.importServiceProxy
+                .getImportVideo()
+                .pipe(finalize(() => this.spinnerService.hide()))
+                .subscribe((videoTutorial) => {
+                    this.BrowseModal.hide();
+                    this.videoModal.show(videoTutorial);
+                })
         }
     }
 
@@ -772,6 +773,10 @@ export class MainImportComponent
     }
     setImImages($event) {
         this.imImages = $event;
+    }
+
+    setHasImages($event) {
+        this.hasImages = $event;
     }
 }
 

@@ -53,7 +53,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     @Output() _folderName= new EventEmitter<any>(); 
     @ViewChild('fileInput') fileInputRef!: ElementRef;
 
-
+    @Output()  _hasImages = new EventEmitter<boolean>(); 
     
     public constructor(private _downloadService: FileDownloadService,
         private _BsModalService: BsModalService,
@@ -191,6 +191,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
 
         this._imData.emit(this.imData);
         this._imImages.emit(this.imImages);
+        this._hasImages.emit(this.imImages);
         this.UploadedFolder.emit(_UploadedFolder);
         event.target.value = "";
 

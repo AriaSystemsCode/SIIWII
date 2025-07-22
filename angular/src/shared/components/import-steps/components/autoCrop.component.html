@@ -47,7 +47,7 @@
 </div>
 </div>
 
-  <div *ngIf="!hideCropper">  
+  <div [ngClass]="{ 'd-none': hideCropper }">  
   <image-cropper #cropperImages  
   [imageChangedEvent]="imagesChangedEvent" 
   [alignImage]="'center'" 

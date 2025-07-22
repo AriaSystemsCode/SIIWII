@@ -72852,6 +72852,7 @@ export interface IAppItemtExcelRecordDTO {
 }
 
 export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
+    updateColorsToLookUp!: boolean;
     excelLogDTO!: ExcelLogDto;
     totalRecords!: number;
     codesFromList!: string[] | undefined;
@@ -72884,6 +72885,7 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.updateColorsToLookUp = _data["updateColorsToLookUp"];
             this.excelLogDTO = _data["excelLogDTO"] ? ExcelLogDto.fromJS(_data["excelLogDTO"]) : <any>undefined;
             this.totalRecords = _data["totalRecords"];
             if (Array.isArray(_data["codesFromList"])) {
@@ -72930,6 +72932,7 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["updateColorsToLookUp"] = this.updateColorsToLookUp;
         data["excelLogDTO"] = this.excelLogDTO ? this.excelLogDTO.toJSON() : <any>undefined;
         data["totalRecords"] = this.totalRecords;
         if (Array.isArray(this.codesFromList)) {
@@ -72965,6 +72968,7 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
 }
 
 export interface IAppItemExcelResultsDTO {
+    updateColorsToLookUp: boolean;
     excelLogDTO: ExcelLogDto;
     totalRecords: number;
     codesFromList: string[] | undefined;
