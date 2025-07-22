@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Injector, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { debounceTime, finalize } from 'rxjs/operators';
-import { AccountsServiceProxy, GetMemberForViewDto, MemberFilterTypeEnum } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, GetAccountForViewDto, GetMemberForViewDto, MemberFilterTypeEnum } from '@shared/service-proxies/service-proxies';
 import { MembersListComponentInputsI } from '../../models/member-list-component-interface';
 import { SelectItem, LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
@@ -17,6 +17,7 @@ export class MembersListComponent extends AppComponentBase {
     @ViewChild('paginator', { static: true }) paginator: Paginator;
     @Output() create: EventEmitter<number> = new EventEmitter<number>()
     @Output() view: EventEmitter<{ memberId: number, userId: number }> = new EventEmitter<{ memberId: number, userId: number }>()
+    @Input() accData:  GetAccountForViewDto;
 
     singleItemPerRowMode: boolean = false
     MemberFilterTypeEnum = MemberFilterTypeEnum

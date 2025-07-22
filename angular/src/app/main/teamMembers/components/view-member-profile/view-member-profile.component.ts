@@ -75,7 +75,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     }
     ngOnInit() {
-        this.getAppItemTypeExtraAttributesById()
         this.getAllAttachmentCategories()
 
     }
@@ -98,7 +97,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
                 this.oldEditBranchValue =this.editBranchValue;
         } else {
-            const memberId: number = this.memberData?.contact?.id;
+            const memberId: number = this.memberData?.id;
             if (isNaN(memberId)) return
             this.edit.emit(memberId);
         }
@@ -133,8 +132,10 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
             }))
             .subscribe((result) => {
-                console.log(result,'coooooooooon')
+             
                 this.memberData = result;
+        this.getAppItemTypeExtraAttributesById()
+
                 this.adminContact =   this.memberData?.name.includes("admin");
                 // const firstName = this.memberData.contact.firstName
                 // const lastName = this.memberData.contact.lastName
@@ -212,7 +213,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     branches: TreeNodeOfBranchForViewDto[] = [];
     selectedBranchid;
     getAccountBranches() {
-        this._AccountsServiceProxy.getBranchForEdit(this.memberData.contact.accountId).subscribe((rootBranchData) => {
+        this._AccountsServiceProxy.getBranchForEdit(this.memberData.accountId).subscribe((rootBranchData) => {
             const rootBranch: TreeNodeOfBranchForViewDto = new TreeNodeOfBranchForViewDto()
             rootBranch.expanded = false
             rootBranch.children = undefined
@@ -299,7 +300,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         }
         
         getAppItemTypeExtraAttributesById() {
-            this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(21)
+            this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.memberData?.accountTypeId)
               .subscribe((res) => {
                 if (res?.length > 0) {
                   this.allAttributes = res[0]?.extraAttributes.extraAttributes;

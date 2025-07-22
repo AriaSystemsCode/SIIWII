@@ -110,6 +110,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
         
+        console.log(this.accountData,'oooooooooooooo')
     }
 
     prevImageClick() {
@@ -143,6 +144,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
+        console.log('111')
         if (this.personalAccount && !this.editPersonal) {
             this.Editting = true;
             this.editInfo = false;
@@ -157,6 +159,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
         }
         else {
+        console.log('22')
+
             this.editInfo = true;
             this.NoteditInfo = false;
             this.Editting = false;

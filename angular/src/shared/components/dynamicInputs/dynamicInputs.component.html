@@ -105,10 +105,10 @@
                               (onChange)="onAnyInputChange()">
                             </p-inputSwitch>
                             
-                              <a *ngIf="extraAttr.selectedValues !== null" class="ml-3 pointer text-muted font-weight-bold"
-                                 (click)="extraAttr.selectedValues = 'true'; onAnyInputChange()">
-                                Reset 
-                              </a>
+                            <a *ngIf="extraAttr.selectedValues" class="ml-5 pointer text-black-50 font-weight-bold"
+                            (click)="extraAttr.selectedValues = null">
+                            Reset
+                        </a>
                             </div>
                           </div>
                           

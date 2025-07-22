@@ -4,7 +4,7 @@
             <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
 
 
-                <div class="kt-subheader kt-grid__item" style="width: 84.2% !important;">
+                <div class="kt-subheader kt-grid__item" style="height: 80px !important;">
                     <div [class]="containerClass">
                         <div class="kt-subheader__main">
                             <h3 class="kt-subheader__title">
@@ -81,7 +81,7 @@
                                         <div class="d-flex view-profile-action-buttons"
                                             *ngIf="accountData.isConnected && showEditConnected &&isNotManualLevel()">
                                             <button class="btn mb-3 mt-4 w-100 btn-save"
-                                                (click)="this.showEditConnected =false">
+                                                (click)="this.showEditConnected =false;editAccount()">
                                                 {{ "Edit" | localize }}
                                             </button>
                                         </div>

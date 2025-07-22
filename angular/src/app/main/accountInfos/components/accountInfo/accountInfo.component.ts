@@ -134,7 +134,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
 
     imgCropperModalRef : BsModalRef
-
+    accData : GetAccountForViewDto
 
 
     constructor(
@@ -499,6 +499,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                         this.hideMainSpinner()
                     }
                 )
+                this.accData = result?.account
         }
 
         else {
@@ -1371,6 +1372,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             skipCount,
             maxResultCount + skipCount
         )
+    }
+    getCodeValue(code: string) {
+        this.accountInfoTemp.code = code;
     }
 
 }
