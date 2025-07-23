@@ -33,7 +33,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     
     editMode = false;
     memberData: CreateOrEditAccountInfoDto;
-    newEditMemberInfo: ContactDto;
+    newEditMemberInfo: CreateOrEditAccountInfoDto;
     canEdit: boolean;
     canDelete: boolean;
     canView: boolean;
@@ -85,7 +85,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         if (this.adminContact) {
             this.editInfo = false;
             this.NoteditInfo = true;
-            this.editjobTitleValue = this.memberData?.contact?.jobTitle;
+            this.editjobTitleValue = this.jobTitleAttr?.selectedValues[this.jobTitleAttr.selectedValues.length - 1].value;
             this.editBranchValue =
                 (this.memberData?.branchName ? (this.memberData?.branchName + ' ' + " - ") : '') +
                 (this.memberData?.addressLine1 ? (this.memberData?.addressLine1 + ', ') : '') +
@@ -138,10 +138,10 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
                 this.memberData = result;
 
                 this.adminContact =   this.memberData?.name.includes("admin");
-                // const firstName = this.memberData.contact.firstName
-                // const lastName = this.memberData.contact.lastName
-                // this.contactDisplayName = firstName ? firstName : ""
-                // this.contactDisplayName += lastName ? " " + lastName : ""
+                const firstName = this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
+                const lastName = this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
+                this.contactDisplayName = firstName ? firstName : ""
+                this.contactDisplayName += lastName ? " " + lastName : ""
                 // if (this.memberData?.imageUrl) this.logoPhoto = this.attachmentBaseUrl + '/' + this.memberData?.imageUrl;
                 // if (this.memberData?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + this.memberData?.coverUrl;
                 const logoAttachment = this.memberData?.entityAttachments?.find(att => att.attachmentCategoryId === 1 && att.url);
@@ -178,24 +178,38 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     }
     CreateUserName() {
        this.createOrEditUserModal.user = new UserEditDto();
-       this.createOrEditUserModal.user.name= this.memberData?.firstName;
-       this.createOrEditUserModal.user.surname=this.memberData?.lastName;
+       this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
+       this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
        this.createOrEditUserModal.fromTeamMember=true;
        this.createOrEditUserModal.show()
     }
+
+    EditUserName(){
+        this.createOrEditUserModal.user = new UserEditDto();
+        this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
+        this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
+        this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
+        this.createOrEditUserModal.fromTeamMember=true;
+        this.createOrEditUserModal.show()
+    }
+
     editjobTitleValue: string = '';
     editBranchValue: string = '';
     oldEditBranchValue:string="";
     Save_editMember() {
-        
-        this.newEditMemberInfo = this.memberData.contact;
-        this.newEditMemberInfo.jobTitle = this.editjobTitleValue;
+   
+        const attr = this.memberData?.entityExtraData?.find(attr => attr.attributeId === 706);
+        if (attr) {
+          attr.attributeValue =this.editjobTitleValue
+        }
+        this.newEditMemberInfo = this.memberData;
+        // this.newEditMemberInfo.jobTitle = this.editjobTitleValue;
         this.newEditMemberInfo.branchName = this.editBranchValue;
         this.newEditMemberInfo.parentId = this.selectedBranchid;
 
             this.editInfo = true;
             this.NoteditInfo = false;
-            this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
+            this._AccountsServiceProxy.createOrUpdateContact(this.newEditMemberInfo)
                 .pipe(finalize(() => {
                     this.hideMainSpinner(); 
                     this.Editting=false;
@@ -235,6 +249,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
 
     branchSelected(Branch) {
+        console.log(Branch,'BranchBranchBranchBranchBranch')
         this.editBranchValue = Branch?.name ? Branch?.name : '';
         this.editBranchValue += Branch?.contactAddresses[0]?.addressLine1 ? (this.editBranchValue != '' ? ' - ' + Branch?.contactAddresses[0]?.addressLine1 : Branch?.contactAddresses[0]?.addressLine1) : '';
         this.editBranchValue += Branch?.contactAddresses[0]?.addressLine2 ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.addressLine2 : Branch?.contactAddresses[0]?.addressLine2) : '';
@@ -341,6 +356,29 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         
           selectUsage(usage: string): void {
             this.selectedUsage = usage;
+          }
+          
+          getUserIdValue(): string | null {
+            const userIdAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 715);
+            const val = userIdAttr?.selectedValues?.[userIdAttr.selectedValues.length - 1]?.value;
+            return val && val.trim() !== '' ? val : null;
+          }
+
+          get jobTitleAttr() {
+            return this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
+          }
+         
+
+          getJoinDate(): string | null {
+            const joinDateAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 707);
+            const val = joinDateAttr?.selectedValues?.[joinDateAttr.selectedValues.length - 1]?.value;
+            return val && val.trim() !== '' ? val : null;
+          }
+          
+          getJoinDateIsPublic(): boolean {
+            const isPublicAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
+            const val = isPublicAttr?.selectedValues?.[isPublicAttr.selectedValues.length - 1]?.value;
+            return val === 'true' ;
           }
           
         

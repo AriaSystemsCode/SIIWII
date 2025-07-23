@@ -215,10 +215,29 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
   }
 
+  // onChangejoinDate() {
+  //   let _joinDate = this.joinDate.toLocaleString();
+  //   this.memberDto.joinDate = moment.utc(_joinDate);
+  // }
+
   onChangejoinDate() {
-    let _joinDate = this.joinDate.toLocaleString();
-    this.memberDto.joinDate = moment.utc(_joinDate);
+    const _joinDate = this.joinDate?.toLocaleString();
+    const joinDateAttr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 707);
+    if (joinDateAttr) {
+      joinDateAttr.selectedValues = [{
+        ...joinDateAttr.selectedValues?.[joinDateAttr.selectedValues.length - 1],
+        value: moment.utc(_joinDate).format() // Store ISO string
+        ,
+        init: function (_data?: any): void {
+          throw new Error('Function not implemented.');
+        },
+        toJSON: function (data?: any) {
+          throw new Error('Function not implemented.');
+        }
+      }];
+    }
   }
+  
 
   getAccountBranches() {
     this._AccountsServiceProxy.getBranchForEdit(this.memberDto.accountId).subscribe((rootBranchData) => {
@@ -711,7 +730,80 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       }
     }
   }
+  get jobTitleAttr() {
+    return this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
+  }
+  getJoinDateAsDate(): Date | null {
+    const joinDateAttr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 707);
+    const val = joinDateAttr?.selectedValues?.[joinDateAttr.selectedValues.length - 1]?.value;
+    return val ? new Date(val) : null;
+  }
   
+  onChangejoinDateFromPicker(date: Date) {
+    const joinDateAttr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 707);
+    if (joinDateAttr) {
+      joinDateAttr.selectedValues = [{
+        ...joinDateAttr.selectedValues?.[joinDateAttr.selectedValues.length - 1],
+        value: moment.utc(date).format(),
+        init: function (_data?: any): void {},
+        toJSON: function (data?: any) {}
+      }];
+    }
+  }
+  
+  getJoinDateIsPublic(): boolean {
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
+    const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+    return val === 'true' ;
+  }
+  
+  setJoinDateIsPublic(val: boolean) {
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
+    if (attr) {
+      attr.selectedValues = [{
+        ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
+        init: function (_data?: any): void {},
+        toJSON: function (data?: any) {}
+      }];
+    }
+  }
 
+  getPhoneIsPublic(index: number): boolean {
+    const attrIdMap = [710, 711, 712];
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === attrIdMap[index]);
+    const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+    return val === 'true' ;
+  }
+  
+  setPhoneIsPublic(index: number, val: boolean): void {
+    const attrIdMap = [710, 711, 712];
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === attrIdMap[index]);
+    if (attr) {
+      attr.selectedValues = [{
+        ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
+        init: function (_data?: any): void {},
+        toJSON: function (data?: any) {}
+      }];
+    }
+  }
+  
+  getEmailIsPublic(): boolean {
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
+    const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+    return val === 'true' ;
+  }
+
+  setEmailIsPublic(val: boolean): void {
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
+    if (attr) {
+      attr.selectedValues = [{
+        ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
+        init: function (_data?: any): void { },
+        toJSON: function (data?: any) { }
+      }];
+    }
+  }
+  
+  
 }
 

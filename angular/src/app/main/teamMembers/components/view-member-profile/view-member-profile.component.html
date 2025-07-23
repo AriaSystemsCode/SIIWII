@@ -32,14 +32,31 @@
                                                     [classList]="'img-cover'">
                                                 </app-image-display>
                                                 <div class="view-profile-action-buttons d-flex">
-                                                    <button *ngIf="canEdit && adminContact"
-                                                        class="btn mb-3 mt-4  transparent-button shadow mr-3"
-                                                        style="color: #4A0D4A;    border-radius: 6px;"
-                                                        (click)="CreateUserName()" [disabled]="Editting">
-                                                        <img src="../../assets/img/input_icons/plus.png"
-                                                            class="mr-2 pb-1">
-                                                        {{ "Create User" | localize }}
+                                                   <!-- Create User Button (if User Id is not present) -->
+                                                    <button *ngIf="canEdit && adminContact && !getUserIdValue()" 
+                                                    class="btn mb-3 mt-4 transparent-button shadow mr-3"
+                                                    style="color: #4A0D4A; border-radius: 6px;"
+                                                    (click)="CreateUserName()" 
+                                                    [disabled]="Editting">
+                                                    <img src="../../assets/img/input_icons/plus.png" class="mr-2 pb-1">
+                                                    {{ "Create User" | localize }}
                                                     </button>
+
+                                                    <!-- Edit User Button (if User Id is present) -->
+                                                    <button *ngIf="canEdit && adminContact  && getUserIdValue()" 
+                                                    class="btn mb-3 mt-4 transparent-button shadow mr-3"
+                                                    style="color: #4A0D4A; border-radius: 6px;"
+                                                    (click)="EditUserName()" 
+                                                    [disabled]="Editting">
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M10.9994 3.22314H9.22172C4.77755 3.22314 2.99988 5.00082 2.99988 9.44499V14.778C2.99988 19.2222 4.77755 20.9999 9.22172 20.9999H14.5547C18.9989 20.9999 20.7766 19.2222 20.7766 14.778V13.0003" stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M15.479 4.12991L8.47497 11.1339C8.20832 11.4006 7.94167 11.925 7.88834 12.3072L7.50614 14.9826C7.36392 15.9514 8.04833 16.6269 9.01716 16.4936L11.6926 16.1114C12.0659 16.0581 12.5903 15.7914 12.8658 15.5248L19.8698 8.52076C21.0787 7.31194 21.6475 5.90758 19.8698 4.12991C18.0922 2.35224 16.6878 2.9211 15.479 4.12991Z" stroke="#4A0D4A" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M14.4749 5.13428C15.0704 7.25859 16.7325 8.92072 18.8657 9.52512" stroke="#4A0D4A" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    {{ "Edit User" | localize }}
+                                                    </button>
+                                            
                                                     <button *ngIf="canEdit" class="btn mb-3 mt-4 editAccount_butn"
                                                         style="border-radius: 6px;    color: white !important;display: flex;" (click)="editMember()" [disabled]="Editting">
                                                         <img src="../../assets/img/input_icons/edit.png" class="" >
@@ -63,9 +80,9 @@
                                             </div>
                                         </div>
                                         <div class="col-md-10 title-cover">
-                                            <h5 class="account-name font-weight-bold">{{memberData?.contact?.firstName}}
-                                                {{" "}} {{memberData?.contact?.lastName}} </h5>
-                                            <p class="jobTitle-label">{{memberData?.contact?.jobTitle}} </p>
+                                            <h5 class="account-name font-weight-bold">{{memberData?.extraDataAttributes[0]?.selectedValues?.[memberData.extraDataAttributes[0].selectedValues.length - 1]?.value}}
+                                                {{" "}} {{memberData?.extraDataAttributes[1]?.selectedValues?.[memberData.extraDataAttributes[1].selectedValues.length - 1]?.value}} </h5>
+                                            <p class="jobTitle-label">{{jobTitleAttr?.selectedValues[jobTitleAttr.selectedValues.length - 1].value}} </p>
                                             <div class="desc">
                                                 <p>
                                                     {{memberData?.notes}}
@@ -109,13 +126,13 @@
                                         localize ) + " :" }}</h6>
                                     <p class="text-left " style="color: #595959;">{{memberData?.contact?.lastName}}</p>
                                 </div> -->
-                                <!-- <hr class="header">
+                                <hr class="header">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                                     <h6 class="text-right font-weight-bold mr-3 "> <img
                                             src="../../assets/img/input_icons/outline-work.png" class=""> {{ (
                                         "JobTitle" | localize ) + " :" }}</h6>
                                     <p  *ngIf="!editjobTitleValue" class="text-left old_editjobTitle" style="color: #595959;"
-                                        [ngClass]="{'hide':NoteditInfo}">{{memberData?.contact?.jobTitle}}</p>
+                                        [ngClass]="{'hide':NoteditInfo}">{{jobTitleAttr?.selectedValues[jobTitleAttr.selectedValues.length - 1].value}}</p>
                                         <p  *ngIf="editjobTitleValue" class="text-left old_editjobTitle" style="color: #595959;"
                                         [ngClass]="{'hide':NoteditInfo}">{{editjobTitleValue}}</p>
                                     <input style="color: #595959 !important;" type="text"
@@ -125,15 +142,17 @@
                                         [placeholder]="'PleaseEnterJobTitle' | localize " required [class.hide]="editInfo">
                                     <validation-messages  *ngIf="NoteditInfo" [formCtrl]="JobTitleInput"></validation-messages>
                                 </div>
-                                <hr class="header" *ngIf="memberData?.contact?.joinDateIsPublic">
-                                <div class="col-md-12 align-items-baseline pt-2 pb-2  pl-3"
-                                    *ngIf="memberData?.contact?.joinDateIsPublic">
-                                    <h6 class="text-right font-weight-bold mr-3 "> <img
-                                            src="../../assets/img/input_icons/workSpaceIcon.png" class=""> {{ (
-                                        "JoinDate" | localize ) + " :" }}</h6>
-                                    <p class="text-left " style="color: #595959;">
-                                        {{memberData?.contact?.joinDate?.toString()| date: 'short'}}</p>
-                                </div> -->
+                                <hr class="header" *ngIf="getJoinDateIsPublic() && getJoinDate()">
+                                <div class="col-md-12 align-items-baseline pt-2 pb-2  pl-3" *ngIf="getJoinDateIsPublic() && getJoinDate()">
+                                  <h6 class="text-right font-weight-bold mr-3">
+                                    <img src="../../assets/img/input_icons/workSpaceIcon.png" class="">
+                                    {{ "JoinDate" | localize }} :
+                                  </h6>
+                                  <p class="text-left" style="color: #595959;">
+                                    {{ getJoinDate() | date: 'short' }}
+                                  </p>
+                                </div>
+                                
                                 <hr class="header" >
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2  pl-3"
                               >
@@ -245,7 +264,7 @@
 
                         </div>
                     </div>
-                    <ng-container *ngFor="let usage of usageList">
+                    <!-- <ng-container *ngFor="let usage of usageList">
                         <app-dynamicInputs-view 
                           [entityData]="memberData"
                           [extraAttributeObject]="{
@@ -256,7 +275,7 @@
                             }
                           }"
                         ></app-dynamicInputs-view>
-                      </ng-container>
+                      </ng-container> -->
                       
                 </div>
             </div>
