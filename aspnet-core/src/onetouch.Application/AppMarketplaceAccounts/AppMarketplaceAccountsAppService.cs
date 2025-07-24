@@ -98,6 +98,14 @@ namespace onetouch.AppMarketplaceAccounts
             _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
 
         }
+        //MMT40[Start]
+        public async Task<bool> CreateOrUpdateRelationship(string requesterSSIN, string RecipientSSIN)
+        {
+            if (requesterSSIN == null || RecipientSSIN== null)
+                return false;
+            return true;
+        }
+        //MMT40[End]
 
         public async Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {

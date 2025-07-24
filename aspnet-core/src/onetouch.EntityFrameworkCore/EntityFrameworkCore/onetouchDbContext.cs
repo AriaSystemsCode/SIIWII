@@ -60,6 +60,9 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        //I40[Start]
+        public virtual DbSet<AppContactRelationshipInfo> AppContactRelationshipInfo { get; set; }
+        //I40[End]
         public virtual DbSet<ValidationRule> ValidationRules { get; set; }
 
         public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
