@@ -33,7 +33,7 @@
                                                 </app-image-display>
                                                 <div class="view-profile-action-buttons d-flex">
                                                    <!-- Create User Button (if User Id is not present) -->
-                                                    <button *ngIf="canEdit && adminContact && !getUserIdValue()" 
+                                                    <button *ngIf="canEdit && !isManualOrExternalContact && !getUserIdValue()" 
                                                     class="btn mb-3 mt-4 transparent-button shadow mr-3"
                                                     style="color: #4A0D4A; border-radius: 6px;"
                                                     (click)="CreateUserName()" 
@@ -43,7 +43,7 @@
                                                     </button>
 
                                                     <!-- Edit User Button (if User Id is present) -->
-                                                    <button *ngIf="canEdit && adminContact  && getUserIdValue()" 
+                                                    <button *ngIf="canEdit && !isManualOrExternalContact  && getUserIdValue()" 
                                                     class="btn mb-3 mt-4 transparent-button shadow mr-3"
                                                     style="color: #4A0D4A; border-radius: 6px;"
                                                     (click)="EditUserName()" 

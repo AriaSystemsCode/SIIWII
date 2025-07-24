@@ -1255,7 +1255,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             canEdit: canEdit
         }
 
-        this.viewMemberProfile.show(input);
+        this.viewMemberProfile.show(input,  isManualContact || isExternalContact);
         this.selectedMember = undefined
     }
 

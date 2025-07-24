@@ -52,7 +52,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     Editting:boolean =false;
     adminContact:boolean =false;
-
+    isManualOrExternalContact: boolean = true
     
         data:any
         allAttributes = []; // flat list from API
@@ -82,7 +82,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     NoteditInfo = false;
     editMember() {
         this.Editting=true;
-        if (this.adminContact) {
+        if (!this.adminContact && !this.isManualOrExternalContact) {
             this.editInfo = false;
             this.NoteditInfo = true;
             this.editjobTitleValue = this.jobTitleAttr?.selectedValues[this.jobTitleAttr.selectedValues.length - 1].value;
@@ -116,7 +116,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         );
     }
 
-    show(input: ViewMemberProfileComponentInputsI) {
+    show(input: ViewMemberProfileComponentInputsI, isManualOrExternalContact?: boolean) {
+      this.isManualOrExternalContact = isManualOrExternalContact;
+  
         this.canDelete = input.canDelete
         this.canEdit = input.canEdit
         this.title = input.title
@@ -186,11 +188,12 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     EditUserName(){
         this.createOrEditUserModal.user = new UserEditDto();
+        this.createOrEditUserModal.user.id = Number(this.userId?.selectedValues[this.userId.selectedValues.length - 1]?.value);
         this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
         this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
         this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
         this.createOrEditUserModal.fromTeamMember=true;
-        this.createOrEditUserModal.show()
+        this.createOrEditUserModal.show(this.createOrEditUserModal.user.id)
     }
 
     editjobTitleValue: string = '';
@@ -381,5 +384,11 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             return val === 'true' ;
           }
           
+
+          get userId() {
+            return this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 715);
+          }
+         
+
         
 }
