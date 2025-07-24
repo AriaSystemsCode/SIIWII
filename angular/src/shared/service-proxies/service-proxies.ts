@@ -61529,6 +61529,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     addressLine2!: string | undefined;
     addressLine1!: string | undefined;
     parentId!: number | undefined;
+    partnerId!: number | undefined;
     entityId!: number | undefined;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
@@ -61600,6 +61601,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             this.addressLine2 = _data["addressLine2"];
             this.addressLine1 = _data["addressLine1"];
             this.parentId = _data["parentId"];
+            this.partnerId = _data["partnerId"];
             this.entityId = _data["entityId"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
@@ -61701,6 +61703,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
         data["addressLine2"] = this.addressLine2;
         data["addressLine1"] = this.addressLine1;
         data["parentId"] = this.parentId;
+        data["partnerId"] = this.partnerId;
         data["entityId"] = this.entityId;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
@@ -61791,6 +61794,7 @@ export interface ICreateOrEditAccountInfoDto {
     addressLine2: string | undefined;
     addressLine1: string | undefined;
     parentId: number | undefined;
+    partnerId: number | undefined;
     entityId: number | undefined;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
@@ -62970,6 +62974,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     addressLine2!: string | undefined;
     addressLine1!: string | undefined;
     parentId!: number | undefined;
+    partnerId!: number | undefined;
     entityId!: number | undefined;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
@@ -63046,6 +63051,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             this.addressLine2 = _data["addressLine2"];
             this.addressLine1 = _data["addressLine1"];
             this.parentId = _data["parentId"];
+            this.partnerId = _data["partnerId"];
             this.entityId = _data["entityId"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
@@ -63152,6 +63158,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
         data["addressLine2"] = this.addressLine2;
         data["addressLine1"] = this.addressLine1;
         data["parentId"] = this.parentId;
+        data["partnerId"] = this.partnerId;
         data["entityId"] = this.entityId;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
@@ -63243,6 +63250,7 @@ export interface IAppContactValidationInputDTO {
     addressLine2: string | undefined;
     addressLine1: string | undefined;
     parentId: number | undefined;
+    partnerId: number | undefined;
     entityId: number | undefined;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;

@@ -21,7 +21,8 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     @ViewChild('organizationUnitTree') organizationUnitTree: OrganizationUnitsTreeComponent;
 
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
-
+    @Output() refreshData: EventEmitter<any> = new EventEmitter<any>();
+    
     active = false;
     saving = false;
     canChangeUserName = true;
@@ -161,7 +162,11 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
         this.saving = true;
         
         this._userService.createOrUpdateUser(input)
-            .pipe(finalize(() => { this.saving = false; }))
+            .pipe(finalize(() => {
+                 this.saving = false; 
+                 this.refreshData.emit(true);
+
+                }))
             .subscribe(() => {
                 this.notify.info(this.l('SavedSuccessfully'));
                 this.close();

@@ -115,8 +115,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         }
         );
     }
-
+    private lastInputId: number;
     show(input: ViewMemberProfileComponentInputsI, isManualOrExternalContact?: boolean) {
+      this.lastInputId = input.id;
       this.isManualOrExternalContact = isManualOrExternalContact;
   
         this.canDelete = input.canDelete
@@ -192,6 +193,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
         this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
         this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
+        this.createOrEditUserModal.user.emailAddress=this.memberData?.eMailAddress
+        this.createOrEditUserModal.user.phoneNumber=this.memberData?.phone1Number
         this.createOrEditUserModal.fromTeamMember=true;
         this.createOrEditUserModal.show(this.createOrEditUserModal.user.id)
     }
@@ -389,6 +392,19 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             return this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 715);
           }
          
+
+          refresh(event: boolean) {
+            if (event && this.lastInputId) {
+                this.show({ 
+                    id: this.lastInputId,
+                    canEdit: this.canEdit,
+                    canDelete: this.canDelete,
+                    title: this.title
+                });
+            }
+        }
+        
+          
 
         
 }
