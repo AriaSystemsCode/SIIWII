@@ -27,6 +27,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     @Output() validateTempBuyer = new EventEmitter<boolean>();
     @Output("updateAppTransactionsForViewDto") updateAppTransactionsForViewDto = new EventEmitter<GetAppTransactionsForViewDto>();
     @Output() loadAddressComponent = new EventEmitter<object>();
+    @Output() companyId = new EventEmitter<any>();
 
     appTransactionContactsIndex = -1;
 
@@ -259,7 +260,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = event?.code
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyCode = event?.code
-
+        this.companyId.emit( this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.id)
         var tempContact: boolean = false;
 
         if (this.tempAccount && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany) {
