@@ -967,7 +967,9 @@ namespace onetouch
             //MMT40[Start]
             configuration.CreateMap<BranchDto, CreateOrEditAccountInfoDto>()
                 .ForMember(z => z.AccountLevel, z => z.MapFrom(s=> AccountLevelEnum.Manual));
-            configuration.CreateMap<GetAccountInfoForEditOutput, BranchDto>();
+            configuration.CreateMap<GetAccountInfoForEditOutput, BranchDto>()
+            .ForMember(a=>a.Id, b => b.MapFrom(ent => ent.AccountInfo.Id))
+            .ForMember(a => a.AccountId, b => b.MapFrom(ent => ent.AccountInfo.AccountId));
             configuration.CreateMap<AppItems.Dtos.ExtraAttribute, AppEntityExtraDataDto>();
             //MMT40[End]
             configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap()
@@ -1131,7 +1133,15 @@ namespace onetouch
             configuration.CreateMap<AppContact, CreateOrEditAccountInfoDto>()
              .ForMember(d => d.EntityExtraData,s=> s.MapFrom(ss => ss.EntityFk.EntityExtraData))
              .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments))
-             .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses ))             ;
+             .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses ))
+             .ForMember(d => d.Phone1Ex, s => s.MapFrom(ss => ss.Phone1Ext))
+             .ForMember(d => d.Phone2Ex, s => s.MapFrom(ss => ss.Phone2Ext))
+             .ForMember(d => d.Phone3Ex, s => s.MapFrom(ss => ss.Phone3Ext))
+             .ForMember(d => d.Notes, s => s.MapFrom(ss => ss.EntityFk.Notes))
+             ;
+            configuration.CreateMap<AppMarketplaceContact, CreateOrEditAccountInfoDto>()
+              .ForMember(a => a.Name, b => b.MapFrom(ent => ent.Name));
+               
             //I40[End]
         }
     }

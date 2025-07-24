@@ -773,6 +773,7 @@ namespace onetouch.AppMarketplaceAccounts
                 appMarketplaceContact.Name = input.Name;
                 appMarketplaceContact.Notes = input.Notes;
                 appMarketplaceContact.OwnerId = input.TenantId;
+                appMarketplaceContact.TenantOwner = int.Parse(input.TenantId.ToString());
                 appMarketplaceContact.TenantId = null;
                 appMarketplaceContact.Code = input.SSIN;
                 appMarketplaceContact.SSIN = input.SSIN;

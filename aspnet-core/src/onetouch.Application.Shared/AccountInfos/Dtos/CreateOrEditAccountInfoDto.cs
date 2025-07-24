@@ -109,6 +109,7 @@ namespace onetouch.AccountInfos.Dtos
         public string AddressLine2 { get; set; }
         public string AddressLine1 { get; set; }
         public long? ParentId { get; set; }
+        public long? PartnerId { get; set; }
         //I40[End]
         public long? EntityId { get; set; }
         public int? TenantId { get; set; }
