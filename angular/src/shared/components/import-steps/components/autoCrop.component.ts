@@ -62,9 +62,12 @@ export class autoCropComponent extends AppComponentBase implements OnInit {
             this.modal.show();
             this.finishCropping.emit(false);
             let firstFailedIndex=this.failedImagesIndex[0];
+            const originalFile = this.imagesList[firstFailedIndex].file;
+            const fileCopy = new File([originalFile], originalFile.name, { type: originalFile.type });
+            
             var event = {
                 target: {
-                    files: [this.imagesList[firstFailedIndex].file],
+                    files: [fileCopy],
                 },
             };
 
@@ -124,6 +127,7 @@ export class autoCropComponent extends AppComponentBase implements OnInit {
     }
 
     imageCropping(index: number) {
+        this.hideCropper = false;
         let reader = new FileReader();
        let imageIndex= this.failedImagesIndex[index];
         let file = this.imagesList[imageIndex].file;
@@ -142,6 +146,8 @@ export class autoCropComponent extends AppComponentBase implements OnInit {
                     files: [file],
                 },
             }
+            this.cropperImages.imageChangedEvent=null;
+            this.imagesChangedEvent =null;
             this.cropperImages.imageChangedEvent = event;
             this.imagesChangedEvent = event;
             this.acceptedRatio = Number(this.sycAttachmentCategory[this.imagesList[imageIndex].imgtype.toUpperCase()].aspectRatio);

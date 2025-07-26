@@ -27,8 +27,8 @@ export class videoTutorialComponent extends AppComponentBase implements OnInit {
 
     }
 
-    show(videoTutorialUrl) {
-        this.videoTutorialUrl=videoTutorialUrl;
+    show(videoTutorial) {
+        this.videoTutorialUrl=videoTutorial?.excelTemplateFullPath;
         this.modal.show();
     }
 
