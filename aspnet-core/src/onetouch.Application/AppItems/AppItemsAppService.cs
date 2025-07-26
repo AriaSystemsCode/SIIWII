@@ -4961,6 +4961,7 @@ namespace onetouch.AppItems
         }
         public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         {
+            //imagesList = new string[] { "e1.png", "e2.png" };
 
             string currentExcelTemplateVersion = _appConfiguration[$"ItemTemplates:ItemExcelTemplateVersion:CurrentVersion"];
             string validExcelTemplates = _appConfiguration[$"ItemTemplates:ItemExcelTemplateVersion:SupportedVersions"];
@@ -5479,11 +5480,12 @@ namespace onetouch.AppItems
             .SelectMany(item => item.ExcelDto.Images)
             .Select(image => image.ImageFileName)
             .Where(name =>
-                !string.IsNullOrWhiteSpace(name) )   // Exclude names already in ImagesList
-            .Distinct()
-            .ToList();
-
-            var uniqueImageFileNamesNotUsed = imagesList.ToList().Select(e=> e).Where(e=> !uniqueImageFileNamesUsed.Contains(e)).ToList();
+                !string.IsNullOrWhiteSpace(name)).Distinct();   // Exclude names already in ImagesList
+             
+            var uniqueImageFileNamesNotUsed = imagesList.ToList().Select(e => e).Where(e => 
+            (uniqueImageFileNamesUsed !=null && !uniqueImageFileNamesUsed.ToList().Contains(e))
+            || true ).ToList();
+            
             foreach(var img in uniqueImageFileNamesNotUsed)
             {//add line to each image into the excel dto(s) to return to FE
                 AppItemtExcelRecordDTO appItemExcelRecordDto = new AppItemtExcelRecordDTO();
@@ -5496,12 +5498,14 @@ namespace onetouch.AppItems
 
                 appItemExcelRecordDto.Status = "Failed";
                 appItemExcelRecordDto.image = img;
+                
                 appItemExcelRecordDto.RecordType = "Image";
                 appItemExcelRecordDto.ErrorMessage = "Image is not linked to data";
                 appItemExcelRecordDto.ExcelDto = new AppItemExcelDto();
                 appItemExcelRecordDto.ExcelDto.Actions = "";
-                
-                
+                appItemExcelRecordDto.ExcelDto.ImagePreview = _appConfiguration[$"Attachment:PathTemp"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + img;
+
+
                 itemExcelResultsDTO.ExcelRecords.Add(appItemExcelRecordDto);
             }
 

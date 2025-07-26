@@ -236,6 +236,46 @@ namespace onetouch.AppItems
 
             return appItemtExcelRecordDTO;
         }
+        public async Task<List<LookupAccountOrTenantDto>> GetWithColors(GetAppItemWithPagedAttributesForEditInput input)
+        {
+            var y = await GetAppItemForEdit(input);
+            var result = y.AppItem.VariationItems
+                    .SelectMany(variationItem =>
+                        variationItem.EntityExtraData
+                        .Where(data =>
+                                data.EntityObjectTypeId == 16 &&
+                                data.EntityObjectTypeCode == "COLOR" &&
+                                data.AttributeId == 101 // <-- Add your target AttributeId here
+                        )
+                        .Select(data => new LookupAccountOrTenantDto
+                        {
+                            Id = variationItem.Id,
+                            DisplayName = data.AttributeCode
+                        })
+                        ).ToList();
+
+
+            return result;
+        }
+        public async Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUpWithColors(GetAllAppItemsInput input)
+        {
+            var GetAllRet = await GetAll(input);
+            List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
+            foreach (var x in GetAllRet.Items)
+            {
+
+                var z = await GetWithColors(new GetAppItemWithPagedAttributesForEditInput() { ItemId = x.AppItem.Id });
+                foreach (var y in z)
+                {
+                    lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code + "-" + y.DisplayName.Trim(), Id = y.Id });
+                }
+            }
+            return new PagedResultDto<LookupAccountOrTenantDto>(
+                   GetAllRet.TotalCount,
+                   lookupAccountOrTenantDtoList
+               );
+
+        }
 
         /* 
          7- when click final import >> create new API saveFromExcelImages, to [4H] 
@@ -256,25 +296,41 @@ namespace onetouch.AppItems
          
          */
 
-        public async Task<long> Create(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        public async Task<long> SaveImageToParent(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
             var y = await GetAppItemForEdit(input);
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
             // add the image to the parent
+            foreach (var item1 in y.AppItem.EntityAttachments)
+            {
+                item1.IsDefault = false;
+
+            }
             if (y.AppItem.EntityAttachments.Count == 0) { y.AppItem.EntityAttachments = new List<AppEntityAttachmentDto>(); }
-            var z = new AppEntityAttachmentDto { AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
+            var z = new AppEntityAttachmentDto {    IsDefault= appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,  AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
 
-            //if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
-            //{
-            //    System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
-            //}
 
-            //try
-            //{
+
+            // rename image at temp attachment folder with guid and keep image name in variable
+            // copy it to attachment folder
+            // add record attachments tables
+            // add record to appitem entity attachements
+
+
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
+            }
+
+            try
+            {
             //    System.IO.File.Copy(path + @"\" + z.guid + "." + guid.ImageFileName.Split('.')[1], _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
-            //}
-            //catch { }
+            }
+            catch { }
+
+            
 
             y.AppItem.EntityAttachments.Add(z);
 
