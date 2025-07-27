@@ -222,7 +222,7 @@ export class MainImportComponent
                 hasImageFile = true;
                 if (file.type.includes("image") && this.hasImages) {
                     totalImageFiles++;
-                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "image")) {
+                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMPORT")) {
                         this.imagesName.push(file.name.toUpperCase());
                         var imgFile = new ImageFile();
                         imgFile.file = file;
