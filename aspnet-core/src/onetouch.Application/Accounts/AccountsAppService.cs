@@ -127,7 +127,7 @@ namespace onetouch.Accounts
         //I40[End]
         private readonly IRepository<ValidationRule> _validationRuleRepo;
         private readonly ICreateMarketplaceAccount _iCreateMarketplaceAccount;
-
+        private readonly IEmailingTemplateAppService _emailingTemplateAppService;
         private enum CardType
         {
             MasterCard, Visa, AmericanExpress, Discover, JCB
@@ -157,6 +157,7 @@ namespace onetouch.Accounts
               IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
               IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository)
         {
+            _emailingTemplateAppService = emailingTemplateAppService;
             _appEntityCategoryRepository = appEntityCategoryRepository;
             _appEntityClassficationRepository = appEntityClassficationRepository;
             _validationRuleRepo = validationRuleRepo;
@@ -225,6 +226,14 @@ namespace onetouch.Accounts
                 }
             }
         }
+        public async Task SendRegistrationEmail(string email, int tenantId, string type, string link, string tenantName)
+        {
+            var localizedString = L("RegistrationLink");
+            //link = "https://app.testing.siiwii.net/account/register-tenant?editionId=1&subscriptionStartType=2";
+            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartnerByType", new List<string>() { tenantName, link, localizedString }, "en");
+            await SendMessage(new SendMailDto() { To = email, Subject = template.MessageSubject, Body = template.MessageBody, IsBodyHtml = true });
+        }
+
         //X527[Start]
         public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
         {
