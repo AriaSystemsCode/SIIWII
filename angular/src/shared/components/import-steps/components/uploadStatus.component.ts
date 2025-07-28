@@ -1,5 +1,5 @@
 // <!-- Iteration-8 -->
-import { HostListener, OnChanges, OnInit, SimpleChanges, ViewChild } from "@angular/core";
+import { ElementRef, HostListener, OnChanges, OnInit, SimpleChanges, ViewChild } from "@angular/core";
 import { Injector } from "@angular/core";
 import { Output } from "@angular/core";
 import { EventEmitter } from "@angular/core";
@@ -17,7 +17,7 @@ import { MainImportService } from "../services/mainImport.service";
     templateUrl: "./uploadStatus.component.html",
     styleUrls: ["./uploadStatus.component.scss"],
 })
-export class uploadStatusComponent extends AppComponentBase implements OnInit , OnChanges{
+export class uploadStatusComponent extends AppComponentBase implements OnInit, OnChanges {
     @ViewChild("uploadStatus", { static: true }) modal: ModalDirective;
 
     @Input() uploadingResult: any = null;
@@ -29,7 +29,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit , 
     importType: ImportTypes;
     ImportTypes = ImportTypes;
     activeRecordType: string = 'Data';
-    uploadStatsColumnsName: string[];
+    uploadStatsColumnsName;
 
 
     public constructor(
@@ -43,8 +43,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit , 
         this.getuploadStatsColumnsName();
     }
 
-       ngOnChanges(changes: SimpleChanges) {
-        this.records= this.filteredRecords();
+    ngOnChanges(changes: SimpleChanges) {
+        this.records = this.filteredRecords();
         this.records.forEach(r => {
             r.showActions = false;
         });
@@ -93,12 +93,12 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit , 
     }
 
 
-     filteredRecords() {
+    filteredRecords() {
         if (this.activeRecordType == 'Data')
             return this.uploadingResult?.excelRecords?.filter(r => r?.recordType !== 'Image');
 
-        else   
-         return this.uploadingResult?.excelRecords?.filter(r => r?.recordType == 'Image');
+        else
+            return this.uploadingResult?.excelRecords?.filter(r => r?.recordType == 'Image');
 
     }
 
@@ -106,93 +106,227 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit , 
     switchTab(type: string) {
         this.activeRecordType = type;
 
-        this.records=this.filteredRecords();
+        this.records = this.filteredRecords();
         this.records.forEach(r => {
             r.showActions = false;
         });
-          
+
     }
 
     getuploadStatsColumnsName() {
-        this.uploadStatsColumnsName = [];
-        this.uploadStatsColumnsName.push("Image Preview");
-        this.uploadStatsColumnsName.push("Record Type");
-        this.uploadStatsColumnsName.push("Record Status");
-        this.uploadStatsColumnsName.push("Status");
-        this.uploadStatsColumnsName.push("Parent Code");
-        this.uploadStatsColumnsName.push("Code");
-        this.uploadStatsColumnsName.push("Name");
-        this.uploadStatsColumnsName.push("Product Description");
-        this.uploadStatsColumnsName.push("Product Classification");
-        this.uploadStatsColumnsName.push("Product Classification Description");
-        this.uploadStatsColumnsName.push("Product Category Code");
-        this.uploadStatsColumnsName.push("Product Category Description");
-        this.uploadStatsColumnsName.push("Price");
-        this.uploadStatsColumnsName.push("Price Currency Code");
-        this.uploadStatsColumnsName.push("Image is Default");
-        this.uploadStatsColumnsName.push("Image Folder Name");
-        this.uploadStatsColumnsName.push("Color Code");
-        this.uploadStatsColumnsName.push("Color Name");
-        this.uploadStatsColumnsName.push("Size Code");
-        this.uploadStatsColumnsName.push("Size Name");
-        this.uploadStatsColumnsName.push("Size Scale Name");
-        this.uploadStatsColumnsName.push("Scale Sizes Order");
-        this.uploadStatsColumnsName.push("Size Ratio Name");
-        this.uploadStatsColumnsName.push("Size Ratio Value");
-        this.uploadStatsColumnsName.push("Material Content");
-        this.uploadStatsColumnsName.push("Sold Out Date");
-        this.uploadStatsColumnsName.push("Brand Code");
-        this.uploadStatsColumnsName.push("Brand Name");
-        this.uploadStatsColumnsName.push("Start Ship Date");
-        this.uploadStatsColumnsName.push("Dimension 1 sizes");
-        this.uploadStatsColumnsName.push("Dimension 2 sizes");
-        this.uploadStatsColumnsName.push("Dimension 3 sizes");
-        this.uploadStatsColumnsName.push("Dimension 1 Name");
-        this.uploadStatsColumnsName.push("Dimension 2 Name");
-        this.uploadStatsColumnsName.push("Dimension 3 Name");
-        this.uploadStatsColumnsName.push("Color-HEX");
-        this.uploadStatsColumnsName.push("Color-Image");
-        this.uploadStatsColumnsName.push("Color-Scheme");
-        this.uploadStatsColumnsName.push("Color-NRF");
-        this.uploadStatsColumnsName.push("Size Market");
-        this.uploadStatsColumnsName.push("Size-NRF");
-        this.uploadStatsColumnsName.push("Dimension1 Position");
-        this.uploadStatsColumnsName.push("Dimension2 Position");
-        this.uploadStatsColumnsName.push("Dimension3 Position");
-        this.uploadStatsColumnsName.push("Price A");
-        this.uploadStatsColumnsName.push("Price B");
-        this.uploadStatsColumnsName.push("Price C");
-        this.uploadStatsColumnsName.push("Price D");
-
+        this.uploadStatsColumnsName = [
+            { name: "Image Preview", showFor: "Image" },
+            { name: "Record Type" },
+            { name: "Status" },
+            { name: "Record Status" },
+            { name: "Parent Code" },
+            { name: "Code" },
+            { name: "Name" },
+            { name: "Product Description" },
+            { name: "Product Classification" },
+            { name: "Product Classification Description" },
+            { name: "Product Category Code" },
+            { name: "Product Category Description" },
+            { name: "Price" },
+            { name: "Price Currency Code" },
+            { name: "Image is Default", showFor: "Image" },
+            { name: "Image Folder Name", showFor: "Image" },
+            { name: "Color Code" },
+            { name: "Color Name" },
+            { name: "Size Code" },
+            { name: "Size Name" },
+            { name: "Size Scale Name" },
+            { name: "Scale Sizes Order" },
+            { name: "Size Ratio Name" },
+            { name: "Size Ratio Value" },
+            { name: "Material Content" },
+            { name: "Sold Out Date" },
+            { name: "Brand Code" },
+            { name: "Brand Name" },
+            { name: "Start Ship Date" },
+            { name: "Dimension 1 sizes" },
+            { name: "Dimension 2 sizes" },
+            { name: "Dimension 3 sizes" },
+            { name: "Dimension 1 Name" },
+            { name: "Dimension 2 Name" },
+            { name: "Dimension 3 Name" },
+            { name: "Color-HEX" },
+            { name: "Color-Image" },
+            { name: "Color-Scheme" },
+            { name: "Color-NRF" },
+            { name: "Size Market" },
+            { name: "Size-NRF" },
+            { name: "Dimension1 Position" },
+            { name: "Dimension2 Position" },
+            { name: "Dimension3 Position" },
+            { name: "Price A" },
+            { name: "Price B" },
+            { name: "Price C" },
+            { name: "Price D" },
+        ];
     }
-    
+
+    getRecordValue(record: any, key: string): any {
+        if (record?.hasOwnProperty(key)) {
+          return record[key];
+        } else if (record?.excelDto?.hasOwnProperty(key)) {
+          return record.excelDto[key];
+        }
+        return '';
+      }
+      
+      setRecordValue(record: any, key: string, value: any): void {
+        if (record?.hasOwnProperty(key)) {
+          record[key] = value;
+        } else if (record?.excelDto?.hasOwnProperty(key)) {
+          record.excelDto[key] = value;
+        }
+      }
+      
+      
+
+    mapColumnNameToKey(columnName: string): string {
+       const map = {
+          "Code": "code",
+          "Name": "name",
+          "Record Type": "recordType",
+          "Status": "status", 
+          "Record Status": "fieldsErrors",
+          "Parent Code": "parentCode",
+          "Product Description": "productDescription",
+          "Product Classification": "productClassificationCode",
+          "Product Classification Description": "productClassificationDescription",
+          "Product Category Code": "productCategoryCode",
+          "Product Category Description": "productCategoryDescription",
+          "Price": "price",
+          "Price Currency Code": "currency",
+          "Image is Default": "imageIsDefault",
+          "Image Folder Name": "imageFolderName",
+          "Color Code": "colorCode",
+          "Color Name": "colorName",
+          "Size Code": "sizeCode",
+          "Size Name": "sizeName",
+          "Size Scale Name": "sizeScaleName",
+          "Scale Sizes Order": "sizeScaleOrder",
+          "Size Ratio Name": "sizeRatioName",
+          "Size Ratio Value": "sizeRatioValue",
+          "Material Content": "materialContent",
+          "Sold Out Date": "soldOutDate",
+          "Brand Code": "brancdCode",
+          "Brand Name": "brandName",
+          "Start Ship Date": "startShipDate",
+          "Dimension 1 sizes": "d1Sizes",
+          "Dimension 2 sizes": "d2Sizes",
+          "Dimension 3 sizes": "d3Sizes",
+          "Dimension 1 Name": "d1Name",
+          "Dimension 2 Name": "d2Name",
+          "Dimension 3 Name": "d3Name",
+          "Dimension1 Position": "d1Pos",
+          "Dimension2 Position": "d2Pos",
+          "Dimension3 Position": "d3Pos",
+          "Color-HEX": "colorHex",
+          "Color-Image": "colorImage", 
+          "Color-Scheme": "colorSchema",
+          "Color-NRF": "colorNRF",
+          "Size Market": "sizeMarket",
+          "Size-NRF": "sizeNRF",
+          "Price A": "priceA",
+          "Price B": "priceB",
+          "Price C": "priceC",
+          "Price D": "priceD"
+        }; 
+      
+        return map[columnName] || columnName.toLowerCase().replace(/ /g, '');
+      }
+      
+
     toggleMenu(record: any, event: MouseEvent) {
         this.records.forEach(r => {
-          if (r !== record) r.showActions = false;
+            if (r !== record) r.showActions = false;
         });
+
         record.showActions = !record.showActions;
 
         if (record.showActions) {
-            const target = (event.target as HTMLElement).closest('.dropdown');
-            const rect = target?.getBoundingClientRect();
-            const spaceBelow = window.innerHeight - (rect?.bottom ?? 0);
-        
-            record.openUpward = spaceBelow < 250;
-          }
-      }
-      
-      @HostListener('document:click', ['$event'])
-      onClickOutside(event: MouseEvent): void {
+            const rect = (event.target as HTMLElement).getBoundingClientRect();
+
+            record.dropdownPosition = {
+                top: document.querySelector('.browser-table')?.getBoundingClientRect().top ?? 0,
+                left: rect.left
+            };
+
+            record.openUpward = true;
+        }
+    }
+
+
+
+
+
+    @HostListener('document:click', ['$event'])
+    onClickOutside(event: MouseEvent): void {
         const clickedInside = (event.target as HTMLElement).closest('.dropdown');
         if (!clickedInside) {
-          this.records?.forEach(record => record.showActions = false);
+            this.records?.forEach(record => record.showActions = false);
         }
-      }
-    validateDataRecord(record){
+    }
+    validateDataRecord(record) {
 
 
         this.records.forEach(r => {
             r.showActions = false;
         });
     }
+    getImageUrl(imageName: string): string {
+        if (!imageName) 
+          return '';
+        return this.attachmentBaseUrl +'/${imageName}' ;
+      }
+
+      getStatusClass(columnName: string, value: any): string {
+        if (columnName?.trim() !== 'Status' || !value) return '';
+        
+        const status = value.toString().trim().toLowerCase();
+      
+        switch (status) {
+          case 'warning':
+            return '_bg-warning';
+          case 'passed':
+            return '_bg-success';
+          case 'failed':
+            return '_bg-danger';
+          default:
+            return '';
+        }
+      }
+      
+      @ViewChild('tableScrollContainer') tableScrollContainer!: ElementRef;
+
+      @HostListener('window:keydown', ['$event'])
+handleKeyDown(event: KeyboardEvent) {
+  const container = this.tableScrollContainer?.nativeElement;
+  if (!container) return;
+
+  const scrollAmount = 100; 
+
+  switch (event.key) {
+    case 'ArrowDown':
+      container.scrollTop += scrollAmount;
+      event.preventDefault();
+      break;
+    case 'ArrowUp':
+      container.scrollTop -= scrollAmount;
+      event.preventDefault();
+      break;
+    case 'ArrowRight':
+      container.scrollLeft += scrollAmount;
+      event.preventDefault();
+      break;
+    case 'ArrowLeft':
+      container.scrollLeft -= scrollAmount;
+      event.preventDefault();
+      break;
+  }
+}
+
 }
