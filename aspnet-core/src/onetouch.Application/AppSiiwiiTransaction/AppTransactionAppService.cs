@@ -7211,7 +7211,7 @@ namespace onetouch.AppSiiwiiTransaction
                         //    .FirstOrDefaultAsync();
                         // if(publishedAcc!=null)
                         {
-                            await _accountAppService.Connect(accountOrg.Id, int.Parse(tenantId.ToString()));
+                            await _accountAppService.ConnectContactsProfiles(accountOrg.Id, int.Parse(tenantId.ToString()));
                             /* var otherAccount = await _appContactRepository.GetAll().Where(z => z.Id == publishedAcc.PartnerId && z.TenantId != null)
                              .FirstOrDefaultAsync();
                              if (otherAccount!=null)

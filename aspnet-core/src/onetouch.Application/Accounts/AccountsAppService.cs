@@ -122,6 +122,8 @@ namespace onetouch.Accounts
         private readonly ISycEntityObjectTypesAppService _sycEntityObjectTypesAppService;
         private readonly IRepository<AppEntityCategory, long> _appEntityCategoryRepository;
         private readonly IRepository<AppEntityClassification, long> _appEntityClassficationRepository;
+        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        private readonly IRepository<SycEntityObjectType, long> _sycEntityObjectTypeRepository;
         //I40[End]
         private readonly IRepository<ValidationRule> _validationRuleRepo;
         private readonly ICreateMarketplaceAccount _iCreateMarketplaceAccount;
@@ -151,7 +153,9 @@ namespace onetouch.Accounts
             , IRepository<onetouch.AppEntities.AppEntitiesRelationship, long> appEntityRelationShipRepository,
               IRepository<AppEntityCategory, long> appEntityCategoryRepository,
               IRepository<AppEntityClassification, long> appEntityClassficationRepository,
-              ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<ValidationRule> validationRuleRepo )
+              ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<ValidationRule> validationRuleRepo,
+              IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
+              IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository)
         {
             _appEntityCategoryRepository = appEntityCategoryRepository;
             _appEntityClassficationRepository = appEntityClassficationRepository;
@@ -184,8 +188,10 @@ namespace onetouch.Accounts
             _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
             _appEntityRelationShipRepository = appEntityRelationShipRepository;
+            _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             //I40[Start]
             _sycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
+            _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
             //I40[End]
 
         }
@@ -970,8 +976,11 @@ namespace onetouch.Accounts
         public async Task<GetAccountInfoForEditOutput> GetMyAccountForEdit()
         {
             var x = new EntityDto<long>();
+            var acc = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
 
             x.Id = 0;
+            if (acc != null)
+                x.Id = acc.Id;
             var contact = await DoGetAccountForEdit(x);
 
             var tenant = await _tenantManager.GetByIdAsync(AbpSession.GetTenantId());
@@ -1119,7 +1128,7 @@ namespace onetouch.Accounts
             return output;
         }
 
-        public async Task Connect(long id, int? tenantId = null)
+        public async Task ConnectContactsProfiles(long id, int? tenantId = null)
         {
             //I45
             if (tenantId == null)
@@ -2752,7 +2761,11 @@ namespace onetouch.Accounts
         public async Task<string> ApplyRelationOnProfile(long input, string ssin)
         {
             //I40{Start}
-            await Connect(input);
+            await ConnectContactsProfiles(input);
+            var originalPublishContactFortCurrTenant = await _appMarketplaceContactRepository.GetAll()
+                       .FirstOrDefaultAsync(x => x.OwnerId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
+            if(originalPublishContactFortCurrTenant!=null)
+            await CreateOrEditMarketplaceContactRelationship(originalPublishContactFortCurrTenant.SSIN, ssin, false);
             return "";
             //I40[End]
             string ret = "";
@@ -5425,6 +5438,88 @@ namespace onetouch.Accounts
             
             return returnObject;
             
+        }
+        public async Task<bool> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN,bool? disconnect)
+        {
+            var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+
+            var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => z.RequesterContactSSIN == requesterSSIN &&
+            z.RecipientContactSSIN == recipientSSIN && z.EntityObjectStatusId == activeRealtionshipStatusId).FirstOrDefaultAsync();
+
+            if (relation != null)
+            {
+                if (disconnect == true)
+                {
+                    var inActiveRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
+                    relation.EntityObjectStatusId = inActiveRealtionshipStatusId;
+                    relation.RelationshipEndDate = DateTime.Now;
+                    await _appContactRelationshipInfoRepository.UpdateAsync(relation);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+
+
+                }
+            }
+            else {
+                var requestContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == requesterSSIN).FirstOrDefaultAsync();
+                var recipientContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == recipientSSIN).FirstOrDefaultAsync();
+                
+                if (recipientContact!=null && requestContact!=null)
+                {
+                    relation = new AppContactRelationshipInfo();
+                    relation.RecipientContactSSIN = recipientSSIN;
+                    relation.RequesterContactSSIN = requesterSSIN;
+                    relation.CreationTime = DateTime.Now;
+                    relation.RelationshipStartDate = DateTime.Now;
+                    relation.EntityObjectStatusId = activeRealtionshipStatusId;
+                    relation.RecipientContactName = recipientContact.Name;
+                    relation.RequesterContactName = requestContact.Name;
+
+                                        
+                    var recipientType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == recipientContact.AccountTypeId).FirstOrDefaultAsync();
+                    if (recipientType!=null)
+                        relation.RecipientContactTypeCode = recipientType.Code;
+                    relation.RecipientContactTypeId = recipientContact.AccountTypeId;
+
+                    var requesterType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == requestContact.AccountTypeId).FirstOrDefaultAsync();
+                    if (requesterType != null)
+                        relation.RequesterContactTypeCode = requesterType.Code;
+                    relation.RequesterContactTypeId = requestContact.AccountTypeId;
+                    if (requesterType != null && recipientType != null)
+                    {
+                        string relationshipCode = requesterType.Code.Substring(0, 1)+"T"+ recipientType.Code.Substring(0, 1);
+                        var relationshipEntityObjectType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+                        if (relationshipEntityObjectType!=null)
+                        {
+                            relation.EntityObjectTypeCode = relationshipEntityObjectType.Code;
+                            relation.EntityObjectTypeId = relationshipEntityObjectType.Id;
+                        }
+                        var relationshiplookup =await  _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+                        if (relationshiplookup != null)
+                        {
+                            var extrDataSharing = relationshiplookup.EntityExtraData.Where(z => z.AttributeId== 605).FirstOrDefault();
+                            if (extrDataSharing != null)
+                            {
+                                relation.SharingLevel = extrDataSharing.AttributeValue == "Public" ? 1 : 3;
+                            }
+                            var extrDataConnectedLabel = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
+                            if (extrDataConnectedLabel!=null)
+                              relation.Name = relation.RequesterContactName + " " + extrDataSharing.AttributeValue.TrimEnd() + " " + relation.RecipientContactName;
+                        }
+                    }
+                    relation.ObjectId = await _helper.SystemTables.GetObjectMarketplaceContactRelationshipId();
+                    relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELTIONSHIP");
+                    await _appContactRelationshipInfoRepository.InsertAsync(relation);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+
+
+
+                }
+            }
+            return true;
         }
         //I40[End]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
@@ -8637,7 +8732,7 @@ namespace onetouch.Accounts
                         { return retId; }
                     }
 
-                    await Connect(retId);
+                    await ConnectContactsProfiles(retId);
                 }
 
                 return retId;

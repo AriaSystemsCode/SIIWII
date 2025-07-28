@@ -51,7 +51,7 @@ namespace onetouch.Accounts
     
 		Task<AppAddressDto> CreateOrEditAddress(AppAddressDto input);
 		//I45
-		Task Connect(long id, int? tenantId = null);
+		Task ConnectContactsProfiles(long id, int? tenantId = null);
         Task<BranchDto> CreateOrEditBranch(BranchDto input);
 		//I45
 		//I46[Start]

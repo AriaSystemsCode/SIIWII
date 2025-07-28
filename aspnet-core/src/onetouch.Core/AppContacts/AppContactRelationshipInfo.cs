@@ -19,6 +19,7 @@ namespace onetouch.AppContacts
         public string RecipientContactName { set; get; }
         public int SharingLevel { set; get; }
         public long RecipientContactTypeId { set; get; }
+        public long RequesterContactTypeId { set; get; }
         public string RequesterContactTypeCode { set; get; }
         public string RecipientContactTypeCode { set; get; }
         public DateTime RelationshipCreationDate { set; get; }

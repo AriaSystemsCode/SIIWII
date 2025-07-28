@@ -14,6 +14,7 @@ using onetouch.SycCurrencyExchangeRates;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.AppEntities;
 using Microsoft.EntityFrameworkCore;
+using onetouch.SycSegmentIdentifierDefinitions.Dtos;
 
 namespace onetouch.Helpers
 {
@@ -30,6 +31,9 @@ namespace onetouch.Helpers
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRate;
         //MMT30[End]
+        //MMT40[Start]
+        private readonly ISycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
+        //MMT40[End]
         private readonly IRepository<AppEntity, long> _appEntityRepository;
         public SystemTables(IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             
@@ -37,7 +41,8 @@ namespace onetouch.Helpers
            
             IRepository<SycEntityObjectStatus, long> sycEntityObjectStatus, IRepository<SycCounter, long> sycCounter, IRepository<SycIdentifierDefinition, long> sycIdentifierDefinitions,
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition,
-            IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate, IRepository<AppEntity, long> appEntityRepository)
+            IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate, IRepository<AppEntity, long> appEntityRepository,
+            ISycIdentifierDefinitionsAppService iAppSycIdentifierDefinitionsService)
         {
             _appEntityRepository = appEntityRepository;
             _sydObjectRepository = sydObjectRepository;
@@ -52,6 +57,9 @@ namespace onetouch.Helpers
             _sycSegmentIdentifierDefinition = sycSegmentIdentifierDefinition;
             //MMT30[End]
             _appEntityRepository = appEntityRepository;
+            //MMT40[Start]
+            _iAppSycIdentifierDefinitionsService = iAppSycIdentifierDefinitionsService;
+            //MMT40[End]
         }
 
         public async Task< long> GetObjectContactId()
@@ -756,5 +764,86 @@ namespace onetouch.Helpers
             }
         }
         //MMT-Entity log [End]
+        //MMT40[Start]
+        public async Task<long> GetEntityObjectStatusRelationshipActive()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "ACTIVE" && x.ObjectCode == "MARKETPLACECONTACTRELATIONSHIP");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetEntityObjectStatusRelationshipInActive()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "INACTIVE" && x.ObjectCode == "MARKETPLACECONTACTRELATIONSHIP");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetObjectMarketplaceContactRelationshipId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "MARKETPLACECONTACTRELATIONSHIP");
+            return obj.Id;
+        }
+        public async Task<string> GetNextSequence(string sydbjectCode)
+        {
+            string returnCode = "";
+            var sydobject = _sydObjectRepository.FirstOrDefault(x => x.Code == sydbjectCode);
+            if (sydobject != null)
+            {
+                var identifierId = sydobject.SycDefaultIdentifierId;
+                if (identifierId != null)
+                {
+                    var identifierDef = await _iAppSycIdentifierDefinitionsService.GetSycIdentifierDefinitionForView(long.Parse(identifierId.ToString()));
+                    if (identifierDef != null)
+                    {
+                        var sycSegmentIdentifierDefinitions = _sycSegmentIdentifierDefinition.GetAll().Where(e => e.SycIdentifierDefinitionId == identifierId).ToList();
+                        var sycSegmentIdentifierDefinitionList = ObjectMapper.Map<List<SycSegmentIdentifierDefinitionDto>>(sycSegmentIdentifierDefinitions);
+                        var productCodeSegment = sycSegmentIdentifierDefinitionList.FirstOrDefault(z => z.SegmentNumber == 1);
+                        returnCode = await GetNextSegment(productCodeSegment, identifierDef.SycIdentifierDefinition.IsTenantLevel);
+                    }
+                }
+            }
+            return returnCode;
+        }
+        public async Task<string> GetNextSegment(SycSegmentIdentifierDefinitionDto segment,bool istenantLevel) 
+        {
+            long? tenantId = istenantLevel ? AbpSession.TenantId : null;
+            string returnString = "";
+            if (segment.IsAutoGenerated & segment.SegmentType == "Sequence")
+            {
+                var sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == tenantId).FirstOrDefault();
+                if (sycCounter == null)
+                {
+                    if (true)
+                    {
+                        sycCounter = new SycCounter();
+                        sycCounter.SycSegmentIdentifierDefinitionId = segment.Id;
+                        sycCounter.Counter = segment.CodeStartingValue + 1;
+                        if (AbpSession.TenantId != null)
+                        {
+                            sycCounter.TenantId = (int?)tenantId;
+                        }
+                        await _sycCounter.InsertAsync(sycCounter);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                    returnString = segment.CodeStartingValue.ToString().Trim().PadLeft(segment.SegmentLength, '0');
+                }
+                else
+                {
+                    returnString = sycCounter.Counter.ToString().Trim().PadLeft(segment.SegmentLength, '0');
+                    if (true)
+                    {
+                        sycCounter.Counter += 1;
+                        await _sycCounter.UpdateAsync(sycCounter);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                }
+            }
+            return returnString;
+        }
+    
+        //MMT40[End]
     }
 }
