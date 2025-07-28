@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto, GetAllEntityObjectTypeOutput, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto, GetAllEntityObjectTypeOutput, SycEntityObjectTypesServiceProxy, UserServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -69,7 +69,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
           activeAccordionIndexes: number[] = [0]; // open first tab by default
           appTransactionsForViewDto:any
           hasUnsavedChanges = false;
-    constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,        private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,) {
+    constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,        private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy, private _userService: UserServiceProxy,) {
         super(injector);
         this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
@@ -188,15 +188,31 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     }
 
     EditUserName(){
+ 
         this.createOrEditUserModal.user = new UserEditDto();
         this.createOrEditUserModal.user.id = Number(this.userId?.selectedValues[this.userId.selectedValues.length - 1]?.value);
-        this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
-        this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
-        this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
-        this.createOrEditUserModal.user.emailAddress=this.memberData?.eMailAddress
-        this.createOrEditUserModal.user.phoneNumber=this.memberData?.phone1Number
-        this.createOrEditUserModal.fromTeamMember=true;
-        this.createOrEditUserModal.show(this.createOrEditUserModal.user.id)
+        this._userService.getUserForEdit( this.createOrEditUserModal.user.id).subscribe(userResult => {
+          if(userResult){
+            // this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
+            // this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
+            // this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
+            // this.createOrEditUserModal.user.emailAddress=this.memberData?.eMailAddress
+            // this.createOrEditUserModal.user.phoneNumber=this.memberData?.phone1Number
+            this.createOrEditUserModal.user.name= userResult?.user?.name
+            this.createOrEditUserModal.user.surname=userResult?.user?.surname
+            this.createOrEditUserModal.user.userName=userResult?.user?.userName
+            this.createOrEditUserModal.user.emailAddress=userResult?.user?.emailAddress
+            this.createOrEditUserModal.user.phoneNumber=userResult?.user?.phoneNumber
+          }
+     
+ 
+          // this.createOrEditUserModal.fromTeamMember=true;
+          this.createOrEditUserModal.show(this.createOrEditUserModal.user.id)
+       
+
+    
+        });
+ 
     }
 
     editjobTitleValue: string = '';
