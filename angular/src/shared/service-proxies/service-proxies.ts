@@ -2416,7 +2416,7 @@ export class AccountsServiceProxy {
     /**
      * @return Success
      */
-    unPublishProfile(): Observable<void> {
+    unPublishProfile(): Observable<boolean> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/UnPublishProfile";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2424,6 +2424,7 @@ export class AccountsServiceProxy {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -2434,14 +2435,14 @@ export class AccountsServiceProxy {
                 try {
                     return this.processUnPublishProfile(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<boolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<boolean>;
         }));
     }
 
-    protected processUnPublishProfile(response: HttpResponseBase): Observable<void> {
+    protected processUnPublishProfile(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2450,7 +2451,11 @@ export class AccountsServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
