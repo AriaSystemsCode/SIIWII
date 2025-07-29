@@ -484,10 +484,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
     }
     async getAccountDataForView() {
-        if (!this.accountId || isNaN(this.accountId)) {
-            console.warn('Invalid accountId passed to getAccountForView:', this.accountId);
-            return;
-          }
+      
         this.showMainSpinner();
      
         let result;
@@ -811,16 +808,16 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     this.getForEditResult.lastChangesIsPublished = false;
                     this.updateLogoService.updateLogo();
     
-                    const newId = result?.accountInfo?.id || this.accountInfoTemp?.id;
-    
-                    if (!this.accountId && newId) {
-                        // Redirect to view page with ProfileView tab
+                    this.accountId = result?.accountInfo?.id 
+                        this.getAccountDataForView()
+                    // if (!this.accountId && newId) {
+                    //     // Redirect to view page with ProfileView tab
                         this._router.navigate([`/app/main/account`], {
                             queryParams: { tab: 'ProfileView' }
                         });
-                    } else {
-                        this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
-                    }
+                    // } else {
+                        // this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
+                    // }
                 }
             }, err => {
                 this.touched = true;
