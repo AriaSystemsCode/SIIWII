@@ -476,6 +476,8 @@ namespace onetouch.Accounts
 
                     var tenant = _appContactRepository.GetAll().Where(e => e.SSIN == input.SSIN && e.IsProfileData && (e.ParentId == null || e.ParentId <= 0))
                         .FirstOrDefault();
+                    if (tenant == null)
+                        return new PagedResultDto<GetAccountForViewDto>();
 
                     var filteredAccounts = _appContactRepository.GetAll()
                             .Include(e => e.AppContactAddresses).ThenInclude(a => a.AddressFk)
