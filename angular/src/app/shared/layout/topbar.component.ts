@@ -569,11 +569,11 @@ export class TopBarComponent
             },
         }).then((result) => {
             if (result.isConfirmed) {
-                debugger 
-                // this._accountsServiceProxy.sendRegistrationEmail(email, tenantId, type, link , tenantName).subscribe(
-                //     response => {
-                //         console.log('Email sent successfully', response);
-                //     })
+                 
+                this._accountsServiceProxy.sendRegistrationEmail(email, tenantId, type, link , tenantName).subscribe(
+                    response => {
+                        console.log('Email sent successfully', response);
+                    })
             }
         })
     }

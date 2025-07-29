@@ -799,35 +799,34 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
                 this.saving = false;
-                if(this.accountInfoTemp?.id && this.accountId ){
-                    this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
-
-                }else {
-                    location.reload()
-                    this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
-                    this.getAccountDataForView()
-                }
             }))
             .subscribe(result => {
-
-                this.touched = false
-                this.notify.success(this.l('SavedSuccessfully'));
-                this.appSession.tenant.currencyInfoDto = this.allCurrenciesDto.filter(e => e.value == this.accountInfoTemp.currencyId)[0];
-                this.tenantDefaultCurrency = this.allCurrenciesDto.filter(e => e.value == this.accountInfoTemp.currencyId)[0];
-                this.displaySaveAccount = true;
-                this.canPublish = true;
-                this.getForEditResult.lastChangesIsPublished = false
-                this.updateLogoService.updateLogo()
-                this.handleComponentMode();
-
-                // this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
-                this.changeTab(AccountInfoPageTabs.ProfileView);
-                this.getAccountDataForView()
-
-
-
-            }, err => this.touched = true);
+                if (result) {
+                    this.touched = false;
+                    this.notify.success(this.l('SavedSuccessfully'));
+                    this.appSession.tenant.currencyInfoDto = this.allCurrenciesDto.find(e => e.value == this.accountInfoTemp.currencyId);
+                    this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
+                    this.displaySaveAccount = true;
+                    this.canPublish = true;
+                    this.getForEditResult.lastChangesIsPublished = false;
+                    this.updateLogoService.updateLogo();
+    
+                    const newId = result?.accountInfo?.id || this.accountInfoTemp?.id;
+    
+                    if (!this.accountId && newId) {
+                        // Redirect to view page with ProfileView tab
+                        this._router.navigate([`/app/main/account`], {
+                            queryParams: { tab: 'ProfileView' }
+                        });
+                    } else {
+                        this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
+                    }
+                }
+            }, err => {
+                this.touched = true;
+            });
     }
+    
 
     async saveExternalOrManualAccount() {
         if (!this.accountInfoTemp.code) {
@@ -1177,7 +1176,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connect(this.accountDataForView.partnerId,null)
+        this._AccountsServiceProxy.connectContactsProfiles(this.accountDataForView.partnerId,null)
         .subscribe(() => {
             this.notify.success(this.l('SuccessfullyConnected'));
             this.accountDataForView.status = true
