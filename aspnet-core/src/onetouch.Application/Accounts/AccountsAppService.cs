@@ -2060,7 +2060,7 @@ namespace onetouch.Accounts
             //contact.Id = contactSavedId;
 
             #region stop phone update from here as it overrider by saving in branch update method...
-            if (contactOriginal != null)
+            if(false)//I40 (contactOriginal != null)
             {
                 contact.Phone1Ext = contactOriginal.Phone1Ext;
                 contact.Phone1Number = contactOriginal.Phone1Number;
@@ -5755,9 +5755,16 @@ namespace onetouch.Accounts
         public async Task<BranchDto> CreateOrEditBranch(BranchDto input)
         {
             //MMT40[Start]
+           
             CreateOrEditAccountInfoDto branchObject = new CreateOrEditAccountInfoDto();
             branchObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(input);
             branchObject.ReturnId = true;
+            if (input.ParentId == null && input.Id != null && input.Id != 0)
+            {
+                branchObject.AccountLevel = AccountLevelEnum.Manual;
+                var outputAcc = await CreateOrEditAccount(branchObject);
+                return ObjectMapper.Map<BranchDto>(outputAcc);
+            }
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             if (string.IsNullOrEmpty(branchObject.SSIN))
             {
