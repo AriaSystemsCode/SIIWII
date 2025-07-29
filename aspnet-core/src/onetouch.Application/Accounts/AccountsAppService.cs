@@ -244,17 +244,19 @@ namespace onetouch.Accounts
                 List<AppEntityAttachmentDto> retrunResult = new List<AppEntityAttachmentDto>();
                 int totalCount = 0;
                 
-                var account = await _appContactRepository.GetAll().Include(z => z.EntityFk).Where(z => z.TenantId == null && z.SSIN == input.AccountSSIN).FirstOrDefaultAsync();
-                if (account != null && account.EntityFk.TenantOwner != null)
+                var account = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantId == null && z.SSIN == input.AccountSSIN).FirstOrDefaultAsync();
+                if (account != null && account.OwnerId != null)
                 {
                     long catgImage = await _helper.SystemTables.GetAttachmentCategoryId("IMAGE");
                     long catgVideo = await _helper.SystemTables.GetAttachmentCategoryId("VIDEO");
                     var entities = from t in _appEntityAttachmentRepository.GetAll().Include(z => z.AttachmentFk)
-                                   .Where(z=>z.AttachmentCategoryId== catgImage || z.AttachmentCategoryId == catgVideo)
+                                   .Where(z=>(z.AttachmentCategoryId== catgImage || z.AttachmentCategoryId == catgVideo) &&
+                                   z.EntityFk.TenantId == null || z.EntityFk.TenantId== account.OwnerId ||
+                                   z.EntityFk.TenantOwner == account.OwnerId)
                                    join
                                   e in _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                        .Where(z => (z.TenantId==null  && z.TenantOwner == account.EntityFk.TenantOwner && z.EntityAttachments.Count() > 0) ||
-                        ((z.ObjectId== postObjectId || z.ObjectId== eventObjectId) && z.TenantId== account.EntityFk.TenantOwner))
+                        .Where(z => (z.TenantId==null  && z.TenantOwner == account.OwnerId && z.EntityAttachments.Count() > 0) ||
+                        ((z.ObjectId== postObjectId || z.ObjectId== eventObjectId) && z.TenantId== account.OwnerId))
                         on t.EntityId equals e.Id into j
                                    from j1 in j
                                    select new AppEntityAttachmentDto()
