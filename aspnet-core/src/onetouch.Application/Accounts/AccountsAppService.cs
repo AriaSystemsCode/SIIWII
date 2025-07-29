@@ -2332,44 +2332,60 @@ namespace onetouch.Accounts
         //MARIAM
         //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
-        public async Task UnPublishProfile()
+        public async Task<Boolean> UnPublishProfile()
         {
+            Boolean ret = false;
             var contact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.AccountId == null);
             if (contact != null)
             {
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
-                    var publishedContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == contact.Id);
-                    if (publishedContact != null)
+                    //check if account has published styles
+
+                    var itemsList = await _appEntityRepository.GetAll()
+                                .Where(e => e.TenantId == null && e.TenantOwner == AbpSession.TenantId && e.EntityObjectTypeCode == "LISTING")
+                                .CountAsync();
+
+                    if (itemsList > 0)
                     {
-                        var publishedContactEntity = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.Id == publishedContact.EntityId);
-                        if (publishedContactEntity != null)
-                        {
-
-                            // publishedContactEntity.EntityObjectStatusCode = "CANCELLED";
-                            publishedContactEntity.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                            await CurrentUnitOfWork.SaveChangesAsync();
-                        }
-                        //xx
-                        //XX
-
-                        var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
-                                     x.ParentId != null).ToList(); // First level of branches
-                        if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
-                        {
-                            foreach (var publishedBranchMember in publishedbranchesandMemebers)
-                            {
-                                publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                            }
-                            await CurrentUnitOfWork.SaveChangesAsync();
-                        }
-
-                        //XX
-                        //xx
+                        // account has published styles and should not be private or hidden 
                     }
+                    else
+                    {
+                        var appMarketplaceContact = await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
+                    }
+                    //var publishedContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == contact.Id);
+                    //if (publishedContact != null)
+                    //{
+                    //    var publishedContactEntity = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.Id == publishedContact.EntityId);
+                    //    if (publishedContactEntity != null)
+                    //    {
+
+                    //        // publishedContactEntity.EntityObjectStatusCode = "CANCELLED";
+                    //        publishedContactEntity.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                    //        await CurrentUnitOfWork.SaveChangesAsync();
+                    //    }
+                    //    //xx
+                    //    //XX
+
+                    //        var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
+                    //                     x.ParentId != null).ToList(); // First level of branches
+                    //        if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
+                    //        {
+                    //            foreach (var publishedBranchMember in publishedbranchesandMemebers)
+                    //            {
+                    //                publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                    //            }
+                    //            await CurrentUnitOfWork.SaveChangesAsync();
+                    //    }
+
+                    //    //XX
+                    //    //xx
+                    //}
                 }
             }
-
+            ret = true;
+            return ret;
         }
         //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
 
