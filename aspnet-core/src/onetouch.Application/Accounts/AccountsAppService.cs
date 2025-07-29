@@ -5765,7 +5765,8 @@ namespace onetouch.Accounts
             {
                 branchObject.AccountLevel = AccountLevelEnum.Manual;
                 var outputAcc = await CreateOrEditAccount(branchObject);
-                return ObjectMapper.Map<BranchDto>(outputAcc);
+                var ret =  ObjectMapper.Map<BranchDto>(outputAcc);
+                return ret;
             }
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             if (string.IsNullOrEmpty(branchObject.SSIN))

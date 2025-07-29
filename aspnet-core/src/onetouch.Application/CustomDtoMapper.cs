@@ -969,6 +969,9 @@ namespace onetouch
                 .ForMember(z => z.AccountLevel, z => z.MapFrom(s=> AccountLevelEnum.Manual));
             configuration.CreateMap<GetAccountInfoForEditOutput, BranchDto>()
             .ForMember(a=>a.Id, b => b.MapFrom(ent => ent.AccountInfo.Id))
+            .ForMember(a => a.Name, b => b.MapFrom(ent => ent.AccountInfo.Name))
+            .ForMember(a => a.Code, b => b.MapFrom(ent => ent.AccountInfo.Code))
+            .ForMember(a => a.ContactAddresses, b => b.MapFrom(ent => ent.AccountInfo.ContactAddresses))
             .ForMember(a => a.AccountId, b => b.MapFrom(ent => ent.AccountInfo.AccountId));
             configuration.CreateMap<AppItems.Dtos.ExtraAttribute, AppEntityExtraDataDto>();
             //MMT40[End]
