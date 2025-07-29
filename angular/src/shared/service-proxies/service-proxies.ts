@@ -917,6 +917,70 @@ export class AccountsServiceProxy {
     }
 
     /**
+     * @param email (optional) 
+     * @param tenantId (optional) 
+     * @param type (optional) 
+     * @param link (optional) 
+     * @param tenantName (optional) 
+     * @return Success
+     */
+    sendRegistrationEmail(email: string | null | undefined, tenantId: number | undefined, type: string | null | undefined, link: string | null | undefined, tenantName: string | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/SendRegistrationEmail?";
+        if (email !== undefined && email !== null)
+            url_ += "email=" + encodeURIComponent("" + email) + "&";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (type !== undefined && type !== null)
+            url_ += "type=" + encodeURIComponent("" + type) + "&";
+        if (link !== undefined && link !== null)
+            url_ += "link=" + encodeURIComponent("" + link) + "&";
+        if (tenantName !== undefined && tenantName !== null)
+            url_ += "tenantName=" + encodeURIComponent("" + tenantName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSendRegistrationEmail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSendRegistrationEmail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSendRegistrationEmail(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param accountSSIN (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
@@ -1905,8 +1969,8 @@ export class AccountsServiceProxy {
      * @param tenantId (optional) 
      * @return Success
      */
-    connect(id: number | undefined, tenantId: number | null | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/Accounts/Connect?";
+    connectContactsProfiles(id: number | undefined, tenantId: number | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/ConnectContactsProfiles?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
@@ -1923,11 +1987,11 @@ export class AccountsServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processConnect(response_);
+            return this.processConnectContactsProfiles(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processConnect(response_ as any);
+                    return this.processConnectContactsProfiles(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<void>;
                 }
@@ -1936,7 +2000,7 @@ export class AccountsServiceProxy {
         }));
     }
 
-    protected processConnect(response: HttpResponseBase): Observable<void> {
+    protected processConnectContactsProfiles(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3445,6 +3509,67 @@ export class AccountsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = ContactDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requesterSSIN (optional) 
+     * @param recipientSSIN (optional) 
+     * @param disconnect (optional) 
+     * @return Success
+     */
+    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditMarketplaceContactRelationship?";
+        if (requesterSSIN !== undefined && requesterSSIN !== null)
+            url_ += "requesterSSIN=" + encodeURIComponent("" + requesterSSIN) + "&";
+        if (recipientSSIN !== undefined && recipientSSIN !== null)
+            url_ += "recipientSSIN=" + encodeURIComponent("" + recipientSSIN) + "&";
+        if (disconnect !== undefined && disconnect !== null)
+            url_ += "disconnect=" + encodeURIComponent("" + disconnect) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditMarketplaceContactRelationship(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditMarketplaceContactRelationship(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processCreateOrEditMarketplaceContactRelationship(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -32584,6 +32709,64 @@ export class MarketplaceAccountsServiceProxy {
     }
 
     /**
+     * @param requesterSSIN (optional) 
+     * @param recipientSSIN (optional) 
+     * @return Success
+     */
+    createOrUpdateRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/MarketplaceAccounts/CreateOrUpdateRelationship?";
+        if (requesterSSIN !== undefined && requesterSSIN !== null)
+            url_ += "requesterSSIN=" + encodeURIComponent("" + requesterSSIN) + "&";
+        if (recipientSSIN !== undefined && recipientSSIN !== null)
+            url_ += "RecipientSSIN=" + encodeURIComponent("" + recipientSSIN) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdateRelationship(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdateRelationship(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processCreateOrUpdateRelationship(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param filter (optional) 
      * @param filterType (optional) 
      * @param name (optional) 
@@ -53667,6 +53850,330 @@ export class SystemTablesServiceProxy {
     }
 
     protected processGetEntityObjectStatusReadyToSendEntityLog(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectStatusRelationshipActive(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectStatusRelationshipActive";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectStatusRelationshipActive(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectStatusRelationshipActive(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectStatusRelationshipActive(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectStatusRelationshipInActive(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectStatusRelationshipInActive";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectStatusRelationshipInActive(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectStatusRelationshipInActive(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectStatusRelationshipInActive(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectMarketplaceContactRelationshipId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectMarketplaceContactRelationshipId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectMarketplaceContactRelationshipId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectMarketplaceContactRelationshipId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectMarketplaceContactRelationshipId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param sydbjectCode (optional) 
+     * @return Success
+     */
+    getNextSequence(sydbjectCode: string | null | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetNextSequence?";
+        if (sydbjectCode !== undefined && sydbjectCode !== null)
+            url_ += "sydbjectCode=" + encodeURIComponent("" + sydbjectCode) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetNextSequence(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetNextSequence(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetNextSequence(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param code (optional) 
+     * @param name (optional) 
+     * @param segmentNumber (optional) 
+     * @param segmentHeader (optional) 
+     * @param segmentMask (optional) 
+     * @param segmentLength (optional) 
+     * @param segmentType (optional) 
+     * @param isAutoGenerated (optional) 
+     * @param isEditable (optional) 
+     * @param isVisible (optional) 
+     * @param codeStartingValue (optional) 
+     * @param lookOrFieldName (optional) 
+     * @param sycIdentifierDefinitionId (optional) 
+     * @param id (optional) 
+     * @param istenantLevel (optional) 
+     * @return Success
+     */
+    getNextSegment(code: string | null | undefined, name: string | null | undefined, segmentNumber: number | undefined, segmentHeader: string | null | undefined, segmentMask: string | null | undefined, segmentLength: number | undefined, segmentType: string | null | undefined, isAutoGenerated: boolean | undefined, isEditable: boolean | undefined, isVisible: boolean | undefined, codeStartingValue: number | undefined, lookOrFieldName: string | null | undefined, sycIdentifierDefinitionId: number | null | undefined, id: number | undefined, istenantLevel: boolean | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetNextSegment?";
+        if (code !== undefined && code !== null)
+            url_ += "Code=" + encodeURIComponent("" + code) + "&";
+        if (name !== undefined && name !== null)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
+        if (segmentNumber === null)
+            throw new Error("The parameter 'segmentNumber' cannot be null.");
+        else if (segmentNumber !== undefined)
+            url_ += "SegmentNumber=" + encodeURIComponent("" + segmentNumber) + "&";
+        if (segmentHeader !== undefined && segmentHeader !== null)
+            url_ += "SegmentHeader=" + encodeURIComponent("" + segmentHeader) + "&";
+        if (segmentMask !== undefined && segmentMask !== null)
+            url_ += "SegmentMask=" + encodeURIComponent("" + segmentMask) + "&";
+        if (segmentLength === null)
+            throw new Error("The parameter 'segmentLength' cannot be null.");
+        else if (segmentLength !== undefined)
+            url_ += "SegmentLength=" + encodeURIComponent("" + segmentLength) + "&";
+        if (segmentType !== undefined && segmentType !== null)
+            url_ += "SegmentType=" + encodeURIComponent("" + segmentType) + "&";
+        if (isAutoGenerated === null)
+            throw new Error("The parameter 'isAutoGenerated' cannot be null.");
+        else if (isAutoGenerated !== undefined)
+            url_ += "IsAutoGenerated=" + encodeURIComponent("" + isAutoGenerated) + "&";
+        if (isEditable === null)
+            throw new Error("The parameter 'isEditable' cannot be null.");
+        else if (isEditable !== undefined)
+            url_ += "IsEditable=" + encodeURIComponent("" + isEditable) + "&";
+        if (isVisible === null)
+            throw new Error("The parameter 'isVisible' cannot be null.");
+        else if (isVisible !== undefined)
+            url_ += "IsVisible=" + encodeURIComponent("" + isVisible) + "&";
+        if (codeStartingValue === null)
+            throw new Error("The parameter 'codeStartingValue' cannot be null.");
+        else if (codeStartingValue !== undefined)
+            url_ += "CodeStartingValue=" + encodeURIComponent("" + codeStartingValue) + "&";
+        if (lookOrFieldName !== undefined && lookOrFieldName !== null)
+            url_ += "LookOrFieldName=" + encodeURIComponent("" + lookOrFieldName) + "&";
+        if (sycIdentifierDefinitionId !== undefined && sycIdentifierDefinitionId !== null)
+            url_ += "SycIdentifierDefinitionId=" + encodeURIComponent("" + sycIdentifierDefinitionId) + "&";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (istenantLevel === null)
+            throw new Error("The parameter 'istenantLevel' cannot be null.");
+        else if (istenantLevel !== undefined)
+            url_ += "istenantLevel=" + encodeURIComponent("" + istenantLevel) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetNextSegment(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetNextSegment(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetNextSegment(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :

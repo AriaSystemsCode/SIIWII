@@ -5553,7 +5553,7 @@ namespace onetouch.Accounts
 
         #endregion Contact(Person)
 
-        #region Branch
+         #region Branch
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<BranchDto> GetBranchForEdit(long input)
         {

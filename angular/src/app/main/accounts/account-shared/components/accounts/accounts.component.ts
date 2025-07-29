@@ -318,7 +318,7 @@ export class AccountsComponent
     connect(account: AccountDto): void {
         this.showMainSpinner();
         this._accountsServiceProxy
-            .connect(account.id,null)
+            .connectContactsProfiles(account.id,null)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
