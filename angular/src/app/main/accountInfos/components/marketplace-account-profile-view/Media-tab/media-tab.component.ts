@@ -62,23 +62,38 @@ export class MediaTabComponent extends AppComponentBase implements OnInit {
   }
 
   getAllMedia() {
-    this.showMainSpinner()
-    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, 0, this.itemsPerPage).pipe(
-      finalize(
-        () =>
-          this.hideMainSpinner()
-      )
-    ).subscribe((res) => {
-
-      this.mediaItems = res.items
-      this.totalItems = this.mediaItems.length;
-    })
+    this.showMainSpinner();
+  
+    const skipCount = (this.currentPage - 1) * this.itemsPerPage;
+  
+    this._AccountsServiceProxy
+      .getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, skipCount, this.itemsPerPage)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe((res) => {
+        this.mediaItems = res.items
+        // ?.map((item) => {
+        //   if (item.attachmentCategoryId == 8) {
+        //     return {
+        //       ...item,
+        //       safeUrl: this.sanitizeUrl(item.url),
+        //       init: item.init,
+        //       toJSON: item.toJSON
+        //     } as AppEntityAttachmentDto;
+        //   }
+        //   return item;
+        // });
+  
+        this.totalItems = res.totalCount; // ✅ This should come from backend
+      });
   }
-
-  changePage(pageNumber: number): void {
-    this.currentPage = pageNumber;
+  
+  changePage(event: any): void {
+    this.currentPage = (event.first / event.rows) + 1;
+    this.itemsPerPage = event.rows;
     this.getAllMedia();
   }
+  
+  
   openModal(index: number): void {
     this.selectedIndex = index;
     this.isModalOpen = true;
