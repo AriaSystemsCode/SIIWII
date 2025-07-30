@@ -238,11 +238,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
     save(): void {
         this.saving = true;
-        let tenancyName = this.appSession.tenancyName;
-        if (!tenancyName)
-            this.branch.code = this.branchCode;
-        else
-            this.branch.code = tenancyName + "-" + this.branchCode;
+    
+            this.branch.code =  this.branchCode;
 
 
         this.branch.contactAddresses = []
