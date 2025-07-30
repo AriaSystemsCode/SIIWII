@@ -5769,17 +5769,18 @@ namespace onetouch.Accounts
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                     .Include(z => z.EntityFk).ThenInclude(z=>z.EntityCategories)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
+                   // .Include(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk).AsNoTracking()
                     .Where(z => z.Id == input.Id).FirstOrDefaultAsync();
                 if (orgAcc != null)
                 {
                     branchObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(orgAcc);
                     branchObject.EMailAddress = input.EMailAddress;
                     branchObject.Website = input.Website;
-                    branchObject.ContactAddresses = new List<AppContactAddressDto>();
-                    foreach(var add in input.ContactAddresses)
-                    {
-                        branchObject.ContactAddresses.Add(add);
-                    }
+                    //branchObject.ContactAddresses = new List<AppContactAddressDto>();
+                    //foreach(var add in input.ContactAddresses)
+                    //{
+                    //    branchObject.ContactAddresses.Add(add);
+                    //}
                     branchObject.CurrencyId = input.CurrencyId;
                     branchObject.LanguageId = input.LanguageId;
                     branchObject.LanguageName = input.LanguageName;
