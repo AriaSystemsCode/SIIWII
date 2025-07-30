@@ -790,7 +790,7 @@
                         </div>
                         <div class="tab5" *ngIf="currentTab == accountInfoPageTabsEnum.ProfileView">
                             <app-view-profile [accountData]="accountDataForView" [isPublished]="isPublished"
-                                [viewMode]="viewMode" [accountLevel]="accountLevel" (edit)="triggerProfile()"
+                                [viewMode]="viewMode" [accountLevel]="accountLevel" (edit)="triggerProfile($event)"
                                 (delete)="askToConfirmDeleteAccount()" (publish)="publishProfile()"
                                 (unPublish)="unPublishProfile()"  [connectionCount]="connectionCount"
                                 [personalAccount]="accountDataForView?.accountTypeId == 21 ? true : false"></app-view-profile>

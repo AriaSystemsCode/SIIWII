@@ -27,6 +27,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Input() personalAccount = false;
 
     @Output("edit") edit: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output("editedData") editedData: EventEmitter<any> = new EventEmitter<any>()
     @Output("delete") delete: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("publish") publish: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("unPublish") unPublish: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -88,7 +89,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     showIsSync = false;
     showShare = true;
     hideshowShare = false;
-
+    editedPersonalData:any
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -144,23 +145,42 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
-      
+  
         if (this.personalAccount && !this.editPersonal) {
             this.Editting = true;
             this.editInfo = false;
             this.NoteditInfo = true;
-            this.editFirstNameValue = this.accountData.name;
-            // this.editLastNameValue = this.accountData.lastName;
+            this.editFirstNameValue = this.accountData.firstName;
+            this.editLastNameValue = this.accountData.lastName;
             this.editJobTitleValue = this.accountData.jobTitle;
             this.editEMailAddressValue = this.accountData.eMailAddress;
             this.editLanguageNameValue = this.accountData.languageName;
             this.editPhoneNumberValue = this.accountData.phoneNumber;
+            console.log('111111111111111')
 
+
+        }else if(this.personalAccount && this.editPersonal){
+            if (!this.editedPersonalData) {
+                this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
+              }
+            
+              this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
+              this.editedPersonalData.languageName = this.editLanguageNameValue;
+              this.editedPersonalData.phoneNumber = this.editPhoneNumberValue;
+              this.editedPersonalData.jobTitle = this.editJobTitleValue;
+            
+              this.editInfo = true;
+              this.NoteditInfo = false;
+              this.Editting = false;
+            
+              this.editedData.emit(this.editedPersonalData);
+            console.log('2222222222222')
 
         }
-        else {
-       
 
+        else {
+            console.log('33333333333333')
+  
             this.editInfo = true;
             this.NoteditInfo = false;
             this.Editting = false;
@@ -387,9 +407,4 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
         return true;
     }
-
-    get jobTitleAttr() {
-        return this.accountData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
-      }
-     
 }
