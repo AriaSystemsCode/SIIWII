@@ -276,7 +276,8 @@ export class MarketplaceProductsComponent
                 requestParams.minimumPrice||     this.minimumPrice,
                 requestParams.maximumPrice || this.maximumPrice,
                this.seletedOption.value,
-                requestParams.onlyAvailableStock ||    this.onlyAvialbleStock,
+               requestParams.onlyAvailableStock ?? this.onlyAvialbleStock ?? false,
+
                 requestParams.startSoldOutData || this.startSoldOutData,
                 requestParams.endSoldOutData ||  this.endSoldOutData,
                 requestParams.startShipData || this.startShipData,
