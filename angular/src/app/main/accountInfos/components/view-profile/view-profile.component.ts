@@ -144,13 +144,13 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
-        console.log('111')
+      
         if (this.personalAccount && !this.editPersonal) {
             this.Editting = true;
             this.editInfo = false;
             this.NoteditInfo = true;
-            this.editFirstNameValue = this.accountData.firstName;
-            this.editLastNameValue = this.accountData.lastName;
+            this.editFirstNameValue = this.accountData.name;
+            // this.editLastNameValue = this.accountData.lastName;
             this.editJobTitleValue = this.accountData.jobTitle;
             this.editEMailAddressValue = this.accountData.eMailAddress;
             this.editLanguageNameValue = this.accountData.languageName;
@@ -159,7 +159,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
         }
         else {
-        console.log('22')
+       
 
             this.editInfo = true;
             this.NoteditInfo = false;
@@ -387,4 +387,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
         return true;
     }
+
+    get jobTitleAttr() {
+        return this.accountData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
+      }
+     
 }

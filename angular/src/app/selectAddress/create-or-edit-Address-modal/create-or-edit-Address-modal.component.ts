@@ -74,21 +74,26 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
         this.saving = true;
         let tenancyName = this.appSession.tenancyName;
         this.address.code = tenancyName + "-" + this.addressCode;
-        let addNew = this.address.id == null || this.address.id == undefined || this.address.id == 0
+      
+        // ✅ Assign country name if applicable
+        const selectedCountry = this.allCountries.find(c => c.value === this.address.countryId);
+        this.address.countryIdName = selectedCountry?.label ?? null;
+      
+        let addNew = this.address.id == null || this.address.id == undefined || this.address.id == 0;
+      
         this._accountsServiceProxy.createOrEditAddress(this.address)
-            .pipe(finalize(() => { this.saving = false; }))
-            .subscribe((value) => {
-                this.notify.info(this.l('SavedSuccessfully'));
-
-                this.close();
-                if (addNew) {
-                    this.addressAdded.emit(value);
-                }
-                else {
-                    this.addressUpdated.emit(value);
-                }
-            });
-    }
+          .pipe(finalize(() => { this.saving = false; }))
+          .subscribe((value) => {
+            this.notify.info(this.l('SavedSuccessfully'));
+            this.close();
+            if (addNew) {
+              this.addressAdded.emit(value);
+            } else {
+              this.addressUpdated.emit(value);
+            }
+          });
+      }
+      
 
     close(): void {
         this.active = false;

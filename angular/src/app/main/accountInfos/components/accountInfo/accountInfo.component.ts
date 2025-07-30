@@ -125,7 +125,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     accountInfoOldCurrencyId = 0;
     changeCurrency: boolean = false;
 
-    personalAccount: boolean = false;
+
     initDataLoaded: boolean = false
     getForEditResult: GetAccountInfoForEditOutput
     touched: boolean = false
@@ -1375,5 +1375,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     getCodeValue(code: string) {
         this.accountInfoTemp.code = code;
     }
+
+    get accountTypeDisplayValue(): string {
+        const map: Record<string, string> = {
+          'PERSONAL': 'Personal',
+          'PEOPLE': 'Personal',     // fallback if old enum is used
+          'GROUP': 'Group',
+          'BUSINESS': 'Business'
+        };
+      
+        return map[this.accountInfoTemp?.accountType?.toUpperCase()] || this.accountInfoTemp?.accountType || '';
+      }
+      
 
 }
