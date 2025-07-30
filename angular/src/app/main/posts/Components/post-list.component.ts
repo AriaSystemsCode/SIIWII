@@ -101,7 +101,10 @@ export class PostListComponent
         this.getProfilePicture();
         this.userName =
             this.appSession.user.name + " " + this.appSession.user.surname;
-        this.refreshData();
+            if(!this.fromMarketplaceProfile && !this.fromOverviewTab){
+                this.refreshData();
+
+            }
 
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "Home") {
