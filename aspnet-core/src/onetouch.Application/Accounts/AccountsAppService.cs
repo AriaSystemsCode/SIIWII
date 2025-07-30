@@ -5765,10 +5765,45 @@ namespace onetouch.Accounts
             branchObject.ReturnId = true;
             if (input.ParentId == null && input.Id != null && input.Id != 0)
             {
-                branchObject.AccountLevel = AccountLevelEnum.Manual;
-                var outputAcc = await CreateOrEditAccount(branchObject);
-                var ret =  ObjectMapper.Map<BranchDto>(outputAcc);
-                return ret;
+                var orgAcc = await _appContactRepository.GetAll().Include(z=>z.EntityFk).ThenInclude(z=>z.EntityExtraData)
+                    .Include(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                    .Include(z => z.EntityFk).ThenInclude(z=>z.EntityCategories)
+                    .Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
+                    .Where(z => z.Id == input.Id).FirstOrDefaultAsync();
+                if (orgAcc != null)
+                {
+                    branchObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(orgAcc);
+                    branchObject.EMailAddress = input.EMailAddress;
+                    branchObject.Website = input.Website;
+                    branchObject.ContactAddresses = new List<AppContactAddressDto>();
+                    foreach(var add in input.ContactAddresses)
+                    {
+                        branchObject.ContactAddresses.Add(add);
+                    }
+                    branchObject.CurrencyId = input.CurrencyId;
+                    branchObject.LanguageId = input.LanguageId;
+                    branchObject.LanguageName = input.LanguageName;
+                    branchObject.Phone1Number = input.Phone1Number;
+                    branchObject.Phone2Number = input.Phone2Number;
+                    branchObject.Phone3Number = input.Phone3Number;
+                    branchObject.Phone1Ex = input.Phone1Ext;
+                    branchObject.Phone2Ex = input.Phone2Ext;
+                    branchObject.Phone3Ex = input.Phone3Ext;
+                    branchObject.Phone1TypeId = input.Phone1TypeId;
+                    branchObject.Phone2TypeId = input.Phone2TypeId;
+                    branchObject.Phone3TypeId = input.Phone3TypeId;
+                    branchObject.Phone1TypeName = input.Phone1TypeName;
+                    branchObject.Phone2TypeName = input.Phone2TypeName;
+                    branchObject.Phone3TypeName = input.Phone3TypeName;
+                    branchObject.TradeName = input.TradeName;
+                    branchObject.Name=input.Name;
+                    branchObject.UseDTOTenant = true;
+                    var outputAcc = await CreateOrEditAccount(branchObject);
+                    var ret = ObjectMapper.Map<BranchDto>(outputAcc);
+                    return ret;
+                }
+                    //branchObject.AccountLevel = AccountLevelEnum.Manual;
+                  
             }
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             if (string.IsNullOrEmpty(branchObject.SSIN))
