@@ -517,7 +517,7 @@
                                 
                                 <div class="form-group row">
                                         <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                            <span class="text-danger font-weight-bold">*</span>
+                                            <!-- <span class="text-danger font-weight-bold">*</span> -->
                                             {{l("Ship Via")}}
                                         </label>
 
@@ -528,7 +528,6 @@
         [options]="allShipVia"
         name="shipVia"
         styleClass="form-control aria-select"
-        [required]="true"
         [placeholder]="'PleaseSelect' | localize"
         optionLabel="label"
         optionValue="value"
@@ -541,7 +540,7 @@
 
                                     <div class="form-group row">
                                         <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                            <span class="text-danger font-weight-bold">*</span>
+                                            <!-- <span class="text-danger font-weight-bold">*</span> -->
                                             {{l("Payment Terms")}}
                                         </label>
                                         <div class="col-sm-8">
@@ -550,7 +549,7 @@
                                             [options]="allPaymentTerms"
                                             name="payTerms"
                                             styleClass="form-control aria-select"
-                                            [required]="true"
+                                       
                                             [placeholder]="'PleaseSelect' | localize"
                                             [(ngModel)]="accountInfoTemp.paymentTermsId"
                                             optionLabel="label"
