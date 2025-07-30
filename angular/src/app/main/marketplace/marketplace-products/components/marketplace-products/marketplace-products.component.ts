@@ -165,7 +165,7 @@ export class MarketplaceProductsComponent
         }
     
         this.getAllProducts(); // Fetch products using restored filters
-        console.log(this.accountDataForView,'llll')
+        
     }
     
     ngAfterViewInit() {
@@ -174,7 +174,12 @@ export class MarketplaceProductsComponent
     }
     
     ngOnChanges(changes: SimpleChanges) {
-
+        if (changes['accountDataForView'] && this.accountDataForView?.ssin) {
+            if(this.fromMarketAcoount || this.fromOverView) {
+                localStorage.removeItem("productFilters");
+            }
+            this.getAllProducts();
+          }
         document.getElementById("_searchInput").focus();
       }
       getAspectatio() {

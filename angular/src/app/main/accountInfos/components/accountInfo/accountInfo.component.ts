@@ -796,6 +796,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
                 this.saving = false;
+                // if (!this.accountId && newId) {
+                //     // Redirect to view page with ProfileView tab
+                    // this._router.navigate([`/app/main/account`], {
+                    //     queryParams: { tab: 'ProfileView' }
+                    // });
+                // } else {
+                    this.getAccountDataForView()
+
+                    this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
+
+                // }
             }))
             .subscribe(result => {
                 if (result) {
@@ -809,15 +820,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     this.updateLogoService.updateLogo();
     
                     this.accountId = result?.accountInfo?.id 
-                        this.getAccountDataForView()
-                    // if (!this.accountId && newId) {
-                    //     // Redirect to view page with ProfileView tab
-                        this._router.navigate([`/app/main/account`], {
-                            queryParams: { tab: 'ProfileView' }
-                        });
-                    // } else {
-                        // this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
-                    // }
+               
                 }
             }, err => {
                 this.touched = true;

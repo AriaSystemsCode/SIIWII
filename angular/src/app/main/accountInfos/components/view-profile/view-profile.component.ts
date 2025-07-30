@@ -20,7 +20,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @ViewChild('nav') slider: NgImageSliderComponent;
     @Input('accountData') accountData: AccountDto;
     @Input('isPublished') isPublished: boolean;
-    @Input('isSync') isSync: boolean;
+    isSync: boolean;
     @Input('connectionCount') connectionCount: number;
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
@@ -110,7 +110,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
         
-        console.log(this.accountData,'oooooooooooooo')
+      
     }
 
     prevImageClick() {
