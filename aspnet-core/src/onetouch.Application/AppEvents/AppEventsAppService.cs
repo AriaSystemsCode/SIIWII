@@ -112,7 +112,14 @@ namespace onetouch.AppEvents
                 var pagedAndFilteredAppEvents = filteredAppEvents
                     .OrderBy(input.Sorting ?? "UTCFromDateTime asc")
                     .PageBy(input);
-
+                //I40[Start]
+                if (input.TenantId != null)
+                {
+                    pagedAndFilteredAppEvents = filteredAppEvents
+                    .OrderBy(input.Sorting ?? "UTCFromDateTime desc")
+                    .PageBy(input);
+                }
+                //I40[end]
                 var appEvents = from o in pagedAndFilteredAppEvents
                                 select new
                                 {
