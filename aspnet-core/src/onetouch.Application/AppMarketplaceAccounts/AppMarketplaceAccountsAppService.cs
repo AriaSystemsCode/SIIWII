@@ -39,6 +39,10 @@ using Microsoft.Extensions.Configuration;
 using NPOI.Util;
 using Stripe;
 using System.Reflection;
+using onetouch.AppMarketplaceItems;
+using onetouch.EntityFrameworkCore;
+using Abp.EntityFrameworkCore.Uow;
+using NUglify.Helpers;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -560,6 +564,7 @@ namespace onetouch.AppMarketplaceAccounts
         private readonly Helper _helper;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IConfigurationRoot _appConfiguration;
+       // private readonly IRepository<AppMarketplaceItem, long> _appMarketplaceItemRepository;
         public CreateMarketplaceAccount(IRepository<AppMarketplaceContact
             , long> appMarketplaceContactRepository
             , Helper helper
@@ -572,6 +577,7 @@ namespace onetouch.AppMarketplaceAccounts
             , IRepository<AppEntityAttachment, long> appEntityAttachmentsRepository
             , IRepository<AppAttachment, long> appAttachmentsRepository
             , IAppConfigurationAccessor appConfigurationAccessor)
+            //, IRepository<AppMarketplaceItem, long> appMarketplaceItemRepository)
         {
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
@@ -584,6 +590,9 @@ namespace onetouch.AppMarketplaceAccounts
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appEntityAttachmentsRepository = appEntityAttachmentsRepository;
             _appAttachmentsRepository = appAttachmentsRepository;
+            //I40[Start]
+            //_appMarketplaceItemRepository = appMarketplaceItemRepository;
+            //I40[End]
         }
 
 
@@ -594,6 +603,20 @@ namespace onetouch.AppMarketplaceAccounts
 
                 var ret = await _appMarketplaceContactRepository.FirstOrDefaultAsync(e => e.TenantId == null && e.SSIN == SSIN);
                 ret.IsHidden = true;
+
+
+                //I40[Start]
+                var itemObjectId = await _helper.SystemTables.GetObjectListingId();
+                onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
+                dbContext.AppMarketplaceItems.Where(z => z.TenantOwner == AbpSession.TenantId && z.ObjectId == itemObjectId && z.SharingLevel != 4)
+                    .ForEach(z=>z.SharingLevel= 4);
+
+                //var marketplaceItems = await _appMarketplaceItemRepository.GetAll().Where(z => z.TenantOwner == AbpSession.TenantId && z.ObjectId == itemObjectId && z.SharingLevel !=4).ToListAsync();
+                //if (marketplaceItems != null && marketplaceItems.Count() > 0)
+                //{
+                //    marketplaceItems.ForEach(z => z.SharingLevel = 4);
+                //}
+                //I40[End]
                 return true;
             }
             catch (Exception ex)
