@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -19,6 +19,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     @ViewChild('nav') slider: NgImageSliderComponent;
     @Input('accountData') accountData: AccountDto;
+    @Input('contactData') contactData: AccountDto;
+    
     @Input('isPublished') isPublished: boolean;
     isSync: boolean;
     @Input('connectionCount') connectionCount: number;
@@ -90,6 +92,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     showShare = true;
     hideshowShare = false;
     editedPersonalData:any
+        allLanguages: LookupLabelDto[];
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -104,14 +107,16 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.initDepartmentVariables(true);
             this.initClassificationVariables(true);
             this.getContactSync();
+            this.getLanguages()
         }
+
     }
     ngOnInit() {
         this.getAllForAccountInfo()
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
         
-      
+    
     }
 
     prevImageClick() {
@@ -150,36 +155,40 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.Editting = true;
             this.editInfo = false;
             this.NoteditInfo = true;
-            this.editFirstNameValue = this.accountData.firstName;
-            this.editLastNameValue = this.accountData.lastName;
-            this.editJobTitleValue = this.accountData.jobTitle;
+            this.editFirstNameValue = this.accountData.name;
+            // this.editLastNameValue = this.accountData.lastName;
+            this.editJobTitleValue = this.contactData?.jobTitle;
             this.editEMailAddressValue = this.accountData.eMailAddress;
-            this.editLanguageNameValue = this.accountData.languageName;
-            this.editPhoneNumberValue = this.accountData.phoneNumber;
-            console.log('111111111111111')
+            // this.editLanguageNameValue = this.contactData.languageName;
+            this.editPhoneNumberValue = this.accountData.phone1Number;
+     
 
 
         }else if(this.personalAccount && this.editPersonal){
             if (!this.editedPersonalData) {
                 this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
               }
-            
+              this.editedPersonalData.name= this.editFirstNameValue
               this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
-              this.editedPersonalData.languageName = this.editLanguageNameValue;
-              this.editedPersonalData.phoneNumber = this.editPhoneNumberValue;
+              this.editedPersonalData.languageId = this.contactData.languageId;
+              this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;              
+              this.editedPersonalData.phone1Number = this.editPhoneNumberValue;
               this.editedPersonalData.jobTitle = this.editJobTitleValue;
+              this.editedPersonalData.emailAddressIsPublic = this.contactData.emailAddressIsPublic;
+              this.editedPersonalData.phone1IsPublic = this.contactData.phone1IsPublic;
             
               this.editInfo = true;
               this.NoteditInfo = false;
               this.Editting = false;
             
               this.editedData.emit(this.editedPersonalData);
-            console.log('2222222222222')
+              this.contactData.languageName = this.editedPersonalData.languageName;
+
 
         }
 
         else {
-            console.log('33333333333333')
+        
   
             this.editInfo = true;
             this.NoteditInfo = false;
@@ -402,9 +411,21 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             return false;
 
 
-        if (this.editFirstNameValue == this.accountData.firstName && this.editLastNameValue == this.accountData.lastName && this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue == this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue == this.accountData.phoneNumber)
+        if (this.editFirstNameValue == this.accountData.name &&  this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue == this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue == this.accountData.phoneNumber)
             return false;
 
         return true;
     }
+
+    get jobTitleAttr() {
+        return this.accountData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
+      }
+      
+    getLanguages() {
+        this._appEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
+            this.allLanguages = result;
+        });
+    }
+
+     
 }

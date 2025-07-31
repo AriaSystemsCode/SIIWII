@@ -468,7 +468,7 @@
                                     "JobTitle" | localize ) + " :" }}</h6>
 
                                 <p *ngIf="!editJobTitleValue" class="text-left" style="color: #595959;"
-                                    [ngClass]="{'hide':NoteditInfo}">{{accountData?.jobTitle}}</p>
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.jobTitle}}</p>
                                 <p *ngIf="editJobTitleValue" class="text-left" style="color: #595959;"
                                     [ngClass]="{'hide':NoteditInfo}">{{editJobTitleValue}}</p>
                                 <input style="color: #595959 !important;" type="text"
@@ -500,8 +500,8 @@
                                     [formCtrl]="eMailAddressInput"></validation-messages>
                                     <div class="d-flex align-items-center ml-3">
                                         <span class="mr-3 isPublic" >{{ "IsPublic" | localize }}</span>
-                                        <p-inputSwitch name="emailAddressIsPublic"
-                                            [(ngModel)]="accountData.emailAddressIsPublic"></p-inputSwitch>
+                                        <p-inputSwitch name="emailAddressIsPublic" [disabled]="Editting == false"
+                                            [(ngModel)]="contactData.emailAddressIsPublic"></p-inputSwitch>
                                     </div>
                                
 
@@ -515,17 +515,16 @@
 
 
                                 <p *ngIf="!editLanguageNameValue" class="text-left" style="color: #595959;"
-                                    [ngClass]="{'hide':NoteditInfo}">{{accountData?.languageName}}</p>
-                                <p *ngIf="editLanguageNameValue" class="text-left" style="color: #595959;"
-                                    [ngClass]="{'hide':NoteditInfo}">{{editLanguageNameValue}}</p>
-                                <input style="color: #595959 !important;" type="text"
-                                    class="form-control form-control-sm aria-input-text" name="languageName"
-                                    #languageNameInput="ngModel" required name="languageName" minlength="2"
-                                    [(ngModel)]="editLanguageNameValue"
-                                    [placeholder]="'Please Enter language Name' | localize " required
-                                    [class.hide]="editInfo">
-                                <validation-messages *ngIf="NoteditInfo"
-                                    [formCtrl]="languageNameInput"></validation-messages>
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.languageName}}</p>
+                                <!-- <p *ngIf="editLanguageNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editLanguageNameValue}}</p> -->
+                            
+                                    <p-dropdown *ngIf="Editting"  [options]="allLanguages"   
+                                    styleClass="form-control aria-select" [filter]="false"
+                                    name="languageId" [(ngModel)]="contactData.languageId"
+                                 
+                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+                       
                             </div>
                             <hr class="header">
                             <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3 d-flex">
@@ -536,7 +535,7 @@
                                 </h6>
 
                                 <p *ngIf="!editPhoneNumberValue" class="text-left" style="color: #595959;"
-                                    [ngClass]="{'hide':NoteditInfo}">{{accountData?.phoneNumber}}</p>
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.phone1Number}}</p>
                                 <p *ngIf="editPhoneNumberValue" class="text-left" style="color: #595959;"
                                     [ngClass]="{'hide':NoteditInfo}">{{editPhoneNumberValue}}</p>
                                 <input style="color: #595959 !important;" type="text"
@@ -550,14 +549,14 @@
 
                                 <div class="d-flex align-items-center ml-3">
                                 <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
-                                <p-inputSwitch name="phoneNumberIsPublic"
-                                    [(ngModel)]="accountData.phoneNumberIsPublic"></p-inputSwitch>
+                                <p-inputSwitch name="phoneNumberIsPublic" [disabled]="Editting == false"
+                                    [(ngModel)]="contactData.phone1IsPublic"></p-inputSwitch>
                                 </div>
                             </div>
                             <div class="row ml-5">
                                 <button class="btn mb-3 mt-4 editAccount_butn Save_editPersonal mr-3" type="submit"
                                     style="color: white !important;" [class.hide]="editInfo"
-                                    (click)="editPersonal=true; editAccount()" [disabled]="!isChangePersonalData()">
+                                    (click)="editPersonal=true; editAccount()" >
                                     {{ "SaveChanges" | localize }}
                                 </button>
 

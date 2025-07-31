@@ -141,7 +141,7 @@
                                             </span>
                                         </span>
                                         <span (click)="triggerProfile($event)"
-                                            *ngIf="(accountId || accountDataForView?.id) && !viewMode">
+                                            *ngIf="(accountId || accountDataForView?.id) && !viewMode && accountDataForView?.accountTypeId != 21">
                                             <i [title]=" 'EditMode' | localize "
                                                 *ngIf="currentTab != accountInfoPageTabsEnum.ProfileCreateOrEdit"
                                                 class="far fa-edit"></i>
@@ -789,8 +789,8 @@
                             </app-members-list>
                         </div>
                         <div class="tab5" *ngIf="currentTab == accountInfoPageTabsEnum.ProfileView">
-                            <app-view-profile [accountData]="accountDataForView" [isPublished]="isPublished"
-                                [viewMode]="viewMode" [accountLevel]="accountLevel" (edit)="triggerProfile($event)"
+                            <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView" [isPublished]="isPublished"
+                                [viewMode]="viewMode" [accountLevel]="accountLevel" (edit)="triggerProfile($event)" (editedData)="savePerData($event)"
                                 (delete)="askToConfirmDeleteAccount()" (publish)="publishProfile()"
                                 (unPublish)="unPublishProfile()"  [connectionCount]="connectionCount"
                                 [personalAccount]="accountDataForView?.accountTypeId == 21 ? true : false"></app-view-profile>
