@@ -5769,18 +5769,60 @@ namespace onetouch.Accounts
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                     .Include(z => z.EntityFk).ThenInclude(z=>z.EntityCategories)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
-                   // .Include(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk).AsNoTracking()
+                    .Include(z=>z.AppContactAddresses)//.ThenInclude(z=>z.AddressFk).AsNoTracking()
                     .Where(z => z.Id == input.Id).FirstOrDefaultAsync();
                 if (orgAcc != null)
                 {
                     branchObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(orgAcc);
                     branchObject.EMailAddress = input.EMailAddress;
                     branchObject.Website = input.Website;
-                    //branchObject.ContactAddresses = new List<AppContactAddressDto>();
-                    //foreach(var add in input.ContactAddresses)
-                    //{
-                    //    branchObject.ContactAddresses.Add(add);
-                    //}
+                    if (input.ContactAddresses != null && input.ContactAddresses.Count > 0)
+                    {
+                        if (branchObject.ContactAddresses != null && branchObject.ContactAddresses.Count > 0)
+                        {
+                            foreach (var addrss in input.ContactAddresses)
+                            {
+                                var exist = branchObject.ContactAddresses.Where(z => z.AddressTypeId == addrss.AddressTypeId
+                                && z.Code == addrss.Code).FirstOrDefault();
+                                if (exist == null)
+                                {
+                                    addrss.Id = 0;
+                                    addrss.AddressFk = null;
+                                    branchObject.ContactAddresses.Add(addrss);
+                                }
+                            }
+                            List<long> toBeRemoved = new List<long>();
+                            foreach (var addrss in branchObject.ContactAddresses)
+                            {
+                                var exist = input.ContactAddresses.Where(z => z.AddressTypeId == addrss.AddressTypeId
+                               && z.Code == addrss.Code).FirstOrDefault();
+                                if (exist == null)
+                                {
+                                    // branchObject.ContactAddresses.Remove(addrss);
+                                    toBeRemoved.Add(addrss.Id);
+                                }
+                            }
+                            if (toBeRemoved.Count > 0)
+                            {
+                                foreach (var id in toBeRemoved)
+                                {
+                                    branchObject.ContactAddresses.Remove(branchObject.ContactAddresses.FirstOrDefault(x => x.Id == id));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (var addrss in input.ContactAddresses)
+                            {
+                                branchObject.ContactAddresses.Add(addrss);
+                            }
+                        }
+                    }
+                        //branchObject.ContactAddresses = new List<AppContactAddressDto>();
+                        //foreach(var add in input.ContactAddresses)
+                        //{
+                        //    branchObject.ContactAddresses.Add(add);
+                        //}
                     branchObject.CurrencyId = input.CurrencyId;
                     branchObject.LanguageId = input.LanguageId;
                     branchObject.LanguageName = input.LanguageName;

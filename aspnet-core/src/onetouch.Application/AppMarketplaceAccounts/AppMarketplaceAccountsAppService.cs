@@ -926,14 +926,13 @@ namespace onetouch.AppMarketplaceAccounts
 
                 //Publish contacts
                 var contactInfo = _appContactRepository.GetAll()
-                    .Where(x => x.IsProfileData
-                           && x.AccountId == mainAccountID
-                           && x.TenantId == AbpSession.TenantId
+                    .Where(x => //x.IsProfileData 
+                           x.TenantId == AbpSession.TenantId
                            && x.ParentId == mainAccountID
                            && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();
                 foreach (var contactObj in contactInfo)
                 {
-                    //await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
+                    await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
                 }
                 return newId;
             }
@@ -1123,7 +1122,7 @@ namespace onetouch.AppMarketplaceAccounts
             var input = await _appContactRepository.GetAll().AsNoTracking()
                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
                                         && x.AccountId == mainAccountID
-                                        && x.Id == contactId && x.IsProfileData == true);
+                                        && x.Id == contactId );//&& x.IsProfileData == true
             var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                 .Include(x => x.EntityExtraData)
@@ -1172,20 +1171,20 @@ namespace onetouch.AppMarketplaceAccounts
                     switch (extraAtt.AttributeId)
                     {
                         case 708: //Language ID
-                            if (extraAtt.AttributeValue.ToLower() == "false")
+                            if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 appMarketplaceContact.LanguageId = null;
                                 appMarketplaceContact.LanguageCode = null;
                             }
                             break;
                         case 709: //Email Address
-                            if (extraAtt.AttributeValue.ToLower() == "false")
+                            if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 appMarketplaceContact.EMailAddress = null;
                             }
                             break;
                         case 710: //Phone#1
-                            if (extraAtt.AttributeValue.ToLower() == "false")
+                            if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 appMarketplaceContact.Phone1Ext = null;
                                 appMarketplaceContact.Phone1Number = null;
@@ -1195,7 +1194,7 @@ namespace onetouch.AppMarketplaceAccounts
                             break;
 
                         case 711://Phone#2
-                            if (extraAtt.AttributeValue.ToLower() == "false")
+                            if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 appMarketplaceContact.Phone2Ext = null;
                                 appMarketplaceContact.Phone2Number = null;
@@ -1205,7 +1204,7 @@ namespace onetouch.AppMarketplaceAccounts
                             break;
 
                         case 712://Phone#3
-                            if (extraAtt.AttributeValue.ToLower() == "false")
+                            if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 appMarketplaceContact.Phone3Ext = null;
                                 appMarketplaceContact.Phone3Number = null;
@@ -1214,7 +1213,7 @@ namespace onetouch.AppMarketplaceAccounts
                             }
                             break;
                         case 713:  // Join DATE 
-                            if (extraAtt.AttributeValue.ToLower() == "false")
+                            if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 // entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713));
                                 appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue = null;
@@ -1224,7 +1223,7 @@ namespace onetouch.AppMarketplaceAccounts
 
 
                         case 714: //UserName
-                            if (extraAtt.AttributeValue.ToLower() == "false")
+                            if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 //entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714));
                                 appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue = null;
