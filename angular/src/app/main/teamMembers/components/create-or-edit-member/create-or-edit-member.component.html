@@ -97,7 +97,7 @@
                                 <div class="col-md-4" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
                                     <p-inputSwitch
-                                    [ngModel]="getEmailIsPublic()"
+                                    [(ngModel)]="emailIsPublic"
                                     (onChange)="setEmailIsPublic($event.checked)">
                                   </p-inputSwitch>
                                   
