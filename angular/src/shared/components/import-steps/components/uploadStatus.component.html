@@ -1,54 +1,130 @@
-
- <!-- Iteration-8 -->
- <div bsModal #uploadStatus="bs-modal" class="modal  fade" tabindex="-1" role="dialog"
-  aria-labelledby="uploadStatus" aria-hidden="true" [config]="{backdrop: 'static'}">
+<div bsModal #uploadStatus="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="uploadStatus"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
   <div class="modal-dialog modal-lg modalCenter">
     <div class="modal-content">
-        <div class="border-bottom">
-       <div class="row pt-4 pl-4 pb-1 pr-4"> 
-           <div class="col-8">
-            <h4 class="font-weight-bold pb-2">{{(ImportTypes[importType]+"uploadstatus") | localize}}</h4>
+      <div class="modal-header-custom">
+        <h5 class="modal-title font-weight-bold">Import {{ImportTypes[importType]}} information</h5>
+        <div>
+          <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()" />
+        </div>
+      </div>
 
-     <h5> {{("Total"+ImportTypes[importType]) | localize}} <span  class="font-weight-bold passed">{{"Passed:" | localize}} {{uploadingResult?.totalPassedRecords}}</span>,
-        {{"Totaldata" | localize}} <span  class="font-weight-bold failed">{{"Failed:" | localize}}  {{uploadingResult?.totalFailedRecords}}</span>
-      </h5> 
-</div>
-<div class="col-4 text-right">
-    <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()"/>
+      <div class="modal-header-custom">
+        <h5 class="modal-title"> {{ (ImportTypes[importType] + " Upload Status") | localize }} </h5>
+      </div>
+
+      <div class="border-bottom">
+        <div class="row pl-3 pr-3 pb-4">
+          <div class="col-4 pt-4">
+            <h6>
+              {{ "Total Data " | localize }}
+              <span class="font-weight-bold passed">{{ " Passed:" | localize }} {{ uploadingResult?.totalPassedRecords
+                }}</span> |
+              <span class="font-weight-bold failed">{{ " Failed:" | localize }} {{ uploadingResult?.totalFailedRecords
+                }}</span>
+            </h6>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body p-0 pl-4 uploadStatusContainer">
+        <ng-container *ngIf="uploadingResult">
+
+          <!-- Tabs -->
+          <ul class="tabs no-gutters">
+            <li [class.active]="activeRecordType === 'Image'" (click)="switchTab('Image')"
+              class="col-6 text-center py-2">Image Records</li>
+            <li [class.active]="activeRecordType === 'Data'" (click)="switchTab('Data')" class="col-6 text-center py-2">
+              Data Records</li>
+          </ul>
+
+          <div class="table-scroll-container" #tableScrollContainer>
+            <table class="browser-table min-width-table" style="min-width: 1000px;">
+              <thead>
+                <tr>
+                  <th class="sticky-action-col">Actions</th>
+                  <th *ngFor="let column of uploadStatsColumnsName"
+                    [hidden]="column.showFor && column.showFor !== activeRecordType">
+                    {{ column.name }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of records">
+                  <td class="sticky-action-col">
+                    <div class="dropdown" #dropdownRef>
+                      <span class="pointer dropdownPointer" (click)="toggleMenu(record, $event)"
+                        style="font-size: 20px;">⋮</span>
+                      <ul class="fixed-dropdown-menu drop-up" *ngIf="record.showActions">
+                        <ng-container *ngIf="record.recordType !== 'Image'">
+                          <li (click)="validateDataRecord(record)">Validate Data Record</li>
+                        </ng-container>
+                        <ng-container *ngIf="record.recordType === 'Image'">
+                          <li (click)="validateDataRecord(record)">Link to existing PARENT ITEM</li>
+                          <li (click)="validateDataRecord(record)">Link to existing ITEM COLOR</li>
+                          <li (click)="validateDataRecord(record)">Link to existing COLOR LOOKUP</li>
+                          <li (click)="validateDataRecord(record)">Create NEW PARENT ITEM and LINK AS DEFAULT IMAGE</li>
+                          <li (click)="validateDataRecord(record)">Create NEW ITEM COLOR and LINK IMAGE AS DEFAULT IMAGE
+                          </li>
+                          <li (click)="validateDataRecord(record)">Create to NEW COLOR LOOKUP and Link IMAGE</li>
+                          <li (click)="validateDataRecord(record)">Link to NEW PARENT ITEM CODE FROM ASSOCIATED DATA
+                          </li>
+                          <li (click)="validateDataRecord(record)">Link to NEW ITEM VARIANT CODE FROM ASSOCIATED DATA
+                          </li>
+                          <li (click)="validateDataRecord(record)">Link to NEW COLOR LOOKUP CODE FROM ASSOCIATED DATA
+                          </li>
+                        </ng-container>
+                      </ul>
+                    </div>
+                  </td>
+
+                  <!-- Dynamic Columns -->
+                  <td *ngFor="let column of uploadStatsColumnsName"
+                    [hidden]="column.showFor && column.showFor !== activeRecordType"
+                    [ngClass]="getStatusClass(column.name, getRecordValue(record, mapColumnNameToKey(column.name)))">
+                    <ng-container [ngSwitch]="column.name">
+                      <img *ngSwitchCase="'Image Preview'" [src]="record.previewUrl" width="50" />
+
+                      <!-- Text only -->
+                      <span *ngSwitchCase="'Record Type'">{{ record.recordType || '—' }}</span>
+                      <span *ngSwitchCase="'Status'">{{ record.status || '—' }}</span>
+
+                      <!--Record Status -->
+                      <ul *ngSwitchCase="'Record Status'" style="padding-left: 1rem; margin: 0; list-style-type: none;">
+                        <ng-container *ngIf="record.fieldsErrors?.length > 0; else showErrorMessage">
+                          <li *ngFor="let error of record.fieldsErrors">{{ error || '—' }}</li>
+                        </ng-container>
+                        <ng-template #showErrorMessage>
+                          <li>{{ record.errorMessage || '—' }}</li>
+                        </ng-template>
+                      </ul>
+                      
+
+                      <!-- Default input -->
+                      <input *ngSwitchDefault type="text" class="form-control" style="width: fit-content;"
+                        [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                        (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                        [disabled]="activeRecordType === 'Image'" />
+
+
+                      <!-- image input -->
+                      <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
+                        width="60" height="60" style="object-fit: cover; border-radius: 4px;" />
+
+
+                    </ng-container>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </ng-container>
+      </div>
+
+      <div class="pb-4 pl-5 border-top pt-4 mt-4 text-right mr-4">
+        <button class="Next-Btn" (click)="GoNextstep()">{{ "Next" | localize }}</button>
+      </div>
     </div>
-</div> 
-
-<div class="row pl-5 pb-3" *ngIf="uploadingResult?.totalFailedRecords > 0"> 
-  <a class="_download font-weight-bold" (click)="downloadLogFile()"> {{"DownloadtheImportlogfile" | localize}} </a>
-</div>
-
-</div>
-<div class="modal-body thin-scroll p-0 pl-4 uploadStatusContainer">
-    <ng-container *ngIf="uploadingResult">
-<div *ngFor="let record of uploadingResult.excelRecords" class="border-bottom modal-body pb-4 row">
-        <div class="col-10">
-      <h5>{{record.recordType}} {{record.code}} </h5> 
-      <h6>{{record.name}} </h6>
-          <span class="{{record.status| uppercase}}STATUS font-weight-bold"> {{record.errorMessage}}</span>
-     
-</div>
-
-<div class="Status ml-3   pt-2 text-center">
-  <img src="../../../../assets/accounts/importAccounts/{{record.status | uppercase}}.svg" class="pr-2"/>
-  <span class="{{record.status| uppercase}}STATUS font-weight-bold">{{record.status+"STATUS"|uppercase|localize}}  </span>
   </div>
-</div>  
-</ng-container>  
 </div>
-
-<div class="pb-4 pl-5 border-top pt-4 mt-4">
-<button class="btn btn-primary  Next-Btn" (click)="GoNextstep()" >{{"Next" | localize}}</button>
-</div>
-
-</div>
-</div>
-</div>
- 
-
-  <!-- Iteration-8 -->
- 

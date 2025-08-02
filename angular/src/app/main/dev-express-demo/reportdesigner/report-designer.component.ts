@@ -20,7 +20,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ReportDesignerComponent extends AppComponentBase {
   reportUrl: string;
-  hostUrl: string = "https://localhost:44305/";
+  hostUrl: string = "https://localhost:44315/";
   getDesignerModelAction: Function;
 
   constructor(injector: Injector, private http: HttpClient) {

@@ -11,7 +11,6 @@ import { uploadStatusComponent } from "./uploadStatus.component";
 import { ImageFile } from "../models/imageFile.model";
 import { upperCase } from "lodash";
 import { isEmpty } from "lodash";
-import { imageCroppingComponent } from "./imageCropping.component";
 import { autoCropComponent } from "./autoCrop.component";
 import { MainImportService } from "../services/mainImport.service";
 import { importConfirmationComponent } from "./importConfirmation.component";
@@ -29,6 +28,7 @@ import { SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxie
 import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
+import { imageCroppingComponent } from "./imageCropping.Component";
 
 @Component({
     selector: "MainImportModal",
@@ -222,7 +222,7 @@ export class MainImportComponent
                 hasImageFile = true;
                 if (file.type.includes("image") && this.hasImages) {
                     totalImageFiles++;
-                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "image")) {
+                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMPORT")) {
                         this.imagesName.push(file.name.toUpperCase());
                         var imgFile = new ImageFile();
                         imgFile.file = file;
