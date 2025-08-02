@@ -311,79 +311,10 @@ namespace onetouch.AppItems
 
             return result;
         }
-      
-        /* 
-         7- when click final import >> create new API saveFromExcelImages, to [4H] 
 
-         7.2 update exisitng item with new added imge 
-
-         >> create new function save only rows of type images to parent items ( input id) 
-
-         call getItemforEdit(id) >> GetAppItemForEditOutput 
-
-         convert from GetAppItemForEditOutput.AppItemForEditDto to AppItem 
-
-         convert from AppItem to CreateOrEditAppItemDto 
-
-         update attachments array with the new linked image 
-
-         Call CreateOrEditAppItemDto  
-         
-         */
-
-        public async Task<long> SaveImageToParent(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
-        {
-            var y = await GetAppItemForEdit(input);
-            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
-            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
-            // add the image to the parent
-            foreach (var item1 in y.AppItem.EntityAttachments)
-            {
-                item1.IsDefault = false;
-
-            }
-            if (y.AppItem.EntityAttachments.Count == 0) { y.AppItem.EntityAttachments = new List<AppEntityAttachmentDto>(); }
-            var z = new AppEntityAttachmentDto {    IsDefault= appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,  AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
-
-
-
-            // rename image at temp attachment folder with guid and keep image name in variable
-            // copy it to attachment folder
-            // add record attachments tables
-            // add record to appitem entity attachements
-
-
-
-            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
-            {
-                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
-            }
-
-            try
-            {
-            //    System.IO.File.Copy(path + @"\" + z.guid + "." + guid.ImageFileName.Split('.')[1], _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
-            }
-            catch { }
-
-            
-
-            y.AppItem.EntityAttachments.Add(z);
-
-
-
-            var item = new GetAppItemForEditOutput { AppItem = ObjectMapper.Map<AppItemForEditDto>(y.AppItem) };
-            CreateOrEditAppItemDto itemUpdate = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
-
-            var x = await DoCreateOrEdit(itemUpdate);
-
-
-            return x;
-        }
-
-      
         public async Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            
+
             var y = await GetAppItemForEdit(input);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
             appItemtExcelRecordDTO.ExcelDto.Price = y.AppItem.Price.ToString();
@@ -480,6 +411,126 @@ namespace onetouch.AppItems
 
             return appItemtExcelRecordDTO;
         }
+
+        /* 
+         7- when click final import >> create new API saveFromExcelImages, to [4H] 
+
+         7.2 update exisitng item with new added imge 
+
+         >> create new function save only rows of type images to parent items ( input id) 
+
+         call getItemforEdit(id) >> GetAppItemForEditOutput 
+
+         convert from GetAppItemForEditOutput.AppItemForEditDto to AppItem 
+
+         convert from AppItem to CreateOrEditAppItemDto 
+
+         update attachments array with the new linked image 
+
+         Call CreateOrEditAppItemDto  
+         
+         */
+
+        public async Task<long> SaveImageToItem(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        {
+            var y = await GetAppItemForEdit(input);
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
+            // add the image to the parent
+            foreach (var item1 in y.AppItem.EntityAttachments)
+            {
+                item1.IsDefault = false;
+
+            }
+            if (y.AppItem.EntityAttachments.Count == 0) { y.AppItem.EntityAttachments = new List<AppEntityAttachmentDto>(); }
+            var z = new AppEntityAttachmentDto {    IsDefault= appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,  AttachmentCategoryEnum=0,AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
+
+
+
+            // rename image at temp attachment folder with guid and keep image name in variable
+            // copy it to attachment folder
+            // add record attachments tables
+            // add record to appitem entity attachements
+
+
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString()))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString());
+            }
+
+            try
+            {
+                System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, _appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString() + @"\" + z.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
+                
+            }
+            catch { }
+
+            
+
+            y.AppItem.EntityAttachments.Add(z);
+
+
+
+            var item = new GetAppItemForEditOutput { AppItem = ObjectMapper.Map<AppItemForEditDto>(y.AppItem) };
+            CreateOrEditAppItemDto itemUpdate = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
+
+            var x = await DoCreateOrEdit(itemUpdate);
+
+
+            return x;
+        }
+
+        public async Task<long> SaveImageToItemColor(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        {
+            var y = await GetAppItemForEdit(input);
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
+            // add the image to the parent
+            foreach (var item1 in y.AppItem.EntityAttachments)
+            {
+                item1.IsDefault = false;
+
+            }
+            if (y.AppItem.EntityAttachments.Count == 0) { y.AppItem.EntityAttachments = new List<AppEntityAttachmentDto>(); }
+            var z = new AppEntityAttachmentDto { IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault, AttachmentCategoryEnum = 0, AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
+
+
+
+            // rename image at temp attachment folder with guid and keep image name in variable
+            // copy it to attachment folder
+            // add record attachments tables
+            // add record to appitem entity attachements
+
+
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString()))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString());
+            }
+
+            try
+            {
+                System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, _appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString() + @"\" + z.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
+
+            }
+            catch { }
+
+
+
+            y.AppItem.EntityAttachments.Add(z);
+
+
+
+            var item = new GetAppItemForEditOutput { AppItem = ObjectMapper.Map<AppItemForEditDto>(y.AppItem) };
+            CreateOrEditAppItemDto itemUpdate = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
+
+            var x = await DoCreateOrEdit(itemUpdate);
+
+
+            return x;
+        }
+
 
 
     }
