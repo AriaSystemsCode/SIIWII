@@ -25,6 +25,8 @@ using onetouch.EntityFrameworkCore;
 using Abp.EntityFrameworkCore.Uow;
 using Abp.Domain.Repositories;
 using AutoMapper.Internal.Mappers;
+using Newtonsoft.Json;
+using onetouch.Notifications;
 
 namespace onetouch.AppItems
 {
@@ -36,8 +38,12 @@ namespace onetouch.AppItems
         //private readonly IAppItemRepository _appItemRepository;
         private readonly IRepository<AppItem, long> _appItemRepository;
         private readonly IAppItemsAppService _appItemsAppService;
-        public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService)
+        private readonly IAppNotifier _appNotifier;
+        public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor,
+            IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService,
+             IAppNotifier appNotifier)
         {
+            _appNotifier = appNotifier;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _helper = helper;
             _appItemRepository = appItemRepository;
@@ -565,7 +571,7 @@ namespace onetouch.AppItems
                             returnDto.ErrorMessage="Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.";
                             returnDto.RecordKey = itemExcelDto.Code;
                             returnDto.Id = itemExcelDto.rowNumber;
-                            returnDto.ErrorType = "";
+                            returnDto.ErrorType = "Stopper";
                            
                         }
                     }
@@ -574,7 +580,7 @@ namespace onetouch.AppItems
                         returnDto.ErrorMessage = "Code :" + itemExcelDto.Code + " is not found";
                         returnDto.RecordKey = itemExcelDto.Code;
                         returnDto.Id = itemExcelDto.rowNumber;
-                        returnDto.ErrorType = "";
+                        returnDto.ErrorType = "Stopper";
                         
                     }
                 }
@@ -594,7 +600,7 @@ namespace onetouch.AppItems
                         returnDto.ErrorMessage = "Code :" + itemExcelDto.Code + " is not found";
                         returnDto.RecordKey = itemExcelDto.Code;
                         returnDto.Id = itemExcelDto.rowNumber;
-                        returnDto.ErrorType = "";
+                        returnDto.ErrorType = "Stopper";
                     }
                 }
 
@@ -603,7 +609,7 @@ namespace onetouch.AppItems
                     returnDto.ErrorMessage = "Code :" + itemExcelDto.Code + ", Stock available quantity is less than zero.";
                     returnDto.RecordKey = itemExcelDto.Code;
                     returnDto.Id = itemExcelDto.rowNumber;
-                    returnDto.ErrorType = "";
+                    returnDto.ErrorType = "Stopper";
                 }
                
 
@@ -636,6 +642,42 @@ namespace onetouch.AppItems
                 var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
                 x.AppItems.UpdateRange(modifiedItemsList);
                 await x.SaveChangesAsync();
+                //mmt
+                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                string tenancyName = myTenantObject.TenancyName;
+                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                if (adminUser != null)
+                {
+                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                        "Stock Availability imported successfully.",
+                        Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                }
+                //mmt
+            }
+            if (returnList.Count > 0)
+            {
+                string attachmentFolder = _appConfiguration[$"APP:ServerRootAddress"] + @"/" +
+                    _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + AbpSession.TenantId.ToString();
+                System.IO.DirectoryInfo dire = new DirectoryInfo(attachmentFolder);
+                //if (!dire.Exists)
+                //    dire.Create();
+                string fileName = "ImportStockAvailabilityResult-" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xlsx";
+                string outFile = attachmentFolder + "//" + fileName;
+
+                string jsonData = JsonConvert.SerializeObject(returnList);
+                string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
+                _helper.ExcelHelper.ExportJsonToExcel(fileToExport, jsonData);
+                {
+                    var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    string tenancyName = myTenantObject.TenancyName;
+                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    if (adminUser != null)
+                    {
+                        await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                            "Importing Stock Availability result can be downloaded from <a href=\"" + outFile + "\" download>" + "here" + "</a>",
+                            Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                    }
+                }
             }
             return returnList;
         }
