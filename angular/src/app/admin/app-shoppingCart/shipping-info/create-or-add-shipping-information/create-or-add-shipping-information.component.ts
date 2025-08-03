@@ -5,7 +5,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
 import * as moment from 'moment';
-import { add } from '@node_modules/@types/lodash';
+ import { add } from '@node_modules/@types/lodash';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
@@ -48,6 +48,7 @@ visible: boolean = false;
 cancelBtn: boolean = false;
 saveBtn: boolean = false;
 SuccessMsg: boolean = false;
+atInitialize: boolean = true;
  subscriptions: Subscription[] = [];
 
   constructor(
@@ -217,7 +218,7 @@ addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToDa
   createOrEditTransaction() {
     
       this.showMainSpinner()
-     
+        this.saveDates()
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     const subs =   this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
@@ -241,7 +242,6 @@ addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToDa
 
   }
 
-  
   enterStore() {
     this.appTransactionsForViewDto.buyerStore = this.storeVal;
   }
@@ -280,6 +280,7 @@ addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToDa
       }
 
     }
+    this.validateShippingTab();
     this.validateShippingTab();
 
   }
@@ -365,18 +366,6 @@ addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToDa
 this.validateShippingTab();
 
   }
-  saveDates(){
-    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
-    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
-    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
-    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
-  
-    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
-  }
-
 
   validateShippingTab() {
     console.log('Validating Shipping Tab:', {
@@ -398,6 +387,17 @@ this.validateShippingTab();
     }
   }
 
+saveDates(){
+  let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+  let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+  let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+  let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+
+  this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+  this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+}
   ngOnDestroy() {
     this.emitDestroy();
 }

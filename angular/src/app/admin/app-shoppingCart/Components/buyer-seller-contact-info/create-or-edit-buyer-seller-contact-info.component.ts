@@ -184,19 +184,25 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   
 
   createOrEditTransaction() {
-    this.showMainSpinner();
+    this.showMainSpinner()
 
-    const toUTC = date => moment.utc(date?.toLocaleString());
-    this.appTransactionsForViewDto.enteredDate = toUTC(this.appTransactionsForViewDto.enteredDate);
-    this.appTransactionsForViewDto.startDate = toUTC(this.appTransactionsForViewDto.startDate);
-    this.appTransactionsForViewDto.availableDate = toUTC(this.appTransactionsForViewDto.availableDate);
-    this.appTransactionsForViewDto.completeDate = toUTC(this.appTransactionsForViewDto.completeDate);
+   let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
 
-    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => this.hideMainSpinner()))
-      .subscribe(res => {
+      .pipe(finalize(() =>  {this.hideMainSpinner();
+
+        // this.generatOrderReport.emit(true); 
+      //  this.SuccessMsg = true
+        }))
+      .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
           this.refreshShoppingCart.emit(true);

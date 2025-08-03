@@ -354,19 +354,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
 this.validateBillingTab()
     
   }
-  saveDates(){
-    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
-    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
-    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
-    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
-
-    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
-    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
-  }
-
-
   updateArContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
     if(addObj){
@@ -385,8 +372,18 @@ this.validateBillingTab()
     }
     
   }
+  saveDates(){
+    let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+    let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+    let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
+    let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
 
-  
+    this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+    this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
+
 
   ngOnDestroy() {
     this.emitDestroy();
