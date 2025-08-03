@@ -173,7 +173,7 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
                            //.Where(e => (e.SSIN != currentTenantAccountSSIN && e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
-                           .Where(e => ((e.IsHidden != true)));
+                           .Where(e => ((e.IsHidden != true)) && e.SSIN != currentTenantAccountSSIN);
 
                     //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 
@@ -245,7 +245,11 @@ namespace onetouch.AppMarketplaceAccounts
                                ).OrderByDescending(z=>z.CreationTime).FirstOrDefaultAsync();
                             if (relationship != null)
                             {
-                                var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
+                                //xx
+                                string relationshipCode = currentTenantAccountObject.EntityFk.EntityObjectTypeCode.Substring(0, 1) + "T" +
+                                account.Account.AccountType.Substring(0, 1);
+                                //xx
+                                var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
                                 if (relationType != null)
                                 {
                                     if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
@@ -495,9 +499,21 @@ namespace onetouch.AppMarketplaceAccounts
                     accountDto.ClassificationsTotalCount = entity.EntityClassifications.Count();
 
                     accountDto.Status = (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == account.Id) > 0 || _appContactRepository.GetAll().Count(x => x.Id == account.Id && x.TenantId == null) > 0);
+                    //I40
+                    //accountDto.Connections = _appContactRepository.GetAll().Count(c => c.TenantId == entity.TenantId && c.PartnerId == id);
+                    //int ConnectionCount = _appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
+                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                    var relationships = _appContactRelationshipInfoRepository.GetAll()
+                               .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                               || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                               z.SharingLevel == 1).Count(); 
+                    //.WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x =>
+                    //(x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
+                    //(x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
+                    accountDto.Connections = relationships;
+                    //I40
 
-                    accountDto.Connections = _appContactRepository.GetAll().Count(c => c.TenantId == entity.TenantId && c.PartnerId == id);
-                    int ConnectionCount = _appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
+                    int ConnectionCount = relationships;//_appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
                     accountDto.EntityId = entity.Id;
                     var firstAddress = account.ContactAddresses.FirstOrDefault();
                     if (account.ContactAddresses.Count() > 0 && firstAddress.AddressFk != null)
@@ -1078,7 +1094,7 @@ namespace onetouch.AppMarketplaceAccounts
                         }
                     }
                     relation.ObjectId = await _helper.SystemTables.GetObjectMarketplaceContactRelationshipId();
-                    relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELTIONSHIP");
+                    relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELATIONSHIP"); 
                     await _appContactRelationshipInfoRepository.InsertAsync(relation);
                     await CurrentUnitOfWork.SaveChangesAsync();
 
