@@ -765,6 +765,14 @@ namespace onetouch.Helpers
         }
         //MMT-Entity log [End]
         //MMT40[Start]
+        public async Task<long> GetEntityObjectStatusRelationshipPending()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "PENDING" && x.ObjectCode == "MARKETPLACECONTACTRELATIONSHIP");
+                return obj.Id;
+            }
+        }
         public async Task<long> GetEntityObjectStatusRelationshipActive()
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
