@@ -179,6 +179,8 @@ export class MarketplaceProductsComponent
                 localStorage.removeItem("productFilters");
             }
             this.getAllProducts();
+          }else {
+            
           }
         document.getElementById("_searchInput").focus();
       }
@@ -223,15 +225,15 @@ export class MarketplaceProductsComponent
         this.isFilterHidden = !this.isFilterHidden;
     }
 
-    viewProductHandler(
-        $event: ActionsMenuEventEmitter<AppItemBrowseEvents, number>
-    ) {
-        if ($event.event != AppItemBrowseEvents.View) return;
-        this._router.navigate([
-            "/app/main/marketplace/products/view",
-            $event.data,
-        ]);
-    }
+    // viewProductHandler(
+    //     $event: ActionsMenuEventEmitter<AppItemBrowseEvents, number>
+    // ) {
+    //     if ($event.event != AppItemBrowseEvents.View) return;
+    //     this._router.navigate([
+    //         "/app/main/marketplace/products/view",
+    //         $event.data,
+    //     ]);
+    // }
 
 
     getAllProducts() {
@@ -298,7 +300,7 @@ export class MarketplaceProductsComponent
             .subscribe((result) => {
                 this.items = result.items;
                 this.pagesNumber = result.totalCount;
-                if (result.items.length == 1) {
+                if (result.items.length == 1 && !this.fromOverView && !this.fromMarketAcoount &&this.searchInput != '') {
                     setTimeout(function() {
                         this.ProdcutCardComponent.first.viewProduct(this.ProdcutCardComponent.first.product.id)
                     }.bind(this), 500);

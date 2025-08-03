@@ -71,6 +71,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
   activeAccordionIndexes: number[] = [0]; // open first tab by default
   hasUnsavedChanges = false;
+  emailIsPublic: boolean = false;
 
   constructor(injector: Injector,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -123,7 +124,11 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType, null).toPromise();
       this.memberDto.code = sequance;
     }
-  
+    const emailAttr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
+    this.emailIsPublic = emailAttr?.selectedValues?.[emailAttr.selectedValues.length - 1]?.value === 'true';
+    // this.emailIsPublic = this.memberDto.extraDataAttributes[10]?.selectedValues?.[
+    //   this.memberDto.extraDataAttributes[10].selectedValues.length - 1
+    // ]?.value === 'true';
     this.active = true;
     this.hideMainSpinner();
   }
@@ -228,12 +233,8 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         ...joinDateAttr.selectedValues?.[joinDateAttr.selectedValues.length - 1],
         value: moment.utc(_joinDate).format() // Store ISO string
         ,
-        init: function (_data?: any): void {
-          throw new Error('Function not implemented.');
-        },
-        toJSON: function (data?: any) {
-          throw new Error('Function not implemented.');
-        }
+        init: function (_data?: any): void {},
+        toJSON: function (data?: any) {}
       }];
     }
   }
@@ -400,7 +401,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       'phone1Number', 'phone1Ex', 'phone2Number', 'phone2Ex', 'phone3Number', 'phone3Ex', 'eMailAddress',
       'phone1TypeId', 'phone2TypeId', 'phone3TypeId', 'currencyId', 'languageId', 'entityId', 'tenantId',
       'attachmentSourceTenantId', 'useDTOTenant', 'returnId', 'accountLevel', 'entityCategories', 'entityClassifications',
-      'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods', 'entityExtraData', 'id', 'parentId', 'accountId'
+      'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods','extraDataAttributes', 'entityExtraData', 'id', 'parentId', 'accountId'
     ];
 
     for (const key of allowedKeys) {
@@ -478,8 +479,8 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
   hide() {
     this.active = false
-    this.memberDto = undefined
-    this.memberForm?.reset()
+    // this.memberDto = undefined
+    // this.memberForm?.reset()
     this.phonelist = []
     this.allLanguages = []
     this.allPhoneTypes = []
@@ -787,21 +788,40 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
   }
   
-  getEmailIsPublic(): boolean {
-    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
-    const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-    return val === 'true' ;
-  }
+  // getEmailIsPublic() {
+  //   const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
+  //   const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+  //   return val ;
+  // }
 
-  setEmailIsPublic(val: boolean): void {
-    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
-    if (attr) {
-      attr.selectedValues = [{
-        ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
-        init: function (_data?: any): void { },
-        toJSON: function (data?: any) { }
-      }];
+  setEmailIsPublic(val: any) {
+    const emailAddressIsPublic = this.memberDto.entityExtraData.findIndex(attr => attr.attributeId === 709);
+      
+    if (emailAddressIsPublic !== -1) {
+      // Update existing attribute
+      this.memberDto.entityExtraData[emailAddressIsPublic].attributeValue = val ?? '';
+    } else {
+      // Add new attribute
+      const emailAddressIsPublic = new AppEntityExtraDataDto();
+      emailAddressIsPublic.init({
+        attributeId: 709,
+        attributeValue: val ?? '',
+        entityId: 0,
+        entityObjectTypeId: 0,
+        entityObjectTypeCode: '',
+        entityObjectTypeName: '',
+        attributeValueId: 0,
+        attributeValueFkName: '',
+        attributeValueFkCode: '',
+        attributeCode: '',
+        id: 0
+      });
+      
+      this.memberDto.entityExtraData.push(emailAddressIsPublic);
+      
+      
     }
+  
   }
   
   

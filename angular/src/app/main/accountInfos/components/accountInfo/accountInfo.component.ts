@@ -1,5 +1,5 @@
 ﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, AfterViewInit, } from '@angular/core';
-import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ActivatedRoute } from '@angular/router';
@@ -116,6 +116,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     selectedMember: { memberId?: number, userId?: number } = {}
 
     accountDataForView: AccountDto
+    accountContactForView: any
     isPublished: boolean;
     isSync: boolean;
     connectionCount: number;
@@ -420,9 +421,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
        this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
       .subscribe((result) => {
         this.accountTypes=result;
-    //            this.accountTypes.push({ label :'Personal' ,value: 'Personal'});
-    // this.accountTypes.push({ label :'Business' ,value: 'Business'});
-    // this.accountTypes.push({ label :'Group' ,value: 'Group'});
+
       }); 
 
   } 
@@ -533,7 +532,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
-
+        this.accountContactForView = result ?  result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if (this.accountDataForView.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
@@ -743,6 +742,104 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
         if (!this.accountDataForView) this.getMyAccountDataForView()
     }
+    savePerData(event) {
+    
+        this.accountInfoTemp = event;
+      
+        // Ensure entityExtraData array exists
+        if (!this.accountInfoTemp.entityExtraData) {
+          this.accountInfoTemp.entityExtraData = [];
+        }
+      
+        // Check if attributeId 706 exists
+        const jobTitleAttrIndex = this.accountInfoTemp.entityExtraData.findIndex(attr => attr.attributeId === 706);
+      
+        if (jobTitleAttrIndex !== -1) {
+          // Update existing attribute
+          this.accountInfoTemp.entityExtraData[jobTitleAttrIndex].attributeValue = event?.jobTitle || '';
+        } else {
+          // Add new attribute
+          const jobTitleAttr = new AppEntityExtraDataDto();
+          jobTitleAttr.init({
+            attributeId: 706,
+            attributeValue: event?.jobTitle ?? '',
+            entityId: 0,
+            entityObjectTypeId: 0,
+            entityObjectTypeCode: '',
+            entityObjectTypeName: '',
+            attributeValueId: 0,
+            attributeValueFkName: '',
+            attributeValueFkCode: '',
+            attributeCode: '',
+            id: 0
+          });
+          
+          this.accountInfoTemp.entityExtraData.push(jobTitleAttr);
+          
+          
+        }
+        // Check if attributeId 706 exists
+        const emailAddressIsPublic = this.accountInfoTemp.entityExtraData.findIndex(attr => attr.attributeId === 709);
+      
+        if (emailAddressIsPublic !== -1) {
+          // Update existing attribute
+          this.accountInfoTemp.entityExtraData[emailAddressIsPublic].attributeValue = event?.emailAddressIsPublic ?? '';
+        } else {
+          // Add new attribute
+          const emailAddressIsPublic = new AppEntityExtraDataDto();
+          emailAddressIsPublic.init({
+            attributeId: 709,
+            attributeValue: event?.emailAddressIsPublic ?? '',
+            entityId: 0,
+            entityObjectTypeId: 0,
+            entityObjectTypeCode: '',
+            entityObjectTypeName: '',
+            attributeValueId: 0,
+            attributeValueFkName: '',
+            attributeValueFkCode: '',
+            attributeCode: '',
+            id: 0
+          });
+          
+          this.accountInfoTemp.entityExtraData.push(emailAddressIsPublic);
+          
+          
+        }
+      
+            // Check if attributeId 706 exists
+            const phoneIsPublic = this.accountInfoTemp.entityExtraData.findIndex(attr => attr.attributeId === 710);
+      
+            if (phoneIsPublic !== -1) {
+              // Update existing attribute
+              this.accountInfoTemp.entityExtraData[phoneIsPublic].attributeValue = event?.phone1IsPublic ?? '';
+            } else {
+              // Add new attribute
+              const phoneIsPublic = new AppEntityExtraDataDto();
+              phoneIsPublic.init({
+                attributeId: 710,
+                attributeValue: event?.phone1IsPublic ?? '',
+                entityId: 0,
+                entityObjectTypeId: 0,
+                entityObjectTypeCode: '',
+                entityObjectTypeName: '',
+                attributeValueId: 0,
+                attributeValueFkName: '',
+                attributeValueFkCode: '',
+                attributeCode: '',
+                id: 0
+              });
+              
+              this.accountInfoTemp.entityExtraData.push(phoneIsPublic);
+              
+              
+            }
+          
+        console.log(this.accountInfoTemp, 'this.accountInfoTemp');
+      
+        // Optional: call save
+        this.saveMyAccount();
+      }
+      
     changeTouchState(bool: boolean = true) {
         this.touched = bool
     }

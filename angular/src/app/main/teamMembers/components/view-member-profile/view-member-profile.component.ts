@@ -341,7 +341,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.memberData?.accountTypeId)
               .subscribe((res) => {
                 if (res?.length > 0) {
-                  this.allAttributes = res[0]?.extraAttributes.extraAttributes;
+                  this.allAttributes = res[0]?.extraAttributes?.extraAttributes ?? [];
+
           
                   // Group attributes by `usage`
                   this.groupedByUsage = this.groupAttributesByUsage(this.allAttributes);
