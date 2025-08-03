@@ -23,6 +23,6 @@ namespace onetouch.AppItems
         Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllColorsLookUp(GetAllAppEntitiesInput input);
         Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
 
-
+        Task<long> SaveImageToColor(long colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
     }
 }
