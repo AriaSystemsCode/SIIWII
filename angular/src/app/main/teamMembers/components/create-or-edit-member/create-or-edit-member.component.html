@@ -21,6 +21,7 @@
                 </div>
             </div>
         </div>
+        
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body pt-5">
@@ -97,9 +98,15 @@
                                 <div class="col-md-4" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
                                     <p-inputSwitch
-                                    [(ngModel)]="emailIsPublic"
-                                    (onChange)="setEmailIsPublic($event.checked)">
+                                    [ngModel]="getBooleanValue(709)"
+                                    (onChange)="setBooleanValue(709, $event.checked)"
+                                    name="EmailAddressIsPublic">
                                   </p-inputSwitch>
+                                  
+                                  
+                                  
+                                  
+                                  
                                   
                                 </div>
                             </div>
@@ -118,7 +125,12 @@
                                 </div>
                                 <div class="col-md-4" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
-                                    <p-inputSwitch name="languageIsPublic" [(ngModel)]="memberDto.languageIsPublic" aria-valuenow="true"></p-inputSwitch>
+                                    <p-inputSwitch
+                                    [ngModel]="getBooleanValue(708)"
+                                    (onChange)="setBooleanValue(708, $event.checked)"
+                                    name="languageIsPublic">
+                                  </p-inputSwitch>
+                                  
                                 </div>
                             </div>
 
@@ -166,14 +178,19 @@
                                         {{ "IsPublic" | localize }}
                                     </span>
                                     <p-inputSwitch
+                                    [ngModel]="getBooleanValue(713)"
+                                    (onChange)="setBooleanValue(713, $event.checked)"
+                                    name="joinDateIsPublic">
+                                  </p-inputSwitch>
+                                    <p-inputSwitch
                                     name="joinDateIsPublic"
                                     [ngModel]="getJoinDateIsPublic()"
                                     (onChange)="setJoinDateIsPublic($event.checked)">
                                   </p-inputSwitch>
                                   
                                 </div>
-                            </div> -->
-                            <hr class="header">
+                            </div>
+                            <hr class="header"> -->
                             <!--User Name -->
                             <!-- <div class="form-group row" *ngIf="!isManualOrExternalContact">
                                 <label for="UserName" class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -225,9 +242,13 @@
                                 <div class="col-sm-2 d-flex align-items-center" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-2 isPublic">{{ "IsPublic" | localize }}</span>
                                     <p-inputSwitch
-                                    [ngModel]="getPhoneIsPublic(i)"
-                                    (onChange)="setPhoneIsPublic(i, $event.checked)">
+                                    [ngModel]="getBooleanValue(i ==0 ? 710 : i==1 ? 711 : 712)"
+                                    (onChange)="setBooleanValue(i ==0 ? 710 : i==1 ? 711 : 712, $event.checked)"
+                                    name="Phone{{i}}IsPublic">
                                   </p-inputSwitch>
+                                  
+                           
+                                  
                                   
                                 </div>
                                 <div class="col-sm-1">
@@ -247,7 +268,9 @@
                                 </div>
                             </div>
                         </div>
+                        
                     </form>
+
                 </div>
 
 
@@ -276,7 +299,6 @@
 
     </div>
 </div>
-
 
 <selectBranchModal
     #selectBranchModal

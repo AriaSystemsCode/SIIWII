@@ -71,7 +71,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
   activeAccordionIndexes: number[] = [0]; // open first tab by default
   hasUnsavedChanges = false;
-  emailIsPublic: boolean = false;
+
 
   constructor(injector: Injector,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -88,6 +88,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
 
   ngOnInit(): void {
+  
     // this.getAppItemTypeExtraAttributesById()
   }
   async show(memberId?: number, accId?: number, isManualOrExternalContact?: boolean) {
@@ -104,7 +105,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       if (!this.canEdit) return this.notify.error("You don't have permission to edit");
   
       await this.getContactDataForView(memberId); // ✅ fills memberDto
-  
+     
       this.getAppItemTypeExtraAttributesById(); // ✅ call AFTER memberDto is filled
     } else { // create logic
       this.canCreate = this.permission.isGranted('Pages.Accounts.Member.Create');
@@ -124,23 +125,20 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType, null).toPromise();
       this.memberDto.code = sequance;
     }
-    const emailAttr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
-    this.emailIsPublic = emailAttr?.selectedValues?.[emailAttr.selectedValues.length - 1]?.value === 'true';
-    // this.emailIsPublic = this.memberDto.extraDataAttributes[10]?.selectedValues?.[
-    //   this.memberDto.extraDataAttributes[10].selectedValues.length - 1
-    // ]?.value === 'true';
+
     this.active = true;
     this.hideMainSpinner();
   }
   
   setDefaultPublicFieldsToTrue() {
-    this.memberDto.phone1IsPublic = this.memberDto.phone1Number || this.memberDto.phone1Ex || this.memberDto.phone1TypeId ? true : false;
-    this.memberDto.phone2IsPublic = this.memberDto.phone2Number || this.memberDto.phone2Ex || this.memberDto.phone2TypeId ? true : false;
-    this.memberDto.phone3IsPublic = this.memberDto.phone3Number || this.memberDto.phone3Ex || this.memberDto.phone3TypeId ? true : false;
-    this.memberDto.joinDateIsPublic = this.memberDto.joinDate ? true : false;
-    this.memberDto.languageIsPublic = this.memberDto.languageId || this.memberDto.languageName ? true : false;
-    this.memberDto.emailAddressIsPublic = this.memberDto.eMailAddress ? true : false;
+    this.setBooleanValue(710, this.memberDto.phone1Number || this.memberDto.phone1Ex || this.memberDto.phone1TypeId ? true : false);
+    this.setBooleanValue(711, this.memberDto.phone2Number || this.memberDto.phone2Ex || this.memberDto.phone2TypeId ? true : false);
+    this.setBooleanValue(712, this.memberDto.phone3Number || this.memberDto.phone3Ex || this.memberDto.phone3TypeId ? true : false);
+    this.setBooleanValue(713, this.memberDto.joinDate ? true : false); // Assuming 707 = Join Date Is Public
+    this.setBooleanValue(708, this.memberDto.languageId || this.memberDto.languageName ? true : false);
+    this.setBooleanValue(709, this.memberDto.eMailAddress ? true : false); // If needed
   }
+  
   getLanguages(): void {
     this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
       const lookupLabelDto: LookupLabelDto = new LookupLabelDto()
@@ -190,7 +188,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     if (result)
       // this.memberDto = result.contact
       this.memberDto = Object.assign(new CreateOrEditAccountInfoDto(), result);
-
+      this.memberDto.emailAddressIsPublic = true
 
     if (result?.contact?.joinDate)
       this.joinDate = moment(result?.contact?.joinDate).toDate();
@@ -391,24 +389,24 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
 
     this.memberDto.useDTOTenant = true;
-    console.log(this.memberDto, 'kkkkkkk')
 
-    // ✅ Create a new DTO instance and assign only the valid fields
-    const cleanDto = new CreateOrEditAccountInfoDto();
 
-    const allowedKeys = [
-      'fileToken', 'tradeName', 'accountType', 'accountTypeId', 'ssin', 'priceLevel', 'notes', 'website', 'name', 'code',
-      'phone1Number', 'phone1Ex', 'phone2Number', 'phone2Ex', 'phone3Number', 'phone3Ex', 'eMailAddress',
-      'phone1TypeId', 'phone2TypeId', 'phone3TypeId', 'currencyId', 'languageId', 'entityId', 'tenantId',
-      'attachmentSourceTenantId', 'useDTOTenant', 'returnId', 'accountLevel', 'entityCategories', 'entityClassifications',
-      'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods','extraDataAttributes', 'entityExtraData', 'id', 'parentId', 'accountId'
-    ];
+    // // ✅ Create a new DTO instance and assign only the valid fields
+    // const cleanDto = new CreateOrEditAccountInfoDto();
 
-    for (const key of allowedKeys) {
-      cleanDto[key] = this.memberDto[key];
-    }
+    // const allowedKeys = [
+    //   'fileToken', 'tradeName', 'accountType', 'accountTypeId', 'ssin', 'priceLevel', 'notes', 'website', 'name', 'code',
+    //   'phone1Number', 'phone1Ex', 'phone2Number', 'phone2Ex', 'phone3Number', 'phone3Ex', 'eMailAddress',
+    //   'phone1TypeId', 'phone2TypeId', 'phone3TypeId', 'currencyId', 'languageId', 'entityId', 'tenantId',
+    //   'attachmentSourceTenantId', 'useDTOTenant', 'returnId', 'accountLevel', 'entityCategories', 'entityClassifications',
+    //   'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods','extraDataAttributes', 'entityExtraData', 'id', 'parentId', 'accountId'
+    // ];
 
-    this._AccountsServiceProxy.createOrUpdateContact(cleanDto)
+    // for (const key of allowedKeys) {
+    //   cleanDto[key] = this.memberDto[key];
+    // }
+
+    this._AccountsServiceProxy.createOrUpdateContact(this.memberDto)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe(result => {
         const userId = this.memberDto?.userId || result.userId;
@@ -629,23 +627,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       });
   }
 
-  // scrollToUsage(usage: string): void {
-  //   this.selectedUsage = usage;
-
-  //   const index = this.usageList.indexOf(usage);
-  //   if (index !== -1) {
-  //     // Expand only the clicked tab
-  //     this.activeAccordionIndexes = [index];
-
-  //     // Scroll to the section
-  //     setTimeout(() => {
-  //       const element = document.getElementById('usage_' + usage);
-  //       if (element) {
-  //         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  //       }
-  //     }, 100);
-  //   }
-  // }
+ 
 
   onExtraAttributesChanged(dataFromChild: any[]) {
 
@@ -750,80 +732,49 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         toJSON: function (data?: any) {}
       }];
     }
-  }
-  
-  getJoinDateIsPublic(): boolean {
-    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
-    const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-    return val === 'true' ;
-  }
-  
-  setJoinDateIsPublic(val: boolean) {
-    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
-    if (attr) {
-      attr.selectedValues = [{
-        ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
-        init: function (_data?: any): void {},
-        toJSON: function (data?: any) {}
-      }];
-    }
-  }
 
-  getPhoneIsPublic(index: number): boolean {
-    const attrIdMap = [710, 711, 712];
-    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === attrIdMap[index]);
-    const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-    return val === 'true' ;
-  }
-  
-  setPhoneIsPublic(index: number, val: boolean): void {
-    const attrIdMap = [710, 711, 712];
-    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === attrIdMap[index]);
-    if (attr) {
-      attr.selectedValues = [{
-        ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
-        init: function (_data?: any): void {},
-        toJSON: function (data?: any) {}
-      }];
+    const joinDateAttrI = this.memberDto?.entityExtraData?.find(attr => attr.extraAttributeId === 707);
+    if (joinDateAttr) {
+      joinDateAttrI.attributeValue =  moment.utc(date).format()
     }
   }
   
-  // getEmailIsPublic() {
-  //   const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 709);
+  // getJoinDateIsPublic(): boolean {
+  //   const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
   //   const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-  //   return val ;
+  //   return val === 'true' ;
+  // }
+  
+  // setJoinDateIsPublic(val: boolean) {
+  //   const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
+  //   if (attr) {
+  //     attr.selectedValues = [{
+  //       ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
+  //       init: function (_data?: any): void {},
+  //       toJSON: function (data?: any) {}
+  //     }];
+  //   }
   // }
 
-  setEmailIsPublic(val: any) {
-    const emailAddressIsPublic = this.memberDto.entityExtraData.findIndex(attr => attr.attributeId === 709);
-      
-    if (emailAddressIsPublic !== -1) {
-      // Update existing attribute
-      this.memberDto.entityExtraData[emailAddressIsPublic].attributeValue = val ?? '';
-    } else {
-      // Add new attribute
-      const emailAddressIsPublic = new AppEntityExtraDataDto();
-      emailAddressIsPublic.init({
-        attributeId: 709,
-        attributeValue: val ?? '',
-        entityId: 0,
-        entityObjectTypeId: 0,
-        entityObjectTypeCode: '',
-        entityObjectTypeName: '',
-        attributeValueId: 0,
-        attributeValueFkName: '',
-        attributeValueFkCode: '',
-        attributeCode: '',
-        id: 0
-      });
-      
-      this.memberDto.entityExtraData.push(emailAddressIsPublic);
-      
-      
-    }
-  
+
+
+
+
+  getBooleanValue(attrId: number): boolean {
+    const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
+    return attr?.selectedValues?.[0]?.value?.toLowerCase() === 'true';
   }
   
-  
-}
+  setBooleanValue(attrId: number, checked: boolean): void {
+    const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
+    if (attr?.selectedValues?.length > 0) {
+      attr.selectedValues[0].value = checked.toString();
+    }
+    const attri = this.memberDto?.entityExtraData?.find(x => x.attributeId === attrId);
+    attri.attributeValue =  checked.toString()
+ 
 
+  }
+  
+
+}
