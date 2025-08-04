@@ -291,6 +291,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   handleAction(record: any, action: string) {
     this.records.forEach(r => r.showActions = false); // Close dropdown
+    this.currentActionRecord = record;
+    record._inAction=true;
 
     switch (action) {
       case 'Validate Data Record':
@@ -333,8 +335,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   LinkToExistingITEM(record) {
     record._isLinkingParent = true;
-    this.currentActionRecord = record;
-
+    
     // Scroll after DOM updated
     setTimeout(() => {
       const container = this.codeInputContainers.find(
@@ -484,6 +485,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
     record._isLinkingParent = false;
     this.currentActionRecord = null;
+    record._inAction=false;
+
   }
 
   isLinkingInProgress(): boolean {

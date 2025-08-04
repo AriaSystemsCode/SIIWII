@@ -56,13 +56,13 @@
                     [class.pointer-events-none]="currentActionRecord && record !== currentActionRecord">
                     <div class="dropdown" #dropdownRef>
                       <!-- IF not in action mode -->
-                      <span class="pointer dropdownPointer" *ngIf="!record._isLinkingParent"
+                      <span class="pointer dropdownPointer" *ngIf="!record._inAction"
                         (click)="toggleMenu(record, $event)" style="font-size: 20px;">
                         ⋮
                       </span>
 
                       <!-- IF action mode is active on this row -->
-                      <span *ngIf="record._isLinkingParent" class="action-icons d-flex align-items-center">
+                      <span *ngIf="record._inAction" class="action-icons d-flex align-items-center">
                         <i class="text-success pointer mr-2" (click)="confirmLinking(record)">✔️</i>
                         <i class="text-danger pointer" (click)="cancelLinking(record)">❌</i>
                       </span>
@@ -141,11 +141,13 @@
                       </div>
 
                       <!-- Default input -->
-                      <input *ngSwitchDefault type="text" class="form-control" style="width: fit-content;"
-                        [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                        (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                        [disabled]="activeRecordType === 'Image' && !(column.name === 'Code' && record._isLinkingParent)"
-                        [ngClass]="{  'link-parent-input': column.name === 'Code' && record._isLinkingParent }" />
+                      <ng-container *ngIf="!(column.name === 'Code' && record._isLinkingParent)">
+                        <input *ngSwitchDefault type="text" class="form-control" style="width: fit-content;"
+                          [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                          (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                          [disabled]="activeRecordType === 'Image' && !(column.name === 'Code' && record._isLinkingParent)"
+                          [ngClass]="{  'link-parent-input': column.name === 'Code' && record._isLinkingParent }" />
+                      </ng-container>
 
                       <!-- image input -->
                       <!-- <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
