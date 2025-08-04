@@ -1020,8 +1020,9 @@ namespace onetouch.AppMarketplaceAccounts
         }
 
         //I40 -MMT[Start]
-        public async Task<bool> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect)
+        public async Task<string> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect)
         {
+            string returnLabel = "";
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
 
             var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => ((z.RecipientContactSSIN == recipientSSIN && z.RequesterContactSSIN == requesterSSIN) ||
@@ -1036,7 +1037,7 @@ namespace onetouch.AppMarketplaceAccounts
                     relation.RelationshipEndDate = DateTime.Now;
                     await _appContactRelationshipInfoRepository.UpdateAsync(relation);
                     await CurrentUnitOfWork.SaveChangesAsync();
-                    return true;
+                    return "";
                 }
                 else
                 {
@@ -1083,6 +1084,11 @@ namespace onetouch.AppMarketplaceAccounts
                         var relationshiplookup = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
                         if (relationshiplookup != null)
                         {
+                            var extrDataConnect = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                            if (extrDataConnect != null)
+                            {
+                                returnLabel = "MPAction" + extrDataConnect.AttributeValue;
+                            }
                             var extrDataSharing = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 605).FirstOrDefault();
                             if (extrDataSharing != null)
                             {
@@ -1102,7 +1108,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                 }
             }
-            return true;
+            return returnLabel;
         }
         //I40 - MMT[End]
         //public async Task<long> DeleteMarketplaceAccount(long marketplaceAccount)
