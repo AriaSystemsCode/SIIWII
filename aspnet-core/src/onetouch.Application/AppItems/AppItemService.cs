@@ -442,8 +442,14 @@ namespace onetouch.AppItems
                 item1.IsDefault = false;
 
             }
+            if (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid))
+            {
+                appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid = Guid.NewGuid().ToString();
+            }
             if (y.AppItem.EntityAttachments.Count == 0) { y.AppItem.EntityAttachments = new List<AppEntityAttachmentDto>(); }
-            var z = new AppEntityAttachmentDto {    IsDefault= appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,  AttachmentCategoryEnum=0,AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
+            var z = new AppEntityAttachmentDto {    IsDefault= appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,  
+                AttachmentCategoryEnum=0,AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
+                guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
 
 
 
@@ -454,19 +460,20 @@ namespace onetouch.AppItems
 
 
 
-            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString()))
+
+            if (!System.IO.Directory.Exists(path))
             {
-                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString());
+                System.IO.Directory.CreateDirectory(path);
             }
 
             try
             {
-                System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, _appConfiguration[$"Attachment:TempPath"] + @"\" + tenantId.ToString() + @"\" + z.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
-                
+                System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, path + @"\" + z.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
+
             }
             catch { }
 
-            
+
 
             y.AppItem.EntityAttachments.Add(z);
 
@@ -480,6 +487,63 @@ namespace onetouch.AppItems
 
             return x;
         }
+
+        public async Task<long> SaveImageToColor( long colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        {
+            var xx = new EntityDto<long>() { Id = colorEntityId };
+            var color = await _appEntitiesAppService.GetAppEntityForEdit(xx);
+            
+            var appEntity = ObjectMapper.Map<AppEntity>(color.AppEntity);
+            var y = ObjectMapper.Map<AppEntityDto>(appEntity);
+
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString() ;
+            // add the image to the parent
+            foreach (var item1 in y.EntityAttachments)
+            {
+                item1.IsDefault = false;
+
+            }
+            if(string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid))
+            {
+                appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid = Guid.NewGuid().ToString();
+            }
+            if (y.EntityAttachments.Count == 0) { y.EntityAttachments = new List<AppEntityAttachmentDto>(); }
+            var z = new AppEntityAttachmentDto { IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault, 
+                AttachmentCategoryEnum = 0, AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
+                guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.EntityAttachments.Count };
+
+            // rename image at temp attachment folder with guid and keep image name in variable
+            // copy it to attachment folder
+            // add record attachments tables
+            // add record to appitem entity attachements
+
+
+
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+
+            try
+            {
+                System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, path + @"\" + z.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
+
+            }
+            catch { }
+
+
+            y.EntityAttachments = color.AppEntity.EntityAttachments;
+            y.EntityAttachments.Add(z);
+
+            var x = await _appEntitiesAppService.SaveEntity(y);
+
+
+
+            return x;
+        }
+
+
 
         public async Task<long> SaveImageToItemColor(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
