@@ -147,7 +147,7 @@ this.accountsTypes=result.items;
         undefined,
         undefined,
         this.accountDataForView?.ssin,
-        this.connectionTypeId > 0 ? this.connectionTypeId : undefined,
+        this.accountDataForView?.accountTypeId,
        undefined,
         undefined,
         undefined,

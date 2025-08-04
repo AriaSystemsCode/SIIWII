@@ -115,7 +115,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   }
 
   handleRefreshRating(event: boolean) {
-    if (event === true) {
+    if (event) {
   
 
     this.getOverAllRatings()
