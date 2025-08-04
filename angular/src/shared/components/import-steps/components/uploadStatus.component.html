@@ -133,8 +133,7 @@
                             *ngIf="activeRecord === record && LinkToExistingITEM_Ret_Data?.items?.length > 0">
                             <li *ngFor="let item of LinkToExistingITEM_Ret_Data.items"
                               (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
-                              {{item}}
-                              {{ item.code }} - {{ item.name }}
+                              {{item.displayName}}
                             </li>
                           </ul>
 
