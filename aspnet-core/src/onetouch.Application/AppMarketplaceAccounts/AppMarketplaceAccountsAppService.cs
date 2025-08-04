@@ -1024,8 +1024,8 @@ namespace onetouch.AppMarketplaceAccounts
         {
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
 
-            var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => z.RequesterContactSSIN == requesterSSIN &&
-            z.RecipientContactSSIN == recipientSSIN && z.EntityObjectStatusId == activeRealtionshipStatusId).FirstOrDefaultAsync();
+            var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => ((z.RecipientContactSSIN == recipientSSIN && z.RequesterContactSSIN == requesterSSIN) ||
+                    (z.RecipientContactSSIN == requesterSSIN && z.RequesterContactSSIN == recipientSSIN)) && z.EntityObjectStatusId == activeRealtionshipStatusId).FirstOrDefaultAsync();
 
             if (relation != null)
             {

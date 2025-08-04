@@ -1835,8 +1835,26 @@ namespace onetouch.Accounts
 
         public async Task Disconnect(long id)
         {
+
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //I40[Start]
+                
+                string recipientSSIN = "";
+                string requesterSSIN = "";
+                var account = await _appMarketplaceContactRepository.GetAll().Where(z => z.Id == id).FirstOrDefaultAsync();
+                if (account != null)
+                    recipientSSIN = account.SSIN;
+                var currentaccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.OwnerId == AbpSession.TenantId && z.IsProfileData && z.ParentId == null).FirstOrDefaultAsync();
+                if (currentaccount != null)
+                    requesterSSIN = currentaccount.SSIN;
+                if (string.IsNullOrEmpty(requesterSSIN) || string.IsNullOrEmpty(recipientSSIN))
+                    return;
+                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN, true);
+                return;
+                
+                
+                //I40[End]
                 long? otherTenantId = null;
                 long? partnerId = null;
                 var existed = await _appContactRepository.GetAll()
