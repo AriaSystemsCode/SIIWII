@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, Injector, SimpleChanges } from 
 import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
     selector: 'app-connections-card',
@@ -27,7 +27,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
 
     constructor(
         injector: Injector,
-        private router: Router
+        private router: Router,
+          private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
     }
@@ -76,23 +77,48 @@ export class ConnectionsCardComponent extends AppComponentBase {
     }
 
 
-    getFormattedConnectionName(connection:string): string | null {
-        if(connection == 'connectionName') {
-            const raw = this.account?.connectionName?.trim();
-            if (!raw || !raw.startsWith('MPAction')) return null;
-          
-            const label = raw.replace('MPAction', '');
-            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
-        } else    if(connection == 'avaliableConnectionName') {
-            const raw = this.account?.avaliableConnectionName?.trim();
-            if (!raw || !raw.startsWith('MPAction')) return null;
-          
-            const label = raw.replace('MPAction', '');
-            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+    getFormattedConnectionName(connection: string): string | null {
+        let raw: string | undefined;
+      
+        if (connection === 'connectionName') {
+          raw = this.account?.connectionName?.trim();
+        } else if (connection === 'avaliableConnectionName') {
+          raw = this.account?.avaliableConnectionName?.trim();
         }
-       
-
-        
+      
+        if (!raw) return null;
+      
+        // If it's 'Follow', return as-is
+        if (raw === 'Follow') return 'Follow';
+      
+        // Format only if starts with 'MPAction'
+        if (raw.startsWith('MPAction')) {
+          const label = raw.replace('MPAction', '');
+          return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+        }
+      
+        // For anything else, return null (or raw if you prefer)
+        return null;
+      }
+      removeRelation(account){
+        this._accountsServiceProxy
+        .disconnect(account.account.id)
+        // .pipe(
+        //     finalize(() => {
+        //         ;
+        //         this.hideMainSpinner();
+        //     })
+        // )
+        .subscribe(
+        //     (result: string) => {
+        //     let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.id);
+        //     if (accountIndx >= 0) {
+        //         this.accounts[accountIndx] = account;
+        //         this.accounts[accountIndx].avaliableConnectionName = "";
+        //         this.accounts[accountIndx].connectionName = this.l(result);
+        //     }
+        // }
+    );
       }
 
 }

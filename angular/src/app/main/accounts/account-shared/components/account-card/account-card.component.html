@@ -113,7 +113,7 @@
                     <div>
 
                         <span style="width: 100%; " class="mt-3" *ngIf="account.connectionName">
-                            <button class="btn relation_Status_button mt-4" [ngStyle]="{
+                            <button class="btn relation_Status_button mt-4" (click)="removeRelation(account)" [ngStyle]="{
                                 'bottom':  singleItemPerRowMode  ? '5px' : 'auto'
                             }" style="    white-space: nowrap;
                                 position: absolute;

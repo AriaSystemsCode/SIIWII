@@ -29257,7 +29257,7 @@ export class CreateMarketplaceAccountServiceProxy {
      * @param disconnect (optional) 
      * @return Success
      */
-    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined): Observable<boolean> {
+    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/CreateMarketplaceAccount/CreateOrEditMarketplaceContactRelationship?";
         if (requesterSSIN !== undefined && requesterSSIN !== null)
             url_ += "requesterSSIN=" + encodeURIComponent("" + requesterSSIN) + "&";
@@ -29282,14 +29282,14 @@ export class CreateMarketplaceAccountServiceProxy {
                 try {
                     return this.processCreateOrEditMarketplaceContactRelationship(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<boolean>;
+                    return _observableThrow(e) as any as Observable<string>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<boolean>;
+                return _observableThrow(response_) as any as Observable<string>;
         }));
     }
 
-    protected processCreateOrEditMarketplaceContactRelationship(response: HttpResponseBase): Observable<boolean> {
+    protected processCreateOrEditMarketplaceContactRelationship(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
