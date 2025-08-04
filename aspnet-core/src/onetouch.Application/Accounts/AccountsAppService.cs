@@ -1292,7 +1292,7 @@ namespace onetouch.Accounts
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 //.Include(x => x.EntityExtraData).Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
-
+                GetAccountInfoForEditOutput saveAccountDest = null;
                 if (originalPublishContactFortCurrTenant == null)
                 {
                     if (tenantId != AbpSession.TenantId)
@@ -1337,7 +1337,11 @@ namespace onetouch.Accounts
                             createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
                             createOrEditAccountInfoDto.ContactAddresses = null;
                             //createOrEditAccountInfoDto.PartnerId = originalPublishContactFortCurrTenant.Id;
-                            var accountSaved = await CreateOrEditAccount(createOrEditAccountInfoDto);
+                            createOrEditAccountInfoDto.AccountId = null;
+                            createOrEditAccountInfoDto.ParentId = null;
+                            
+                            saveAccountDest = await CreateOrEditAccount(createOrEditAccountInfoDto);
+                            var accountSaved = saveAccountDest;
                             if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
                             {
                                 if (originalPublishContactFortCurrTenant.ContactAddresses != null && originalPublishContactFortCurrTenant.ContactAddresses.Count > 0)
@@ -1380,7 +1384,7 @@ namespace onetouch.Accounts
                         }
                     }
                 }
-
+                GetAccountInfoForEditOutput savedAccountSrc = null;
                 if (originalContact != null)
                 {
                     var existed = await _appContactRepository.GetAll()
@@ -1410,7 +1414,10 @@ namespace onetouch.Accounts
                         }
                         createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
                         createOrEditAccountInfoDto.ContactAddresses = null;
-                        var accountSaved = await CreateOrEditAccount(createOrEditAccountInfoDto);
+                        createOrEditAccountInfoDto.AccountId = null;
+                        createOrEditAccountInfoDto.ParentId = null;
+                        savedAccountSrc = await CreateOrEditAccount(createOrEditAccountInfoDto);
+                        var accountSaved = savedAccountSrc;
                         if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
                         {
                             if (originalContact.ContactAddresses != null && originalContact.ContactAddresses.Count > 0)
@@ -1545,6 +1552,8 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.UseDTOTenant = true;
                         createOrEditAccountInfoDto.TenantId = tenantId;
                         createOrEditAccountInfoDto.Id = 0;
+                        createOrEditAccountInfoDto.ParentId = savedAccountSrc.AccountInfo.Id;
+                        createOrEditAccountInfoDto.AccountId = savedAccountSrc.AccountInfo.Id;
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenantObj != null)
                         {
@@ -1587,6 +1596,8 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.UseDTOTenant = true;
                         createOrEditAccountInfoDto.TenantId = originalContact.OwnerId;
                         createOrEditAccountInfoDto.Id = 0;
+                        createOrEditAccountInfoDto.ParentId = saveAccountDest.AccountInfo.Id;
+                        createOrEditAccountInfoDto.AccountId = saveAccountDest.AccountInfo.Id;
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(originalContact.OwnerId.ToString()));
                         if (tenantObj != null)
                         {
