@@ -1,7 +1,7 @@
 {
-  "attachmentBaseUrl": "http://localhost:44315",
-  "remoteServiceBaseUrl": "http://localhost:44315",
-  "appBaseUrl": "http://localhost:4205",
+  "attachmentBaseUrl": "http://localhost:44316",
+  "remoteServiceBaseUrl": "http://localhost:44316",
+  "appBaseUrl": "http://localhost:4206",
   "localeMappings": {
     "angular": [
       {

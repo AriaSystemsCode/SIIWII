@@ -778,5 +778,45 @@ export class MainImportComponent
     setHasImages($event) {
         this.hasImages = $event;
     }
+
+
+    onLinkToExistingITEM_Data($event) {
+        this.showMainSpinner();
+        this.importServiceProxy
+            .getAllLookUp(
+                0,
+                0,
+                false,
+                $event.filter,
+                $event.filterType,
+                "",
+                "",
+                0,
+                [],
+                [],
+                [],
+                [],
+                [],
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                "",
+                0,
+                100
+              )
+            .pipe(finalize(() => {
+                this.hideMainSpinner();
+
+            }))
+            .subscribe((result) => {
+                this.StatusModal.LinkToExistingITEM_Ret_Data = result;
+            });
+
+    }
+
 }
 

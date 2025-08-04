@@ -32,6 +32,8 @@
     (close)="askToClose($event)"
     (totalFailedRecords)="ontotalFailedRecords($event)"
     (totalPassedRecords)="ontotalPassedRecords($event)"
+    [imagesList]="imagesList"
+    (linkToExistingITEM_Data)="onLinkToExistingITEM_Data($event)"
 ></uploadStatusModal>
 <!-- <autoCropModal
     #AutoCropModal
