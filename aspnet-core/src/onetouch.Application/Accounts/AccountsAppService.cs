@@ -306,16 +306,21 @@ namespace onetouch.Accounts
                                 x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
 
                             .WhereIf(input.FilterType <= 1 && input.FilterType != 6,
-                                x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId))
+                                x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null &&
+                                x.EntityFk.EntityObjectStatusId != cancelledStatusId))
                             .WhereIf(input.FilterType == 2 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null && x.PartnerId != null)
-                                && (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
+                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null
+                                && _appMarketplaceContactRepository.GetAll().Count(z=>z.SSIN == x.SSIN) > 0))// x.PartnerId != null)
+                                //&& (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
                             .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null && x.PartnerId == null))
+                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
+                                _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN) == 0))//x.PartnerId == null))
                              .WhereIf(input.FilterType == 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null && x.PartnerId == null)
-                                || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null && x.PartnerId != null)
-                                && (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
+                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
+                                _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN) == 0)//x.PartnerId == null)
+                                || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
+                                _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN) > 0))//x.PartnerId != null)
+                                //&& (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
 
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
                                 x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
@@ -404,7 +409,7 @@ namespace onetouch.Accounts
                                             AddressLine1 = o.AppContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
                                             CountryName = o.AppContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
                                             Status = input.FilterType != 1 ? (_appContactRepository.GetAll().Count(x => x.TenantId == null && x.Id == o.PartnerId) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)) :
-                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == o.Id) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)),
+                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN) > 0) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)),
                                             Id = o.Id,
                                             IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && o.PartnerId == null,
                                             LogoUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
@@ -412,7 +417,7 @@ namespace onetouch.Accounts
                                              : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
                                             Classfications = o.EntityFk.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(5).ToArray(),
                                             Categories = o.EntityFk.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(5).ToArray(),
-                                            PartnerId = o.PartnerId
+                                            PartnerId = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN)>0? _appMarketplaceContactRepository.GetAll().FirstOrDefault(z => z.SSIN == o.SSIN).Id : null//o.PartnerId
                                         },
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
                                     };
@@ -1398,6 +1403,7 @@ namespace onetouch.Accounts
                                 createOrEditAccountInfoDto.Code = tenantObj.TenancyName.Trim() + "-M" + sequance;
                             }
                             createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
+                            //createOrEditAccountInfoDto.PartnerId = originalPublishContactFortCurrTenant.Id;
                             createOrEditAccountInfoDto.ContactAddresses = null;
                             //createOrEditAccountInfoDto.PartnerId = originalPublishContactFortCurrTenant.Id;
                             createOrEditAccountInfoDto.AccountId = null;
@@ -1483,6 +1489,8 @@ namespace onetouch.Accounts
                             createOrEditAccountInfoDto.Code = tenantObj.TenancyName.Trim() + "-M" + sequance;
                         }
                         createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
+                        //createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Connected;
+                        //createOrEditAccountInfoDto.PartnerId = originalContact.Id;
                         createOrEditAccountInfoDto.ContactAddresses = null;
                         createOrEditAccountInfoDto.AccountId = null;
                         createOrEditAccountInfoDto.ParentId = null;

@@ -1024,10 +1024,15 @@ namespace onetouch.AppMarketplaceAccounts
         {
             string returnLabel = "";
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
-
+            var requestContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == requesterSSIN).FirstOrDefaultAsync();
+            var recipientContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == recipientSSIN).FirstOrDefaultAsync();
+            var recipientType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == recipientContact.EntityObjectTypeId).FirstOrDefaultAsync();
+            var requesterType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == requestContact.EntityObjectTypeId).FirstOrDefaultAsync();
             var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => ((z.RecipientContactSSIN == recipientSSIN && z.RequesterContactSSIN == requesterSSIN) ||
                     (z.RecipientContactSSIN == requesterSSIN && z.RequesterContactSSIN == recipientSSIN)) && z.EntityObjectStatusId == activeRealtionshipStatusId).FirstOrDefaultAsync();
-
+            
+            //var relationshiplookup = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+            
             if (relation != null)
             {
                 if (disconnect == true)
@@ -1047,8 +1052,7 @@ namespace onetouch.AppMarketplaceAccounts
             }
             else
             {
-                var requestContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == requesterSSIN).FirstOrDefaultAsync();
-                var recipientContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == recipientSSIN).FirstOrDefaultAsync();
+                
 
                 if (recipientContact != null && requestContact != null)
                 {
@@ -1062,12 +1066,12 @@ namespace onetouch.AppMarketplaceAccounts
                     relation.RequesterContactName = requestContact.Name;
 
 
-                    var recipientType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == recipientContact.EntityObjectTypeId).FirstOrDefaultAsync();
+                    //var recipientType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == recipientContact.EntityObjectTypeId).FirstOrDefaultAsync();
                     if (recipientType != null)
                         relation.RecipientContactTypeCode = recipientType.Code;
                     relation.RecipientContactTypeId = recipientContact.EntityObjectTypeId;
 
-                    var requesterType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == requestContact.EntityObjectTypeId).FirstOrDefaultAsync();
+                    //var requesterType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == requestContact.EntityObjectTypeId).FirstOrDefaultAsync();
                     if (requesterType != null)
                         relation.RequesterContactTypeCode = requesterType.Code;
                     relation.RequesterContactTypeId = requestContact.EntityObjectTypeId;
