@@ -145,14 +145,19 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         if (type == 'company') {
             localStorage.setItem("comNew", JSON.stringify(event?.target?.checked));
             this.appTransactionsForViewDto.createManualAccount = event?.target?.checked
-            this.saveManualAccount()
-            this.saveManualBranch()
+            if(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code == null){
+                this.saveManualAccount()
+                this.saveManualBranch()
+            }
+         
         }
         else if (type == 'contact') {
 
             localStorage.setItem("conNew", JSON.stringify(event?.target?.checked));
-
+            if(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code ==null){
             this.saveManualContact()
+                
+            }
 
             this.appTransactionsForViewDto.createManualContact = event?.target?.checked
 
@@ -160,7 +165,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.isValidForm();
 
     }
-
 
     async saveManualAccount() {
         let sequance = "";
