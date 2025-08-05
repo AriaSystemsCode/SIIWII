@@ -154,8 +154,8 @@ namespace onetouch.Accounts
               IRepository<AppEntityCategory, long> appEntityCategoryRepository,
               IRepository<AppEntityClassification, long> appEntityClassficationRepository,
               ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<ValidationRule> validationRuleRepo,
-              IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
-              )
+              IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
+              IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository)
               
         {
             _emailingTemplateAppService = emailingTemplateAppService;
@@ -192,7 +192,7 @@ namespace onetouch.Accounts
             //_appEntityRelationShipRepository = appEntityRelationShipRepository;
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             _sycEntityObjectTypesAppService= sycEntityObjectTypesAppService;
-
+            _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
         }
         private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
         {
@@ -578,6 +578,15 @@ namespace onetouch.Accounts
                     var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                     //I40
+                    //var currentTenantAccountObj = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                      // .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                    var currentTenantAccountSSIN = currentTenantAccount.SSIN;
+                    var currentTenantAccountType = currentTenantAccount.EntityFk.EntityObjectTypeId;
+                    var contactObjectid = await _helper.SystemTables.GetObjectContactId();
+                    var groupAccountEntityObjectTypeId = await _sycEntityObjectTypeRepository.GetAll()
+                        .FirstOrDefaultAsync(z => z.Code == "GROUP" && z.ObjectId == contactObjectid);
+                    bool excludeGroupAccount = (currentTenantAccountType == groupAccountEntityObjectTypeId.Id);
+
                     var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
                     var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                     var relationships = _appContactRelationshipInfoRepository.GetAll()
@@ -606,6 +615,7 @@ namespace onetouch.Accounts
                                            .Include(encl => encl.EntityClassifications)
                                            .Include(enca => enca.EntityCategories)
                                            .Include(ena => ena.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                           .WhereIf(excludeGroupAccount, z => z.EntityObjectTypeId != groupAccountEntityObjectTypeId.Id)
                                            .Where(z=>z.SSIN!= input.SSIN) //&& z.SSIN!= currentTenantAccount.SSIN
                                            from b in relationships 
                                            where (a.SSIN == b.RequesterContactSSIN || a.SSIN== b.RecipientContactSSIN)
