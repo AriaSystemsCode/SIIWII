@@ -113,7 +113,7 @@
                                 </div>
                                 <div class="col title-cover">
                                     <h5 class="account-name">{{accountData?.name}} <span class="number-connect">
-                                            {{connectionCount}} {{'MembersAreConnected'|localize}}</span></h5>
+                                            {{accountData?.connections}} {{'MembersAreConnected'|localize}}</span></h5>
 
                                     <div *ngIf="!personalAccount">
                                         <textarea class="thin-scroll w-100 mt-2" style="
@@ -498,7 +498,7 @@
                                     [class.hide]="editInfo">
                                 <validation-messages *ngIf="NoteditInfo"
                                     [formCtrl]="eMailAddressInput"></validation-messages>
-                                    <div class="d-flex align-items-center ml-3">
+                                    <div class="d-flex align-items-center ml-3" *ngIf="contactData?.emailAddressIsPublic">
                                         <span class="mr-3 isPublic" >{{ "IsPublic" | localize }}</span>
                                         <p-inputSwitch name="emailAddressIsPublic" [disabled]="Editting == false"
                                             [(ngModel)]="contactData.emailAddressIsPublic"></p-inputSwitch>
@@ -547,7 +547,7 @@
                                 <validation-messages *ngIf="NoteditInfo"
                                     [formCtrl]="phoneNumberInput"></validation-messages>
 
-                                <div class="d-flex align-items-center ml-3">
+                                <div class="d-flex align-items-center ml-3" *ngIf="contactData">
                                 <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
                                 <p-inputSwitch name="phoneNumberIsPublic" [disabled]="Editting == false"
                                     [(ngModel)]="contactData.phone1IsPublic"></p-inputSwitch>

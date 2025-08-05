@@ -174,8 +174,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
               this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;              
               this.editedPersonalData.phone1Number = this.editPhoneNumberValue;
               this.editedPersonalData.jobTitle = this.editJobTitleValue;
-              this.editedPersonalData.emailAddressIsPublic = this.contactData.emailAddressIsPublic;
-              this.editedPersonalData.phone1IsPublic = this.contactData.phone1IsPublic;
+              this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
+              this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
             
               this.editInfo = true;
               this.NoteditInfo = false;

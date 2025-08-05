@@ -328,9 +328,12 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
       .subscribe(() => {
         this.messageServiceProxy
           .createUserEntityRating(this.selectedRating, this.entityID)
+          .pipe(finalize(() => {
+            this.refreshRating.emit(true)
+            
+          }))
 
           .subscribe(() => {
-
           });
 
       });
