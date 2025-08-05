@@ -132,7 +132,7 @@ namespace onetouch.AppMarketplaceAccounts
                             .Include(e => e.EntityClassifications)
                             .Include(e => e.EntityCategories)
                             .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
-                            .WhereIf(excludeGroupAccount, z=> z.EntityObjectTypeId != groupAccountEntityObjectTypeId.Id)
+                            .WhereIf(excludeGroupAccount, z => z.EntityObjectTypeId != groupAccountEntityObjectTypeId.Id)
                             .WhereIf(!string.IsNullOrEmpty(input.Filter),
                                 x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
 
@@ -183,7 +183,7 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
                            //.Where(e => (e.SSIN != currentTenantAccountSSIN && e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
-                           .Where(e => ((e.IsHidden != true)) && e.SSIN != currentTenantAccountSSIN);
+                           .Where(e => ((e.IsHidden != true))); //&& e.SSIN != currentTenantAccountSSIN);
 
                     //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 

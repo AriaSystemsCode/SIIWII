@@ -435,10 +435,10 @@ namespace onetouch.Accounts
                                             ZipCode = o.AppContactAddresses.FirstOrDefault().AddressFk.PostalCode,
                                             AddressLine1 = o.AppContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
                                             CountryName = o.AppContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
-                                            Status = input.FilterType != 1 ? (_appContactRepository.GetAll().Count(x => x.TenantId == null && x.Id == o.PartnerId) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)) :
-                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN) > 0) > 0 || (o.TenantId != null && o.ParentId == null && o.PartnerId == null)),
+                                            Status = input.FilterType != 1 ? (_appMarketplaceContactRepository.GetAll().Count(z=>z.SSIN == o.SSIN) > 0 || (o.TenantId != null && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN) == 0)) :
+                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN) > 0) > 0 || (o.TenantId != null && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN) == 0)),
                                             Id = o.Id,
-                                            IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && o.PartnerId == null,
+                                            IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN) == 0,
                                             LogoUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                              ""
                                              : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
@@ -1086,8 +1086,8 @@ namespace onetouch.Accounts
                 accountDto.PriceLevel = account.PriceLevel;
                 accountDto.AccountTypeId = entity.EntityObjectTypeId;
                 accountDto.AccountType = entity.EntityObjectTypeCode;
-                accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData && account.ParentId == null && account.PartnerId == null);
-                accountDto.IsConnected = (account.TenantId == null && !account.IsProfileData && account.ParentId == null);
+                accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData && account.ParentId == null && (_appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN) == 0));//account.PartnerId == null);
+                accountDto.IsConnected = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN) > 0;//(account.TenantId == null && !account.IsProfileData && account.ParentId == null);
                 #endregion I31 fill account type from entity type in AppEntities 
 
 
