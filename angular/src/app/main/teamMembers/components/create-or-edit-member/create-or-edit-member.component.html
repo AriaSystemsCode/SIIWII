@@ -65,13 +65,25 @@
                                     {{l("Name")}}
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" id="name" class="form-control" name="name" #FirstNameInput="ngModel" [(ngModel)]="memberDto.name" required [placeholder]="'PleaseEnterName' | localize "/>
+                                    <input type="text" id="FirstName" class="form-control" name="FirstName" #FirstNameInput="ngModel" [ngModel]="getSrtingValue(701)" required [placeholder]="'PleaseEnterFirstName' | localize "/>
                                     <validation-messages [formCtrl]="FirstNameInput"></validation-messages>
                                 </div>
                             </div>
                             <hr class="header">
                             <!--Sur Name -->
-                         
+                            <div class=" row">
+                                <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("Sir Name")}}
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" id="LastName" class="form-control" name="LastName" #LastNameInput="ngModel" [ngModel]="getSrtingValue(702)" required [placeholder]="'PleaseEnterFirstName' | localize "/>
+                                    <validation-messages [formCtrl]="LastNameInput"></validation-messages>
+                                </div>
+                            </div>
+                            <hr class="header">
+
+                            <!-- code -->
                             <div class=" row">
                                 <label for="Code" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                     <span class="text-danger">*</span>

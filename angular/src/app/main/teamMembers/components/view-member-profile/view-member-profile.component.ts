@@ -420,7 +420,22 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
                 });
             }
         }
+        getBooleanValue(attrId: number): string {
+          const attr = this.memberData?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
+          const lastValue = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+          return lastValue;
+        }
         
+        // setBooleanValue(attrId: number, checked: boolean): void {
+        //   const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
+        //   if (attr?.selectedValues?.length > 0) {
+        //     attr.selectedValues[0].value = checked.toString();
+        //   }
+        //   const attri = this.memberDto?.entityExtraData?.find(x => x.attributeId === attrId);
+        //   attri.attributeValue =  checked.toString()
+       
+      
+        // }
           
 
         

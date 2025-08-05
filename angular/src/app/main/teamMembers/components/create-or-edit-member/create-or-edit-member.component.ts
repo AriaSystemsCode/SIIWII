@@ -758,8 +758,21 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
 
 
+  getSrtingValue(attrId: number): string {
+    const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
+          const lastValue = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+          return lastValue;
+  }
+  setStringValue(attrId: number, checked: boolean): void {
+    const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
+    if (attr?.selectedValues?.length > 0) {
+      attr.selectedValues[attr.selectedValues.length - 1].value = this.getSrtingValue(attrId);
+    }
+    const attri = this.memberDto?.entityExtraData?.find(x => x.attributeId === attrId);
+    attri.attributeValue = this.getSrtingValue(attrId)
+ 
 
-
+  }
   getBooleanValue(attrId: number): boolean {
     const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
     return attr?.selectedValues?.[0]?.value?.toLowerCase() === 'true';

@@ -1,11 +1,11 @@
         <!-- Show when there are no items -->
-        <p *ngIf="items?.length === 0" class="text-center mx-auto mt-5 py-5">
+        <p *ngIf="items?.length === 0 && (fromOverView || fromMarketAcoount)" class="text-center mx-auto mt-5 py-5">
             <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
             <span class="noDataTxt">There is no data to show ....</span>
           </p>
 <div
     [@routerTransition]
-    *ngIf="items?.length > 0"
+  
     style="margin-top: -50px;overflow: hidden;"
     class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0"
     [ngClass]="[
