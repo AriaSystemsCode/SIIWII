@@ -209,9 +209,9 @@ export class MarketplaceProductsComponent
             });
     }
 
-    getCurrencyCurrent() {
-        this._pricingHelperService.getDefaultPricingInstance();
-    }
+    // getCurrencyCurrent() {
+    //     this._pricingHelperService.getDefaultPricingInstance();
+    // }
 
     getAllCurrencies() {
         this._AppEntitiesServiceProxy
@@ -312,18 +312,32 @@ export class MarketplaceProductsComponent
     
 
     setCurrency() {
-        this.selectedCurrrency =
-            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                ? this.tenantDefaultCurrency
-                : JSON.parse(localStorage.getItem("currencyCode"));
-        this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
-
+        const currencyCodeRaw = localStorage.getItem("currencyCode");
+    
+        if (!currencyCodeRaw || currencyCodeRaw === "undefined" || currencyCodeRaw === "null") {
+            this.selectedCurrrency = this.tenantDefaultCurrency;
+        } else {
+            try {
+                const parsed = JSON.parse(currencyCodeRaw);
+                this.selectedCurrrency = parsed;
+            } catch (e) {
+                // Fallback to string if it's not a JSON object
+                this.selectedCurrrency = currencyCodeRaw;
+            }
+        }
+    
+        this.currency = this.selectedCurrrency?.code ?? this.selectedCurrrency;
+    
+        // If it's just a code (e.g., "AFN"), find matching currency object
         if (!this.selectedCurrrency?.code) {
-            var indx = this.currencies?.findIndex(x => x.code == this.selectedCurrrency);
-            if (indx >= 0)
-                this.selectedCurrrency = this.currencies[indx];
+            const match = this.currencies?.find(x => x.code === this.selectedCurrrency);
+            if (match) {
+                this.selectedCurrrency = match;
+            }
         }
     }
+    
+
 
     onPageChange(value: any) {
         this.skipCount = value.first;
