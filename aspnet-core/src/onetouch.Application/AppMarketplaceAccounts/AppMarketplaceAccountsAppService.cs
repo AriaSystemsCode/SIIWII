@@ -64,6 +64,7 @@ namespace onetouch.AppMarketplaceAccounts
         private readonly IBinaryObjectManager _binaryObjectManager;
         //I40[Start]
         private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        private readonly IRepository<SycEntityObjectType , long> _sycEntityObjectTypeRepository;
         //I40[End]
 
         public MarketplaceAccountsAppService(
@@ -86,7 +87,8 @@ namespace onetouch.AppMarketplaceAccounts
             , IAccountsAppService iAccountsAppService
             , ICreateMarketplaceAccount iCreateMarketplaceAccount
             , IRepository<AppContact, long> appContactRepository,
-              IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
+              IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
+              IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository
             )
 
         {
@@ -103,7 +105,7 @@ namespace onetouch.AppMarketplaceAccounts
             _appNotifier = appNotifier;
             _binaryObjectManager = binaryObjectManager;
             _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
-
+            _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
         }
         
 
@@ -113,8 +115,15 @@ namespace onetouch.AppMarketplaceAccounts
             {
                 try
                 {
-                    var currentTenantAccountSSIN = _appContactRepository.GetAll().Include(e => e.EntityFk)
-                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null).SSIN;
+                    var currentTenantAccountObj = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                    var currentTenantAccountSSIN = currentTenantAccountObj.SSIN;
+                    var currentTenantAccountType = currentTenantAccountObj.EntityFk.EntityObjectTypeId;
+                    var contactObjectid = await _helper.SystemTables.GetObjectContactId();
+                    var groupAccountEntityObjectTypeId =await _sycEntityObjectTypeRepository.GetAll()
+                        .FirstOrDefaultAsync(z=> z.Code=="GROUP" && z.ObjectId==contactObjectid);
+                    bool excludeGroupAccount = (currentTenantAccountType == groupAccountEntityObjectTypeId.Id);
+
 
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
 
@@ -123,6 +132,7 @@ namespace onetouch.AppMarketplaceAccounts
                             .Include(e => e.EntityClassifications)
                             .Include(e => e.EntityCategories)
                             .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
+                            .WhereIf(excludeGroupAccount, z=> z.EntityObjectTypeId != groupAccountEntityObjectTypeId.Id)
                             .WhereIf(!string.IsNullOrEmpty(input.Filter),
                                 x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
 
