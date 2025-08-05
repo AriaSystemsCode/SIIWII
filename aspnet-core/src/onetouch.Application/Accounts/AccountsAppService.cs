@@ -235,6 +235,10 @@ namespace onetouch.Accounts
         //X527[Start]
         public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
         {
+            //var accountObjectId = await _helper.SystemTables.GetObjectContactId();
+            //var itemListObjectId = await _helper.SystemTables.GetObjectListingId();
+            var entityObjectTypeSoId = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
+            var entityObjectTypePOId = await _helper.SystemTables.GetEntityObjectTypePurchaseOrder();
             var postObjectId = await _helper.SystemTables.GetObjectPostId();
             var eventObjectId = await _helper.SystemTables.GetObjectEventId();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -247,15 +251,38 @@ namespace onetouch.Accounts
                 {
                     long catgImage = await _helper.SystemTables.GetAttachmentCategoryId("IMAGE");
                     long catgVideo = await _helper.SystemTables.GetAttachmentCategoryId("VIDEO");
-                    var entities = from t in _appEntityAttachmentRepository.GetAll().Include(z => z.AttachmentFk)
-                                   .Where(z=>(z.AttachmentCategoryId== catgImage || z.AttachmentCategoryId == catgVideo) &&
-                                   z.EntityFk.TenantId == null || z.EntityFk.TenantId== account.OwnerId ||
+                    /*var entities = _appEntityRepository.GetAll().Include(z => z.EntityAttachments
+                                 .Where(a => a.AttachmentCategoryId == catgImage || a.AttachmentCategoryId == catgVideo)
+                                 ).ThenInclude(z => z.AttachmentFk)
+                        .Where(z => (z.TenantId == null && z.TenantOwner == account.OwnerId && z.EntityAttachments.Count() > 0) ||
+                        ((z.ObjectId == postObjectId || z.ObjectId == eventObjectId) && z.TenantId == account.OwnerId));*/
+
+
+                    var appEntityAttach = _appEntityAttachmentRepository.GetAll().Include(z=>z.EntityFk).Include(z => z.AttachmentFk)
+                                   .Where(z => (z.AttachmentCategoryId == catgImage || z.AttachmentCategoryId == catgVideo) &&
+                                   z.EntityFk.TenantId == null && //(z.EntityFk.TenantId== account.OwnerId ||
                                    z.EntityFk.TenantOwner == account.OwnerId)
-                                   join
-                                  e in _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                        .Where(z => (z.TenantId==null  && z.TenantOwner == account.OwnerId && z.EntityAttachments.Count() > 0) ||
-                        ((z.ObjectId== postObjectId || z.ObjectId== eventObjectId) && z.TenantId== account.OwnerId))
-                        on t.EntityId equals e.Id into j
+                                 .Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
+                                 && z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId && z.EntityFk.EntityAttachments.Count() > 0) ||
+                        ((z.EntityFk.ObjectId == postObjectId || z.EntityFk.ObjectId == eventObjectId) && z.EntityFk.TenantId == account.OwnerId)); 
+                    /*var appEntities = _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                        .Where(z => ((z.ObjectId== itemListObjectId || z.ObjectId== accountObjectId) && z.TenantId == null && z.TenantOwner == account.OwnerId && z.EntityAttachments.Count() > 0) ||
+                        ((z.ObjectId == postObjectId || z.ObjectId == eventObjectId) && z.TenantId == account.OwnerId));*/
+
+                    var entities = from t in appEntityAttach
+                                   //join e in appEntities
+                                   //on t.EntityId equals e.Id into j
+                                   //from j1 in j
+                                   select new AppEntityAttachmentDto()
+                                   {
+                                       Url = "attachments/" + ((t.EntityFk.ObjectId == postObjectId || t.EntityFk.ObjectId == eventObjectId) ? t.EntityFk.TenantId.ToString() : "-1") + "/" + t.AttachmentFk.Attachment,
+                                       DisplayName = t.AttachmentFk.Name,
+                                       AttachmentCategoryId = t.AttachmentCategoryId,
+                                       Id = t.Id,
+                                   };
+
+                      /*var entities = from t in appEntityAttach
+                                   join e in appEntities on t.EntityId equals e.Id into j
                                    from j1 in j
                                    select new AppEntityAttachmentDto()
                                    {
@@ -264,7 +291,7 @@ namespace onetouch.Accounts
                                        AttachmentCategoryId = t.AttachmentCategoryId,
                                        Id = t.Id,
                                        
-                                   };
+                                   };*/
 
                     var pagedAndFilteredAccounts = entities.OrderBy("Id desc").PageBy(input);
                     retrunResult = await pagedAndFilteredAccounts.ToListAsync();
