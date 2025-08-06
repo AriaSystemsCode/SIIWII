@@ -17,11 +17,11 @@ namespace onetouch.AppItems
         Task<ExcelTemplateDto> GetImportVideo();
         Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUp(GetAllAppItemsInput input);
         Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUpWithColors(GetAllAppItemsInput input);
-        Task<AppItemtExcelRecordDTO> GetAppItemForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
-        Task<long> SaveImageToItem(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
-        Task<long> SaveImageToItemColor(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
+        Task<AppItemtExcelRecordDTO> GetAppItemForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
+        Task<long> SaveImageToItem(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
+        Task<long> SaveImageToItemColor(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
         Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllColorsLookUp(GetAllAppEntitiesInput input);
-        Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
+        Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
 
         Task<long> SaveImageToColor(long colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
     }

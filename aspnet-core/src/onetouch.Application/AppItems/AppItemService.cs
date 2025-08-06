@@ -145,7 +145,7 @@ namespace onetouch.AppItems
             foreach (var x in GetAllRet.Items)
             {
 
-                var z = await GetWithColors(new GetAppItemWithPagedAttributesForEditInput() { ItemId = x.AppItem.Id });
+                var z = await GetWithColors( x.AppItem.Id );
                 foreach (var y in z)
                 {
                     lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code + "-" + y.DisplayName.Trim(), Id = y.Id });
@@ -178,9 +178,10 @@ namespace onetouch.AppItems
         }
 
 
-        public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var y = await GetAppItemForEdit(input);
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId= input};
+            var y = await GetAppItemForEdit(xInput);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
             appItemtExcelRecordDTO.ExcelDto.Price = y.AppItem.Price.ToString();
             appItemtExcelRecordDTO.ExcelDto.ProductDescription = y.AppItem.Description;
@@ -290,9 +291,10 @@ namespace onetouch.AppItems
         }
        
         
-        public async Task<List<LookupAccountOrTenantDto>> GetWithColors(GetAppItemWithPagedAttributesForEditInput input)
+        public async Task<List<LookupAccountOrTenantDto>> GetWithColors(long input)
         {
-            var y = await GetAppItemForEdit(input);
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };
+            var y = await GetAppItemForEdit(xInput);
             var result = y.AppItem.VariationItems
                     .SelectMany(variationItem =>
                         variationItem.EntityExtraData
@@ -312,10 +314,10 @@ namespace onetouch.AppItems
             return result;
         }
 
-        public async Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        public async Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-
-            var y = await GetAppItemForEdit(input);
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };
+            var y = await GetAppItemForEdit(xInput);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
             appItemtExcelRecordDTO.ExcelDto.Price = y.AppItem.Price.ToString();
             appItemtExcelRecordDTO.ExcelDto.ProductDescription = y.AppItem.Description;
@@ -431,9 +433,10 @@ namespace onetouch.AppItems
          
          */
 
-        public async Task<long> SaveImageToItem(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        public async Task<long> SaveImageToItem(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var y = await GetAppItemForEdit(input);
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };
+            var y = await GetAppItemForEdit(xInput);
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
             // add the image to the parent
@@ -545,9 +548,10 @@ namespace onetouch.AppItems
 
 
 
-        public async Task<long> SaveImageToItemColor(GetAppItemWithPagedAttributesForEditInput input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        public async Task<long> SaveImageToItemColor(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var y = await GetAppItemForEdit(input);
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };
+            var y = await GetAppItemForEdit(xInput);
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
             // add the image to the parent
