@@ -1098,9 +1098,11 @@ namespace onetouch.Accounts
 
                 accountDto.Classfications = entity.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(resultCount).ToArray();
                 accountDto.ClassificationsTotalCount = entity.EntityClassifications.Count();
-
-                accountDto.Status = (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == account.Id) > 0 || _appContactRepository.GetAll().Count(x => x.Id == account.PartnerId && x.TenantId == null) > 0);
-
+                //I40[Start]
+                //accountDto.Status = (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == account.Id) > 0 || _appContactRepository.GetAll().Count(x => x.Id == account.PartnerId && x.TenantId == null) > 0);
+                accountDto.Status = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN) > 0;
+                // (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == account.Id) > 0 || _appContactRepository.GetAll().Count(x => x.Id == account.PartnerId && x.TenantId == null) > 0);
+                //I40[End]
                 accountDto.Connections = _appContactRepository.GetAll().Count(c => c.TenantId == entity.TenantId && c.PartnerId == id);
                 int ConnectionCount = _appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
 
@@ -1388,7 +1390,7 @@ namespace onetouch.Accounts
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                         .Include(x => x.EntityExtraData)
                         //.Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
-                        .FirstOrDefaultAsync(x => x.OwnerId == tenantId && x.IsProfileData == true && x.ParentId== null );
+                        .FirstOrDefaultAsync(x => x.IsHidden == false && x.OwnerId == tenantId && x.IsProfileData == true && x.ParentId== null );
                
                 originalContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                         .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
@@ -1396,7 +1398,7 @@ namespace onetouch.Accounts
                         .Include(x => x.EntityClassifications)
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 //.Include(x => x.EntityExtraData).Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.IsHidden == false && x.Id == id);
                 GetAccountInfoForEditOutput saveAccountDest = null;
                 if (originalPublishContactFortCurrTenant == null)
                 {
