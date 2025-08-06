@@ -14,9 +14,9 @@ namespace onetouch.Web.Url
 
         public abstract string ServerRootAddressFormatKey { get; }
 
-        public string WebSiteRootAddressFormat => _appConfiguration[WebSiteRootAddressFormatKey] ?? "https://localhost:44315/";
+        public string WebSiteRootAddressFormat => _appConfiguration[WebSiteRootAddressFormatKey] ?? "https://localhost:44316/";
 
-        public string ServerRootAddressFormat => _appConfiguration[ServerRootAddressFormatKey] ?? "https://localhost:44315/";
+        public string ServerRootAddressFormat => _appConfiguration[ServerRootAddressFormatKey] ?? "https://localhost:44316/";
 
         public bool SupportsTenancyNameInUrl
         {

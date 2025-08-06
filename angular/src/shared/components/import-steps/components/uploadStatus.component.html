@@ -50,39 +50,69 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of records">
-                  <td class="sticky-action-col">
+                <tr #rowRef *ngFor="let record of records; let i = index" [attr.data-record-id]="record.id"
+                  [class.disabled-row]="currentActionRecord && record !== currentActionRecord">
+                  <td class="sticky-action-col"
+                    [class.pointer-events-none]="currentActionRecord && record !== currentActionRecord">
                     <div class="dropdown" #dropdownRef>
-                      <span class="pointer dropdownPointer" (click)="toggleMenu(record, $event)"
-                        style="font-size: 20px;">⋮</span>
-                      <ul class="fixed-dropdown-menu drop-up" *ngIf="record.showActions">
+                      <!-- IF not in action mode -->
+                      <span class="pointer dropdownPointer" *ngIf="!record._inAction"
+                        (click)="toggleMenu(record, $event)" style="font-size: 20px;">
+                        ⋮
+                      </span>
+
+                      <!-- IF action mode is active on this row -->
+                      <span *ngIf="record._inAction" class="action-icons d-flex align-items-center">
+                        <i class="text-success pointer mr-2" (click)="confirmLinking(record)">✔️</i>
+                        <i class="text-danger pointer" (click)="cancelLinking(record)">❌</i>
+                      </span>
+
+                      <ul class="fixed-dropdown-menu drop-up"
+                        *ngIf="record.showActions && (!currentActionRecord || currentActionRecord === record)">
                         <ng-container *ngIf="record.recordType !== 'Image'">
-                          <li (click)="validateDataRecord(record)">Validate Data Record</li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">
+                            Validate Data Record
+                          </li>
                         </ng-container>
                         <ng-container *ngIf="record.recordType === 'Image'">
-                          <li (click)="validateDataRecord(record)">Link to existing PARENT ITEM</li>
-                          <li (click)="validateDataRecord(record)">Link to existing ITEM COLOR</li>
-                          <li (click)="validateDataRecord(record)">Link to existing COLOR LOOKUP</li>
-                          <li (click)="validateDataRecord(record)">Create NEW PARENT ITEM and LINK AS DEFAULT IMAGE</li>
-                          <li (click)="validateDataRecord(record)">Create NEW ITEM COLOR and LINK IMAGE AS DEFAULT IMAGE
-                          </li>
-                          <li (click)="validateDataRecord(record)">Create to NEW COLOR LOOKUP and Link IMAGE</li>
-                          <li (click)="validateDataRecord(record)">Link to NEW PARENT ITEM CODE FROM ASSOCIATED DATA
-                          </li>
-                          <li (click)="validateDataRecord(record)">Link to NEW ITEM VARIANT CODE FROM ASSOCIATED DATA
-                          </li>
-                          <li (click)="validateDataRecord(record)">Link to NEW COLOR LOOKUP CODE FROM ASSOCIATED DATA
-                          </li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to existing PARENT
+                            ITEM</li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to existing ITEM
+                            COLOR</li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to existing COLOR
+                            LOOKUP</li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Create NEW PARENT ITEM
+                            and LINK AS DEFAULT IMAGE</li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Create NEW ITEM COLOR and
+                            LINK IMAGE AS DEFAULT IMAGE</li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Create to NEW COLOR
+                            LOOKUP and Link IMAGE</li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to NEW PARENT ITEM
+                            CODE FROM ASSOCIATED DATA </li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to NEW ITEM VARIANT
+                            CODE FROM ASSOCIATED DATA </li>
+                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to NEW COLOR LOOKUP
+                            CODE FROM ASSOCIATED DATA </li>
                         </ng-container>
                       </ul>
                     </div>
                   </td>
 
                   <!-- Dynamic Columns -->
-                  <td *ngFor="let column of uploadStatsColumnsName"
+                  <td *ngFor="let column of uploadStatsColumnsName" #imgPreview #codeCellRef
                     [hidden]="column.showFor && column.showFor !== activeRecordType"
                     [ngClass]="getStatusClass(column.name, getRecordValue(record, mapColumnNameToKey(column.name)))">
                     <ng-container [ngSwitch]="column.name">
+                      <!-- Checkbox for "Image is Default" column -->
+                      <div *ngSwitchCase="'Image is Default'">
+                        <input
+                          type="checkbox"
+                          [checked]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                          [disabled]="!record._inAction"
+                          (change)="setRecordValue(record, mapColumnNameToKey(column.name), $event.target.checked)"
+                        />
+                      </div>
+                      
                       <img *ngSwitchCase="'Image Preview'" [src]="record.previewUrl" width="50" />
 
                       <!-- Text only -->
@@ -98,20 +128,53 @@
                           <li>{{ record.errorMessage || '—' }}</li>
                         </ng-template>
                       </ul>
-                      
+
+                      <div *ngSwitchDefault>
+                        <div *ngIf="column.name === 'Code' && record._isLinkingParent" [attr.data-record-id]="record.id"
+                          class="position-relative" #codeInputContainer>
+                          <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'code')">
+                            Search for Parent Item
+                          </small>
+
+                          <input type="text" class="form-control link-parent-input"
+                            [ngModel]="getRecordValue(record, 'code')"
+                            (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.." #codeInputRef
+                            (focus)="activeRecord = record" />
+
+                          <ul class="search-dropdown bg-white border position-absolute mt-1 w-100 shadow-sm"
+                            *ngIf="activeRecord === record && LinkToExistingITEM_Ret_Data?.items?.length > 0">
+                            <li *ngFor="let item of LinkToExistingITEM_Ret_Data.items"
+                              (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                              {{item.displayName}}
+                            </li>
+                          </ul>
+
+                        </div>
+                      </div>
 
                       <!-- Default input -->
-                      <input *ngSwitchDefault type="text" class="form-control" style="width: fit-content;"
-                        [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                        (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                        [disabled]="activeRecordType === 'Image'" />
-
+                      <ng-container *ngIf="!(column.name === 'Code' && record._isLinkingParent)">
+                        <input *ngSwitchDefault type="text" class="form-control" style="width: fit-content;"
+                          [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                          (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                          [disabled]="activeRecordType === 'Image' && !(column.name === 'Code' && record._isLinkingParent)"
+                          [ngClass]="{  'link-parent-input': column.name === 'Code' && record._isLinkingParent }" />
+                      </ng-container>
 
                       <!-- image input -->
-                      <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
-                        width="60" height="60" style="object-fit: cover; border-radius: 4px;" />
+                      <!-- <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
+                      width="60" height="60" style="object-fit: cover; border-radius: 4px;" /> -->
 
-
+                      <a *ngSwitchCase="'Image Preview'" class="selectImageActive">
+                        <img [src]="getImageSource(record)" class="pointer" #imgRef
+                          (error)="imgRef.style.display = 'none'; fallbackText.style.display = 'inline'" [ngStyle]="{
+                            'object-fit': 'cover',
+                            'border-radius.px': 4,
+                            'width.px': 60,
+                            'height.px': imgPreview?.clientWidth / acceptedAspectRatio
+                          }" />
+                        <span #fallbackText style="display: none;">-</span>
+                      </a>
                     </ng-container>
                   </td>
                 </tr>
@@ -123,7 +186,11 @@
       </div>
 
       <div class="pb-4 pl-5 border-top pt-4 mt-4 text-right mr-4">
-        <button class="Next-Btn" (click)="GoNextstep()">{{ "Next" | localize }}</button>
+        <ng-container *ngIf="isLinkingInProgress() as linking">
+          <button class="Next-Btn" (click)="GoNextstep()" [disabled]="linking" [ngClass]="{ disabled: linking }">
+            {{ "Next" | localize }}
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>

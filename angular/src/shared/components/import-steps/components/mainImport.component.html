@@ -32,6 +32,11 @@
     (close)="askToClose($event)"
     (totalFailedRecords)="ontotalFailedRecords($event)"
     (totalPassedRecords)="ontotalPassedRecords($event)"
+    [imagesList]="imagesList"
+    (searchItemCode)="onsSarchItemCode($event)"
+    (selectSugItemCode)="onSelectSugItemCode($event)"
+    [updatedRecordData]="updatedRecordData"
+    (_linkToExistingITEMRec)="onLinkToExistingITEMRec($event)"
 ></uploadStatusModal>
 <!-- <autoCropModal
     #AutoCropModal
