@@ -97,7 +97,7 @@ namespace onetouch.AppMarketplaceContacts.Dtos
 
         public string AvaliableConnectionName { get; set; }
         public string ConnectionName { get; set; }
-
+		public string DisConnectLabel { get; set; }
         //MMT10
     }
 

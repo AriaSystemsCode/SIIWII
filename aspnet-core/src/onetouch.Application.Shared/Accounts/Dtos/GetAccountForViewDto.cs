@@ -15,6 +15,9 @@
         //MMT10
         public bool IsPublished { get; set; }
         //MMT10
-       
+        //I40[Start]
+        public string DisConnectLabel { get; set; }
+        //I40[End]
+
     }
 }

@@ -477,6 +477,11 @@ namespace onetouch.Accounts
                                 var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
                                 if (relationType != null)
                                 {
+                                    var extrDataDisconnect = relationType.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
+                                    if (extrDataDisconnect != null)
+                                    {
+                                        account.DisConnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
+                                    }
                                     if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                                     {
                                         var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
@@ -1386,6 +1391,7 @@ namespace onetouch.Accounts
                         .AsNoTracking()
                         .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
                         .Include(x => x.EntityCategories)
+                        .Include(x => x.EntityExtraData)
                         .Include(x => x.EntityClassifications)
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                         .Include(x => x.EntityExtraData)
@@ -1395,6 +1401,7 @@ namespace onetouch.Accounts
                 originalContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                         .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
                         .Include(x => x.EntityCategories)
+                        .Include(x => x.EntityExtraData)
                         .Include(x => x.EntityClassifications)
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 //.Include(x => x.EntityExtraData).Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
@@ -1447,7 +1454,15 @@ namespace onetouch.Accounts
                             //createOrEditAccountInfoDto.PartnerId = originalPublishContactFortCurrTenant.Id;
                             createOrEditAccountInfoDto.AccountId = null;
                             createOrEditAccountInfoDto.ParentId = null;
-
+                            
+                            if (createOrEditAccountInfoDto.EntityExtraData != null)
+                            {
+                                foreach (var parentExtrData in createOrEditAccountInfoDto.EntityExtraData)
+                                {
+                                    parentExtrData.Id = 0;
+                                    parentExtrData.EntityId = 0;
+                                }
+                            }
                             saveAccountDest = await CreateOrEditAccount(createOrEditAccountInfoDto);
                             var accountSaved = saveAccountDest;
                             if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
@@ -1520,7 +1535,7 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.UseDTOTenant = true;
                         createOrEditAccountInfoDto.TenantId = tenantId;
                         createOrEditAccountInfoDto.Id = 0;
-                        //createOrEditAccountInfoDto.PartnerId = originalContact.Id;
+                        //createOrEditAccountInfoDto.PartnerId = ori
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenantObj != null)
                         {
@@ -1533,6 +1548,14 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.ContactAddresses = null;
                         createOrEditAccountInfoDto.AccountId = null;
                         createOrEditAccountInfoDto.ParentId = null;
+                        if (createOrEditAccountInfoDto.EntityExtraData != null)
+                        {
+                            foreach (var parentExtrData in createOrEditAccountInfoDto.EntityExtraData)
+                            {
+                                parentExtrData.Id = 0;
+                                parentExtrData.EntityId = 0;
+                            }
+                        }
                         savedAccountSrc = await CreateOrEditAccount(createOrEditAccountInfoDto);
                         var accountSaved = savedAccountSrc;
                         if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
