@@ -2593,7 +2593,9 @@ namespace onetouch.Accounts
                                         }
                                     }
                                     ContactDto savedContactDto = await CreateOrUpdateContact(accountDto);
-                                  //  await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false);
+                                    await PublishProfile();
+                                    await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
+                                    await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false);
                                     //I40[End]
 
                                 }
