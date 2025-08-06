@@ -103,6 +103,16 @@
                     [hidden]="column.showFor && column.showFor !== activeRecordType"
                     [ngClass]="getStatusClass(column.name, getRecordValue(record, mapColumnNameToKey(column.name)))">
                     <ng-container [ngSwitch]="column.name">
+                      <!-- Checkbox for "Image is Default" column -->
+                      <div *ngSwitchCase="'Image is Default'">
+                        <input
+                          type="checkbox"
+                          [checked]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                          [disabled]="!record._inAction"
+                          (change)="setRecordValue(record, mapColumnNameToKey(column.name), $event.target.checked)"
+                        />
+                      </div>
+                      
                       <img *ngSwitchCase="'Image Preview'" [src]="record.previewUrl" width="50" />
 
                       <!-- Text only -->
@@ -125,7 +135,7 @@
                           <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'code')">
                             Search for Parent Item
                           </small>
-                          
+
                           <input type="text" class="form-control link-parent-input"
                             [ngModel]="getRecordValue(record, 'code')"
                             (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.." #codeInputRef

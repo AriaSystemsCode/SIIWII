@@ -905,15 +905,14 @@ export class MainImportComponent
         });
     }
 
-    onLinkToExistingITEMRec(record){
-       //I44 validateImportItemData
+    onLinkToExistingITEMRec(record) {
+        //I44 validateImportItemData
         this.importServiceProxy.validateImportItemData().subscribe((result) => {
             this.updatedRecordData = {
                 record,
                 newData: result
             };
         });
-
     }
 }
 
