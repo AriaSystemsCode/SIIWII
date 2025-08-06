@@ -629,7 +629,7 @@ namespace onetouch.AppItems
                     returnList.Add(returnDto);
                 else
                 {
-                    var appItem = await _appItemRepository.GetAll().Where(z => z.Code == itemExcelDto.Code).FirstOrDefaultAsync();
+                    var appItem = await _appItemRepository.GetAll().Where(z => z.Code == itemExcelDto.Code.Replace(" ", string.Empty)).FirstOrDefaultAsync();
                     if (appItem != null)
                     {
                         appItem.StockAvailability = long.Parse(itemExcelDto.StockAvailable);
