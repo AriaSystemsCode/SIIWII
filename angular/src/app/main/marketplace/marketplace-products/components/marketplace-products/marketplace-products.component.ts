@@ -313,24 +313,31 @@ export class MarketplaceProductsComponent
 
     setCurrency() {
         const currencyCodeRaw = localStorage.getItem("currencyCode");
-    
+        console.log(currencyCodeRaw,'currencyCodeRaw')
         if (!currencyCodeRaw || currencyCodeRaw === "undefined" || currencyCodeRaw === "null") {
             this.selectedCurrrency = this.tenantDefaultCurrency;
         } else {
             try {
                 const parsed = JSON.parse(currencyCodeRaw);
                 this.selectedCurrrency = parsed;
+        console.log(parsed,'parsed')
+
             } catch (e) {
                 // Fallback to string if it's not a JSON object
                 this.selectedCurrrency = currencyCodeRaw;
+        console.log('2222')
+
             }
         }
     
         this.currency = this.selectedCurrrency?.code ?? this.selectedCurrrency;
+        console.log(this.currency,'this.currency')
     
         // If it's just a code (e.g., "AFN"), find matching currency object
         if (!this.selectedCurrrency?.code) {
             const match = this.currencies?.find(x => x.code === this.selectedCurrrency);
+        console.log(match,'match')
+
             if (match) {
                 this.selectedCurrrency = match;
             }

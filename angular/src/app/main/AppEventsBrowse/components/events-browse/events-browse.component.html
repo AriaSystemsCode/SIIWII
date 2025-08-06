@@ -4,7 +4,7 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  [ngClass]="fromOverviewMarketPlaceProfile ? 'p-0':''">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="" [ngClass]="fromOverviewMarketPlaceProfile ? '':'kt-portlet__body'">
-                        <div class="row pt-5" *ngIf="active && items?.length > 0 ">
+                        <div class="row pt-4" *ngIf="active && items?.length > 0 ">
                             <div class="col-12 list-toolbar" 
                             [ngClass]="{ 'border-dashed-bottom pb-4': !fromMarketPlaceProfile }">
 
@@ -107,7 +107,7 @@
                             </div>
                             <div  class="col d-flex flex-column justify-content-between app-items-container thin-scroll" >
                                 <div class="row " [ngClass]="fromOverviewMarketPlaceProfile ? '':'pt-3 pl-5 pr-2'">
-                                    <div *ngFor="let item of items;index as i" class="col-12  " [ngClass]="singleItemPerRowMode || fromMarketPlaceProfile ?'col-md-12 single-item-per-row-layout mb-2' : 'col-md-6 mb-5'">
+                                    <div *ngFor="let item of items;index as i" class="col-12  " [ngClass]="singleItemPerRowMode || fromMarketPlaceProfile ?'col-md-12 single-item-per-row-layout mb-2 px-0' : 'col-md-6 mb-5'">
                                         <app-events-browse-card
                                             [item]="item"
                                             [filterForm]="filterForm"

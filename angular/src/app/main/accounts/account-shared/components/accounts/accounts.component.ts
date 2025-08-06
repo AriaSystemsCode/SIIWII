@@ -407,6 +407,8 @@ export class AccountsComponent
 
 
     createRelation(account) {
+        this.showMainSpinner();
+
         this._accountsServiceProxy
             .applyRelationOnProfile(account.account.id, undefined)
             .pipe(

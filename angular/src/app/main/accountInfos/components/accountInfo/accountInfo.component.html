@@ -5,15 +5,15 @@
                 <div [class]="containerClass">
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
-                            <span [ngSwitch]="accountLevel" class="pageTitle">
-                                <span *ngSwitchCase="accountLevelEnum.Profile">{{l("MyAccount")}}</span>
-                                <span *ngSwitchCase="accountLevelEnum.External">{{l("ExternalAccount")}}</span>
-                                <span *ngSwitchCase="accountLevelEnum.Manual">{{l("ManualAccount")}}</span>
+                            <span  class="pageTitle">
+                                <span *ngIf="isRecordOwner">{{l("MyAccount")}}</span>
+                                <span *ngIf="(accountDataForView?.isConnected) && !isRecordOwner">{{l("ExternalAccount")}}</span>
+                                <span *ngIf="(accountDataForView?.isManual) && !isRecordOwner">{{l("ManualAccount")}}</span>
                             </span>
                         </h3>
                         <span class="kt-subheader__separator kt-subheader__separator--v"></span>
                         <span class="kt-subheader__desc">
-                            <span>{{ accountLevel == accountLevelEnum.Profile ? l('UpdateYourAccountInformation') :
+                            <span>{{ isRecordOwner ? l('UpdateYourAccountInformation') :
                                 l("UpdateAccountInformation") }}</span>
                         </span>
                     </div>
@@ -91,11 +91,11 @@
                                     </div>
                                 </div>
                                 <div *ngIf="viewMode && !isHost">
-                                    <button type="button"
+                                    <!-- <button type="button"
                                         *ngIf="accountDataForView && accountDataForView.status === false && !isHost && !isRecordOwner"
                                         class="btn mb-3 mt-4 w-100 btn-success" (click)="connect()">
                                         {{ "Connect" | localize }}
-                                    </button>
+                                    </button> -->
                                     <button type="button"
                                         *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner"
                                         class="btn mb-3 mt-4 w-100 btn-danger" (click)="disConnect()">
@@ -140,8 +140,9 @@
                                                 {{l("AccountProfile")}}
                                             </span>
                                         </span>
+                                     
                                         <span (click)="triggerProfile($event)"
-                                            *ngIf="(accountId || accountDataForView?.id) && !viewMode && accountDataForView?.accountTypeId != 21">
+                                        *ngIf="(accountId || accountDataForView?.id) && !viewMode && (isRecordOwner && accountDataForView?.accountTypeId != 21)">
                                             <i [title]=" 'EditMode' | localize "
                                                 *ngIf="currentTab != accountInfoPageTabsEnum.ProfileCreateOrEdit"
                                                 class="far fa-edit"></i>
@@ -221,7 +222,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item ml-2"
-                                    *ngIf="accountDataForView?.accountTypeId != 21 && accountLevel == accountLevelEnum.Profile">
+                                    *ngIf="accountDataForView?.accountTypeId != 21 && accountLevel == accountLevelEnum.Profile && isRecordOwner">
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.AccountBilling?'active':''">
 
@@ -520,17 +521,17 @@
     
                                         <div class="col-sm-8">
                                             <p-dropdown
-            id="shipVia"
-            [(ngModel)]="accountInfoTemp.shipViaId"
-            [options]="allShipVia"
-            name="shipVia"
-            styleClass="form-control aria-select"
-            [placeholder]="'PleaseSelect' | localize"
-            optionLabel="label"
-            optionValue="value"
-            (onChange)="changeTouchState()"
-        >
-        </p-dropdown>
+                                                id="shipVia"
+                                                [(ngModel)]="accountInfoTemp.shipViaId"
+                                                [options]="allShipVia"
+                                                name="shipVia"
+                                                styleClass="form-control aria-select"
+                                                [placeholder]="'PleaseSelect' | localize"
+                                                optionLabel="label"
+                                                optionValue="value"
+                                                (onChange)="changeTouchState()"
+                                            >
+                                            </p-dropdown>
     
                                         </div>
                                         </div>
@@ -784,7 +785,7 @@
                                 (changeTouchState)="changeTouchState()"></app-payment-methods-list>
                         </div>
                         <div class="tab4" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.MembersList}">
-                            <app-members-list [accData]="accData"  #memberListComponent (create)="createOrEditMemberHandler()"
+                            <app-members-list [accData]="accountDataForView"  #memberListComponent (create)="createOrEditMemberHandler()"
                                 (view)="viewMemberHandler($event)">
                             </app-members-list>
                         </div>
@@ -797,7 +798,7 @@
                         </div>
                         <div class="tab6"
                             [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.CreateOrEditMember}">
-                            <app-create-or-edit-member [accData]="accData" (createOrEditDone)="onCreateOrEditDoneHandler($event)"
+                            <app-create-or-edit-member [accData]="accountDataForView" (createOrEditDone)="onCreateOrEditDoneHandler($event)"
                                 #createOrEditMember></app-create-or-edit-member>
                         </div>
                         <div class="tab7" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.ViewMember}">

@@ -93,6 +93,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     hideshowShare = false;
     editedPersonalData:any
         allLanguages: LookupLabelDto[];
+        isRecordOwner:boolean
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -108,6 +109,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.initClassificationVariables(true);
             this.getContactSync();
             this.getLanguages()
+            this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
         }
 
     }
@@ -116,6 +118,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
         
+    
     
     }
 
@@ -128,7 +131,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     handleAccountData() {
-        this.accountData.isConnected = this.accountData.status;
         if (this.accountData.isConnected)
             this.showEditConnected = true;
         else

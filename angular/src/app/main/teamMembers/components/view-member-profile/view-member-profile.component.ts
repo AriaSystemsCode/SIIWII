@@ -203,6 +203,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             this.createOrEditUserModal.user.userName=userResult?.user?.userName
             this.createOrEditUserModal.user.emailAddress=userResult?.user?.emailAddress
             this.createOrEditUserModal.user.phoneNumber=userResult?.user?.phoneNumber
+            this.createOrEditUserModal.fromTeamMember=true;
           }
      
  

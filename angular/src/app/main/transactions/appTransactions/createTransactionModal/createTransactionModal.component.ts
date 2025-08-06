@@ -987,7 +987,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
                         localStorage.setItem(
                             "currencyCode",
-                            JSON.stringify(this.currencyCode)
+                            JSON.stringify(this.sellerCurrencyCode)
                         );
                     }
 
