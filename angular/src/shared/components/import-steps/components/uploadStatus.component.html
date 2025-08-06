@@ -122,8 +122,10 @@
                       <div *ngSwitchDefault>
                         <div *ngIf="column.name === 'Code' && record._isLinkingParent" [attr.data-record-id]="record.id"
                           class="position-relative" #codeInputContainer>
-                          <small class="text-danger d-block mb-1"> Search for Parent Item</small>
-
+                          <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'code')">
+                            Search for Parent Item
+                          </small>
+                          
                           <input type="text" class="form-control link-parent-input"
                             [ngModel]="getRecordValue(record, 'code')"
                             (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.." #codeInputRef

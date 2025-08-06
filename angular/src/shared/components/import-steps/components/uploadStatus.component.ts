@@ -37,9 +37,14 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   currentActionRecord: any = null;
   @ViewChildren('codeInputContainer') codeInputContainers!: QueryList<ElementRef>;
   @ViewChildren('rowRef') rowRefs!: QueryList<ElementRef>;
-  @Output() linkToExistingITEM_Data = new EventEmitter<any>();
+  @Output() searchItemCode = new EventEmitter<any>();
   LinkToExistingITEM_Ret_Data;
   activeRecord: any = null;
+  @ViewChild('codeInputRef') codeInputRef!: ElementRef<HTMLInputElement>;
+  @Output() selectSugItemCode = new EventEmitter<any>();
+  @Input() updatedRecordData: any;
+
+  @Output() _linkToExistingITEMRec = new EventEmitter<any>();
 
   public constructor(
     private _importService: MainImportService,
@@ -59,6 +64,18 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.records?.forEach(r => {
       r.showActions = false;
     });
+
+    if (changes['updatedRecordData'] && this.updatedRecordData) {
+      const { record, newData } = this.updatedRecordData;
+      const updatedRec = this.records.find(r => r.id === record.id);
+
+      if (updatedRec) {
+        Object.keys(newData).forEach(key => {
+          this.setRecordValue(updatedRec, key, newData[key]);
+        });
+      }
+    }
+
   }
 
 
@@ -292,7 +309,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   handleAction(record: any, action: string) {
     this.records.forEach(r => r.showActions = false); // Close dropdown
     this.currentActionRecord = record;
-    record._inAction=true;
+    record._inAction = true;
 
     switch (action) {
       case 'Validate Data Record':
@@ -335,7 +352,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   LinkToExistingITEM(record) {
     record._isLinkingParent = true;
-    
+
     // Scroll after DOM updated
     setTimeout(() => {
       const container = this.codeInputContainers.find(
@@ -465,7 +482,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       maxResultCount: 100
     };
 
-    this.linkToExistingITEM_Data.emit(payload);
+    this.searchItemCode.emit(payload);
   }
 
   confirmLinking(record: any): void {
@@ -474,6 +491,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
     record._isLinkingParent = false;
     this.currentActionRecord = null;
+
+    this._linkToExistingITEMRec.emit(record);
+
   }
 
 
@@ -483,9 +503,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       delete record._original;
     }
 
+
+    //I44 coe after cancel not show
     record._isLinkingParent = false;
     this.currentActionRecord = null;
-    record._inAction=false;
+    record._inAction = false;
 
   }
 
@@ -495,8 +517,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   selectSuggestion(record: any, selectedItem: any) {
-    this.setRecordValue(record, 'code', selectedItem.code);
-    this.activeRecord = null;
-  }
+    this.setRecordValue(record, 'code', selectedItem.displayName);
+    setTimeout(() => {
+      this.activeRecord = null;
+    }, 0);
+    this.selectSugItemCode.emit({ selectedItem, record });
 
-}
+  }
+}  

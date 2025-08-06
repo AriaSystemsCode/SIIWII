@@ -24,7 +24,7 @@ import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { Observable } from "rxjs";
 import { ProgressComponent } from "@app/shared/common/progress/progress.component";
 import { ImportTypes } from "../models/ImportTypes";
-import { SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
+import { AppItemsServiceProxy, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
 import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
@@ -116,12 +116,15 @@ export class MainImportComponent
     imImages: boolean = false;
     invalidImport: boolean = false;
     limitImImages = 100;
+    updatedRecordData;
 
     public constructor(
         private _httpClient: HttpClient,
         private _importService: MainImportService,
         private _downloadService: FileDownloadService,
-        private injector: Injector
+        private injector: Injector,
+        //I44 remove _appItemsServiceProxy
+        private _appItemsServiceProxy: AppItemsServiceProxy
     ) {
         super(injector);
     }
@@ -780,11 +783,10 @@ export class MainImportComponent
     }
 
 
-    onLinkToExistingITEM_Data($event) {
-        this.showMainSpinner();
+    onsSarchItemCode($event) {
         this.importServiceProxy
             .getAllLookUp(
-                0,
+                this.appSession.tenantId,
                 0,
                 false,
                 $event.filter,
@@ -807,16 +809,111 @@ export class MainImportComponent
                 "",
                 0,
                 100
-              )
-            .pipe(finalize(() => {
-                this.hideMainSpinner();
-
-            }))
+            )
             .subscribe((result) => {
                 this.StatusModal.LinkToExistingITEM_Ret_Data = result;
             });
 
     }
 
+    onSelectSugItemCode(event: { selectedItem: any, record: any }) {
+        const { selectedItem, record } = event;
+
+        //I44 - getAppItemForEditData
+        this.importServiceProxy.getAppItemForEditData(selectedItem.id,
+            undefined,
+            undefined, undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined, undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined, undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+        ).subscribe((result) => {
+            this.updatedRecordData = {
+                record,
+                newData: result
+            };
+        });
+    }
+
+    onLinkToExistingITEMRec(record){
+       //I44 validateImportItemData
+        this.importServiceProxy.validateImportItemData().subscribe((result) => {
+            this.updatedRecordData = {
+                record,
+                newData: result
+            };
+        });
+
+    }
 }
 
