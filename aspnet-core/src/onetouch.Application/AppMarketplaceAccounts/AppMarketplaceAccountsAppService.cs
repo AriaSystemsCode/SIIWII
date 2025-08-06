@@ -262,6 +262,12 @@ namespace onetouch.AppMarketplaceAccounts
                                 var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
                                 if (relationType != null)
                                 {
+                                    var extrDataDisconnect = relationType.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
+                                    if (extrDataDisconnect != null)
+                                    {
+                                        account.DisConnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
+                                    }
+
                                     if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                                     {
                                         var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
