@@ -24,7 +24,7 @@ import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { Observable } from "rxjs";
 import { ProgressComponent } from "@app/shared/common/progress/progress.component";
 import { ImportTypes } from "../models/ImportTypes";
-import { AppItemsServiceProxy, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
+import { AppItemsServiceProxy, AppItemtExcelRecordDTO, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
 import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
@@ -294,7 +294,7 @@ export class MainImportComponent
             return;
         }
 
-        if (!this.invalidImport) {
+        if (!this.invalidImport && this.imData) {
             this.uploader.onSuccessItem = (item, response, status) => {
                 const ajaxResponse = <IAjaxResponse>JSON.parse(response);
                 if (ajaxResponse?.success) {
@@ -354,9 +354,50 @@ export class MainImportComponent
                 this.progress = 100;
             };
         }
+
+
+        if (!this.invalidImport && !this.imData) {
+            setTimeout(() => {
+                this.CheckRatio();
+            }, 0);
+
+            this.ProgressModal.hide();
+            this.spinnerService.show();
+            this.importServiceProxy
+                .validateExcel(this._guid, this.imagesName)
+                .pipe(finalize(() => this.spinnerService.hide()))
+                .subscribe((result) => {
+                    this.logFileUrl =
+                        result?.excelLogDTO?.excelLogPath;
+                    this.logFileName =
+                        result?.excelLogDTO?.excelLogFileName;
+                    if (!isEmpty(result?.errorMessage)) {
+                        Swal.fire(
+                            " ",
+                            result?.errorMessage,
+                            "error"
+                        );
+                    } else {
+                        this.uploadingResult = result;
+                        this.goNext();
+                        if (this.hasImages) {
+                            let ret = this.serviceUtilitesProxy.checkImagesExistance(result, this.imagesList, this.sycAttachmentCategory);
+                            this.imagePassed = ret.imagePassed;
+                            this.imageFailed = ret.imageFailed;
+                            this.failedImagesIndex = ret.failedImagesIndex;
+                        }
+                    }
+                });
+
+            this.folder_details = true;
+            this.ProgressModal.show();
+            this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
+            this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+            this.folder_details = false;
+            this.progress = 100;
+        }
+
     }
-
-
 
     ontotalFailedRecords($event) {
         this.totalFailedRecords = $event;
@@ -816,103 +857,89 @@ export class MainImportComponent
 
     }
 
-    onSelectSugItemCode(event: { selectedItem: any, record: any }) {
+    onSelectSugItemCode(event: { selectedItem: any, record: AppItemtExcelRecordDTO }) {
         const { selectedItem, record } = event;
-
+     
+        
         //I44 - getAppItemForEditData
-        this.importServiceProxy.getAppItemForEditData(selectedItem.id,
-            undefined,
-            undefined, undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined, undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined, undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined
-        ).subscribe((result) => {
-            this.updatedRecordData = {
-                record,
-                newData: result
-            };
-        });
+        this._appItemsServiceProxy.getAppItemForEditData(
+            selectedItem.id,
+            record.recordType,
+            record.parentCode,
+            record.code,
+            record.name,
+            record.fieldsErrors,
+            record.excelDto?.actions,
+            record.excelDto?.imagePreview,
+            record.excelDto?.imageIsDefault,
+            record.excelDto?.colorCode,
+            record.excelDto?.colorName,
+            record.excelDto?.colorHex,
+            record.excelDto?.colorImage,
+            record.excelDto?.colorSchema,
+            record.excelDto?.colorNRF,
+            record.excelDto?.sizeName,
+            record.excelDto?.sizeScaleOrder,
+            record.excelDto?.sizeMarket,
+            record.excelDto?.sizeNRF,
+            record.excelDto?.materialContent,
+            record.excelDto?.soldOutDate,
+            record.excelDto?.brancdCode,
+            record.excelDto?.brandName,
+            record.excelDto?.startShipDate,
+            record.excelDto?.id,
+            record.excelDto?.rowNumber,
+            record.excelDto?.recordType,
+            record.excelDto?.productType,
+            record.excelDto?.productClassificationCode,
+            record.excelDto?.productClassificationDescription,
+            record.excelDto?.productCategoryCode,
+            record.excelDto?.productCategoryDescription,
+            record.excelDto?.price,
+            record.excelDto?.priceA,
+            record.excelDto?.priceB,
+            record.excelDto?.priceC,
+            record.excelDto?.priceD,
+            record.excelDto?.currency,
+            record.excelDto?.parentCode,
+            record.excelDto?.imageType,
+            record.excelDto?.imageFolderName,
+            record.excelDto?.parentId,
+            record.excelDto?.extraAttributesValues,
+            record.excelDto?.extraAttributes,
+            record.excelDto?.images,
+            record.excelDto?.code,
+            record.excelDto?.name,
+            record.excelDto?.productDescription,
+            record.excelDto?.entityObjectClassificaionID,
+            record.excelDto?.entityObjectCategoryID,
+            record.excelDto?.sizeScaleName,
+            record.excelDto?.sizeRatioName,
+            record.excelDto?.sizeRatioValue,
+            record.excelDto?.noOfDim,
+            record.excelDto?.d1Name,
+            record.excelDto?.d2Name,
+            record.excelDto?.d3Name,
+            record.excelDto?.d1Sizes,
+            record.excelDto?.d2Sizes,
+            record.excelDto?.d3Sizes,
+            record.excelDto?.d1Pos,
+            record.excelDto?.d2Pos,
+            record.excelDto?.d3Pos,
+            record.excelDto?.sizeCode,
+            record.status,
+            record.errorMessage,
+            record.imageType,
+            record.image
+          )
+          
+            .subscribe((result) => {
+                this.updatedRecordData = {
+                    record,
+                    newData: result
+                };
+            });
     }
-
-    onLinkToExistingITEMRec(record) {
-        //I44 validateImportItemData
-        this.importServiceProxy.validateImportItemData().subscribe((result) => {
-            this.updatedRecordData = {
-                record,
-                newData: result
-            };
-        });
-    }
+    
 }
 

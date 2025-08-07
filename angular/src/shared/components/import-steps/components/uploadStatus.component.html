@@ -13,7 +13,7 @@
         <h5 class="modal-title"> {{ (ImportTypes[importType] + " Upload Status") | localize }} </h5>
       </div>
 
-      <div class="border-bottom">
+      <div class="border-bottom" *ngIf="hasDataRecords">
         <div class="row pl-3 pr-3 pb-4">
           <div class="col-4 pt-4">
             <h6>
@@ -28,13 +28,14 @@
       </div>
 
       <div class="modal-body p-0 pl-4 uploadStatusContainer">
-        <ng-container *ngIf="uploadingResult">
+        <ng-container *ngIf="records?.length > 0; else noData">
 
           <!-- Tabs -->
           <ul class="tabs no-gutters">
             <li [class.active]="activeRecordType === 'Image'" (click)="switchTab('Image')"
-              class="col-6 text-center py-2">Image Records</li>
-            <li [class.active]="activeRecordType === 'Data'" (click)="switchTab('Data')" class="col-6 text-center py-2">
+              class="col-6 text-center py-2" *ngIf="hasImageRecords">Image Records</li>
+            <li [class.active]="activeRecordType === 'Data'" (click)="switchTab('Data')" class="col-6 text-center py-2"
+              *ngIf="hasDataRecords">
               Data Records</li>
           </ul>
 
@@ -42,8 +43,8 @@
             <table class="browser-table min-width-table" style="min-width: 1000px;">
               <thead>
                 <tr>
-                  <th class="sticky-action-col">Actions</th>
-                  <th *ngFor="let column of uploadStatsColumnsName"
+                  <th class="sticky-action-col sticky-header">Actions</th>
+                  <th *ngFor="let column of uploadStatsColumnsName" class="sticky-header"
                     [hidden]="column.showFor && column.showFor !== activeRecordType">
                     {{ column.name }}
                   </th>
@@ -51,6 +52,7 @@
               </thead>
               <tbody>
                 <tr #rowRef *ngFor="let record of records; let i = index" [attr.data-record-id]="record.id"
+                  [class.in-action]="record._inAction" [class.active-record]="activeRecord === record"
                   [class.disabled-row]="currentActionRecord && record !== currentActionRecord">
                   <td class="sticky-action-col"
                     [class.pointer-events-none]="currentActionRecord && record !== currentActionRecord">
@@ -70,31 +72,46 @@
                       <ul class="fixed-dropdown-menu drop-up"
                         *ngIf="record.showActions && (!currentActionRecord || currentActionRecord === record)">
                         <ng-container *ngIf="record.recordType !== 'Image'">
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">
+                          <li (click)="handleAction(record, UploadActionEnum.ValidateDataRecord)">
                             Validate Data Record
                           </li>
                         </ng-container>
+
                         <ng-container *ngIf="record.recordType === 'Image'">
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to existing PARENT
-                            ITEM</li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to existing ITEM
-                            COLOR</li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to existing COLOR
-                            LOOKUP</li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Create NEW PARENT ITEM
-                            and LINK AS DEFAULT IMAGE</li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Create NEW ITEM COLOR and
-                            LINK IMAGE AS DEFAULT IMAGE</li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Create to NEW COLOR
-                            LOOKUP and Link IMAGE</li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to NEW PARENT ITEM
-                            CODE FROM ASSOCIATED DATA </li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to NEW ITEM VARIANT
-                            CODE FROM ASSOCIATED DATA </li>
-                          <li (click)="handleAction(record, $event.target.textContent.trim())">Link to NEW COLOR LOOKUP
-                            CODE FROM ASSOCIATED DATA </li>
+                          <li (click)="handleAction(record, UploadActionEnum.LinkToExistingParentItem)">
+                            Link to existing PARENT ITEM
+                          </li>
+                          <li (click)="handleAction(record, UploadActionEnum.LinkToExistingItemColor)">
+                            Link to existing ITEM COLOR
+                          </li>
+                          <li (click)="handleAction(record, UploadActionEnum.LinkToExistingColorLookup)">
+                            Link to existing COLOR LOOKUP
+                          </li>
+                          <li (click)="handleAction(record, UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage)">
+                            Create NEW PARENT ITEM and LINK AS DEFAULT IMAGE
+                          </li>
+                          <li
+                            (click)="handleAction(record, UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage)">
+                            Create NEW ITEM COLOR and LINK IMAGE AS DEFAULT IMAGE
+                          </li>
+                          <li (click)="handleAction(record, UploadActionEnum.CreateNewColorLookupAndLinkImage)">
+                            Create to NEW COLOR LOOKUP and Link IMAGE
+                          </li>
+                          <li
+                            (click)="handleAction(record, UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData)">
+                            Link to NEW PARENT ITEM CODE FROM ASSOCIATED DATA
+                          </li>
+                          <li
+                            (click)="handleAction(record, UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData)">
+                            Link to NEW ITEM VARIANT CODE FROM ASSOCIATED DATA
+                          </li>
+                          <li
+                            (click)="handleAction(record, UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData)">
+                            Link to NEW COLOR LOOKUP CODE FROM ASSOCIATED DATA
+                          </li>
                         </ng-container>
                       </ul>
+
                     </div>
                   </td>
 
@@ -105,14 +122,11 @@
                     <ng-container [ngSwitch]="column.name">
                       <!-- Checkbox for "Image is Default" column -->
                       <div *ngSwitchCase="'Image is Default'">
-                        <input
-                          type="checkbox"
-                          [checked]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                        <input type="checkbox" [checked]="getRecordValue(record, mapColumnNameToKey(column.name))"
                           [disabled]="!record._inAction"
-                          (change)="setRecordValue(record, mapColumnNameToKey(column.name), $event.target.checked)"
-                        />
+                          (change)="setRecordValue(record, mapColumnNameToKey(column.name), $event.target.checked)" />
                       </div>
-                      
+
                       <img *ngSwitchCase="'Image Preview'" [src]="record.previewUrl" width="50" />
 
                       <!-- Text only -->
@@ -153,13 +167,15 @@
                       </div>
 
                       <!-- Default input -->
-                      <ng-container *ngIf="!(column.name === 'Code' && record._isLinkingParent)">
+                      <ng-container>
                         <input *ngSwitchDefault type="text" class="form-control" style="width: fit-content;"
                           [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
                           (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                          [disabled]="activeRecordType === 'Image' && !(column.name === 'Code' && record._isLinkingParent)"
-                          [ngClass]="{  'link-parent-input': column.name === 'Code' && record._isLinkingParent }" />
+                          [disabled]=" !(column.name === 'Code' && record._isLinkingParent)" [ngClass]="{
+                            'link-parent-input': column.name === 'Code' && record._isLinkingParent
+                          }" [hidden]="column.name === 'Code' && record._isLinkingParent" />
                       </ng-container>
+
 
                       <!-- image input -->
                       <!-- <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
@@ -183,14 +199,26 @@
           </div>
 
         </ng-container>
+
+        <ng-template #noData>
+          <div class="text-center text-muted py-5">
+            {{ "No records to display." | localize }}
+          </div>
+        </ng-template>
+
       </div>
 
       <div class="pb-4 pl-5 border-top pt-4 mt-4 text-right mr-4">
-        <ng-container *ngIf="isLinkingInProgress() as linking">
-          <button class="Next-Btn" (click)="GoNextstep()" [disabled]="linking" [ngClass]="{ disabled: linking }">
+        <ng-container *ngIf="!isActionInProgress(); else disableBtn">
+          <button class="Next-Btn" (click)="GoNextstep()">
             {{ "Next" | localize }}
           </button>
         </ng-container>
+        <ng-template #disableBtn>
+          <button class="Next-Btn disabled" disabled>
+            {{ "Next" | localize }}
+          </button>
+        </ng-template>
       </div>
     </div>
   </div>
