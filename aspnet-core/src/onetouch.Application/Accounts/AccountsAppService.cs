@@ -2539,7 +2539,10 @@ namespace onetouch.Accounts
                         {
                             if (AbpSession.TenantId != null && AbpSession.TenantId != 0)
                             {
-                                var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
+                                var account = _appContactRepository.GetAll().Include(z=>z.EntityFk)
+                                    .Include(x => x.EntityFk.EntityExtraData)
+                                    .Include(x => x.EntityFk.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                    .FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                                 if (account != null)
                                 {
                                     //I40[Start]
@@ -2565,15 +2568,25 @@ namespace onetouch.Accounts
                                     //    await ApplyPersonalExtraData(contactDto);
                                     //}
                                     CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
-                                    accountDto.Id = 0;
-                                    //accountDto.Code = System.Guid.NewGuid().ToString();
-                                    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("MANUALACCOUNTCONTACT");
-                                    accountDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
-                                    accountDto.Name = adminUser.Name + " " + adminUser.Surname;
-                                    accountDto.TradeName = "";
-                                    accountDto.EMailAddress = adminUser.EmailAddress;
-                                    accountDto.ReturnId = true;
-                                    accountDto.AccountLevel = AccountLevelEnum.Manual;
+                                    //I40[Start]
+                                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                                    if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                                    {
+                                        accountDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(account);
+                                    }
+                                    else
+                                    {
+                                        //I40[End]
+                                        accountDto.Id = 0;
+                                        //accountDto.Code = System.Guid.NewGuid().ToString();
+                                        string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("MANUALACCOUNTCONTACT");
+                                        accountDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
+                                        accountDto.Name = adminUser.Name + " " + adminUser.Surname;
+                                        accountDto.TradeName = "";
+                                        accountDto.EMailAddress = adminUser.EmailAddress;
+                                        accountDto.ReturnId = true;
+                                        accountDto.AccountLevel = AccountLevelEnum.Manual;
+                                    }
                                     accountDto.EntityExtraData = new List<AppEntityExtraDataDto>();
                                     var entityObjectType = await _sycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode("PERSONAL");
                                     if (entityObjectType != null && entityObjectType.Count > 0)
@@ -2617,10 +2630,19 @@ namespace onetouch.Accounts
                                             }
                                         }
                                     }
-                                    ContactDto savedContactDto = await CreateOrUpdateContact(accountDto);
-                                    await PublishProfile();
-                                    await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
-                                    await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false);
+                                    if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                                    {
+                                        await Update(accountDto);
+                                       // await PublishProfile();
+                                        //await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
+                                    }
+                                    else
+                                    {
+                                        ContactDto savedContactDto = await CreateOrUpdateContact(accountDto);
+                                        await PublishProfile();
+                                        await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false);
+                                    }
                                     //I40[End]
 
                                 }
