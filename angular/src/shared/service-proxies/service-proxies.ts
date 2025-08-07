@@ -92439,6 +92439,7 @@ export class CreateOrEditMarketplaceAccountInfoDto implements ICreateOrEditMarke
     branches!: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses!: AppMarketplaceContactAddressDto[] | undefined;
     contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
+    entityExtraData!: AppEntityExtraDataDto[] | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -92517,6 +92518,11 @@ export class CreateOrEditMarketplaceAccountInfoDto implements ICreateOrEditMarke
                 for (let item of _data["contactPaymentMethods"])
                     this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
             }
+            if (Array.isArray(_data["entityExtraData"])) {
+                this.entityExtraData = [] as any;
+                for (let item of _data["entityExtraData"])
+                    this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
             this.id = _data["id"];
         }
     }
@@ -92593,6 +92599,11 @@ export class CreateOrEditMarketplaceAccountInfoDto implements ICreateOrEditMarke
             for (let item of this.contactPaymentMethods)
                 data["contactPaymentMethods"].push(item.toJSON());
         }
+        if (Array.isArray(this.entityExtraData)) {
+            data["entityExtraData"] = [];
+            for (let item of this.entityExtraData)
+                data["entityExtraData"].push(item.toJSON());
+        }
         data["id"] = this.id;
         return data;
     }
@@ -92634,6 +92645,7 @@ export interface ICreateOrEditMarketplaceAccountInfoDto {
     branches: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses: AppMarketplaceContactAddressDto[] | undefined;
     contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
+    entityExtraData: AppEntityExtraDataDto[] | undefined;
     id: number | undefined;
 
     [key: string]: any;
