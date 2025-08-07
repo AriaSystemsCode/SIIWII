@@ -22,7 +22,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Input('contactData') contactData: AccountDto;
     
     @Input('isPublished') isPublished: boolean;
-    isSync: boolean;
+    @Input('isSync') isSync: boolean;
+
     @Input('connectionCount') connectionCount: number;
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
@@ -30,6 +31,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     @Output("edit") edit: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("editedData") editedData: EventEmitter<any> = new EventEmitter<any>()
+    @Output("editedContactData") editedContactData: EventEmitter<any> = new EventEmitter<any>()
     @Output("delete") delete: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("publish") publish: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("unPublish") unPublish: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -88,7 +90,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     showHide = true;
     hidUshare = false;
-    showIsSync = false;
+    // showIsSync = false;
     showShare = true;
     hideshowShare = false;
     editedPersonalData:any
@@ -107,7 +109,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.handleAccountData()
             this.initDepartmentVariables(true);
             this.initClassificationVariables(true);
-            this.getContactSync();
+            // this.getContactSync();
             this.getLanguages()
             this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
         }
@@ -178,14 +180,14 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
               this.editedPersonalData.jobTitle = this.editJobTitleValue;
               this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
               this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
-            
+              this.contactData.languageName = this.editedPersonalData.languageName;
+              this.editedContactData.emit(this.contactData)
+              this.editedData.emit(this.editedPersonalData);
               this.editInfo = true;
               this.NoteditInfo = false;
               this.Editting = false;
-            
-              this.editedData.emit(this.editedPersonalData);
-              this.contactData.languageName = this.editedPersonalData.languageName;
-
+              this.editPersonal = false;
+           
 
         }
 
@@ -372,9 +374,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             )).subscribe(
                 (response: boolean) => {
                     this.notify.success(this.l("Account sync Successfully"));
-                    this.showIsSync = !response;
+                    // this.showIsSync = !response;
+                    // this.isSync = !response;
                     this.isSync = !response;
-                    this.accountData.isSync = !response;
                     
                 });
 
@@ -396,13 +398,13 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
 
-    getContactSync() {
-        this._AccountsServiceProxy.getContactSync(this.accountData.id)
-            .subscribe((res: boolean) => {
-                this.isSync = res;
-            });
+    // getContactSync() {
+    //     this._AccountsServiceProxy.getContactSync(this.accountData.id)
+    //         .subscribe((res: boolean) => {
+    //             this.isSync = res;
+    //         });
 
-    }
+    // }
 
     isNotManualLevel(): boolean {
      
