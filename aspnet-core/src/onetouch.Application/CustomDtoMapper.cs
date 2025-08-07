@@ -420,6 +420,9 @@ namespace onetouch
                 .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
                 .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
                 .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses))
+                .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments ))
+                .ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories))
+                .ForMember(d => d.EntityClassifications, s => s.MapFrom(ss => ss.EntityFk.EntityClassifications))
                 ;
 
             //AppMarketplaceContact

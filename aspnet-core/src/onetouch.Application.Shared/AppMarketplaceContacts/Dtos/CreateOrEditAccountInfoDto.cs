@@ -9,6 +9,7 @@ using onetouch.AppContacts.Dtos;
 using onetouch.AppContacts;
 using onetouch.AccountInfos.Dtos;
 using onetouch.AppMarketplaceContacts.Dtos;
+using onetouch.AppItems.Dtos;
 
 namespace onetouch.AppMarketplaceContacts.Dtos
 {
@@ -110,6 +111,9 @@ namespace onetouch.AppMarketplaceContacts.Dtos
         public virtual IList<AppMarketplaceContactAddressDto> ContactAddresses { get; set; }
 
         public virtual IList<AppContactPaymentMethodDto> ContactPaymentMethods { get; set; }
+        //I40[Start]
+        public virtual IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
+        //I40[End]
 
     }
 }

@@ -2542,6 +2542,8 @@ namespace onetouch.Accounts
                                 var account = _appContactRepository.GetAll().Include(z=>z.EntityFk)
                                     .Include(x => x.EntityFk.EntityExtraData)
                                     .Include(x => x.EntityFk.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                    .Include(x=>x.EntityFk).ThenInclude(z=>z.EntityClassifications)
+                                    .Include(x => x.EntityFk).ThenInclude(z => z.EntityCategories)
                                     .FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                                 if (account != null)
                                 {
@@ -2721,7 +2723,12 @@ namespace onetouch.Accounts
             {
                 //T-SII-20230207.0001,1 MMT 03/14/2023 When click on "Publish" button in Account profile page , The value of "IsPublished" not update[Start]
                 //var contact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true);
-                var contact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
+                var contact = await _appContactRepository.GetAll().AsNoTracking()
+                    .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
+                    .Include(x=>x.EntityFk).ThenInclude(x=>x.EntityExtraData)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                     .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.AccountId == null);
                 //T-SII-20230207.0001,1 MMT 03/14/2023 When click on "Publish" button in Account profile page , The value of "IsPublished" not update[End]
                 if (contact != null)
