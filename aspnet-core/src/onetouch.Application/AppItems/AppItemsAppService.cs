@@ -5536,9 +5536,9 @@ namespace onetouch.AppItems
                 appItemExcelRecordDto.ExcelDto.ProductType = "UnAssigned";
 
                 appItemExcelRecordDto.ExcelDto.ProductDescription = " ";
-                appItemExcelRecordDto.ExcelDto.Name = " ";
-                appItemExcelRecordDto.ExcelDto.Code = " ";
-                appItemExcelRecordDto.ExcelDto.ParentCode = " ";
+                appItemExcelRecordDto.ExcelDto.Name = "-";
+                appItemExcelRecordDto.ExcelDto.Code = "-";
+                appItemExcelRecordDto.ExcelDto.ParentCode = "-";
                 appItemExcelRecordDto.ExcelDto.ParentId = 0;
 
 
