@@ -63004,6 +63004,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     appEntityName!: string | undefined;
     isSync!: boolean;
     isPublished!: boolean;
+    disConnectLabel!: string | undefined;
 
     [key: string]: any;
 
@@ -63030,6 +63031,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             this.appEntityName = _data["appEntityName"];
             this.isSync = _data["isSync"];
             this.isPublished = _data["isPublished"];
+            this.disConnectLabel = _data["disConnectLabel"];
         }
     }
 
@@ -63054,6 +63056,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
         data["appEntityName"] = this.appEntityName;
         data["isSync"] = this.isSync;
         data["isPublished"] = this.isPublished;
+        data["disConnectLabel"] = this.disConnectLabel;
         return data;
     }
 }
@@ -63067,6 +63070,7 @@ export interface IGetAccountForViewDto {
     appEntityName: string | undefined;
     isSync: boolean;
     isPublished: boolean;
+    disConnectLabel: string | undefined;
 
     [key: string]: any;
 }
@@ -97242,6 +97246,7 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
     allowedAction!: string | undefined;
     avaliableConnectionName!: string | undefined;
     connectionName!: string | undefined;
+    disConnectLabel!: string | undefined;
 
     [key: string]: any;
 
@@ -97266,6 +97271,7 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
             this.allowedAction = _data["allowedAction"];
             this.avaliableConnectionName = _data["avaliableConnectionName"];
             this.connectionName = _data["connectionName"];
+            this.disConnectLabel = _data["disConnectLabel"];
         }
     }
 
@@ -97288,6 +97294,7 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
         data["allowedAction"] = this.allowedAction;
         data["avaliableConnectionName"] = this.avaliableConnectionName;
         data["connectionName"] = this.connectionName;
+        data["disConnectLabel"] = this.disConnectLabel;
         return data;
     }
 }
@@ -97299,6 +97306,7 @@ export interface IGetMarketplaceAccountForViewDto {
     allowedAction: string | undefined;
     avaliableConnectionName: string | undefined;
     connectionName: string | undefined;
+    disConnectLabel: string | undefined;
 
     [key: string]: any;
 }
