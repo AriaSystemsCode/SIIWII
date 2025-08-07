@@ -416,7 +416,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         }
     
                         else
-                            this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact,false);
+                            this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact);
                     }
                 });
             }
@@ -669,66 +669,67 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     }
 
-    onChangeContact(event: any,stop=true) {
-       
-        console.log(event, 'Incoming Event Data');
-        console.log(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType, 'Previous Phone Type');
-    
-        if (this.tempContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
-            this.tempContact = false;
-            this.contactFilterValue = "";
-        }
-    
-        // Reset contact details
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-        // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
-    
-        if (event) {
-            // Assign new contact details
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName = event.name;
-            this.allPhoneTypes = event?.phoneList ;
-    if(stop){
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone || "";
-    }
-         
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = event?.phone || "";
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId = event?.phoneTypeId || "";
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = event?.phoneTypeName || "";
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = event?.email || "";
-    
-            // ✅ Ensure selected phone type is assigned correctly
-            if (event?.phoneList?.length > 0) {
-                let matchedPhoneType = event.phoneList.find(p => p.phoneNumber === event.phone);
-    
-                if (!matchedPhoneType) {
-                    // Try to keep the previous selection if it's still valid
-                    const prevPhoneType = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType;
-                    
-                    if (prevPhoneType && event.phoneList.some(p => p.phoneTypeId === prevPhoneType.phoneTypeId)) {
-                        matchedPhoneType = event.phoneList.find(p => p.phoneTypeId === prevPhoneType.phoneTypeId);
-                    } 
-                }
-    
-                // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = matchedPhoneType;
-            }
-        } else {
-            // Reset selection if event is null
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-        }
-    
-        // Assign selected phone type value (for UI binding)
+    onChangeContact(event:any) {
+   
 
+  
+          if (this.tempContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
+              this.tempContact = false;
+              this.contactFilterValue = "";
+          }
+      
+          // Reset contact details
+          // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
+          // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
+          // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
+      
+          if (event) {
+              // Assign new contact details
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
 
-        this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
-    // }
-        this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId || null;
-        this.isValidForm();
-    }
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName = event.name;
+              this.allPhoneTypes = event?.phoneList ;
+      if(stop){
+          this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = event?.phone || "";
+      }
+           
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = event?.phone || "";
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeId = event?.phoneTypeId || "";
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneTypeName = event?.phoneTypeName || "";
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = event?.email || "";
+      
+              // ✅ Ensure selected phone type is assigned correctly
+              if (event?.phoneList?.length > 0) {
+                  let matchedPhoneType = event.phoneList.find(p => p.phoneNumber === event.phone);
+      
+                  if (!matchedPhoneType) {
+                      // Try to keep the previous selection if it's still valid
+                      const prevPhoneType = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType;
+                      
+                      if (prevPhoneType && event.phoneList.some(p => p.phoneTypeId === prevPhoneType.phoneTypeId)) {
+                          matchedPhoneType = event.phoneList.find(p => p.phoneTypeId === prevPhoneType.phoneTypeId);
+                      } 
+                  }
+      
+                  // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = matchedPhoneType;
+              }
+          } else {
+              // Reset selection if event is null
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
+              this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
+          }
+      
+          // Assign selected phone type value (for UI binding)
+  
+  
+          this.onchangePhoneType(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType);
+      // }
+          this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId || null;
+          this.isValidForm();
+      }
+      
     
     
 

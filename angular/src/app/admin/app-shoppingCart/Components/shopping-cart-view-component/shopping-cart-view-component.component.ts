@@ -583,7 +583,7 @@ loadCommentsList() {
 this.temp=temp;
     this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, Intl.DateTimeFormat().resolvedOptions().timeZone,undefined, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, Intl.DateTimeFormat().resolvedOptions().timeZone,undefined, undefined, 0, 10, this.transactionPosition.Current,)
     .pipe(finalize(() => {
 this.hideMainSpinner();
     }))
@@ -1136,8 +1136,8 @@ onEditPrice(rowNode) {
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0,undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
-      .subscribe((res: GetAppTransactionsForViewDto) => {
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined,  false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
+    .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
         // this.onGeneratOrderReport(true,undefined,false,true);
@@ -1202,12 +1202,7 @@ onEditPrice(rowNode) {
       });
   }
   isOrderConfirmationNeedsReprint(): void {
-    this.saveDates()
-    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-    .subscribe((res) => {
-      if (res) {
-        this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
         .subscribe((res) => {
             if (res == true) {
                 this.regenrate = true;
@@ -1222,11 +1217,7 @@ onEditPrice(rowNode) {
               this.mainLoad = true
             }
         });
-      }
-    });
-  }
-  
-
+}
 stopReport(event) {
 
   if (event) {
@@ -1257,7 +1248,17 @@ stopReport(event) {
     // }).then((result) => {
     //   if (result.isConfirmed) {
         this.showMainSpinner();
-       this.saveDates()
+              let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
+                let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
+                let availableDate =  moment(this.appTransactionsForViewDto?.availableDate).toDate();
+                let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
+            
+            
+            
+                this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
+                this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
@@ -1359,7 +1360,7 @@ stopReport(event) {
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, 0, 10,transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined,Intl.DateTimeFormat().resolvedOptions().timeZone,undefined,undefined, 0, 10,transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
 
@@ -1443,38 +1444,30 @@ stopReport(event) {
   printTransaction() {
     // var page = window.open(this._transactionFormPath);
     // page.print();
-    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .subscribe((res) => {
-        if (res) {
-          this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    .subscribe((res) => {
+        if (res == true) {
+
+          this.showMainSpinner()
+          this.onGeneratOrderReport(true,undefined,true,false,true)
+        
+
+        }  else {
+            this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
+          .pipe(
+              finalize(() => {
+       
+              })
+          )
           .subscribe((res) => {
-              if (res == true) {
-      
-                this.showMainSpinner()
-                this.onGeneratOrderReport(true,undefined,true,false,true)
-              
-      
-              }  else {
-                  this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
-                .pipe(
-                    finalize(() => {
-             
-                    })
-                )
-                .subscribe((res) => {
-                  var page = window.open(res);
-                  page.print();
-                }
-                 
-                );
-         
-              }
-          });
+            var page = window.open(res);
+            page.print();
+          }
+           
+          );
+   
         }
-      });
-
-
+    });
 
   }
 
@@ -1597,16 +1590,4 @@ stopReport(event) {
 }
 
 
-
-saveDates(){
-  let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
-  let startDate = moment(this.appTransactionsForViewDto?.startDate).toDate();
-  let availableDate = moment(this.appTransactionsForViewDto?.availableDate).toDate();
-  let completeDate = moment(this.appTransactionsForViewDto?.completeDate).toDate();
-
-  this.appTransactionsForViewDto.enteredDate = moment.utc(moment(enteredDate).format('YYYY-MM-DD'));
-  this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
-  this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
-  this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
-}
 }

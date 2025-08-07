@@ -2249,7 +2249,7 @@ namespace onetouch.AppItems
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
-            if (input.Id==0 && entity.TenantOwner!=null && entity.TenantOwner != 0)
+            if (input.Id==0 && entity.TenantOwner!= null && entity.TenantOwner != 0)
             {
                 entity.AttachmentSourceTenantId = -1;
             }
