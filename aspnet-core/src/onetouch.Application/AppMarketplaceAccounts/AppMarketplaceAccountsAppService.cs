@@ -43,6 +43,8 @@ using onetouch.AppMarketplaceItems;
 using onetouch.EntityFrameworkCore;
 using Abp.EntityFrameworkCore.Uow;
 using NUglify.Helpers;
+using Microsoft.PowerShell.Commands;
+using onetouch.AppItems.Dtos;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -916,18 +918,93 @@ namespace onetouch.AppMarketplaceAccounts
                 }
 
                 appMarketplaceContact.EntityExtraData = new List<AppEntityExtraData>();
-                foreach (var EntityExtraData in foundContactInfo.EntityFk.EntityExtraData) {
-                     
+                foreach (var EntityExtraData in input.EntityExtraData)
+                {
+                    //I40[Start]
+                    AppEntityExtraData ext = ObjectMapper.Map<AppEntityExtraData>(EntityExtraData);
+                    ext.EntityId = 0;
+                    ext.Id = 0;
+                    ext.EntityFk = null;
+                    appMarketplaceContact.EntityExtraData.Add(ext);
+                }
+                foreach (var EntityExtraData in input.EntityExtraData) 
+                {
+                    //I40[Start]
+
+                    switch (EntityExtraData.AttributeId)
+                    {
+                        case 708: //Language ID
+                            if (EntityExtraData.AttributeValue == null || EntityExtraData.AttributeValue.ToLower() == "false")
+                            {
+                                appMarketplaceContact.LanguageId = null;
+                                appMarketplaceContact.LanguageCode = null;
+                            }
+                            break;
+                        case 709: //Email Address
+                            if (EntityExtraData.AttributeValue == null || EntityExtraData.AttributeValue.ToLower() == "false")
+                            {
+                                appMarketplaceContact.EMailAddress = null;
+                            }
+                            break;
+                        case 710: //Phone#1
+                            if (EntityExtraData.AttributeValue == null || EntityExtraData.AttributeValue.ToLower() == "false")
+                            {
+                                appMarketplaceContact.Phone1Ext = null;
+                                appMarketplaceContact.Phone1Number = null;
+                                appMarketplaceContact.Phone1TypeId = null;
+                                appMarketplaceContact.Phone1TypeName = null;
+                            }
+                            break;
+
+                        case 711://Phone#2
+                            if (EntityExtraData.AttributeValue == null || EntityExtraData.AttributeValue.ToLower() == "false")
+                            {
+                                appMarketplaceContact.Phone2Ext = null;
+                                appMarketplaceContact.Phone2Number = null;
+                                appMarketplaceContact.Phone2TypeId = null;
+                                appMarketplaceContact.Phone2TypeName = null;
+                            }
+                            break;
+
+                        case 712://Phone#3
+                            if (EntityExtraData.AttributeValue == null || EntityExtraData.AttributeValue.ToLower() == "false")
+                            {
+                                appMarketplaceContact.Phone3Ext = null;
+                                appMarketplaceContact.Phone3Number = null;
+                                appMarketplaceContact.Phone3TypeId = null;
+                                appMarketplaceContact.Phone3TypeName = null;
+                            }
+                            break;
+                        case 713:  // Join DATE 
+                            if (EntityExtraData.AttributeValue == null || EntityExtraData.AttributeValue.ToLower() == "false")
+                            {
+                                // entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713));
+                                appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue = null;
+                            }
+
+                            break;
 
 
-                    AppEntityExtraData appEntityExtraDto = new AppEntityExtraData();
-                    appEntityExtraDto.EntityId = appMarketplaceContact.Id;
-                    appEntityExtraDto.AttributeValueId = EntityExtraData.AttributeValueId;
-                    appEntityExtraDto.AttributeValue = EntityExtraData.AttributeValue;
-                    appEntityExtraDto.AttributeId = EntityExtraData.AttributeId;
-                    appEntityExtraDto.EntityObjectTypeId = EntityExtraData.EntityObjectTypeId;
+                        case 714: //UserName
+                            if (EntityExtraData.AttributeValue == null || EntityExtraData.AttributeValue.ToLower() == "false")
+                            {
+                                //entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714));
+                                appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue = null;
+                            }
+                            break;
 
-                    appMarketplaceContact.EntityExtraData.Add(appEntityExtraDto);
+                    }
+                    
+                    //I40[End]
+
+                    //AppEntityExtraData appEntityExtraDto = new AppEntityExtraData();
+                    //appEntityExtraDto.EntityId = appMarketplaceContact.Id;
+                    //appEntityExtraDto.AttributeValueId = EntityExtraData.AttributeValueId;
+                    //appEntityExtraDto.AttributeValue = EntityExtraData.AttributeValue;
+                    //appEntityExtraDto.AttributeId = EntityExtraData.AttributeId;
+                    //appEntityExtraDto.EntityObjectTypeId = EntityExtraData.EntityObjectTypeId;
+
+                    //appMarketplaceContact.EntityExtraData.Add(appEntityExtraDto);
                 }
                 //I40 -MMT  -Account Attachment[Start]
                 appMarketplaceContact.EntityAttachments = new List<AppEntityAttachment>();

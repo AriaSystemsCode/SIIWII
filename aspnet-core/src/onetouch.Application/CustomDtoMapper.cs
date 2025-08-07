@@ -423,6 +423,7 @@ namespace onetouch
                 .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments ))
                 .ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories))
                 .ForMember(d => d.EntityClassifications, s => s.MapFrom(ss => ss.EntityFk.EntityClassifications))
+                .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData))
                 ;
 
             //AppMarketplaceContact
