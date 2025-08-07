@@ -546,8 +546,6 @@ namespace onetouch.AppItems
             return x;
         }
 
-
-
         public async Task<long> SaveImageToItemColor(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
             var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };

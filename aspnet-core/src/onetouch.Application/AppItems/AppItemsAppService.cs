@@ -5532,6 +5532,16 @@ namespace onetouch.AppItems
 
                 appItemExcelRecordDto.RecordType = "Image";
                 appItemExcelRecordDto.ExcelDto = new AppItemExcelDto();
+                appItemExcelRecordDto.ExcelDto.RecordType = "Image";
+                appItemExcelRecordDto.ExcelDto.ProductType = "UnAssigned";
+
+                appItemExcelRecordDto.ExcelDto.ProductDescription = " ";
+                appItemExcelRecordDto.ExcelDto.Name = " ";
+                appItemExcelRecordDto.ExcelDto.Code = " ";
+                appItemExcelRecordDto.ExcelDto.ParentCode = " ";
+                appItemExcelRecordDto.ExcelDto.ParentId = 0;
+
+
                 appItemExcelRecordDto.ExcelDto.Actions = "";
                 appItemExcelRecordDto.ExcelDto.ImagePreview = _appConfiguration[$"Attachment:PathTemp"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + img;
 
@@ -5700,6 +5710,43 @@ namespace onetouch.AppItems
         {
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
+
+            #region handle 1,2,3 actions
+            // select type images
+            // action 1 add to item
+            // action 2 add to item code
+            // action 3 add to color
+            // remove from result
+            List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
+                .Where(r => (r.ExcelDto.Actions == "1" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3")
+                && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
+            foreach(var excelDto in result123)
+            {
+                int number = Int32.Parse(excelDto.ExcelDto.Actions);
+
+                switch (number)
+                {
+                    case 1:
+                        await SaveImageToItem(Int32.Parse(excelDto.Code), excelDto);
+                        break;
+                    case 2:
+                        await SaveImageToItemColor(Int32.Parse(excelDto.Code), excelDto);
+                        break;
+                    case 3:
+                        await SaveImageToColor(Int32.Parse(excelDto.Code), excelDto);
+                        break;
+                    default:
+                       // Console.WriteLine("Unknown number");
+                        break;
+                }
+
+            }
+            result = result.Select(r => r).Where(r => (r.Actions != "1" && r.Actions != "2" && r.Actions != "3")).ToList();
+            #endregion
+
+            // action 
+
+
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());

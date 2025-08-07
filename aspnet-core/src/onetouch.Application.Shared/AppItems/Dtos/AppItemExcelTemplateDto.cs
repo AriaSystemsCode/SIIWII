@@ -12,7 +12,7 @@ namespace onetouch.AppItems.Dtos
         public long Id { get; set; }
         public Int32 rowNumber { get; set; }
         [Required(ErrorMessage = "Record Type must have a value.")]
-        [Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
+        [RecordTypeValidation]
         public string RecordType { get; set; }
         [Required(ErrorMessage = "Product Type must have a value.")]
         public string ProductType { get; set; }

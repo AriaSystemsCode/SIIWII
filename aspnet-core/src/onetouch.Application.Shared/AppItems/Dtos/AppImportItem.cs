@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Abp.Application.Services.Dto;
 
 namespace onetouch.AppItems.Dtos
@@ -57,6 +58,22 @@ namespace onetouch.AppItems.Dtos
         public string Dimension2Position { set; get; }
         public string Dimension3Position { set; get; }
     }
+
+    public class RecordTypeValidationAttribute : ValidationAttribute
+    {
+        private static readonly string[] allowedValues = new[] { "Item", "Item Variant", "Image", "Color" };
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            if (value == null || !allowedValues.Contains(value.ToString()))
+            {
+                return new ValidationResult("Record Type must be Item, Item Variant, or Image.");
+            }
+
+            return ValidationResult.Success;
+        }
+    }
+
     public partial class AppItemExcelDto
     {
         public string Actions { set; get; }
