@@ -12,6 +12,8 @@ import Swal from "sweetalert2";
 import { ImportTypes } from "../models/ImportTypes";
 import { MainImportService } from "../services/mainImport.service";
 import { GetAllAppItemsInput, ItemsFilterTypesEnum } from "@shared/service-proxies/service-proxies";
+import { ReorderTreeListDragDropHelper } from "@node_modules/@devexpress/analytics-core/analytics-widgets-internal";
+import { UploadActionEnum } from "../models/UploadActionEnum";
 
 @Component({
   selector: "uploadStatusModal",
@@ -44,7 +46,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   @Output() selectSugItemCode = new EventEmitter<any>();
   @Input() updatedRecordData: any;
 
-  @Output() _linkToExistingITEMRec = new EventEmitter<any>();
+
+  @Input() imData: boolean;
+  @Input() imImages: boolean;
+  hasDataRecords: boolean = false;
+  hasImageRecords: boolean = false;
+  UploadActionEnum = UploadActionEnum;
+
 
   public constructor(
     private _importService: MainImportService,
@@ -59,23 +67,39 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.getAspectatio();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.records = this.filteredRecords()?.map((r, idx) => ({ ...r, id: idx }));
-    this.records?.forEach(r => {
-      r.showActions = false;
-    });
 
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['uploadingResult'] && this.uploadingResult) {
+      const allRecords = this.uploadingResult?.excelRecords || [];
+      this.hasDataRecords = allRecords.some(r => r.recordType !== 'Image');
+      this.hasImageRecords = allRecords.some(r => r.recordType === 'Image');
+
+      if (this.hasDataRecords)
+        this.activeRecordType = 'Data'
+      else
+        this.activeRecordType = 'Image'
+    }
+
+    this.records = this.filteredRecords()?.map((r, idx) => ({
+      ...r,
+      id: r.id ?? idx
+    })) || [];
+    this.records.forEach(r => r.showActions = false);
+
+    //I44 update record
     if (changes['updatedRecordData'] && this.updatedRecordData) {
       const { record, newData } = this.updatedRecordData;
       const updatedRec = this.records.find(r => r.id === record.id);
 
       if (updatedRec) {
-        Object.keys(newData).forEach(key => {
-          this.setRecordValue(updatedRec, key, newData[key]);
-        });
+        for (const key in newData) {
+          if (newData.hasOwnProperty(key)) {
+            this.setRecordValue(updatedRec, key, newData[key]);
+          }
+        }
       }
     }
-
   }
 
 
@@ -124,6 +148,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   filteredRecords() {
+    if (!this.uploadingResult?.excelRecords?.length) return [];
+
     if (this.activeRecordType == 'Data')
       return this.uploadingResult?.excelRecords?.filter(r => r?.recordType !== 'Image');
 
@@ -133,15 +159,23 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   records;
+
   switchTab(type: string) {
+    if (this.isActionInProgress()) {
+      return;
+    }
+
     this.activeRecordType = type;
 
-    this.records = this.filteredRecords();
-    this.records?.forEach(r => {
-      r.showActions = false;
-    });
+    this.records = this.filteredRecords()?.map((r, idx) => ({
+      ...r,
+      id: r.id ?? idx
+    })) || [];
 
+    this.records?.forEach(r => r.showActions = false);
   }
+
+
 
   getuploadStatsColumnsName() {
     this.uploadStatsColumnsName = [
@@ -306,48 +340,51 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
   }
 
-  handleAction(record: any, action: string) {
+  handleAction(record: any, action: UploadActionEnum) {
     this.records.forEach(r => r.showActions = false); // Close dropdown
     this.currentActionRecord = record;
     record._inAction = true;
-
+    record._original = { ...record };
+    record.action = action;
+  
     switch (action) {
-      case 'Validate Data Record':
-
+      case UploadActionEnum.ValidateDataRecord:
         break;
-
-      case 'Link to existing PARENT ITEM':
+  
+      case UploadActionEnum.LinkToExistingParentItem:
         this.LinkToExistingITEM(record);
         break;
-
-      case 'Link to existing ITEM COLOR':
+  
+      case UploadActionEnum.LinkToExistingItemColor:
         break;
-
-      case 'Link to existing COLOR LOOKUP':
+  
+      case UploadActionEnum.LinkToExistingColorLookup:
         break;
-
-      case 'Create NEW PARENT ITEM and LINK AS DEFAULT IMAGE':
+  
+      case UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage:
         break;
-
-      case 'Create NEW ITEM COLOR and LINK IMAGE AS DEFAULT IMAGE':
+  
+      case UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage:
         break;
-
-      case 'Create to NEW COLOR LOOKUP and Link IMAGE':
+  
+      case UploadActionEnum.CreateNewColorLookupAndLinkImage:
         break;
-
-      case 'Link to NEW PARENT ITEM CODE FROM ASSOCIATED DATA':
+  
+      case UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData:
         break;
-
-      case 'Link to NEW ITEM VARIANT CODE FROM ASSOCIATED DATA':
+  
+      case UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData:
         break;
-
-      case 'Link to NEW COLOR LOOKUP CODE FROM ASSOCIATED DATA':
+  
+      case UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData:
         break;
-
+  
       default:
-        console.warn('Unknown action:', action);
+        console.warn('Unknown action enum:', action);
     }
   }
+  
+  
 
 
   LinkToExistingITEM(record) {
@@ -488,11 +525,21 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   confirmLinking(record: any): void {
     const codeValue = this.getRecordValue(record, 'code');
 
-
+    //I44 3 first cases  if (codeValue  && (record._isLinkingParent  || record._isLinking..... )) {
+    if (codeValue  && (record._isLinkingParent )) {
+      record.fieldsErrors = [];
+      record.errorMessage = "";
+      record.status = "Passed";
+    }
     record._isLinkingParent = false;
     this.currentActionRecord = null;
+    record._inAction = false;
+    this.LinkToExistingITEM_Ret_Data = null;
+    this.activeRecord = null;
 
-    this._linkToExistingITEMRec.emit(record);
+    
+
+    this.cdr.detectChanges();
 
   }
 
@@ -502,17 +549,19 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       Object.assign(record, record._original);
       delete record._original;
     }
-
-
-    //I44 coe after cancel not show
     record._isLinkingParent = false;
     this.currentActionRecord = null;
     record._inAction = false;
+    this.LinkToExistingITEM_Ret_Data = null;
+    this.activeRecord = null;
+
+    this.cdr.detectChanges();
+
 
   }
 
-  isLinkingInProgress(): boolean {
-    return this.records?.some(r => r._isLinkingParent);
+  isActionInProgress(): boolean {
+    return this.records?.some(r => r._inAction);
   }
 
 

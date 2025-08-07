@@ -94,7 +94,6 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   fileChangeEvent(event: Event): void {
-    //I44 prevent show upload folder popup message 
     event.preventDefault();
     event.stopPropagation();
 
