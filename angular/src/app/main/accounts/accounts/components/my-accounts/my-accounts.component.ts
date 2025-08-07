@@ -28,7 +28,7 @@ export class MyAccountsComponent extends AppComponentBase implements OnInit {
     const filters: { labelKey: string; value: AccountMainFilterEnum }[] = this.isHost
       ? [{ labelKey: 'ExternalAccounts', value: AccountMainFilterEnum.ExternalAccounts }]
       : [
-          { labelKey: 'MyAccounts', value: AccountMainFilterEnum.ManualAndConnectedAccounts },
+          { labelKey: 'My Connections', value: AccountMainFilterEnum.ManualAndConnectedAccounts },
           { labelKey: 'ManualAccounts', value: AccountMainFilterEnum.ManualAccounts },
           { labelKey: 'ConnectedAccounts', value: AccountMainFilterEnum.ConnectedAccounts }
         ];

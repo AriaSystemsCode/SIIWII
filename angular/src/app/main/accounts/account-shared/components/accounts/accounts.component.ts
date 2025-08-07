@@ -30,7 +30,7 @@ import { MainImportComponent } from "../../../../../../shared/components/import-
 import { AccountMainFilterEnum } from "../../models/accounts-main-filter.enum";
 import { AbstractControl, FormBuilder, FormGroup } from "@angular/forms";
 import { AppConsts } from "@shared/AppConsts";
-import { Observable, observable } from "rxjs";
+import { Observable } from "rxjs";
 import { ImportTypes } from "@shared/components/import-steps/models/ImportTypes";
 import { AccountsImport } from "@shared/components/import-steps/services/accountsImport.service";
 import { ImportStepInfo } from "@shared/components/import-steps/models/ImportStepInfo";
@@ -64,7 +64,6 @@ export class AccountsComponent
     mailsubject: string;
     mailbody: string;
     filterForm: FormGroup;
-    connectionType: string = "All"
     isHost: boolean;
     singleItemPerRowMode: boolean = false;
 
