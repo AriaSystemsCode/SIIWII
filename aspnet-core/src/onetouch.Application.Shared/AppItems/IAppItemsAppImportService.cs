@@ -15,12 +15,12 @@ namespace onetouch.AppItems
     public interface IAppItemsAppImportService : IApplicationService
     {
         Task<ExcelTemplateDto> GetImportVideo();
-        Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUp(GetAllAppItemsInput input);
-        Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUpWithColors(GetAllAppItemsInput input);
+        Task<PagedResultDto<LookupItems>> GetAllLookUp(GetAllAppItemsInput input);
+        Task<PagedResultDto<LookupItems>> GetAllLookUpWithColors(GetAllAppItemsInput input);
         Task<AppItemtExcelRecordDTO> GetAppItemForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
         Task<long> SaveImageToItem(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
         Task<long> SaveImageToItemColor(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
-        Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllColorsLookUp(GetAllAppEntitiesInput input);
+        Task<PagedResultDto<LookupItems>> GetAllColorsLookUp(GetAllAppEntitiesInput input);
         Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
 
         Task<long> SaveImageToColor(long colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO);

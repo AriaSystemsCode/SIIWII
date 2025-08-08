@@ -82,6 +82,7 @@ using Microsoft.AspNetCore.Http;
 using PayPalCheckoutSdk.Orders;
 using NPOI.HSSF.Util;
 using Abp.AspNetZeroCore.Timing;
+using onetouch.Migrations;
 
 namespace onetouch.AppItems
 {
@@ -144,7 +145,9 @@ namespace onetouch.AppItems
             //       GetAllRet.TotalCount,
             //       lookupAccountOrTenantDtoList
             //   );
-            var GetAllRet = _appItemRepository.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.ParentId == null);
+            var GetAllRet = _appItemRepository.GetAll()
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) )
+                .Where(a => a.TenantOwner == AbpSession.TenantId && a.ParentId == null);
             var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "id asc").PageBy(input);
             var totalCount = await GetAllRet.CountAsync();
             List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
@@ -158,29 +161,58 @@ namespace onetouch.AppItems
         }
         public async Task<PagedResultDto<LookupItems>> GetAllLookUpWithColors(GetAllAppItemsInput input)
         {
-            //var GetAllRet = await GetAll(input);
-            //List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
-            //foreach (var x in GetAllRet.Items)
-            //{
+            var tenantId = AbpSession.TenantId ?? -1;
 
-            //    var z = await GetWithColors( x.AppItem.Id );
-            //    foreach (var y in z)
-            //    {
-            //        lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code + "-" + y.DisplayName.Trim(), Id = y.Id });
-            //    }
-            //}
-            var GetAllRet = _appItemRepository.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.ParentId == null );
-            var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "id asc").PageBy(input);
-            var totalCount = await GetAllRet.CountAsync();
-            List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
-            lookupAccountOrTenantDtoList = GetAllRetItems.Select(e=> new LookupItems() { DisplayName = e.Code, Id=e.Id.ToString()}).ToList();  
+            // Base query with minimal joins and only required fields
+            var query =
+                from item in _appItemRepository.GetAll()
+                where item.ParentId != null
+                      && item.TenantId == tenantId
+                      && !item.IsDeleted
+                      && (string.IsNullOrEmpty(input.Filter) ||
+                          item.Name.Contains(input.Filter) ||
+                          item.Code.Contains(input.Filter))
+                join parent in _appItemRepository.GetAll() on item.ParentId equals parent.Id
+                join extra in _appEntityExtraDataRepository.GetAll()
+                     on item.EntityId equals extra.EntityId
+                where extra.EntityObjectTypeId == 16
+                select new
+                {
+                    item.EntityId,
+                    Code = parent.Code + "-" + extra.AttributeValue
+                };
 
-            return new PagedResultDto<LookupItems>(
-                   totalCount,
-                   lookupAccountOrTenantDtoList
-               );
+            // Group in DB
+            var groupedQuery =
+                from x in query
+                group x by x.Code into g
+                select new
+                {
+                    Code = g.Key,
+                    IdList = string.Join(",", g.Select(x => x.EntityId))
+                };
 
+            // Total count before paging
+            var totalCount = await groupedQuery.CountAsync();
+
+            // Paging in DB
+            var pagedData = await groupedQuery
+                .OrderBy(input.Sorting ?? "Code asc") // dynamic sorting
+                .PageBy(input) // ABP's paging extension
+                .ToListAsync();
+
+            // Map to DTO
+            var result = pagedData
+                .Select(e => new LookupItems
+                {
+                    DisplayName = e.Code,
+                    Id = e.IdList
+                })
+                .ToList();
+
+            return new PagedResultDto<LookupItems>(totalCount, result);
         }
+
         public async Task<PagedResultDto<LookupItems>> GetAllColorsLookUp(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = 16;
@@ -201,10 +233,50 @@ namespace onetouch.AppItems
 
         }
 
+        public async Task<PagedResultDto<LookupItems>> GetAllLookUpWithColors2(GetAllAppItemsInput input)
+        {
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+            var GetAllRet = _appItemRepository
+                            .GetAll()
+                            .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
+                            .Where(item => item.ParentId != null && item.TenantId == tenantId && item.IsDeleted == false)
+                            .Include(item => item.ParentFk)
+                            .Include(item => item.EntityFk.EntityExtraData)
+                            .Select(item => new
+                            {
+                                item.EntityId,
+                                Code = item.ParentFk.Code + "-" + item.EntityFk.EntityExtraData
+                                    .Where(extra => extra.EntityObjectTypeId == 16)
+                                    .Select(extra => extra.AttributeValue)
+                                    .FirstOrDefault() // assuming only one per item
+                            })
+                            .Where(x => x.Code != null) // only those with matching extra data
+                            .GroupBy(x => x.Code)
+                            .Select(g => new
+                            {
+                                Code = g.Key,
+                                IdList = string.Join(",", g.Select(x => x.EntityId))
+                            });
+
+
+            var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "Code asc").PageBy(input);
+
+            List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
+            lookupAccountOrTenantDtoList = GetAllRetItems.Select(e => new LookupItems() { DisplayName = e.Code, Id = e.IdList}).ToList();
+            var totalCount = await GetAllRet.CountAsync();
+            return new PagedResultDto<LookupItems>(
+                   totalCount,
+                   lookupAccountOrTenantDtoList
+               );
+
+        }
+
+
 
         public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId= input};
+            var appItemId = _appItemRepository.GetAll().Where(e=> e.EntityId == input).FirstOrDefault();
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId= appItemId.Id };
             var y = await GetAppItemForEdit(xInput);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
             appItemtExcelRecordDTO.ExcelDto.Price = y.AppItem.Price.ToString();
@@ -339,7 +411,8 @@ namespace onetouch.AppItems
 
         public async Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };
+            var appItemId = _appItemRepository.GetAll().Where(e => e.EntityId == input).FirstOrDefault();
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = ((long)appItemId.ParentId) };
             var y = await GetAppItemForEdit(xInput);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
             appItemtExcelRecordDTO.ExcelDto.Price = y.AppItem.Price.ToString();
