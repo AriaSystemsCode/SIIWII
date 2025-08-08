@@ -81,6 +81,7 @@ using System.Management.Automation.Language;
 using Microsoft.AspNetCore.Http;
 using PayPalCheckoutSdk.Orders;
 using NPOI.HSSF.Util;
+using Abp.AspNetZeroCore.Timing;
 
 namespace onetouch.AppItems
 {
@@ -123,54 +124,77 @@ namespace onetouch.AppItems
 
             return itemExcelTemplateDto;
         }
-        public async Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUp(GetAllAppItemsInput input)
+        public async Task<PagedResultDto<LookupItems>> GetAllLookUp(GetAllAppItemsInput input)
         {
-            var GetAllRet = await GetAll(input);
-            List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
-            foreach (var x in GetAllRet.Items)
-            {
-                lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code, Id = x.AppItem.Id });
+            //var GetAllRet = await GetAll(input);
+            //List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
+            ////foreach (var x in GetAllRet.Items)
+            ////{
+            ////    lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code, Id = x.AppItem.Id });
 
-            }
-            return new PagedResultDto<LookupAccountOrTenantDto>(
-                   GetAllRet.TotalCount,
+            ////}
+            //lookupAccountOrTenantDtoList = (from d in GetAllRet.Items
+            //        join m in _appItemRepository.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId)
+            //                              on d.AppItem.Id equals m.Id into j1
+            //        from j2 in j1
+            //        select new LookupAccountOrTenantDto { DisplayName = j2.Code, Id = j2.EntityId }).ToList();
+
+
+            //return new PagedResultDto<LookupAccountOrTenantDto>(
+            //       GetAllRet.TotalCount,
+            //       lookupAccountOrTenantDtoList
+            //   );
+            var GetAllRet = _appItemRepository.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.ParentId == null);
+            var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "id asc").PageBy(input);
+            var totalCount = await GetAllRet.CountAsync();
+            List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
+            lookupAccountOrTenantDtoList = GetAllRetItems.Select(e => new LookupItems() { DisplayName = e.Code, Id = e.EntityId.ToString() }).ToList();
+
+            return new PagedResultDto<LookupItems>(
+                   totalCount,
                    lookupAccountOrTenantDtoList
                );
 
         }
-        public async Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllLookUpWithColors(GetAllAppItemsInput input)
+        public async Task<PagedResultDto<LookupItems>> GetAllLookUpWithColors(GetAllAppItemsInput input)
         {
-            var GetAllRet = await GetAll(input);
-            List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
-            foreach (var x in GetAllRet.Items)
-            {
+            //var GetAllRet = await GetAll(input);
+            //List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
+            //foreach (var x in GetAllRet.Items)
+            //{
 
-                var z = await GetWithColors( x.AppItem.Id );
-                foreach (var y in z)
-                {
-                    lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code + "-" + y.DisplayName.Trim(), Id = y.Id });
-                }
-            }
-            return new PagedResultDto<LookupAccountOrTenantDto>(
-                   GetAllRet.TotalCount,
+            //    var z = await GetWithColors( x.AppItem.Id );
+            //    foreach (var y in z)
+            //    {
+            //        lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppItem.Code + "-" + y.DisplayName.Trim(), Id = y.Id });
+            //    }
+            //}
+            var GetAllRet = _appItemRepository.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.ParentId == null );
+            var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "id asc").PageBy(input);
+            var totalCount = await GetAllRet.CountAsync();
+            List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
+            lookupAccountOrTenantDtoList = GetAllRetItems.Select(e=> new LookupItems() { DisplayName = e.Code, Id=e.Id.ToString()}).ToList();  
+
+            return new PagedResultDto<LookupItems>(
+                   totalCount,
                    lookupAccountOrTenantDtoList
                );
 
         }
-        public async Task<PagedResultDto<LookupAccountOrTenantDto>> GetAllColorsLookUp(GetAllAppEntitiesInput input)
+        public async Task<PagedResultDto<LookupItems>> GetAllColorsLookUp(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = 16;
             //var itemObjectId = await _helper.SystemTables.GetObjectItemId();
 
             var GetAllRet = await _appEntitiesAppService.GetAll(input);
 
-            List<LookupAccountOrTenantDto> lookupAccountOrTenantDtoList = new List<LookupAccountOrTenantDto>();
+            List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
             foreach (var x in GetAllRet.Items)
             {
-                lookupAccountOrTenantDtoList.Add(new LookupAccountOrTenantDto { DisplayName = x.AppEntity.Code, Id = x.AppEntity.Id });
+                lookupAccountOrTenantDtoList.Add(new LookupItems { DisplayName = x.AppEntity.Code, Id = x.AppEntity.Id.ToString() });
 
             }
-            return new PagedResultDto<LookupAccountOrTenantDto>(
+            return new PagedResultDto<LookupItems>(
                    GetAllRet.TotalCount,
                    lookupAccountOrTenantDtoList
                );
@@ -289,8 +313,7 @@ namespace onetouch.AppItems
 
             return appItemtExcelRecordDTO;
         }
-       
-        
+             
         public async Task<List<LookupAccountOrTenantDto>> GetWithColors(long input)
         {
             var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };
@@ -502,17 +525,13 @@ namespace onetouch.AppItems
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString() ;
             // add the image to the parent
-            foreach (var item1 in y.EntityAttachments)
-            {
-                item1.IsDefault = false;
-
-            }
+            
             if(string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid))
             {
                 appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid = Guid.NewGuid().ToString();
             }
             if (y.EntityAttachments.Count == 0) { y.EntityAttachments = new List<AppEntityAttachmentDto>(); }
-            var z = new AppEntityAttachmentDto { IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault, 
+            var z = new AppEntityAttachmentDto {IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault, 
                 AttachmentCategoryEnum = 0, AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
                 guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.EntityAttachments.Count };
 
@@ -537,8 +556,15 @@ namespace onetouch.AppItems
 
 
             y.EntityAttachments = color.AppEntity.EntityAttachments;
-            y.EntityAttachments.Add(z);
+            
+            
+            foreach (var item1 in y.EntityAttachments)
+            {
+                item1.IsDefault = false;
 
+            }
+            y.TenantId = tenantId;
+            y.EntityAttachments.Add(z);
             var x = await _appEntitiesAppService.SaveEntity(y);
 
 

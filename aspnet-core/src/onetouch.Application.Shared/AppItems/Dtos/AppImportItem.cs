@@ -5,6 +5,13 @@ using Abp.Application.Services.Dto;
 
 namespace onetouch.AppItems.Dtos
 {
+    public class LookupItems
+    {
+        public string Id { get; set; }
+
+        public string DisplayName { get; set; }
+    }
+
     public partial class AppItemExcelResultsDTO
     {
         public bool UpdateColorsToLookUp { get; set; }
