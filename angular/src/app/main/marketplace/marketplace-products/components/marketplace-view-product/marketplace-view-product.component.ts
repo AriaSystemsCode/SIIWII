@@ -14,6 +14,8 @@ import {
     CurrencyInfoDto,
     GetAppMarketplaceItemDetailForViewDto,
     MarketplaceExtraDataAttrDto,
+    MessageServiceProxy,
+    // OverAllRatingDto,
     ShoppingCartSummary,
     TransactionType,
 } from "@shared/service-proxies/service-proxies";
@@ -84,6 +86,8 @@ export class MarketplaceViewProductComponent
     showSpecialPrice: boolean = false;
     languageSettingName  =AppConsts.languageSettingName;
     IsConnected : boolean = false
+    // overRating: OverAllRatingDto
+    
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -92,6 +96,7 @@ export class MarketplaceViewProductComponent
         private router: Router,
         private AccountsServiceProxy: AccountsServiceProxy,
         private appItemsAppservice: AppItemsServiceProxy,
+         private messageServiceProxy: MessageServiceProxy,
         injector: Injector
     ) {
         super(injector);
@@ -101,7 +106,6 @@ export class MarketplaceViewProductComponent
         this.priceLevel = localStorage.getItem("tempPriceLevel");
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
-
     }
     ngOnInit(): void {
         this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
@@ -194,6 +198,7 @@ export class MarketplaceViewProductComponent
                         this.productBodyData.currencyCode,
                         this.productBodyData.buyerSSIN,
                         this.productBodyData.sellerSSIN,
+                        this.priceLevel,
                         this.productBodyData.id,
                         undefined,
                         undefined,
@@ -210,6 +215,7 @@ export class MarketplaceViewProductComponent
                     )
                     .pipe(
                         finalize(() => {
+                            // this.getOverAllRatings()
                             this.hideMainSpinner();
                         })
                     )
@@ -267,28 +273,32 @@ export class MarketplaceViewProductComponent
     }
 
     setSizes(index: number) {
+        console.log(index,'indexxx')
         this.currentIndex = index;
         this.isColorView = false
-        this.colorAttachmentForMainIamge = this.colorsData[index]?.colorImg;
-        this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
-
+       // this.colorAttachmentForMainIamge = this.colorsData[index]?.colorImg;
+        // this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
+        let originalIndex = this.colorsData.findIndex(color => color?.colorCodeSelectedValues?.toLowerCase()?.trim() === this.filteredColors[index].colorCodeSelectedValues?.toLowerCase()?.trim());
+        this.colorAttachmentForMainIamge = this.filteredColors[index]?.colorImg
+        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments
     }
     setColorView(value: boolean) {
         this.isColorView = value
     }
 
     slideToNextImage(): void {
-        this.currentIndex = (this.currentIndex + 1) % this.colorsData?.length;
+        this.currentIndex = (this.currentIndex + 1) % this.filteredColors.length;
         this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
         this.isColorView = true
-        this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex]?.colorImg;
+        this.colorAttachmentForMainIamge = this.filteredColors[this.currentIndex].colorImg;
         this.setSizes(this.currentIndex)
         this.scrollIntoView();
     }
-
+    
+    
     slideToPreviousImage(): void {
         // Update currentIndex and translateX
-        this.currentIndex = (this.currentIndex - 1 + this.colorsData?.length) % this.colorsData?.length;
+        this.currentIndex = (this.currentIndex - 1 + this.filteredColors.length) % this.filteredColors.length;
         this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
         this.isColorView = true;
         this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex]?.colorImg;
@@ -927,6 +937,38 @@ export class MarketplaceViewProductComponent
             });
     }
 
+    // getOverAllRatings() {
+    //     const subs = this.messageServiceProxy
+    //       .getOverAllRatings(
+    //      this.productBodyData.id,
+    //       )
+    //       .pipe(
+    //         finalize(() => {
+    
+    //         })
+    //       )
+    //       .subscribe(
+    //         (result) => {
+    //           this.overRating = result
+    
+    //         },
+    
+    //       );
+    //     this.subscriptions.push(subs);
+    //   }
+
+      refreshRatingFlag = false;
+
+handleRefreshRating(event: boolean) {
+  if (event === true) {
+
+
+  this.getProductDetailsForView()
+//   this.getOverAllRatings()
+  }
+}
+
+    
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
