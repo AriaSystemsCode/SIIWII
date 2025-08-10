@@ -5717,37 +5717,30 @@ namespace onetouch.AppItems
             // action 2 add to item code
             // action 3 add to color
             // remove from result
-            
+
             List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
-                .Where(r => (r.ExcelDto.Actions == "1" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3")
+                .Where(r => r.Status.ToUpper()=="PASSED" && (r.ExcelDto.Actions == "1" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
+                || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6")
                 && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
-            foreach(var excelDto in result123)
+            foreach (var excelDto in result123)
             {
                 int number = Int32.Parse(excelDto.ExcelDto.Actions);
-                if(number == 1 || number== 2 || number==3)
+                if (number == 1 || number == 2 || number == 3 || number == 6)
                 {
                     foreach (var id in excelDto.Code.Split(","))
                     { await SaveImageToColor(id, excelDto); }
                 }
+                if (number == 4 || number == 5 )
+                {
+                    if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
 
-                //switch (number)
-                //{
-                //    case 1:
-                //        await SaveImageToColor(excelDto, new string[] { excelDto.Code });
-                //        break;
-                //    case 2:
-                //        await SaveImageToColor(excelDto, excelDto.Code.Split(","));
-                //        break;
-                //    case 3:
-                //        await SaveImageToColor(excelDto, new string[] { excelDto.Code });
-                //        break;
-                //    default:
-                //       // Console.WriteLine("Unknown number");
-                //        break;
-                //}
+                }
 
-            }
-            result = result.Select(r => r).Where(r => (r.Actions != "1" && r.Actions != "2" && r.Actions != "3")).ToList();
+                }
+            result = result.Select(r => r).Where(r => (r.Actions != "1" && r.Actions != "2" && r.Actions != "3"
+            //&& r.Actions != "4" && r.Actions != "5" 
+            && r.Actions != "6")).ToList();
             #endregion
 
             // action 

@@ -627,18 +627,22 @@ namespace onetouch.AppItems
                 var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString();
                 // add the image to the parent
 
-                if (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid))
+                if(appItemtExcelRecordDTO.ExcelDto.Images is null) { appItemtExcelRecordDTO.ExcelDto.Images = new List<AppItemImage>(); }
+                var imagesCount = appItemtExcelRecordDTO.ExcelDto.Images.Count();
+                if (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid))
                 {
-                    appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid = Guid.NewGuid().ToString();
+                    appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid = Guid.NewGuid().ToString();
                 }
+                appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName = appItemtExcelRecordDTO.image;
+
                 if (appEntityDto.EntityAttachments.Count == 0) { appEntityDto.EntityAttachments = new List<AppEntityAttachmentDto>(); }
                 var appEntityAttachmentDto = new AppEntityAttachmentDto
                 {
                     IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,
                     AttachmentCategoryEnum = 0,
                     AttachmentCategoryId = 3,
-                    FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
-                    guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid,
+                    FileName = appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName,
+                    guid = appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid,
                     Index = appEntityDto.EntityAttachments.Count
                 };
 
@@ -656,7 +660,7 @@ namespace onetouch.AppItems
 
                 try
                 {
-                    System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, path + @"\" + appEntityAttachmentDto.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
+                    System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName, path + @"\" + appEntityAttachmentDto.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName.Split('.')[1], true);
 
                 }
                 catch { }
