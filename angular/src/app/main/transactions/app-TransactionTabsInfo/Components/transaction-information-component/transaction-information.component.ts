@@ -1270,6 +1270,7 @@ export class TransactionInformationComponent
         this.printInfoParam.userId = this.appSession?.userId;
 
         // Asynchronous handling for setting orderConfirmationRole
+        this.saveDates()
         this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId).subscribe((res) => {
           this.printInfoParam.orderConfirmationRole = res.contactRole;
           this.printInfoParam.contactName = res.contactName;
@@ -1315,6 +1316,7 @@ export class TransactionInformationComponent
   onShareTransactionByMessage($event: { tenantTransactionInfo: TenantTransactionInfo[], appTransactionsForViewDto: GetAppTransactionsForViewDto }) {
     // Assign the incoming data
     this.appTransactionsForViewDto = $event.appTransactionsForViewDto;
+    this.saveDates()
 
     // Iterate through tenantTransactionInfo to fetch tenant roles and generate reports
     $event.tenantTransactionInfo.forEach((tenantInfo) => {
