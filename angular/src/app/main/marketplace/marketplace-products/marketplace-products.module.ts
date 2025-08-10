@@ -30,6 +30,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AppCommonModule } from "@app/shared/common/app-common.module";
 import { UtilsModule } from "@shared/utils/utils.module";
+import { OverALLRatingReviewsModule } from "@app/main/overallRating-reviews/overallRating-reviews.module";
 @NgModule({
     declarations: [
         MarketplaceProductsComponent,
@@ -61,7 +62,8 @@ import { UtilsModule } from "@shared/utils/utils.module";
         InputNumberModule,
         TabViewModule,
         ConfirmDialogModule,AppCommonModule,
-        UtilsModule
+        UtilsModule,
+        OverALLRatingReviewsModule
     ],
     providers:[AppMarketplaceItemsServiceProxy]
 })
