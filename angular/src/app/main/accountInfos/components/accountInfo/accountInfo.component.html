@@ -19,7 +19,7 @@
                     </div>
                     <div class="kt-subheader__toolbar">
                         <div class="kt-subheader__wrapper" *ngIf="!viewMode && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit) ">
-                            <button type="submit" *ngIf="!touched && accountLevel !== accountLevelEnum.Manual && accountInfoTemp.id && !getForEditResult.lastChangesIsPublished" class="btn btn-secondary bg-light" (click)="publishProfile()"
+                            <button type="submit" *ngIf="!touched && accountLevel !== accountLevelEnum.Manual && accountInfoTemp.id && !getForEditResult?.lastChangesIsPublished" class="btn btn-secondary bg-light" (click)="publishProfile()"
                                 [disabled]="accountInfoForm.form.touched && !canPublish" [buttonBusy]="publishing" [busyText]="l('Publishing')">
                                 <span >
                                     <ng-container *ngIf="accountLevel === accountLevelEnum.Profile; else elseTemplate">
@@ -99,7 +99,7 @@
                                     <button type="button"
                                         *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner"
                                         class="btn mb-3 mt-4 w-100 btn-danger" (click)="disConnect()">
-                                        {{ "Disconnect" | localize }}
+                                        {{ accData?.disConnectLabel != null ? accData.disConnectLabel : "Disconnect" | localize }}
                                     </button>
                                 </div>
                             </div>
@@ -792,7 +792,7 @@
                         <div class="tab5" *ngIf="currentTab == accountInfoPageTabsEnum.ProfileView">
                             <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView" [isPublished]="isPublished"
                                 [viewMode]="viewMode" [accountLevel]="accountLevel" (edit)="triggerProfile($event)" (editedData)="savePerData($event)"
-                                (delete)="askToConfirmDeleteAccount()" (publish)="publishProfile()"
+                                (delete)="askToConfirmDeleteAccount()" (publish)="publishProfile()" (editedContactData)="getCotactData($event)" [isSync]="isSync"
                                 (unPublish)="unPublishProfile()"  [connectionCount]="connectionCount"
                                 [personalAccount]="accountDataForView?.accountTypeId == 21 ? true : false"></app-view-profile>
                         </div>
