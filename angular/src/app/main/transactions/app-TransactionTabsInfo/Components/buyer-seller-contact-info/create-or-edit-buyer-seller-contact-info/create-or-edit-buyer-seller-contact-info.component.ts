@@ -57,8 +57,11 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     if ($event)
       this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = true : this.createOrEditSellerContactInfo = true;
   }
-  save() {
-    this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
+  save(fromContinue?:boolean) {
+    if(!fromContinue){
+      this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
+
+    }
     this.synchronizeContactDetailsAndSave();
   }
   cancel() {
