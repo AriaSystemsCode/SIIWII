@@ -587,62 +587,94 @@ namespace onetouch.AppItems
             return x;
         }
 
-        public async Task<long> SaveImageToColor( long colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        public async Task<long> SaveImageToColor(string colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var xx = new EntityDto<long>() { Id = colorEntityId };
-            var color = await _appEntitiesAppService.GetAppEntityForEdit(xx);
-            
-            var appEntity = ObjectMapper.Map<AppEntity>(color.AppEntity);
-            var y = ObjectMapper.Map<AppEntityDto>(appEntity);
-
-            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
-            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString() ;
-            // add the image to the parent
-            
-            if(string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid))
-            {
-                appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid = Guid.NewGuid().ToString();
-            }
-            if (y.EntityAttachments.Count == 0) { y.EntityAttachments = new List<AppEntityAttachmentDto>(); }
-            var z = new AppEntityAttachmentDto {IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault, 
-                AttachmentCategoryEnum = 0, AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
-                guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.EntityAttachments.Count };
-
-            // rename image at temp attachment folder with guid and keep image name in variable
-            // copy it to attachment folder
-            // add record attachments tables
-            // add record to appitem entity attachements
+                string tempId = colorEntityId;
+                #region create color lookup
+                if (colorEntityId == "0" && appItemtExcelRecordDTO.ExcelDto.Actions=="6")
+                {
+                     
+               
+                    var codeExist = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => 
+                    x.Code == appItemtExcelRecordDTO.ExcelDto.ColorCode && x.EntityObjectTypeId == 16
+                    && (x.TenantId == null || x.TenantId == AbpSession.TenantId));
 
 
+                if (codeExist == null)
+                {
+                    var colorEntity = new AppEntityDto();
+                    colorEntity.Name = appItemtExcelRecordDTO.ExcelDto.ColorName;
+                    colorEntity.Code = appItemtExcelRecordDTO.ExcelDto.ColorCode;
+                    colorEntity.EntityObjectTypeId = 16;
+                    var itemObjectId = await _helper.SystemTables.GetObjectLookupId();
+                    colorEntity.ObjectId = itemObjectId;
 
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
+                    var returnColorEntityCreation = await _appEntitiesAppService.SaveEntity(colorEntity);
+                    tempId = returnColorEntityCreation.ToString();
+                }else { tempId = codeExist.Id.ToString(); }
+                 
+                }
+                #endregion create color lookup
 
-            try
-            {
-                System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, path + @"\" + z.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
+                var entityDto = new EntityDto<long>() { Id = Int32.Parse(tempId) };
+                var color = await _appEntitiesAppService.GetAppEntityForEdit(entityDto);
 
-            }
-            catch { }
+                var appEntity = ObjectMapper.Map<AppEntity>(color.AppEntity);
+                appEntity.Code = color.AppEntity.Code;
+                var appEntityDto = ObjectMapper.Map<AppEntityDto>(appEntity);
+
+                var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+                var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString();
+                // add the image to the parent
+
+                if (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid))
+                {
+                    appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid = Guid.NewGuid().ToString();
+                }
+                if (appEntityDto.EntityAttachments.Count == 0) { appEntityDto.EntityAttachments = new List<AppEntityAttachmentDto>(); }
+                var appEntityAttachmentDto = new AppEntityAttachmentDto
+                {
+                    IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,
+                    AttachmentCategoryEnum = 0,
+                    AttachmentCategoryId = 3,
+                    FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
+                    guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid,
+                    Index = appEntityDto.EntityAttachments.Count
+                };
+
+                // rename image at temp attachment folder with guid and keep image name in variable
+                // copy it to attachment folder
+                // add record attachments tables
+                // add record to appitem entity attachements
 
 
-            y.EntityAttachments = color.AppEntity.EntityAttachments;
-            
-            
-            foreach (var item1 in y.EntityAttachments)
-            {
-                item1.IsDefault = false;
 
-            }
-            y.TenantId = tenantId;
-            y.EntityAttachments.Add(z);
-            var x = await _appEntitiesAppService.SaveEntity(y);
+                if (!System.IO.Directory.Exists(path))
+                {
+                    System.IO.Directory.CreateDirectory(path);
+                }
+
+                try
+                {
+                    System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName, path + @"\" + appEntityAttachmentDto.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName.Split('.')[1], true);
+
+                }
+                catch { }
 
 
+                appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
 
-            return x;
+
+                foreach (var item1 in appEntityDto.EntityAttachments)
+                {
+                    item1.IsDefault = false;
+
+                }
+                appEntityDto.TenantId = tenantId;
+                appEntityDto.EntityAttachments.Add(appEntityAttachmentDto);
+                var saveEntity = await _appEntitiesAppService.SaveEntity(appEntityDto);
+
+            return saveEntity;
         }
 
         public async Task<long> SaveImageToItemColor(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
