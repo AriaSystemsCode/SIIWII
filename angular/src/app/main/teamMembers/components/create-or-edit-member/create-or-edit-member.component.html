@@ -55,6 +55,26 @@
                                 >
                                 </app-image-upload>
                             </div>
+
+                            <div class="form-group row">
+                                <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("Code")}}
+                                </label>
+                                <div class="col-md-8">
+                                    <app-codes *ngIf="!(memberDto?.id>0)" [objectType]="entityObjectType" [editMode]=false
+                                        classes="bg-white" [code]="memberDto?.code"
+                                        placeHolder="{{ 'Contact Code' | localize}}" (getCodeValue)="getCodeValue($event)"  [maxlength]="12">
+                                    </app-codes>
+                                    <app-codes *ngIf="memberDto?.id>0" [objectType]="entityObjectType" [readonly]="true"
+                                        [editMode]=true classes="bg-white" [code]="memberDto?.code"
+                                        placeHolder="{{ 'Contact Code' | localize}}"
+                                        (getCodeValue)="getCodeValue($event)"
+                                        [maxlength]="12"></app-codes>
+
+                                </div>
+                            </div>
+
                             <!--First Name -->
                             <div class="form-group row">
                                 <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">

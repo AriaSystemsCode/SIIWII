@@ -8,6 +8,7 @@ export interface ICreateEditAppItemExtraAttribute {
     filteredExtraAttributes?:FilteredExtraAttribute[]
     orderOfDisplay:number,
     selectedValue?:string
+    extraAttributes?: FilteredExtraAttribute[]; // ✅ Add this line
 }
 export class CreateEditAppItemExtraAttribute {
     header:string

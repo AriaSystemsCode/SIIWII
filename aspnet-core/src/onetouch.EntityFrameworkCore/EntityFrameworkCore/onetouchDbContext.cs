@@ -1,4 +1,5 @@
-﻿using onetouch.AppSubscriptionPlans;
+﻿using onetouch.Onetouch.ValidationRules;
+using onetouch.AppSubscriptionPlans;
 using onetouch.AppSubScriptionPlan;
 using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
@@ -58,6 +59,8 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<ValidationRule> ValidationRules { get; set; }
+
         public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
 
         public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }

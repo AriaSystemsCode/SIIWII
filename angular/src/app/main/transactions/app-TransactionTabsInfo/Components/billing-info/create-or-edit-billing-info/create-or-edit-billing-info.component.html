@@ -1,0 +1,109 @@
+<div class="position-relative  thin-scroll">
+
+    <div>
+        <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
+            <div class="header p-2 my-2 d-flex justify-content-between">
+                <h6><span class="headertxt">{{l("APContact")}} : </span></h6>
+
+
+            </div>
+            <hr class="my-2" />
+            <div class="InfoForm pr-3 thin-scroll">
+                <div class="row ml-1">
+                    <app-contact class="w-100" [billingIndexInfo]="1"
+                        (loadAddressComponent)="reloadAddresscomponentAPContact($event)"
+                        [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab" [currentTab]="currentTab"
+                        [appTransactionsForViewDto]="appTransactionsForViewDto"
+                        (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                        (formValidityChanged)="isContactFormValid($event,1)"></app-contact>
+                </div>
+            </div>
+        </div>
+
+        <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+            <app-address [isCreateOredit]="createOrEditBillingInfo" [contactId]="contactIdApContact"
+                (updateSelectedAddress)="updateApContact($event)" [selectedAddressDetails]="apContactSelectedAdd"
+                [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && isAccManual) ? true : false"
+                [showAddressType]="false" [currentTab]="currentTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto" [billingIndexInfo]="1" [canChange]="canChange"
+                [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"></app-address>
+        </div>
+
+        <div class="container-fluid pt-1" [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
+            <div class="header p-2 my-2 d-flex justify-content-between">
+                <h6><span class="headertxt"> {{l("ARContact")}} : </span></h6>
+            </div>
+            <hr class="my-2" />
+            <div class="InfoForm pr-3 thin-scroll">
+                <div class="row ml-1">
+                    <app-contact class="w-100" [billingIndexInfo]="2"
+                        (loadAddressComponent)="reloadAddresscomponentARContact($event)"
+                        [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab" [currentTab]="currentTab"
+                        [appTransactionsForViewDto]="appTransactionsForViewDto"
+                        (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                        (formValidityChanged)="isContactFormValid($event,2)"></app-contact>
+                </div>
+            </div>
+        </div>
+
+
+        <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+            <app-address [isCreateOredit]="createOrEditBillingInfo" [contactId]="contactIdARContact"
+                (updateSelectedAddress)="updateArContact($event)" [selectedAddressDetails]="arContactSelectedAdd"
+                [showAddressType]="false" [currentTab]="currentTab" [billingIndexInfo]="2"
+                [appTransactionsForViewDto]="appTransactionsForViewDto" [canChange]="canChange"
+                [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"></app-address>
+        </div>
+        <div class="container-fluid pt-1 mb-3 mt-3" [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
+            <div class="header p-2 my-2 d-flex justify-content-between">
+                <h6><span class="headertxt">{{l("PaymentInformation")}} : </span></h6>
+            </div>
+            <div class="row edit-mode ">
+                <div class="col-md-6 col-12 mb-4">
+                    <label class="label mt-1 mb-1">{{l("PaymentTerms")}}:</label>
+                    <p-dropdown id="payTerms" [options]="payTermsListList" name="payTerms"
+                        styleClass="form-control aria-select" [required]="true"
+                        [placeholder]="'PleaseSelect' | localize" (onChange)="onchangePayment($event)"
+                        [(ngModel)]="appTransactionsForViewDto.paymentTermsId">
+                    </p-dropdown>
+                    <p class="text-danger" *ngIf="!appTransactionsForViewDto.paymentTermsId">
+                        <small>
+                            Please select payment terms option
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div [ngClass]="!createOrEditBillingInfo   ?  'd-block' : 'd-none'">
+        <app-view-billing-info (showBillingEditMode)="onshowBillingEditMode($event)"
+            (onshowSaveBtn)="onshowSaveBtn($event)" [activeTab]="activeTab" [currentTab]="currentTab"
+            [contactIdApContact]="contactIdApContact" [contactIdARContact]="contactIdARContact"
+            [createOrEditBillingInfo]="createOrEditBillingInfo" [selectedAddressDetailsAp]="apContactSelectedAdd"
+            [selectedAddressDetailsAr]="arContactSelectedAdd" [appTransactionsForViewDto]="appTransactionsForViewDto"
+            [canChange]="canChange" (isContactsValid_1)="isContactFormValid($event,1)"
+            (isContactsValid_2)="isContactFormValid($event,2)">
+        </app-view-billing-info>
+    </div>
+
+
+    <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+        <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
+            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
+                class="continuebtn text-center btn float-right" *ngIf="!showSaveBtn">
+                {{l("Continue")}}
+            </button>
+            <button *ngIf="showSaveBtn" (click)="cancel();" class="cancelbtn text-center btn ">
+                Cancel
+
+            </button>
+            <button *ngIf="showSaveBtn" [disabled]="!(isContactsValid)" (click)="save();"
+                class="previewbtn text-center btn ">
+                Save
+
+            </button>
+        </div>
+    </div>
+</div>

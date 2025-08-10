@@ -1,4 +1,5 @@
-﻿using onetouch.AppSubscriptionPlans;
+﻿using onetouch.Onetouch.ValidationRules;
+using onetouch.AppSubscriptionPlans;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SycSegmentIdentifierDefinitions;
@@ -27,6 +28,7 @@ namespace onetouch.EntityHistory
 
         public static readonly Type[] HostSideTrackedTypes =
         {
+            typeof(ValidationRule),
             typeof(AppTenantInvoice),
             typeof(AppTenantActivitiesLog),
             typeof(oldAppTenantsActivitiesLog),

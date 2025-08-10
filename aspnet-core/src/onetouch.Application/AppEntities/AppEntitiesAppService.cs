@@ -131,7 +131,24 @@ namespace onetouch.AppEntities
 
         public async Task<PagedResultDto<GetAppEntityForViewDto>> GetAll(GetAllAppEntitiesInput input)
         {
+            //I46{start}
+            if (input.EntityObjectTypeId !=null)
+            {
+                var defaultObject = await _appEntityRepository.GetAll()
+                    .Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId && (z.TenantId == AbpSession.TenantId || z.TenantId == null) && z.IsDefault).FirstOrDefaultAsync();
+                if (defaultObject == null)
+                {
+                    var firstObject = await _appEntityRepository.GetAll()
+                    .Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId && (z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
+                    if (firstObject != null)
+                    {
+                        firstObject.IsDefault =true;
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
 
+                }
+            }
+            //I46{End}
             var filteredAppEntities = _appEntityRepository.GetAll()
                         .Include(e => e.EntityObjectTypeFk)
                         .Include(e => e.EntityObjectStatusFk)
@@ -169,7 +186,9 @@ namespace onetouch.AppEntities
                                       Name = o.Name,
                                       Code = o.Code,
                                       Notes = o.Notes,
-                                      //ExtraData = o.ExtraData,
+                                      IsDefault = o.IsDefault,
+                                      EntityObjectTypeId = o.EntityObjectTypeId,
+                                      EntityObjectTypeCode = o.EntityObjectTypeCode,
                                       Id = o.Id,
                                       IsHostRecord = o.TenantId == null
                                   },
@@ -867,7 +886,34 @@ namespace onetouch.AppEntities
                 })
                 .ToListAsync();
         }
-
+        //I46[Start]
+        public async Task<bool> SetAsDefault(long entityId, long entityObjectTypeId)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                if (entityId != 0)
+                {
+                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == entityId && z.EntityObjectTypeId == entityObjectTypeId).FirstOrDefaultAsync();
+                    if (entity != null)
+                    {
+                        var oldDefaultList = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == entity.EntityObjectTypeId
+                        && z.ObjectId == entity.ObjectId && z.TenantId == entity.TenantId && z.IsDefault == true && z.Id != entity.Id)
+                       .ToListAsync();
+                        if (oldDefaultList != null && oldDefaultList.Count > 0)
+                        {
+                            oldDefaultList.ForEach(z => z.IsDefault = false);
+                        }
+                        entity.IsDefault = true;
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        return true;
+                    }
+                    else { return false; }
+                    
+                }
+                else { return false; }
+            }
+        }
+        //I46 {End}
         public async Task<long> SaveEntity(AppEntityDto input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -897,7 +943,8 @@ namespace onetouch.AppEntities
                     //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[End]   
                     entity = new AppEntity();
                 }
-
+               
+                
                 //temp solution to test 
                 if (string.IsNullOrEmpty(input.Code))
                     input.Code = System.Guid.NewGuid().ToString();
@@ -933,8 +980,21 @@ namespace onetouch.AppEntities
                 //input.TenantID==-1 means not set and the backend must set it by the current seesion.TenantId
                 entity.TenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
                 //entity.TenantId = GetCurrentTenant().Id;
+                //I46[Start]
+                if (input.IsDefault)
+                {
+                    var oldDefaultList = await _appEntityRepository.GetAll().Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId
+                    && z.ObjectId == input.ObjectId && z.TenantId == entity.TenantId && z.IsDefault == true)
+                        .WhereIf(input.Id !=0, z=>z.Id!=input.Id)
+                        .ToListAsync();
+                    if (oldDefaultList != null && oldDefaultList.Count > 0)
+                    {
+                        oldDefaultList.ForEach(z=>z.IsDefault=false);
+                    }
 
-
+                }
+                entity.IsDefault = input.IsDefault;
+                //I46[End]
                 if (entity.EntityAttachments == null)
                     entity.EntityAttachments = new List<AppEntityAttachment>();
                 if (entity.EntityAddresses == null)
