@@ -1128,6 +1128,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
 
-    }
 
+}
 }
