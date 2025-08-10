@@ -2007,7 +2007,7 @@ namespace onetouch.Accounts
                     requesterSSIN = currentaccount.SSIN;
                 if (string.IsNullOrEmpty(requesterSSIN) || string.IsNullOrEmpty(recipientSSIN))
                     return;
-                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN, true);
+                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN ,true,null);
                 return;
                 
                 
@@ -2643,7 +2643,7 @@ namespace onetouch.Accounts
                                         ContactDto savedContactDto = await CreateOrUpdateContact(accountDto);
                                         await PublishProfile();
                                         await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
-                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false);
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false,null);
                                     }
                                     //I40[End]
 
@@ -3114,7 +3114,7 @@ namespace onetouch.Accounts
             var retId = await _appEntityRelationShipRepository.InsertAndGetIdAsync(entity);
             return retId;
         }
-        public async Task<string> ApplyRelationOnProfile(long input, string ssin)
+        public async Task<string> ApplyRelationOnProfile(long input, string ssin, bool? isPublic)
         {
             //I40{Start}
             if (ssin == null)
@@ -3134,7 +3134,7 @@ namespace onetouch.Accounts
             var originalPublishContactFortCurrTenant = await _appMarketplaceContactRepository.GetAll()
                        .FirstOrDefaultAsync(x => x.OwnerId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
             if(originalPublishContactFortCurrTenant!=null)
-               returnVal = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(originalPublishContactFortCurrTenant.SSIN, ssin, false);
+               returnVal = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(originalPublishContactFortCurrTenant.SSIN, ssin, false, isPublic);
             return returnVal;
             //I40[End]
             string ret = "";

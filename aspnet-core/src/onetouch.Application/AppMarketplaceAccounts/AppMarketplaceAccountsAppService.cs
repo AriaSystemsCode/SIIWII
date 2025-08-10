@@ -1113,7 +1113,8 @@ namespace onetouch.AppMarketplaceAccounts
         }
 
         //I40 -MMT[Start]
-        public async Task<string> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect)
+        public async Task<string> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect, 
+            bool? isPublic)
         {
             string returnLabel = "";
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
@@ -1157,7 +1158,7 @@ namespace onetouch.AppMarketplaceAccounts
                     relation.EntityObjectStatusId = activeRealtionshipStatusId;
                     relation.RecipientContactName = recipientContact.Name;
                     relation.RequesterContactName = requestContact.Name;
-
+                    
 
                     //var recipientType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == recipientContact.EntityObjectTypeId).FirstOrDefaultAsync();
                     if (recipientType != null)
@@ -1196,6 +1197,11 @@ namespace onetouch.AppMarketplaceAccounts
                                 relation.Name = relation.RequesterContactName + " " + extrDataConnectedLabel.AttributeValue.TrimEnd() + " " + relation.RecipientContactName;
                         }
                     }
+                    if (isPublic != null)
+                    {
+                        relation.SharingLevel = isPublic == true ? 1 : 4;
+                    }
+
                     relation.ObjectId = await _helper.SystemTables.GetObjectMarketplaceContactRelationshipId();
                     relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELATIONSHIP"); 
                     await _appContactRelationshipInfoRepository.InsertAsync(relation);
