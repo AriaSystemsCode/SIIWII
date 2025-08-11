@@ -29,8 +29,8 @@
 
             </div>
 
-            <button [disabled]="!(isContactsValid)" (click)="save(true)" *ngIf="!showSaveBtn "
-                class="continuebtn text-center">
+            <button [disabled]="!(isContactsValid)" *ngIf="!showSaveBtn "
+                class="continuebtn text-center"  (click)="save(true)">
                 Continue
             </button>
         </div>
