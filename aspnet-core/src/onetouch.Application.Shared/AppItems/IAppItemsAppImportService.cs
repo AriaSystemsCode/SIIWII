@@ -17,11 +17,11 @@ namespace onetouch.AppItems
         Task<ExcelTemplateDto> GetImportVideo();
         Task<PagedResultDto<LookupItems>> GetAllLookUp(GetAllAppItemsInput input);
         Task<PagedResultDto<LookupItems>> GetAllLookUpWithColors(GetAllAppItemsInput input);
-        Task<AppItemtExcelRecordDTO> GetAppItemForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
+        Task<AppItemtExcelRecordDTO> GetAppItemForEditData(string input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
         Task<long> SaveImageToItem(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
         Task<long> SaveImageToItemColor(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
         Task<PagedResultDto<LookupItems>> GetAllColorsLookUp(GetAllAppEntitiesInput input);
-        Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
+        Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(string input, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
 
         Task<long> SaveImageToColor(string colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO);
     }

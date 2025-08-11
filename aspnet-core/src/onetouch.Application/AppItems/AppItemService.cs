@@ -273,9 +273,9 @@ namespace onetouch.AppItems
 
 
 
-        public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(string input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var appItemId = _appItemRepository.GetAll().Where(e=> e.EntityId == input).FirstOrDefault();
+            var appItemId = _appItemRepository.GetAll().Where(e=> e.EntityId == Int32.Parse(input)).FirstOrDefault();
             var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId= appItemId.Id };
             var y = await GetAppItemForEdit(xInput);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
@@ -409,9 +409,9 @@ namespace onetouch.AppItems
             return result;
         }
 
-        public async Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(long input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
-        {
-            var appItemId = _appItemRepository.GetAll().Where(e => e.EntityId == input).FirstOrDefault();
+        public async Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(string input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
+        {   var longinput = input.Split(',');
+            var appItemId = _appItemRepository.GetAll().Where(e => e.EntityId == Int32.Parse(longinput[0])).FirstOrDefault();
             var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = ((long)appItemId.ParentId) };
             var y = await GetAppItemForEdit(xInput);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
