@@ -778,12 +778,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
       
         // Set values using helper functions
-        if (this.editedContactPerData?.firstName != null) {
-          this.setStringValue(701, this.editedContactPerData?.firstName); 
+        if (event?.firstName != null) {
+          this.setStringValue(701, event?.firstName); 
         }
       
-        if (this.editedContactPerData?.lastName != null) {
-            this.setStringValue(702, this.editedContactPerData?.lastName);
+        if (event?.lastName != null) {
+            this.setStringValue(702, event?.lastName);
           }
 
           if (this.editedContactPerData?.titleId != null) {

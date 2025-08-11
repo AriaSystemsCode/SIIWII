@@ -424,31 +424,31 @@
 
                                 <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class=" font-weight-bold mr-3" [ngClass]="Editting ? 'addWidth':''"><img
-                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "Name" |
+                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "First Name" |
                                     localize ) + " :"}}</h6>
 
                                 <p *ngIf="!editFirstNameValue" class="text-left" style="color: #595959;"
-                                    [ngClass]="{'hide':NoteditInfo}">{{accountData?.name}}</p>
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.firstName}}</p>
                                 <p *ngIf="editFirstNameValue" class="text-left" style="color: #595959;"
                                     [ngClass]="{'hide':NoteditInfo}">{{editFirstNameValue}}</p>
                                 <input style="color: #595959 !important;" type="text"
-                                    class="form-control form-control-sm aria-input-text" name="name"
-                                    #nameInput="ngModel" required name="name" minlength="2"
+                                    class="form-control form-control-sm aria-input-text" name="firstName"
+                                    #firstNameInput="ngModel" required name="firstName" minlength="2"
                                     [(ngModel)]="editFirstNameValue"
                                     [placeholder]="'Please Enter Name' | localize " required
                                     [class.hide]="editInfo">
                                 <validation-messages *ngIf="NoteditInfo"
-                                    [formCtrl]="nameInput"></validation-messages>
+                                    [formCtrl]="firstNameInput"></validation-messages>
 
                             </div>
                             <hr class="header">
-                            <!-- <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
+                            <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class="text-right font-weight-bold mr-3 "><img
-                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "SurName" |
+                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "Sur Name" |
                                     localize ) + " :" }}</h6>
 
                                 <p *ngIf="!editLastNameValue" class="text-left" style="color: #595959;"
-                                    [ngClass]="{'hide':NoteditInfo}">{{accountData?.lastName}}</p>
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.lastName}}</p>
                                 <p *ngIf="editLastNameValue" class="text-left" style="color: #595959;"
                                     [ngClass]="{'hide':NoteditInfo}">{{editLastNameValue}}</p>
                                 <input style="color: #595959 !important;" type="text"
@@ -461,7 +461,7 @@
 
 
                             </div>
-                            <hr class="header"> -->
+                            <hr class="header">
                             <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class=" font-weight-bold mr-3 "  [ngClass]="Editting ? 'addWidth':''"> <img
                                         src="../../assets/img/input_icons/outline-work.png" class=""> {{ (
