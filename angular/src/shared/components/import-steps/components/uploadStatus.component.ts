@@ -38,9 +38,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   acceptedAspectRatio;
   currentActionRecord: any = null;
   @ViewChildren('codeInputContainer') codeInputContainers!: QueryList<ElementRef>;
+  @ViewChildren('colorCodeInputContainer') colorCodeInputContainers!: QueryList<ElementRef>;
+
   @ViewChildren('rowRef') rowRefs!: QueryList<ElementRef>;
   @Output() searchItemCode = new EventEmitter<any>();
   LinkToExistingITEM_Ret_Data;
+  LinkToExistingItemColor_Ret_Data;
+  LinkToExistingColorLookup_Ret_Data;
   activeRecord: any = null;
   @ViewChild('codeInputRef') codeInputRef!: ElementRef<HTMLInputElement>;
   @Output() selectSugItemCode = new EventEmitter<any>();
@@ -52,6 +56,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   hasDataRecords: boolean = false;
   hasImageRecords: boolean = false;
   UploadActionEnum = UploadActionEnum;
+  @Output() updatedRecords = new EventEmitter<any[]>();
 
 
   public constructor(
@@ -71,6 +76,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['uploadingResult'] && this.uploadingResult) {
+      this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map((r, idx) => ({
+        id: r.id ?? idx,
+        ...r
+      }));
+
       const allRecords = this.uploadingResult?.excelRecords || [];
       this.hasDataRecords = allRecords.some(r => r.recordType !== 'Image');
       this.hasImageRecords = allRecords.some(r => r.recordType === 'Image');
@@ -87,7 +97,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     })) || [];
     this.records.forEach(r => r.showActions = false);
 
-    //I44 update record
+    //I44-FE update record
     if (changes['updatedRecordData'] && this.updatedRecordData) {
       const { record, newData } = this.updatedRecordData;
       const updatedRec = this.records.find(r => r.id === record.id);
@@ -129,6 +139,19 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       });
     } else {
       this.goNextstep.emit();
+
+      this.records.forEach(updatedRec => {
+        const originalRec = this.uploadingResult.excelRecords.find(r => r.id === updatedRec.id);
+        if (originalRec) {
+          Object.assign(originalRec, updatedRec);
+        }
+      });
+
+      this.updatedRecords.emit(this.uploadingResult);
+
+      // this.uploadingResult.totalPassedRecords = this.uploadingResult.excelRecords.filter(r => r.status.toLowerCase() === 'passed').length;
+      // this.uploadingResult.totalFailedRecords = this.uploadingResult.excelRecords.filter(r => r.status.toLowerCase() === 'failed').length;
+
       this.totalFailedRecords.emit(
         this.uploadingResult.totalFailedRecords
       );
@@ -139,6 +162,21 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   askToClose() {
+    this.records.forEach(r => {
+      r._isLinkingParent = false;
+      r._isLinkingItemColor = false;
+      r._isLinkingColorLookup = false;
+      r._isCreateParent = false;
+      r._isCreateItemColor = false;
+      r._isCreateColorLookup = false;
+      r._isLinkNewParent = false;
+      r._isLinkNewItemColor = false;
+      r._isLinkNewColorLookup = false;
+      r._inAction = false;
+      delete r._original;
+    });
+    this.currentActionRecord = null;
+
     this.close.emit(true);
   }
 
@@ -346,45 +384,64 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record._inAction = true;
     record._original = { ...record };
     record.action = action;
-  
+
+
+    record._isLinkingParent = false;
+    record._isLinkingItemColor = false;
+    record._isLinkingColorLookup = false;
+    record._isCreateParent = false;
+    record._isCreateItemColor = false;
+    record._isCreateColorLookup = false;
+    record._isLinkNewParent = false;
+    record._isLinkNewItemColor = false;
+    record._isLinkNewColorLookup = false;
+
     switch (action) {
       case UploadActionEnum.ValidateDataRecord:
         break;
-  
+
       case UploadActionEnum.LinkToExistingParentItem:
         this.LinkToExistingITEM(record);
         break;
-  
+
       case UploadActionEnum.LinkToExistingItemColor:
+        this.LinkToExistingITEMCOLOR(record);
         break;
-  
+
       case UploadActionEnum.LinkToExistingColorLookup:
+        this.LinkToExistingCOLORLOOKUP(record);
         break;
-  
+
       case UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage:
+        this.CreateNewParentItemAndLinkAsDefaultImage(record);
         break;
-  
+
       case UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage:
+        this.CreateNewItemColorAndLinkImageAsDefaultImage(record);
         break;
-  
+
       case UploadActionEnum.CreateNewColorLookupAndLinkImage:
+        this.CreateNewColorLookupAndLinkImage(record);
         break;
-  
+
       case UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData:
+        this.LinkToNewParentItemCodeFromAssociatedData(record);
         break;
-  
+
       case UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData:
+        this.LinkToNewItemVariantCodeFromAssociatedData(record);
         break;
-  
+
       case UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData:
+        this.LinkToNewColorLookupCodeFromAssociatedData(record);
         break;
-  
+
       default:
         console.warn('Unknown action enum:', action);
     }
   }
-  
-  
+
+
 
 
   LinkToExistingITEM(record) {
@@ -409,6 +466,86 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   }
+
+  LinkToExistingITEMCOLOR(record) {
+    record._isLinkingItemColor = true;
+
+    // Scroll after DOM updated
+    setTimeout(() => {
+      const container = this.codeInputContainers.find(
+        (el: ElementRef) => el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
+
+
+  }
+
+  LinkToExistingCOLORLOOKUP(record) {
+    record._isLinkingColorLookup = true;
+
+    // Scroll after DOM updated
+    setTimeout(() => {
+      const container = this.colorCodeInputContainers.find(
+        (el: ElementRef) => el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
+  }
+
+  CreateNewParentItemAndLinkAsDefaultImage(record) {
+    record._isCreateParent = true;
+
+  }
+
+
+  CreateNewItemColorAndLinkImageAsDefaultImage(record) {
+    record._isCreateItemColor = true;
+
+  }
+
+
+  CreateNewColorLookupAndLinkImage(record) {
+    record._isCreateColorLookup = true;
+
+  }
+
+
+  LinkToNewParentItemCodeFromAssociatedData(record) {
+    record._isLinkNewParent = true;
+
+  }
+
+
+  LinkToNewItemVariantCodeFromAssociatedData(record) {
+    record._isLinkNewItemColor = true;
+
+  }
+
+  LinkToNewColorLookupCodeFromAssociatedData(record) {
+    record._isLinkNewColorLookup = true;
+
+  }
+
+
 
   getImageUrl(imageName: string): string {
     if (!imageName)
@@ -491,7 +628,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   onCodeInputChange(record: any, value: string) {
-    this.setRecordValue(record, 'code', value);
+    if (record._isLinkingParent || record._isLinkingItemColor)
+      this.setRecordValue(record, 'code', value);
+
+    else if (record._isLinkingColorLookup)
+      this.setRecordValue(record, 'colorCode', value);
+
+
     const payload = {
       filter: value,
       recordId: record.id,
@@ -516,31 +659,48 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       visibilityStatus: 0,
       sorting: "",
       skipCount: 0,
-      maxResultCount: 100
+      maxResultCount: 100,
+      isCodeItem: record._isLinkingParent || false,
+      isCodeColorItem: record._isLinkingItemColor || false,
+      isCodeColorLookup: record._isLinkingColorLookup || false
     };
 
     this.searchItemCode.emit(payload);
   }
 
   confirmLinking(record: any): void {
-    const codeValue = this.getRecordValue(record, 'code');
+    let codeValue = "";
+    let ColorCodeValue = "";
 
-    //I44 3 first cases  if (codeValue  && (record._isLinkingParent  || record._isLinking..... )) {
-    if (codeValue  && (record._isLinkingParent )) {
+
+    if (record._isLinkingParent || record._isLinkingItemColor)
+      codeValue = this.getRecordValue(record, 'code');
+
+    else if (record._isLinkingColorLookup)
+      ColorCodeValue = this.getRecordValue(record, 'colorCode');
+
+
+    if (((record._isLinkingParent || record._isLinkingItemColor) && codeValue) || (record._isLinkingColorLookup && ColorCodeValue)) {
       record.fieldsErrors = [];
       record.errorMessage = "";
       record.status = "Passed";
     }
     record._isLinkingParent = false;
+    record._isLinkingItemColor = false;
+    record._isLinkingColorLookup = false;
+    record._isCreateParent = false;
+    record._isCreateItemColor = false;
+    record._isCreateColorLookup = false;
+    record._isLinkNewParent = false;
+    record._isLinkNewItemColor = false;
+    record._isLinkNewColorLookup = false;
     this.currentActionRecord = null;
     record._inAction = false;
     this.LinkToExistingITEM_Ret_Data = null;
+    this.LinkToExistingItemColor_Ret_Data = null;
+    this.LinkToExistingColorLookup_Ret_Data = null;
     this.activeRecord = null;
-
-    
-
     this.cdr.detectChanges();
-
   }
 
 
@@ -550,9 +710,21 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       delete record._original;
     }
     record._isLinkingParent = false;
+    record._isLinkingItemColor = false;
+    record._isLinkingColorLookup = false;
+    record._isCreateParent = false;
+    record._isCreateItemColor = false;
+    record._isCreateColorLookup = false;
+    record._isLinkNewParent = false;
+    record._isLinkNewItemColor = false;
+    record._isLinkNewColorLookup = false;
     this.currentActionRecord = null;
     record._inAction = false;
+
     this.LinkToExistingITEM_Ret_Data = null;
+    this.LinkToExistingItemColor_Ret_Data = null;
+    this.LinkToExistingColorLookup_Ret_Data = null;
+
     this.activeRecord = null;
 
     this.cdr.detectChanges();
@@ -566,11 +738,17 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   selectSuggestion(record: any, selectedItem: any) {
-    this.setRecordValue(record, 'code', selectedItem.displayName);
+    if (record._isLinkingParent || record._isLinkingItemColor)
+      this.setRecordValue(record, 'code', selectedItem.displayName);
+
+    else if (record._isLinkingColorLookup)
+      this.setRecordValue(record, 'colorCode', selectedItem.displayName);
+
     setTimeout(() => {
       this.activeRecord = null;
     }, 0);
     this.selectSugItemCode.emit({ selectedItem, record });
 
   }
+
 }  
