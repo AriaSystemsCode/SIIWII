@@ -33,11 +33,12 @@
     (totalFailedRecords)="ontotalFailedRecords($event)"
     (totalPassedRecords)="ontotalPassedRecords($event)"
     [imagesList]="imagesList"
-    (searchItemCode)="onsSarchItemCode($event)"
+    (searchItemCode)="onsSearchItemCode($event)"
     (selectSugItemCode)="onSelectSugItemCode($event)"
     [updatedRecordData]="updatedRecordData"
     [imData]="imData"
     [imImages]="imImages"
+    (updatedRecords)="onUpdatedRecords($event)"
 ></uploadStatusModal>
 <!-- <autoCropModal
     #AutoCropModal

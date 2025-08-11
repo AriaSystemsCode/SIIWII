@@ -164,6 +164,51 @@
                           </ul>
 
                         </div>
+
+
+
+                        <div *ngIf="column.name === 'Code' && record._isLinkingItemColor"
+                          [attr.data-record-id]="record.id" class="position-relative" #codeInputContainer>
+                          <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'code')">
+                            Search for Item - Color
+                          </small>
+
+                          <input type="text" class="form-control link-parent-input"
+                            [ngModel]="getRecordValue(record, 'code')"
+                            (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.." #codeInputRef
+                            (focus)="activeRecord = record" />
+
+                          <ul class="search-dropdown bg-white border position-absolute mt-1 w-100 shadow-sm"
+                            *ngIf="activeRecord === record && LinkToExistingItemColor_Ret_Data?.items?.length > 0">
+                            <li *ngFor="let item of LinkToExistingItemColor_Ret_Data.items"
+                              (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                              {{item.displayName}}
+                            </li>
+                          </ul>
+                        </div>
+
+
+                        <div *ngIf="column.name === 'Color Code'&& record._isLinkingColorLookup"
+                          [attr.data-record-id]="record.id" class="position-relative" #colorCodeInputContainer>
+
+                          <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'colorCode')">
+                            Search for Color Lookup
+                          </small>
+
+                          <input type="text" class="form-control link-parent-input"
+                            [ngModel]="getRecordValue(record, 'colorCode')"
+                            (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.."
+                            #colorCodeInputRef (focus)="activeRecord = record" />
+
+                          <ul class="search-dropdown bg-white border position-absolute mt-1 w-100 shadow-sm"
+                            *ngIf="activeRecord === record && LinkToExistingColorLookup_Ret_Data?.items?.length > 0">
+                            <li *ngFor="let item of LinkToExistingColorLookup_Ret_Data.items"
+                              (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                              {{item.displayName}}
+                            </li>
+                          </ul>
+                        </div>
+
                       </div>
 
                       <!-- Default input -->
@@ -171,9 +216,14 @@
                         <input *ngSwitchDefault type="text" class="form-control" style="width: fit-content;"
                           [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
                           (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                          [disabled]=" !(column.name === 'Code' && record._isLinkingParent)" [ngClass]="{
-                            'link-parent-input': column.name === 'Code' && record._isLinkingParent
-                          }" [hidden]="column.name === 'Code' && record._isLinkingParent" />
+                          [disabled]=" !(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor))"
+                          [ngClass]="{
+                            'link-parent-input': column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor)
+                          }"
+                          [hidden]="
+                          (column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor)) ||
+                          (column.name === 'Color Code'  && record._isLinkingColorLookup)
+                        "/>
                       </ng-container>
 
 

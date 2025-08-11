@@ -123,7 +123,7 @@ export class MainImportComponent
         private _importService: MainImportService,
         private _downloadService: FileDownloadService,
         private injector: Injector,
-        //I44 remove _appItemsServiceProxy
+        //I44-FE remove _appItemsServiceProxy
         private _appItemsServiceProxy: AppItemsServiceProxy
     ) {
         super(injector);
@@ -824,44 +824,99 @@ export class MainImportComponent
     }
 
 
-    onsSarchItemCode($event) {
-        this.importServiceProxy
-            .getAllLookUp(
-                this.appSession.tenantId,
-                0,
-                false,
-                $event.filter,
-                $event.filterType,
-                "",
-                "",
-                0,
-                [],
-                [],
-                [],
-                [],
-                [],
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                "",
-                0,
-                100
-            )
-            .subscribe((result) => {
-                this.StatusModal.LinkToExistingITEM_Ret_Data = result;
-            });
+    onsSearchItemCode($event) {
+        //I44-BE search APIs ?
+
+        if ($event?.isCodeItem) {
+            this.importServiceProxy
+                .getAllLookUp(
+                    this.appSession.tenantId,
+                    0,
+                    false,
+                    $event.filter,
+                    $event.filterType,
+                    "",
+                    "",
+                    0,
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    "",
+                    0,
+                    100
+                )
+                .subscribe((result) => {
+                    this.StatusModal.LinkToExistingITEM_Ret_Data = result;
+                });
+        }
+
+
+        else if ($event?.isCodeColorItem) {
+            this.importServiceProxy
+                .getAllLookUpWithColors(
+                    this.appSession.tenantId,
+                    0,
+                    false,
+                    $event.filter,
+                    $event.filterType,
+                    "",
+                    "",
+                    0,
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    "",
+                    0,
+                    100
+                )
+                .subscribe((result) => {
+                    this.StatusModal.LinkToExistingItemColor_Ret_Data = result;
+                });
+        }
+
+
+        else if ($event?.isCodeColorLookup) {
+            this.importServiceProxy
+                .getAllColorsLookUp(
+                    $event.filter,
+                    undefined,
+                    undefined,
+                    undefined, undefined, undefined, undefined, undefined, undefined, "", 0, 100
+
+                )
+                .subscribe((result) => {
+                    this.StatusModal.LinkToExistingColorLookup_Ret_Data = result;
+                });
+        }
+
 
     }
 
     onSelectSugItemCode(event: { selectedItem: any, record: AppItemtExcelRecordDTO }) {
         const { selectedItem, record } = event;
-     
-        
-        //I44 - getAppItemForEditData
+
+
+        //I44-BE - get data APIs ?   - for item colo & color ? 
+
+        //I44-BE -  AppItemForEditData null data 
         this._appItemsServiceProxy.getAppItemForEditData(
             selectedItem.id,
             record.recordType,
@@ -931,15 +986,20 @@ export class MainImportComponent
             record.errorMessage,
             record.imageType,
             record.image
-          )
-          
+        )
+
             .subscribe((result) => {
                 this.updatedRecordData = {
                     record,
                     newData: result
                 };
             });
+
     }
-    
+
+    onUpdatedRecords($event) {
+        this.uploadingResult = $event;
+    }
+
 }
 
