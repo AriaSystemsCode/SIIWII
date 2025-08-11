@@ -78,6 +78,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     ).subscribe((res) => {
       this.accountDataForView = res.account
       this.marketPlaceData = res
+      console.log(this.marketPlaceData,'ll')
 
     })
   }

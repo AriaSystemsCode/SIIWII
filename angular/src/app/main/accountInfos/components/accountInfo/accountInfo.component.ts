@@ -245,13 +245,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
 
 
-    defineAccountTypes() {
-        this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-            .subscribe((res) => {
+    // defineAccountTypes() {
+    //     this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
+    //         .subscribe((res) => {
 
-                this.allAccountTypes = res
-            })
-    }
+    //             this.allAccountTypes = res
+    //         })
+    // }
 
     showDialogSaveAccount() {
         this.save();
@@ -395,7 +395,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         if (this.accountInfoTemp)
             this.accountInfoTemp.currencyId = this.tenantDefaultCurrency.value;
 
-        this.defineAccountTypes();
+        // this.defineAccountTypes();
         this.getLanguages();
         this.getCurrencies();
         this.getCurrenciesDto();
@@ -422,12 +422,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     getAccountTypes() {
         this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-            .subscribe((result) => {
-                this.accountTypes = result;
-
-            });
-
-    }
+          .subscribe(result => {
+            this.accountTypes = (result ?? []).filter(t =>
+             t.label === 'Business'
+            );
+          });
+      }
+      
 
 
     getAccountDataForEdit(): void {
@@ -750,9 +751,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
     getCotactData(event){
         this.editedContactPerData = event
+        this.accountInfoTemp.entityAttachments = event?.entityAttachments
         console.log(this.editedContactPerData ,'editedContactPerData')
+
     }
     savePerData(event) {
+        console.log(event,'event')
        
         this.accountInfoTemp = event
         if (!this.accountInfoTemp.entityExtraData) {
@@ -799,7 +803,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
           if (this.editedContactPerData?.joinDateIsPublic != null) {
 
             
-            this.setBooleanValue(713, this.editedContactPerData.joinDateIsPublic); 
+            this.setBooleanValue(713, true); 
           }
           
           if (this.editedContactPerData?.languageIsPublic != null) {
@@ -829,7 +833,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
           if (this.editedContactPerData?.userNameIsPublic != null) {
             this.setBooleanValue(714, this.editedContactPerData.userNameIsPublic); // boolean
           }
+          
         this.saveMyAccount();
+
       }
       
     private ensureAttribute(attrId: number): void {
