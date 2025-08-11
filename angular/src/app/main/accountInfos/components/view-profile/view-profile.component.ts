@@ -159,8 +159,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.Editting = true;
             this.editInfo = false;
             this.NoteditInfo = true;
-            this.editFirstNameValue = this.accountData.name;
-            // this.editLastNameValue = this.accountData.lastName;
+            this.editFirstNameValue = this.contactData?.firstName;
+            this.editLastNameValue =  this.contactData?.lastName;
             this.editJobTitleValue = this.contactData?.jobTitle;
             this.editEMailAddressValue = this.accountData.eMailAddress;
             // this.editLanguageNameValue = this.contactData.languageName;
@@ -172,7 +172,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             if (!this.editedPersonalData) {
                 this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
               }
-              this.editedPersonalData.name= this.editFirstNameValue
+              this.editedPersonalData.firstName= this.editFirstNameValue
+              this.editedPersonalData.lastName= this.editLastNameValue
               this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
               this.editedPersonalData.languageId = this.contactData.languageId;
               this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;              
@@ -432,6 +433,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.allLanguages = result;
         });
     }
+
 
      
 }
