@@ -506,7 +506,8 @@ namespace onetouch.AppItems
             appItemtExcelRecordDTO.ExcelDto.PriceD = y.AppItem.AppItemPriceInfos != null && y.AppItem.AppItemPriceInfos.Any()
                       ? y.AppItem.AppItemPriceInfos.FirstOrDefault(p => p.Code == "D")?.Price.ToString()
                       : null;
-
+            appItemtExcelRecordDTO.ParentCode = y.AppItem.Code;
+            appItemtExcelRecordDTO.ExcelDto.ParentCode = y.AppItem.Code;
             return appItemtExcelRecordDTO;
         }
 
