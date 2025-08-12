@@ -408,11 +408,11 @@ export class AccountsComponent
     }
 
 
-    createRelation(account) {
+    createRelation(account,status:boolean = false) {
         this.showMainSpinner();
 
         this._accountsServiceProxy
-            .applyRelationOnProfile(account.account.id, undefined)
+            .applyRelationOnProfile(account.account.id, undefined,status,undefined)
             .pipe(
                 finalize(() => {
                     ;

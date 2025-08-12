@@ -104,5 +104,20 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         this.disconnectMe.emit(account);
    
       }
+      makeRelationPrivate(account){
+          this.showMainSpinner();
+        
+                this._accountsServiceProxy
+                    .applyRelationOnProfile(account.account.id, undefined,true,undefined)
+                    .pipe(
+                        finalize(() => {
+                            ;
+                            this.hideMainSpinner();
+                        })
+                    )
+                    .subscribe((result: string) => {
+                      account?.availableConnections[0]?.defaultVisibility == 'Private'
+                    });
+      }
 
 }

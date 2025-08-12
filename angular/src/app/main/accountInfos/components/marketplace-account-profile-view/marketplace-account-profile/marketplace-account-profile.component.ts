@@ -89,9 +89,9 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   }
 
 
-  createRelation() {
+  createRelation(status:boolean = false) {
     this._AccountsServiceProxy
-      .applyRelationOnProfile(this.accountId, undefined)
+      .applyRelationOnProfile(this.accountId, undefined,status,undefined)
       .pipe(
         finalize(() => {
           ;

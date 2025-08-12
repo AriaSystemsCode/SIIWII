@@ -232,9 +232,9 @@ disconnect(account: AccountDto): void {
       });
 }
 
-  createRelation(account) {
+  createRelation(account,status:boolean = false) {
     this._accountsServiceProxy
-      .applyRelationOnProfile(undefined,account.account.ssin)
+      .applyRelationOnProfile(account.account.id,account.account.ssin,status,undefined)
       .pipe(
         finalize(() => {
           ;

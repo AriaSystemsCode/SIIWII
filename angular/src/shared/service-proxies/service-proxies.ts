@@ -2592,9 +2592,11 @@ export class AccountsServiceProxy {
     /**
      * @param input (optional) 
      * @param ssin (optional) 
+     * @param isPublic (optional) 
+     * @param connectionTypeId (optional) 
      * @return Success
      */
-    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined): Observable<string> {
+    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ApplyRelationOnProfile?";
         if (input === null)
             throw new Error("The parameter 'input' cannot be null.");
@@ -2602,6 +2604,12 @@ export class AccountsServiceProxy {
             url_ += "input=" + encodeURIComponent("" + input) + "&";
         if (ssin !== undefined && ssin !== null)
             url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
+        if (isPublic !== undefined && isPublic !== null)
+            url_ += "isPublic=" + encodeURIComponent("" + isPublic) + "&";
+        if (connectionTypeId === null)
+            throw new Error("The parameter 'connectionTypeId' cannot be null.");
+        else if (connectionTypeId !== undefined)
+            url_ += "connectionTypeId=" + encodeURIComponent("" + connectionTypeId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -29255,9 +29263,11 @@ export class CreateMarketplaceAccountServiceProxy {
      * @param requesterSSIN (optional) 
      * @param recipientSSIN (optional) 
      * @param disconnect (optional) 
+     * @param isPublic (optional) 
+     * @param connectionTypeId (optional) 
      * @return Success
      */
-    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined): Observable<string> {
+    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/CreateMarketplaceAccount/CreateOrEditMarketplaceContactRelationship?";
         if (requesterSSIN !== undefined && requesterSSIN !== null)
             url_ += "requesterSSIN=" + encodeURIComponent("" + requesterSSIN) + "&";
@@ -29265,6 +29275,10 @@ export class CreateMarketplaceAccountServiceProxy {
             url_ += "recipientSSIN=" + encodeURIComponent("" + recipientSSIN) + "&";
         if (disconnect !== undefined && disconnect !== null)
             url_ += "disconnect=" + encodeURIComponent("" + disconnect) + "&";
+        if (isPublic !== undefined && isPublic !== null)
+            url_ += "isPublic=" + encodeURIComponent("" + isPublic) + "&";
+        if (connectionTypeId !== undefined && connectionTypeId !== null)
+            url_ += "connectionTypeId=" + encodeURIComponent("" + connectionTypeId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -53822,6 +53836,58 @@ export class SystemTablesServiceProxy {
     /**
      * @return Success
      */
+    getEntityObjectTypeMarketplaceRelationship(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeMarketplaceRelationship";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeMarketplaceRelationship(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeMarketplaceRelationship(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeMarketplaceRelationship(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getEntityObjectStatusRelationshipPending(): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectStatusRelationshipPending";
         url_ = url_.replace(/[?&]$/, "");
@@ -62546,6 +62612,8 @@ export class AccountDto implements IAccountDto {
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     code!: string | undefined;
+    currencyId!: number | undefined;
+    currencyName!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -62619,6 +62687,8 @@ export class AccountDto implements IAccountDto {
             this.shipViaId = _data["shipViaId"];
             this.paymentTermsId = _data["paymentTermsId"];
             this.code = _data["code"];
+            this.currencyId = _data["currencyId"];
+            this.currencyName = _data["currencyName"];
             this.id = _data["id"];
         }
     }
@@ -62690,6 +62760,8 @@ export class AccountDto implements IAccountDto {
         data["shipViaId"] = this.shipViaId;
         data["paymentTermsId"] = this.paymentTermsId;
         data["code"] = this.code;
+        data["currencyId"] = this.currencyId;
+        data["currencyName"] = this.currencyName;
         data["id"] = this.id;
         return data;
     }
@@ -62734,6 +62806,8 @@ export interface IAccountDto {
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     code: string | undefined;
+    currencyId: number | undefined;
+    currencyName: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -62995,6 +63069,62 @@ export interface IContactDto {
     [key: string]: any;
 }
 
+export class ConnectionType implements IConnectionType {
+    connectLabel!: string | undefined;
+    connectionEntityId!: number;
+    defaultVisibility!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IConnectionType) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.connectLabel = _data["connectLabel"];
+            this.connectionEntityId = _data["connectionEntityId"];
+            this.defaultVisibility = _data["defaultVisibility"];
+        }
+    }
+
+    static fromJS(data: any): ConnectionType {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConnectionType();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["connectLabel"] = this.connectLabel;
+        data["connectionEntityId"] = this.connectionEntityId;
+        data["defaultVisibility"] = this.defaultVisibility;
+        return data;
+    }
+}
+
+export interface IConnectionType {
+    connectLabel: string | undefined;
+    connectionEntityId: number;
+    defaultVisibility: string | undefined;
+
+    [key: string]: any;
+}
+
 export class GetAccountForViewDto implements IGetAccountForViewDto {
     account!: AccountDto;
     contact!: ContactDto;
@@ -63005,6 +63135,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     isSync!: boolean;
     isPublished!: boolean;
     disConnectLabel!: string | undefined;
+    availableConnections!: ConnectionType[] | undefined;
 
     [key: string]: any;
 
@@ -63032,6 +63163,11 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             this.isSync = _data["isSync"];
             this.isPublished = _data["isPublished"];
             this.disConnectLabel = _data["disConnectLabel"];
+            if (Array.isArray(_data["availableConnections"])) {
+                this.availableConnections = [] as any;
+                for (let item of _data["availableConnections"])
+                    this.availableConnections!.push(ConnectionType.fromJS(item));
+            }
         }
     }
 
@@ -63057,6 +63193,11 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
         data["isSync"] = this.isSync;
         data["isPublished"] = this.isPublished;
         data["disConnectLabel"] = this.disConnectLabel;
+        if (Array.isArray(this.availableConnections)) {
+            data["availableConnections"] = [];
+            for (let item of this.availableConnections)
+                data["availableConnections"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -63071,6 +63212,7 @@ export interface IGetAccountForViewDto {
     isSync: boolean;
     isPublished: boolean;
     disConnectLabel: string | undefined;
+    availableConnections: ConnectionType[] | undefined;
 
     [key: string]: any;
 }
@@ -97259,6 +97401,7 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
     avaliableConnectionName!: string | undefined;
     connectionName!: string | undefined;
     disConnectLabel!: string | undefined;
+    availableConnections!: ConnectionType[] | undefined;
 
     [key: string]: any;
 
@@ -97284,6 +97427,11 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
             this.avaliableConnectionName = _data["avaliableConnectionName"];
             this.connectionName = _data["connectionName"];
             this.disConnectLabel = _data["disConnectLabel"];
+            if (Array.isArray(_data["availableConnections"])) {
+                this.availableConnections = [] as any;
+                for (let item of _data["availableConnections"])
+                    this.availableConnections!.push(ConnectionType.fromJS(item));
+            }
         }
     }
 
@@ -97307,6 +97455,11 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
         data["avaliableConnectionName"] = this.avaliableConnectionName;
         data["connectionName"] = this.connectionName;
         data["disConnectLabel"] = this.disConnectLabel;
+        if (Array.isArray(this.availableConnections)) {
+            data["availableConnections"] = [];
+            for (let item of this.availableConnections)
+                data["availableConnections"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -97319,6 +97472,7 @@ export interface IGetMarketplaceAccountForViewDto {
     avaliableConnectionName: string | undefined;
     connectionName: string | undefined;
     disConnectLabel: string | undefined;
+    availableConnections: ConnectionType[] | undefined;
 
     [key: string]: any;
 }
