@@ -1,4 +1,7 @@
-﻿namespace onetouch.Accounts.Dtos
+﻿using onetouch.AppMarketplaceContacts.Dtos;
+using System.Collections.Generic;
+
+namespace onetouch.Accounts.Dtos
 {
     public class GetAccountForViewDto
     {
@@ -17,6 +20,7 @@
         //MMT10
         //I40[Start]
         public string DisConnectLabel { get; set; }
+        public List<ConnectionType> AvailableConnections { get; set; }
         //I40[End]
 
     }

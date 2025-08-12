@@ -74,6 +74,7 @@ using onetouch.Globals;
 using MimeKit;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
+using onetouch.AppMarketplaceContacts;
 
 
 //using NUglify.Helpers;
@@ -133,6 +134,7 @@ namespace onetouch.AppSiiwiiTransaction
         //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
         //I46[Start]
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I46[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -157,7 +159,7 @@ namespace onetouch.AppSiiwiiTransaction
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
              TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
-             IRepository<AppEntityLog, long> appEntityLogRepository
+             IRepository<AppEntityLog, long> appEntityLogRepository, IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
@@ -208,6 +210,7 @@ namespace onetouch.AppSiiwiiTransaction
             //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
             //I46[Start]
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
             //I46{End}
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
@@ -7199,9 +7202,9 @@ namespace onetouch.AppSiiwiiTransaction
 
                     }
                     //share
-                    accountOrg = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                    var accountOrgin = await _appMarketplaceContactRepository.GetAll().Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
                         //.Include(z=>z.ParentFkList).ThenInclude(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
-                        .Where(z => z.SSIN == accountSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                        .Where(z => z.SSIN == accountSSIN && z.TenantId == null && z.IsHidden == false).FirstOrDefaultAsync();
                     //share
                     if (accountOrg != null)// && accountOrg.PartnerId != null)
                     {
@@ -7211,7 +7214,7 @@ namespace onetouch.AppSiiwiiTransaction
                         //    .FirstOrDefaultAsync();
                         // if(publishedAcc!=null)
                         {
-                            await _accountAppService.ConnectContactsProfiles(accountOrg.Id, int.Parse(tenantId.ToString()));
+                            await _accountAppService.ConnectContactsProfiles(accountOrgin.Id, int.Parse(tenantId.ToString()));
                             /* var otherAccount = await _appContactRepository.GetAll().Where(z => z.Id == publishedAcc.PartnerId && z.TenantId != null)
                              .FirstOrDefaultAsync();
                              if (otherAccount!=null)
