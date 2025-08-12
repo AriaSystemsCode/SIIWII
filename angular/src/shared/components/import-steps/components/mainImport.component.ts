@@ -994,7 +994,6 @@ export class MainImportComponent
 
 
         else if (record?.isCodeColorItem || record?._isLinkingItemColor) {
-            //I44-BE -Var Color  - parent code shouldn't be null 
             this.importServiceProxy.getAppItemColorForEditData(
                 selectedItem.id,
                 record.recordType,
