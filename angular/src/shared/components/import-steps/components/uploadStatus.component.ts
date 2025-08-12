@@ -14,6 +14,7 @@ import { MainImportService } from "../services/mainImport.service";
 import { GetAllAppItemsInput, ItemsFilterTypesEnum } from "@shared/service-proxies/service-proxies";
 import { ReorderTreeListDragDropHelper } from "@node_modules/@devexpress/analytics-core/analytics-widgets-internal";
 import { UploadActionEnum } from "../models/UploadActionEnum";
+import { DomSanitizer, SafeHtml } from "@node_modules/@angular/platform-browser";
 
 @Component({
   selector: "uploadStatusModal",
@@ -49,6 +50,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   @ViewChild('codeInputRef') codeInputRef!: ElementRef<HTMLInputElement>;
   @Output() selectSugItemCode = new EventEmitter<any>();
   @Input() updatedRecordData: any;
+  @Input() _resetRecords: boolean = false;
 
 
   @Input() imData: boolean;
@@ -62,7 +64,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   public constructor(
     private _importService: MainImportService,
     injector: Injector,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {
     super(injector);
   }
@@ -77,8 +80,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   ngOnChanges(changes: SimpleChanges) {
     if (changes['uploadingResult'] && this.uploadingResult) {
       this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map((r, idx) => ({
+        ...r,
         id: r.id ?? idx,
-        ...r
+        __originalIndex: r.id ?? idx
       }));
 
       const allRecords = this.uploadingResult?.excelRecords || [];
@@ -91,26 +95,66 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         this.activeRecordType = 'Image'
     }
 
-    this.records = this.filteredRecords()?.map((r, idx) => ({
-      ...r,
-      id: r.id ?? idx
-    })) || [];
-    this.records.forEach(r => r.showActions = false);
+    if (!this.records || this.records?.length == 0) {
+      this.records = this.filteredRecords()?.map((r, idx) => ({
+        ...r,
+        id: r.id ?? idx,
+        __originalIndex: r.id ?? idx
+      })) || [];
+    }
+    else {
+      this.records?.forEach((rec, idx) => {
+        const updated = this.filteredRecords()?.[idx];
+        if (updated) {
+          Object.assign(rec, updated);
+        }
+      });
+    }
 
-    //I44-FE update record
+    this.records?.forEach(r => r.showActions = false);
+    this.uploadingResult.excelRecords?.forEach(r => r.showActions = false);
+
+
     if (changes['updatedRecordData'] && this.updatedRecordData) {
       const { record, newData } = this.updatedRecordData;
-      const updatedRec = this.records.find(r => r.id === record.id);
 
-      if (updatedRec) {
-        for (const key in newData) {
-          if (newData.hasOwnProperty(key)) {
-            this.setRecordValue(updatedRec, key, newData[key]);
-          }
-        }
-      }
+      const updatedRec = this.mergeRecord(record, newData);
+      let indx = this.records.findIndex(r => r.id == record.id);
+      this.records[indx] = updatedRec;
+      this.currentActionRecord = updatedRec;
+    }
+
+    if (changes['_resetRecords'] && this._resetRecords) {
+      this.records.forEach((r, index) => {
+        this.resetRecords(r, index);
+      });
     }
   }
+
+  mergeRecord(record: any, newData: any) {
+    const merged = JSON.parse(JSON.stringify(record)); // clone record
+
+    const deepMergeValues = (target: any, source: any) => {
+      for (const key in source) {
+        if (
+          source[key] !== null &&
+          typeof source[key] === 'object' &&
+          !Array.isArray(source[key])
+        ) {
+          if (!target[key] || typeof target[key] !== 'object') {
+            target[key] = {};
+          }
+          deepMergeValues(target[key], source[key]);
+        } else {
+          target[key] = source[key];
+        }
+      }
+    };
+
+    deepMergeValues(merged, newData);
+    return merged;
+  }
+
 
 
   show(importType: ImportTypes) {
@@ -162,22 +206,41 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   askToClose() {
-    this.records.forEach(r => {
-      r._isLinkingParent = false;
-      r._isLinkingItemColor = false;
-      r._isLinkingColorLookup = false;
-      r._isCreateParent = false;
-      r._isCreateItemColor = false;
-      r._isCreateColorLookup = false;
-      r._isLinkNewParent = false;
-      r._isLinkNewItemColor = false;
-      r._isLinkNewColorLookup = false;
-      r._inAction = false;
-      delete r._original;
-    });
-    this.currentActionRecord = null;
-
     this.close.emit(true);
+  }
+
+
+  resetRecords(record, originalIndex) {
+    record._isLinkingParent = false;
+    record._isLinkingItemColor = false;
+    record._isLinkingColorLookup = false;
+    record._isCreateParent = false;
+    record._isCreateItemColor = false;
+    record._isCreateColorLookup = false;
+    record._isLinkNewParent = false;
+    record._isLinkNewItemColor = false;
+    record._isLinkNewColorLookup = false;
+    record._inAction = false;
+
+
+    this.uploadingResult.excelRecords[originalIndex]._isLinkingParent = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkingItemColor = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkingColorLookup = false;
+    this.uploadingResult.excelRecords[originalIndex]._isCreateParent = false;
+    this.uploadingResult.excelRecords[originalIndex]._isCreateItemColor = false;
+    this.uploadingResult.excelRecords[originalIndex]._isCreateColorLookup = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkNewParent = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkNewItemColor = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkNewColorLookup = false;
+    this.uploadingResult.excelRecords[originalIndex]._inAction = false;
+
+
+    this.currentActionRecord = null;
+    this.LinkToExistingITEM_Ret_Data = null;
+    this.LinkToExistingItemColor_Ret_Data = null;
+    this.LinkToExistingColorLookup_Ret_Data = null;
+    this.activeRecord = null;
+    delete record._original;
   }
 
   downloadLogFile() {
@@ -382,7 +445,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.records.forEach(r => r.showActions = false); // Close dropdown
     this.currentActionRecord = record;
     record._inAction = true;
-    record._original = { ...record };
+    record._original = JSON.parse(JSON.stringify(record));
     record.action = action;
 
 
@@ -685,21 +748,19 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record.errorMessage = "";
       record.status = "Passed";
     }
-    record._isLinkingParent = false;
-    record._isLinkingItemColor = false;
-    record._isLinkingColorLookup = false;
-    record._isCreateParent = false;
-    record._isCreateItemColor = false;
-    record._isCreateColorLookup = false;
-    record._isLinkNewParent = false;
-    record._isLinkNewItemColor = false;
-    record._isLinkNewColorLookup = false;
-    this.currentActionRecord = null;
-    record._inAction = false;
-    this.LinkToExistingITEM_Ret_Data = null;
-    this.LinkToExistingItemColor_Ret_Data = null;
-    this.LinkToExistingColorLookup_Ret_Data = null;
-    this.activeRecord = null;
+
+    const originalIndex = record.__originalIndex;
+    if (
+      Array.isArray(this.uploadingResult?.excelRecords) &&
+      originalIndex >= 0 &&
+      originalIndex < this.uploadingResult.excelRecords.length
+    ) {
+      this.uploadingResult.excelRecords[originalIndex] = {
+        ...this.uploadingResult.excelRecords[originalIndex],
+        ...record
+      };
+    }
+    this.resetRecords(record, originalIndex);
     this.cdr.detectChanges();
   }
 
@@ -749,6 +810,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }, 0);
     this.selectSugItemCode.emit({ selectedItem, record });
 
+  }
+
+  getSafeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html || '');
   }
 
 }  
