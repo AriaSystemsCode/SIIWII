@@ -125,8 +125,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
     if (changes['_resetRecords'] && this._resetRecords) {
-      this.records.forEach(r => {
-        this.resetRecords(r);
+      this.records.forEach((r, index) => {
+        this.resetRecords(r, index);
       });
     }
   }
@@ -210,7 +210,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  resetRecords(record) {
+  resetRecords(record, originalIndex) {
     record._isLinkingParent = false;
     record._isLinkingItemColor = false;
     record._isLinkingColorLookup = false;
@@ -220,8 +220,22 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record._isLinkNewParent = false;
     record._isLinkNewItemColor = false;
     record._isLinkNewColorLookup = false;
-    this.currentActionRecord = null;
     record._inAction = false;
+
+
+    this.uploadingResult.excelRecords[originalIndex]._isLinkingParent = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkingItemColor = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkingColorLookup = false;
+    this.uploadingResult.excelRecords[originalIndex]._isCreateParent = false;
+    this.uploadingResult.excelRecords[originalIndex]._isCreateItemColor = false;
+    this.uploadingResult.excelRecords[originalIndex]._isCreateColorLookup = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkNewParent = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkNewItemColor = false;
+    this.uploadingResult.excelRecords[originalIndex]._isLinkNewColorLookup = false;
+    this.uploadingResult.excelRecords[originalIndex]._inAction = false;
+
+
+    this.currentActionRecord = null;
     this.LinkToExistingITEM_Ret_Data = null;
     this.LinkToExistingItemColor_Ret_Data = null;
     this.LinkToExistingColorLookup_Ret_Data = null;
@@ -735,8 +749,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record.status = "Passed";
     }
 
-    //I44-FE after confirm and make another action , records should not change
-
     const originalIndex = record.__originalIndex;
     if (
       Array.isArray(this.uploadingResult?.excelRecords) &&
@@ -748,13 +760,12 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         ...record
       };
     }
-    this.resetRecords(record);
+    this.resetRecords(record, originalIndex);
     this.cdr.detectChanges();
   }
 
 
   cancelLinking(record: any): void {
-    //I44-should cancel record only 
     if (record._original) {
       Object.assign(record, record._original);
       delete record._original;
