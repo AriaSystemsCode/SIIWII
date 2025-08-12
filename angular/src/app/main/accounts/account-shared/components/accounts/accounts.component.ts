@@ -330,9 +330,10 @@ export class AccountsComponent
     }
 
     disconnect(account: AccountDto): void {
+      
         this.showMainSpinner();
         this._accountsServiceProxy
-            .disconnect(account.id)
+            .disconnect(account.account.id)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
@@ -341,6 +342,8 @@ export class AccountsComponent
             .subscribe(() => {
                 this.notify.success(this.l("SuccessfullyDisconnected"));
                 account.status = false;
+                account.connectionName  = "";
+                // account.avaliableConnectionName = this.l(result);
             });
     }
 

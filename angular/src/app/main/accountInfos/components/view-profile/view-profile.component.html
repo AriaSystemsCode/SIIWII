@@ -78,13 +78,13 @@
 
                                         </div>
 
-                                        <!-- <div class="d-flex view-profile-action-buttons"
-                                            *ngIf="accountData.isConnected && showEditConnected &&isNotManualLevel() && !isRecordOwner && (accountData.accountTypeId != 21 )">
+                                        <div class="d-flex view-profile-action-buttons"
+                                            *ngIf="((accountData.isConnected && showEditConnected) ||  accountData.isManual) && !isRecordOwner">
                                             <button class="btn mb-3 mt-4 w-100 btn-save"
                                                 (click)="this.showEditConnected =false;editAccount()">
                                                 {{ "Edit" | localize }}
                                             </button>
-                                        </div> -->
+                                        </div>
                                         <div class="d-flex view-profile-action-buttons"
                                             *ngIf="accountData.isConnected && !showEditConnected &&isNotManualLevel()">
                                             <button class="btn mb-3 mt-4 w-100 btn-save"

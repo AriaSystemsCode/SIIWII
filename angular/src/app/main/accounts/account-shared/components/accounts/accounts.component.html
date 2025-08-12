@@ -255,10 +255,9 @@
                                                         account.account,
                                                         i
                                                     )
-                                                " (connectMe)="
-                                                    connect(account.account)
+                                            
                                                 " (disconnectMe)="
-                                                    disconnect(account.account)
+                                                    disconnect($event)
                                                 " [isHost]="isHost"
                                                 (_createRelation)="createRelation($event)"></app-account-card>
                                         </div>

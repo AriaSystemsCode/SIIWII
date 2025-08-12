@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import {  AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
@@ -14,8 +15,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Input('singleItemPerRowMode') singleItemPerRowMode : boolean
     @Input('isHost') isHost : boolean
     @Output() deleteMe : EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() connectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() disconnectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output() disconnectMe : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
     @Input() fromMarketplace;
     @Output() _createRelation : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
 
@@ -38,13 +38,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     deleteAccount(){
         this.deleteMe.emit()
     }
-    connect(): void {
-        this.connectMe.emit()
-    }
 
-    disconnect(): void {
-        this.disconnectMe.emit()
-    }
+
 
     edit(): void {
         if(!this.id) return
@@ -85,6 +80,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
           raw = this.account?.connectionName?.trim();
         } else if (connection === 'avaliableConnectionName') {
           raw = this.account?.avaliableConnectionName?.trim();
+        }else{
+          raw = this.account?.disConnectLabel?.trim();
         }
       
         if (!raw) return null;
@@ -102,24 +99,10 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         return null;
       }
       removeRelation(account){
-        this._accountsServiceProxy
-        .disconnect(account.account.id)
-        // .pipe(
-        //     finalize(() => {
-        //         ;
-        //         this.hideMainSpinner();
-        //     })
-        // )
-        .subscribe(
-        //     (result: string) => {
-        //     let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.id);
-        //     if (accountIndx >= 0) {
-        //         this.accounts[accountIndx] = account;
-        //         this.accounts[accountIndx].avaliableConnectionName = "";
-        //         this.accounts[accountIndx].connectionName = this.l(result);
-        //     }
-        // }
-    );
+     
+
+        this.disconnectMe.emit(account);
+   
       }
 
 }
