@@ -78,11 +78,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   ngOnChanges(changes: SimpleChanges) {
-    //I44-FE after confirm and make another action , records should not change
     if (changes['uploadingResult'] && this.uploadingResult) {
       this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map((r, idx) => ({
+        ...r,
         id: r.id ?? idx,
-        ...r
+        __originalIndex: r.id ?? idx
       }));
 
       const allRecords = this.uploadingResult?.excelRecords || [];
@@ -98,7 +98,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     if (!this.records || this.records?.length == 0) {
       this.records = this.filteredRecords()?.map((r, idx) => ({
         ...r,
-        id: r.id ?? idx
+        id: r.id ?? idx,
+        __originalIndex: r.id ?? idx
       })) || [];
     }
     else {
@@ -111,6 +112,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
     this.records?.forEach(r => r.showActions = false);
+    this.uploadingResult.excelRecords?.forEach(r => r.showActions = false);
+
 
     if (changes['updatedRecordData'] && this.updatedRecordData) {
       const { record, newData } = this.updatedRecordData;
@@ -122,7 +125,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
     if (changes['_resetRecords'] && this._resetRecords) {
-      this.resetRecords();
+      this.records.forEach(r => {
+        this.resetRecords(r);
+      });
     }
   }
 
@@ -205,22 +210,23 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  resetRecords() {
-    this.records.forEach(r => {
-      r._isLinkingParent = false;
-      r._isLinkingItemColor = false;
-      r._isLinkingColorLookup = false;
-      r._isCreateParent = false;
-      r._isCreateItemColor = false;
-      r._isCreateColorLookup = false;
-      r._isLinkNewParent = false;
-      r._isLinkNewItemColor = false;
-      r._isLinkNewColorLookup = false;
-      r._inAction = false;
-      delete r._original;
-    });
+  resetRecords(record) {
+    record._isLinkingParent = false;
+    record._isLinkingItemColor = false;
+    record._isLinkingColorLookup = false;
+    record._isCreateParent = false;
+    record._isCreateItemColor = false;
+    record._isCreateColorLookup = false;
+    record._isLinkNewParent = false;
+    record._isLinkNewItemColor = false;
+    record._isLinkNewColorLookup = false;
     this.currentActionRecord = null;
-
+    record._inAction = false;
+    this.LinkToExistingITEM_Ret_Data = null;
+    this.LinkToExistingItemColor_Ret_Data = null;
+    this.LinkToExistingColorLookup_Ret_Data = null;
+    this.activeRecord = null;
+    delete record._original;
   }
 
   downloadLogFile() {
@@ -728,27 +734,27 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record.errorMessage = "";
       record.status = "Passed";
     }
-    record._isLinkingParent = false;
-    record._isLinkingItemColor = false;
-    record._isLinkingColorLookup = false;
-    record._isCreateParent = false;
-    record._isCreateItemColor = false;
-    record._isCreateColorLookup = false;
-    record._isLinkNewParent = false;
-    record._isLinkNewItemColor = false;
-    record._isLinkNewColorLookup = false;
-    this.currentActionRecord = null;
-    record._inAction = false;
-    this.LinkToExistingITEM_Ret_Data = null;
-    this.LinkToExistingItemColor_Ret_Data = null;
-    this.LinkToExistingColorLookup_Ret_Data = null;
-    this.activeRecord = null;
-    delete record._original;
+
+    //I44-FE after confirm and make another action , records should not change
+
+    const originalIndex = record.__originalIndex;
+    if (
+      Array.isArray(this.uploadingResult?.excelRecords) &&
+      originalIndex >= 0 &&
+      originalIndex < this.uploadingResult.excelRecords.length
+    ) {
+      this.uploadingResult.excelRecords[originalIndex] = {
+        ...this.uploadingResult.excelRecords[originalIndex],
+        ...record
+      };
+    }
+    this.resetRecords(record);
     this.cdr.detectChanges();
   }
 
 
   cancelLinking(record: any): void {
+    //I44-should cancel record only 
     if (record._original) {
       Object.assign(record, record._original);
       delete record._original;
