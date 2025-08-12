@@ -1071,6 +1071,9 @@ namespace onetouch.Accounts
             {
                 var account = await _appContactRepository.GetAll()
                 .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                //I40
+                .Include(z=>z.CurrencyFk)
+                //I40
                 .FirstOrDefaultAsync(x => x.Id == id);
 
                 var entity = await _appEntityRepository.GetAll()
@@ -1199,6 +1202,10 @@ namespace onetouch.Accounts
                 output.Account.PaymentTermsId = account.PaymentTermsId;
                 output.Account.PaymentTermsName = account.PaymentTermsName;
                 //I46[End]
+                //I40[Start]
+                output.Account.CurrencyId = account.CurrencyId;
+                output.Account.CurrencyName = account.CurrencyFk.Name;
+                //I40[End]
                 var publishedRecord = await _appMarketplaceContactRepository.GetAll()
                                  .AsNoTracking()
                                  .FirstOrDefaultAsync(x => x.TenantId == null

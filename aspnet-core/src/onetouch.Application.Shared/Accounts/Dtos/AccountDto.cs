@@ -73,6 +73,8 @@ namespace onetouch.Accounts.Dtos
         public virtual long? ShipViaId { set; get; }
         public virtual long? PaymentTermsId { set; get; }
         public virtual string Code { set; get; }
+        public virtual long? CurrencyId { set; get; }
+        public virtual string CurrencyName { set; get; }
         //I46[End]
     }
 }
