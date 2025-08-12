@@ -427,10 +427,20 @@ export class MarketplaceProductsComponent
     }
 
     ngOnDestroy() {
-        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
-            sessionStorage.removeItem("SellerSSIN");
-            localStorage.removeItem("BuyerSSIN");
-        }
+
+          // Keep SellerSSIN while navigating inside the seller room / product views
+  const inSellerRoom = JSON.parse(localStorage.getItem('fromSellerRoom') || 'false');
+  const inMarketplace = JSON.parse(localStorage.getItem('fromMarketPlace') || 'false');
+
+  if (!inSellerRoom || inMarketplace) {
+    sessionStorage.removeItem('SellerSSIN');
+    localStorage.removeItem('BuyerSSIN');
+  }
+
+        // if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
+        //     sessionStorage.removeItem("SellerSSIN");
+        //     localStorage.removeItem("BuyerSSIN");
+        // }
         localStorage.setItem("currencyCode", null);
     }
 
