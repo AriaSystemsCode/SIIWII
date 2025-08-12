@@ -9,7 +9,7 @@ import { FileUploader, FileUploaderOptions } from "ng2-file-upload";
 import { IAjaxResponse } from "abp-ng2-module";
 import { uploadStatusComponent } from "./uploadStatus.component";
 import { ImageFile } from "../models/imageFile.model";
-import { upperCase } from "lodash";
+import { result, upperCase } from "lodash";
 import { isEmpty } from "lodash";
 import { autoCropComponent } from "./autoCrop.component";
 import { MainImportService } from "../services/mainImport.service";
@@ -24,7 +24,7 @@ import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { Observable } from "rxjs";
 import { ProgressComponent } from "@app/shared/common/progress/progress.component";
 import { ImportTypes } from "../models/ImportTypes";
-import { AppItemsServiceProxy, AppItemtExcelRecordDTO, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
+import { AppEntitiesServiceProxy, AppItemsServiceProxy, AppItemtExcelRecordDTO, GetAppEntityForEditOutput, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
 import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
@@ -117,6 +117,7 @@ export class MainImportComponent
     invalidImport: boolean = false;
     limitImImages = 100;
     updatedRecordData;
+    _resetRecords: boolean = false;
 
     public constructor(
         private _httpClient: HttpClient,
@@ -124,7 +125,8 @@ export class MainImportComponent
         private _downloadService: FileDownloadService,
         private injector: Injector,
         //I44-FE remove _appItemsServiceProxy
-        private _appItemsServiceProxy: AppItemsServiceProxy
+        private _appItemsServiceProxy: AppItemsServiceProxy,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
         super(injector);
     }
@@ -479,6 +481,7 @@ export class MainImportComponent
 
         isConfirmed.subscribe((res) => {
             if (res) {
+                this._resetRecords = true;
                 this.hideAllmodal();
             }
         }
@@ -825,8 +828,6 @@ export class MainImportComponent
 
 
     onsSearchItemCode($event) {
-        //I44-BE search APIs ?
-
         if ($event?.isCodeItem) {
             this.importServiceProxy
                 .getAllLookUp(
@@ -912,89 +913,176 @@ export class MainImportComponent
 
     onSelectSugItemCode(event: { selectedItem: any, record: AppItemtExcelRecordDTO }) {
         const { selectedItem, record } = event;
+        if (record?.isCodeItem || record?._isLinkingParent) {
+            this.importServiceProxy.getAppItemForEditData(
+                selectedItem.id,
+                record.recordType,
+                record.parentCode,
+                record.code,
+                record.name,
+                record.fieldsErrors,
+                record.excelDto?.actions,
+                record.excelDto?.imagePreview,
+                record.excelDto?.imageIsDefault,
+                record.excelDto?.colorCode,
+                record.excelDto?.colorName,
+                record.excelDto?.colorHex,
+                record.excelDto?.colorImage,
+                record.excelDto?.colorSchema,
+                record.excelDto?.colorNRF,
+                record.excelDto?.sizeName,
+                record.excelDto?.sizeScaleOrder,
+                record.excelDto?.sizeMarket,
+                record.excelDto?.sizeNRF,
+                record.excelDto?.materialContent,
+                record.excelDto?.soldOutDate,
+                record.excelDto?.brancdCode,
+                record.excelDto?.brandName,
+                record.excelDto?.startShipDate,
+                record.excelDto?.id,
+                record.excelDto?.rowNumber,
+                record.excelDto?.recordType,
+                record.excelDto?.productType,
+                record.excelDto?.productClassificationCode,
+                record.excelDto?.productClassificationDescription,
+                record.excelDto?.productCategoryCode,
+                record.excelDto?.productCategoryDescription,
+                record.excelDto?.price,
+                record.excelDto?.priceA,
+                record.excelDto?.priceB,
+                record.excelDto?.priceC,
+                record.excelDto?.priceD,
+                record.excelDto?.currency,
+                record.excelDto?.parentCode,
+                record.excelDto?.imageType,
+                record.excelDto?.imageFolderName,
+                record.excelDto?.parentId,
+                record.excelDto?.extraAttributesValues,
+                record.excelDto?.extraAttributes,
+                record.excelDto?.images,
+                record.excelDto?.code,
+                record.excelDto?.name,
+                record.excelDto?.productDescription,
+                record.excelDto?.entityObjectClassificaionID,
+                record.excelDto?.entityObjectCategoryID,
+                record.excelDto?.sizeScaleName,
+                record.excelDto?.sizeRatioName,
+                record.excelDto?.sizeRatioValue,
+                record.excelDto?.noOfDim,
+                record.excelDto?.d1Name,
+                record.excelDto?.d2Name,
+                record.excelDto?.d3Name,
+                record.excelDto?.d1Sizes,
+                record.excelDto?.d2Sizes,
+                record.excelDto?.d3Sizes,
+                record.excelDto?.d1Pos,
+                record.excelDto?.d2Pos,
+                record.excelDto?.d3Pos,
+                record.excelDto?.sizeCode,
+                record.status,
+                record.errorMessage,
+                record.imageType,
+                record.image
+            )
+                .subscribe((result) => {
+                    this.updatedRecordData = {
+                        record,
+                        newData: result
+                    };
+                });
+        }
 
 
-        //I44-BE - get data APIs ?   - for item colo & color ? 
-
-        //I44-BE -  AppItemForEditData null data 
-        this._appItemsServiceProxy.getAppItemForEditData(
-            selectedItem.id,
-            record.recordType,
-            record.parentCode,
-            record.code,
-            record.name,
-            record.fieldsErrors,
-            record.excelDto?.actions,
-            record.excelDto?.imagePreview,
-            record.excelDto?.imageIsDefault,
-            record.excelDto?.colorCode,
-            record.excelDto?.colorName,
-            record.excelDto?.colorHex,
-            record.excelDto?.colorImage,
-            record.excelDto?.colorSchema,
-            record.excelDto?.colorNRF,
-            record.excelDto?.sizeName,
-            record.excelDto?.sizeScaleOrder,
-            record.excelDto?.sizeMarket,
-            record.excelDto?.sizeNRF,
-            record.excelDto?.materialContent,
-            record.excelDto?.soldOutDate,
-            record.excelDto?.brancdCode,
-            record.excelDto?.brandName,
-            record.excelDto?.startShipDate,
-            record.excelDto?.id,
-            record.excelDto?.rowNumber,
-            record.excelDto?.recordType,
-            record.excelDto?.productType,
-            record.excelDto?.productClassificationCode,
-            record.excelDto?.productClassificationDescription,
-            record.excelDto?.productCategoryCode,
-            record.excelDto?.productCategoryDescription,
-            record.excelDto?.price,
-            record.excelDto?.priceA,
-            record.excelDto?.priceB,
-            record.excelDto?.priceC,
-            record.excelDto?.priceD,
-            record.excelDto?.currency,
-            record.excelDto?.parentCode,
-            record.excelDto?.imageType,
-            record.excelDto?.imageFolderName,
-            record.excelDto?.parentId,
-            record.excelDto?.extraAttributesValues,
-            record.excelDto?.extraAttributes,
-            record.excelDto?.images,
-            record.excelDto?.code,
-            record.excelDto?.name,
-            record.excelDto?.productDescription,
-            record.excelDto?.entityObjectClassificaionID,
-            record.excelDto?.entityObjectCategoryID,
-            record.excelDto?.sizeScaleName,
-            record.excelDto?.sizeRatioName,
-            record.excelDto?.sizeRatioValue,
-            record.excelDto?.noOfDim,
-            record.excelDto?.d1Name,
-            record.excelDto?.d2Name,
-            record.excelDto?.d3Name,
-            record.excelDto?.d1Sizes,
-            record.excelDto?.d2Sizes,
-            record.excelDto?.d3Sizes,
-            record.excelDto?.d1Pos,
-            record.excelDto?.d2Pos,
-            record.excelDto?.d3Pos,
-            record.excelDto?.sizeCode,
-            record.status,
-            record.errorMessage,
-            record.imageType,
-            record.image
-        )
-
-            .subscribe((result) => {
+        else if (record?.isCodeColorItem || record?._isLinkingItemColor) {
+            //I44-BE -Var Color  - parent code shouldn't be null 
+            this.importServiceProxy.getAppItemColorForEditData(
+                selectedItem.id,
+                record.recordType,
+                record.parentCode,
+                record.code,
+                record.name,
+                record.fieldsErrors,
+                record.excelDto?.actions,
+                record.excelDto?.imagePreview,
+                record.excelDto?.imageIsDefault,
+                record.excelDto?.colorCode,
+                record.excelDto?.colorName,
+                record.excelDto?.colorHex,
+                record.excelDto?.colorImage,
+                record.excelDto?.colorSchema,
+                record.excelDto?.colorNRF,
+                record.excelDto?.sizeName,
+                record.excelDto?.sizeScaleOrder,
+                record.excelDto?.sizeMarket,
+                record.excelDto?.sizeNRF,
+                record.excelDto?.materialContent,
+                record.excelDto?.soldOutDate,
+                record.excelDto?.brancdCode,
+                record.excelDto?.brandName,
+                record.excelDto?.startShipDate,
+                record.excelDto?.id,
+                record.excelDto?.rowNumber,
+                record.excelDto?.recordType,
+                record.excelDto?.productType,
+                record.excelDto?.productClassificationCode,
+                record.excelDto?.productClassificationDescription,
+                record.excelDto?.productCategoryCode,
+                record.excelDto?.productCategoryDescription,
+                record.excelDto?.price,
+                record.excelDto?.priceA,
+                record.excelDto?.priceB,
+                record.excelDto?.priceC,
+                record.excelDto?.priceD,
+                record.excelDto?.currency,
+                record.excelDto?.parentCode,
+                record.excelDto?.imageType,
+                record.excelDto?.imageFolderName,
+                record.excelDto?.parentId,
+                record.excelDto?.extraAttributesValues,
+                record.excelDto?.extraAttributes,
+                record.excelDto?.images,
+                record.excelDto?.code,
+                record.excelDto?.name,
+                record.excelDto?.productDescription,
+                record.excelDto?.entityObjectClassificaionID,
+                record.excelDto?.entityObjectCategoryID,
+                record.excelDto?.sizeScaleName,
+                record.excelDto?.sizeRatioName,
+                record.excelDto?.sizeRatioValue,
+                record.excelDto?.noOfDim,
+                record.excelDto?.d1Name,
+                record.excelDto?.d2Name,
+                record.excelDto?.d3Name,
+                record.excelDto?.d1Sizes,
+                record.excelDto?.d2Sizes,
+                record.excelDto?.d3Sizes,
+                record.excelDto?.d1Pos,
+                record.excelDto?.d2Pos,
+                record.excelDto?.d3Pos,
+                record.excelDto?.sizeCode,
+                record.status,
+                record.errorMessage,
+                record.imageType,
+                record.image
+            ).subscribe((result) => {
                 this.updatedRecordData = {
                     record,
                     newData: result
                 };
             });
+        }
 
+        else if (record?.isCodeColorLookup || record?._isLinkingColorLookup) {
+            this._appEntitiesServiceProxy.getAppEntityForEdit(selectedItem.id)
+                .subscribe((result: GetAppEntityForEditOutput) => {
+                    record.excelDto.colorCode = result.appEntity.code;
+                    record.excelDto.colorName = result.appEntity.name;
+                    this.updatedRecordData = {
+                        record,
+                        newData: record
+                    };
+                });
+        }
     }
 
     onUpdatedRecords($event) {

@@ -188,6 +188,19 @@
                         </div>
 
 
+                        <div *ngIf="column.name === 'Image Folder Name'">
+                          <input type="text" class="form-control link-parent-input" [ngModel]="!getRecordValue(record, 'image') || getRecordValue(record, 'image') === 'noimage_item.jpg' 
+                                   ? '-' 
+                                   : './' + getRecordValue(record, 'image')" disabled />
+                        </div>
+
+                        <div *ngIf="column.name === 'Product Description'">
+                          <div class="form-control"
+                            [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))" style="background-color: #f4f4f4 !important; opacity: 1; cursor: not-allowed;">
+                          </div>
+                        </div>
+
+
                         <div *ngIf="column.name === 'Color Code'&& record._isLinkingColorLookup"
                           [attr.data-record-id]="record.id" class="position-relative" #colorCodeInputContainer>
 
@@ -219,11 +232,12 @@
                           [disabled]=" !(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor))"
                           [ngClass]="{
                             'link-parent-input': column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor)
-                          }"
-                          [hidden]="
+                          }" [hidden]="
                           (column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor)) ||
-                          (column.name === 'Color Code'  && record._isLinkingColorLookup)
-                        "/>
+                          (column.name === 'Color Code'  && record._isLinkingColorLookup) ||
+                          (column.name === 'Product Description') || 
+                          (column.name === 'Image Folder Name')
+                        " />
                       </ng-container>
 
 

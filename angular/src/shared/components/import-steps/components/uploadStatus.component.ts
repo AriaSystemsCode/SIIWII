@@ -14,6 +14,7 @@ import { MainImportService } from "../services/mainImport.service";
 import { GetAllAppItemsInput, ItemsFilterTypesEnum } from "@shared/service-proxies/service-proxies";
 import { ReorderTreeListDragDropHelper } from "@node_modules/@devexpress/analytics-core/analytics-widgets-internal";
 import { UploadActionEnum } from "../models/UploadActionEnum";
+import { DomSanitizer, SafeHtml } from "@node_modules/@angular/platform-browser";
 
 @Component({
   selector: "uploadStatusModal",
@@ -49,6 +50,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   @ViewChild('codeInputRef') codeInputRef!: ElementRef<HTMLInputElement>;
   @Output() selectSugItemCode = new EventEmitter<any>();
   @Input() updatedRecordData: any;
+  @Input() _resetRecords: boolean = false;
 
 
   @Input() imData: boolean;
@@ -62,7 +64,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   public constructor(
     private _importService: MainImportService,
     injector: Injector,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {
     super(injector);
   }
@@ -75,6 +78,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   ngOnChanges(changes: SimpleChanges) {
+    //I44-FE after confirm and make another action , records should not change
     if (changes['uploadingResult'] && this.uploadingResult) {
       this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map((r, idx) => ({
         id: r.id ?? idx,
@@ -91,26 +95,61 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         this.activeRecordType = 'Image'
     }
 
-    this.records = this.filteredRecords()?.map((r, idx) => ({
-      ...r,
-      id: r.id ?? idx
-    })) || [];
-    this.records.forEach(r => r.showActions = false);
+    if (!this.records || this.records?.length == 0) {
+      this.records = this.filteredRecords()?.map((r, idx) => ({
+        ...r,
+        id: r.id ?? idx
+      })) || [];
+    }
+    else {
+      this.records?.forEach((rec, idx) => {
+        const updated = this.filteredRecords()?.[idx];
+        if (updated) {
+          Object.assign(rec, updated);
+        }
+      });
+    }
 
-    //I44-FE update record
+    this.records?.forEach(r => r.showActions = false);
+
     if (changes['updatedRecordData'] && this.updatedRecordData) {
       const { record, newData } = this.updatedRecordData;
-      const updatedRec = this.records.find(r => r.id === record.id);
 
-      if (updatedRec) {
-        for (const key in newData) {
-          if (newData.hasOwnProperty(key)) {
-            this.setRecordValue(updatedRec, key, newData[key]);
-          }
-        }
-      }
+      const updatedRec = this.mergeRecord(record, newData);
+      let indx = this.records.findIndex(r => r.id == record.id);
+      this.records[indx] = updatedRec;
+      this.currentActionRecord = updatedRec;
+    }
+
+    if (changes['_resetRecords'] && this._resetRecords) {
+      this.resetRecords();
     }
   }
+
+  mergeRecord(record: any, newData: any) {
+    const merged = JSON.parse(JSON.stringify(record)); // clone record
+
+    const deepMergeValues = (target: any, source: any) => {
+      for (const key in source) {
+        if (
+          source[key] !== null &&
+          typeof source[key] === 'object' &&
+          !Array.isArray(source[key])
+        ) {
+          if (!target[key] || typeof target[key] !== 'object') {
+            target[key] = {};
+          }
+          deepMergeValues(target[key], source[key]);
+        } else {
+          target[key] = source[key];
+        }
+      }
+    };
+
+    deepMergeValues(merged, newData);
+    return merged;
+  }
+
 
 
   show(importType: ImportTypes) {
@@ -162,6 +201,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   askToClose() {
+    this.close.emit(true);
+  }
+
+
+  resetRecords() {
     this.records.forEach(r => {
       r._isLinkingParent = false;
       r._isLinkingItemColor = false;
@@ -177,7 +221,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     });
     this.currentActionRecord = null;
 
-    this.close.emit(true);
   }
 
   downloadLogFile() {
@@ -382,7 +425,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.records.forEach(r => r.showActions = false); // Close dropdown
     this.currentActionRecord = record;
     record._inAction = true;
-    record._original = { ...record };
+    record._original = JSON.parse(JSON.stringify(record));
     record.action = action;
 
 
@@ -700,6 +743,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.LinkToExistingItemColor_Ret_Data = null;
     this.LinkToExistingColorLookup_Ret_Data = null;
     this.activeRecord = null;
+    delete record._original;
     this.cdr.detectChanges();
   }
 
@@ -749,6 +793,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }, 0);
     this.selectSugItemCode.emit({ selectedItem, record });
 
+  }
+
+  getSafeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html || '');
   }
 
 }  
