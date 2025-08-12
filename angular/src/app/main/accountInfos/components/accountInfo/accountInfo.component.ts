@@ -751,7 +751,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
     getCotactData(event){
         this.editedContactPerData = event
-        this.accountInfoTemp.entityAttachments = event?.entityAttachments
+        // this.accountInfoTemp.entityAttachments =  this.editedContactPerData?.entityAttachments
         console.log(this.editedContactPerData ,'editedContactPerData')
 
     }
@@ -762,7 +762,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         if (!this.accountInfoTemp.entityExtraData) {
           this.accountInfoTemp.entityExtraData = [];
         }
-      
+        this.accountInfoTemp.entityAttachments =  this.editedContactPerData?.entityAttachments
         // Ensure attributes exist
         this.ensureAttribute(701); // first name
         this.ensureAttribute(702); // last name
