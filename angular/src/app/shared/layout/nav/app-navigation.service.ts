@@ -59,6 +59,7 @@ export class AppNavigationService {
 
             new AppMenuItem('ProductsList', 'Pages.AppItemsLists', 'flaticon-more', '/app/main/productslists'),
             new AppMenuItem('Linesheet', 'Pages.AppItems', 'flaticon-more', '/app/main/linesheet/print'),
+
             // new AppMenuItem('Product Selector Test Page', 'Pages.AppItems', 'flaticon-more', '/app/demo/AppItemsMultiSelection'),
             // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
         )
@@ -132,6 +133,7 @@ export class AppNavigationService {
             new AppMenuItem('VisualSettings', 'Pages.Administration.UiCustomization', 'flaticon-medical', '/app/admin/ui-customization'),
             new AppMenuItem('Settings', 'Pages.Administration.Host.Settings', 'flaticon-settings', '/app/admin/hostSettings'),
             new AppMenuItem('Settings', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/tenantSettings'),
+            new AppMenuItem('AriaSystem', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/AriaSystem'),
             new AppMenuItem('WebhookSubscriptions', 'Pages.Administration.WebhookSubscription', 'flaticon2-world', '/app/admin/webhook-subscriptions'),
             // new AppMenuItem('DynamicParameters', '', 'flaticon-interface-8', '', [], [
             //     new AppMenuItem('Definitions', 'Pages.Administration.DynamicParameters', '', '/app/admin/dynamic-parameter'),

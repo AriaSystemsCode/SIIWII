@@ -1,0 +1,11 @@
+<button (click)="openAriaNewTab()" class="ariaBtn">+</button>
+<!-- {{erpUrl}} -->
+<!-- example.component.html -->
+<iframe
+  [src]="erpUrl"
+  width="100%"
+  height="800"
+  style="border: none;"
+  (load)="onIframeLoad()"
+></iframe>
+

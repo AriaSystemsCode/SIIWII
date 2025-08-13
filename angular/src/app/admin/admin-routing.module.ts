@@ -52,6 +52,7 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
 import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/appTenantSubscriptionPlans.component';
 import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
 import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
+import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
 // import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
 // import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
 // import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
@@ -111,6 +112,7 @@ import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/ap
                     { path: 'subscription-management', component: SubscriptionManagementComponent, data: { permission: 'Pages.Administration.Tenant.SubscriptionManagement' } },
                     { path: 'invoice/:paymentId', component: InvoiceComponent, data: { permission: 'Pages.Administration.Tenant.SubscriptionManagement' } },
                     { path: 'tenantSettings', component: TenantSettingsComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
+                    { path: 'AriaSystem', component: AriaIframeComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
                     { path: 'hostDashboard', component: HostDashboardComponent, data: { permission: 'Pages.Administration.Host.Dashboard' } },
                     { path: 'demo-ui-components', component: DemoUiComponentsComponent, data: { permission: 'Pages.DemoUiComponents' } },
                     { path: 'install', component: InstallComponent },
@@ -122,6 +124,7 @@ import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/ap
                     // { path: 'dynamic-parameter-detail', component: DynamicParameterDetailComponent, data: { permission: 'Pages.Administration.DynamicParameters' } },
                     // { path: 'entity-dynamic-parameter', component: EntityDynamicParameterComponent, data: { permission: 'Pages.Administration.EntityDynamicParameters' } },
                     // { path: 'entity-dynamic-parameter-value/manage-all/:entityFullName/:rowId', component: EntityDynamicParameterValueComponent, data: { permission: 'Pages.Administration.EntityDynamicParameters' } },
+                    
                     { path: '', redirectTo: 'hostDashboard', pathMatch: 'full' },
                     { path: '**', redirectTo: 'hostDashboard' }
                 ]
