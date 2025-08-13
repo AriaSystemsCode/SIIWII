@@ -214,6 +214,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   resetRecords(record, originalIndex) {
+    record._isDataRecord = false;
     record._isLinkingParent = false;
     record._isLinkingItemColor = false;
     record._isLinkingColorLookup = false;
@@ -226,6 +227,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record._inAction = false;
 
 
+    this.uploadingResult.excelRecords[originalIndex]._isDataRecord = false;
     this.uploadingResult.excelRecords[originalIndex]._isLinkingParent = false;
     this.uploadingResult.excelRecords[originalIndex]._isLinkingItemColor = false;
     this.uploadingResult.excelRecords[originalIndex]._isLinkingColorLookup = false;
@@ -458,6 +460,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
     switch (action) {
       case UploadActionEnum.ValidateDataRecord:
+        this.ValidateDataRecord(record);
         break;
 
       case UploadActionEnum.LinkToExistingParentItem:
@@ -502,7 +505,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-
+  ValidateDataRecord(record) {
+    record._isDataRecord = true;
+  }
 
   LinkToExistingITEM(record) {
     record._isLinkingParent = true;
@@ -774,9 +779,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record.status = "Passed";
     }
 
-    if (record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup) {
+    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup) {
       //I44-FE Call Validate function
-      
+
 
       //I44-FE Update status
       /*  record.fieldsErrors = [];
@@ -807,6 +812,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       Object.assign(record, record._original);
       delete record._original;
     }
+    record._isDataRecord = false;
     record._isLinkingParent = false;
     record._isLinkingItemColor = false;
     record._isLinkingColorLookup = false;
