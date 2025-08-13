@@ -141,30 +141,61 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
 
-    createManualCompany(event, type?: string) {
-        if (type == 'company') {
-            localStorage.setItem("comNew", JSON.stringify(event?.target?.checked));
-            this.appTransactionsForViewDto.createManualAccount = event?.target?.checked
-            if(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code == null){
-                this.saveManualAccount()
-                this.saveManualBranch()
-            }
-         
+    async createManualCompany(event: any, type?: 'company' | 'contact') {
+        const checked = !!event?.target?.checked;
+      
+        // guard
+        if (!this.appTransactionsForViewDto?.appTransactionContacts || this.appTransactionContactsIndex < 0) {
+          this.isValidForm();
+          return;
         }
-        else if (type == 'contact') {
-
-            localStorage.setItem("conNew", JSON.stringify(event?.target?.checked));
-            if(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code ==null){
-            this.saveManualContact()
-                
-            }
-
-            this.appTransactionsForViewDto.createManualContact = event?.target?.checked
-
+      
+        const row = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex];
+      
+        if (type === 'company') {
+          // persist toggle
+          localStorage.setItem('comNew', JSON.stringify(checked));
+          this.appTransactionsForViewDto.createManualAccount = checked;
+      
+          // 🔒 coerce company & branch to objects (they may be strings if user typed free-text)
+          if (!row.selectedCompany || typeof row.selectedCompany !== 'object') {
+            const obj = new GetAccountInformationOutputDto();
+            obj.name = typeof row.selectedCompany === 'string' ? row.selectedCompany : (row.companyName || '');
+            row.selectedCompany = obj;
+          }
+          if (!row.selectedBranch || typeof row.selectedBranch !== 'object') {
+            const obj = new AccountBranchDto();
+            obj.name = typeof row.selectedBranch === 'string' ? row.selectedBranch : (row.branchName || '*Main*');
+            row.selectedBranch = obj;
+          }
+      
+          // generate codes when toggled ON and missing
+          if (checked) {
+            if (!row.selectedCompany.code) await this.saveManualAccount();
+            if (!row.selectedBranch.code)  await this.saveManualBranch();
+          }
+      
+        } else if (type === 'contact') {
+          localStorage.setItem('conNew', JSON.stringify(checked));
+          this.appTransactionsForViewDto.createManualContact = checked;
+      
+          // 🔒 coerce contact to object
+          if (!row.selectedContact || typeof row.selectedContact !== 'object') {
+            const obj = new GetContactInformationDto();
+            obj.name = typeof row.selectedContact === 'string' ? row.selectedContact : (row.contactName || '');
+            row.selectedContact = obj;
+          }
+      
+          // generate code when toggled ON and missing
+          if (checked && !row.selectedContact.code) {
+            await this.saveManualContact();
+          }
         }
+      
         this.isValidForm();
-
-    }
+        this.cdr.markForCheck(); // OnPush
+      }
+      
 
     async saveManualAccount() {
         let sequance = "";
