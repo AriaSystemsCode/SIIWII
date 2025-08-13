@@ -234,7 +234,7 @@ disconnect(account: AccountDto): void {
 
   createRelation(account,status:boolean = false) {
     this._accountsServiceProxy
-      .applyRelationOnProfile(account.account.id,account.account.ssin,status,undefined)
+      .applyRelationOnProfile(account.account.id,account.account.ssin,status,account.availableConnections[0].connectionEntityId)
       .pipe(
         finalize(() => {
           ;

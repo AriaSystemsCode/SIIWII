@@ -412,7 +412,7 @@ export class AccountsComponent
         this.showMainSpinner();
 
         this._accountsServiceProxy
-            .applyRelationOnProfile(account.account.id, undefined,status,undefined)
+            .applyRelationOnProfile(account.account.id, undefined,status,account.availableConnections[0].connectionEntityId)
             .pipe(
                 finalize(() => {
                     ;

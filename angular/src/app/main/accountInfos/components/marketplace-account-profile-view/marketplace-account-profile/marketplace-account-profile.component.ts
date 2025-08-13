@@ -78,7 +78,6 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     ).subscribe((res) => {
       this.accountDataForView = res.account
       this.marketPlaceData = res
-      console.log(this.marketPlaceData,'ll')
 
     })
   }
@@ -91,7 +90,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
 
   createRelation(status:boolean = false) {
     this._AccountsServiceProxy
-      .applyRelationOnProfile(this.accountId, undefined,status,undefined)
+      .applyRelationOnProfile(this.accountId, undefined,status,this.marketPlaceData.availableConnections[0].connectionEntityId)
       .pipe(
         finalize(() => {
           ;

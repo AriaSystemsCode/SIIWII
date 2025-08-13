@@ -79,6 +79,7 @@ export class MarketplaceProductsComponent
     @Input() fromMarketAcoount: boolean;
     @Input() fromOverView: boolean = false
     @Input() accountDataForView :any
+    @Input() marketplaceAccCurrency :string
     constructor(
         injector: Injector,
         private _router: Router,
@@ -209,9 +210,9 @@ export class MarketplaceProductsComponent
             });
     }
 
-    // getCurrencyCurrent() {
-    //     this._pricingHelperService.getDefaultPricingInstance();
-    // }
+    getCurrencyCurrent() {
+        this._pricingHelperService.getDefaultPricingInstance();
+    }
 
     getAllCurrencies() {
         this._AppEntitiesServiceProxy
@@ -255,7 +256,7 @@ export class MarketplaceProductsComponent
             startShipData: this.startShipData || null,
             endShipData: this.endShipData || null,
             brands: this.brands || [],
-            selectedCurrency: this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
+            selectedCurrency: this.fromMarketAcoount || this.fromOverView ? this.marketplaceAccCurrency: this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
             maxResultCount: this.fromOverView ? 8 : this.maxResultCount
@@ -313,30 +314,25 @@ export class MarketplaceProductsComponent
 
     setCurrency() {
         const currencyCodeRaw = localStorage.getItem("currencyCode");
-        console.log(currencyCodeRaw,'currencyCodeRaw')
         if (!currencyCodeRaw || currencyCodeRaw === "undefined" || currencyCodeRaw === "null") {
             this.selectedCurrrency = this.tenantDefaultCurrency;
         } else {
             try {
                 const parsed = JSON.parse(currencyCodeRaw);
                 this.selectedCurrrency = parsed;
-        console.log(parsed,'parsed')
 
             } catch (e) {
                 // Fallback to string if it's not a JSON object
                 this.selectedCurrrency = currencyCodeRaw;
-        console.log('2222')
 
             }
         }
     
         this.currency = this.selectedCurrrency?.code ?? this.selectedCurrrency;
-        console.log(this.currency,'this.currency')
     
         // If it's just a code (e.g., "AFN"), find matching currency object
         if (!this.selectedCurrrency?.code) {
             const match = this.currencies?.find(x => x.code === this.selectedCurrrency);
-        console.log(match,'match')
 
             if (match) {
                 this.selectedCurrrency = match;

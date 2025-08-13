@@ -144,7 +144,7 @@
       </p-tabPanel>
       <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" header="Products">
         <app-marketplace-products [fromMarketAcoount]="true"
-          [accountDataForView]="accountDataForView"></app-marketplace-products>
+          [accountDataForView]="accountDataForView" [marketplaceAccCurrency]="accountDataForView.currencyId"></app-marketplace-products>
       </p-tabPanel>
 
       <p-tabPanel header="Connections" *ngIf="accountDataForView">

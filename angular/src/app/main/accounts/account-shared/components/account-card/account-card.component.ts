@@ -108,7 +108,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
           this.showMainSpinner();
         
                 this._accountsServiceProxy
-                    .applyRelationOnProfile(account.account.id, undefined,true,undefined)
+                    .applyRelationOnProfile(account.account.id, undefined,true,account.availableConnections[0].connectionEntityId)
                     .pipe(
                         finalize(() => {
                             ;
