@@ -914,6 +914,7 @@ export class MainImportComponent
     onSelectSugItemCode(event: { selectedItem: any, record: AppItemtExcelRecordDTO }) {
         const { selectedItem, record } = event;
         if (record?.isCodeItem || record?._isLinkingParent) {
+            //I44-BE description null error 
             this.importServiceProxy.getAppItemForEditData(
                 selectedItem.id,
                 record.recordType,

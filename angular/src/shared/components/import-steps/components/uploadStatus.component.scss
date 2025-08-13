@@ -156,7 +156,7 @@
   min-width: 1000px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border-radius: 4px;
- // overflow: hidden;
+  // overflow: hidden;
 }
 
 .browser-table thead {
@@ -317,13 +317,13 @@
 }
 
 .link-parent-input {
-  border-color: #D5D4DC !important;    
-  color: black !important;  
+  border-color: #D5D4DC !important;
+  color: black !important;
 }
 
 .link-parent-input::placeholder {
   color: black !important;
-  opacity: 1; 
+  opacity: 1;
 }
 
 .disabled-row {
@@ -344,11 +344,12 @@
 .action-icons i:hover {
   opacity: 0.7;
 }
-.disabled
-{
-  opacity: 0.65; 
+
+.disabled {
+  opacity: 0.65;
   cursor: not-allowed;
 }
+
 .table-scroll-container {
   max-height: 400px;
   overflow-y: auto;
@@ -366,4 +367,30 @@
 .browser-table tr.in-action,
 .browser-table tr.active-record {
   background-color: #D9D9D9 !important;
+}
+
+
+.border-danger {
+  border: 2px solid red !important;
+}
+
+
+.table-scroll-container td {
+  vertical-align: middle;
+}
+
+.table-scroll-container td .form-control {
+  height: 32px;
+  padding: 4px 8px;
+}
+
+.table-scroll-container td small.text-danger {
+  font-size: 11px;
+  line-height: 1.2;
+  margin-top: 2px;
+  display: block;
+}
+
+.table-scroll-container td .form-control.border-danger {
+  border: 1px solid red !important;
 }
