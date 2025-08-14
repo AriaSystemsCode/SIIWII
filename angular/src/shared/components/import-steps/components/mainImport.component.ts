@@ -914,6 +914,7 @@ export class MainImportComponent
     onSelectSugItemCode(event: { selectedItem: any, record: AppItemtExcelRecordDTO }) {
         const { selectedItem, record } = event;
         if (record?.isCodeItem || record?._isLinkingParent) {
+            //I44-BE description null error 
             this.importServiceProxy.getAppItemForEditData(
                 selectedItem.id,
                 record.recordType,
@@ -994,7 +995,6 @@ export class MainImportComponent
 
 
         else if (record?.isCodeColorItem || record?._isLinkingItemColor) {
-            //I44-BE -Var Color  - parent code shouldn't be null 
             this.importServiceProxy.getAppItemColorForEditData(
                 selectedItem.id,
                 record.recordType,

@@ -78,8 +78,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   ngOnChanges(changes: SimpleChanges) {
+
+
     if (changes['uploadingResult'] && this.uploadingResult) {
-      this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map((r, idx) => ({
+      this.uploadingResult.excelRecords = this.uploadingResult?.excelRecords.map((r, idx) => ({
         ...r,
         id: r.id ?? idx,
         __originalIndex: r.id ?? idx
@@ -93,27 +95,32 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         this.activeRecordType = 'Data'
       else
         this.activeRecordType = 'Image'
+
+
+      if (!this.records || this.records?.length == 0) {
+        this.records = this.filteredRecords()?.map((r, idx) => ({
+          ...r,
+          id: r.id ?? idx,
+          __originalIndex: r.id ?? idx
+        })) || [];
+      }
+      else {
+        this.records?.forEach((rec, idx) => {
+          const updated = this.filteredRecords()?.[idx];
+          if (updated) {
+            Object.assign(rec, updated);
+          }
+        });
+      }
+      this.records?.forEach(r => r.showActions = false);
+      this.uploadingResult?.excelRecords?.forEach(r => r.showActions = false);
     }
 
-    if (!this.records || this.records?.length == 0) {
-      this.records = this.filteredRecords()?.map((r, idx) => ({
-        ...r,
-        id: r.id ?? idx,
-        __originalIndex: r.id ?? idx
-      })) || [];
-    }
-    else {
-      this.records?.forEach((rec, idx) => {
-        const updated = this.filteredRecords()?.[idx];
-        if (updated) {
-          Object.assign(rec, updated);
-        }
+    if (changes['_resetRecords'] && this._resetRecords) {
+      this.records.forEach((r, index) => {
+        this.resetRecords(r, index);
       });
     }
-
-    this.records?.forEach(r => r.showActions = false);
-    this.uploadingResult.excelRecords?.forEach(r => r.showActions = false);
-
 
     if (changes['updatedRecordData'] && this.updatedRecordData) {
       const { record, newData } = this.updatedRecordData;
@@ -124,11 +131,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.currentActionRecord = updatedRec;
     }
 
-    if (changes['_resetRecords'] && this._resetRecords) {
-      this.records.forEach((r, index) => {
-        this.resetRecords(r, index);
-      });
-    }
+
   }
 
   mergeRecord(record: any, newData: any) {
@@ -185,7 +188,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.goNextstep.emit();
 
       this.records.forEach(updatedRec => {
-        const originalRec = this.uploadingResult.excelRecords.find(r => r.id === updatedRec.id);
+        const originalRec = this.uploadingResult?.excelRecords.find(r => r.id === updatedRec.id);
         if (originalRec) {
           Object.assign(originalRec, updatedRec);
         }
@@ -211,6 +214,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   resetRecords(record, originalIndex) {
+    record._isDataRecord = false;
     record._isLinkingParent = false;
     record._isLinkingItemColor = false;
     record._isLinkingColorLookup = false;
@@ -223,6 +227,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record._inAction = false;
 
 
+    this.uploadingResult.excelRecords[originalIndex]._isDataRecord = false;
     this.uploadingResult.excelRecords[originalIndex]._isLinkingParent = false;
     this.uploadingResult.excelRecords[originalIndex]._isLinkingItemColor = false;
     this.uploadingResult.excelRecords[originalIndex]._isLinkingColorLookup = false;
@@ -442,70 +447,69 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   handleAction(record: any, action: UploadActionEnum) {
-    this.records.forEach(r => r.showActions = false); // Close dropdown
+    const originalIndex = record.__originalIndex;
+  
+    this.resetRecords(record, originalIndex);
+  
+    this.records.forEach(r => r.showActions = false);
     this.currentActionRecord = record;
+  
+    record.action = action; 
+    this.uploadingResult.excelRecords[originalIndex]._inAction = true;
     record._inAction = true;
     record._original = JSON.parse(JSON.stringify(record));
-    record.action = action;
-
-
-    record._isLinkingParent = false;
-    record._isLinkingItemColor = false;
-    record._isLinkingColorLookup = false;
-    record._isCreateParent = false;
-    record._isCreateItemColor = false;
-    record._isCreateColorLookup = false;
-    record._isLinkNewParent = false;
-    record._isLinkNewItemColor = false;
-    record._isLinkNewColorLookup = false;
-
+  
     switch (action) {
-      case UploadActionEnum.ValidateDataRecord:
+      case this.UploadActionEnum.ValidateDataRecord:
+        this.ValidateDataRecord(record);
         break;
-
-      case UploadActionEnum.LinkToExistingParentItem:
+  
+      case this.UploadActionEnum.LinkToExistingParentItem:
         this.LinkToExistingITEM(record);
         break;
-
-      case UploadActionEnum.LinkToExistingItemColor:
+  
+      case this.UploadActionEnum.LinkToExistingItemColor:
         this.LinkToExistingITEMCOLOR(record);
         break;
-
-      case UploadActionEnum.LinkToExistingColorLookup:
+  
+      case this.UploadActionEnum.LinkToExistingColorLookup:
         this.LinkToExistingCOLORLOOKUP(record);
         break;
-
-      case UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage:
+  
+      case this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage:
         this.CreateNewParentItemAndLinkAsDefaultImage(record);
         break;
-
-      case UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage:
+  
+      case this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage:
         this.CreateNewItemColorAndLinkImageAsDefaultImage(record);
         break;
-
-      case UploadActionEnum.CreateNewColorLookupAndLinkImage:
+  
+      case this.UploadActionEnum.CreateNewColorLookupAndLinkImage:
         this.CreateNewColorLookupAndLinkImage(record);
         break;
-
-      case UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData:
+  
+      case this.UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData:
         this.LinkToNewParentItemCodeFromAssociatedData(record);
         break;
-
-      case UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData:
+  
+      case this.UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData:
         this.LinkToNewItemVariantCodeFromAssociatedData(record);
         break;
-
-      case UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData:
+  
+      case this.UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData:
         this.LinkToNewColorLookupCodeFromAssociatedData(record);
         break;
-
+  
       default:
         console.warn('Unknown action enum:', action);
     }
   }
+  
 
 
-
+  ValidateDataRecord(record) {
+    record._isDataRecord = true;
+  }
 
   LinkToExistingITEM(record) {
     record._isLinkingParent = true;
@@ -574,8 +578,34 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }, 100);
   }
 
+
+
+
+
+
   CreateNewParentItemAndLinkAsDefaultImage(record) {
     record._isCreateParent = true;
+
+    this.editableColumnsForCreateNewParent.forEach(colName => {
+      this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
+    });
+
+    // Scroll after DOM updated
+    setTimeout(() => {
+      const container = this.codeInputContainers.find(
+        (el: ElementRef) => el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
 
   }
 
@@ -691,6 +721,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   onCodeInputChange(record: any, value: string) {
+
+    record._selectionMade = false;
     if (record._isLinkingParent || record._isLinkingItemColor)
       this.setRecordValue(record, 'code', value);
 
@@ -723,9 +755,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       sorting: "",
       skipCount: 0,
       maxResultCount: 100,
-      isCodeItem: record._isLinkingParent || false,
-      isCodeColorItem: record._isLinkingItemColor || false,
-      isCodeColorLookup: record._isLinkingColorLookup || false
+      isCodeItem: record._isLinkingParent,
+      isCodeColorItem: record._isLinkingItemColor,
+      isCodeColorLookup: record._isLinkingColorLookup
     };
 
     this.searchItemCode.emit(payload);
@@ -749,14 +781,26 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record.status = "Passed";
     }
 
+    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup) {
+      //I44-FE Call Validate function
+
+
+      //I44-FE Update status
+      /*  record.fieldsErrors = [];
+       record.errorMessage = "";
+       record.status = "Passed"; */
+    }
+
+
+
     const originalIndex = record.__originalIndex;
     if (
       Array.isArray(this.uploadingResult?.excelRecords) &&
       originalIndex >= 0 &&
-      originalIndex < this.uploadingResult.excelRecords.length
+      originalIndex < this.uploadingResult?.excelRecords.length
     ) {
       this.uploadingResult.excelRecords[originalIndex] = {
-        ...this.uploadingResult.excelRecords[originalIndex],
+        ...this.uploadingResult?.excelRecords[originalIndex],
         ...record
       };
     }
@@ -770,6 +814,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       Object.assign(record, record._original);
       delete record._original;
     }
+    record._isDataRecord = false;
     record._isLinkingParent = false;
     record._isLinkingItemColor = false;
     record._isLinkingColorLookup = false;
@@ -806,6 +851,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.setRecordValue(record, 'colorCode', selectedItem.displayName);
 
     setTimeout(() => {
+      record._selectionMade = true;
       this.activeRecord = null;
     }, 0);
     this.selectSugItemCode.emit({ selectedItem, record });
@@ -815,5 +861,175 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   getSafeHtml(html: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(html || '');
   }
+
+
+  //I44-FE change 2 create cases 
+  editableColumnsForCreateNewParent = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Product Classification',
+    'Product Classification Description',
+    'Product Category Code',
+    'Product Category Description',
+    'Price',
+    'Price Currency Code',
+    'Material Content',
+    'Sold Out Date',
+    'Brand Code',
+    'Brand Name',
+    'Start Ship Date',
+    'Price A',
+    'Price B',
+    'Price C',
+    'Price D'
+  ];
+
+  editableColumnsForCreateNewItemColor = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Product Classification',
+    'Product Classification Description',
+    'Product Category Code',
+    'Product Category Description',
+    'Price',
+    'Price Currency Code',
+    'Material Content',
+    'Sold Out Date',
+    'Brand Code',
+    'Brand Name',
+    'Start Ship Date',
+    'Price A',
+    'Price B',
+    'Price C',
+    'Price D'
+  ];
+
+  editableColumnsForCreateNewColorLookup = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Product Classification',
+    'Product Classification Description',
+    'Product Category Code',
+    'Product Category Description',
+    'Price',
+    'Price Currency Code',
+    'Material Content',
+    'Sold Out Date',
+    'Brand Code',
+    'Brand Name',
+    'Start Ship Date',
+    'Price A',
+    'Price B',
+    'Price C',
+    'Price D'
+  ];
+
+
+  exampleTextsForCreateNewParent: { [key: string]: string } = {
+    'Code': 'Example: SAM001',
+    'Price Currency Code': 'Example: USD , GBP'
+  };
+
+  exampleTextsForCreateNewItemColor: { [key: string]: string } = {
+    'Code': 'Example: SAM001',
+    'Price Currency Code': 'Example: USD , GBP'
+  };
+
+  exampleTextsForCreateNewColorLookup: { [key: string]: string } = {
+    'Code': 'Example: SAM001',
+    'Price Currency Code': 'Example: USD , GBP'
+  };
+
+  requiredColumnsForCreateNewParent: string[] = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Price',
+    'Price Currency Code'
+  ];
+  requiredColumnsForCreateNewItemColor: string[] = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Price',
+    'Price Currency Code'
+  ];
+  requiredColumnsForCreateNewColorLookup: string[] = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Price',
+    'Price Currency Code'
+  ];
+
+
+
+  isCreateNewCase(record: any, columnName: string): boolean {
+    if (!record.action) return false;
+
+    const editableColumnsMap = {
+      [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.editableColumnsForCreateNewParent,
+      [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.editableColumnsForCreateNewItemColor,
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.editableColumnsForCreateNewColorLookup
+    };
+
+    const editableColumns = editableColumnsMap[record.action] || [];
+    return editableColumns.includes(columnName);
+  }
+
+
+  getExampleTextForCreateNewCase(record: any, columnName: string): string {
+    const exampleTextsMap = {
+      [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.exampleTextsForCreateNewParent,
+      [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.exampleTextsForCreateNewItemColor,
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.exampleTextsForCreateNewColorLookup
+    };
+    return exampleTextsMap[record.action]?.[columnName] || '';
+  }
+
+
+  isRequiredColumnForCreateNewCase(record: any, columnName: string): boolean {
+    const requiredColumnsMap = {
+      [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.requiredColumnsForCreateNewParent,
+      [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.requiredColumnsForCreateNewItemColor,
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.requiredColumnsForCreateNewColorLookup
+    };
+    return requiredColumnsMap[record.action]?.includes(columnName) || false;
+  }
+
+  onCodeSelected(record: any, selectedCode: string) {
+    record._selectionMade = true;
+    this.setRecordValue(record, 'code', selectedCode);
+  }
+  isCodeValid(record: any): boolean {
+    return !!record._selectionMade && !!this.getRecordValue(record, 'code');
+  }
+  isRestrictedCase(record: any): boolean {
+    return record._isLinkingParent || record._isLinkingItemColor || record._isLinkingColorLookup;
+  }
+
+  private isNumberLike(val: any): boolean {
+    if (val === null || val === undefined) return false;
+    const s = String(val).trim();
+    if (!s) return false;
+    return /^-?\d+(\.\d+)?$/.test(s);
+  }
+
+  isPriceValid(record: any): boolean {
+    const price = this.getRecordValue(record, 'price');
+    return this.isNumberLike(price);
+  }
+
+  isPriceFieldInvalid(record: any, columnName: string): boolean {
+    if (columnName !== 'Price') return false;
+    const val = this.getRecordValue(record, 'price');
+    return !this.isNumberLike(val);
+  }
+
+
+
 
 }  
