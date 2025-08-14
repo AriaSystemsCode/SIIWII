@@ -92,6 +92,10 @@
             background-color: #fff !important;
             color: #f6851d !important;
         }
+        border-radius: 3px !important;
+    .p-dialog .p-dialog-header {
+        background-color: #fff !important;
+        color: #f6851d !important ;
     }
 
     .p-dialog .p-dialog-content {
@@ -388,5 +392,8 @@ label {
 
 :host ::ng-deep .addDanger .p-dropdown {
     border: 1px solid #C83532ed !important;
+
+}
+
 
 }

@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
-import { AppAddressDto, AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, AppAddressDto, AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
@@ -35,7 +35,8 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
   constructor(
     injector: Injector,
-    private _AppTransactionServiceProxy: AppTransactionServiceProxy
+    private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+        private _AccountsServiceProxy: AccountsServiceProxy,
   ) {
     super(injector);
   }
@@ -56,15 +57,21 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     if ($event)
       this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = true : this.createOrEditSellerContactInfo = true;
   }
-  save() {
-    this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
-    this.synchronizeContactDetailsAndSave();
-  }
+ 
   cancel() {
     this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
     this.showSaveBtn = false;
+  }
+
+
+  save(fromContinue?:boolean) {
+    if(!fromContinue){
+      this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
+
+    }
+    this.synchronizeContactDetailsAndSave();
   }
   synchronizeContactDetailsAndSave() {
     const buyerContact = this.appTransactionsForViewDto.appTransactionContacts.find(
@@ -190,8 +197,6 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
     this.TempComp.emit($event);
 
-
-
   }
 
   isContactFormValid(value) {
@@ -220,7 +225,29 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.appTransactionsForViewDto.appTransactionContacts[1].branchCode = this.appTransactionsForViewDto?.appTransactionContacts[1]?.selectedBranch?.code
   }
 
+  getCompanyId(id){
 
+
+         this._AccountsServiceProxy.getAccountForView(id, 5)
+   
+         .pipe(finalize(() => {
+          this.hideMainSpinner();
+  
+  
+        }))
+        .subscribe((res) => {
+          if (res) {
+        this.appTransactionsForViewDto.paymentTermsId =res?.account?.paymentTermsId
+        this.appTransactionsForViewDto.paymentTermsName =res?.account?.paymentTermsName
+        this.appTransactionsForViewDto.shipViaId =res?.account?.shipViaId
+        this.appTransactionsForViewDto.shipViaName =res?.account?.shipViaName
+     
+          }
+        });
+    
+   
+ 
+  }
 
   saveDates() {
     let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();

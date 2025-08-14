@@ -190,7 +190,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             undefined,undefined,filters.referenceNumberFilter,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
-            maxResultCount
+            maxResultCount,
             // this.dataTable.filters
         ).subscribe(result => {
             this.loading = false;

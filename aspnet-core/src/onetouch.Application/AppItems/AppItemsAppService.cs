@@ -6150,17 +6150,34 @@ namespace onetouch.AppItems
                             //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
                             if (lNewVariation == true)
                             {
-                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z => z.ItemPricesFkList)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               .Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
-                               .FirstOrDefault();
+                                // itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z => z.ItemPricesFkList)
+                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
+                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
+                                //.FirstOrDefault();
+                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
+                                .Include(x => x.EntityFk).AsNoTracking()
+                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                                .FirstOrDefault();
+                                if (itemOrg != null)
+                                {
+                                    itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
+                                    itemOrg.ParentFkList = _appItemRepository.GetAll()
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                   .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
+                                }
                                 break;
                             }
                             else
@@ -6170,9 +6187,10 @@ namespace onetouch.AppItems
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
                             itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
+                               .Include(x => x.EntityFk).AsNoTracking()
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x=> x.AttachmentFk)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
@@ -6182,13 +6200,13 @@ namespace onetouch.AppItems
                                .FirstOrDefault();
                             if (itemOrg != null)
                             {
-                                itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().Where(z => z.AppItemId == excelDto.Id).ToList();
+                                itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
                                 itemOrg.ParentFkList = _appItemRepository.GetAll()
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               .Include(z => z.ItemPricesFkList).Where(z => z.ParentId == excelDto.Id).ToList();
+                               .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
                             }
                             //itemOrg.ParentFkList.Clear();
                             //appItemDeleteList.Add(itemOrg);
@@ -6274,7 +6292,7 @@ namespace onetouch.AppItems
                             string oldCode = excelDto.Code;
                             excelDto.Code = GetItemCopyCode(excelDto.Code);
                             excelDto.Id = 0;
-                            var childItemsCopy = result.Where(x => x.ParentCode == oldCode && x.Id != 0);
+                            var childItemsCopy = result.Where(x => x.ParentCode == oldCode);// && x.Id != 0);
                             if (childItemsCopy != null && childItemsCopy.Count<AppItemExcelDto>() > 0)
                             {
                                 foreach (var itemCopy in childItemsCopy)
@@ -6846,7 +6864,7 @@ namespace onetouch.AppItems
                                     foreach (var size in appItemSizeScalesHeader.AppItemSizeScalesDetails)
                                     {
                                         size.SizeScaleId = appItemSizeScalesHeader.Id;
-                                        await _appItemSizeScalesDetailRepository.InsertAsync(size);
+                                        //await _appItemSizeScalesDetailRepository.InsertAsync(size);
                                     }
                                 }
                             }

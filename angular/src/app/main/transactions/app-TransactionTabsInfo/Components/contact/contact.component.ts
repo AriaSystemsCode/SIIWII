@@ -27,6 +27,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     @Output() validateTempBuyer = new EventEmitter<boolean>();
     @Output("updateAppTransactionsForViewDto") updateAppTransactionsForViewDto = new EventEmitter<GetAppTransactionsForViewDto>();
     @Output() loadAddressComponent = new EventEmitter<object>();
+    @Output() companyId = new EventEmitter<any>();
 
     appTransactionContactsIndex = -1;
 
@@ -144,14 +145,19 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         if (type == 'company') {
             localStorage.setItem("comNew", JSON.stringify(event?.target?.checked));
             this.appTransactionsForViewDto.createManualAccount = event?.target?.checked
-            this.saveManualAccount()
-            this.saveManualBranch()
+            if(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code == null){
+                this.saveManualAccount()
+                this.saveManualBranch()
+            }
+         
         }
         else if (type == 'contact') {
 
             localStorage.setItem("conNew", JSON.stringify(event?.target?.checked));
-
+            if(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code ==null){
             this.saveManualContact()
+                
+            }
 
             this.appTransactionsForViewDto.createManualContact = event?.target?.checked
 
@@ -159,7 +165,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.isValidForm();
 
     }
-
 
     async saveManualAccount() {
         let sequance = "";
@@ -259,7 +264,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = event?.code
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].companyCode = event?.code
-
+        this.companyId.emit( this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.id)
         var tempContact: boolean = false;
 
         if (this.tempAccount && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany) {
@@ -273,7 +278,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.getContacts(tempContact);
 
         if (this.loadAddressComponent) {
-            this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id });
+            this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id ,branchSsin :this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.ssin });
         }
         this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.contactName || '';
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = new GetContactInformationDto();
@@ -582,7 +587,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
 
                 if (this.loadAddressComponent) {
-                    this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id });
+                    this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id,branchSsin :this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.ssin });
                 }
             }
 

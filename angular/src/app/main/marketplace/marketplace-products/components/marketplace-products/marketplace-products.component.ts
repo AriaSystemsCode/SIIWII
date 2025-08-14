@@ -64,8 +64,6 @@ export class MarketplaceProductsComponent
     sellerSSIN: any;
     buyerSSIN: any;
     contactSSIN:any;
-    acceptedAspectRatio;
-
     isFromSellerRoom:boolean
     ismarketPLace:boolean
     items: any[];
@@ -76,6 +74,7 @@ export class MarketplaceProductsComponent
     appItemListId: any;
     selectedDepartments: any;
  
+    acceptedAspectRatio;
     constructor(
         injector: Injector,
         private _router: Router,

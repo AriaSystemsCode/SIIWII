@@ -23,7 +23,8 @@
             <div class="row topheader">
                 <div class="">
                     <div class="row bg-white  m-3 p-2  pl-4" style="border-radius: 4px;min-width: 270px;">
-                        Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{appTransactionsForViewDto?.transactionType == 0 ? 'Sales Order':'Purchase Order'}} &nbsp; &nbsp; >
+                        Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{appTransactionsForViewDto?.transactionType == 0 ?
+                        'Sales Order':'Purchase Order'}} &nbsp; &nbsp; >
                         &nbsp; &nbsp;
                         {{transactionCode}}
                     </div>
@@ -382,44 +383,36 @@
                                 </app-create-or-edit-billing-info>
                             </div>
                         </p-accordionTab>
-                   
-<p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="currentTab = 6">
-                         
 
-    <ng-template pTemplate="header">
-      <div class="d-inline-block custom-header ">
-        <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header | localize}}</h6>
-        <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
-      </div>
-    </ng-template>
-    
-    
-    <div *ngIf="currentTab==6 ">
-    <create-or-edit-extra-data 
-    
-    [extraAttributeObject]="extraAttributeObject"
-    [activeTab]="6"
-    [currentTab]="currentTab"
-    [appTransactionsForViewDto]="appTransactionsForViewDto"
-    
-    [createOrEditExtraData]="createOrEditExtraData"
-    
-    (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
-    
-    (refreshShoppingCart)="refreshShoppingCart($event)"
-    
-    [canChange]="canChange"
-    ></create-or-edit-extra-data>
-    </div>
-    <div>
-    
-    </div>
-    
-    
-    
-    
-    </p-accordionTab>
-    
+                        <p-accordionTab *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index"
+                            [ngClass]="!showTabs ? 'd-none':''" (click)="currentTab = 6">
+
+
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header ">
+                                    <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header |
+                                        localize}}</h6>
+                                    <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
+                                </div>
+                            </ng-template>
+
+
+                            <div *ngIf="currentTab==6 ">
+                                <create-or-edit-extra-data [extraAttributeObject]="extraAttributeObject" [activeTab]="6"
+                                    [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                    [createOrEditExtraData]="createOrEditExtraData" (ontabChange)="ontabChange($event)"
+                                    [showSaveBtn]="showSaveBtn" (refreshShoppingCart)="refreshShoppingCart($event)"
+                                    [canChange]="canChange"></create-or-edit-extra-data>
+                            </div>
+                            <div>
+
+                            </div>
+
+
+
+
+                        </p-accordionTab>
+
 
 
 
@@ -489,7 +482,9 @@
                                                         [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                         {{ col.header }}
                                                     </th>
-
+                                                    <!--  <th> <img
+                                                src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
+                                        </th> -->
                                                     <th class="purpleColor" *ngIf="canChange" style="width: 5rem;">
                                                         {{l("Action")}}
                                                     </th>
@@ -507,17 +502,18 @@
                                                         <label
                                                             *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                             {{ rowData[col.field] }}</label>
-                                                        <label *ngIf="(col.field=='price')||(col.field=='amount')">
+                                                        <label
+                                                            *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice) || (col.field=='amount')">
                                                             {{ rowData[col.field] | currency:' ' }}</label>
                                                         <label
                                                             *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
                                                             {{ rowData[col.field] }}</label>
 
                                                         <label *ngIf="col.field=='image'">
-                                                            <img *ngIf="!rowNode.node.data.added"
-                                                                [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                            <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
                                                                 onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                 class="imgIcon" />
+
 
                                                         </label>
 
@@ -545,15 +541,35 @@
                                                             </div>
 
                                                         </label>
+
+                                                        <label
+                                                            *ngIf="col.field=='price' && rowNode?.node?.data?.showEditPrice">
+                                                            <div class="editQtyContainer">
+                                                                <div class="fieldset">
+                                                                    <input type="number" min="0"
+                                                                        class="form-control inputs form-text"
+                                                                        id="editPrice"
+                                                                        [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                                    <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                        (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                                    <button
+                                                                        class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                        (click)="onEditPrice(rowNode);"
+                                                                        [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                                        [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+
                                                     </td>
 
                                                     <td class="p-treeTable text-center" style="width: 5rem;"
                                                         *ngIf="canChange">
                                                         <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
-                                                  class="imgIcon" (click)="onDelete(rowNode)" />
-                                              <img *ngIf="rowNode?.node?.data?.editQty" src=""
-                                                  class="editIcon fa fa-edit ml-3 fa-1x"
-                                                  (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty" /> -->
+                                                class="imgIcon" (click)="onDelete(rowNode)" />
+                                            <img *ngIf="rowNode?.node?.data?.editQty" src=""
+                                                class="editIcon fa fa-edit ml-3 fa-1x"
+                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty" /> -->
 
                                                         <div class="dropdown" dropdown>
                                                             <button class="btn btn-secondary dropdown-toggle p-0"
@@ -566,7 +582,7 @@
                                                                 aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                                 <div *ngIf="rowNode?.node?.data?.editQty"
                                                                     class="pointer"
-                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty ; rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
                                                                     <a class="link purpleColor p-3">
                                                                         <svg class="ml-3"
                                                                             xmlns="http://www.w3.org/2000/svg"
@@ -690,19 +706,19 @@
                                                                 <p
                                                                     style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important; margin-bottom: 0px;">
                                                                     {{productDetails?.name}}</p>
-                                                                    <div class="type ml-3 pt-2 text-center">
-                                                                        <p class="mb-0" style="white-space: nowrap;"> {{
-                                                                            productDetails?.orderByPrePack === false
-                                                                            ? "By Size"
-                                                                            : "By Prepack"
-                                                                            }}</p>
-                        
-                                                                    </div>
+                                                                <div class="type ml-3 pt-2 text-center">
+                                                                    <p class="mb-0" style="white-space: nowrap;"> {{
+                                                                        productDetails?.orderByPrePack === false
+                                                                        ? "By Size"
+                                                                        : "By Prepack"
+                                                                        }}</p>
+
+                                                                </div>
 
                                                             </div>
                                                             <div class="price mb-4">
 
-                                                                <div class="msrp d-flex ">
+                                                                <div class="msrp d-flex align-items-baseline">
                                                                     <h5 class="mr-2"
                                                                         style="color: black !important;font-size: 16px;margin-top: 10px;">
                                                                         MSRP: </h5>
@@ -1041,17 +1057,18 @@
                                                 <!-- end order by prepack -->
                                             </div>
 
-                                            <div *ngIf="showAddLine" class="d-flex justify-content-between mt-3">
+                                            <div *ngIf="showAddLine" class="d-flex justify-content-end mt-3">
                                                 <button (click)="cancelVariationLine()"
                                                     class="cancelbtn text-center btn float-right">Cancel</button>
-                                                <button [disabled]="filterForm.controls['selectedVariation'].value == ''"
+                                                <button
+                                                    [disabled]="filterForm.controls['selectedVariation'].value == ''"
                                                     (click)="saveVariations()"
                                                     class="previewbtn text-center btn ml-2">Save</button>
                                             </div>
                                         </form>
 
 
-                               
+
 
                                     </div>
 
@@ -1551,7 +1568,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                             </div>
 
 
-                                            <div class="row handleMob" >
+                                            <div class="row handleMob">
                                                 <div class="ml-4 mr-4">
                                                     <p-treeTable [value]="shoppingCartTreeNodes" [scrollable]="true"
                                                         [tableStyle]="{'min-width':'375px'}">
@@ -1591,8 +1608,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                         {{ rowData[col.field] }}</label>
 
                                                                     <label *ngIf="col.field=='image'">
-                                                                        <img *ngIf="!rowNode.node.data.added"
-                                                                            [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                                        <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
                                                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                             class="imgIcon"
                                                                             style="height: 35px; width: 35px;border-radius: 8px;" />
@@ -1706,7 +1722,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                     </button>
 
 
-                                                    <form [formGroup]="filterForm" *ngIf="!addLine" >
+                                                    <form [formGroup]="filterForm" *ngIf="!addLine">
                                                         <div class="mb-3 w-100 row ">
                                                             <div class="d-md-flex  w-100">
                                                                 <div class="col-md-4 col-12">
@@ -1776,14 +1792,16 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                             <p
                                                                                 style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important;margin-bottom: 0px;">
                                                                                 {{productDetails?.name}}</p>
-                                                                                <div class="type ml-3 pt-2 text-center">
-                                                                                    <p class="mb-0" style="white-space: nowrap;"> {{
-                                                                                        productDetails?.orderByPrePack === false
-                                                                                        ? "By Size"
-                                                                                        : "By Prepack"
-                                                                                        }}</p>
-                                    
-                                                                                </div>
+                                                                            <div class="type ml-3 pt-2 text-center">
+                                                                                <p class="mb-0"
+                                                                                    style="white-space: nowrap;"> {{
+                                                                                    productDetails?.orderByPrePack ===
+                                                                                    false
+                                                                                    ? "By Size"
+                                                                                    : "By Prepack"
+                                                                                    }}</p>
+
+                                                                            </div>
 
                                                                         </div>
                                                                         <div class="price mb-4">
@@ -2149,24 +2167,62 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                             <!-- end order by prepack -->
                                                         </div>
 
-                                                                 <div *ngIf="showAddLine"
-                                                        class="d-flex justify-content-between mt-3">
-                                                        <button (click)="cancelVariationLine()"
-                                                            class="cancelbtn text-center btn float-right">Cancel</button>
-                                                        <button
-                                                            [disabled]="filterForm.controls['selectedVariation'].value == ''"
-                                                            (click)="saveVariations();"
-                                                            class="previewbtn text-center btn ml-2">Save</button>
-                                                    </div>
+                                                        <div *ngIf="showAddLine"
+                                                            class="d-flex justify-content-between mt-3">
+                                                            <button (click)="cancelVariationLine()"
+                                                                class="cancelbtn text-center btn float-right">Cancel</button>
+                                                            <button
+                                                                [disabled]="filterForm.controls['selectedVariation'].value == ''"
+                                                                (click)="saveVariations();"
+                                                                class="previewbtn text-center btn ml-2">Save</button>
+                                                        </div>
                                                     </form>
 
 
 
-                                           
+
                                                 </div>
                                             </div>
                                         </div>
                                     </p-accordionTab>
+
+
+                                    <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="currentTab = 6">
+                         
+
+                                        <ng-template pTemplate="header">
+                                          <div class="d-inline-block custom-header ">
+                                            <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header | localize}}</h6>
+                                            <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
+                                          </div>
+                                        </ng-template>
+                                        
+                                        
+                                        <div *ngIf="currentTab==6 ">
+                                        <create-or-edit-extra-data 
+                                        
+                                        [extraAttributeObject]="extraAttributeObject"
+                                        [activeTab]="6"
+                                        [currentTab]="currentTab"
+                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                        
+                                        [createOrEditExtraData]="createOrEditExtraData"
+                                        
+                                        (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
+                                        
+                                        (refreshShoppingCart)="refreshShoppingCart($event)"
+                                        
+                                        [canChange]="canChange"
+                                        ></create-or-edit-extra-data>
+                                        </div>
+                                        <div>
+                                        
+                                        </div>
+                                        
+                                        
+                                        
+                                        
+                                        </p-accordionTab>
                                     <!-- order Preview tab -->
                                     <p-accordionTab class="shoppingCartAccordionTabBG"
                                         *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'"
