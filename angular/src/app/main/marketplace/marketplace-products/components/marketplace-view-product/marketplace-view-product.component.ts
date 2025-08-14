@@ -15,7 +15,7 @@ import {
     GetAppMarketplaceItemDetailForViewDto,
     MarketplaceExtraDataAttrDto,
     MessageServiceProxy,
-    // OverAllRatingDto,
+    OverAllRatingDto,
     ShoppingCartSummary,
     TransactionType,
 } from "@shared/service-proxies/service-proxies";
@@ -86,7 +86,7 @@ export class MarketplaceViewProductComponent
     showSpecialPrice: boolean = false;
     languageSettingName  =AppConsts.languageSettingName;
     IsConnected : boolean = false
-    // overRating: OverAllRatingDto
+    overRating: OverAllRatingDto
     
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
@@ -215,7 +215,7 @@ export class MarketplaceViewProductComponent
                     )
                     .pipe(
                         finalize(() => {
-                            // this.getOverAllRatings()
+                            this.getOverAllRatings()
                             this.hideMainSpinner();
                         })
                     )
@@ -937,25 +937,25 @@ export class MarketplaceViewProductComponent
             });
     }
 
-    // getOverAllRatings() {
-    //     const subs = this.messageServiceProxy
-    //       .getOverAllRatings(
-    //      this.productBodyData.id,
-    //       )
-    //       .pipe(
-    //         finalize(() => {
+    getOverAllRatings() {
+        const subs = this.messageServiceProxy
+          .getOverAllRatings(
+         this.productBodyData.id,
+          )
+          .pipe(
+            finalize(() => {
     
-    //         })
-    //       )
-    //       .subscribe(
-    //         (result) => {
-    //           this.overRating = result
+            })
+          )
+          .subscribe(
+            (result) => {
+              this.overRating = result
     
-    //         },
+            },
     
-    //       );
-    //     this.subscriptions.push(subs);
-    //   }
+          );
+        this.subscriptions.push(subs);
+      }
 
       refreshRatingFlag = false;
 
@@ -964,7 +964,7 @@ handleRefreshRating(event: boolean) {
 
 
   this.getProductDetailsForView()
-//   this.getOverAllRatings()
+  this.getOverAllRatings()
   }
 }
 

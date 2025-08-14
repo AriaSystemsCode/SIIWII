@@ -60,7 +60,8 @@ namespace onetouch.Message.Dto
         public GetProfilePictureOutput UserImage { get; set; }
 
         public string ProfilePictureUrl { get; set; }
-
+        public string SenderCompanyName { get; set; }
+       
     }
 
 }
