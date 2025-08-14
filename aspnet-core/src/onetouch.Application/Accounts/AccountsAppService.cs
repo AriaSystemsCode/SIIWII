@@ -1726,8 +1726,8 @@ namespace onetouch.Accounts
                     {
                         //I40[Start]
                         var relationship = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contactObj.SSIN
-                        && z.RequesterContactSSIN == originalContact.SSIN) || (z.RequesterContactSSIN == contactObj.SSIN
-                        && z.RecipientContactSSIN == originalContact.SSIN) && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
+                        && z.RequesterContactSSIN == originalContact.SSIN) && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
+                        //|| (z.RequesterContactSSIN == contactObj.SSIN && z.RecipientContactSSIN == originalContact.SSIN
                         if (relationship == null)
                             continue;
                         CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
@@ -1753,6 +1753,12 @@ namespace onetouch.Accounts
                         if (createOrEditAccountInfoDto.EntityExtraData != null)
                         {
                             createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
+                            var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                            if (userIdExtraData != null)
+                            {
+                                userIdExtraData.AttributeValue = "";
+                            }
+
                         }
                         if (createOrEditAccountInfoDto.EntityAttachments != null)
                         {
@@ -1776,8 +1782,8 @@ namespace onetouch.Accounts
                         //m
                         //I40[Start]
                         var relationship = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contactObj.SSIN
-                        && z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN) || (z.RequesterContactSSIN == contactObj.SSIN
-                        && z.RecipientContactSSIN == originalPublishContactFortCurrTenant.SSIN) && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
+                        && z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN)  && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
+                        //|| (z.RequesterContactSSIN == contactObj.SSIN && z.RecipientContactSSIN == originalPublishContactFortCurrTenant.SSIN)
                         if (relationship == null)
                             continue;
 
@@ -1804,6 +1810,11 @@ namespace onetouch.Accounts
                         if (createOrEditAccountInfoDto.EntityExtraData != null)
                         {
                             createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
+                            var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                            if (userIdExtraData != null)
+                            {
+                                userIdExtraData.AttributeValue = "";
+                            }
                         }
                         if (createOrEditAccountInfoDto.EntityAttachments != null)
                         {
@@ -2016,19 +2027,54 @@ namespace onetouch.Accounts
                 foreach (var contactObj in contactsInfo)
                 {
                     var relationship = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contactObj.SSIN
-                       && z.RequesterContactSSIN == connectMainAccountContact.SSIN) || (z.RequesterContactSSIN == contactObj.SSIN
-                       && z.RecipientContactSSIN == connectMainAccountContact.SSIN) && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
+                       && z.RequesterContactSSIN == connectMainAccountContact.SSIN)  && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
                     if (relationship == null)
                         continue;
-
+                    //|| (z.RequesterContactSSIN == contactObj.SSIN && z.RecipientContactSSIN == connectMainAccountContact.SSIN)
                     CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
                     accountDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contactObj);
                     accountDto.Id = 0;
                     accountDto.ParentId = savedContactDto.Id;
-                    accountDto.AccountId = savedContactDto.Id;
-                    accountDto.EntityExtraData.ForEach(z => z.Id = 0);
-                    accountDto.EntityAttachments.ForEach(z => z.Id = 0);
+                    accountDto.AccountId = savedContactDto.AccountId;
+                    //accountDto.EntityExtraData.ForEach(z => z.Id = 0);
+                    //accountDto.EntityAttachments.ForEach(z => z.Id = 0);
                     accountDto.TenantId = int.Parse(connectTenant.ToString());
+
+                    //XXX
+                    //CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
+                    //createOrEditAccountInfoDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contactObj);
+                    if (contactObj.EntityAttachments != null && contactObj.EntityAttachments.Count > 0)
+                    {
+                        foreach (var parentAttachObj in contactObj.EntityAttachments)
+                        {
+                            MoveFile(parentAttachObj.AttachmentFk.Attachment, -1, connectTenant);
+                        }
+                    }
+                    accountDto.UseDTOTenant = true;
+                    accountDto.TenantId = int.Parse(connectTenant.ToString()); ;
+                    accountDto.Id = 0;
+                    accountDto.ParentId = savedContactDto.Id; ;
+                    accountDto.AccountId = long.Parse(savedContactDto.AccountId.ToString());
+                    if (tenantObj != null)
+                    {
+                        string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("MANUALACCOUNTCONTACT", connectTenant);
+                        accountDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
+                    }
+                    if (accountDto.EntityExtraData != null)
+                    {
+                        accountDto.EntityExtraData.ForEach(x => x.Id = 0);
+                        var userIdExtraData = accountDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                        if (userIdExtraData != null)
+                        {
+                            userIdExtraData.AttributeValue = "";
+                        }
+                    }
+                    if (accountDto.EntityAttachments != null)
+                    {
+                        accountDto.EntityAttachments.ForEach(x => x.Id = 0);
+                    }
+                    accountDto.ContactAddresses = null;
+                    //XXX
                     var contact = CreateOrUpdateContact(accountDto);
                 }
                 //Contacts[End]
@@ -3172,7 +3218,7 @@ namespace onetouch.Accounts
             var retId = await _appEntityRelationShipRepository.InsertAndGetIdAsync(entity);
             return retId;
         }
-        public async Task<string> ApplyRelationOnProfile(long input, string ssin, bool? isPublic, long connectionTypeId)
+        public async Task<string> ApplyRelationOnProfile(long input, string ssin, bool? isPublic, long? connectionTypeId)
         {
             //I40{Start}
             if (ssin == null)
