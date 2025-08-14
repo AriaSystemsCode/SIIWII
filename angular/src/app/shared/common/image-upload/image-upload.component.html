@@ -5,6 +5,8 @@
         <input class="input-file"  type="file" name="image{{inputID}}" id="image{{inputID}}"
             (change)="fileChange($event)"
             [accept]="acceptedExtensions"
+            [disabled]="isDisabled"
+            [ngStyle]="{'cursor': isDisabled ? 'not-allowed' : 'pointer'}"
             >
         <app-image-display
             [staticWidth]="staticWidth"

@@ -99,3 +99,42 @@
     gap: 5px;
     padding: 0px 15px;
 }
+
+
+.clrBtn {
+    color: #F6851D !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+
+ ::ng-deep .bgAdd{
+   
+    p-tree[selectionmode=single] .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label {
+        background-color: #4A0D4A !important;
+    }
+    p-tree .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label {
+        background-color: #4A0D4A !important;
+    }
+
+    .p-treenode-content .p-treenode-selectable .p-highlight {
+        .p-treenode-label {
+            background-color: #4A0D4A !important;
+        }
+            }
+}
+
+.bgAdd{
+    .p-treenode-content .p-treenode-selectable .p-highlight {
+.p-treenode-label {
+    background-color: #4A0D4A !important;
+}
+    }
+    p-tree[selectionmode=single] .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label {
+        background-color: #4A0D4A !important;
+    }
+    p-tree .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label {
+        background-color: #4A0D4A !important;
+    }
+    
+}

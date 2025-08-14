@@ -1,0 +1,392 @@
+::ng-deep {
+    .p-dialog {
+        // border-radius: 3px !important;
+        border: 1px solid #EEE;
+        background: #FFF;
+        // padding: 10px !important;
+        margin: 10px;
+        box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.15);
+    }
+
+    @media only screen and (min-width: 768px) {
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 305px !important;
+        }
+
+        .p-datepicker-calendar {
+            width: 286px !important;
+        }
+    }
+
+    .focused-calendar .p-datepicker-trigger {
+        border-bottom-right-radius: 8px !important;
+    }
+
+
+    .p-datepicker-calendar {
+
+        .p-datepicker table td {
+            padding: 5px !important;
+        }
+
+
+        .p-datepicker table td>span {
+            width: 30px !important;
+        }
+
+        .p-calendar-w-btn .p-inputtext {
+            color: #9E9E9E !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+
+        }
+    }
+
+    .p-inputtext {
+        color: #595959 !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+    }
+
+    .spEnterd {
+        color: #1B101B;
+        font-size: 16px;
+
+        font-weight: 700;
+
+    }
+
+    .temm {
+        margin: 20px 0;
+    }
+
+    .enteredBy {
+        color: #4A0D4A !important;
+
+        font-size: 16px;
+
+        font-weight: 800;
+        line-height: normal;
+    }
+
+    .p-dropdown-label {
+        color: #595959 !important;
+        font-size: 14px !important;
+        font-style: normal;
+        font-weight: 600 !important;
+    }
+
+    .p-calendar .p-inputtext {
+        color: #595959 !important;
+        font-size: 14px !important;
+        font-style: normal !important;
+        font-weight: 600 !important;
+    }
+
+    .p-menu .p-submenu-header {
+        display: none !important;
+    }
+
+    .transM {
+        .p-dialog .p-dialog-header {
+            background-color: #fff !important;
+            color: #f6851d !important;
+        }
+    }
+
+    .p-dialog .p-dialog-content {
+        text-align: left !important;
+
+    }
+
+    body .p-dialog .p-dialog-content {
+        padding: 0 0 0 0 !important;
+
+    }
+
+    .p-dropdown {
+        width: 100% !important;
+        height: 44px !important;
+    }
+
+    .p-dropdown-filter-icon {
+        top: 16px !important;
+    }
+
+    .p-button:enabled:active {
+        border-radius: 6px;
+        border: 1px solid rgba(238, 238, 238, 0.93);
+        background: #FFF !important;
+        box-shadow: 2px 2px 6px 0px rgba(22, 22, 22, 0.05);
+        color: #4a0d4a;
+    }
+
+    .addTextBtn {
+        border-radius: 6px;
+        border: 1px solid rgba(238, 238, 238, 0.93);
+        background: #FFF !important;
+        box-shadow: 2px 2px 6px 0px rgba(22, 22, 22, 0.05);
+        color: #4a0d4a;
+    }
+
+    .p-button:enabled:hover {
+        background: #FFF !important;
+
+        color: #4a0d4a !important;
+
+        border: 1px solid rgba(238, 238, 238, 0.93) !important;
+
+    }
+
+
+    .form-control {
+        height: 44px !important;
+        border-radius: 8px !important;
+        border: 1px solid #D9D9D9 !important;
+        background: #FFF !important;
+        color: #595959 !important;
+        font-size: 14px !important;
+        font-style: normal !important;
+        font-weight: 600 !important;
+    }
+
+    .form-control::placeholder {
+        color: #595959 !important;
+        opacity: 1;
+        /* Ensure full opacity */
+    }
+
+    .form-control:focus {
+        border-radius: 8px !important;
+        border: 2px solid #4A0D4A !important;
+        background: #FFF !important;
+    }
+
+
+
+    .form-control:hover {
+        border-radius: 8px !important;
+        border: 1px solid #D5D4DC !important;
+        background: rgba(248, 248, 248, 0.97) !important;
+    }
+}
+
+.wrapper {
+    padding: 0px 10px;
+
+    .user {
+        background-color: #F8F8F8;
+        padding: 2px 10px;
+        border-radius: 6px;
+
+        .enter {
+            span {
+                color: #4a0d4a;
+                text-transform: capitalize;
+                font-weight: 700;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+        }
+
+        .date {
+            color: #464e5f;
+            font-size: 12px;
+        }
+    }
+
+    .seller {
+        .sellerHeader {
+            background-color: #F8F8F8;
+            padding: 2px 10px;
+            border-radius: 6px;
+
+            span {
+                color: #1B101B;
+                text-transform: capitalize;
+                font-weight: 700;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+        }
+
+        .form {
+            label {
+                color: #464e5f;
+                font-size: 13px !important;
+            }
+        }
+    }
+}
+
+.footer {
+    border-radius: 12px;
+    border: 1px solid #E0E0E0;
+    background: #F8F8F8;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+        background-color: #4a0d4a;
+        color: #fff;
+        border-radius: 8px !important;
+        border: none !important;
+        padding: 10px 30px;
+        font-size: 13px;
+        margin: 10px 0px;
+    }
+}
+
+
+.tem-footer {
+    padding: 4px 10px;
+}
+
+::ng-deep .calendar-form {
+    .p-calendar {
+        width: 100% !important;
+
+        svg {
+            display: none !important;
+        }
+
+
+    }
+
+    .p-calendar-w-btn .p-datepicker-trigger {
+        width: 48px !important;
+        height: 44px !important;
+    }
+
+
+    img {
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        right: 12px;
+        bottom: 12px;
+        cursor: pointer;
+
+    }
+
+    p-calendar.ng-dirty.ng-invalid>.p-calendar>.p-inputtext {
+        border: 1px solid #a80000 !important;
+    }
+
+
+}
+
+::ng-deep {
+
+    .text-danger {
+        color: #C83532 !important;
+    }
+
+    .was-validated .form-control:invalid,
+    .form-control.is-invalid {
+        border: 1px solid#C83532 !important;
+
+    }
+
+
+    p-autocomplete .p-autocomplete {
+        width: 100% !important;
+
+        .p-button:focus {
+            box-shadow: none !important;
+        }
+
+        .p-button {
+            background-color: #fff !important;
+            color: #9E9E9E !important;
+            border: 1px solid #D9D9D9 !important;
+            border-left: none !important;
+            border-top-right-radius: 8px !important;
+            border-bottom-right-radius: 8px !important;
+            border-top-left-radius: 0px !important;
+            border-bottom-left-radius: 0px !important;
+        }
+
+        .p-inputtext {
+            height: 44px !important;
+            border-top-left-radius: 8px !important;
+            border-bottom-left-radius: 8px !important;
+            border: 1px solid #D9D9D9 !important;
+            border-right: none !important;
+            color: #595959 !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+        }
+
+        .p-inputtext:enabled:focus {
+            border: 1px solid #e2e5ec !important;
+            border-right: none !important;
+        }
+
+        .p-button:enabled:hover {
+            border: 1px solid #e2e5ec !important;
+            border-left: none !important;
+        }
+
+
+    }
+
+    @media (min-width: 567px) and (max-width: 778px) {
+        .col-md-6 {
+            width: 50% !important;
+            max-width: 50%;
+        }
+
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 265px !important;
+        }
+
+
+        input.form-control.ng-dirty.ng-invalid.ng-touched {
+            border: 1px solid red !important;
+        }
+
+        .p-datepicker-calendar {
+            width: 245px !important;
+
+            .p-datepicker table td {
+                padding: 5px !important;
+            }
+
+
+        }
+    }
+
+    @media only screen and (max-width: 426px) {
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 77% !important;
+        }
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .mobile {
+
+        width: 85%;
+    }
+}
+
+label {
+    color: #1B101B !important;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.price-sec {
+    gap: 10px;
+}
+
+
+
+:host ::ng-deep .addDanger .p-dropdown {
+    border: 1px solid #C83532ed !important;
+
+}

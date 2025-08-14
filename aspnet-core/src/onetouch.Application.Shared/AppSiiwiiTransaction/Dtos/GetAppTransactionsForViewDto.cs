@@ -48,6 +48,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[Start]
         public virtual DateTime CreationDate { set; get; }
         //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
+        //I46[Start] 
+        public List<ExtraDataAttrDto> ExtraDataAttributes { get; set; }
+       // public List<ExtraDataAttrDto> Additional { get; set; }
+        //I46[End]
     }
 
     //xx
@@ -137,6 +141,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public ValidateTransaction ValidateOrder { get; set; }
         public TransactionType OrderType { get; set; }
         public string CurrencyCode { set; get; }
+        public string BuyerName { set; get; }
+        public string SellerName { set; get; }
 
     }
 
@@ -185,6 +191,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public int TenantId { set; get; }
         public string TenantName { set; get; }
         public bool CanBeRemoved { set; get; } = true;
+        public string Code { set; get; }
     }
     public class SharingTransactionOptions
     {

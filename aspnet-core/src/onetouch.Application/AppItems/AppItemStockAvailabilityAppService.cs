@@ -25,6 +25,8 @@ using onetouch.EntityFrameworkCore;
 using Abp.EntityFrameworkCore.Uow;
 using Abp.Domain.Repositories;
 using AutoMapper.Internal.Mappers;
+using Newtonsoft.Json;
+using onetouch.Notifications;
 
 namespace onetouch.AppItems
 {
@@ -36,8 +38,12 @@ namespace onetouch.AppItems
         //private readonly IAppItemRepository _appItemRepository;
         private readonly IRepository<AppItem, long> _appItemRepository;
         private readonly IAppItemsAppService _appItemsAppService;
-        public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService)
+        private readonly IAppNotifier _appNotifier;
+        public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor,
+            IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService,
+             IAppNotifier appNotifier)
         {
+            _appNotifier = appNotifier;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _helper = helper;
             _appItemRepository = appItemRepository;
@@ -500,6 +506,183 @@ namespace onetouch.AppItems
           //  ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
             return itemExcelResultsDTO;
         }
+        //I46[Start]
+        public async Task<List<ImportItemReturnDto>> ImportItemStock(List<AppItemStockAvailabilityExcelDto> itemExcelDtoList)
+        {
+            var timeStamp = DateTime.Now;
+            List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
+            List<AppItem> modifiedItems = new List<AppItem>();
+            var parentCodes = itemExcelDtoList.Select(z => z.ParentCode).Distinct().ToList();
+            foreach (var parent in parentCodes)
+            {
+                var parentItem = await _appItemRepository.GetAll().Include(z => z.EntityFk)
+                    .Include(z => z.ParentFkList.Where(x => string.IsNullOrEmpty(x.Code))).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
+                    .Where(z => z.Code == parent && z.ItemType == 0 && z.ParentFkList.Where(x => string.IsNullOrEmpty(x.Code)).Count() > 0).FirstOrDefaultAsync();
+                if (parentItem != null)
+                {
+                    List<VariationItemDto> variations = ObjectMapper.Map<List<VariationItemDto>>(parentItem.ParentFkList);
+                    var updatedVariations = await _appItemsAppService.GetVariationsCodes(long.Parse(parentItem.SycIdentifierId.ToString()), parentItem.Code, variations, parentItem.EntityFk.EntityObjectTypeId, AbpSession.TenantId);
+                    foreach (var vari in updatedVariations)
+                    {
+                        var item = await _appItemRepository.GetAll().Where(z => z.Id == vari.Id).FirstOrDefaultAsync();
+                        if (item != null)
+                        {
+                            item.Code = vari.Code;
+                            modifiedItems.Add(item);
+                        }
+                    }
+                }
+            }
+            if (modifiedItems.Count > 0)
+            {
+                var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                x.AppItems.UpdateRange(modifiedItems);
+                await x.SaveChangesAsync();
+            }
+            List<AppItem> modifiedItemsList = new List<AppItem>();
+            var resJoin1 = from r in itemExcelDtoList
+                           join i in _appItemRepository.GetAll().AsNoTracking().Include(x => x.ParentFk).Where(x => x.ItemType == 0)
+                           on r.Code.Replace(" ", string.Empty) equals i.Code.Replace(" ", string.Empty) into j1
+                           from j in j1
+                           select new { item = j, code = j.Code.Replace(" ", string.Empty), parentCode = (j.ParentFk != null ? j.ParentFk.Code : null) };
+
+
+            var resJoin = resJoin1.ToList().OrderBy(z => z.code);
+            double rowNumber = 0;
+            foreach (AppItemStockAvailabilityExcelDto itemExcelDto in itemExcelDtoList)
+            {
+                if (itemExcelDto.Code == "Code")
+                {
+                    continue;
+                }
+
+                
+                rowNumber++;
+                ImportItemReturnDto returnDto = new ImportItemReturnDto();
+                if (!string.IsNullOrEmpty(itemExcelDto.ParentCode))
+                {
+                    var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId != null && x.item.ItemType == 0).FirstOrDefault();
+                    var itemExists = itemExisting == null ? null : itemExisting.item;
+                    if (itemExists != null)
+                    {
+                        itemExcelDto.Id = itemExists.Id;
+                       
+                        if (itemExisting.parentCode != null && itemExisting.parentCode != itemExcelDto.ParentCode)
+                        {
+                            returnDto.ErrorMessage="Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.";
+                            returnDto.RecordKey = itemExcelDto.Code;
+                            returnDto.Id = itemExcelDto.rowNumber;
+                            returnDto.ErrorType = "Stopper";
+                           
+                        }
+                    }
+                    else
+                    {
+                        returnDto.ErrorMessage = "Code :" + itemExcelDto.Code + " is not found";
+                        returnDto.RecordKey = itemExcelDto.Code;
+                        returnDto.Id = itemExcelDto.rowNumber;
+                        returnDto.ErrorType = "Stopper";
+                        
+                    }
+                }
+                else
+                {
+                    
+                    var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId == null && x.item.ItemType == 0).FirstOrDefault();
+                    var itemExists = itemExisting == null ? null : itemExisting.item;
+                    
+                    if (itemExists != null)
+                    {
+                        itemExcelDto.Id = itemExists.Id;
+
+                    }
+                    else
+                    {
+                        returnDto.ErrorMessage = "Code :" + itemExcelDto.Code + " is not found";
+                        returnDto.RecordKey = itemExcelDto.Code;
+                        returnDto.Id = itemExcelDto.rowNumber;
+                        returnDto.ErrorType = "Stopper";
+                    }
+                }
+
+                if (long.Parse(itemExcelDto.StockAvailable.ToString()) < 0)
+                {
+                    returnDto.ErrorMessage = "Code :" + itemExcelDto.Code + ", Stock available quantity is less than zero.";
+                    returnDto.RecordKey = itemExcelDto.Code;
+                    returnDto.Id = itemExcelDto.rowNumber;
+                    returnDto.ErrorType = "Stopper";
+                }
+               
+
+                #region code, name, email and website validation    
+                if (itemExcelDtoList.Count(r => r.Code == itemExcelDto.Code) > 1)
+                {
+                    returnDto.ErrorMessage = "Code: must be used Once.";
+                    returnDto.RecordKey = itemExcelDto.Code;
+                    returnDto.Id = itemExcelDto.rowNumber;
+                    returnDto.ErrorType = "";
+                }
+
+                #endregion code, name validation 
+
+                if (!string.IsNullOrEmpty(returnDto.ErrorMessage))
+                    returnList.Add(returnDto);
+                else
+                {
+                    var appItem = await _appItemRepository.GetAll().Where(z => z.Code == itemExcelDto.Code).FirstOrDefaultAsync();
+                    if (appItem != null)
+                    {
+                        appItem.StockAvailability = long.Parse(itemExcelDto.StockAvailable);
+                        appItem.TimeStamp = timeStamp;
+                        modifiedItemsList.Add(appItem);
+                    }
+                }
+            }
+            if (modifiedItemsList.Count > 0)
+            {
+                var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                x.AppItems.UpdateRange(modifiedItemsList);
+                await x.SaveChangesAsync();
+                //mmt
+                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                string tenancyName = myTenantObject.TenancyName;
+                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                if (adminUser != null)
+                {
+                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                        "Stock Availability imported successfully.",
+                        Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                }
+                //mmt
+            }
+            if (returnList.Count > 0)
+            {
+                string attachmentFolder = _appConfiguration[$"APP:ServerRootAddress"] + @"/" +
+                    _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + AbpSession.TenantId.ToString();
+                System.IO.DirectoryInfo dire = new DirectoryInfo(attachmentFolder);
+                //if (!dire.Exists)
+                //    dire.Create();
+                string fileName = "ImportStockAvailabilityResult-" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xlsx";
+                string outFile = attachmentFolder + "//" + fileName;
+
+                string jsonData = JsonConvert.SerializeObject(returnList);
+                string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
+                _helper.ExcelHelper.ExportJsonToExcel(fileToExport, jsonData);
+                {
+                    var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    string tenancyName = myTenantObject.TenancyName;
+                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    if (adminUser != null)
+                    {
+                        await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                            "Importing Stock Availability result can be downloaded from <a href=\"" + outFile + "\" download>" + "here" + "</a>",
+                            Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                    }
+                }
+            }
+            return returnList;
+        }
+        //I46[End]
     }
     public sealed class AppItemStockAvailabilityExcelDtoProfile : Profile
     {

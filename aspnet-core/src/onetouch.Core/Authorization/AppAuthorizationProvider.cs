@@ -156,6 +156,11 @@ namespace onetouch.Authorization
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
 
+            var validationRules = administration.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules, L("ValidationRules"), multiTenancySides: MultiTenancySides.Host);
+            validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Create, L("CreateNewValidationRule"), multiTenancySides: MultiTenancySides.Host);
+            validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Edit, L("EditValidationRule"), multiTenancySides: MultiTenancySides.Host);
+            validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Delete, L("DeleteValidationRule"), multiTenancySides: MultiTenancySides.Host);
+
             var sycCurrencyExchangeRates = administration.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates, L("SycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
             sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Create, L("CreateNewSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
             sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Edit, L("EditSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);

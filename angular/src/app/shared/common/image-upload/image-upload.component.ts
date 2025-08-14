@@ -22,8 +22,10 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     inputID : string
     mbToByteConversionFactor = 1e+6
     acceptedExtensions:string =""
-    acceptedExtensionsArr:string[] = []
+    acceptedExtensionsArr:string[] = [] 
     imgFile : File
+    @Input() isDisabled : boolean =  false;
+    
     constructor(injector:Injector) {
         super(injector)
         this.inputID = this.guid()

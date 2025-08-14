@@ -565,7 +565,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.Reference = reference;
                     obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? 0 : tenantPlan.AppSubscriptionPlanHeaderId;
                     obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString();
+                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     obj.Name = obj.Code;
                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -610,7 +610,7 @@ namespace onetouch.AppSubScriptionPlan
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
                     obj.EntityObjectTypeId = entityActivityObjectType.Id;
                     obj.EntityObjectTypeCode = entityActivityObjectType.Code;
-                    obj.Code = featureCode.Trim() + " " + DateTime.Now.ToString();
+                    obj.Code = featureCode.Trim() + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     obj.RelatedEntityCode = relatedEntityCode;
                     obj.RelatedEntityId = relatedEntityId;
                     obj.RelatedEntityObjectTypeId = relatedEntityOvbjectTypeId;

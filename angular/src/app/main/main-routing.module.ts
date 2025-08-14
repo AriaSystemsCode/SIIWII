@@ -142,6 +142,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                                     permission: "Pages.Marketplace.Events",
                                 },
                             },
+                        
                             {
                                 path: "news",
                                 loadChildren: () =>
@@ -194,6 +195,18 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                         loadChildren: () => import('./app-items/appitems-catalogue-report/appitems-catalogue-report.module').then(m => m.AppitemsCatalogueReportModule),
                         data: { preload: true }
                     },
+                    {
+                        path: "transactions",
+                        loadChildren: () =>
+                            import(
+                                "./transactions/transaction.module"
+                            ).then((m) => m.TransactionModule),
+                        data: {
+                            preload: true,
+                            // permission: "Pages.AppSiiwiiTransactions",
+                        },
+                    },
+                    // { path: '**', redirectTo: '/app/main/dashboard'}
                     { path: "**", redirectTo: "dashboard" },
                 ],
             },
