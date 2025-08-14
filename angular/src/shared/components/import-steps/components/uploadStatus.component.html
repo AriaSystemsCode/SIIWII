@@ -227,7 +227,7 @@
                       <!-- Default input -->
                       <div *ngSwitchDefault>
 
-                        <div *ngIf="isCreateNewParentCase(record, column.name); else normalInput">
+                        <div *ngIf="isCreateNewCase(record, column.name); else normalInput">
                           <ng-container *ngIf="column.name === 'Product Description'; else editableInput">
                             <input type="text" class="form-control" [attr.data-record-id]="record.id"
                               [attr.data-column-name]="column.name" #codeInputContainer
@@ -236,11 +236,11 @@
                                 'background-color': '#fff',
                                 'cursor': 'text'
                               }" [ngClass]="{
-                                'border-danger': isRequiredColumnForCreateNewParent(column.name) && 
+                                'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
                                                  !getRecordValue(record, 'productDescription')
                               }" />
                             <small class="text-danger" *ngIf="!getRecordValue(record, 'productDescription')">
-                              {{ getExampleTextForCreateNewParent(column.name) }}
+                              {{ getExampleTextForCreateNewCase(record, column.name) }}
                             </small>
                           </ng-container>
 
@@ -251,15 +251,16 @@
                               (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
                               [ngClass]="{
                                 'border-danger':
-                                  (isRequiredColumnForCreateNewParent(column.name) &&
+                                  (isRequiredColumnForCreateNewCase(record, column.name) &&
                                    !getRecordValue(record, mapColumnNameToKey(column.name))) ||
                                   isPriceFieldInvalid(record, column.name)
                               }" [attr.inputmode]="column.name === 'Price' ? 'decimal' : null"
                               [attr.pattern]="column.name === 'Price' ? '^-?\\d+(\\.\\d+)?$' : null" />
 
                             <small class="text-danger"
-                              *ngIf="isRequiredColumnForCreateNewParent(column.name) && !getRecordValue(record, mapColumnNameToKey(column.name))">
-                              {{ getExampleTextForCreateNewParent(column.name) }}
+                              *ngIf="isRequiredColumnForCreateNewCase(record, column.name)
+                              && !getRecordValue(record, mapColumnNameToKey(column.name))">
+                              {{ getExampleTextForCreateNewCase(record, column.name) }}
                             </small>
                             <small class="text-danger"
                               *ngIf="column.name === 'Price' && isPriceFieldInvalid(record, column.name)">

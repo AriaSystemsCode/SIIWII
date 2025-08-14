@@ -448,61 +448,63 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   handleAction(record: any, action: UploadActionEnum) {
     const originalIndex = record.__originalIndex;
+  
     this.resetRecords(record, originalIndex);
-
-    this.records.forEach(r => r.showActions = false); // Close dropdown
+  
+    this.records.forEach(r => r.showActions = false);
     this.currentActionRecord = record;
-
+  
+    record.action = action; 
     this.uploadingResult.excelRecords[originalIndex]._inAction = true;
     record._inAction = true;
     record._original = JSON.parse(JSON.stringify(record));
-    record.action = action;
-
+  
     switch (action) {
-      case UploadActionEnum.ValidateDataRecord:
+      case this.UploadActionEnum.ValidateDataRecord:
         this.ValidateDataRecord(record);
         break;
-
-      case UploadActionEnum.LinkToExistingParentItem:
+  
+      case this.UploadActionEnum.LinkToExistingParentItem:
         this.LinkToExistingITEM(record);
         break;
-
-      case UploadActionEnum.LinkToExistingItemColor:
+  
+      case this.UploadActionEnum.LinkToExistingItemColor:
         this.LinkToExistingITEMCOLOR(record);
         break;
-
-      case UploadActionEnum.LinkToExistingColorLookup:
+  
+      case this.UploadActionEnum.LinkToExistingColorLookup:
         this.LinkToExistingCOLORLOOKUP(record);
         break;
-
-      case UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage:
+  
+      case this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage:
         this.CreateNewParentItemAndLinkAsDefaultImage(record);
         break;
-
-      case UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage:
+  
+      case this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage:
         this.CreateNewItemColorAndLinkImageAsDefaultImage(record);
         break;
-
-      case UploadActionEnum.CreateNewColorLookupAndLinkImage:
+  
+      case this.UploadActionEnum.CreateNewColorLookupAndLinkImage:
         this.CreateNewColorLookupAndLinkImage(record);
         break;
-
-      case UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData:
+  
+      case this.UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData:
         this.LinkToNewParentItemCodeFromAssociatedData(record);
         break;
-
-      case UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData:
+  
+      case this.UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData:
         this.LinkToNewItemVariantCodeFromAssociatedData(record);
         break;
-
-      case UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData:
+  
+      case this.UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData:
         this.LinkToNewColorLookupCodeFromAssociatedData(record);
         break;
-
+  
       default:
         console.warn('Unknown action enum:', action);
     }
   }
+  
 
 
   ValidateDataRecord(record) {
@@ -861,6 +863,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
+  //I44-FE change 2 create cases 
   editableColumnsForCreateNewParent = [
     'Code',
     'Name',
@@ -882,11 +885,63 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price D'
   ];
 
+  editableColumnsForCreateNewItemColor = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Product Classification',
+    'Product Classification Description',
+    'Product Category Code',
+    'Product Category Description',
+    'Price',
+    'Price Currency Code',
+    'Material Content',
+    'Sold Out Date',
+    'Brand Code',
+    'Brand Name',
+    'Start Ship Date',
+    'Price A',
+    'Price B',
+    'Price C',
+    'Price D'
+  ];
+
+  editableColumnsForCreateNewColorLookup = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Product Classification',
+    'Product Classification Description',
+    'Product Category Code',
+    'Product Category Description',
+    'Price',
+    'Price Currency Code',
+    'Material Content',
+    'Sold Out Date',
+    'Brand Code',
+    'Brand Name',
+    'Start Ship Date',
+    'Price A',
+    'Price B',
+    'Price C',
+    'Price D'
+  ];
+
+
   exampleTextsForCreateNewParent: { [key: string]: string } = {
     'Code': 'Example: SAM001',
     'Price Currency Code': 'Example: USD , GBP'
   };
 
+  exampleTextsForCreateNewItemColor: { [key: string]: string } = {
+    'Code': 'Example: SAM001',
+    'Price Currency Code': 'Example: USD , GBP'
+  };
+
+  exampleTextsForCreateNewColorLookup: { [key: string]: string } = {
+    'Code': 'Example: SAM001',
+    'Price Currency Code': 'Example: USD , GBP'
+  };
 
   requiredColumnsForCreateNewParent: string[] = [
     'Code',
@@ -895,21 +950,55 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price',
     'Price Currency Code'
   ];
+  requiredColumnsForCreateNewItemColor: string[] = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Price',
+    'Price Currency Code'
+  ];
+  requiredColumnsForCreateNewColorLookup: string[] = [
+    'Code',
+    'Name',
+    'Product Description',
+    'Price',
+    'Price Currency Code'
+  ];
 
-  isRequiredColumnForCreateNewParent(columnName: string): boolean {
-    return this.requiredColumnsForCreateNewParent.includes(columnName);
+
+
+  isCreateNewCase(record: any, columnName: string): boolean {
+    if (!record.action) return false;
+
+    const editableColumnsMap = {
+      [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.editableColumnsForCreateNewParent,
+      [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.editableColumnsForCreateNewItemColor,
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.editableColumnsForCreateNewColorLookup
+    };
+
+    const editableColumns = editableColumnsMap[record.action] || [];
+    return editableColumns.includes(columnName);
   }
 
 
-  isCreateNewParentCase(record: any, columnName: string): boolean {
-    return record._isCreateParent &&
-      this.editableColumnsForCreateNewParent.includes(columnName);
+  getExampleTextForCreateNewCase(record: any, columnName: string): string {
+    const exampleTextsMap = {
+      [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.exampleTextsForCreateNewParent,
+      [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.exampleTextsForCreateNewItemColor,
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.exampleTextsForCreateNewColorLookup
+    };
+    return exampleTextsMap[record.action]?.[columnName] || '';
   }
 
-  getExampleTextForCreateNewParent(columnName: string): string {
-    return this.exampleTextsForCreateNewParent[columnName] || '';
-  }
 
+  isRequiredColumnForCreateNewCase(record: any, columnName: string): boolean {
+    const requiredColumnsMap = {
+      [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.requiredColumnsForCreateNewParent,
+      [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.requiredColumnsForCreateNewItemColor,
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.requiredColumnsForCreateNewColorLookup
+    };
+    return requiredColumnsMap[record.action]?.includes(columnName) || false;
+  }
 
   onCodeSelected(record: any, selectedCode: string) {
     record._selectionMade = true;
