@@ -108,7 +108,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
           this.showMainSpinner();
         
                 this._accountsServiceProxy
-                    .applyRelationOnProfile(account.account.id, undefined,status,account.availableConnections[0].connectionEntityId)
+                    .applyRelationOnProfile(account.account.id, undefined,status,undefined)
                     .pipe(
                         finalize(() => {
                             ;
@@ -116,7 +116,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
                         })
                     )
                     .subscribe((result: string) => {
-                      account?.availableConnections[0]?.defaultVisibility == 'Private'
+                      account?.visibility==  !account?.visibility
                     });
       }
 
