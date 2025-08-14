@@ -5535,7 +5535,7 @@ namespace onetouch.AppItems
                 appItemExcelRecordDto.ExcelDto.RecordType = "Image";
                 appItemExcelRecordDto.ExcelDto.ProductType = "UnAssigned";
 
-                appItemExcelRecordDto.ExcelDto.ProductDescription = " ";
+                appItemExcelRecordDto.ExcelDto.ProductDescription = "-";
                 appItemExcelRecordDto.ExcelDto.Name = "-";
                 appItemExcelRecordDto.ExcelDto.Code = "-";
                 appItemExcelRecordDto.ExcelDto.ParentCode = "-";
@@ -5570,8 +5570,7 @@ namespace onetouch.AppItems
                 appItemExcelRecordDto.ExcelDto.ProductDescription = "-";
                 appItemExcelRecordDto.ExcelDto.Name = "-";
                 appItemExcelRecordDto.ExcelDto.Code = "-";
-                //appItemExcelRecordDto.ExcelDto.ParentCode = "-";
-                //appItemExcelRecordDto.ExcelDto.ParentId = 0;
+            
                 appItemExcelRecordDto.ExcelDto.Actions = "";
                 appItemExcelRecordDto.ExcelDto.ImagePreview = _appConfiguration[$"Attachment:PathTemp"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + img;
 
