@@ -471,8 +471,9 @@ namespace onetouch.Accounts
                             if (relationship != null)
                             {
                                 //xx
-                                string relationshipCode = currentTenantAccount.EntityFk.EntityObjectTypeCode.Substring(0, 1) + "T" +
-                                account.Account.AccountType.Substring(0, 1);
+                                account.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
+                                string relationshipCode = relationship.EntityObjectTypeCode; //currentTenantAccount..EntityFk.EntityObjectTypeCode.Substring(0, 1) + "T" +
+                                //account.Account.AccountType.Substring(0, 1);
                                 //xx
                                 var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
                                 if (relationType != null)
@@ -725,6 +726,7 @@ namespace onetouch.Accounts
                               ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();
                             if (relationship != null)
                             {
+                                account.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
                                 var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
                                 if (relationType != null)
                                 {
