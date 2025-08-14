@@ -319,10 +319,10 @@ namespace onetouch.AppMarketplaceAccounts
                             foreach (var relationshipCodeLookup in relationShipLookups)
                             {
                                 var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
-                                if (requestorType != null && requestorType.AttributeValue.ToLower()== currentTenantAccountObject.EntityFk.EntityObjectTypeCode.ToLower())
+                                if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower()== currentTenantAccountObject.EntityFk.EntityObjectTypeCode.ToLower())
                                 {
                                     var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
-                                    if (responseType!=null && responseType.AttributeValue.ToLower() == account.Account.AccountTypeString.ToLower())
+                                    if (responseType!=null && responseType.AttributeValue.TrimEnd().ToLower() == account.Account.AccountTypeString.ToLower())
                                     {
                                         var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                                         if (connectLabel != null)
