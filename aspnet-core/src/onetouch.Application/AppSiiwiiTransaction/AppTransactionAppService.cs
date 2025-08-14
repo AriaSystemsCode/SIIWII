@@ -156,8 +156,8 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
-             TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
-             TimeZoneInfoAppService timeZoneInfoAppService, IRepository<AppEntityLog, long> appEntityLogRepository
+             TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
+             IRepository<AppEntityLog, long> appEntityLogRepository
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
