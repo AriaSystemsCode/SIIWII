@@ -46,7 +46,7 @@ namespace onetouch.AppSubScriptionPlan
         {
 
             var filteredAppTenantActivitiesLog = _appTenantActivityLogRepository.GetAll()
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.ToUpper().Contains(input.Filter.ToUpper()) || e.ActivityType.ToUpper().Contains(input.Filter.ToUpper()) || e.AppSubscriptionPlanCode.ToUpper().Contains(input.Filter.ToUpper()) || e.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureCode.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureName.ToUpper().Contains(input.Filter.ToUpper()) || e.Reference.ToUpper().Contains(input.Filter.ToUpper()) || e.InvoiceNumber.ToUpper().Contains(input.Filter.ToUpper()) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.ToUpper().Contains(input.Filter.ToUpper()) || e.ActivityType.ToUpper().Contains(input.Filter.ToUpper()) || e.AppSubscriptionPlanCode.ToUpper().Contains(input.Filter.ToUpper()) || e.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureCode.ToUpper().Contains(input.Filter) || e.FeatureName.ToUpper().Contains(input.Filter.ToUpper()) || e.Reference.ToUpper().Contains(input.Filter.ToUpper()) || e.InvoiceNumber.ToUpper().Contains(input.Filter.ToUpper()) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
                         .WhereIf(input.MinTenantIdFilter != null, e => e.TenantId >= input.MinTenantIdFilter)
                         .WhereIf(input.MaxTenantIdFilter != null, e => e.TenantId <= input.MaxTenantIdFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName.ToUpper().Contains(input.TenantNameFilter.ToUpper()))
@@ -565,7 +565,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.Reference = reference;
                     obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? 0 : tenantPlan.AppSubscriptionPlanHeaderId;
                     obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString();
+                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     obj.Name = obj.Code;
                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -610,7 +610,7 @@ namespace onetouch.AppSubScriptionPlan
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
                     obj.EntityObjectTypeId = entityActivityObjectType.Id;
                     obj.EntityObjectTypeCode = entityActivityObjectType.Code;
-                    obj.Code = featureCode.Trim() + " " + DateTime.Now.ToString();
+                    obj.Code = featureCode.Trim() + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     obj.RelatedEntityCode = relatedEntityCode;
                     obj.RelatedEntityId = relatedEntityId;
                     obj.RelatedEntityObjectTypeId = relatedEntityOvbjectTypeId;

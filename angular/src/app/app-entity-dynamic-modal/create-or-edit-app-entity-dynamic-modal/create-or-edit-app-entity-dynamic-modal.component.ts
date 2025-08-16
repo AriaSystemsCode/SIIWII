@@ -100,6 +100,11 @@ export class CreateOrEditAppEntityDynamicModalComponent
             this.appEntity.nonlookup=false;
                 this._appEntitiesServiceProxy
                 .getAppEntityForEdit(this.appEntity.id)
+                .pipe(
+                    finalize(() => {
+                        this.getExtrAttributes();
+                    })
+                )
                 .subscribe((res) => {
                     this.appEntity = AppEntityDto.fromJS(res.appEntity);
                    if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
@@ -130,6 +135,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.setSolid(true);
             else
             this.setSolid(false);
+           
+         this.getExtrAttributes();
+               
             }
         }
 
@@ -176,7 +184,6 @@ export class CreateOrEditAppEntityDynamicModalComponent
             
         });
         this.getExtrAttributes();
-
         this.active = true;
         this.modal.show();
     }
@@ -252,11 +259,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         this.saving = true;
 
-        if(this.visual.image) 
+        if(this.visual.image && this.entityObjectType.code== "COLOR" ) 
             this.appEntity.entityExtraData=[];
-           else
+          
+        if(!this.visual.image)
            this.appEntity.entityAttachments=[];
-
+        
         if(this.addToLookup){ 
            if(this.appEntity.nonlookup)
             {
@@ -708,6 +716,10 @@ export class CreateOrEditAppEntityDynamicModalComponent
     setSolid(value:boolean){
         this.visual.solid=value;
         this.visual.image=!value;
+    }
+
+    dropdownOptions(validEntries){
+        return validEntries.split('|');
     }
 }
 

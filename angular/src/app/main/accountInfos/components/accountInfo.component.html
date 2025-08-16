@@ -19,7 +19,7 @@
             </span>
           </div>
           <div class="kt-subheader__toolbar">
-              <div class="kt-subheader__wrapper" *ngIf="!viewMode && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit">
+              <div class="kt-subheader__wrapper" *ngIf="!viewMode && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit) ">
                   <button type="submit" *ngIf="!touched && accountLevel !== accountLevelEnum.Manual && accountInfoTemp.id && !getForEditResult.lastChangesIsPublished" class="btn btn-secondary bg-light" (click)="publishProfile()"
                       [disabled]="accountInfoForm.form.touched && !canPublish" [buttonBusy]="publishing" [busyText]="l('Publishing')">
                       <span >
@@ -271,7 +271,7 @@
                             <div class="form-group row ">
                                 <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayLogo")}}
                                 </label>
-                                <app-image-upload
+                                <app-image-upload [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)" 
                                     [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                     [image]="companyLogo"
                                     [staticWidth]="170"
@@ -284,7 +284,7 @@
                             <!-- company cover photo-->
                             <div class="form-group row ">
                                 <label  class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayImages")}} </label>
-                                <app-image-upload
+                                <app-image-upload [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)"
                                     [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                     [image]="coverPhoto"
                                     [staticHeight]="120"
@@ -300,7 +300,7 @@
                                 <div class="col-sm-10 offset-sm-2 d-flex align-items-center d-flex flex-wrap">
                                     <!--Other image 1-->
                                     <div class="m-2">
-                                        <app-image-upload
+                                        <app-image-upload [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)"
                                             [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                             [image]="OtherImages1"
                                             [staticHeight]="100"
@@ -312,7 +312,7 @@
 
                                     <!--Other image 2-->
                                     <div class="m-2">
-                                            <app-image-upload
+                                            <app-image-upload [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)"
                                             [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                             [image]="OtherImages2"
                                             [staticHeight]="100"
@@ -324,7 +324,7 @@
 
                                     <!--Other image 3-->
                                     <div class="m-2">
-                                        <app-image-upload
+                                        <app-image-upload [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)"
                                             [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                             [image]="OtherImages3"
                                             [staticHeight]="100"
@@ -335,7 +335,7 @@
                                     </div>
                                     <!--Other image 4-->
                                     <div class="m-2">
-                                        <app-image-upload
+                                        <app-image-upload [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)"
                                             [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                             [image]="OtherImages4"
                                             [staticHeight]="100"
@@ -363,22 +363,46 @@
                                     </p>
                                 </div>
                             </div>
+
+
+                            
+
+                            <div class="form-group row">
+                                <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger font-weight-bold">*</span>
+                                    {{l("Code")}}
+                                </label>
+                            <div class="col-sm-8">
+                                <app-codes *ngIf="!(accountInfoTemp?.id>0)" [objectType]="entityObjectType" [editMode]=false
+                                    classes="bg-white" [code]="accountInfoTemp?.code"
+                                    placeHolder="{{ 'Account Code' | localize}}" (getCodeValue)="getCodeValue($event)"  [maxlength]="12">
+                                </app-codes>
+                                <app-codes *ngIf="accountInfoTemp?.id>0" [objectType]="entityObjectType" [readonly]="true"
+                                    [editMode]=true classes="bg-white" [code]="accountInfoTemp?.code"
+                                    placeHolder="{{ 'Account Code' | localize}}"
+                                    (getCodeValue)="getCodeValue($event)"
+                                    [maxlength]="12"></app-codes>
+                            </div>
+                            </div>
+
                             <div class="form-group row">
                             <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                 <span class="text-danger font-weight-bold">*</span>
                                 {{l("Name")}}
                             </label>
+
                             <div class="col-sm-8">
 
                                 <input type="text" id="AccountInfoTemp_Name" #nameInput="ngModel"
                                 class="form-control form-control-sm aria-input-text" id="colFormLabelSm"
                                 [(ngModel)]="accountInfoTemp.name" name="name" minlength="2" maxlength="250" required
                                 (input)="changeTouchState()"
-                                [placeholder]=" 'PleaseEnterCompanyName...' | localize ">
+                                [placeholder]=" 'PleaseEnterCompanyName...' | localize " [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}">
 
                                 <validation-messages [formCtrl]="nameInput"></validation-messages>
                             </div>
                             </div>
+                            
                             <div class="form-group row">
                             <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                 <!-- <span class="text-danger font-weight-bold">*</span> -->
@@ -389,7 +413,7 @@
                                 class="form-control form-control-sm aria-input-text" [(ngModel)]="accountInfoTemp.tradeName"
                                 (input)="changeTouchState()"
                                 name="tradeName" minlength="2" maxlength="100" 
-                                [placeholder]="'PleaseEnterTradeName...' | localize " />
+                                [placeholder]="'PleaseEnterTradeName...' | localize " [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"/>
                                 <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
                             </div>
                             </div>
@@ -402,7 +426,7 @@
                                 <input type="email" id="AccountInfoTemp_EMailAddress" #emailAddressInput="ngModel"
                                 class="form-control form-control-sm aria-input-text" [(ngModel)]="accountInfoTemp.eMailAddress"
                                 (input)="changeTouchState()"
-                                name="eMailAddress" minlength="7" maxlength="100" email [placeholder]=" 'PleaseEnterEmail...' | localize " />
+                                name="eMailAddress" minlength="7" maxlength="100" email [placeholder]=" 'PleaseEnterEmail...' | localize "  [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"/>
                                 <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
                             </div>
                             </div>
@@ -415,7 +439,7 @@
                                 <input type="url" id="AccountInfoTemp_Website" #websiteInput="ngModel"
                                 class="form-control form-control-sm aria-input-text" (change)="onWebsiteChange()" [(ngModel)]="accountInfoTemp.website"
                                 (input)="changeTouchState()"
-                                name="website" minlength="5" maxlength="100" url [placeholder]=" 'PleaseEnterWebsite...' | localize " />
+                                name="website" minlength="5" maxlength="100" url [placeholder]=" 'PleaseEnterWebsite...' | localize "  [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"/>
                                 <validation-messages [formCtrl]="websiteInput"></validation-messages>
                                 <div class="form-control-feedback" *ngIf="websiteValidation">{{ 'InvalidWebsiteFormat' | localize }}</div>
                             </div>
@@ -446,7 +470,7 @@
                                         [filter]="false"
                                        name="accountType" 
                                        [(ngModel)]="accountInfoTemp.accountTypeId"
-                                      required>
+                                      required [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}">
                                        </p-dropdown>
                                        <input 
                                        *ngIf="accountLevel != accountLevelEnum.Manual" type="text" id="AccountInfoTemp_AccountType" #accountTypeInput="ngModel"
@@ -467,7 +491,7 @@
                                 {{l("Currency")}}</label>
                             <div class="col-sm-8">
                                 <p-dropdown [options]="allCurrencies" styleClass="form-control aria-select" [filter]="false"
-                                name="currencyId" [(ngModel)]="accountInfoTemp.currencyId" required (onChange)="changeTouchState()" [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+                                name="currencyId" [(ngModel)]="accountInfoTemp.currencyId" required (onChange)="changeTouchState()" [placeholder]="'PleaseSelect' | localize" [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"></p-dropdown>
                             </div>
                             </div>
                             <div class="form-group row">
@@ -475,12 +499,12 @@
                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Language")}}</label>
                             <div class="col-sm-8">
                                 <p-dropdown [options]="allLanguages" styleClass="form-control aria-select" [filter]="false"
-                                name="languageId" [(ngModel)]="accountInfoTemp.languageId" (onChange)="changeTouchState()" [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+                                name="languageId" [(ngModel)]="accountInfoTemp.languageId" (onChange)="changeTouchState()" [placeholder]="'PleaseSelect' | localize" [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"></p-dropdown>
 
                             </div>
                             </div>
 
-                            <div class="form-group row" *ngIf="accountLevel == accountLevelEnum.Manual">
+                            <div class="form-group row" *ngIf="accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit) ">
                                 <label for="colFormLabelSm"
                                     class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
                                 <div class="col-sm-8">
@@ -489,6 +513,52 @@
     
                                 </div>
                                 </div>
+
+                                
+                                <div class="form-group row">
+                                        <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                            <!-- <span class="text-danger font-weight-bold">*</span> -->
+                                            {{l("Ship Via")}}
+                                        </label>
+
+                                    <div class="col-sm-8">
+                                        <p-dropdown
+        id="shipVia"
+        [(ngModel)]="accountInfoTemp.shipViaId"
+        [options]="allShipVia"
+        name="shipVia"
+        styleClass="form-control aria-select"
+        [placeholder]="'PleaseSelect' | localize"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="changeTouchState()"
+    >
+    </p-dropdown>
+
+                                    </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                            <!-- <span class="text-danger font-weight-bold">*</span> -->
+                                            {{l("Payment Terms")}}
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <p-dropdown
+                                            id="payTerms"
+                                            [options]="allPaymentTerms"
+                                            name="payTerms"
+                                            styleClass="form-control aria-select"
+                                       
+                                            [placeholder]="'PleaseSelect' | localize"
+                                            [(ngModel)]="accountInfoTemp.paymentTermsId"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            (onChange)="changeTouchState()"
+                                        >
+                                        </p-dropdown>
+                                        </div>
+                                        </div>
 
                                 <div class="form-group row">
                                     <label for="colFormLabelSm"
@@ -507,7 +577,7 @@
                                 <textarea class="form-control z-depth-1 aria-textarea-text" id="exampleFormControlTextarea6"
                                 rows="4" [(ngModel)]="accountInfoTemp.notes" name="notes"
                                 (input)="changeTouchState()"
-                                [placeholder]=" 'PleaseEnterAboutUs' | localize "></textarea>
+                                [placeholder]=" 'PleaseEnterAboutUs' | localize " [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"></textarea>
                             </div>
                             </div>
 
@@ -532,7 +602,7 @@
                             <div class="col-md-2  header-block-buttons">
 
 
-                            <button class="btn btn-primary btn-blue" (click)="openSelectClassificationsModal()">
+                            <button class="btn btn-primary btn-blue" (click)="openSelectClassificationsModal()" [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}">
 
                                 <span>{{l("Select")}}</span></button>
 
@@ -630,7 +700,7 @@
                             <div class="col-md-2  header-block-buttons">
 
 
-                            <button class="btn btn-primary btn-blue" (click)="openSelectCategoriesModal()">
+                            <button class="btn btn-primary btn-blue" (click)="openSelectCategoriesModal()" [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"   [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}">
 
                                 <span>{{l("Select")}}</span></button>
 

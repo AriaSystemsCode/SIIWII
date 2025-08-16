@@ -78,5 +78,8 @@ namespace onetouch.AppEntities
         //I45
         public virtual DateTime TimeStamp { get; set; }
         //I45
+        //MMT46[Start]
+        public virtual bool IsDefault { set; get; }
+        //MMT46[End]
     }
 }

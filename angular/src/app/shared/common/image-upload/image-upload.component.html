@@ -1,10 +1,12 @@
 <div class="d-flex justify-content-center image-upload-container" [ngStyle]="{'width.px':staticWidth ,'height.px':staticHeight }">
-    <label class="p-0 mb-0 uploadfilecontainer w-100 h-100" for="image{{inputID}}"
+    <label class="p-0 mb-0  w-100 h-100" for="image{{inputID}}" [ngClass]="fromReview ? '':'uploadfilecontainer'"
         style="background-image: url({{image}}) no-repeat fixed center;"
         (drop)="fileChange($event)">
         <input class="input-file"  type="file" name="image{{inputID}}" id="image{{inputID}}"
             (change)="fileChange($event)"
             [accept]="acceptedExtensions"
+            [disabled]="isDisabled"
+            [ngStyle]="{'cursor': isDisabled ? 'not-allowed' : 'pointer'}"
             >
         <app-image-display
             [staticWidth]="staticWidth"
@@ -15,7 +17,7 @@
         </app-image-display>
 
         <div *ngIf="!image" class="align-items-center d-flex flex-column h-100 justify-content-center w-100 pl-1 pr-1">
-            <div>
+            <div *ngIf="!fromReview">
                 {{l("ClickOrDrop")}}
             </div>
             <div  *ngIf="sycAttachmentCategory?.aspectRatio && showGuidelines">
@@ -32,7 +34,9 @@
                 {{acceptedExtensions}}
             </div>
         </div>
-        <img src="assets/profile/Edit_Image.svg" class="image-upload-edit" />
+        <img *ngIf="!fromReview" src="assets/profile/Edit_Image.svg" class="image-upload-edit" />
+        <img  *ngIf="fromReview"src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
+       /> 
         <img src="assets/profile/Remove_image.svg" *ngIf="image" class="image-upload-remove" (click)="emitRemoveImage($event)" />
     </label>
 </div>

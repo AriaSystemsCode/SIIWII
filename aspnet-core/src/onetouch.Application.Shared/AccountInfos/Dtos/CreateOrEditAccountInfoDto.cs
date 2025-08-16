@@ -111,6 +111,9 @@ namespace onetouch.AccountInfos.Dtos
         public virtual IList<AppContactAddressDto> ContactAddresses { get; set; }
 
         public virtual IList<AppContactPaymentMethodDto> ContactPaymentMethods { get; set; }
-
+        //I46[Start]
+        public virtual long? ShipViaId { set; get; }
+        public virtual long? PaymentTermsId { set; get; }
+        //I46[End]
     }
 }

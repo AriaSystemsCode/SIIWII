@@ -30,5 +30,8 @@ namespace onetouch.AppEntities.Dtos
 		public long ObjectId { get; set; }
 
 		public string EntityObjectTypeCode { get; set; }
+		//I46[Start]
+		public bool IsDefault { get; set; }
+		//I46[End]
 	}
 }

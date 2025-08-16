@@ -1,0 +1,489 @@
+<form #contactForm="ngForm" class="pl-2">
+    <div class="row" style="width: 100%;" *ngIf="isCreateOrEdit">
+        <!-- company code -->
+        <div class="col-md-6 " *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div class="formGroup">
+                <div class="d-flex justify-content-between flex-column">
+                    <div class="d-flex justify-content-between">
+                        <label class="label ml-3">Company Code</label>
+
+
+                        <div class="d-flex align-items-center gap-1 "
+                            *ngIf="appTransactionsForViewDto?.buyerCompanySSIN == '' && activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+
+                            <input type="checkbox" name="company" class="m-2" [(ngModel)]="comNew"
+                                (change)="createManualCompany($event,'company')" />
+                            <div class="tooltip-container">
+                                <label for="ny" class="p-0 mb-0">Create new </label>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <input [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''" placeholder="Company Code"
+                        type="text" class="form-control ml-3 w-100"
+                        [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code"
+                        #companyCodeInput="ngModel" name="companyCode" (input)="setCompanyCode($event)"
+                        (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code,'company')" />
+
+                    <div *ngIf="isCompanyExist" class="text-danger m-2">
+                        This Company code already exists!
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- company name -->
+        <div class="col-md-6 pr-0">
+            <div class="formGroup">
+                <div class="d-flex justify-content-between">
+
+                    <label class="label">Company Name</label>
+
+                </div>
+
+
+
+
+                <p-autoComplete [ngClass]=" tempAccount ? 'tempAccount' : ''"
+                    *ngIf="activeTab!=transactionCartoccordionTabs.orderInfo && activeTab!=transactionCartoccordionTabs.SellerContactInfo"
+                    #autoComplete [dropdown]="true" [suggestions]="companeyNames" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
+                    (completeMethod)="handleCompanySearch($event)" (onSelect)="onChangeCompany($event)"
+                    [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" field="name"
+                    [forceSelection]="false" class="w-100" [ngClass]="{'tempAccount': tempAccount}">
+
+
+                </p-autoComplete>
+                <div
+                    *ngIf="activeTab==transactionCartoccordionTabs.orderInfo || activeTab==transactionCartoccordionTabs.SellerContactInfo">
+                    <p class="previewValue text-nowrap m-0 p-0  pl-2 col-6"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name          || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName">
+                        {{
+                            appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name
+                              || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName
+                              || '-'
+                          }}
+                        
+                    </p>
+                    <!-- <p class="previewValue text-nowrap m-0 p-0 pl-5 col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
+                        -
+                    </p> -->
+                </div>
+            </div>
+
+        </div>
+        <!-- company name -->
+
+
+        <!-- contact code -->
+        <div class="col-md-6 my-3" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div class="formGroup">
+                <div class="d-flex justify-content-between flex-column">
+                    <div class="d-flex justify-content-between">
+                        <label class="label ml-3">Contact Code</label>
+
+
+                        <div class="d-flex align-items-center gap-1 "
+                            *ngIf="appTransactionsForViewDto?.buyerCompanySSIN == '' && activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+
+
+                            <input type="checkbox" name="contact" class="m-2" [(ngModel)]=" conNew"
+                                (change)="createManualCompany($event,'contact')" />
+                            <div class="tooltip-container">
+                                <label for="ny" class="p-0 mb-0">Create new </label>
+
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <input placeholder="contact Code" type="text" class="form-control ml-3 w-100"
+                        [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''" (input)="setContactCode($event)"
+                        [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code"
+                        #contactCodeInput="ngModel" name="contactCode"
+                        (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code,'contact')" />
+                    <div *ngIf="isContactExist" class="text-danger m-2">
+                        This contact code already exists!
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- contact name -->
+        <div class="col-md-6 my-3 pr-0">
+            <div class="formGroup">
+                <div class="d-flex justify-content-between">
+
+                    <label class="label">Contact Name</label>
+
+
+                </div>
+
+
+                <p-autoComplete #autoComplete [dropdown]="!tempAccount" [suggestions]="filteredContacts "
+                    [ngModelOptions]="{standalone: true}" *ngIf="activeTab != transactionCartoccordionTabs.orderInfo"
+                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
+                    (completeMethod)="handleContactSearch($event);" (onSelect)="onChangeContact($event)"
+                    (click)="onClearText()" (onClear)="onClearText()" [placeholder]=" defaultcontactNamePlaceholder"
+                    field="name" [forceSelection]="false" class="w-100" [ngClass]="tempAccount ?  'tempCon' : ''">
+
+
+                </p-autoComplete>
+
+
+                <div *ngIf="activeTab==transactionCartoccordionTabs.orderInfo">
+                    <p class=" previewValue text-nowrap  m-0 p-0 pl-2 col-4"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
+                        {{
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name
+                        }}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  pl-5 col-4"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- contact name -->
+        <!-- phone -->
+        <div class="col-md-6 pl-3">
+            <div class="row">
+                <div class="col-6 pl-md-4">
+                    <label class="label">Phone Type</label>
+                </div>
+                <div class="col">
+                    <label class="label">Phone Number</label>
+                </div>
+                <div class="col-12 pl-md-2 pl-0">
+                    <div class="groupForm">
+
+                        <p-dropdown [options]="allPhoneTypes" class=" col-6"
+                            styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
+                            name="selectedPhoneType" optionLabel="phoneTypeName"
+                            [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType"
+                            [style]="{'width':'100%'}" (onChange)="onchangePhoneType($event)"></p-dropdown>
+                        <div class="w-100">
+
+                            <input placeholder="Phone Number..." type="text" class="form-control ml-3 w-100"
+                                (change)="onChangePhoneNumber($event)"
+                                [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber"
+                                #phoneNumberInput="ngModel" name="phoneNumber" minlength="5" maxlength="20"
+                                pattern="[0-9]*" />
+                        </div>
+                    </div>
+                    <div *ngIf="phoneNumberInput.invalid && (phoneNumberInput.dirty || phoneNumberInput.touched)"
+                        class="text-danger">
+                        <small *ngIf="phoneNumberInput.errors?.pattern">
+                            Phone number must contain only numbers.
+                        </small>
+                        <small
+                            *ngIf="!phoneNumberInput.errors?.pattern && (phoneNumberInput.value.length < 5 || phoneNumberInput.value.length > 20)">
+                            Phone number must be between 5 and 20 characters long.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- phone -->
+        <!-- Email -->
+        <div class="col-md-6 my-2 pr-0 pl-md-3" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div>
+                <label class="label">Email</label>
+                <input type="text" placeholder="Email..." class="form-control w-100" (change)="onChangeEmail($event)"
+                    [pattern]="emailPattern" #emailInput="ngModel"
+                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail"
+                    name="email" />
+            </div>
+            <div *ngIf="emailInput.errors &&(emailInput.touched || emailInput.dirty)" class="text-danger">
+                <small>
+                    Invalid Email
+                </small>
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="col-md-6 my-2 pr-0 pl-md-4" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
+            <div>
+                <label class="label">Email</label>
+                <input type="text" placeholder="Email..." class="form-control w-100" (change)="onChangeEmail($event)"
+                    [pattern]="emailPattern" #emailInput="ngModel"
+                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail"
+                    name="email" />
+            </div>
+            <div *ngIf="emailInput.errors &&(emailInput.touched || emailInput.dirty)" class="text-danger">
+                <small>
+                    Invalid Email
+                </small>
+            </div>
+        </div>
+        <!-- branches -->
+        <!-- branch code -->
+        <div class="col-md-6 " *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div class="formGroup">
+                <div class="d-flex justify-content-between flex-column">
+
+                    <label class="label ml-3">Branch Code</label>
+
+                    <input placeholder="Branch Code" type="text" class="form-control ml-3 w-100"
+                        [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''"
+                        [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code"
+                        #branchCodeInput="ngModel" name="branchCode" (input)="setBranchCode($event)"
+                        (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code,'branch')" />
+
+                    <div *ngIf="isBranchExist" class="text-danger m-2">
+                        This Branch code already exists!
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col-md-6 col-12 my-2 pr-0">
+            <div>
+                <label class="label">Branch</label>
+
+
+                <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredBranches"
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch"
+                    (keydown)="preventTyping($event)" (completeMethod)="handleBranchSearch($event)"
+                    [placeholder]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch || ' Main'"
+                    field="name" [forceSelection]="false" class="w-100" [ngClass]="{'tempAccount': tempContact}"
+                    (onSelect)="onChangeBranch($event)">
+
+
+                </p-autoComplete>
+            </div>
+        </div>
+        <!-- branches -->
+
+        <!-- Department -->
+        <div class="col-md-12 my-2 pr-0" *ngIf="showDepartment">
+            <div>
+                <label class="label">Department</label>
+                <input type="text" placeholder="Department Name..." class="form-control w-100" name="DepartmentName"
+                    [(ngModel)]="appTransactionsForViewDto.buyerDepartment" #DepartmentName="ngModel" />
+                <div *ngIf="
+                    DepartmentName.invalid &&
+                        (DepartmentName.dirty || DepartmentName.touched)
+                    " class="text-danger">
+                    <small *ngIf="DepartmentName.errors.required">
+                        Department Name is required.
+                    </small>
+                </div>
+            </div>
+        </div>
+        <!-- Departments -->
+
+    </div>
+
+    <div class="row" *ngIf="!isCreateOrEdit">
+        <!-- company code -->
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div>
+                <div class="d-flex align-items-center   w-100">
+                    <h6 class="previewTitle m-0 p-0  col-6">Company Code:</h6>
+                    <p class=" previewValue   m-0 p-0  col-6"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.code  || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyCode">
+                        {{
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyCode}}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.code  && !appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyCode">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- company name -->
+        <div class="col-md-6 my-2">
+            <div>
+                <div class="d-flex align-items-center   w-100">
+                    <h6 class="previewTitle m-0 p-0  col-6">Company Name:</h6>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name  || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName">
+                        {{
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name
+                        ?
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name
+                        :
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName}}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name  && !appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- company name -->
+
+        <!-- phone -->
+        <div class="col-md-6 my-2">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex align-items-center   w-100">
+                        <h6 class="previewTitle m-0 p-0  "
+                            [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ?'col-md-6 col-6':'col-md-3 col-6'">
+                            Phone : </h6>
+                        <p class=" previewValue text-nowrap  m-0 p-0 "
+                            [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ? ' col-md-6 col-6':' col-md-9 col-6'"
+                            *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber || appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber">
+                            {{appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber
+                            ?
+                            appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber
+                            :
+                            appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber}}
+                        </p>
+                        <p class=" previewValue text-nowrap  m-0 p-0 pl-2"
+                            [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ? ' col-md-6 col-6':' col-md-9 col-6'"
+                            *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber && !appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber">
+                            -
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- phone -->
+
+        <!-- Email -->
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div>
+                <div class="d-flex    w-100">
+                    <h6 class="previewTitle m-0 p-0  col-md-6 col-6">Email :</h6>
+                    <p class=" previewValue  m-0 p-0  col-md-6 col-6" style="word-break: break-word;"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
+                        {{
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail
+                        }}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-md-9 col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- contact code -->
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div>
+                <div class="d-flex align-items-center   w-100">
+                    <h6 class="previewTitle m-0 p-0  col-6">Contact Code:</h6>
+                    <p class=" previewValue   m-0 p-0  col-6"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.code  || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactCode">
+                        {{
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactCode}}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.code  && !appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactCode">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- contact name -->
+        <div class="col-md-6 my-2">
+            <div>
+                <div class="d-flex align-items-center   w-100">
+                    <h6 class="previewTitle m-0 p-0  col-6">Contact Name :</h6>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name || this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName">
+                        {{
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name
+                        ?
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name
+                        :
+                        this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName}}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name  && !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- contact name -->
+
+        <!-- Email -->
+        <div class="col-md-6 my-2" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
+            <div>
+                <div class="d-flex    w-100">
+                    <h6 class="previewTitle m-0 p-0  col-md-3 col-6">Email :</h6>
+                    <p class=" previewValue  m-0 p-0  col-md-9 col-6" style="word-break: break-word;"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
+                        {{
+                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail
+                        }}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-md-9 col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Email -->
+
+        <!-- branches -->
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+            <div>
+                <div class="d-flex align-items-center   w-100">
+                    <h6 class="previewTitle m-0 p-0  col-6">Branch Code:</h6>
+                    <p class=" previewValue  m-0 p-0  col-6"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchCode">
+                        {{ appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchCode }}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchCode">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 my-2">
+            <div>
+                <div class="d-flex align-items-center   w-100">
+                    <h6 class="previewTitle m-0 p-0  col-6">Branch :</h6>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName">
+                        {{ appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName }}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- branches -->
+
+        <!-- Department -->
+        <div class="col-md-11 my-2" *ngIf="showDepartment">
+            <div>
+                <div class="d-flex align-items-center   w-100">
+                    <h6 class="previewTitle m-0 p-0   col-6">Department Name :</h6>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="appTransactionsForViewDto?.buyerDepartment">
+                        {{ appTransactionsForViewDto?.buyerDepartment }}
+                    </p>
+                    <p class=" previewValue text-nowrap  m-0 p-0  col-6"
+                        *ngIf="!appTransactionsForViewDto?.buyerDepartment">
+                        -
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Departments -->
+
+    </div>
+</form>

@@ -58,4 +58,10 @@ namespace onetouch.AppItems.Dtos
         public string Code { get; set; }
         public string ParentCode { get; set; }
     }
+    //I46[Start]
+    public class ImportItemStockInputDto
+    { 
+
+    }
+    //I46[End]
 }

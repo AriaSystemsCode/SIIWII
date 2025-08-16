@@ -22,7 +22,7 @@
         public const int MaxFeatureNameLength = 50;
 
         public const int MinReferenceLength = 1;
-        public const int MaxReferenceLength = 50;
+        public const int MaxReferenceLength = 100;
 
         public const int MinInvoiceNumberLength = 1;
         public const int MaxInvoiceNumberLength = 30;
