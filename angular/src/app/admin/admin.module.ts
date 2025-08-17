@@ -191,6 +191,8 @@ import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 
 
+import { TreeSelectModule } from 'primeng/treeselect';
+import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
@@ -375,6 +377,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         WebhookSubscriptionDetailComponent,
         WebhookEventDetailComponent,
         StepperComponent,
+        AriaIframeComponent
 
     ],
     exports: [AddMemberModalComponent, AddRoleModalComponent],
