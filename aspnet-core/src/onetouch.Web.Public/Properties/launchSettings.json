@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "https://localhost:44316/",
+      "applicationUrl": "https://localhost:44310/",
       "sslPort": 44316
     }
   },
@@ -18,7 +18,7 @@
     "onetouch.Web.FrontEnd": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:44316",
+      "applicationUrl": "https://localhost:44310",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
