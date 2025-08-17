@@ -4073,11 +4073,14 @@ export class AccountsServiceProxy {
     }
 
     /**
+     * @param repeatHandler (optional) 
      * @param body (optional) 
      * @return Success
      */
-    importContact(body: AccountExcelDto[] | null | undefined): Observable<ImportContactReturnDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/Accounts/ImportContact";
+    importContact(repeatHandler: string | null | undefined, body: AccountExcelDto[] | null | undefined): Observable<ImportContactReturnDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/ImportContact?";
+        if (repeatHandler !== undefined && repeatHandler !== null)
+            url_ += "repeatHandler=" + encodeURIComponent("" + repeatHandler) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -13556,11 +13559,14 @@ export class AppItemsServiceProxy {
     }
 
     /**
+     * @param repeatHandler (optional) 
      * @param body (optional) 
      * @return Success
      */
-    importItem(body: ImportItemInputDto[] | null | undefined): Observable<ImportItemReturnDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/ImportItem";
+    importItem(repeatHandler: string | null | undefined, body: ImportItemInputDto[] | null | undefined): Observable<ImportItemReturnDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ImportItem?";
+        if (repeatHandler !== undefined && repeatHandler !== null)
+            url_ += "repeatHandler=" + encodeURIComponent("" + repeatHandler) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -17031,6 +17037,69 @@ export class AppItemStockAvailabilityServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AppItemStockAvailabilityExcelResultsDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    importItemStock(body: AppItemStockAvailabilityExcelDto[] | null | undefined): Observable<ImportItemReturnDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppItemStockAvailability/ImportItemStock";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processImportItemStock(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processImportItemStock(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ImportItemReturnDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ImportItemReturnDto[]>;
+        }));
+    }
+
+    protected processImportItemStock(response: HttpResponseBase): Observable<ImportItemReturnDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ImportItemReturnDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -72591,6 +72660,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
     showSync!: boolean;
     lastModifiedDate!: moment.Moment;
     numberOfSubscribers!: number;
+    manufacturerCode!: string | undefined;
     code!: string | undefined;
     name!: string | undefined;
     entityId!: number;
@@ -72664,6 +72734,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             this.showSync = _data["showSync"];
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
             this.numberOfSubscribers = _data["numberOfSubscribers"];
+            this.manufacturerCode = _data["manufacturerCode"];
             this.code = _data["code"];
             this.name = _data["name"];
             this.entityId = _data["entityId"];
@@ -72799,6 +72870,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
         data["showSync"] = this.showSync;
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
         data["numberOfSubscribers"] = this.numberOfSubscribers;
+        data["manufacturerCode"] = this.manufacturerCode;
         data["code"] = this.code;
         data["name"] = this.name;
         data["entityId"] = this.entityId;
@@ -72919,6 +72991,7 @@ export interface IAppItemForViewDto {
     showSync: boolean;
     lastModifiedDate: moment.Moment;
     numberOfSubscribers: number;
+    manufacturerCode: string | undefined;
     code: string | undefined;
     name: string | undefined;
     entityId: number;

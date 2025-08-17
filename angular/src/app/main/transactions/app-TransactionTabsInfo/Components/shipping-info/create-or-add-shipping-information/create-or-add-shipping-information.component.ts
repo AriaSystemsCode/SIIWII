@@ -5,6 +5,7 @@ import { finalize, Subscription } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
 import { TransactionCartoccordionTabs } from '../../../../enums/TransactionCartoccordionTabs';
 import * as moment from 'moment';
+
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
@@ -269,7 +270,6 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
       }
 
     }
-    this.validateShippingTab();
     this.validateShippingTab();
 
   }
