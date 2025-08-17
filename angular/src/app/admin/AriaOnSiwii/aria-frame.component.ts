@@ -1,7 +1,7 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
     templateUrl: './aria-frame.component.html',
@@ -20,13 +20,10 @@ export class AriaIframeComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
-    
-        const externalUrl = 'https://ariaonline.net/RDWeb/webclient'; // Replace with your ERP site URL
-        setTimeout(() => {
-            this.erpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(externalUrl);
-
-          }, 500); // 10s
-    }
+        const externalUrl = 'https://ariaonline.net/RDWeb/webclient';
+        this.erpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(externalUrl);
+      }
+      
     openAriaNewTab(){
         let bt = 'app/admin/AriaSystem'
         window.open(bt);
