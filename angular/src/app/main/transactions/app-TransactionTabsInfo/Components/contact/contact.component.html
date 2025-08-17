@@ -49,11 +49,11 @@
 
 
 
-                <p-autoComplete [ngClass]=" tempAccount ? 'tempAccount' : ''"
+                <p-autoComplete [ngClass]=" tempAccount ? 'tempAccount' : ''" 
                     *ngIf="activeTab!=transactionCartoccordionTabs.orderInfo && activeTab!=transactionCartoccordionTabs.SellerContactInfo"
                     #autoComplete [dropdown]="true" [suggestions]="companeyNames" [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
-                    (completeMethod)="handleCompanySearch($event)" (onSelect)="onChangeCompany($event)"
+                    (completeMethod)="handleCompanySearch($event)"  (onSelect)="onChangeCompany($event)" (onFocus)="handleCompanySearch('')"
                     [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" field="name"
                     [forceSelection]="false" class="w-100" [ngClass]="{'tempAccount': tempAccount}">
 
