@@ -835,17 +835,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record.status = "Passed";
     }
 
-    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup) {
+    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup)
       this.ValidateRecord(record);
-
-
-      //I44-FE Update status
-      /*  record.fieldsErrors = [];
-       record.errorMessage = "";
-       record.status = "Passed"; */
-    }
-
-
 
     const originalIndex = record.__originalIndex;
     if (
