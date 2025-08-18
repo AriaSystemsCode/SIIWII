@@ -1418,6 +1418,7 @@ namespace onetouch.Accounts
             //I45
             //I40[Start]
             var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             //I40[End]
             var cancelledStatus = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
             AppMarketplaceContact originalContact;
@@ -1494,13 +1495,16 @@ namespace onetouch.Accounts
                             //createOrEditAccountInfoDto.PartnerId = originalPublishContactFortCurrTenant.Id;
                             createOrEditAccountInfoDto.AccountId = null;
                             createOrEditAccountInfoDto.ParentId = null;
-                            
+                            createOrEditAccountInfoDto.TenantOwner = originalPublishContactFortCurrTenant.OwnerId;
                             if (createOrEditAccountInfoDto.EntityExtraData != null)
                             {
                                 foreach (var parentExtrData in createOrEditAccountInfoDto.EntityExtraData)
                                 {
                                     parentExtrData.Id = 0;
                                     parentExtrData.EntityId = 0;
+                                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId == presonEntityObjectTypeId &&
+                                        parentExtrData.AttributeId == 715)
+                                        parentExtrData.AttributeValue = "";
                                 }
                             }
                             saveAccountDest = await CreateOrEditAccount(createOrEditAccountInfoDto);
@@ -1588,12 +1592,16 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.ContactAddresses = null;
                         createOrEditAccountInfoDto.AccountId = null;
                         createOrEditAccountInfoDto.ParentId = null;
+                        createOrEditAccountInfoDto.TenantOwner = originalContact.OwnerId;
                         if (createOrEditAccountInfoDto.EntityExtraData != null)
                         {
                             foreach (var parentExtrData in createOrEditAccountInfoDto.EntityExtraData)
                             {
                                 parentExtrData.Id = 0;
                                 parentExtrData.EntityId = 0;
+                                if (originalContact.EntityObjectTypeId == presonEntityObjectTypeId &&
+                                        parentExtrData.AttributeId == 715)
+                                    parentExtrData.AttributeValue = "";
                             }
                         }
                         savedAccountSrc = await CreateOrEditAccount(createOrEditAccountInfoDto);
@@ -1715,7 +1723,7 @@ namespace onetouch.Accounts
                     }
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
                     //Contact[start]
-                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    
                     var contactsInfo = _appMarketplaceContactRepository.GetAll()
                         .Include(z => z.EntityExtraData)
                         .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
@@ -1744,6 +1752,7 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.Id = 0;
                         createOrEditAccountInfoDto.ParentId = savedAccountSrc.AccountInfo.Id;
                         createOrEditAccountInfoDto.AccountId = savedAccountSrc.AccountInfo.Id;
+                        createOrEditAccountInfoDto.TenantOwner = contactObj.OwnerId;
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenantObj != null)
                         {
@@ -1753,6 +1762,7 @@ namespace onetouch.Accounts
                         if (createOrEditAccountInfoDto.EntityExtraData != null)
                         {
                             createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
+                            createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.EntityId= 0);
                             var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
                             if (userIdExtraData != null)
                             {
@@ -1793,7 +1803,7 @@ namespace onetouch.Accounts
                         {
                             foreach (var parentAttachObj in contactObj.EntityAttachments)
                             {
-                                MoveFile(parentAttachObj.AttachmentFk.Attachment, -1, tenantId);
+                                MoveFile(parentAttachObj.AttachmentFk.Attachment, -1, originalContact.OwnerId);
                             }
                         }
                         createOrEditAccountInfoDto.UseDTOTenant = true;
@@ -1801,6 +1811,7 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.Id = 0;
                         createOrEditAccountInfoDto.ParentId = saveAccountDest.AccountInfo.Id;
                         createOrEditAccountInfoDto.AccountId = saveAccountDest.AccountInfo.Id;
+                        createOrEditAccountInfoDto.TenantOwner = contactObj.OwnerId;
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(originalContact.OwnerId.ToString()));
                         if (tenantObj != null)
                         {
@@ -1810,6 +1821,7 @@ namespace onetouch.Accounts
                         if (createOrEditAccountInfoDto.EntityExtraData != null)
                         {
                             createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
+                            createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.EntityId = 0);
                             var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
                             if (userIdExtraData != null)
                             {
@@ -1956,6 +1968,7 @@ namespace onetouch.Accounts
                 contactDto.UseDTOTenant = true;
                 contactDto.ParentId = parentContact.Id;
                 contactDto.ContactAddresses = null;
+                contactDto.TenantOwner = branchesPublishedParentContact.OwnerId;
                 var tenantObj = await TenantManager.GetByIdAsync(int.Parse(connectTenant.ToString()));
                 if (tenantObj != null)
                 {
@@ -2039,7 +2052,7 @@ namespace onetouch.Accounts
                     //accountDto.EntityExtraData.ForEach(z => z.Id = 0);
                     //accountDto.EntityAttachments.ForEach(z => z.Id = 0);
                     accountDto.TenantId = int.Parse(connectTenant.ToString());
-
+                    contactDto.TenantOwner = contactObj.OwnerId;
                     //XXX
                     //CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
                     //createOrEditAccountInfoDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contactObj);
@@ -2377,6 +2390,8 @@ namespace onetouch.Accounts
             entity.EntityObjectTypeCode = partnerEntityObjectTypeCode;
             entity.Name = input.Name;
             entity.Notes = input.Notes;
+            if (input.TenantOwner!=null)
+            entity.TenantOwner = long.Parse(input.TenantOwner.ToString());
             if (input.UseDTOTenant)
             {
                 entity.TenantId = input.TenantId;
@@ -5862,7 +5877,9 @@ namespace onetouch.Accounts
                 accountDto.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
             }
-            accountDto.TenantId = AbpSession.TenantId;
+            if (accountDto.TenantId==null)
+                accountDto.TenantId = AbpSession.TenantId;
+
             accountDto.UseDTOTenant = true;
             accountDto.AccountLevel = AccountLevelEnum.Manual;
             var output = await CreateOrEditAccount(accountDto);
@@ -5893,7 +5910,7 @@ namespace onetouch.Accounts
                 //ContactDto contactDtoObj = new ContactDto();
                 ObjectMapper.Map(contact, returnObject);
                 //Publish Contact if the related Account is published
-                //if (input.UserId != null && input.UserId != 0)
+                if (accountDto.TenantId  == AbpSession.TenantId)//input.UserId != null && input.UserId != 0)
                 {
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
@@ -6214,6 +6231,7 @@ namespace onetouch.Accounts
                     branchObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(orgAcc);
                     branchObject.EMailAddress = input.EMailAddress;
                     branchObject.Website = input.Website;
+
                     if (input.ContactAddresses != null && input.ContactAddresses.Count > 0)
                     {
                         if (branchObject.ContactAddresses != null && branchObject.ContactAddresses.Count > 0)
