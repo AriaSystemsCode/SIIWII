@@ -271,8 +271,6 @@ namespace onetouch.AppItems
 
         }
 
-
-
         public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(string input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
             var appItemId = _appItemRepository.GetAll().Where(e=> e.EntityId == Int32.Parse(input)).FirstOrDefault();

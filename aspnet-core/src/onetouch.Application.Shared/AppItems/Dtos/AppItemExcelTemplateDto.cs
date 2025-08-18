@@ -80,7 +80,8 @@ namespace onetouch.AppItems.Dtos
         [Required(ErrorMessage = "Product Type must have a value.")]
         public string ProductType { get; set; }
         [Required(ErrorMessage = "Record Type must have a value.")]
-        [Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
+        //[Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
+        [RecordTypeValidation]
         public string RecordType{ set; get; }
         [Required(ErrorMessage = "Code must have a value.")]
         public string Code { set; get; }
