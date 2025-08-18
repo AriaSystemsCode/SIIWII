@@ -38,6 +38,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   @Input() imagesList;
   acceptedAspectRatio;
   currentActionRecord: any = null;
+
+  @ViewChildren('parentCodeInputContainer') ParentCodeInputContainers!: QueryList<ElementRef>;
   @ViewChildren('codeInputContainer') codeInputContainers!: QueryList<ElementRef>;
   @ViewChildren('colorCodeInputContainer') colorCodeInputContainers!: QueryList<ElementRef>;
 
@@ -59,7 +61,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   hasImageRecords: boolean = false;
   UploadActionEnum = UploadActionEnum;
   @Output() updatedRecords = new EventEmitter<any[]>();
-
+  @Output() _validateRecord = new EventEmitter<any[]>();
 
   public constructor(
     private _importService: MainImportService,
@@ -448,67 +450,75 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   handleAction(record: any, action: UploadActionEnum) {
     const originalIndex = record.__originalIndex;
-  
+
     this.resetRecords(record, originalIndex);
-  
+
     this.records.forEach(r => r.showActions = false);
     this.currentActionRecord = record;
-  
-    record.action = action; 
+
+    if (record.action)
+      record._previousAction = record.action;
+
+    record.action = action;
     this.uploadingResult.excelRecords[originalIndex]._inAction = true;
     record._inAction = true;
     record._original = JSON.parse(JSON.stringify(record));
-  
+
+
     switch (action) {
       case this.UploadActionEnum.ValidateDataRecord:
         this.ValidateDataRecord(record);
         break;
-  
+
       case this.UploadActionEnum.LinkToExistingParentItem:
         this.LinkToExistingITEM(record);
         break;
-  
+
       case this.UploadActionEnum.LinkToExistingItemColor:
         this.LinkToExistingITEMCOLOR(record);
         break;
-  
+
       case this.UploadActionEnum.LinkToExistingColorLookup:
         this.LinkToExistingCOLORLOOKUP(record);
         break;
-  
+
       case this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage:
         this.CreateNewParentItemAndLinkAsDefaultImage(record);
         break;
-  
+
       case this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage:
         this.CreateNewItemColorAndLinkImageAsDefaultImage(record);
         break;
-  
+
       case this.UploadActionEnum.CreateNewColorLookupAndLinkImage:
         this.CreateNewColorLookupAndLinkImage(record);
         break;
-  
+
       case this.UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData:
         this.LinkToNewParentItemCodeFromAssociatedData(record);
         break;
-  
+
       case this.UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData:
         this.LinkToNewItemVariantCodeFromAssociatedData(record);
         break;
-  
+
       case this.UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData:
         this.LinkToNewColorLookupCodeFromAssociatedData(record);
         break;
-  
+
       default:
         console.warn('Unknown action enum:', action);
     }
   }
-  
+
 
 
   ValidateDataRecord(record) {
     record._isDataRecord = true;
+  }
+
+  ValidateRecord(record) {
+    this._validateRecord.emit(record);
   }
 
   LinkToExistingITEM(record) {
@@ -613,11 +623,55 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   CreateNewItemColorAndLinkImageAsDefaultImage(record) {
     record._isCreateItemColor = true;
 
+    this.editableColumnsForCreateNewItemColor.forEach(colName => {
+      this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
+    });
+
+    // Scroll after DOM updated
+    setTimeout(() => {
+      const container = this.ParentCodeInputContainers.find((el: ElementRef) =>
+        el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
+
   }
 
 
   CreateNewColorLookupAndLinkImage(record) {
     record._isCreateColorLookup = true;
+
+
+    this.editableColumnsForCreateNewColorLookup.forEach(colName => {
+      this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
+    });
+
+    // Scroll after DOM updated
+    setTimeout(() => {
+      const container = this.colorCodeInputContainers.find(
+        (el: ElementRef) => el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
+
 
   }
 
@@ -782,7 +836,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
     if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup) {
-      //I44-FE Call Validate function
+      this.ValidateRecord(record);
 
 
       //I44-FE Update status
@@ -810,29 +864,20 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   cancelLinking(record: any): void {
+    const originalIndex = record.__originalIndex;
+
     if (record._original) {
       Object.assign(record, record._original);
       delete record._original;
     }
-    record._isDataRecord = false;
-    record._isLinkingParent = false;
-    record._isLinkingItemColor = false;
-    record._isLinkingColorLookup = false;
-    record._isCreateParent = false;
-    record._isCreateItemColor = false;
-    record._isCreateColorLookup = false;
-    record._isLinkNewParent = false;
-    record._isLinkNewItemColor = false;
-    record._isLinkNewColorLookup = false;
-    this.currentActionRecord = null;
-    record._inAction = false;
 
-    this.LinkToExistingITEM_Ret_Data = null;
-    this.LinkToExistingItemColor_Ret_Data = null;
-    this.LinkToExistingColorLookup_Ret_Data = null;
+    if (record._previousAction)
+      record.action = record._previousAction;
+    else
+      record.action = null;
 
-    this.activeRecord = null;
 
+    this.resetRecords(record, originalIndex);
     this.cdr.detectChanges();
 
 
@@ -863,7 +908,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  //I44-FE change 2 create cases 
   editableColumnsForCreateNewParent = [
     'Code',
     'Name',
@@ -886,6 +930,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   ];
 
   editableColumnsForCreateNewItemColor = [
+    'Parent Code',
     'Code',
     'Name',
     'Product Description',
@@ -895,36 +940,22 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Product Category Description',
     'Price',
     'Price Currency Code',
-    'Material Content',
-    'Sold Out Date',
-    'Brand Code',
-    'Brand Name',
-    'Start Ship Date',
+    'Color Code',
+    'Color Name',
+    'Size Scale Name',
+    'Scale Sizes Order',
+    'Size Ratio Name',
+    'Size Ratio Value',
     'Price A',
     'Price B',
     'Price C',
     'Price D'
   ];
 
+
   editableColumnsForCreateNewColorLookup = [
-    'Code',
-    'Name',
-    'Product Description',
-    'Product Classification',
-    'Product Classification Description',
-    'Product Category Code',
-    'Product Category Description',
-    'Price',
-    'Price Currency Code',
-    'Material Content',
-    'Sold Out Date',
-    'Brand Code',
-    'Brand Name',
-    'Start Ship Date',
-    'Price A',
-    'Price B',
-    'Price C',
-    'Price D'
+    'Color Code',
+    'Color Name'
   ];
 
 
@@ -934,13 +965,20 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   };
 
   exampleTextsForCreateNewItemColor: { [key: string]: string } = {
-    'Code': 'Example: SAM001',
-    'Price Currency Code': 'Example: USD , GBP'
+    'Parent Code': 'Example: SAM001',
+    'Code': 'Example: SAM001 - BLK',
+    'Price Currency Code': 'Example: USD , GBP',
+    'Color Code': 'Example: BLK',
+    'Color Name': 'Example: Black',
+    'Size Scale Name': 'Example: S-XL',
+    'Scale Sizes Order': 'Example: S|M|L|XL',
+    'Size Ratio Name': 'Example: 1-2-2-1',
+    'Size Ratio Value': 'Example: S~M~L~XL|1-2-2-1',
   };
 
   exampleTextsForCreateNewColorLookup: { [key: string]: string } = {
-    'Code': 'Example: SAM001',
-    'Price Currency Code': 'Example: USD , GBP'
+    'Color Code': 'Example: BLK',
+    'Color Name': 'Example: Black',
   };
 
   requiredColumnsForCreateNewParent: string[] = [
@@ -950,19 +988,24 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price',
     'Price Currency Code'
   ];
+
+
   requiredColumnsForCreateNewItemColor: string[] = [
+    'Parent Code',
     'Code',
     'Name',
     'Product Description',
     'Price',
-    'Price Currency Code'
+    'Price Currency Code',
+    'Color Code',
+    'Color Name',
+    'Size Scale Name',
+    'Scale Sizes Order',
   ];
+
   requiredColumnsForCreateNewColorLookup: string[] = [
-    'Code',
-    'Name',
-    'Product Description',
-    'Price',
-    'Price Currency Code'
+    'Color Code',
+    'Color Name',
   ];
 
 
@@ -979,6 +1022,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     const editableColumns = editableColumnsMap[record.action] || [];
     return editableColumns.includes(columnName);
   }
+
 
 
   getExampleTextForCreateNewCase(record: any, columnName: string): string {
