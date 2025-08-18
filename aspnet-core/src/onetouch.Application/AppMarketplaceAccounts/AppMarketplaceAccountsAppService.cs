@@ -1199,7 +1199,8 @@ namespace onetouch.AppMarketplaceAccounts
                 //HIA - share Account related branches [End]
 
                 //Publish contacts
-                var contactInfo = _appContactRepository.GetAll()
+                //if (personEntityObjectTypeId)
+                /*var contactInfo = _appContactRepository.GetAll()
                     .Where(x => //x.IsProfileData 
                            x.TenantId == AbpSession.TenantId
                            && x.ParentId == mainAccountID
@@ -1207,7 +1208,7 @@ namespace onetouch.AppMarketplaceAccounts
                 foreach (var contactObj in contactInfo)
                 {
                     await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
-                }
+                }*/
                 return newId;
             }
 
@@ -1488,7 +1489,7 @@ namespace onetouch.AppMarketplaceAccounts
                 await CurrentUnitOfWork.SaveChangesAsync();
 
                 //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var contactInfo = _appContactRepository.GetAll()
+                /*var contactInfo = _appContactRepository.GetAll()
                 .Where(x => x.IsProfileData
                            && x.AccountId == mainAccountID
                            && x.TenantId == AbpSession.TenantId
@@ -1498,7 +1499,7 @@ namespace onetouch.AppMarketplaceAccounts
                 foreach (var contactObj in contactInfo)
                 {
                     await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newAccountID);
-                }
+                }*/
 
                 //publish sub branches
                 var branchInfo = _appContactRepository.GetAll()
