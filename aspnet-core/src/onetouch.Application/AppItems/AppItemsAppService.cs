@@ -6141,7 +6141,7 @@ namespace onetouch.AppItems
             List<AppEntityClassification> appEntityClassificationDeleteList = new List<AppEntityClassification>();
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
-
+            List<string> sizeScaleNames = new List<string>();
             foreach (var excelDto in result)
             {
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
@@ -6777,8 +6777,23 @@ namespace onetouch.AppItems
 
                         appSizeScaleForEditDto.Dimesion1Name = excelDto.SizeScaleName;
                         appSizeScaleForEditDto.Name = excelDto.SizeScaleName;
-                        var sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
-                        var sizeScaleSavedId = sizescale.Result.Id;
+                        long? sizeScaleSavedId = 0;
+                        Task<AppSizeScaleForEditDto> sizescale = null;
+                        try
+                        {
+                            //var sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+                            // var sizeScaleSavedId = sizescale.Result.Id;
+                            sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+                            sizeScaleSavedId = sizescale.Result.Id;
+                            sizeScaleNames.Add(excelDto.SizeScaleName);
+                        }
+                        catch {
+                            if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
+                            {
+                                sizescale = _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleForEditDto.Id.ToString()));
+                                sizeScaleSavedId = sizescale.Result.Id;
+                            }
+                        }
                         ////if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
                         ////{
                         ////    AppSizeScaleForEditDto appSizeScaleRatioForEditDto = new AppSizeScaleForEditDto();
@@ -7031,16 +7046,22 @@ namespace onetouch.AppItems
                                     }
 
                                 }
-
+                                if (appItem.ItemSizeScaleHeadersFkList.Count == 0) 
+                                {
+                                    appItemSizeScalesHeader.AppItemId = appItem.Id;
+                                    appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                                }
                                 appItemSizeScalesHeaderRatio.AppItemId = appItem.Id;
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
 
                         }
-                        appItemSizeScalesHeader.AppItemId = appItem.Id;
-
-                        appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                        if (appItem.ItemSizeScaleHeadersFkList.Count == 0) 
+                        {
+                            appItemSizeScalesHeader.AppItemId = appItem.Id;
+                            appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                        }
                         // string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
                         // scaleHeader.SizeScaleCode = (scaleHeader.ParentId == null ? "SizeScale-" : "SizeRatio-") + seq;
 
