@@ -510,6 +510,7 @@ namespace onetouch.AppMarketplaceAccounts
                     } else { return new GetAccountForViewDto(); }
                 }
                 var account = await _appMarketplaceContactRepository.GetAll()
+                    .Include (z=>z.EntityExtraData)
                 .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
                 var output = new GetAccountForViewDto();
@@ -718,6 +719,21 @@ namespace onetouch.AppMarketplaceAccounts
                     }
                 }
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
+                //I40[Start]
+                output.Contact = new ContactDto();
+                //output.Contact = ObjectMapper.Map<ContactDto>(account);
+                if (account.EntityExtraData != null && account.EntityExtraData.Count > 0)
+                {
+                    output.Contact.FirstName = account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null ? "" : account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue;
+                    output.Contact.LastName = account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null ? "" : account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue;
+                    //if (output.ParentId != null)
+                    //  {
+                    //var joinDate = account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707)?.AttributeValue;
+                    output.Contact.JobTitle = (account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) != null &&
+                                       account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue != null)
+                                        ? account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue : "";
+                }
+                //I40[End]
                 return output;
             }
         }
@@ -1624,7 +1640,12 @@ namespace onetouch.AppMarketplaceAccounts
             }
             //Extra Attributes[End]
             long newId = 0;
-            { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
+            {
+                var marketplaceRecord = await _appMarketplaceContactRepository.GetAll().FirstOrDefaultAsync(z=>z.SSIN == appMarketplaceContact.SSIN &&
+                z.Code== appMarketplaceContact.Code);
+                if (marketplaceRecord==null)
+                    newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); 
+            }
             await CurrentUnitOfWork.SaveChangesAsync();
 
             return (appMarketplaceContact.Id != 0);
