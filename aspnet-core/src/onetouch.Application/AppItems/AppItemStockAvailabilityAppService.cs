@@ -561,7 +561,7 @@ namespace onetouch.AppItems
                 ImportItemReturnDto returnDto = new ImportItemReturnDto();
                 if (!string.IsNullOrEmpty(itemExcelDto.ParentCode))
                 {
-                    var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId != null && x.item.ItemType == 0).FirstOrDefault();
+                    var itemExisting = resJoin.Where(x => x.code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId != null && x.item.ItemType == 0).FirstOrDefault();
                     var itemExists = itemExisting == null ? null : itemExisting.item;
                     if (itemExists != null)
                     {
@@ -588,7 +588,7 @@ namespace onetouch.AppItems
                 else
                 {
                     
-                    var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId == null && x.item.ItemType == 0).FirstOrDefault();
+                    var itemExisting = resJoin.Where(x => x.code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId == null && x.item.ItemType == 0).FirstOrDefault();
                     var itemExists = itemExisting == null ? null : itemExisting.item;
                     
                     if (itemExists != null)
@@ -629,7 +629,7 @@ namespace onetouch.AppItems
                     returnList.Add(returnDto);
                 else
                 {
-                    var appItem = await _appItemRepository.GetAll().Where(z => z.Code == itemExcelDto.Code.Replace(" ", string.Empty)).FirstOrDefaultAsync();
+                    var appItem = await _appItemRepository.GetAll().Where(z => z.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty)).FirstOrDefaultAsync();
                     if (appItem != null)
                     {
                         appItem.StockAvailability = long.Parse(itemExcelDto.StockAvailable);
