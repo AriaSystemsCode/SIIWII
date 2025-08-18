@@ -24,7 +24,7 @@ import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { Observable } from "rxjs";
 import { ProgressComponent } from "@app/shared/common/progress/progress.component";
 import { ImportTypes } from "../models/ImportTypes";
-import { AppEntitiesServiceProxy, AppItemsServiceProxy, AppItemtExcelRecordDTO, GetAppEntityForEditOutput, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
+import { AppEntitiesServiceProxy, AppItemsServiceProxy, AppItemtExcelRecordDTO, GetAppEntityForEditOutput, ImportItemInputDto, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
 import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
@@ -356,7 +356,6 @@ export class MainImportComponent
                 this.progress = 100;
             };
         }
-
 
         if (!this.invalidImport && !this.imData) {
             setTimeout(() => {
@@ -914,7 +913,6 @@ export class MainImportComponent
     onSelectSugItemCode(event: { selectedItem: any, record: AppItemtExcelRecordDTO }) {
         const { selectedItem, record } = event;
         if (record?.isCodeItem || record?._isLinkingParent) {
-            //I44-BE description null error 
             this.importServiceProxy.getAppItemForEditData(
                 selectedItem.id,
                 record.recordType,
@@ -1088,6 +1086,75 @@ export class MainImportComponent
     onUpdatedRecords($event) {
         this.uploadingResult = $event;
     }
+
+    onValidateRecord(record) {
+        let _ImportItemInputDto: ImportItemInputDto = new ImportItemInputDto();
+        _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
+        this._appItemsServiceProxy.validateImportItemData(_ImportItemInputDto)
+            .subscribe((result) => {
+                //I44-BE error 
+                //I44-FE update record after validation
+
+                this.updatedRecordData = {
+                    record,
+                    newData: result
+                };
+            });
+
+    }
+
+    private mapRecordToImportItemInputDto(record: any): ImportItemInputDto {
+        const dto = record?.excelDto;
+        const ret = new ImportItemInputDto();
+
+        if (!dto)
+            return ret;
+
+        ret.brandCode = dto.brandCode;
+        ret.productType = dto.productType;
+        ret.recordType = dto.recordType;
+        ret.code = dto.code;
+        ret.name = dto.name;
+        ret.productDescription = dto.productDescription;
+        ret.productClassificationCode = dto.productClassificationCode;
+        ret.productCategoryCode = dto.productCategoryCode;
+        ret.price = dto.price;
+        ret.priceCurrencyCode = dto.priceCurrencyCode;
+        ret.imageType = dto.imageType;
+        ret.colorCode = dto.colorCode;
+        ret.colorName = dto.colorName;
+        ret.sizeScaleName = dto.sizeScaleName;
+        ret.scaleSizesOrder = dto.scaleSizesOrder;
+        ret.sizeRatioName = dto.sizeRatioName;
+        ret.sizeRatioValue = dto.sizeRatioValue;
+        ret.materialContent = dto.materialContent;
+        ret.soldOutDate = dto.soldOutDate;
+        ret.brandCode = dto.brandCode;
+        ret.brandName = dto.brandName;
+        ret.startShipDate = dto.startShipDate;
+        ret.dimension1Sizes = dto.dimension1Sizes;
+        ret.dimension2Sizes = dto.dimension2Sizes;
+        ret.dimension3Sizes = dto.dimension3Sizes;
+        ret.dimension1Name = dto.dimension1Name;
+        ret.dimension2Name = dto.dimension2Name;
+        ret.dimension3Name = dto.dimension3Name;
+        ret.noOfDimensions = dto.noOfDimensions;
+        ret.priceA = dto.priceA;
+        ret.priceB = dto.priceB;
+        ret.priceC = dto.priceC;
+        ret.priceD = dto.priceD;
+        ret.parentCode = dto.parentCode;
+        ret.productClassificationDescription = dto.productClassificationDescription;
+        ret.productCategoryDescription = dto.productCategoryDescription;
+        ret.sizeCode = dto.sizeCode;
+        ret.sizeName = dto.sizeName;
+        ret.dimension1Position = dto.dimension1Position;
+        ret.dimension2Position = dto.dimension2Position;
+        ret.dimension3Position = dto.dimension3Position;
+
+        return ret;
+    }
+
 
 }
 

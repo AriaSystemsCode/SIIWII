@@ -92,7 +92,7 @@ export class MainImportService extends AppComponentBase  {
        
         var imageExt= imageName.substring(imageName.lastIndexOf(".")+1);
 
-        var indx =sycAttachmentCategory[imageType.toUpperCase()].sycAttachmentTypeDto.findIndex(
+        var indx =sycAttachmentCategory[imageType.toUpperCase()]?.sycAttachmentTypeDto.findIndex(
                             (x) =>
                                 x.extension.toUpperCase() ==
                                 imageExt.toUpperCase()
