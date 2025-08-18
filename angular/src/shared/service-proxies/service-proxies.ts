@@ -2596,7 +2596,7 @@ export class AccountsServiceProxy {
      * @param connectionTypeId (optional) 
      * @return Success
      */
-    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | undefined): Observable<string> {
+    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ApplyRelationOnProfile?";
         if (input === null)
             throw new Error("The parameter 'input' cannot be null.");
@@ -2606,9 +2606,7 @@ export class AccountsServiceProxy {
             url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
         if (isPublic !== undefined && isPublic !== null)
             url_ += "isPublic=" + encodeURIComponent("" + isPublic) + "&";
-        if (connectionTypeId === null)
-            throw new Error("The parameter 'connectionTypeId' cannot be null.");
-        else if (connectionTypeId !== undefined)
+        if (connectionTypeId !== undefined && connectionTypeId !== null)
             url_ += "connectionTypeId=" + encodeURIComponent("" + connectionTypeId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -61305,6 +61303,7 @@ export class BranchDto implements IBranchDto {
     ssin!: string | undefined;
     tenantId!: number | undefined;
     useDTOTenant!: boolean;
+    tenantOwner!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -61359,6 +61358,7 @@ export class BranchDto implements IBranchDto {
             this.ssin = _data["ssin"];
             this.tenantId = _data["tenantId"];
             this.useDTOTenant = _data["useDTOTenant"];
+            this.tenantOwner = _data["tenantOwner"];
             this.id = _data["id"];
         }
     }
@@ -61411,6 +61411,7 @@ export class BranchDto implements IBranchDto {
         data["ssin"] = this.ssin;
         data["tenantId"] = this.tenantId;
         data["useDTOTenant"] = this.useDTOTenant;
+        data["tenantOwner"] = this.tenantOwner;
         data["id"] = this.id;
         return data;
     }
@@ -61448,6 +61449,7 @@ export interface IBranchDto {
     ssin: string | undefined;
     tenantId: number | undefined;
     useDTOTenant: boolean;
+    tenantOwner: number | undefined;
     id: number;
 
     [key: string]: any;
@@ -62114,6 +62116,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     branches!: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
     contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner!: number | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
     accountId!: number | undefined;
     shipViaId!: number | undefined;
@@ -62210,6 +62213,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 for (let item of _data["contactPaymentMethods"])
                     this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
             }
+            this.tenantOwner = _data["tenantOwner"];
             if (Array.isArray(_data["entityExtraData"])) {
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
@@ -62312,6 +62316,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             for (let item of this.contactPaymentMethods)
                 data["contactPaymentMethods"].push(item.toJSON());
         }
+        data["tenantOwner"] = this.tenantOwner;
         if (Array.isArray(this.entityExtraData)) {
             data["entityExtraData"] = [];
             for (let item of this.entityExtraData)
@@ -62379,6 +62384,7 @@ export interface ICreateOrEditAccountInfoDto {
     branches: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
     contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner: number | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
     accountId: number | undefined;
     shipViaId: number | undefined;
@@ -63136,6 +63142,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     isPublished!: boolean;
     disConnectLabel!: string | undefined;
     availableConnections!: ConnectionType[] | undefined;
+    visibility!: string | undefined;
 
     [key: string]: any;
 
@@ -63168,6 +63175,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                 for (let item of _data["availableConnections"])
                     this.availableConnections!.push(ConnectionType.fromJS(item));
             }
+            this.visibility = _data["visibility"];
         }
     }
 
@@ -63198,6 +63206,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             for (let item of this.availableConnections)
                 data["availableConnections"].push(item.toJSON());
         }
+        data["visibility"] = this.visibility;
         return data;
     }
 }
@@ -63213,6 +63222,7 @@ export interface IGetAccountForViewDto {
     isPublished: boolean;
     disConnectLabel: string | undefined;
     availableConnections: ConnectionType[] | undefined;
+    visibility: string | undefined;
 
     [key: string]: any;
 }
@@ -63639,6 +63649,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     branches!: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
     contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner!: number | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
     accountId!: number | undefined;
     shipViaId!: number | undefined;
@@ -63740,6 +63751,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 for (let item of _data["contactPaymentMethods"])
                     this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
             }
+            this.tenantOwner = _data["tenantOwner"];
             if (Array.isArray(_data["entityExtraData"])) {
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
@@ -63847,6 +63859,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             for (let item of this.contactPaymentMethods)
                 data["contactPaymentMethods"].push(item.toJSON());
         }
+        data["tenantOwner"] = this.tenantOwner;
         if (Array.isArray(this.entityExtraData)) {
             data["entityExtraData"] = [];
             for (let item of this.entityExtraData)
@@ -63915,6 +63928,7 @@ export interface IAppContactValidationInputDTO {
     branches: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
     contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner: number | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
     accountId: number | undefined;
     shipViaId: number | undefined;
