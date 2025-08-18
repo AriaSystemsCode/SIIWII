@@ -24,7 +24,7 @@ import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { Observable } from "rxjs";
 import { ProgressComponent } from "@app/shared/common/progress/progress.component";
 import { ImportTypes } from "../models/ImportTypes";
-import { AppEntitiesServiceProxy, AppItemsServiceProxy, AppItemtExcelRecordDTO, GetAppEntityForEditOutput, ImportItemInputDto, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
+import { AppEntitiesServiceProxy, AppItemsServiceProxy, AppItemtExcelRecordDTO, GetAppEntityForEditOutput, ImportItemInputDto, ImportItemReturnDto, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
 import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
@@ -199,6 +199,14 @@ export class MainImportComponent
         let hasImageFile = false;
         let invalidImagesCount = 0;
         let totalImageFiles = 0;
+        let fakeProgress = 0;
+        const interval = setInterval(() => {
+            // Increase the fake progress gradually
+            if (fakeProgress < 95) {
+                fakeProgress += 10;
+                this.progress = fakeProgress;
+            }
+        }, 100);
 
 
         if (this.imImages) {
@@ -304,11 +312,14 @@ export class MainImportComponent
                         this.CheckRatio();
                     }, 0);
 
-                    this.ProgressModal.hide();
-                    this.spinnerService.show();
                     this.importServiceProxy
                         .validateExcel(this._guid, this.imagesName)
-                        .pipe(finalize(() => this.spinnerService.hide()))
+                        .pipe(finalize(() => {
+                            this.progress = 100;
+                            clearInterval(interval);
+                            this.ProgressModal.hide();
+                        }
+                        ))
                         .subscribe((result) => {
                             this.logFileUrl =
                                 result?.excelLogDTO?.excelLogPath;
@@ -342,19 +353,21 @@ export class MainImportComponent
             };
 
             this.uploader.uploadAll();
-            this.folder_details = true;
+            this.folder_details = false;
+            this.progress = 0;
             this.ProgressModal.show();
             this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
             this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
-            this.folder_details = false;
-            this.uploader.onProgressAll = (progress) => {
+
+
+           /*  this.uploader.onProgressAll = (progress) => {
                 this.progress = progress;
 
-            };
+            }; */
 
-            this.uploader.onCompleteAll = () => {
+            /* this.uploader.onCompleteAll = () => {
                 this.progress = 100;
-            };
+            }; */
         }
 
         if (!this.invalidImport && !this.imData) {
@@ -362,12 +375,14 @@ export class MainImportComponent
                 this.CheckRatio();
             }, 0);
 
-            this.ProgressModal.hide();
-            this.spinnerService.show();
             this.importServiceProxy
                 .validateExcel(this._guid, this.imagesName)
-                .pipe(finalize(() => this.spinnerService.hide()))
-                .subscribe((result) => {
+                .pipe(finalize(() => {
+                    this.progress = 100;
+                    clearInterval(interval);
+                    this.ProgressModal.hide();
+                }
+                )).subscribe((result) => {
                     this.logFileUrl =
                         result?.excelLogDTO?.excelLogPath;
                     this.logFileName =
@@ -390,12 +405,10 @@ export class MainImportComponent
                     }
                 });
 
-            this.folder_details = true;
+            this.folder_details = false;
             this.ProgressModal.show();
             this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
             this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
-            this.folder_details = false;
-            this.progress = 100;
         }
 
     }
@@ -714,7 +727,7 @@ export class MainImportComponent
                         form.append("guid" + i, this.guids[i]);
                     }
                 };
-
+                //I44-FE progress not show !
                 this.ProgressModal.show();
                 // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
                 this.progressHeader = "Uploading folder contents";
@@ -1091,14 +1104,19 @@ export class MainImportComponent
         let _ImportItemInputDto: ImportItemInputDto = new ImportItemInputDto();
         _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
         this._appItemsServiceProxy.validateImportItemData(_ImportItemInputDto)
-            .subscribe((result) => {
-                //I44-BE error 
-                //I44-FE update record after validation
+            .subscribe((result: ImportItemReturnDto[]) => {
+                //I44-BE test failed validate 
+                const hasErrors = Array.isArray(result) && result.length > 0;
+
+                record.fieldsErrors = hasErrors ? result : [];
+                record.errorMessage = hasErrors ? "" : record.errorMessage;
+                record.status = hasErrors ? "Failed" : "Passed";
 
                 this.updatedRecordData = {
                     record,
-                    newData: result
-                };
+                    newData: record
+                }
+
             });
 
     }

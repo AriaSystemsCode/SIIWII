@@ -62,6 +62,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   UploadActionEnum = UploadActionEnum;
   @Output() updatedRecords = new EventEmitter<any[]>();
   @Output() _validateRecord = new EventEmitter<any[]>();
+  isConfirm: boolean = false;
 
   public constructor(
     private _importService: MainImportService,
@@ -131,6 +132,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       let indx = this.records.findIndex(r => r.id == record.id);
       this.records[indx] = updatedRec;
       this.currentActionRecord = updatedRec;
+
+      if (this.isConfirm)
+        this.resumeConfirm(updatedRec)
     }
 
 
@@ -214,42 +218,43 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.close.emit(true);
   }
 
-
-  resetRecords(record, originalIndex) {
-    record._isDataRecord = false;
-    record._isLinkingParent = false;
-    record._isLinkingItemColor = false;
-    record._isLinkingColorLookup = false;
-    record._isCreateParent = false;
-    record._isCreateItemColor = false;
-    record._isCreateColorLookup = false;
-    record._isLinkNewParent = false;
-    record._isLinkNewItemColor = false;
-    record._isLinkNewColorLookup = false;
-    record._inAction = false;
-
-
-    this.uploadingResult.excelRecords[originalIndex]._isDataRecord = false;
-    this.uploadingResult.excelRecords[originalIndex]._isLinkingParent = false;
-    this.uploadingResult.excelRecords[originalIndex]._isLinkingItemColor = false;
-    this.uploadingResult.excelRecords[originalIndex]._isLinkingColorLookup = false;
-    this.uploadingResult.excelRecords[originalIndex]._isCreateParent = false;
-    this.uploadingResult.excelRecords[originalIndex]._isCreateItemColor = false;
-    this.uploadingResult.excelRecords[originalIndex]._isCreateColorLookup = false;
-    this.uploadingResult.excelRecords[originalIndex]._isLinkNewParent = false;
-    this.uploadingResult.excelRecords[originalIndex]._isLinkNewItemColor = false;
-    this.uploadingResult.excelRecords[originalIndex]._isLinkNewColorLookup = false;
-    this.uploadingResult.excelRecords[originalIndex]._inAction = false;
-
-
+   resetRecords(record: any, originalIndex: number) {
+    const resetFlags = (rec: any) => {
+      rec._isDataRecord = false;
+      rec._isLinkingParent = false;
+      rec._isLinkingItemColor = false;
+      rec._isLinkingColorLookup = false;
+      rec._isCreateParent = false;
+      rec._isCreateItemColor = false;
+      rec._isCreateColorLookup = false;
+      rec._isLinkNewParent = false;
+      rec._isLinkNewItemColor = false;
+      rec._isLinkNewColorLookup = false;
+      rec._inAction = false;
+    };
+  
+    // reset for current record
+    resetFlags(record);
+  
+    // reset for the one inside excelRecords
+    if (
+      Array.isArray(this.uploadingResult?.excelRecords) &&
+      originalIndex >= 0 &&
+      originalIndex < this.uploadingResult.excelRecords.length
+    ) {
+      resetFlags(this.uploadingResult.excelRecords[originalIndex]);
+    }
+  
     this.currentActionRecord = null;
     this.LinkToExistingITEM_Ret_Data = null;
     this.LinkToExistingItemColor_Ret_Data = null;
     this.LinkToExistingColorLookup_Ret_Data = null;
     this.activeRecord = null;
+    this.isConfirm = false;
+  
     delete record._original;
-  }
-
+  } 
+  
   downloadLogFile() {
     this.onDownloadLogFile.emit(true);
   }
@@ -833,11 +838,18 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record.fieldsErrors = [];
       record.errorMessage = "";
       record.status = "Passed";
+
+      this.resumeConfirm(record);
     }
 
-    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup)
-      this.ValidateRecord(record);
 
+    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup) {
+      this.isConfirm = true;
+      this.ValidateRecord(record);
+    }
+  }
+
+  resumeConfirm(record) {
     const originalIndex = record.__originalIndex;
     if (
       Array.isArray(this.uploadingResult?.excelRecords) &&
@@ -1044,6 +1056,32 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
   isRestrictedCase(record: any): boolean {
     return record._isLinkingParent || record._isLinkingItemColor || record._isLinkingColorLookup;
+  }
+
+  isCreateCase(record: any): boolean {
+    return record._isCreateItemColor || record._isCreateColorLookup || record._isCreateParent;
+  }
+  hasAllRequiredFields(record: any): boolean {
+    const requiredColumnsMap = {
+      [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.requiredColumnsForCreateNewParent,
+      [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.requiredColumnsForCreateNewItemColor,
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.requiredColumnsForCreateNewColorLookup
+    };
+
+    const requiredColumns = requiredColumnsMap[record.action] || [];
+
+    return requiredColumns.every(colName => !!this.getRecordValue(record, this.mapColumnNameToKey(colName)));
+  }
+
+
+  canConfirm(record: any): boolean {
+    if (this.isRestrictedCase(record)) {
+      return this.isCodeValid(record);
+    }
+    if (this.isCreateCase(record)) {
+      return this.hasAllRequiredFields(record);
+    }
+    return true;
   }
 
   private isNumberLike(val: any): boolean {

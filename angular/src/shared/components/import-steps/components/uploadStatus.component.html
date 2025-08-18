@@ -65,11 +65,10 @@
 
                       <!-- IF action mode is active on this row -->
                       <span *ngIf="record._inAction" class="action-icons d-flex align-items-center">
-                        <i class="text-success mr-2"
-                          [class.pointer-events-none]="isRestrictedCase(record) && !isCodeValid(record)" [ngStyle]="{
-                          'cursor': (isRestrictedCase(record) && !isCodeValid(record)) ? 'not-allowed' : 'pointer',
-                          'opacity': (isRestrictedCase(record) && !isCodeValid(record)) ? '0.5' : '1'
-                        }" (click)="(!isRestrictedCase(record) || isCodeValid(record)) && confirmLinking(record)">
+                        <i class="text-success mr-2" [class.pointer-events-none]="!canConfirm(record)" [ngStyle]="{
+                          'cursor': !canConfirm(record) ? 'not-allowed' : 'pointer',
+                          'opacity': !canConfirm(record) ? '0.5' : '1'
+                        }" (click)="canConfirm(record) && confirmLinking(record)">
                           ✔️
                         </i>
                         <i class="text-danger pointer" (click)="cancelLinking(record)">❌</i>
@@ -225,17 +224,14 @@
                       </div>
 
                       <!-- Default input -->
-                      <div *ngSwitchDefault> 
+                      <div *ngSwitchDefault>
 
                         <div *ngIf="isCreateNewCase(record, column.name); else normalInput">
-                      
+
                           <ng-container *ngIf="column.name === 'Product Description'; else checkOtherColumns">
-                            <input type="text" class="form-control"
-                                   [attr.data-record-id]="record.id"
-                                   #codeInputContainer
-                                   [ngModel]="getRecordValue(record, 'productDescription')"
-                                   (ngModelChange)="setRecordValue(record, 'productDescription', $event)"
-                                   [ngClass]="{
+                            <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                              #codeInputContainer [ngModel]="getRecordValue(record, 'productDescription')"
+                              (ngModelChange)="setRecordValue(record, 'productDescription', $event)" [ngClass]="{
                                      'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
                                                       !getRecordValue(record, 'productDescription')
                                    }" />
@@ -243,16 +239,13 @@
                               {{ getExampleTextForCreateNewCase(record, column.name) }}
                             </small>
                           </ng-container>
-                      
+
                           <ng-template #checkOtherColumns>
-                      
+
                             <ng-container *ngIf="column.name === 'Code'; else checkColorCode">
-                              <input type="text" class="form-control"
-                                     [attr.data-record-id]="record.id"
-                                     #codeInputContainer
-                                     [ngModel]="getRecordValue(record, 'code')"
-                                     (ngModelChange)="setRecordValue(record, 'code', $event)"
-                                     [ngClass]="{
+                              <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                #codeInputContainer [ngModel]="getRecordValue(record, 'code')"
+                                (ngModelChange)="setRecordValue(record, 'code', $event)" [ngClass]="{
                                        'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
                                                         !getRecordValue(record, 'code')
                                      }" />
@@ -260,15 +253,12 @@
                                 {{ getExampleTextForCreateNewCase(record, column.name) }}
                               </small>
                             </ng-container>
-                      
+
                             <ng-template #checkColorCode>
                               <ng-container *ngIf="column.name === 'Color Code'; else checkParentCode">
-                                <input type="text" class="form-control"
-                                       [attr.data-record-id]="record.id"
-                                       #colorCodeInputContainer
-                                       [ngModel]="getRecordValue(record, 'colorCode')"
-                                       (ngModelChange)="setRecordValue(record, 'colorCode', $event)"
-                                       [ngClass]="{
+                                <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                  #colorCodeInputContainer [ngModel]="getRecordValue(record, 'colorCode')"
+                                  (ngModelChange)="setRecordValue(record, 'colorCode', $event)" [ngClass]="{
                                          'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
                                                           !getRecordValue(record, 'colorCode')
                                        }" />
@@ -277,14 +267,13 @@
                                 </small>
                               </ng-container>
                             </ng-template>
-                      
+
                             <ng-template #checkParentCode>
                               <ng-container *ngIf="column.name === 'Parent Code'; else checkPrice">
                                 <div #parentCodeInputContainer [attr.data-record-id]="record.id">
                                   <input type="text" class="form-control"
-                                         [ngModel]="getRecordValue(record, 'parentCode')"
-                                         (ngModelChange)="setRecordValue(record, 'parentCode', $event)"
-                                         [ngClass]="{
+                                    [ngModel]="getRecordValue(record, 'parentCode')"
+                                    (ngModelChange)="setRecordValue(record, 'parentCode', $event)" [ngClass]="{
                                            'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
                                                             !getRecordValue(record, 'parentCode')
                                          }" />
@@ -294,16 +283,13 @@
                                 </div>
                               </ng-container>
                             </ng-template>
-                      
+
                             <ng-template #checkPrice>
                               <ng-container *ngIf="column.name === 'Price'; else editableInput">
-                                <input type="text" class="form-control"
-                                       [attr.data-record-id]="record.id"
-                                       [ngModel]="getRecordValue(record, 'price')"
-                                       (ngModelChange)="setRecordValue(record, 'price', $event)"
-                                       inputmode="decimal"
-                                       pattern="^-?\\d+(\\.\\d+)?$"
-                                       [ngClass]="{
+                                <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                  [ngModel]="getRecordValue(record, 'price')"
+                                  (ngModelChange)="setRecordValue(record, 'price', $event)" inputmode="decimal"
+                                  pattern="^-?\\d+(\\.\\d+)?$" [ngClass]="{
                                          'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
                                                           !getRecordValue(record, 'price')
                                        }" />
@@ -315,41 +301,39 @@
                                 </small>
                               </ng-container>
                             </ng-template>
-                      
+
                             <ng-template #editableInput>
-                              <input type="text" class="form-control"
-                                     [attr.data-record-id]="record.id"
-                                     [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                                     (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                                     [ngClass]="{
+                              <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                                (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                                [ngClass]="{
                                        'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
                                                         !getRecordValue(record, mapColumnNameToKey(column.name))
                                      }" />
-                              <small class="text-danger"
-                                     *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
+                              <small class="text-danger" *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
                                             !getRecordValue(record, mapColumnNameToKey(column.name))">
                                 {{ getExampleTextForCreateNewCase(record, column.name) }}
                               </small>
                             </ng-template>
-                      
+
                           </ng-template>
-                      
+
                         </div>
-                      
+
                         <ng-template #normalInput>
                           <ng-container *ngIf="column.name === 'Product Description'; else normalTextInput">
                             <div class="form-control"
-                                 [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
-                                 style="background-color: #f4f4f4 !important; opacity: 1; cursor: not-allowed;">
+                              [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
+                              style="background-color: #f4f4f4 !important; opacity: 1; cursor: not-allowed;">
                             </div>
                           </ng-container>
-                      
+
                           <ng-template #normalTextInput>
                             <input type="text" class="form-control" style="width: fit-content;"
-                                   [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                                   (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                                   [disabled]="!(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor))"
-                                   [ngClass]="{
+                              [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                              (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                              [disabled]="!(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor))"
+                              [ngClass]="{
                                      'link-parent-input': column.name === 'Code' && 
                                                           (record._isLinkingParent || record._isLinkingItemColor)
                                    }" [hidden]="
@@ -359,9 +343,9 @@
                                    " />
                           </ng-template>
                         </ng-template>
-                      
+
                       </div>
-                      
+
 
                       <!-- image input -->
                       <!-- <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"

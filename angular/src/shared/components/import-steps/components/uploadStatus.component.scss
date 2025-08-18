@@ -394,3 +394,7 @@
 .table-scroll-container td .form-control.border-danger {
   border: 1px solid red !important;
 }
+
+.search-dropdown {
+  z-index: 9999 !important;
+}
