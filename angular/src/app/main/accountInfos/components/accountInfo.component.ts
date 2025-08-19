@@ -170,7 +170,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     get otherAccount() :boolean { return this.viewMode }
 
-
    paymentTermsId; 
    shipViaId;
     GetContactDefaults(){
