@@ -1235,7 +1235,7 @@ namespace onetouch.Accounts
                 //I40[Start]
                 output.Account.CurrencyId = account.CurrencyId;
                 output.Account.CurrencyCode = account.CurrencyCode;
-                output.Account.CurrencyName = account.CurrencyFk.Name;
+                output.Account.CurrencyName = account.CurrencyFk==null? "": account.CurrencyFk.Name;
                 //I40[End]
                 var publishedRecord = await _appMarketplaceContactRepository.GetAll()
                                  .AsNoTracking()
@@ -3307,6 +3307,12 @@ namespace onetouch.Accounts
                 var account = await _appMarketplaceContactRepository.GetAll().Where(z => z.Id== input).FirstOrDefaultAsync();
                 if (account != null)
                     ssin = account.SSIN;
+                else
+                {
+                    var accountLoc = await _appContactRepository.GetAll().Where(z => z.Id == input).FirstOrDefaultAsync();
+                    if (accountLoc != null)
+                        ssin = accountLoc.SSIN;
+                }
             }
             if ((input == 0 || input == null) && !string.IsNullOrEmpty(ssin))
             {
