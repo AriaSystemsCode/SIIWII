@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { AccountBranchDto, AccountsServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, PhoneNumberAndtype, SycIdentifierDefinitionsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { TransactionCartoccordionTabs } from "@app/main/transactions/enums/TransactionCartoccordionTabs";
-
+import { finalize } from 'rxjs';
 
 @Component({
     selector: "app-contact",
@@ -58,6 +58,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     isCompanyExist: boolean = false
     isBranchExist: boolean = false
     isContactExist: boolean = false
+
+
+    
+    companyLoading = false;
+    private companySearchTimer: any;
+    private companySearchSub?: import('rxjs').Subscription;
     constructor(
         injector: Injector,
 
@@ -768,43 +774,39 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
 
+    
 
-
-
-    handleCompanySearch(event) {
-
-
-        setTimeout(() => {
-            this._AppTransactionServiceProxy
-                .getRelatedAccounts(
-                    event.query,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined, false, null
-                )
-                .subscribe((res: any) => {
-                    this.companeyNames = [...res.items];
-
-                });
-        }, 1000);
-        this.isValidForm();
-    }
+    handleCompanySearch(event: { query?: string } | string) {
+        const q = typeof event === 'string' ? event : (event?.query ?? '');
+      
+        // Debounce & cancel previous
+        if (this.companySearchTimer) clearTimeout(this.companySearchTimer);
+        this.companySearchTimer = setTimeout(() => {
+          this.companySearchSub?.unsubscribe();
+          this.companyLoading = true;
+      
+          this._AppTransactionServiceProxy
+            .getRelatedAccounts(
+              q,
+              undefined, undefined, undefined, undefined, undefined, undefined,
+              undefined, undefined, undefined, undefined, undefined, undefined,
+              undefined, undefined, undefined, undefined, undefined, undefined,
+              undefined, false, null
+            )
+            .pipe(finalize(() => {
+              this.companyLoading = false;
+              this.cdr.markForCheck(); // OnPush refresh
+            }))
+            .subscribe((res: any) => {
+              this.companeyNames = res?.items ?? [];
+              this.cdr.markForCheck();
+            }, _ => {
+              this.companeyNames = [];
+              this.cdr.markForCheck();
+            });
+        }, 250);
+      }
+      
     handleBranchSearch(event) {
         this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
             this.allBranches = result;
@@ -955,6 +957,10 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactCode = event?.target?.value.toUpperCase()
     }
 
-
+    ngOnDestroy() {
+        this.companySearchSub?.unsubscribe();
+        if (this.companySearchTimer) clearTimeout(this.companySearchTimer);
+      }
+      
 
 }
