@@ -826,7 +826,8 @@ namespace onetouch.AppMarketplaceAccounts
             {
 
                 var ret = await _appMarketplaceContactRepository.FirstOrDefaultAsync(e => e.TenantId == null && e.SSIN == SSIN);
-                ret.IsHidden = true;
+                if (ret != null)
+                    ret.IsHidden = true;
 
 
                 //I40[Start]
@@ -1543,7 +1544,7 @@ namespace onetouch.AppMarketplaceAccounts
             return true;
         }
 
-        private async Task<bool> PublishMember(long contactId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
+        public async Task<bool> PublishMember(long contactId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
         {
             var input = await _appContactRepository.GetAll().AsNoTracking()
                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
