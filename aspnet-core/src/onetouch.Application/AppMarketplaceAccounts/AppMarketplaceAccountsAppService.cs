@@ -756,7 +756,7 @@ namespace onetouch.AppMarketplaceAccounts
                 //I40[Start]
                 output.Account.CurrencyId = account.CurrencyId;
                 output.Account.CurrencyCode = account.CurrencyCode;
-                output.Account.CurrencyName = account.CurrencyFk.Name;
+                output.Account.CurrencyName = account.CurrencyFk==null?"":account.CurrencyFk.Name;
                 //I40[End]
                 //I40[End]
                 return output;
