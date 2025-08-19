@@ -1234,6 +1234,7 @@ namespace onetouch.Accounts
                 //I46[End]
                 //I40[Start]
                 output.Account.CurrencyId = account.CurrencyId;
+                output.Account.CurrencyCode = account.CurrencyCode;
                 output.Account.CurrencyName = account.CurrencyFk.Name;
                 //I40[End]
                 var publishedRecord = await _appMarketplaceContactRepository.GetAll()

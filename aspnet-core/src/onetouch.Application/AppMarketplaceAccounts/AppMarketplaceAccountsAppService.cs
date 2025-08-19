@@ -512,6 +512,7 @@ namespace onetouch.AppMarketplaceAccounts
                 var account = await _appMarketplaceContactRepository.GetAll()
                     .Include (z=>z.EntityExtraData)
                 .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                .Include(z=>z.CurrencyFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
                 var output = new GetAccountForViewDto();
 
@@ -561,6 +562,25 @@ namespace onetouch.AppMarketplaceAccounts
                     //(x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
                     //(x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
                     accountDto.Connections = relationships;
+                    //var currentAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.OwnerId == AbpSession.TenantId && z.IsProfileData && z.ParentId == null).FirstOrDefaultAsync();
+                    //var relationshipObj = await _appContactRelationshipInfoRepository.GetAll()
+                    //            .Where(z => ((z.RecipientContactSSIN == currentAccount.SSIN && z.RequesterContactSSIN == account.SSIN)
+                    //            || (z.RecipientContactSSIN == account.SSIN && z.RequesterContactSSIN == currentAccount.SSIN))
+                    //           ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();
+                    //if (relationshipObj != null)
+                    //{
+                    //   string relationshipCode = relationshipObj.EntityObjectTypeCode;
+                    //   var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+                    //   if (relationType != null)
+                    //   {
+                    //        var extrDataDisconnect = relationType.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
+                    //        if (extrDataDisconnect != null)
+                    //        {
+                    //            accountDto.DisConnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
+                    //        }
+
+                    //    }
+                    //}
                     //I40
 
                     int ConnectionCount = relationships;//_appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
@@ -733,6 +753,11 @@ namespace onetouch.AppMarketplaceAccounts
                                        account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue != null)
                                         ? account.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue : "";
                 }
+                //I40[Start]
+                output.Account.CurrencyId = account.CurrencyId;
+                output.Account.CurrencyCode = account.CurrencyCode;
+                output.Account.CurrencyName = account.CurrencyFk.Name;
+                //I40[End]
                 //I40[End]
                 return output;
             }
