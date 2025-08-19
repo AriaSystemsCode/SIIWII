@@ -2129,11 +2129,11 @@ namespace onetouch.Accounts
                 }
                 else
                 {
-                    var releatedAccount = await _appContactRepository.GetAll().Where(z => z.Id == id).FirstOrDefaultAsync();
+                    var releatedAccount = await _appContactRepository.GetAll().Include(z=>z.EntityFk).Where(z => z.Id == id).FirstOrDefaultAsync();
                     if (releatedAccount != null)
                     {
                         recipientSSIN = releatedAccount.SSIN;
-                        recipientEntityObjecttypeId = account.EntityObjectTypeCode;
+                        recipientEntityObjecttypeId = releatedAccount.EntityFk.EntityObjectTypeCode;
                     }
                 }
 
