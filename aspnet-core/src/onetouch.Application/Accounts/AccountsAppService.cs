@@ -1234,6 +1234,7 @@ namespace onetouch.Accounts
                 //I46[End]
                 //I40[Start]
                 output.Account.CurrencyId = account.CurrencyId;
+                output.Account.CurrencyCode = account.CurrencyCode;
                 output.Account.CurrencyName = account.CurrencyFk.Name;
                 //I40[End]
                 var publishedRecord = await _appMarketplaceContactRepository.GetAll()
@@ -2812,9 +2813,22 @@ namespace onetouch.Accounts
                                     else
                                     {
                                         ContactDto savedContactDto = await CreateOrUpdateContact(accountDto);
+                                        //await PublishMember(savedContactDto.Id);
+                                        //CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
+                                        //ObjectMapper.Map(savedContactDto, createOrEditAccountInfoDto);
+                                        //var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto, false);
+                                        //await _iCreateMarketplaceAccount.HideAccount(savedContactDto.SSIN);
                                         await PublishProfile();
-                                        await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
-                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false,null,null);
+                                        
+                                        
+                                        var accountMarketplace = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == account.SSIN).FirstOrDefaultAsync();
+                                        if (accountMarketplace != null)
+                                        {
+                                            await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
+                                            await _iCreateMarketplaceAccount.PublishMember(savedContactDto.Id, accountMarketplace.Id, presonEntityObjectTypeId, account.Id, accountMarketplace.Id);
+                                            await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false, null, null);
+                                        }
+
                                     }
                                     //I40[End]
 
@@ -4149,7 +4163,7 @@ namespace onetouch.Accounts
         }
         private async Task<bool> PublishMember(long contactId)
         {
-            var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contactId && x.IsProfileData == true);
+            var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contactId );
             if (contact == null)
                 return false;
             var entity = await _appEntityRepository.GetAll().AsNoTracking()
@@ -5935,6 +5949,7 @@ namespace onetouch.Accounts
             accountDto.UseDTOTenant = true;
             accountDto.AccountLevel = AccountLevelEnum.Manual;
             var output = await CreateOrEditAccount(accountDto);
+            AppContact account = new AppContact();
             if (output != null && output.AccountInfo.Id != null)
             {
                 var contactObjectId = await _helper.SystemTables.GetObjectContactId();
@@ -5943,7 +5958,7 @@ namespace onetouch.Accounts
                 var contact = await _appContactRepository.GetAll().Include(z => z.EntityFk).Where(z => z.Id == output.AccountInfo.Id).FirstOrDefaultAsync();
                 if (contact != null)
                 {
-                    var account = _appContactRepository.GetAll()
+                    account = _appContactRepository.GetAll()
                         .WhereIf(accountDto.AccountId != null, z=> z.TenantId == AbpSession.TenantId && z.Id== accountDto.AccountId)
                         .WhereIf(accountDto.AccountId == null, x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null)
                         .FirstOrDefault();
@@ -5966,10 +5981,9 @@ namespace onetouch.Accounts
                 {
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
-                        var publishContactAccount = await _appContactRepository.GetAll().AsNoTracking()
-                            .Include(x => x.AppContactAddresses)
-                            .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false
-                            && x.PartnerId == contact.AccountId);
+                        var publishContactAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
+                            .Include(x => x.ContactAddresses)
+                            .FirstOrDefaultAsync(x => x.SSIN == account.SSIN);
                         if (publishContactAccount != null)
                         {
                             await PublishMember(contact.Id);
