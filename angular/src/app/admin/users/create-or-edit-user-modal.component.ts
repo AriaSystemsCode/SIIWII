@@ -44,6 +44,7 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     defaultTenancyName:string="SIIWII.NET"; 
     entityObjectType:string ="TENANTCONTACT";
     fromTeamMember:boolean=false;
+    teamMemberId:number;
     constructor(
         injector: Injector,
         private _userService: UserServiceProxy,
@@ -148,7 +149,7 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
         ((res) => { 
             let tenancyName = this.appSession.tenancyName;
             sequance=res;
-        input.code= tenancyName+"-C"+sequance; 
+        input.code= sequance; 
         input.user = this.user;
         input.setRandomPassword = this.setRandomPassword;
         input.sendActivationEmail = this.sendActivationEmail;
@@ -160,7 +161,7 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
         input.organizationUnits = this.organizationUnitTree.getSelectedOrganizations();
 
         this.saving = true;
-        
+        input.contactId = this.teamMemberId
         this._userService.createOrUpdateUser(input)
             .pipe(finalize(() => {
                  this.saving = false; 

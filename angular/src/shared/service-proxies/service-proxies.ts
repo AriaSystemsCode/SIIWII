@@ -113546,6 +113546,7 @@ export class CreateOrUpdateUserInput implements ICreateOrUpdateUserInput {
     setRandomPassword!: boolean;
     organizationUnits!: number[] | undefined;
     code!: string | undefined;
+    contactId!: number | undefined;
 
     [key: string]: any;
 
@@ -113582,6 +113583,7 @@ export class CreateOrUpdateUserInput implements ICreateOrUpdateUserInput {
                     this.organizationUnits!.push(item);
             }
             this.code = _data["code"];
+            this.contactId = _data["contactId"];
         }
     }
 
@@ -113612,6 +113614,7 @@ export class CreateOrUpdateUserInput implements ICreateOrUpdateUserInput {
                 data["organizationUnits"].push(item);
         }
         data["code"] = this.code;
+        data["contactId"] = this.contactId;
         return data;
     }
 }
@@ -113623,6 +113626,7 @@ export interface ICreateOrUpdateUserInput {
     setRandomPassword: boolean;
     organizationUnits: number[] | undefined;
     code: string | undefined;
+    contactId: number | undefined;
 
     [key: string]: any;
 }

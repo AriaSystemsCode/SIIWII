@@ -181,6 +181,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     }
     CreateUserName() {
        this.createOrEditUserModal.user = new UserEditDto();
+       this.createOrEditUserModal.teamMemberId = this.memberData?.id
        this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
        this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
        this.createOrEditUserModal.fromTeamMember=true;
@@ -198,6 +199,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             // this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
             // this.createOrEditUserModal.user.emailAddress=this.memberData?.eMailAddress
             // this.createOrEditUserModal.user.phoneNumber=this.memberData?.phone1Number
+       this.createOrEditUserModal.teamMemberId = this.memberData?.id
             this.createOrEditUserModal.user.name= userResult?.user?.name
             this.createOrEditUserModal.user.surname=userResult?.user?.surname
             this.createOrEditUserModal.user.userName=userResult?.user?.userName

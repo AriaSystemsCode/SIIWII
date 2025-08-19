@@ -390,22 +390,6 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     this.memberDto.useDTOTenant = true;
 
-
-    // // ✅ Create a new DTO instance and assign only the valid fields
-    // const cleanDto = new CreateOrEditAccountInfoDto();
-
-    // const allowedKeys = [
-    //   'fileToken', 'tradeName', 'accountType', 'accountTypeId', 'ssin', 'priceLevel', 'notes', 'website', 'name', 'code',
-    //   'phone1Number', 'phone1Ex', 'phone2Number', 'phone2Ex', 'phone3Number', 'phone3Ex', 'eMailAddress',
-    //   'phone1TypeId', 'phone2TypeId', 'phone3TypeId', 'currencyId', 'languageId', 'entityId', 'tenantId',
-    //   'attachmentSourceTenantId', 'useDTOTenant', 'returnId', 'accountLevel', 'entityCategories', 'entityClassifications',
-    //   'entityAttachments', 'branches', 'contactAddresses', 'contactPaymentMethods','extraDataAttributes', 'entityExtraData', 'id', 'parentId', 'accountId'
-    // ];
-
-    // for (const key of allowedKeys) {
-    //   cleanDto[key] = this.memberDto[key];
-    // }
-
     this._AccountsServiceProxy.createOrUpdateContact(this.memberDto)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe(result => {
