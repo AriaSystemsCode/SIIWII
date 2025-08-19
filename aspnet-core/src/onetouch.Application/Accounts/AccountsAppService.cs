@@ -2123,13 +2123,11 @@ namespace onetouch.Accounts
                 if (currentaccount != null)
                     requesterSSIN = currentaccount.SSIN;
                 if (string.IsNullOrEmpty(requesterSSIN) || string.IsNullOrEmpty(recipientSSIN))
+                {
                     return;
-                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN ,true,null,null);
-                return;
-                
-                
+                }
                 //I40[End]
-                long? otherTenantId = null;
+                long? otherTenantId = null; 
                 long? partnerId = null;
                 var existed = await _appContactRepository.GetAll()
                 .FirstOrDefaultAsync(x => x.PartnerId == id && x.TenantId == AbpSession.TenantId);
@@ -2219,6 +2217,8 @@ namespace onetouch.Accounts
                         }
                     }
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
+                    await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN, true, null, null);
+                    return;
                 }
 
             }
