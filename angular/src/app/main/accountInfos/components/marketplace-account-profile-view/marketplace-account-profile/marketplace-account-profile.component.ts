@@ -106,23 +106,49 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       });
   }
 
-  getFormattedConnectionName(connection:string): string | null {
-    if(connection == 'connectionName') {
-        const raw = this.marketPlaceData?.connectionName?.trim();
-        if (!raw || !raw.startsWith('MPAction')) return null;
-      
-        const label = raw.replace('MPAction', '');
-        return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
-    } else    if(connection == 'avaliableConnectionName') {
-        const raw = this.marketPlaceData?.avaliableConnectionName?.trim();
-        if (!raw || !raw.startsWith('MPAction')) return null;
-      
-        const label = raw.replace('MPAction', '');
-        return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
-    }
-   
-
-    
-  }
+  getFormattedConnectionName(connection: string): string | null {
+    let raw: string | undefined;
   
+    if (connection === 'connectionName') {
+      raw = this.marketPlaceData?.connectionName?.trim();
+    } else if (connection === 'avaliableConnectionName') {
+      raw = this.marketPlaceData?.avaliableConnectionName?.trim();
+    }else{
+      raw = this.marketPlaceData?.disConnectLabel?.trim();
+    }
+  
+    if (!raw) return null;
+  
+    // If it's 'Follow', return as-is
+    if (raw === 'Follow') return 'Follow';
+    if (raw === 'Connect') return 'Connect';
+    if (raw === 'Join') return 'Join';
+    if (raw === 'Employ') return 'Employ';
+  
+    // Format only if starts with 'MPAction'
+    if (raw.startsWith('MPAction')) {
+      const label = raw.replace('MPAction', '');
+      return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+    }
+  
+    // For anything else, return null (or raw if you prefer)
+    return null;
+  }
+  disconnect(): void {
+      
+    this.showMainSpinner();
+    this._AccountsServiceProxy
+        .disconnect(this.marketPlaceData.account.id)
+        .pipe(
+            finalize(() => {
+                this.hideMainSpinner();
+            })
+        )
+        .subscribe((res) => {
+            this.notify.success(this.l("SuccessfullyDisconnected"));
+            this.marketPlaceData.status = false;
+            this.marketPlaceData.connectionName  = "";
+            this.marketPlaceData.avaliableConnectionName = res[0].connectLabel
+        });
+}
 }

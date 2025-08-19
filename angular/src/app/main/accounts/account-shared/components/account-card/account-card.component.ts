@@ -119,7 +119,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
                         })
                     )
                     .subscribe((result: string) => {
-                      account.visibility == 'Public' ? account.visibility = 'Private' :  account.visibility 
+
+                      account.visibility == 'Public' ? account.visibility = 'Private' :  account.visibility   = 'Public'
                     });
       }
 

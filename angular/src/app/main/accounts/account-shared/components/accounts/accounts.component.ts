@@ -342,7 +342,6 @@ export class AccountsComponent
             .subscribe((res) => {
                 this.notify.success(this.l("SuccessfullyDisconnected"));
                 account.status = false;
-                console.log(res[0].connectLabel,'reees')
                 account.connectionName  = "";
                 account.avaliableConnectionName = res[0].connectLabel
             });
