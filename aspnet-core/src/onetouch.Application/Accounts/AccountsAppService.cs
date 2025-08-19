@@ -2107,55 +2107,105 @@ namespace onetouch.Accounts
         }
         //Mariam[End]
 
-        public async Task Disconnect(long id)
+        public async Task<List<ConnectionType>> Disconnect(long id)
         {
-
+            List<ConnectionType> AvailableConnections = new List<ConnectionType>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 //I40[Start]
-                
+                var marketplaceRelationshipSycEntityObjId = await _helper.SystemTables.GetEntityObjectTypeMarketplaceRelationship();
+                var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
                 string recipientSSIN = "";
                 string requesterSSIN = "";
+                string recipientEntityObjecttypeId = "";
+                string RequestorEntityObjecttypeId = "";
                 var account = await _appMarketplaceContactRepository.GetAll().Where(z => z.Id == id).FirstOrDefaultAsync();
                 if (account != null)
+                {
                     recipientSSIN = account.SSIN;
-                var currentaccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.OwnerId == AbpSession.TenantId && z.IsProfileData && z.ParentId == null).FirstOrDefaultAsync();
-                if (currentaccount != null)
-                    requesterSSIN = currentaccount.SSIN;
-                if (string.IsNullOrEmpty(requesterSSIN) || string.IsNullOrEmpty(recipientSSIN))
-                {
-                    return;
-                }
-                //I40[End]
-                long? otherTenantId = null; 
-                long? partnerId = null;
-                var existed = await _appContactRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.PartnerId == id && x.TenantId == AbpSession.TenantId);
-                if (existed == null)
-                {
-                    existed = await _appContactRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.Id == id && x.TenantId == AbpSession.TenantId);
-
+                    recipientEntityObjecttypeId = account.EntityObjectTypeCode;
                 }
                 else
-                { id = existed.Id; }
+                {
+                    var releatedAccount = await _appContactRepository.GetAll().Where(z => z.Id == id).FirstOrDefaultAsync();
+                    if (releatedAccount != null)
+                    {
+                        recipientSSIN = releatedAccount.SSIN;
+                        recipientEntityObjecttypeId = account.EntityObjectTypeCode;
+                    }
+                }
+
+                var currentaccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.OwnerId == AbpSession.TenantId 
+                     && z.IsProfileData && z.ParentId == null).FirstOrDefaultAsync();
+                if (currentaccount != null)
+                {
+                    requesterSSIN = currentaccount.SSIN;
+                    RequestorEntityObjecttypeId = currentaccount.EntityObjectTypeCode;
+                }
+                if (string.IsNullOrEmpty(requesterSSIN) || string.IsNullOrEmpty(recipientSSIN))
+                {
+                    return AvailableConnections;
+                }
+                foreach (var relationshipCodeLookup in relationShipLookups)
+                {
+                    var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
+                    if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == RequestorEntityObjecttypeId.ToLower())
+                    {
+                        var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
+                        if (responseType != null && responseType.AttributeValue.TrimEnd().ToLower() == recipientEntityObjecttypeId.ToLower())
+                        {
+                            var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
+                            if (connectLabel != null)
+                            {
+                                var sharingLevl = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 605).FirstOrDefault();
+
+                                AvailableConnections.Add(new ConnectionType
+                                {
+                                    ConnectionEntityId = relationshipCodeLookup.Id,
+                                    ConnectLabel = connectLabel.AttributeValue,
+                                    DefaultVisibility = sharingLevl != null && !string.IsNullOrEmpty(sharingLevl.AttributeValue) ? sharingLevl.AttributeValue : "Public"
+                                });
+                            }
+                        }
+
+                    }
+                }
+
+                //I40[End]
+                long? otherTenantId = null; 
+                string? partnerId = null;
+
+                var existed = await _appContactRepository.GetAll()
+                .FirstOrDefaultAsync(x => x.SSIN == recipientSSIN && x.TenantId == AbpSession.TenantId);
+                //if (existed != null)
+                //{
+                //    existed = await _appContactRepository.GetAll()
+                //.FirstOrDefaultAsync(x => x.Id == id && x.TenantId == AbpSession.TenantId);
+
+                //}
+                //else
+                //{ id = existed.Id; }
 
                 if (existed != null)
                 {
-                    partnerId = existed.PartnerId;
-                    var otherTenantPublished = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.ParentId == null && x.Id == existed.PartnerId);
+                    partnerId = existed.SSIN;
+                    var otherTenantPublished = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == existed.SSIN).FirstOrDefaultAsync();
+                        //_appContactRepository.GetAll()
+                        //.FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.ParentId == null && x.Id == existed.PartnerId);
                     if (otherTenantPublished != null)
                     {
-                        var otherTenantOrgin = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId != null && x.IsProfileData == true && x.ParentId == null && x.Id == otherTenantPublished.PartnerId);
-                        if (otherTenantOrgin != null)
-                            otherTenantId = otherTenantOrgin.TenantId;
+                        otherTenantId = otherTenantPublished.OwnerId;
+                        //var otherTenantOrgin = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId != null && x.IsProfileData == true && x.ParentId == null && x.Id == otherTenantPublished.PartnerId);
+                        //if (otherTenantOrgin != null)
+                        //    otherTenantId = otherTenantOrgin.TenantId;
                     }
                 }
-                else { return; }
+                else { return AvailableConnections; }
 
                 var originalContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
-                var originalPublishContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == originalContactFortCurrTenant.Id);
-                var originalConnectRecordFortOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == otherTenantId && x.PartnerId == originalPublishContactFortCurrTenant.Id);
+                var originalPublishContactFortCurrTenant = await _appMarketplaceContactRepository.GetAll().FirstOrDefaultAsync(x => x.SSIN == originalContactFortCurrTenant.SSIN);
+                var originalConnectRecordFortOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == otherTenantId && x.SSIN== requesterSSIN);
 
                 if (existed != null)
                 {
@@ -2164,6 +2214,7 @@ namespace onetouch.Accounts
                     var contactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == existed.Id).ToList();
                     foreach (var contactRec in contactsInfo)
                     {
+                        await _appContactAddressRepository.DeleteAsync(z => z.ContactId == contactRec.Id);
                         await _appEntityRepository.DeleteAsync(contactRec.EntityId);
                         await _appContactRepository.DeleteAsync(contactRec.Id);
                         await _appAddressRepository.DeleteAsync(z => z.AccountId == existed.Id);
@@ -2173,6 +2224,7 @@ namespace onetouch.Accounts
                         var otherContactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == originalConnectRecordFortOtherTenant.Id).ToList();
                         foreach (var contactRec in otherContactsInfo)
                         {
+                            await _appContactAddressRepository.DeleteAsync(z => z.ContactId == contactRec.Id);
                             await _appEntityRepository.DeleteAsync(contactRec.EntityId);
                             await _appContactRepository.DeleteAsync(contactRec.Id);
                             await _appAddressRepository.DeleteAsync(z => z.AccountId == originalConnectRecordFortOtherTenant.Id);
@@ -2191,13 +2243,13 @@ namespace onetouch.Accounts
                         await _appContactRepository.DeleteAsync(originalConnectRecordFortOtherTenant.Id);
                     }
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
-                    var PublishContactFortDisconnectFromTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.Id == partnerId);
+                    var PublishContactFortDisconnectFromTenant = await _appMarketplaceContactRepository.GetAll().FirstOrDefaultAsync(x => x.SSIN == partnerId);
                     if (PublishContactFortDisconnectFromTenant != null)
                     {
-                        var profileContactofOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.Id == PublishContactFortDisconnectFromTenant.PartnerId);
-                        if (profileContactofOtherTenant != null && profileContactofOtherTenant.TenantId != null)
+                        //var profileContactofOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.Id == PublishContactFortDisconnectFromTenant.PartnerId);
+                       // if (profileContactofOtherTenant != null && profileContactofOtherTenant.TenantId != null)
                         {
-                            var tenantObject = await TenantManager.GetByIdAsync(int.Parse(profileContactofOtherTenant.TenantId.ToString()));
+                            var tenantObject = await TenantManager.GetByIdAsync(int.Parse(PublishContactFortDisconnectFromTenant.OwnerId.ToString()));
                             if (tenantObject != null)
                             {
                                 string tenancyName = tenantObject.TenancyName;
@@ -2207,7 +2259,7 @@ namespace onetouch.Accounts
                                     var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                                     //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
                                     string accProfileUrl = _appConfiguration["App:ClientRootAddress"] + "app/main/account/view/" + originalPublishContactFortCurrTenant.Id.ToString() + "?tab=ProfileView";
-                                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(profileContactofOtherTenant.TenantId, adminUser.Id),
+                                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(PublishContactFortDisconnectFromTenant.OwnerId, adminUser.Id),
                                         "Tenant <a  href=\"" + accProfileUrl + "\">" + myTenantObject.Name + "</a>  has been disconnected from you",
                                         Abp.Notifications.NotificationSeverity.Info,
                                         new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
@@ -2218,11 +2270,11 @@ namespace onetouch.Accounts
                     }
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
                     await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN, true, null, null);
-                    return;
+                    return AvailableConnections;
                 }
 
             }
-
+            return AvailableConnections; 
         }
 
 
