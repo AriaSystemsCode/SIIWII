@@ -3313,12 +3313,23 @@ namespace onetouch.AppSiiwiiTransaction
                                 {
                                     foreach (var parentAttach in detParent.EntityAttachments)
                                     {
-                                        parentAttach.Id = 0;
+                                        if (!parentAttach.IsDefault)
+                                            continue;
 
+                                        parentAttach.Id = 0;
                                         parentAttach.EntityId = 0;
                                         parentAttach.EntityFk = null;
                                         parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                        MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                        if (marketplaceItemMain.TenantOwner == AbpSession.TenantId)
+                                        {
+                                            string fileName = (new Guid()).ToString().Replace("-","") +"."+parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                            MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                            parentAttach.AttachmentFk.Attachment = fileName;
+                                        }
+                                        else
+                                        {
+                                            MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
+                                        }
                                         parentAttach.AttachmentId = 0;
                                         parentAttach.AttachmentFk.Id = 0;
                                     }
@@ -3419,7 +3430,7 @@ namespace onetouch.AppSiiwiiTransaction
                                                 parentAttach.EntityId = 0;
                                                 parentAttach.EntityFk = null;
                                                 parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
                                                 parentAttach.AttachmentId = 0;
                                                 parentAttach.AttachmentFk.Id = 0;
                                             }
@@ -3446,14 +3457,17 @@ namespace onetouch.AppSiiwiiTransaction
                 }
             }
         }
-        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId,string? newFileName)
         {
             if (sourceTenantId == null) sourceTenantId = -1;
             if (distinationTenantId == null) distinationTenantId = -1;
 
+            if (string.IsNullOrEmpty(newFileName))
+                newFileName = fileName;
+
             var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
             var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
-            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + newFileName;
 
             if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
             {
@@ -3952,7 +3966,7 @@ namespace onetouch.AppSiiwiiTransaction
                             appAtt.AttachmentFk.Name = attch.AttachmentFk.Name;
                             appAtt.AttachmentFk.Attributes = attch.AttachmentFk.Attributes;
 
-                            MoveFile(attch.AttachmentFk.Attachment, -1, tenantId);
+                            MoveFile(attch.AttachmentFk.Attachment, -1, tenantId,null);
                             appAtt.AttachmentId = 0;
                             appAtt.IsDefault = attch.IsDefault;
                             entityMain.EntityAttachments.Add(appAtt);
@@ -4080,7 +4094,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         extr.EntityCode = tenantVariation.Code;
 
                                         if (ext.AttributeId == 202 && !string.IsNullOrEmpty(ext.AttributeValue))
-                                            MoveFile(ext.AttributeValue, -1, tenantId);
+                                            MoveFile(ext.AttributeValue, -1, tenantId,null);
 
                                         tenantVariation.EntityFk.EntityExtraData.Add(extr);
                                     }
@@ -4136,7 +4150,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         appAtt.AttachmentFk.Code = attch.AttachmentFk.Code;
                                         appAtt.AttachmentFk.Name = attch.AttachmentFk.Name;
                                         appAtt.AttachmentFk.Attributes = attch.AttachmentFk.Attributes;
-                                        MoveFile(attch.AttachmentFk.Attachment, -1, tenantId);
+                                        MoveFile(attch.AttachmentFk.Attachment, -1, tenantId,null);
                                         appAtt.AttachmentId = 0;
                                         appAtt.IsDefault = attch.IsDefault;
                                         tenantVariation.EntityFk.EntityAttachments.Add(appAtt);
@@ -5308,7 +5322,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 newExt.Id = 0;
                                 //newExt.EntityFk = tenantTransaction;
                                 newExt.AttachmentFk.TenantId = tenantId;
-                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                 newExt.AttachmentId = 0;
                                 newExt.AttachmentFk.Id = 0;
                                 tenantTransaction.EntityAttachments.Add(newExt);
@@ -5364,7 +5378,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         newExt.Id = 0;
                                         newExt.EntityFk = null;
                                         newExt.AttachmentFk.TenantId = tenantId;
-                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                         newExt.AttachmentId = 0;
                                         newExt.AttachmentFk.Id = 0;
                                         detail.EntityAttachments.Add(newExt);
@@ -5443,7 +5457,7 @@ namespace onetouch.AppSiiwiiTransaction
                                                 newExt.Id = 0;
                                                 newExt.EntityFk = null;
                                                 newExt.AttachmentFk.TenantId = null;
-                                                MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1);
+                                                MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1,null);
                                                 newExt.AttachmentId = 0;
                                                 newExt.AttachmentFk.Id = 0;
                                                 detailch.EntityAttachments.Add(newExt);
@@ -5594,7 +5608,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 newExt.Id = 0;
                                 newExt.EntityFk = null;
                                 newExt.AttachmentFk.TenantId = tenantId;
-                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                 newExt.AttachmentId = 0;
                                 newExt.AttachmentFk.Id = 0;
                                 tenantTransactionObj.EntityAttachments.Add(newExt);
@@ -5654,7 +5668,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         newExt.Id = 0;
                                         newExt.EntityFk = null;
                                         newExt.AttachmentFk.TenantId = tenantId;
-                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                         newExt.AttachmentId = 0;
                                         newExt.AttachmentFk.Id = 0;
                                         detail.EntityAttachments.Add(newExt);
@@ -5732,7 +5746,7 @@ namespace onetouch.AppSiiwiiTransaction
                                                 newExt.Id = 0;
                                                 newExt.EntityFk = null;
                                                 newExt.AttachmentFk.TenantId = tenantId;
-                                                MoveFile(ext.AttachmentFk.Attachment, -1, tenantId);
+                                                MoveFile(ext.AttachmentFk.Attachment, -1, tenantId,null);
                                                 newExt.AttachmentId = 0;
                                                 newExt.AttachmentFk.Id = 0;
                                                 detailch.EntityAttachments.Add(newExt);
@@ -5812,7 +5826,7 @@ namespace onetouch.AppSiiwiiTransaction
                             newExt.Id = 0;
                             newExt.EntityFk = null;
                             newExt.AttachmentFk.TenantId = null;
-                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1);
+                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1,null);
                             newExt.AttachmentId = 0;
                             newExt.AttachmentFk.Id = 0;
                             marketplaceTransaction.EntityAttachments.Add(newExt);
@@ -5909,7 +5923,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     newExt.Id = 0;
                                     newExt.EntityFk = null;
                                     newExt.AttachmentFk.TenantId = null;
-                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1);
+                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1,null);
                                     newExt.AttachmentId = 0;
                                     newExt.AttachmentFk.Id = 0;
                                     detail.EntityAttachments.Add(newExt);
@@ -5985,7 +5999,7 @@ namespace onetouch.AppSiiwiiTransaction
                                             newExt.Id = 0;
                                             newExt.EntityFk = null;
                                             newExt.AttachmentFk.TenantId = null;
-                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1);
+                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1,null);
                                             newExt.AttachmentId = 0;
                                             newExt.AttachmentFk.Id = 0;
                                             detailch.EntityAttachments.Add(newExt);
@@ -6042,7 +6056,7 @@ namespace onetouch.AppSiiwiiTransaction
                             newExt.Id = 0;
                             newExt.EntityFk = null;
                             newExt.AttachmentFk.TenantId = null;
-                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1);
+                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1,null);
                             newExt.AttachmentId = 0;
                             newExt.AttachmentFk.Id = 0;
                             marketplaceTransaction.EntityAttachments.Add(newExt);
@@ -6127,7 +6141,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     newExt.Id = 0;
                                     newExt.EntityFk = null;
                                     newExt.AttachmentFk.TenantId = null;
-                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1);
+                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1,null);
                                     newExt.AttachmentId = 0;
                                     newExt.AttachmentFk.Id = 0;
                                     detail.EntityAttachments.Add(newExt);
@@ -6205,7 +6219,7 @@ namespace onetouch.AppSiiwiiTransaction
                                             newExt.Id = 0;
                                             newExt.EntityFk = null;
                                             newExt.AttachmentFk.TenantId = null;
-                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1);
+                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1,null);
                                             newExt.AttachmentId = 0;
                                             newExt.AttachmentFk.Id = 0;
                                             detailch.EntityAttachments.Add(newExt);
@@ -6833,7 +6847,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     parentAttach.EntityId = 0;
                                     parentAttach.EntityFk = null;
                                     parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
                                     parentAttach.AttachmentId = 0;
                                     parentAttach.AttachmentFk.Id = 0;
                                 }
@@ -6923,7 +6937,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 parentAttach.EntityId = 0;
                                 parentAttach.EntityFk = null;
                                 parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
                                 parentAttach.AttachmentId = 0;
                                 parentAttach.AttachmentFk.Id = 0;
                             }
