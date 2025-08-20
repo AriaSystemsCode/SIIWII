@@ -510,6 +510,12 @@ namespace onetouch.AppMarketplaceAccounts
                         id = marketPlaceAccount.Id;
                     } else { return new GetAccountForViewDto(); }
                 }
+                //I40[Start]
+                var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                
+                var currentTenantAccountSSIN = currentTenantAccount.SSIN;
+                //I40[End]
                 var account = await _appMarketplaceContactRepository.GetAll()
                     .Include (z=>z.EntityExtraData)
                 .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
@@ -558,7 +564,7 @@ namespace onetouch.AppMarketplaceAccounts
                     var relationships = _appContactRelationshipInfoRepository.GetAll()
                                .Where(z => ((z.RequesterContactSSIN == account.SSIN)
                                || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
-                               z.SharingLevel == 1).Count(); 
+                               (z.SharingLevel == 1 || (z.SharingLevel == 4 && account.SSIN == currentTenantAccountSSIN))).Count(); 
                     //.WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x =>
                     //(x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
                     //(x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
@@ -669,8 +675,8 @@ namespace onetouch.AppMarketplaceAccounts
                     }
                     output.AvailableConnections = new List<ConnectionType>();
                     //fill connection attrs
-                    var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
-                            .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                    //var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                      //      .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                             //.EntityFk.EntityObjectTypeCode;
                     var accountConnection = _appContactRepository.GetAll().Include(z=>z.EntityFk)
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == output.Account.SSIN);

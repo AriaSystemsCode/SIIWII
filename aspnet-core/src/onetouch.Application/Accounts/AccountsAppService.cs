@@ -598,7 +598,7 @@ namespace onetouch.Accounts
                     var relationships = _appContactRelationshipInfoRepository.GetAll()
                                .Where(z => ((z.RequesterContactSSIN == input.SSIN)
                                || (z.RecipientContactSSIN == input.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
-                               z.SharingLevel == 1)
+                               (z.SharingLevel == 1 || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
                                .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x =>
                                (x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
                                (x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
