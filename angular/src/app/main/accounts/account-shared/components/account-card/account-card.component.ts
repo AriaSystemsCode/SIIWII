@@ -88,6 +88,9 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
       
         // If it's 'Follow', return as-is
         if (raw === 'Follow') return 'Follow';
+        if (raw === 'Connect') return 'Connect';
+        if (raw === 'Join') return 'Join';
+        if (raw === 'Employ') return 'Employ';
       
         // Format only if starts with 'MPAction'
         if (raw.startsWith('MPAction')) {
@@ -116,7 +119,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
                         })
                     )
                     .subscribe((result: string) => {
-                      account?.visibility==  !account?.visibility
+
+                      account.visibility == 'Public' ? account.visibility = 'Private' :  account.visibility   = 'Public'
                     });
       }
 

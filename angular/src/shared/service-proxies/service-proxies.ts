@@ -2023,7 +2023,7 @@ export class AccountsServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    disconnect(id: number | undefined): Observable<void> {
+    disconnect(id: number | undefined): Observable<ConnectionType[]> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/Disconnect?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -2035,6 +2035,7 @@ export class AccountsServiceProxy {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -2045,14 +2046,14 @@ export class AccountsServiceProxy {
                 try {
                     return this.processDisconnect(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ConnectionType[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ConnectionType[]>;
         }));
     }
 
-    protected processDisconnect(response: HttpResponseBase): Observable<void> {
+    protected processDisconnect(response: HttpResponseBase): Observable<ConnectionType[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2061,7 +2062,17 @@ export class AccountsServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ConnectionType.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2596,7 +2607,7 @@ export class AccountsServiceProxy {
      * @param connectionTypeId (optional) 
      * @return Success
      */
-    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | undefined): Observable<string> {
+    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ApplyRelationOnProfile?";
         if (input === null)
             throw new Error("The parameter 'input' cannot be null.");
@@ -2606,9 +2617,7 @@ export class AccountsServiceProxy {
             url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
         if (isPublic !== undefined && isPublic !== null)
             url_ += "isPublic=" + encodeURIComponent("" + isPublic) + "&";
-        if (connectionTypeId === null)
-            throw new Error("The parameter 'connectionTypeId' cannot be null.");
-        else if (connectionTypeId !== undefined)
+        if (connectionTypeId !== undefined && connectionTypeId !== null)
             url_ += "connectionTypeId=" + encodeURIComponent("" + connectionTypeId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -29304,6 +29313,81 @@ export class CreateMarketplaceAccountServiceProxy {
     }
 
     protected processCreateOrEditMarketplaceContactRelationship(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param contactId (optional) 
+     * @param parentId (optional) 
+     * @param personEntityObjectTypeId (optional) 
+     * @param mainAccountID (optional) 
+     * @param newAccountID (optional) 
+     * @return Success
+     */
+    publishMember(contactId: number | undefined, parentId: number | undefined, personEntityObjectTypeId: number | undefined, mainAccountID: number | null | undefined, newAccountID: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/CreateMarketplaceAccount/PublishMember?";
+        if (contactId === null)
+            throw new Error("The parameter 'contactId' cannot be null.");
+        else if (contactId !== undefined)
+            url_ += "contactId=" + encodeURIComponent("" + contactId) + "&";
+        if (parentId === null)
+            throw new Error("The parameter 'parentId' cannot be null.");
+        else if (parentId !== undefined)
+            url_ += "parentId=" + encodeURIComponent("" + parentId) + "&";
+        if (personEntityObjectTypeId === null)
+            throw new Error("The parameter 'personEntityObjectTypeId' cannot be null.");
+        else if (personEntityObjectTypeId !== undefined)
+            url_ += "personEntityObjectTypeId=" + encodeURIComponent("" + personEntityObjectTypeId) + "&";
+        if (mainAccountID !== undefined && mainAccountID !== null)
+            url_ += "mainAccountID=" + encodeURIComponent("" + mainAccountID) + "&";
+        if (newAccountID === null)
+            throw new Error("The parameter 'newAccountID' cannot be null.");
+        else if (newAccountID !== undefined)
+            url_ += "newAccountID=" + encodeURIComponent("" + newAccountID) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processPublishMember(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processPublishMember(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processPublishMember(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -61305,6 +61389,7 @@ export class BranchDto implements IBranchDto {
     ssin!: string | undefined;
     tenantId!: number | undefined;
     useDTOTenant!: boolean;
+    tenantOwner!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -61359,6 +61444,7 @@ export class BranchDto implements IBranchDto {
             this.ssin = _data["ssin"];
             this.tenantId = _data["tenantId"];
             this.useDTOTenant = _data["useDTOTenant"];
+            this.tenantOwner = _data["tenantOwner"];
             this.id = _data["id"];
         }
     }
@@ -61411,6 +61497,7 @@ export class BranchDto implements IBranchDto {
         data["ssin"] = this.ssin;
         data["tenantId"] = this.tenantId;
         data["useDTOTenant"] = this.useDTOTenant;
+        data["tenantOwner"] = this.tenantOwner;
         data["id"] = this.id;
         return data;
     }
@@ -61448,6 +61535,7 @@ export interface IBranchDto {
     ssin: string | undefined;
     tenantId: number | undefined;
     useDTOTenant: boolean;
+    tenantOwner: number | undefined;
     id: number;
 
     [key: string]: any;
@@ -62114,6 +62202,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     branches!: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
     contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner!: number | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
     accountId!: number | undefined;
     shipViaId!: number | undefined;
@@ -62210,6 +62299,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 for (let item of _data["contactPaymentMethods"])
                     this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
             }
+            this.tenantOwner = _data["tenantOwner"];
             if (Array.isArray(_data["entityExtraData"])) {
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
@@ -62312,6 +62402,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             for (let item of this.contactPaymentMethods)
                 data["contactPaymentMethods"].push(item.toJSON());
         }
+        data["tenantOwner"] = this.tenantOwner;
         if (Array.isArray(this.entityExtraData)) {
             data["entityExtraData"] = [];
             for (let item of this.entityExtraData)
@@ -62379,6 +62470,7 @@ export interface ICreateOrEditAccountInfoDto {
     branches: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
     contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner: number | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
     accountId: number | undefined;
     shipViaId: number | undefined;
@@ -62613,6 +62705,7 @@ export class AccountDto implements IAccountDto {
     paymentTermsId!: number | undefined;
     code!: string | undefined;
     currencyId!: number | undefined;
+    currencyCode!: string | undefined;
     currencyName!: string | undefined;
     id!: number;
 
@@ -62688,6 +62781,7 @@ export class AccountDto implements IAccountDto {
             this.paymentTermsId = _data["paymentTermsId"];
             this.code = _data["code"];
             this.currencyId = _data["currencyId"];
+            this.currencyCode = _data["currencyCode"];
             this.currencyName = _data["currencyName"];
             this.id = _data["id"];
         }
@@ -62761,6 +62855,7 @@ export class AccountDto implements IAccountDto {
         data["paymentTermsId"] = this.paymentTermsId;
         data["code"] = this.code;
         data["currencyId"] = this.currencyId;
+        data["currencyCode"] = this.currencyCode;
         data["currencyName"] = this.currencyName;
         data["id"] = this.id;
         return data;
@@ -62807,6 +62902,7 @@ export interface IAccountDto {
     paymentTermsId: number | undefined;
     code: string | undefined;
     currencyId: number | undefined;
+    currencyCode: string | undefined;
     currencyName: string | undefined;
     id: number;
 
@@ -63136,6 +63232,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     isPublished!: boolean;
     disConnectLabel!: string | undefined;
     availableConnections!: ConnectionType[] | undefined;
+    visibility!: string | undefined;
 
     [key: string]: any;
 
@@ -63168,6 +63265,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                 for (let item of _data["availableConnections"])
                     this.availableConnections!.push(ConnectionType.fromJS(item));
             }
+            this.visibility = _data["visibility"];
         }
     }
 
@@ -63198,6 +63296,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             for (let item of this.availableConnections)
                 data["availableConnections"].push(item.toJSON());
         }
+        data["visibility"] = this.visibility;
         return data;
     }
 }
@@ -63213,6 +63312,7 @@ export interface IGetAccountForViewDto {
     isPublished: boolean;
     disConnectLabel: string | undefined;
     availableConnections: ConnectionType[] | undefined;
+    visibility: string | undefined;
 
     [key: string]: any;
 }
@@ -63639,6 +63739,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     branches!: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
     contactPaymentMethods!: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner!: number | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
     accountId!: number | undefined;
     shipViaId!: number | undefined;
@@ -63740,6 +63841,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 for (let item of _data["contactPaymentMethods"])
                     this.contactPaymentMethods!.push(AppContactPaymentMethodDto.fromJS(item));
             }
+            this.tenantOwner = _data["tenantOwner"];
             if (Array.isArray(_data["entityExtraData"])) {
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
@@ -63847,6 +63949,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             for (let item of this.contactPaymentMethods)
                 data["contactPaymentMethods"].push(item.toJSON());
         }
+        data["tenantOwner"] = this.tenantOwner;
         if (Array.isArray(this.entityExtraData)) {
             data["entityExtraData"] = [];
             for (let item of this.entityExtraData)
@@ -63915,6 +64018,7 @@ export interface IAppContactValidationInputDTO {
     branches: TreeNodeOfBranchForViewDto[] | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
     contactPaymentMethods: AppContactPaymentMethodDto[] | undefined;
+    tenantOwner: number | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
     accountId: number | undefined;
     shipViaId: number | undefined;
@@ -113532,6 +113636,7 @@ export class CreateOrUpdateUserInput implements ICreateOrUpdateUserInput {
     setRandomPassword!: boolean;
     organizationUnits!: number[] | undefined;
     code!: string | undefined;
+    contactId!: number | undefined;
 
     [key: string]: any;
 
@@ -113568,6 +113673,7 @@ export class CreateOrUpdateUserInput implements ICreateOrUpdateUserInput {
                     this.organizationUnits!.push(item);
             }
             this.code = _data["code"];
+            this.contactId = _data["contactId"];
         }
     }
 
@@ -113598,6 +113704,7 @@ export class CreateOrUpdateUserInput implements ICreateOrUpdateUserInput {
                 data["organizationUnits"].push(item);
         }
         data["code"] = this.code;
+        data["contactId"] = this.contactId;
         return data;
     }
 }
@@ -113609,6 +113716,7 @@ export interface ICreateOrUpdateUserInput {
     setRandomPassword: boolean;
     organizationUnits: number[] | undefined;
     code: string | undefined;
+    contactId: number | undefined;
 
     [key: string]: any;
 }

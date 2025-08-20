@@ -23,7 +23,8 @@
 
                         <div class="d-flex justify-content-between mb-2" [ngClass]=" singleItemPerRowMode ? 'flex-row' : 'flex-column' ">
                             <div class="jobDetails mb-2">
-                                {{ member?.jobTitle + ( member?.accountName && member?.jobTitle ? ' ' + l('at') + ' ' : ''   ) + member?.accountName }}
+                            {{member?.jobTitle}} {{member?.accountName && member?.jobTitle ? ' at ' :''}} {{ member?.accountName  }}
+                              
                              </div>
                             <div  *ngIf="member.eMailAddress && singleItemPerRowMode"> | </div>
                             <div *ngIf="member.eMailAddress">
@@ -47,7 +48,7 @@
                                 {{'NotActive'| localize }}
                             </span>
                         </div>
-                        <div *ngIf="!member?.userId" >
+                        <!-- <div *ngIf="!member?.userId" >
                             <span class="connected  activeStatus">
                                 <span class="mr-1">
                                     <i
@@ -57,7 +58,7 @@
                                 </span>
                                 {{'ManualContact' | localize }}
                             </span>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
