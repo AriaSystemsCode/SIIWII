@@ -133,6 +133,7 @@ firstName:string=";"
       this.model.editionId= Number(this.accountType) ? Number(this.accountType) :  this.model.editionId;
        this.model.accountTypeId=this.accountType;
        this.model.accountType = this.accountTypeLabel;
+       this.model.relatedTenantId = this.relatedTenantId;
 //this.model.firstName=this.firstName;
 //this.model.lastName=this.lastName;
 

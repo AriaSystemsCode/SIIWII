@@ -89551,6 +89551,7 @@ export interface IUserToken {
 }
 
 export class User implements IUser {
+    relatedTenantId!: number;
     profilePictureId!: string | undefined;
     shouldChangePasswordOnNextLogin!: boolean;
     signInTokenExpireTimeUtc!: moment.Moment | undefined;
@@ -89614,6 +89615,7 @@ export class User implements IUser {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.relatedTenantId = _data["relatedTenantId"];
             this.profilePictureId = _data["profilePictureId"];
             this.shouldChangePasswordOnNextLogin = _data["shouldChangePasswordOnNextLogin"];
             this.signInTokenExpireTimeUtc = _data["signInTokenExpireTimeUtc"] ? moment(_data["signInTokenExpireTimeUtc"].toString()) : <any>undefined;
@@ -89703,6 +89705,7 @@ export class User implements IUser {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["relatedTenantId"] = this.relatedTenantId;
         data["profilePictureId"] = this.profilePictureId;
         data["shouldChangePasswordOnNextLogin"] = this.shouldChangePasswordOnNextLogin;
         data["signInTokenExpireTimeUtc"] = this.signInTokenExpireTimeUtc ? this.signInTokenExpireTimeUtc.toISOString() : <any>undefined;
@@ -89781,6 +89784,7 @@ export class User implements IUser {
 }
 
 export interface IUser {
+    relatedTenantId: number;
     profilePictureId: string | undefined;
     shouldChangePasswordOnNextLogin: boolean;
     signInTokenExpireTimeUtc: moment.Moment | undefined;
@@ -110652,6 +110656,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
     lastName!: string;
     accountType!: string | undefined;
     accountTypeId!: string | undefined;
+    relatedTenantId!: number;
 
     [key: string]: any;
 
@@ -110682,6 +110687,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
             this.lastName = _data["lastName"];
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
+            this.relatedTenantId = _data["relatedTenantId"];
         }
     }
 
@@ -110710,6 +110716,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
         data["lastName"] = this.lastName;
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
+        data["relatedTenantId"] = this.relatedTenantId;
         return data;
     }
 }
@@ -110727,6 +110734,7 @@ export interface IRegisterTenantInput {
     lastName: string;
     accountType: string | undefined;
     accountTypeId: string | undefined;
+    relatedTenantId: number;
 
     [key: string]: any;
 }
