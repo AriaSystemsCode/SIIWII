@@ -3311,10 +3311,9 @@ namespace onetouch.AppSiiwiiTransaction
                                 }
                                 if (detParent.EntityAttachments != null)
                                 {
+                                    detParent.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                                     foreach (var parentAttach in detParent.EntityAttachments)
                                     {
-                                        if (!parentAttach.IsDefault)
-                                            continue;
 
                                         parentAttach.Id = 0;
                                         parentAttach.EntityId = 0;
@@ -3322,7 +3321,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
                                         if (marketplaceItemMain.TenantOwner == AbpSession.TenantId)
                                         {
-                                            string fileName = (new Guid()).ToString().Replace("-","") +"."+parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                            string fileName = System.Guid.NewGuid().ToString() +"."+parentAttach.AttachmentFk.Attachment.Split('.')[1];
                                             MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
                                             parentAttach.AttachmentFk.Attachment = fileName;
                                         }
@@ -3423,14 +3422,28 @@ namespace onetouch.AppSiiwiiTransaction
                                         }
                                         if (det.EntityAttachments != null)
                                         {
+                                            det.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                                             foreach (var parentAttach in det.EntityAttachments)
                                             {
+
                                                 parentAttach.Id = 0;
 
                                                 parentAttach.EntityId = 0;
                                                 parentAttach.EntityFk = null;
                                                 parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
+                                                //I40
+                                                //MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
+                                                if (marketplaceItem.TenantOwner == AbpSession.TenantId)
+                                                {
+                                                    string fileName = System.Guid.NewGuid().ToString() + "." + parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                                    parentAttach.AttachmentFk.Attachment = fileName;
+                                                }
+                                                else
+                                                {
+                                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, null);
+                                                }
+                                                //I40
                                                 parentAttach.AttachmentId = 0;
                                                 parentAttach.AttachmentFk.Id = 0;
                                             }
@@ -6840,6 +6853,7 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                             if (detParent.EntityAttachments != null)
                             {
+                                detParent.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                                 foreach (var parentAttach in detParent.EntityAttachments)
                                 {
                                     parentAttach.Id = 0;
@@ -6847,7 +6861,18 @@ namespace onetouch.AppSiiwiiTransaction
                                     parentAttach.EntityId = 0;
                                     parentAttach.EntityFk = null;
                                     parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
+                                    //I40
+                                    if (marketplaceVariationParent.TenantOwner== AbpSession.TenantId)
+                                    {
+                                        string fileName = System.Guid.NewGuid().ToString() + "." + parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                        MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                        parentAttach.AttachmentFk.Attachment = fileName;
+                                    }
+                                    else
+                                    {
+                                    //I40
+                                        MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, null);
+                                    }
                                     parentAttach.AttachmentId = 0;
                                     parentAttach.AttachmentFk.Id = 0;
                                 }
@@ -6930,6 +6955,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         if (det.EntityAttachments != null)
                         {
+                            det.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                             foreach (var parentAttach in det.EntityAttachments)
                             {
                                 parentAttach.Id = 0;
@@ -6937,7 +6963,18 @@ namespace onetouch.AppSiiwiiTransaction
                                 parentAttach.EntityId = 0;
                                 parentAttach.EntityFk = null;
                                 parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
+                                //I40
+                                if (marketplaceVariationParent.TenantOwner == AbpSession.TenantId)
+                                {
+                                    string fileName = System.Guid.NewGuid().ToString() + "." + parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                    parentAttach.AttachmentFk.Attachment = fileName;
+                                }
+                                else
+                                {
+                                    //I40
+                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, null);
+                                }
                                 parentAttach.AttachmentId = 0;
                                 parentAttach.AttachmentFk.Id = 0;
                             }
