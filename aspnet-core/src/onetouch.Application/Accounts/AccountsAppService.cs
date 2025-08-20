@@ -2827,6 +2827,17 @@ namespace onetouch.Accounts
                                             await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
                                             await _iCreateMarketplaceAccount.PublishMember(savedContactDto.Id, accountMarketplace.Id, presonEntityObjectTypeId, account.Id, accountMarketplace.Id);
                                             await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false, null, null);
+                                            //var tenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                            if (adminUser.RelatedTenantId != null && adminUser.RelatedTenantId != 0)
+                                            {
+
+                                                var marketplaceRelatedAccount = await _appMarketplaceContactRepository.GetAll()
+                                                     .Where(z => z.OwnerId == adminUser.RelatedTenantId && z.IsProfileData && z.ParentId == null).FirstOrDefaultAsync();
+                                                if (marketplaceRelatedAccount != null)
+                                                {
+                                                    await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, marketplaceRelatedAccount.SSIN, false, null, null);
+                                                }
+                                            }
                                         }
 
                                     }
