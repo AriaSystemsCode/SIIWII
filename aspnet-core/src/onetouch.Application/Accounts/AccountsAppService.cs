@@ -2824,7 +2824,7 @@ namespace onetouch.Accounts
                                         var accountMarketplace = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == account.SSIN).FirstOrDefaultAsync();
                                         if (accountMarketplace != null)
                                         {
-                                            await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
+                                            
                                             await _iCreateMarketplaceAccount.PublishMember(savedContactDto.Id, accountMarketplace.Id, presonEntityObjectTypeId, account.Id, accountMarketplace.Id);
                                             await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, savedContactDto.SSIN, false, null, null);
                                             //var tenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
@@ -2835,9 +2835,11 @@ namespace onetouch.Accounts
                                                      .Where(z => z.OwnerId == adminUser.RelatedTenantId && z.IsProfileData && z.ParentId == null).FirstOrDefaultAsync();
                                                 if (marketplaceRelatedAccount != null)
                                                 {
-                                                    await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, marketplaceRelatedAccount.SSIN, false, null, null);
+                                                    await ApplyRelationOnProfile(marketplaceRelatedAccount.Id, null, true, null);
+; ;                                                   // await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(account.SSIN, marketplaceRelatedAccount.SSIN, false, null, null);
                                                 }
                                             }
+                                            await _iCreateMarketplaceAccount.HideAccount(account.SSIN);
                                         }
 
                                     }
