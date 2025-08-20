@@ -134,8 +134,8 @@ namespace onetouch.AppMarketplaceAccounts
                             .Include(e => e.EntityClassifications)
                             .Include(e => e.EntityCategories)
                             .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
-                            .WhereIf(excludeGroupAccount, z => (z.EntityObjectTypeId != groupAccountEntityObjectTypeId.Id) ||
-                            (z.EntityObjectTypeId == groupAccountEntityObjectTypeId.Id && z.OwnerId==AbpSession.TenantId) )
+                           // .WhereIf(excludeGroupAccount, z => (z.EntityObjectTypeId != groupAccountEntityObjectTypeId.Id) ||
+                           // (z.EntityObjectTypeId == groupAccountEntityObjectTypeId.Id && z.OwnerId==AbpSession.TenantId) )
                             .WhereIf(!string.IsNullOrEmpty(input.Filter),
                                 x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
 
@@ -564,7 +564,7 @@ namespace onetouch.AppMarketplaceAccounts
                     var relationships = _appContactRelationshipInfoRepository.GetAll()
                                .Where(z => ((z.RequesterContactSSIN == account.SSIN)
                                || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
-                               (z.SharingLevel == 1 || (z.SharingLevel == 4 && account.SSIN == currentTenantAccountSSIN))).Count(); 
+                               (z.SharingLevel == 1 )).Count(); 
                     //.WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x =>
                     //(x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
                     //(x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
@@ -1555,7 +1555,7 @@ namespace onetouch.AppMarketplaceAccounts
         {
             var input = await _appContactRepository.GetAll().AsNoTracking()
                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
-                                        && x.AccountId == mainAccountID
+                                       // && x.AccountId == mainAccountID
                                         && x.Id == contactId );//&& x.IsProfileData == true
             var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
