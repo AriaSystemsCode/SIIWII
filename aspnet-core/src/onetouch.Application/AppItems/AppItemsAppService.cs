@@ -80,6 +80,7 @@ using Z.Expressions;
 using onetouch.Migrations;
 using Newtonsoft.Json;
 using System.Drawing;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 
 namespace onetouch.AppItems
 {
@@ -6170,8 +6171,44 @@ namespace onetouch.AppItems
                     foreach (var id in excelDto.Code.Split(","))
                     { await SaveImageToColor(id, excelDto); }
                 }
-                if (number == 4 || number == 5)
+                if (number == 4 )
                 {
+                    if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    excelDto.ExcelDto.Actions = "";
+                     
+
+                }
+                if (number == 5)
+                {
+                    // search for parent record and get ScaleSizesOrder
+                    // replace record type as 'Item Variant', and consider as base record
+                    // for length of ScaleSizesOrder[] repeat the record and update code as code+'-'+ ScaleSizesOrder[i] split for '|' 
+                    // remove the base record
+                    int index = excelResultsDTO.ExcelRecords.FindIndex(x => x.Code == excelDto.ParentCode);
+                    //var parent = excelResultsDTO.ExcelRecords.Select(e => e).Where(e => e.Code == excelDto.ParentCode).FirstOrDefault();
+                    if (index > -1)
+                    {
+                        var parent = excelResultsDTO.ExcelRecords[index];
+                        foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
+                        {
+                            var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            
+                            thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+                            thirdItemCopy.RecordType = "Item Variant";
+
+                            thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+                            thirdItemCopy.ExcelDto.RecordType = "Item Variant";
+                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                            thirdItemCopy.ExcelDto.Actions = "";
+                            excelResultsDTO.ExcelRecords.Insert(index+1,thirdItemCopy);
+
+                        }
+                    }
+
+
+
+
                     if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
                     excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
 
