@@ -54344,6 +54344,58 @@ export class SystemTablesServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeGroupId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeGroupId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeGroupId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeGroupId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeGroupId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -63233,6 +63285,9 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     disConnectLabel!: string | undefined;
     availableConnections!: ConnectionType[] | undefined;
     visibility!: string | undefined;
+    availableGroupConnections!: number;
+    availableBusinessConnections!: number;
+    availablePeopleConnections!: number;
 
     [key: string]: any;
 
@@ -63266,6 +63321,9 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                     this.availableConnections!.push(ConnectionType.fromJS(item));
             }
             this.visibility = _data["visibility"];
+            this.availableGroupConnections = _data["availableGroupConnections"];
+            this.availableBusinessConnections = _data["availableBusinessConnections"];
+            this.availablePeopleConnections = _data["availablePeopleConnections"];
         }
     }
 
@@ -63297,6 +63355,9 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                 data["availableConnections"].push(item.toJSON());
         }
         data["visibility"] = this.visibility;
+        data["availableGroupConnections"] = this.availableGroupConnections;
+        data["availableBusinessConnections"] = this.availableBusinessConnections;
+        data["availablePeopleConnections"] = this.availablePeopleConnections;
         return data;
     }
 }
@@ -63313,6 +63374,9 @@ export interface IGetAccountForViewDto {
     disConnectLabel: string | undefined;
     availableConnections: ConnectionType[] | undefined;
     visibility: string | undefined;
+    availableGroupConnections: number;
+    availableBusinessConnections: number;
+    availablePeopleConnections: number;
 
     [key: string]: any;
 }

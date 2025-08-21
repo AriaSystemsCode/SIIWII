@@ -15,6 +15,8 @@ import {  finalize, Observable } from 'rxjs';
 })
 export class ConnectionsTabComponent extends AppComponentBase {
   @Input() accountDataForView :AccountDto;
+  @Input() marketPlaceData :AccountDto;
+  
   @Input() loginAccoutType:string;
   @Input() fromOverview:boolean = false;
 
