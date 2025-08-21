@@ -497,7 +497,7 @@ namespace onetouch.AppMarketplaceAccounts
             {
                 //if(id==93619)
                 //ssin = "Business-000000005537";
-
+                var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                 if (!string.IsNullOrEmpty(ssin))
                 {
                     var marketPlaceAccount = _appMarketplaceContactRepository.GetAll()
@@ -560,7 +560,7 @@ namespace onetouch.AppMarketplaceAccounts
                     //I40
                     //accountDto.Connections = _appContactRepository.GetAll().Count(c => c.TenantId == entity.TenantId && c.PartnerId == id);
                     //int ConnectionCount = _appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
-                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                    //var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                     var relationships = _appContactRelationshipInfoRepository.GetAll()
                                .Where(z => ((z.RequesterContactSSIN == account.SSIN)
                                || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
@@ -764,7 +764,55 @@ namespace onetouch.AppMarketplaceAccounts
                 output.Account.CurrencyId = account.CurrencyId;
                 output.Account.CurrencyCode = account.CurrencyCode;
                 output.Account.CurrencyName = account.CurrencyFk==null?"":account.CurrencyFk.Name;
-                //I40[End]
+                //I40[Start]
+                var groupAccountEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeGroupId();
+                var personId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var businessId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
+                
+                
+                output.AvailableGroupConnections = await _appContactRelationshipInfoRepository.GetAll()
+                           .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                           || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                           (z.SharingLevel == 1)
+                           &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN) > 0 &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0
+                           )// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
+                           .Where(x =>
+                           (x.RequesterContactSSIN == account.SSIN &&
+                           x.RecipientContactTypeId == long.Parse(groupAccountEntityObjectTypeId.ToString())) ||
+                           (x.RecipientContactSSIN == account.SSIN &&
+                           x.RequesterContactTypeId == long.Parse(groupAccountEntityObjectTypeId.ToString()))).CountAsync();
+
+                output.AvailableBusinessConnections = await _appContactRelationshipInfoRepository.GetAll()
+                           .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                           || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId 
+                           &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN) > 0 &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0 &&
+                           (z.SharingLevel == 1))// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
+                           .Where(x =>
+                           (x.RequesterContactSSIN == account.SSIN && x.RecipientContactTypeId == long.Parse(businessId.ToString())) ||
+                           (x.RecipientContactSSIN == account.SSIN && x.RequesterContactTypeId == long.Parse(businessId.ToString()))).CountAsync();
+                output.AvailablePeopleConnections = await _appContactRelationshipInfoRepository.GetAll()
+                   .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                   || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN) > 0 &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0 &&
+                   (z.SharingLevel == 1))// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
+                   .Where(x =>
+                   (x.RequesterContactSSIN == account.SSIN && x.RecipientContactTypeId == long.Parse(personId.ToString())) ||
+                   (x.RecipientContactSSIN == account.SSIN && x.RequesterContactTypeId == long.Parse(personId.ToString()))).CountAsync();
+
+                var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
+                              .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                              || (z.RecipientContactSSIN == account.SSIN)) &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN) > 0 &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0 &&
+                              z.EntityObjectStatusId == activeRelationshipStatusId &&
+                              (z.SharingLevel == 1)).CountAsync();// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
+
+                output.ConnectionCount = relationshipsConut;
                 //I40[End]
                 return output;
             }

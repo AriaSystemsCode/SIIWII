@@ -22,6 +22,9 @@ namespace onetouch.Accounts.Dtos
         public string DisConnectLabel { get; set; }
         public List<ConnectionType> AvailableConnections { get; set; }
         public string Visibility { set; get; }
+        public int AvailableGroupConnections { get; set; }
+        public int AvailableBusinessConnections { get; set; }
+        public int AvailablePeopleConnections { get; set; }
         //I40[End]
 
     }

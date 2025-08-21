@@ -881,7 +881,12 @@ namespace onetouch.Helpers
             }
             return returnString;
         }
-    
+        public async Task<long> GetEntityObjectTypeGroupId()
+        {
+            //var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "PARTNER");
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "GROUP");
+            return obj.Id;
+        }
         //MMT40[End]
     }
 }
