@@ -727,7 +727,6 @@ export class MainImportComponent
                         form.append("guid" + i, this.guids[i]);
                     }
                 };
-                //I44-FE progress not show !
                 this.ProgressModal.show();
                 // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
                 this.progressHeader = "Uploading folder contents";
@@ -1105,7 +1104,6 @@ export class MainImportComponent
         _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
         this._appItemsServiceProxy.validateImportItemData(_ImportItemInputDto)
             .subscribe((result: ImportItemReturnDto[]) => {
-                //I44-BE test failed validate 
                 const hasErrors = Array.isArray(result) && result.length > 0;
 
                 record.fieldsErrors = hasErrors ? result : [];

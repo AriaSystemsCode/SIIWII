@@ -218,7 +218,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.close.emit(true);
   }
 
-   resetRecords(record: any, originalIndex: number) {
+  resetRecords(record: any, originalIndex: number) {
     const resetFlags = (rec: any) => {
       rec._isDataRecord = false;
       rec._isLinkingParent = false;
@@ -232,10 +232,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       rec._isLinkNewColorLookup = false;
       rec._inAction = false;
     };
-  
+
     // reset for current record
     resetFlags(record);
-  
+
     // reset for the one inside excelRecords
     if (
       Array.isArray(this.uploadingResult?.excelRecords) &&
@@ -244,17 +244,17 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     ) {
       resetFlags(this.uploadingResult.excelRecords[originalIndex]);
     }
-  
+
     this.currentActionRecord = null;
     this.LinkToExistingITEM_Ret_Data = null;
     this.LinkToExistingItemColor_Ret_Data = null;
     this.LinkToExistingColorLookup_Ret_Data = null;
     this.activeRecord = null;
     this.isConfirm = false;
-  
+
     delete record._original;
-  } 
-  
+  }
+
   downloadLogFile() {
     this.onDownloadLogFile.emit(true);
   }
@@ -825,16 +825,19 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   confirmLinking(record: any): void {
     let codeValue = "";
     let ColorCodeValue = "";
+    let ColorCodeNameValue = "";
 
 
-    if (record._isLinkingParent || record._isLinkingItemColor)
-      codeValue = this.getRecordValue(record, 'code');
-
-    else if (record._isLinkingColorLookup)
-      ColorCodeValue = this.getRecordValue(record, 'colorCode');
+    codeValue = this.getRecordValue(record, 'code');
+    ColorCodeValue = this.getRecordValue(record, 'colorCode');
+    ColorCodeNameValue = this.getRecordValue(record, 'colorName');
 
 
-    if (((record._isLinkingParent || record._isLinkingItemColor) && codeValue) || (record._isLinkingColorLookup && ColorCodeValue)) {
+
+    if (((record._isLinkingParent || record._isLinkingItemColor) && codeValue) || (record._isLinkingColorLookup && ColorCodeValue)
+      || ((record._isCreateColorLookup) && ColorCodeValue && ColorCodeNameValue)
+
+    ) {
       record.fieldsErrors = [];
       record.errorMessage = "";
       record.status = "Passed";
@@ -843,7 +846,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
 
-    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || record._isCreateColorLookup) {
+    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor) {
       this.isConfirm = true;
       this.ValidateRecord(record);
     }
@@ -1052,7 +1055,12 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.setRecordValue(record, 'code', selectedCode);
   }
   isCodeValid(record: any): boolean {
+    if(record._isLinkingParent || record._isLinkingItemColor)
     return !!record._selectionMade && !!this.getRecordValue(record, 'code');
+
+   else if(record._isLinkingColorLookup)
+    return !!record._selectionMade && !!this.getRecordValue(record, 'colorCode') 
+
   }
   isRestrictedCase(record: any): boolean {
     return record._isLinkingParent || record._isLinkingItemColor || record._isLinkingColorLookup;

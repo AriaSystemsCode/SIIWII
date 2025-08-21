@@ -141,7 +141,9 @@
                       <!--Record Status -->
                       <ul *ngSwitchCase="'Record Status'" style="padding-left: 1rem; margin: 0; list-style-type: none;">
                         <ng-container *ngIf="record.fieldsErrors?.length > 0; else showErrorMessage">
-                          <li *ngFor="let error of record.fieldsErrors">{{ error || '—' }}</li>
+                          <li *ngFor="let error of record.fieldsErrors">
+                            {{ error?.errorMessage ? error.errorMessage : (error || '—') }}
+                          </li>                          
                         </ng-container>
                         <ng-template #showErrorMessage>
                           <li>{{ record.errorMessage || '—' }}</li>
