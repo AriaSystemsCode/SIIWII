@@ -360,10 +360,10 @@ export class MainImportComponent
             this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
 
 
-           /*  this.uploader.onProgressAll = (progress) => {
-                this.progress = progress;
-
-            }; */
+            /*  this.uploader.onProgressAll = (progress) => {
+                 this.progress = progress;
+ 
+             }; */
 
             /* this.uploader.onCompleteAll = () => {
                 this.progress = 100;
@@ -528,77 +528,68 @@ export class MainImportComponent
     uploadStartTime = Date.now();
     uploadedFilesCount = 1;
     callImport(iterationNo: number) {
-        //this.progress=(this.uploadingResult.toList[iterationNo]*100/this.uploadingResult.totalRecords);
         if (iterationNo === 0) {
             this.uploadStartTime = Date.now();
         }
-        var toValue = this.uploadingResult.toList[iterationNo];
-        if (toValue > 1) { toValue = toValue - 1; }
-        //   this.progress = (toValue * 100 / this.uploadingResult.totalRecords);
-        this.progress = Math.ceil((toValue / this.uploadingResult.totalRecords) * 100);
 
+        if (this.imData) {
+            var toValue = this.uploadingResult?.toList[iterationNo];
+            if (toValue > 1) { toValue = toValue - 1; }
+            this.progress = Math.ceil((toValue / this.uploadingResult?.totalRecords) * 100);
+            this.ProgressDetail = this.uploadingResult?.codesFromList[iterationNo] + "[" + this.uploadingResult?.fromList[iterationNo] + "-" + this.uploadingResult?.toList[iterationNo] + "]";
 
-        this.ProgressDetail = this.uploadingResult.codesFromList[iterationNo] + "[" + this.uploadingResult.fromList[iterationNo] + "-" + this.uploadingResult.toList[iterationNo] + "]";
-        /*     this.remainingFiles = this.uploadingResult.totalRecords - toValue;
-    
-    
-            const uploadedSoFar = toValue;
-            this.uploadedFilesCount = Math.floor(uploadedSoFar);
-    
-            const now = Date.now();
-            const elapsedSeconds = (now - this.uploadStartTime) / 1000;
-        
-            if (uploadedSoFar > 0) {
-                const avgTimePerFile = elapsedSeconds / uploadedSoFar;
-               const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
-               const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
-               this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes); 
-            } else {
-                this.estimatedRemainingTime = 0;
+            if (iterationNo < this.uploadingResult?.fromList.length) {
+                this.uploadingResult.from = this.uploadingResult?.fromList[iterationNo]
+                this.uploadingResult.to = this.uploadingResult?.toList[iterationNo]
+
+                /*   this.uploadingResult.excelRecords = this.uploadindResultExcelList.slice(
+                      this.uploadingResult.from - 2, this.uploadingResult.to - 2 + 1);
+   */
             }
-     */
+        }
 
-        if (iterationNo < this.uploadingResult.fromList.length) {
-            this.uploadingResult.from = this.uploadingResult.fromList[iterationNo]
-            this.uploadingResult.to = this.uploadingResult.toList[iterationNo]
+        if (Array.isArray(this.uploadingResult.excelRecords)) {
+            this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map(item => {
+                return item instanceof AppItemtExcelRecordDTO
+                    ? item
+                    : AppItemtExcelRecordDTO.fromJS(item);
+            });
+        }
 
-            this.uploadingResult.excelRecords = null;
-            this.uploadingResult.excelRecords = this.uploadindResultExcelList.slice(
-                this.uploadingResult.from - 2, this.uploadingResult.to - 2 + 1);
-            this.importServiceProxy
-                .saveFromExcel(this.uploadingResult)
-                .pipe(finalize(() => {
 
-                    if (iterationNo == this.uploadingResult.fromList.length - 1) {
-                        this.spinnerService.hide()
-                        this.ProgressModal.hide();
-                    }
+        //I44-BE gives internal error !
+        this.importServiceProxy
+            .saveFromExcel(this.uploadingResult)
+            .pipe(finalize(() => {
 
-                }))
-                .subscribe((result) => {
+                if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
+                    this.spinnerService.hide()
+                    this.ProgressModal.hide();
+                }
 
-                    if (iterationNo == this.uploadingResult.fromList.length - 1) {
-                        this.logFileUrl = result.excelLogPath;
-                        this.logFileName = result.excelLogFileName;
+            }))
+            .subscribe((result) => {
 
+                if (this.imData && iterationNo == this.uploadingResult.fromList.length - 1) {
+                    this.logFileUrl = result.excelLogPath;
+                    this.logFileName = result.excelLogFileName;
+
+                    this.successfullyImportModal.show(this.importType);
+                }
+                else {
+                    this.callImport(iterationNo + 1);
+                }
+            }
+                , (error) => {
+                    if (this.imData && iterationNo == this.uploadingResult.fromList.length - 1) {
                         this.successfullyImportModal.show(this.importType);
                     }
                     else {
                         this.callImport(iterationNo + 1);
                     }
                 }
-                    , (error) => {
-                        //console.log("error happen in iteration "+iterationNo.toString() + " From:"+this.uploadingResult.from + " To: "+ this.uploadingResult.to )
-                        //this.callImport(iterationNo+1);
-                        if (iterationNo == this.uploadingResult.fromList.length - 1) {
-                            this.successfullyImportModal.show(this.importType);
-                        }
-                        else {
-                            this.callImport(iterationNo + 1);
-                        }
-                    }
-                );
-        }
+            );
+
     }
 
     createUploader(
@@ -628,6 +619,7 @@ export class MainImportComponent
     }
 
     goPrevious() {
+        //i44 records when previous !
         if (this.currentStep.stepNumber - 1 >= 0)
             this.currentStep = this.importStepsInfo[this.currentStep.stepNumber - 1];
         else

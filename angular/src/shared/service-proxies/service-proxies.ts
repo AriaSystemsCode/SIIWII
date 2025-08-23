@@ -66325,6 +66325,7 @@ export enum AttachmentType {
     Image = 1,
     Video = 2,
     Document = 3,
+    ImportImage = 4,
 }
 
 export class SycAttachmentCategory implements ISycAttachmentCategory {
@@ -76321,8 +76322,8 @@ export class ImportItemInputDto implements IImportItemInputDto {
     productDescription!: string;
     productClassificationCode!: string | undefined;
     productCategoryCode!: string | undefined;
-    price!: string | undefined;
-    priceCurrencyCode!: string | undefined;
+    price!: string;
+    priceCurrencyCode!: string;
     imageType!: string | undefined;
     colorCode!: string | undefined;
     colorName!: string | undefined;
@@ -76480,8 +76481,8 @@ export interface IImportItemInputDto {
     productDescription: string;
     productClassificationCode: string | undefined;
     productCategoryCode: string | undefined;
-    price: string | undefined;
-    priceCurrencyCode: string | undefined;
+    price: string;
+    priceCurrencyCode: string;
     imageType: string | undefined;
     colorCode: string | undefined;
     colorName: string | undefined;

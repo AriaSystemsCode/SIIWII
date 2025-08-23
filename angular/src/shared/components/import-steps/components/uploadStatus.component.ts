@@ -180,12 +180,17 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     var _text = "";
     _text = "All " + ImportTypes[this.importType] + " Failed , can not import.";
 
+    
+    this.uploadingResult.totalPassedRecords = this.records.filter(r=>r.status.toLowerCase()=='passed')?.length;
+    this.uploadingResult.totalFailedRecords = this.records.filter(r => r.status.toLowerCase() == 'failed')?.length;
+
+
     if (this.uploadingResult.totalPassedRecords == 0) {
       Swal.fire({
         title: "",
         text: _text,
         icon: "warning",
-        showCancelButton: true,
+        showCancelButton: false,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Ok",
@@ -202,9 +207,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       });
 
       this.updatedRecords.emit(this.uploadingResult);
-
-      // this.uploadingResult.totalPassedRecords = this.uploadingResult.excelRecords.filter(r => r.status.toLowerCase() === 'passed').length;
-      // this.uploadingResult.totalFailedRecords = this.uploadingResult.excelRecords.filter(r => r.status.toLowerCase() === 'failed').length;
 
       this.totalFailedRecords.emit(
         this.uploadingResult.totalFailedRecords
@@ -1056,11 +1058,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.setRecordValue(record, 'code', selectedCode);
   }
   isCodeValid(record: any): boolean {
-    if(record._isLinkingParent || record._isLinkingItemColor)
-    return !!record._selectionMade && !!this.getRecordValue(record, 'code');
+    if (record._isLinkingParent || record._isLinkingItemColor)
+      return !!record._selectionMade && !!this.getRecordValue(record, 'code');
 
-   else if(record._isLinkingColorLookup)
-    return !!record._selectionMade && !!this.getRecordValue(record, 'colorCode') 
+    else if (record._isLinkingColorLookup)
+      return !!record._selectionMade && !!this.getRecordValue(record, 'colorCode')
 
   }
   isRestrictedCase(record: any): boolean {
