@@ -5919,6 +5919,27 @@ namespace onetouch.AppItems
                         ErrorType = "Stopper"
                     });
                 }
+
+                if (itemExcelDto.RecordType != "Item Variant" && string.IsNullOrEmpty(itemExcelDto.ColorCode))
+                {
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Color Code cannot be empty.",
+                        ErrorType = "Stopper"
+                    });
+                }
+
+                if (itemExcelDto.RecordType != "Item Variant" && string.IsNullOrEmpty(itemExcelDto.ColorName))
+                {
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Color Name cannot be empty.",
+                        ErrorType = "Stopper"
+                    });
+                }
+
                 //if (input.Where(r => r.Code == itemExcelDto.Code).ToList().Count() > 1)
                 //{
                 //    returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = "Code: must be used Once." });

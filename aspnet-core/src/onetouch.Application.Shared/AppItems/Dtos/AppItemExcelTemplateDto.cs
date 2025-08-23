@@ -79,19 +79,27 @@ namespace onetouch.AppItems.Dtos
     {
         [Required(ErrorMessage = "Product Type must have a value.")]
         public string ProductType { get; set; }
+
         [Required(ErrorMessage = "Record Type must have a value.")]
         //[Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
         [RecordTypeValidation]
         public string RecordType{ set; get; }
+
         [Required(ErrorMessage = "Code must have a value.")]
         public string Code { set; get; }
+
         [Required(ErrorMessage = "Name must have a value.")]
         public string Name { set; get; }
         [Required(ErrorMessage = "Product Description must have a value.")]
         public string ProductDescription { set; get; }
         public string ProductClassificationCode { set; get; }
         public string ProductCategoryCode { set; get; }
+
+        //[Range(1, long.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        [Required(ErrorMessage = "Price must have a value.")]
         public string Price { set; get; }
+
+        [Required(ErrorMessage = "Currency must have a value.")]
         public string PriceCurrencyCode { set; get; }
         public string ImageType { set; get; }
         public string ColorCode { set; get; }
@@ -116,6 +124,7 @@ namespace onetouch.AppItems.Dtos
         public string PriceB { set; get; }
         public string PriceC { set; get; }
         public string PriceD { set; get; }
+
         public string ParentCode  { set; get; }
         public string ProductClassificationDescription { set; get; }
         public string ProductCategoryDescription { set; get; }
