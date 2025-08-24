@@ -25,6 +25,7 @@ namespace onetouch.AppContacts
         public DateTime RelationshipCreationDate { set; get; }
         public DateTime RelationshipStartDate { set; get; }
         public DateTime? RelationshipEndDate { set; get; }
+        public bool ConsiderAsTeamMember { set; get; }
 
     }
 }

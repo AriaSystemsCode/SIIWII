@@ -1400,6 +1400,13 @@ namespace onetouch.AppMarketplaceAccounts
                             {
                                 relation.SharingLevel = extrDataSharing.AttributeValue == "Public" ? 1 : 3;
                             }
+                            //member
+                            var extrDataMember = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 609).FirstOrDefault();
+                            if (extrDataMember != null)
+                            {
+                                relation.ConsiderAsTeamMember = extrDataMember.AttributeValue.ToUpper().TrimEnd() =="TRUE";
+                            }
+                            //member
                             var extrDataConnectedLabel = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                             if (extrDataConnectedLabel != null)
                                 relation.Name = relation.RequesterContactName + " " + extrDataConnectedLabel.AttributeValue.TrimEnd() + " " + relation.RecipientContactName;
