@@ -344,6 +344,7 @@ export class AccountsComponent
                 account.status = false;
                 account.connectionName  = "";
                 account.avaliableConnectionName = res[0].connectLabel
+                account.availableConnections = res
             });
     }
 
@@ -410,9 +411,8 @@ export class AccountsComponent
 
     createRelation(account,status:boolean = false) {
         this.showMainSpinner();
-
         this._accountsServiceProxy
-            .applyRelationOnProfile(account.account.id, undefined,account.availableConnections[0].defaultVisibility =='Public'?true:false,account.availableConnections[0].connectionEntityId)
+            .applyRelationOnProfile(account.account.account.id, undefined,account.relation.defaultVisibility =='Public'?true:false,account.relation.connectionEntityId)
             .pipe(
                 finalize(() => {
                     ;
@@ -420,11 +420,12 @@ export class AccountsComponent
                 })
             )
             .subscribe((result: string) => {
-                let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.id);
+                let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.account.id);
                 if (accountIndx >= 0) {
-                    this.accounts[accountIndx] = account;
+                    this.accounts[accountIndx] = account.account;
                     this.accounts[accountIndx].avaliableConnectionName = "";
                     this.accounts[accountIndx].connectionName = this.l(result);
+                    this.accounts[accountIndx].availableConnections[0].connectLabel = this.l(result);
                 }
             });
     }

@@ -17,7 +17,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Output() deleteMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
     @Input() fromMarketplace;
-    @Output() _createRelation : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
+    @Output() _createRelation : EventEmitter<any> = new EventEmitter<any>()
+
 
     isRecordOwner : boolean
     attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
@@ -70,8 +71,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         }
     }
 
-    createRelation(){
-      this._createRelation.emit(this.account);
+    createRelation(relationType){
+      this._createRelation.emit({account:this.account,relation:relationType});
     }
     getFormattedConnectionName(connection: string): string | null {
         let raw: string | undefined;
@@ -107,6 +108,22 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         this.disconnectMe.emit(account);
    
       }
+
+      private readonly ICONS: Record<string, string> = {
+        FOLLOW: 'assets/accounts/FOLLOW.png',
+        CONNECT: 'assets/accounts/CONNECT.png',
+        EMPLOY: 'assets/accounts/CONNECT.png',
+        EMPLOYEE: 'assets/accounts/EMPLOYEE.png',
+        JOIN: 'assets/accounts/JOIN.png',
+      };
+      getConnectionIcon(label?: string): string {
+        const t = (label || '').toUpperCase();
+        for (const key of Object.keys(this.ICONS)) {
+          if (t.includes(key)) return this.ICONS[key];
+        }
+        return 'assets/accounts/CONNECT.png'; // fallback
+      }
+      
       makeRelationPrivatePublic(account,status){
           this.showMainSpinner();
         
