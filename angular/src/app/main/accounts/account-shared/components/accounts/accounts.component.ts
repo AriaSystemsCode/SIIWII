@@ -423,9 +423,9 @@ export class AccountsComponent
                 let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.account.id);
                 if (accountIndx >= 0) {
                     this.accounts[accountIndx] = account.account;
-                    this.accounts[accountIndx].avaliableConnectionName = "";
+                    this.accounts[accountIndx].avaliableConnectionName = '';
                     this.accounts[accountIndx].connectionName = this.l(result);
-                    this.accounts[accountIndx].availableConnections[0].connectLabel = this.l(result);
+                    this.accounts[accountIndx].availableConnections.length = 0;
                 }
             });
     }

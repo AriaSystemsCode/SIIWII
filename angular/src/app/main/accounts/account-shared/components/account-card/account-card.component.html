@@ -149,7 +149,7 @@
                         </span>
 
                         <span style="width: 100%; " class="mt-3"
-                            *ngIf="(account?.availableConnections?.length > 0 && fromMarketplace) || (!fromMarketplace
+                            *ngIf="(account?.availableConnections?.length > 0 && fromMarketplace && account?.avaliableConnectionName) || (!fromMarketplace
                              && !account.connectionName && account.avaliableConnectionName)">
 
                             <!-- Guard + alias once -->
