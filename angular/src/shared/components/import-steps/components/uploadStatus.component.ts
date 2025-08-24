@@ -685,6 +685,23 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   LinkToNewParentItemCodeFromAssociatedData(record) {
     record._isLinkNewParent = true;
+    // Scroll after DOM updated
+    setTimeout(() => {
+      const container = this.codeInputContainers.find(
+        (el: ElementRef) => el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
+
 
   }
 
@@ -692,11 +709,44 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   LinkToNewItemVariantCodeFromAssociatedData(record) {
     record._isLinkNewItemColor = true;
 
+    // Scroll after DOM updated
+    setTimeout(() => {
+      const container = this.codeInputContainers.find(
+        (el: ElementRef) => el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
+
+
   }
 
   LinkToNewColorLookupCodeFromAssociatedData(record) {
     record._isLinkNewColorLookup = true;
 
+    setTimeout(() => {
+      const container = this.colorCodeInputContainers.find(
+        (el: ElementRef) => el.nativeElement.getAttribute('data-record-id') == record.id
+      );
+
+      if (container) {
+        container.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const inputEl: HTMLInputElement = container.nativeElement.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    }, 100);
   }
 
 
@@ -824,6 +874,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.searchItemCode.emit(payload);
   }
 
+
+  onAssCodeInputChange(record: any, value: string) {
+    //i44 open dropdowm with ass codes (3 cases)
+
+  }
   confirmLinking(record: any): void {
     let codeValue = "";
     let ColorCodeValue = "";
@@ -989,6 +1044,19 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Color Name': 'Example: Black',
   };
 
+  exampleTextsForLinkToNewParentFromAssociatedData: { [key: string]: string } = {
+    'Code': 'Valid parent item code from associated data'
+  };
+
+
+  exampleTextsForLinkToNewItemVariantCodeFromAssociatedData: { [key: string]: string } = {
+    'Code': 'Valid item-color code from associated data'
+  };
+
+  exampleTextsForLinkToNewColorLookupCodeFromAssociatedData: { [key: string]: string } = {
+    'Color Code': 'Valid color lookup code from associated data'
+  };
+
   requiredColumnsForCreateNewParent: string[] = [
     'Code',
     'Name',
@@ -1032,15 +1100,20 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-
-  getExampleTextForCreateNewCase(record: any, columnName: string): string {
+  getExampleTextForCases(record: any, columnName: string): string {
     const exampleTextsMap = {
       [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.exampleTextsForCreateNewParent,
       [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.exampleTextsForCreateNewItemColor,
-      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.exampleTextsForCreateNewColorLookup
+      [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.exampleTextsForCreateNewColorLookup,
+      [this.UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData]: this.exampleTextsForLinkToNewParentFromAssociatedData,
+      [this.UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData]: this.exampleTextsForLinkToNewItemVariantCodeFromAssociatedData,
+      [this.UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData]: this.exampleTextsForLinkToNewColorLookupCodeFromAssociatedData
+
     };
+
     return exampleTextsMap[record.action]?.[columnName] || '';
   }
+
 
 
   isRequiredColumnForCreateNewCase(record: any, columnName: string): boolean {
@@ -1053,19 +1126,19 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   onCodeSelected(record: any, selectedCode: string) {
+    //i44 call this in 3 cases and bind data 
     record._selectionMade = true;
     this.setRecordValue(record, 'code', selectedCode);
   }
   isCodeValid(record: any): boolean {
-    if (record._isLinkingParent || record._isLinkingItemColor)
+    if (record._isLinkingParent || record._isLinkingItemColor ||  record._isLinkNewParent || record._isLinkNewItemColor )
       return !!record._selectionMade && !!this.getRecordValue(record, 'code');
 
-    else if (record._isLinkingColorLookup)
+    else if (record._isLinkingColorLookup || record._isLinkNewColorLookup )
       return !!record._selectionMade && !!this.getRecordValue(record, 'colorCode')
-
   }
   isRestrictedCase(record: any): boolean {
-    return record._isLinkingParent || record._isLinkingItemColor || record._isLinkingColorLookup;
+    return record._isLinkingParent || record._isLinkingItemColor || record._isLinkingColorLookup ||   record._isLinkNewParent || record._isLinkNewItemColor || record._isLinkNewColorLookup;
   }
 
   isCreateCase(record: any): boolean {

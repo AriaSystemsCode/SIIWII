@@ -124,8 +124,6 @@ export class MainImportComponent
         private _importService: MainImportService,
         private _downloadService: FileDownloadService,
         private injector: Injector,
-        //I44-FE remove _appItemsServiceProxy
-        private _appItemsServiceProxy: AppItemsServiceProxy,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
         super(injector);
@@ -619,7 +617,6 @@ export class MainImportComponent
     }
 
     goPrevious() {
-        //i44 records when previous !
         if (this.currentStep.stepNumber - 1 >= 0)
             this.currentStep = this.importStepsInfo[this.currentStep.stepNumber - 1];
         else
@@ -1094,7 +1091,7 @@ export class MainImportComponent
     onValidateRecord(record) {
         let _ImportItemInputDto: ImportItemInputDto = new ImportItemInputDto();
         _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
-        this._appItemsServiceProxy.validateImportItemData(_ImportItemInputDto)
+        this.importServiceProxy.validateImportItemData(_ImportItemInputDto)
             .subscribe((result: ImportItemReturnDto[]) => {
                 const hasErrors = Array.isArray(result) && result.length > 0;
 

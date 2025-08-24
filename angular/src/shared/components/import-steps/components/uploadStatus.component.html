@@ -143,7 +143,7 @@
                         <ng-container *ngIf="record.fieldsErrors?.length > 0; else showErrorMessage">
                           <li *ngFor="let error of record.fieldsErrors">
                             {{ error?.errorMessage ? error.errorMessage : (error || '—') }}
-                          </li>                          
+                          </li>
                         </ng-container>
                         <ng-template #showErrorMessage>
                           <li>{{ record.errorMessage || '—' }}</li>
@@ -238,7 +238,7 @@
                                                       !getRecordValue(record, 'productDescription')
                                    }" />
                             <small class="text-danger" *ngIf="!getRecordValue(record, 'productDescription')">
-                              {{ getExampleTextForCreateNewCase(record, column.name) }}
+                              {{ getExampleTextForCases(record, column.name) }}
                             </small>
                           </ng-container>
 
@@ -252,7 +252,7 @@
                                                         !getRecordValue(record, 'code')
                                      }" />
                               <small class="text-danger" *ngIf="!getRecordValue(record, 'code')">
-                                {{ getExampleTextForCreateNewCase(record, column.name) }}
+                                {{ getExampleTextForCases(record, column.name) }}
                               </small>
                             </ng-container>
 
@@ -265,7 +265,7 @@
                                                           !getRecordValue(record, 'colorCode')
                                        }" />
                                 <small class="text-danger" *ngIf="!getRecordValue(record, 'colorCode')">
-                                  {{ getExampleTextForCreateNewCase(record, column.name) }}
+                                  {{ getExampleTextForCases(record, column.name) }}
                                 </small>
                               </ng-container>
                             </ng-template>
@@ -280,7 +280,7 @@
                                                             !getRecordValue(record, 'parentCode')
                                          }" />
                                   <small class="text-danger" *ngIf="!getRecordValue(record, 'parentCode')">
-                                    {{ getExampleTextForCreateNewCase(record, column.name) }}
+                                    {{ getExampleTextForCases(record, column.name) }}
                                   </small>
                                 </div>
                               </ng-container>
@@ -296,7 +296,7 @@
                                                           !getRecordValue(record, 'price')
                                        }" />
                                 <small class="text-danger" *ngIf="!getRecordValue(record, 'price')">
-                                  {{ getExampleTextForCreateNewCase(record, column.name) }}
+                                  {{ getExampleTextForCases(record, column.name) }}
                                 </small>
                                 <small class="text-danger" *ngIf="isPriceFieldInvalid(record, column.name)">
                                   Please enter a valid number for Price.
@@ -314,7 +314,7 @@
                                      }" />
                               <small class="text-danger" *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
                                             !getRecordValue(record, mapColumnNameToKey(column.name))">
-                                {{ getExampleTextForCreateNewCase(record, column.name) }}
+                                {{ getExampleTextForCases(record, column.name) }}
                               </small>
                             </ng-template>
 
@@ -331,16 +331,44 @@
                           </ng-container>
 
                           <ng-template #normalTextInput>
+
+                            <ng-container
+                              *ngIf="column.name === 'Code' && (record._isLinkNewParent ||  record._isLinkNewItemColor) ">
+                              <input #codeInputContainer  [attr.data-record-id]="record.id"
+                              class="position-relative"  type="text" class="form-control"
+                                [ngModel]="getRecordValue(record, 'code')"
+                                (ngModelChange)="setRecordValue(record, 'code', $event)" [ngClass]="{
+                                        'border-danger': !getRecordValue(record, 'code')
+                                     }" (ngModelChange)="onAssCodeInputChange(record, $event)" />
+                              <small class="text-danger" *ngIf="!getRecordValue(record, 'code')">
+                                {{ getExampleTextForCases(record, column.name) }}
+                              </small>
+                            </ng-container>
+
+
+                            <ng-container *ngIf="column.name === 'Color Code' && record._isLinkNewColorLookup">
+                              <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                #colorCodeInputContainer [ngModel]="getRecordValue(record, 'colorCode')"
+                                (ngModelChange)="onAssCodeInputChange(record, $event)" [ngClass]="{
+                                       'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
+                                                        !getRecordValue(record, 'colorCode')
+                                     }" />
+                              <small class="text-danger" *ngIf="!getRecordValue(record, 'colorCode')">
+                                {{ getExampleTextForCases(record, column.name) }}
+                              </small>
+                            </ng-container>
+
+
                             <input type="text" class="form-control" style="width: fit-content;"
                               [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
                               (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                              [disabled]="!(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor))"
+                              [disabled]="!(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor || record._isLinkNewParent ||  record._isLinkNewItemColor))"
                               [ngClass]="{
                                      'link-parent-input': column.name === 'Code' && 
-                                                          (record._isLinkingParent || record._isLinkingItemColor)
+                                                          (record._isLinkingParent || record._isLinkingItemColor  || record._isLinkNewParent ||  record._isLinkNewItemColor)
                                    }" [hidden]="
-                                     (column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor)) ||
-                                     (column.name === 'Color Code' && record._isLinkingColorLookup) ||
+                                     (column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor  || record._isLinkNewParent ||  record._isLinkNewItemColor)) ||
+                                     (column.name === 'Color Code' &&(record._isLinkingColorLookup ||  record._isLinkNewColorLookup )) ||
                                      (column.name === 'Image Folder Name')
                                    " />
                           </ng-template>
