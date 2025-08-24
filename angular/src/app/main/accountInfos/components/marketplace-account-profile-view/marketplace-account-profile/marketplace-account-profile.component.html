@@ -170,7 +170,7 @@
       </p-tabPanel>
 
       <p-tabPanel header="Connections" *ngIf="accountDataForView">
-        <app-connections-tab [accountDataForView]="accountDataForView"
+        <app-connections-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData"
           [loginAccoutType]="loginAccoutType"></app-connections-tab>
       </p-tabPanel>
 

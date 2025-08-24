@@ -9,7 +9,7 @@
                             <div *ngIf="accounts?.length > 0 && accountsTypes?.length > 0 && !fromOverview" class="d-flex align-items-center flex-wrap">
                                 <!-- All Button -->
                                 <button
-                                  type="button"
+                                  type="button" *ngIf="marketPlaceData?.connectionCount >0"
                                   class="btn btn-sm mx-1"
                                   [ngClass]="{ 'btPurble': connectionTypeId === 0, 'btn-outline-secondary': connectionTypeId !== 0 }"
                                   (click)="setConnectionType(0)">
@@ -19,10 +19,8 @@
                               
                                 <!-- Account Type Buttons -->
                                 <ng-container *ngFor="let accountsType of accountsTypes; let i = index">
-                                  <ng-container *ngIf="accountsType.code?.toUpperCase() !== 'GROUP' || 
-                                                       (accountsType.code?.toUpperCase() === 'GROUP' && accountDataForView?.accountType?.toUpperCase() !== 'GROUP' && loginAccoutType?.toUpperCase() !== 'GROUP')">
-                                    
-                                    <button
+                  
+                                    <button *ngIf="(marketPlaceData?.availableBusinessConnections && accountsType.code?.toUpperCase() === 'BUSINESS') ||  (marketPlaceData?.availablePeopleConnections && accountsType.code?.toUpperCase() === 'PERSONAL') || (marketPlaceData?.availableGroupConnections && accountsType.code?.toUpperCase() === 'GROUP')"
                                       type="button"
                                       class="btn btn-sm mx-1"
                                       [ngClass]="{ 
@@ -41,7 +39,7 @@
                                     <span
                                       class="separator"
                                       *ngIf="i < accountsTypes.length - 1 ">|</span>
-                                  </ng-container>
+                                 
                                 </ng-container>
                               </div>
                               
