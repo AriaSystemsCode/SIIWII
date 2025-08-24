@@ -294,6 +294,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             contact.selectContactPhoneNumber = contact.contactPhoneNumber || contact.selectContactPhoneNumber;
             contact.selectedContactEmail = contact.contactEmail || contact.selectedContactEmail;
         }
+        this.isValidForm();
+
     }
 
 
@@ -582,6 +584,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         resolve();
                     }, () => {
                         this.hideMainSpinner();
+                    this.isValidForm();
                         resolve();
                     });
             } else {
@@ -701,10 +704,43 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
             if ((this.appTransactionsForViewDto?.buyerCompanySSIN == '' || this.appTransactionsForViewDto?.buyerCompanySSIN == null) && this.activeTab == this.transactionCartoccordionTabs.BuyerContactInfo) {
-                (isValid) = (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') && (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '') &&
-
-                    (this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany == this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) ? this.comNew == false :
-                        this.comNew == true) && ((this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany != this.companeyNames?.find(x => x.accountSSIN != this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN)) && (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name == null) ? this.conNew == false : (this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany == this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name != null || this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name != '')) ? this.conNew == false : this.conNew == true)
+                const c = this.appTransactionsForViewDto?.appTransactionContacts?.[this.appTransactionContactsIndex];
+                const inBuyerCreateFlow =
+                  (!this.appTransactionsForViewDto?.buyerCompanySSIN || this.appTransactionsForViewDto?.buyerCompanySSIN === '') &&
+                  this.activeTab === this.transactionCartoccordionTabs.BuyerContactInfo;
+                
+                const norm = (s?: string) => (s ?? '').trim(); 
+                
+                const hasCompany = !!norm(c?.selectedCompany?.name);
+                const hasBranch  = !!norm(c?.selectedBranch?.name);
+                
+                if (!inBuyerCreateFlow) {
+                  isValid = hasCompany && hasBranch;
+                } else {
+                
+                  const companies = this.companeyNames ?? [];
+                  const selectedCompanySSIN = c?.selectedCompany?.accountSSIN ?? c?.companySSIN ?? '';
+                  const isExistingCompany = companies.some(x => x.accountSSIN === selectedCompanySSIN);
+                
+              
+                  const companyFlagOk = (this.comNew === !isExistingCompany);
+                
+                 
+                  const contacts = this.allContacts ?? []; 
+                  const contactName = norm(c?.selectedContact?.name);
+                  const hasContactName = contactName.length > 0;
+                
+                  const selectedContactSSIN = c?.selectedContact?.ssin ?? c?.contactSSIN ?? '';
+                  const isExistingContact = selectedContactSSIN
+                    ? contacts.some(p => p.ssin === selectedContactSSIN)              
+                    : (hasContactName && contacts.some(p => norm(p.name) === contactName)); 
+                
+             
+                  const contactFlagOk = (this.conNew === (hasContactName ? !isExistingContact : false));
+                
+                  isValid = hasCompany && hasBranch && companyFlagOk && contactFlagOk;
+                }
+                
             } else {
 
 
@@ -827,6 +863,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             .pipe(finalize(() => {
               this.companyLoading = false;
               this.cdr.markForCheck(); // OnPush refresh
+        this.isValidForm();
+
             }))
             .subscribe((res: any) => {
               this.companeyNames = res?.items ?? [];
