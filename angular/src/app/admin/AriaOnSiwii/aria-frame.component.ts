@@ -20,13 +20,10 @@ export class AriaIframeComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
-    
-        const externalUrl = 'https://ariaonline.net/RDWeb/webclient'; // Replace with your ERP site URL
-        setTimeout(() => {
-            this.erpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(externalUrl);
-
-          }, 500); // 10s
-    }
+        const externalUrl = 'https://ariaonline.net/RDWeb/webclient/index.html';
+        this.erpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(externalUrl);
+      }
+      
     openAriaNewTab(){
         let bt = 'app/admin/AriaSystem'
         window.open(bt);
