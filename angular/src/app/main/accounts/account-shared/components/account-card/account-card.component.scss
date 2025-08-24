@@ -171,3 +171,13 @@ a.btn {
 // .extra-padding-bottom {
 //     padding-bottom: 50px !important;
 // }
+
+
+
+::ng-deep {
+    .dropdown-item.active, .dropdown-item:active{
+        background-color: #4a0d4a !important;
+        color: white !important;
+        padding: 5px 10px !important;
+    }
+}

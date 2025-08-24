@@ -88,9 +88,9 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   }
 
 
-  createRelation(status:boolean = false) {
+  createRelation(relation, status: boolean = false) {
     this._AccountsServiceProxy
-      .applyRelationOnProfile(this.accountId, undefined,status,this.marketPlaceData.availableConnections[0].connectionEntityId)
+      .applyRelationOnProfile(this.accountId, undefined, relation.defaultVisibility == 'Public' ? true : false, relation.connectionEntityId)
       .pipe(
         finalize(() => {
           ;
@@ -102,53 +102,70 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
 
         this.marketPlaceData.avaliableConnectionName = "";
         this.marketPlaceData.connectionName = this.l(result);
-
+        this.marketPlaceData.availableConnections[0].connectLabel = this.l(result);
       });
   }
 
+
+
   getFormattedConnectionName(connection: string): string | null {
     let raw: string | undefined;
-  
+
     if (connection === 'connectionName') {
       raw = this.marketPlaceData?.connectionName?.trim();
     } else if (connection === 'avaliableConnectionName') {
       raw = this.marketPlaceData?.avaliableConnectionName?.trim();
-    }else{
+    } else {
       raw = this.marketPlaceData?.disConnectLabel?.trim();
     }
-  
+
     if (!raw) return null;
-  
+
     // If it's 'Follow', return as-is
     if (raw === 'Follow') return 'Follow';
     if (raw === 'Connect') return 'Connect';
     if (raw === 'Join') return 'Join';
     if (raw === 'Employ') return 'Employ';
-  
+
     // Format only if starts with 'MPAction'
     if (raw.startsWith('MPAction')) {
       const label = raw.replace('MPAction', '');
       return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
     }
-  
+
     // For anything else, return null (or raw if you prefer)
     return null;
   }
   disconnect(): void {
-      
+
     this.showMainSpinner();
     this._AccountsServiceProxy
-        .disconnect(this.marketPlaceData.account.id)
-        .pipe(
-            finalize(() => {
-                this.hideMainSpinner();
-            })
-        )
-        .subscribe((res) => {
-            this.notify.success(this.l("SuccessfullyDisconnected"));
-            this.marketPlaceData.status = false;
-            this.marketPlaceData.connectionName  = "";
-            this.marketPlaceData.avaliableConnectionName = res[0].connectLabel
-        });
-}
+      .disconnect(this.marketPlaceData.account.id)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+        })
+      )
+      .subscribe((res) => {
+        this.notify.success(this.l("SuccessfullyDisconnected"));
+        this.marketPlaceData.status = false;
+        this.marketPlaceData.connectionName = "";
+        this.marketPlaceData.avaliableConnectionName = res[0].connectLabel
+        this.marketPlaceData.availableConnections = res
+      });
+  }
+  private readonly ICONS: Record<string, string> = {
+    FOLLOW: 'assets/accounts/FOLLOW.png',
+    CONNECT: 'assets/accounts/CONNECT.png',
+    EMPLOY: 'assets/accounts/CONNECT.png',
+    EMPLOYEE: 'assets/accounts/EMPLOYEE.png',
+    JOIN: 'assets/accounts/JOIN.png',
+  };
+  getConnectionIcon(label?: string): string {
+    const t = (label || '').toUpperCase();
+    for (const key of Object.keys(this.ICONS)) {
+      if (t.includes(key)) return this.ICONS[key];
+    }
+    return 'assets/accounts/CONNECT.png'; // fallback
+  }
 }

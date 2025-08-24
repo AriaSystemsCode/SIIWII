@@ -155,7 +155,73 @@
                 <div>
                     <div>
 
-                        <span style="width: 100%; " class="mt-3" *ngIf="account.connectionName">
+                        <span style="width: 100%; " class="mt-3 d-flex" *ngIf="(account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)">
+                           
+                            <div class="btn relation_Status_button mt-4" [ngStyle]="{
+                                'bottom':  singleItemPerRowMode  ? '5px' : '1px'
+                            }" style="    white-space: nowrap; font-size: 12px;
+                            
+                                right: 0px;cursor: auto;  " dropdown>
+
+                                <button type="button" dropdownToggle style="  border: none !important;
+                                background: white;padding: 0;">
+                                    <img class="pb-1" style="width: 20px;"
+                                        src="../../assets/accounts/ph_check-bold.png" /> <span>{{
+                                        getFormattedConnectionName('connectionName') | localize }}</span> <i
+                                        class="fas fa-lg ml-1 fa-angle-down" style="color: #777777 !important;"></i>
+                                </button>
+
+                                <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                    <li role="menuitem">
+                                        <button class="dropdown-item" type="button" (click)="removeRelation(account)">
+                                            {{ getFormattedConnectionName('disConnectLabel') }}
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+
+                        </span>
+
+                        <span style="width: 100%; " class="mt-3"
+                            *ngIf="(account?.availableConnections?.length > 0 ) || (!account.connectionName && account.avaliableConnectionName)">
+
+                            <!-- Guard + alias once -->
+                            <ng-container *ngIf="account?.availableConnections as options">
+                                <div
+                                    [ngStyle]="{ bottom: singleItemPerRowMode ? '5px' : '1px' }"
+                                    style="white-space: nowrap;  right: 5px;" dropdown>
+                                    <!-- Main button = first option -->
+                                    <button type="button" class="relation_button" dropdownToggle
+                                       >
+                                        <img class="pb-1" style="width: 20px;"
+                                            [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
+                                        <span  (click)="createRelation(options[0])" class="ml-1">{{ options[0]?.connectLabel }}</span>
+
+                                        <!-- caret only if there are more -->
+                                        <i *ngIf="options.length > 1" class="fas fa-lg ml-4 fa-angle-down"
+                                            style="color: #fff !important;"></i>
+                                    </button>
+
+                                    <!-- Dropdown only if > 1 -->
+                                    <ng-container *ngIf="options.length > 1">
+                                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                          <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                                            <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                                              <img class="pb-1 mr-2" style="width: 18px;" [src]="getConnectionIcon(option?.connectLabel)" alt="" />
+                                              {{ option?.connectLabel }}
+                                            </button>
+                                          </li>
+                                        </ul>
+                                      </ng-container>
+                                      
+                                </div>
+                            </ng-container>
+
+                        </span>
+
+                        <!-- <span style="width: 100%; " class="mt-3" *ngIf="account.connectionName">
                             <button class="btn relation_Status_button" (click)="removeRelation(account)" [ngStyle]="{
                                 'bottom':  singleItemPerRowMode  ? '5px' : 'auto'
                             }">
@@ -184,7 +250,7 @@
                                     src="../../assets/accounts/JOIN.png" /> {{ getFormattedConnectionName('avaliableConnectionName') |
                                 localize }}
                             </button>
-                        </span>
+                        </span> -->
                     </div>
                 </div>
             </div>

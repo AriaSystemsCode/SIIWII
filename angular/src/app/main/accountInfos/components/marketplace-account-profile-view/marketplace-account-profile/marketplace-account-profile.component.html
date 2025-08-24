@@ -48,65 +48,44 @@
             </p>
           </div>
 
-          <button *ngIf="marketPlaceData?.connectionName == null || marketPlaceData?.connectionName == ''"
-            (click)="createRelation()" class="connect-btn d-md-flex d-none">
-            <svg *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('CONNECT')" width="24"
-              height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M16.9 10.2V6M14.8 8.1H19M14.8 17.9V17.06C14.8 15.8839 14.8 15.2958 14.5711 14.8466C14.3698 14.4515 14.0485 14.1302 13.6534 13.9289C13.2042 13.7 12.6161 13.7 11.44 13.7H8.36C7.18389 13.7 6.59583 13.7 6.14662 13.9289C5.75148 14.1302 5.43022 14.4515 5.22889 14.8466C5 15.2958 5 15.8839 5 17.06V17.9M12.35 8.45C12.35 9.8031 11.2531 10.9 9.9 10.9C8.5469 10.9 7.45 9.8031 7.45 8.45C7.45 7.0969 8.5469 6 9.9 6C11.2531 6 12.35 7.0969 12.35 8.45Z"
-                stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+          <span style="width: 100%; " class="mt-3"
+          *ngIf="marketPlaceData?.availableConnections?.length > 0">
 
-            <svg *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('JOIN')" width="24" height="24"
-              viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M16.9 10.2V6M14.8 8.1H19M14.8 17.9V17.06C14.8 15.8839 14.8 15.2958 14.5711 14.8466C14.3698 14.4515 14.0485 14.1302 13.6534 13.9289C13.2042 13.7 12.6161 13.7 11.44 13.7H8.36C7.18389 13.7 6.59583 13.7 6.14662 13.9289C5.75148 14.1302 5.43022 14.4515 5.22889 14.8466C5 15.2958 5 15.8839 5 17.06V17.9M12.35 8.45C12.35 9.8031 11.2531 10.9 9.9 10.9C8.5469 10.9 7.45 9.8031 7.45 8.45C7.45 7.0969 8.5469 6 9.9 6C11.2531 6 12.35 7.0969 12.35 8.45Z"
-                stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+          <!-- Guard + alias once -->
+          <ng-container *ngIf="marketPlaceData?.availableConnections as options">
+              <div
+            
+                  style="white-space: nowrap; position: absolute; right: 5px;" dropdown>
+                  <!-- Main button = first option -->
+                  <button type="button" class="relation_button" dropdownToggle
+                     >
+                      <img class="pb-1" style="width: 20px;"
+                          [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
+                      <span  (click)="createRelation(options[0])" class="ml-1">{{ options[0]?.connectLabel }}</span>
 
+                      <!-- caret only if there are more -->
+                      <i *ngIf="options.length > 1" class="fas fa-lg ml-4 fa-angle-down"
+                          style="color: #fff !important;"></i>
+                  </button>
 
-            <svg *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('FOLLOW')" width="24"
-              height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M12.3073 4.61534C11.729 4.32623 11.0278 4.60163 10.8008 5.20692L8.94124 10.1656H6.17772C4.975 10.1656 4 11.1407 4 12.3434V18.1506C4 19.3533 4.975 20.3283 6.17772 20.3283H16.6117C17.6432 20.3283 18.5332 19.6046 18.7436 18.5948L19.9534 12.7875C20.2352 11.4352 19.2028 10.1656 17.8215 10.1656H14.0809L14.617 8.55747C15.074 7.18663 14.4534 5.6884 13.1609 5.04219L12.3073 4.61534ZM10.3006 10.6754L12.0186 6.09418L12.5117 6.34072C13.1579 6.66384 13.4682 7.41295 13.2397 8.09837L12.7037 9.70654C12.3903 10.6466 13.09 11.6174 14.0809 11.6174H17.8215C18.282 11.6174 18.626 12.0407 18.5322 12.4914L18.4118 13.0693H15.6145C15.2136 13.0693 14.8886 13.3942 14.8886 13.7952C14.8886 14.1961 15.2136 14.5211 15.6145 14.5211H18.1093L17.8069 15.9729H15.6145C15.2136 15.9729 14.8886 16.2979 14.8886 16.6988C14.8886 17.0997 15.2136 17.4247 15.6145 17.4247H17.5044L17.3223 18.2987C17.2522 18.6353 16.9555 18.8765 16.6117 18.8765H9.08134V11.6107C9.62878 11.5579 10.1047 11.1979 10.3006 10.6754ZM7.62953 11.6174H6.17772C5.77681 11.6174 5.45181 11.9424 5.45181 12.3434V18.1506C5.45181 18.5515 5.77681 18.8765 6.17772 18.8765H7.62953V11.6174Z"
-                fill="#4A0D4A" />
-            </svg>
+                  <!-- Dropdown only if > 1 -->
+                  <ng-container *ngIf="options?.length > 1">
+                      <ul *dropdownMenu class="dropdown-menu" role="menu">
+                        <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                          <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                            <img class="pb-1 mr-2" style="width: 18px;" [src]="getConnectionIcon(option?.connectLabel)" alt="" />
+                            {{ option?.connectLabel }}
+                          </button>
+                        </li>
+                      </ul>
+                    </ng-container>
+                    
+              </div>
+          </ng-container>
 
-            <img class="pb-1" *ngIf="marketPlaceData?.avaliableConnectionName?.toUpperCase().includes('EMPLOYEE')"
-              src="../../assets/accounts/EMPLOYEE.png" />
-
-            {{ getFormattedConnectionName('avaliableConnectionName') | localize }}
-
-
-          </button>
-
-
-
-<!-- 
-          <button
-            *ngIf="marketPlaceData?.avaliableConnectionName == '' || marketPlaceData?.avaliableConnectionName == null"
-            class="connect-btn d-md-flex d-none">
-            <svg *ngIf="marketPlaceData?.connectionName?.toUpperCase().includes('CONNECTTED')" width="24" height="24"
-              viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M16.9 10.2V6M14.8 8.1H19M14.8 17.9V17.06C14.8 15.8839 14.8 15.2958 14.5711 14.8466C14.3698 14.4515 14.0485 14.1302 13.6534 13.9289C13.2042 13.7 12.6161 13.7 11.44 13.7H8.36C7.18389 13.7 6.59583 13.7 6.14662 13.9289C5.75148 14.1302 5.43022 14.4515 5.22889 14.8466C5 15.2958 5 15.8839 5 17.06V17.9M12.35 8.45C12.35 9.8031 11.2531 10.9 9.9 10.9C8.5469 10.9 7.45 9.8031 7.45 8.45C7.45 7.0969 8.5469 6 9.9 6C11.2531 6 12.35 7.0969 12.35 8.45Z"
-                stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-
-            <svg *ngIf="marketPlaceData?.connectionName?.toUpperCase().includes('JOINED')" width="24" height="24"
-              viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M16.9 10.2V6M14.8 8.1H19M14.8 17.9V17.06C14.8 15.8839 14.8 15.2958 14.5711 14.8466C14.3698 14.4515 14.0485 14.1302 13.6534 13.9289C13.2042 13.7 12.6161 13.7 11.44 13.7H8.36C7.18389 13.7 6.59583 13.7 6.14662 13.9289C5.75148 14.1302 5.43022 14.4515 5.22889 14.8466C5 15.2958 5 15.8839 5 17.06V17.9M12.35 8.45C12.35 9.8031 11.2531 10.9 9.9 10.9C8.5469 10.9 7.45 9.8031 7.45 8.45C7.45 7.0969 8.5469 6 9.9 6C11.2531 6 12.35 7.0969 12.35 8.45Z"
-                stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <img class="pb-1" style="width: 20px;"
-              *ngIf="marketPlaceData?.connectionName?.toUpperCase().includes('FOLLOWWED')"
-              src="../../assets/accounts/FOLLOW.png" />
-            <img class="pb-1" *ngIf="marketPlaceData?.connectionName?.toUpperCase().includes('EMPLOYEE')"
-              src="../../assets/accounts/EMPLOYEE.png" />
-            {{ getFormattedConnectionName('connectionName') | localize }}
-          </button> -->
-          <span style="width: 100%; " class="mt-3 d-flex"  *ngIf="marketPlaceData?.avaliableConnectionName == '' || marketPlaceData?.avaliableConnectionName == null">
+      </span>
+     
+          <span style="width: 100%; " class="mt-3 d-flex"  *ngIf="marketPlaceData?.availableConnections?.length == 0 && marketPlaceData?.connectionName">
             <div  class="btn relation_Status_button mt-4" style="    white-space: nowrap;
                 position: absolute;
                 right: 0;top: 5px;cursor: auto;  " dropdown>

@@ -122,7 +122,7 @@ export class AccountsComponent
 
     toggleFilter(): void {
         this.filterVisible = !this.filterVisible;
-        this.filterVisiblelg  = ! this.filterVisiblelg 
+        this.filterVisiblelg = !this.filterVisiblelg
     }
     setMainPageFilter(filter: AccountMainFilterEnum) {
         const selectedfilter = this.pageMainFilters.filter(
@@ -317,7 +317,7 @@ export class AccountsComponent
     connect(account: AccountDto): void {
         this.showMainSpinner();
         this._accountsServiceProxy
-            .connectContactsProfiles(account.id,null)
+            .connectContactsProfiles(account.id, null)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
@@ -330,7 +330,7 @@ export class AccountsComponent
     }
 
     disconnect(account: AccountDto): void {
-      
+
         this.showMainSpinner();
         this._accountsServiceProxy
             .disconnect(account.account.id)
@@ -342,7 +342,7 @@ export class AccountsComponent
             .subscribe((res) => {
                 this.notify.success(this.l("SuccessfullyDisconnected"));
                 account.status = false;
-                account.connectionName  = "";
+                account.connectionName = "";
                 account.avaliableConnectionName = res[0].connectLabel
                 account.availableConnections = res
             });
@@ -409,10 +409,10 @@ export class AccountsComponent
     }
 
 
-    createRelation(account,status:boolean = false) {
+    createRelation(account, status: boolean = false) {
         this.showMainSpinner();
         this._accountsServiceProxy
-            .applyRelationOnProfile(account.account.account.id, undefined,account.relation.defaultVisibility =='Public'?true:false,account.relation.connectionEntityId)
+            .applyRelationOnProfile(account.account.account.id, undefined, account.relation.defaultVisibility == 'Public' ? true : false, account.relation.connectionEntityId)
             .pipe(
                 finalize(() => {
                     ;

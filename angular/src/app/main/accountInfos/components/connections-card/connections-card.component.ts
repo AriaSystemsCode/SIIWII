@@ -19,7 +19,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
     @Output() deleteMe: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() _createRelation: EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
+    @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
     isRecordOwner: boolean
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
@@ -72,8 +72,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
         }
     }
 
-    createRelation() {
-        this._createRelation.emit(this.account);
+    createRelation(relation) {
+        this._createRelation.emit({account:this.account,relation:relation});
     }
 
 
@@ -84,12 +84,17 @@ export class ConnectionsCardComponent extends AppComponentBase {
           raw = this.account?.connectionName?.trim();
         } else if (connection === 'avaliableConnectionName') {
           raw = this.account?.avaliableConnectionName?.trim();
+        }else{
+          raw = this.account?.disConnectLabel?.trim();
         }
       
         if (!raw) return null;
       
         // If it's 'Follow', return as-is
         if (raw === 'Follow') return 'Follow';
+        if (raw === 'Connect') return 'Connect';
+        if (raw === 'Join') return 'Join';
+        if (raw === 'Employ') return 'Employ';
       
         // Format only if starts with 'MPAction'
         if (raw.startsWith('MPAction')) {
@@ -119,6 +124,21 @@ export class ConnectionsCardComponent extends AppComponentBase {
         //     }
         // }
     );
+      }
+
+      private readonly ICONS: Record<string, string> = {
+        FOLLOW: 'assets/accounts/FOLLOW.png',
+        CONNECT: 'assets/accounts/CONNECT.png',
+        EMPLOY: 'assets/accounts/CONNECT.png',
+        EMPLOYEE: 'assets/accounts/EMPLOYEE.png',
+        JOIN: 'assets/accounts/JOIN.png',
+      };
+      getConnectionIcon(label?: string): string {
+        const t = (label || '').toUpperCase();
+        for (const key of Object.keys(this.ICONS)) {
+          if (t.includes(key)) return this.ICONS[key];
+        }
+        return 'assets/accounts/CONNECT.png'; // fallback
       }
 
 }

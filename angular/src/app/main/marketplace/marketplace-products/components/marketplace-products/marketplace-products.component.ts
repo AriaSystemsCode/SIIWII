@@ -6,10 +6,10 @@ import {
     Injector,
     OnDestroy,
     ViewChild,
-   SimpleChanges, OnChanges, ViewChildren, ElementRef,
-   Input
+    SimpleChanges, OnChanges, ViewChildren, ElementRef,
+    Input
 } from "@angular/core";
-import {  Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
 import { AppItemBrowseEvents } from "@app/main/app-items/app-items-browse/models/appItems-browse-events";
 import { ActionsMenuEventEmitter } from "@app/main/app-items/app-items-browse/models/ActionsMenuEventEmitter";
@@ -35,7 +35,7 @@ import { ProdcutCardComponent } from "../prodcut-card/prodcut-card.component";
 })
 export class MarketplaceProductsComponent
     extends AppComponentBase
-    implements OnDestroy , OnChanges  {
+    implements OnDestroy, OnChanges {
     @ViewChild("AppItemsBrowseComponent") appItemsBrowseComponent: AppItemsComponent;
     @ViewChildren(ProdcutCardComponent) ProdcutCardComponent: ProdcutCardComponent;
     isFilterHidden: boolean = false;
@@ -64,11 +64,11 @@ export class MarketplaceProductsComponent
     @ViewChild("filters", { static: false }) filters!: any;
     sellerSSIN: any;
     buyerSSIN: any;
-    contactSSIN:any;
+    contactSSIN: any;
     acceptedAspectRatio;
 
-    isFromSellerRoom:boolean
-    ismarketPLace:boolean
+    isFromSellerRoom: boolean
+    ismarketPLace: boolean
     items: any[];
     minimumPrice: number;
     maximumPrice: number;
@@ -78,8 +78,8 @@ export class MarketplaceProductsComponent
     selectedDepartments: any;
     @Input() fromMarketAcoount: boolean;
     @Input() fromOverView: boolean = false
-    @Input() accountDataForView :any
-    @Input() marketplaceAccCurrency :string
+    @Input() accountDataForView: any
+    @Input() marketplaceAccCurrency: string
     constructor(
         injector: Injector,
         private _router: Router,
@@ -90,12 +90,12 @@ export class MarketplaceProductsComponent
         public breakpointObserver: BreakpointObserver,
     ) {
         super(injector);
-        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
-        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace") );
+        this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom"));
+        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
 
-  
+
         if (localStorage.getItem("contactSSIN") && localStorage.getItem("contactSSIN") != "undefined") {
-               this.contactSSIN = JSON.parse(localStorage.getItem("contactSSIN"));
+            this.contactSSIN = JSON.parse(localStorage.getItem("contactSSIN"));
         }
 
         if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
@@ -104,7 +104,7 @@ export class MarketplaceProductsComponent
         if (localStorage.getItem("BuyerSSIN") && localStorage.getItem("BuyerSSIN") != "undefined") {
             this.buyerSSIN = JSON.parse(localStorage.getItem("BuyerSSIN"));
         }
-   
+
         this.isSellerIdExists = sessionStorage.getItem("SellerSSIN")
             ? true
             : false;
@@ -116,7 +116,7 @@ export class MarketplaceProductsComponent
                 });
         }
         this.sortingData = [
-            { label: "Product Name", value: "name" }, 
+            { label: "Product Name", value: "name" },
             { label: "Product code", value: "manufacturercode" },
             { label: "Price low to high", value: "price" },
             { label: "Price high to low", value: "price desc" },
@@ -133,59 +133,59 @@ export class MarketplaceProductsComponent
 
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
-        
+
 
 
         this.checkMediaQuery();
         this.getAspectatio();
-        
+
     }
     ngOnInit() {
-        
+
         const savedFilters = localStorage.getItem("productFilters");
-        
+
         if (savedFilters) {
             const parsedFilters = JSON.parse(savedFilters);
             this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? undefined;
             this.selectedCurrrency = parsedFilters.selectedCurrency ?? 'USD';
             this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
-            
-            this.appItemListId = parsedFilters.appItemListId ||   this.appItemListId;
-            this.searchInput = parsedFilters.searchText||    this.searchInput;
-            this.selectedDepartments = parsedFilters.selectedDepartments ||  this.selectedDepartments;
-            this.minimumPrice = parsedFilters.minimumPrice ||  this.minimumPrice;
+
+            this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
+            this.searchInput = parsedFilters.searchText || this.searchInput;
+            this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
+            this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
             this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
             this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
             this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
-            this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) :   this.startShipData;
-            this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) :  this.endShipData;
-            this.brands = parsedFilters.brands || this.brands ;
+            this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : this.startShipData;
+            this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : this.endShipData;
+            this.brands = parsedFilters.brands || this.brands;
             this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
-            this.skipCount = parsedFilters.skipCount ||     this.skipCount;
+            this.skipCount = parsedFilters.skipCount || this.skipCount;
             this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
-    
+
         this.getAllProducts(); // Fetch products using restored filters
-        
+
     }
-    
+
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
 
     }
-    
+
     ngOnChanges(changes: SimpleChanges) {
         if (changes['accountDataForView'] && this.accountDataForView?.ssin) {
-            if(this.fromMarketAcoount || this.fromOverView) {
+            if (this.fromMarketAcoount || this.fromOverView) {
                 localStorage.removeItem("productFilters");
             }
             this.getAllProducts();
-          }else {
-            
-          }
+        } else {
+
+        }
         document.getElementById("_searchInput").focus();
-      }
-      getAspectatio() {
+    }
+    getAspectatio() {
         let sycAttachmentCategoryImage;
         this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
             result.forEach(item => {
@@ -239,10 +239,10 @@ export class MarketplaceProductsComponent
 
     getAllProducts() {
         this.showMainSpinner();
-    
+
         const requestParams = {
             contactSSIN: this.contactSSIN,
-            sellerSSIN:    this.sellerSSIN,
+            sellerSSIN: this.sellerSSIN,
             tenantId: null,
             appItemListId: this.appItemListId || null,
             searchText: this.searchInput || '',
@@ -256,40 +256,40 @@ export class MarketplaceProductsComponent
             startShipData: this.startShipData || null,
             endShipData: this.endShipData || null,
             brands: this.brands || [],
-            selectedCurrency: this.fromMarketAcoount || this.fromOverView ? this.marketplaceAccCurrency: this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
+            selectedCurrency: this.fromMarketAcoount || this.fromOverView ? this.marketplaceAccCurrency : this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
             maxResultCount: this.fromOverView ? 8 : this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
-        
-    
+
+
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView?.ssin :  sessionStorage.getItem("SellerSSIN"),
+                this.fromMarketAcoount || this.fromOverView ? this.accountDataForView?.ssin : sessionStorage.getItem("SellerSSIN"),
                 null,
-                requestParams.appItemListId ||  this.appItemListId,
+                requestParams.appItemListId || this.appItemListId,
                 false, // false
                 requestParams.searchText || this.searchInput,
                 null, //null
                 null, //null
                 null, // null
-                requestParams.selectedDepartments ||     this.selectedDepartments,
-                requestParams.minimumPrice||     this.minimumPrice,
+                requestParams.selectedDepartments || this.selectedDepartments,
+                requestParams.minimumPrice || this.minimumPrice,
                 requestParams.maximumPrice || this.maximumPrice,
-               this.seletedOption.value,
-               requestParams.onlyAvailableStock,
+                this.seletedOption.value,
+                requestParams.onlyAvailableStock,
 
                 requestParams.startSoldOutData || this.startSoldOutData,
-                requestParams.endSoldOutData ||  this.endSoldOutData,
+                requestParams.endSoldOutData || this.endSoldOutData,
                 requestParams.startShipData || this.startShipData,
-                requestParams.endShipData ||  this.endShipData,
-                requestParams.brands ||  this.brands, // ids
-                requestParams.selectedCurrency ||  this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                requestParams.endShipData || this.endShipData,
+                requestParams.brands || this.brands, // ids
+                requestParams.selectedCurrency || this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
                 requestParams.selectedSort || this.selectedSort.value,
                 requestParams.skipCount || this.skipCount,
-                requestParams.maxResultCount ||  this.maxResultCount
+                requestParams.maxResultCount || this.maxResultCount
             )
             .pipe(
                 finalize(() => {
@@ -301,16 +301,16 @@ export class MarketplaceProductsComponent
             .subscribe((result) => {
                 this.items = result.items;
                 this.pagesNumber = result.totalCount;
-                if (result.items.length == 1 && !this.fromOverView && !this.fromMarketAcoount &&this.searchInput != '') {
-                    setTimeout(function() {
+                if (result.items.length == 1 && !this.fromOverView && !this.fromMarketAcoount && this.searchInput != '') {
+                    setTimeout(function () {
                         this.ProdcutCardComponent.first.viewProduct(this.ProdcutCardComponent.first.product.id)
                     }.bind(this), 500);
-                    }
-                });
-                
-       
+                }
+            });
+
+
     }
-    
+
 
     setCurrency() {
         const currencyCodeRaw = localStorage.getItem("currencyCode");
@@ -327,9 +327,9 @@ export class MarketplaceProductsComponent
 
             }
         }
-    
+
         this.currency = this.selectedCurrrency?.code ?? this.selectedCurrrency;
-    
+
         // If it's just a code (e.g., "AFN"), find matching currency object
         if (!this.selectedCurrrency?.code) {
             const match = this.currencies?.find(x => x.code === this.selectedCurrrency);
@@ -339,7 +339,7 @@ export class MarketplaceProductsComponent
             }
         }
     }
-    
+
 
 
     onPageChange(value: any) {
@@ -374,13 +374,13 @@ export class MarketplaceProductsComponent
     }
     swtichStock(value) {
         this.onlyAvialbleStock = value.checked;
-            this.getAllProducts();
+        this.getAllProducts();
     }
 
     // start filter criteria
     selectCatalog(value) {
         this.appItemListId = value.id;
-            this.getAllProducts();
+        this.getAllProducts();
     }
 
     selectDepartment(value) {
@@ -392,45 +392,45 @@ export class MarketplaceProductsComponent
                 value.node.data.sycEntityObjectCategory.id,
             ];
         }
-            this.getAllProducts();
+        this.getAllProducts();
     }
 
 
     setPriceFrom(value) {
         this.minimumPrice = value;
-            this.getAllProducts();
+        this.getAllProducts();
     }
     setPriceTo(value) {
         this.maximumPrice = value;
-            this.getAllProducts();
+        this.getAllProducts();
     }
 
     startShipData: any;
     setStartShipDate(value) {
         this.startShipData = value;
-            this.getAllProducts();
+        this.getAllProducts();
     }
 
     endShipData: any;
     setEndtShipDate(value) {
         this.endShipData = value;
-            this.getAllProducts();
+        this.getAllProducts();
     }
     startSoldOutData: any;
     setStartSoldOutDate(value) {
         this.startSoldOutData = value;
-            this.getAllProducts();
+        this.getAllProducts();
     }
     endSoldOutData: any;
     setEndSoldOutDate(value) {
         this.endSoldOutData = value;
-            this.getAllProducts();
+        this.getAllProducts();
     }
 
     brands: [] = [];
     selectBrands(value) {
         this.brands = value;
-            this.getAllProducts();
+        this.getAllProducts();
     }
 
     resetProducts($event) {
@@ -448,12 +448,12 @@ export class MarketplaceProductsComponent
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
-         this.appItemListId =''
+        this.appItemListId = ''
 
-        this.brands =[]
-        this.skipCount= 0;
-        this.maxResultCount= 12;
-        this.selectedDepartments =[]
+        this.brands = []
+        this.skipCount = 0;
+        this.maxResultCount = 12;
+        this.selectedDepartments = []
         this.onlyAvialbleStock = undefined
         localStorage.removeItem("productFilters");
         this.getAllProducts();
@@ -461,12 +461,23 @@ export class MarketplaceProductsComponent
     }
 
     ngOnDestroy() {
-        if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
-            sessionStorage.removeItem("SellerSSIN");
-            localStorage.removeItem("BuyerSSIN");
+
+        // Keep SellerSSIN while navigating inside the seller room / product views
+        const inSellerRoom = JSON.parse(localStorage.getItem('fromSellerRoom') || 'false');
+        const inMarketplace = JSON.parse(localStorage.getItem('fromMarketPlace') || 'false');
+
+        if (!inSellerRoom || inMarketplace) {
+            sessionStorage.removeItem('SellerSSIN');
+            localStorage.removeItem('BuyerSSIN');
         }
+
+        // if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
+        //     sessionStorage.removeItem("SellerSSIN");
+        //     localStorage.removeItem("BuyerSSIN");
+        // }
         localStorage.setItem("currencyCode", null);
     }
+
 
     // start mobile filters
     cancel() {
@@ -485,9 +496,9 @@ export class MarketplaceProductsComponent
 
     }
     clearFiltrs(value) {
-      if(value){
-        this.resetProducts('')
-      }
-     
+        if (value) {
+            this.resetProducts('')
+        }
+
     }
 }

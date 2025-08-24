@@ -217,3 +217,21 @@ h4 {
     color: #9E9E9E;
 
 }
+
+
+
+.relation_button {
+    background-color: #4a0d4a;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 10px;
+}
+
+
+::ng-deep {
+    .dropdown-item.active, .dropdown-item:active{
+        background-color: #4a0d4a !important;
+        color: white !important;
+        padding: 5px 10px !important;
+    }
+}
