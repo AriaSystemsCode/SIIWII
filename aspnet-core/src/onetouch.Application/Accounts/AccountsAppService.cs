@@ -966,26 +966,72 @@ namespace onetouch.Accounts
 
                 //       .PageBy(input);
 
-                IQueryable<AppContact> pagedAndFilteredContacts = null;
+                //I40[Start]
+                var currentTenantAccount = _appContactRepository.GetAll().Include(z=>z.EntityFk)
+                       .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile,
+                                x => x.TenantId == AbpSession.TenantId && x.Id == input.AccountId) 
+                       .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.View,
+                        x => x.Id == input.AccountId).FirstOrDefault();
+
+                var currentTenantAccountSSIN = currentTenantAccount.SSIN;
+                var currentTenantAccountType = currentTenantAccount.EntityFk.EntityObjectTypeId;
+                var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                var relationships = _appContactRelationshipInfoRepository.GetAll()
+                           .Where(s => s.RecipientContactTypeId == presonEntityObjectTypeId &&
+                           s.RequesterContactSSIN == currentTenantAccountSSIN && s.ConsiderAsTeamMember == true && s.SharingLevel == 1
+                           && s.EntityObjectStatusId == activeRelationshipStatusId);
+                
+                //I40[Start]
+                DateTime jDate = DateTime.Now;
+                var contactInfoj = contactInfo
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                    .Include(x => x.AppContactAddresses)
+                    .Include(x => x.AccountFk)
+                    .Join(relationships, x => x.SSIN, sa => sa.RecipientContactSSIN, (s, sa) => new { account =s });
+
+                var contactInfoJoin = from o in contactInfoj
+                                      select new GetMemberForViewDto()
+                                      {
+                                          Id = o.account.Id,
+                                          FirstName = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue) ? "" : o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue,
+                                          SurName = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue) ? "" : o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue,
+                                          JobTitle = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null || o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue) ? "" : o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue,
+                                          EMailAddress = o.account.EMailAddress == null ? "" : o.account.EMailAddress,
+                                          AccountName = o.account.AccountFk.Name,
+                                          //MMT222
+                                          //JoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null ? DateTime.Now : DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue),
+                                          JoinDate = (o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null || o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue)) ? DateTime.Now : (DateTime.TryParse(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue, out jDate) ? DateTime.Parse(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue) : DateTime.Now),
+                                          //MMT222
+                                          //IsPublicJoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic") == null ? false : bool.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic").AttributeValue),
+                                          IsActive = false,
+                                          UserId = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null || o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue) ? 0 : long.Parse(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue),
+                                          ImageUrl = string.IsNullOrEmpty(o.account.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
+                                          ""
+                                          : "attachments/" + (o.account.EntityFk.TenantId == null ? "-1" : o.account.EntityFk.TenantId.ToString()) + "/" + o.account.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment
+                                      };
+                //I40[End]
+
+                IQueryable<GetMemberForViewDto> pagedAndFilteredContacts = null;
                 if (input.Sorting != null && input.Sorting.ToLower().Contains("lastname"))
                 {
-                    pagedAndFilteredContacts = contactInfo
-                      .OrderBy(p => p.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue).PageBy(input);
+                    pagedAndFilteredContacts = contactInfoJoin
+                      .OrderBy(p => p.SurName).PageBy(input);
+                      //(p => p.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue).PageBy(input);
                 }
                 else
                 {
-                    pagedAndFilteredContacts = contactInfo
-                          .OrderBy(input.Sorting ?? "name asc")
+                    pagedAndFilteredContacts = contactInfoJoin
+                          .OrderBy(input.Sorting ?? "FirstName asc")
                           .PageBy(input);
                 }
 
                 //MMT - 08/18/2022 Sort my team members by Surname when there are no records, gives an error[End]
-
-
+               
+                
                 //MMT22
-                DateTime jDate = DateTime.Now;
-                //MMT22
-                var contacts = from o in pagedAndFilteredContacts
+                var contacts = pagedAndFilteredContacts;
+                    /*from o in pagedAndFilteredContacts
                                select new GetMemberForViewDto()
                                {
                                    Id = o.Id,
@@ -1004,10 +1050,10 @@ namespace onetouch.Accounts
                                    ImageUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                             ""
                                             : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment
-                               };
+                               };*/
 
 
-                var totalCount = await contactInfo.CountAsync();
+                var totalCount = await contactInfoJoin.CountAsync();
 
                 var contactList = await contacts.ToListAsync();
 
@@ -1780,7 +1826,8 @@ namespace onetouch.Accounts
                     {
                         //I40[Start]
                         var relationship = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contactObj.SSIN
-                        && z.RequesterContactSSIN == originalContact.SSIN) && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
+                        && z.RequesterContactSSIN == originalContact.SSIN) && z.EntityObjectStatusId == activeRelationshipStatusId 
+                        && z.SharingLevel == 1 && z.ConsiderAsTeamMember==true).FirstOrDefaultAsync();
                         //|| (z.RequesterContactSSIN == contactObj.SSIN && z.RecipientContactSSIN == originalContact.SSIN
                         if (relationship == null)
                             continue;
@@ -1844,7 +1891,8 @@ namespace onetouch.Accounts
                         //m
                         //I40[Start]
                         var relationship = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contactObj.SSIN
-                        && z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN)  && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1).FirstOrDefaultAsync();
+                        && z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN) 
+                        && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1 && z.ConsiderAsTeamMember == true).FirstOrDefaultAsync();
                         //|| (z.RequesterContactSSIN == contactObj.SSIN && z.RecipientContactSSIN == originalPublishContactFortCurrTenant.SSIN)
                         if (relationship == null)
                             continue;
@@ -3397,6 +3445,14 @@ namespace onetouch.Accounts
             if(originalPublishContactFortCurrTenant!=null)
                returnVal = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(originalPublishContactFortCurrTenant.SSIN, ssin, false, isPublic, connectionTypeId);
             //I40[Start]
+            var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+            var currentRelation = await _appContactRelationshipInfoRepository.GetAll()
+                .Where(z => z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN &&
+                z.RecipientContactSSIN == ssin && z.EntityObjectStatusId== activeRelationshipStatusId &&
+                z.ConsiderAsTeamMember== true).FirstOrDefaultAsync();
+            if (currentRelation == null)
+                return returnVal;
+
             var businessEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             if (originalPublishContactFortCurrTenant.EntityObjectTypeId == businessEntityObjectTypeId &&

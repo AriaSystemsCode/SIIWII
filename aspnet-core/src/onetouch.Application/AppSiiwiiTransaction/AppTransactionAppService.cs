@@ -136,6 +136,9 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I46[End]
+        //I40[Start]
+        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        //I40[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
@@ -159,7 +162,8 @@ namespace onetouch.AppSiiwiiTransaction
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
              TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
-             IRepository<AppEntityLog, long> appEntityLogRepository, IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
+             IRepository<AppEntityLog, long> appEntityLogRepository, IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository,
+             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
@@ -212,6 +216,9 @@ namespace onetouch.AppSiiwiiTransaction
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             //I46{End}
+            //I40[Start]
+            _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
+            //I40[End]
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -2099,12 +2106,18 @@ namespace onetouch.AppSiiwiiTransaction
         }
         public async Task<List<GetContactInformationDto>> GetAccountRelatedContacts(long accountId, string filter)
         {
+            var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             List<GetContactInformationDto> returnObjectList = new List<GetContactInformationDto>();
+            var accountObject = await _appContactRepository.GetAll().Where(z => z.Id == accountId).FirstOrDefaultAsync();
             var accountsList = _appContactRepository.GetAll()
                 .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                 .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
-                & a.AccountId == accountId & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+                & a.AccountId == accountId & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId
+                &
+                    _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountObject.SSIN &&
+                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId == activeRealtionshipStatusId) > 0
+                );
 
 
             var pagedAndFilteredAccounts = accountsList.OrderBy("name asc");
@@ -3556,12 +3569,16 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     return returnList;
                 }
+                var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 List<GetContactInformationDto> returnObjectList = new List<GetContactInformationDto>();
                 var accountsList = _appContactRepository.GetAll()
                     .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                     .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
-                    & a.AccountId == accountId.Id & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+                    & a.AccountId == accountId.Id & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &
+                    _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountSSIN &&
+                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId== activeRealtionshipStatusId)>0
+                    );
 
 
                 var pagedAndFilteredAccounts = accountsList.OrderBy("name asc");
