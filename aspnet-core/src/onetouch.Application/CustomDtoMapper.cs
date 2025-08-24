@@ -443,6 +443,8 @@ namespace onetouch
 
             configuration.CreateMap<CreateOrEditAccountInfoDto, AppMarketplaceContact>()
               .ForMember(a => a.Code, b => b.MapFrom(ent => ent.SSIN))
+              .ForMember(a => a.EntityExtraData, b => b.MapFrom(ent => ent.EntityExtraData))
+              .ForMember(a => a.EntityAttachments, b => b.MapFrom(ent => ent.EntityAttachments))
                ;
 
             configuration.CreateMap<AppMarketplaceContact, AppContactDto>();
@@ -1147,8 +1149,9 @@ namespace onetouch
              .ForMember(d => d.Notes, s => s.MapFrom(ss => ss.EntityFk.Notes))
              ;
             configuration.CreateMap<AppMarketplaceContact, CreateOrEditAccountInfoDto>()
-              .ForMember(a => a.Name, b => b.MapFrom(ent => ent.Name));
-               
+              .ForMember(a => a.Name, b => b.MapFrom(ent => ent.Name))
+              .ForMember(a => a.EntityExtraData, b => b.MapFrom(ent => ent.EntityExtraData))
+              .ForMember(a => a.EntityAttachments, b => b.MapFrom(ent => ent.EntityAttachments));
             //I40[End]
         }
     }
