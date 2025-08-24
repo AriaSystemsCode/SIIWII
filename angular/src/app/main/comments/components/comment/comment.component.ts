@@ -38,12 +38,9 @@ export class CommentComponent implements OnChanges {
                 }
             });
     }
-   
 
-    // toggleExpand() {
-    //   this.isExpanded = !this.isExpanded;
-    // }
     setupContent() {
+      // merge
         const bodyFormat = this.comment?.messages?.body || '';
         if (bodyFormat.length > this.charLimit) {
           this.isLongContent = true;
