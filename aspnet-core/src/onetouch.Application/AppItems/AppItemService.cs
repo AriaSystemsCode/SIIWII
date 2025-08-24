@@ -594,9 +594,9 @@ namespace onetouch.AppItems
                 {
                      
                
-                    var codeExist = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => 
+                    var codeExist = _appEntityRepository.GetAll().FirstOrDefaultAsync(x => 
                     x.Code == appItemtExcelRecordDTO.ExcelDto.ColorCode && x.EntityObjectTypeId == 16
-                    && (x.TenantId == null || x.TenantId == AbpSession.TenantId));
+                    && (x.TenantId == null || x.TenantId == AbpSession.TenantId)).Result;
 
 
                 if (codeExist == null)
@@ -605,10 +605,10 @@ namespace onetouch.AppItems
                     colorEntity.Name = appItemtExcelRecordDTO.ExcelDto.ColorName;
                     colorEntity.Code = appItemtExcelRecordDTO.ExcelDto.ColorCode;
                     colorEntity.EntityObjectTypeId = 16;
-                    var itemObjectId = await _helper.SystemTables.GetObjectLookupId();
+                    var itemObjectId = _helper.SystemTables.GetObjectLookupId().Result;
                     colorEntity.ObjectId = itemObjectId;
 
-                    var returnColorEntityCreation = await _appEntitiesAppService.SaveEntity(colorEntity);
+                    var returnColorEntityCreation = _appEntitiesAppService.SaveEntity(colorEntity).Result;
                     tempId = returnColorEntityCreation.ToString();
                 }else { tempId = codeExist.Id.ToString(); }
                  
@@ -616,7 +616,7 @@ namespace onetouch.AppItems
                 #endregion create color lookup
 
                 var entityDto = new EntityDto<long>() { Id = Int32.Parse(tempId) };
-                var color = await _appEntitiesAppService.GetAppEntityForEdit(entityDto);
+                var color = _appEntitiesAppService.GetAppEntityForEdit(entityDto).Result;
 
                 var appEntity = ObjectMapper.Map<AppEntity>(color.AppEntity);
                 appEntity.Code = color.AppEntity.Code;
@@ -626,13 +626,13 @@ namespace onetouch.AppItems
                 var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString();
                 // add the image to the parent
 
-                if(appItemtExcelRecordDTO.ExcelDto.Images is null) { appItemtExcelRecordDTO.ExcelDto.Images = new List<AppItemImage>(); }
-                var imagesCount = appItemtExcelRecordDTO.ExcelDto.Images.Count();
-                if (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid))
-                {
-                    appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid = Guid.NewGuid().ToString();
-                }
-                appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName = appItemtExcelRecordDTO.image;
+                //if(appItemtExcelRecordDTO.ExcelDto.Images is null) { appItemtExcelRecordDTO.ExcelDto.Images = new List<AppItemImage>(); }
+                //var imagesCount = appItemtExcelRecordDTO.ExcelDto.Images.Count();
+                //if (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid))
+                //{
+                //    appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid = Guid.NewGuid().ToString();
+                //}
+                //appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName = appItemtExcelRecordDTO.image;
 
                 if (appEntityDto.EntityAttachments.Count == 0) { appEntityDto.EntityAttachments = new List<AppEntityAttachmentDto>(); }
                 var appEntityAttachmentDto = new AppEntityAttachmentDto
@@ -640,8 +640,8 @@ namespace onetouch.AppItems
                     IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,
                     AttachmentCategoryEnum = 0,
                     AttachmentCategoryId = 3,
-                    FileName = appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName,
-                    guid = appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageGuid,
+                    FileName = appItemtExcelRecordDTO.ExcelDto.ImagePreview,
+                    guid = Guid.NewGuid().ToString(),
                     Index = appEntityDto.EntityAttachments.Count
                 };
 
@@ -659,7 +659,7 @@ namespace onetouch.AppItems
 
                 try
                 {
-                    System.IO.File.Copy(path + @"\" + appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName, path + @"\" + appEntityAttachmentDto.guid + "." + appItemtExcelRecordDTO.ExcelDto.Images[imagesCount].ImageFileName.Split('.')[1], true);
+                    System.IO.File.Copy(path + @"\" + appEntityAttachmentDto.FileName, path + @"\" + appEntityAttachmentDto.guid + "." + appEntityAttachmentDto.FileName.Split('.')[1], true);
 
                 }
                 catch { }
@@ -675,7 +675,7 @@ namespace onetouch.AppItems
                 }
                 appEntityDto.TenantId = tenantId;
                 appEntityDto.EntityAttachments.Add(appEntityAttachmentDto);
-                var saveEntity = await _appEntitiesAppService.SaveEntity(appEntityDto);
+                var saveEntity = _appEntitiesAppService.SaveEntity(appEntityDto).Result;
 
             return saveEntity;
         }

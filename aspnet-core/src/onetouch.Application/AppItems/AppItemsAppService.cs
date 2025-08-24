@@ -6180,6 +6180,17 @@ namespace onetouch.AppItems
             // action 3 add to color
             // remove from result
 
+            // temp
+            excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "1";
+            excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
+            excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
+             
+
+            excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
+            excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
+            excelResultsDTO.ExcelRecords[1].ExcelDto.ImagePreview = "SADE2.png";
+
+            // temp end
             List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
                 .Where(r => r.Status.ToUpper() == "PASSED" && (r.ExcelDto.Actions == "1" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
                 || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6")
@@ -6189,15 +6200,17 @@ namespace onetouch.AppItems
                 int number = Int32.Parse(excelDto.ExcelDto.Actions);
                 if (number == 1 || number == 2 || number == 3 || number == 6)
                 {
-                    foreach (var id in excelDto.Code.Split(","))
-                    { await SaveImageToColor(id, excelDto); }
+                    foreach (var id in excelDto.ExcelDto.Code.Split(","))
+                    { var ret1 = SaveImageToColor(id, excelDto).Result; }
                 }
                 if (number == 4 )
                 {
                     if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
                     excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
                     excelDto.ExcelDto.Actions = "";
-                     
+                    excelDto.ExcelDto.RecordType = "Item";
+                    excelDto.RecordType = "Item";
+
 
                 }
                 if (number == 5)
@@ -6211,6 +6224,7 @@ namespace onetouch.AppItems
                     if (index > -1)
                     {
                         var parent = excelResultsDTO.ExcelRecords[index];
+                        int childNo = 0;
                         foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
                         {
                             var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
@@ -6220,28 +6234,29 @@ namespace onetouch.AppItems
 
                             thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.ExcelDto.RecordType = "Item Variant";
+                            thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
                             thirdItemCopy.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
                             thirdItemCopy.ExcelDto.Actions = "";
-                            excelResultsDTO.ExcelRecords.Insert(index+1,thirdItemCopy);
+                            childNo = +1;
+                            excelResultsDTO.ExcelRecords.Insert(index+ childNo, thirdItemCopy);
 
                         }
                     }
 
-
-
-
-                    if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
-                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    //if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+                    //excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
 
                 }
 
             }
             result = result.Select(r => r).Where(r => (r.Actions != "1" && r.Actions != "2" && r.Actions != "3"
-            //&& r.Actions != "4" && r.Actions != "5" 
-            && r.Actions != "6")).ToList();
+            && r.Actions != "5"
+            && r.Actions != "6" && r.RecordType!="Image" && r.RecordType != "Color") ).ToList();
+           
+            if(result.Count<= 0) { return excelResultsDTO.ExcelLogDTO; }
             #endregion
 
-
+           
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
