@@ -20,7 +20,7 @@ export class AriaIframeComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
-        const externalUrl = 'https://ariaonline.net/RDWeb/webclient';
+        const externalUrl = 'https://ariaonline.net/RDWeb/webclient/index.html';
         this.erpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(externalUrl);
       }
       
