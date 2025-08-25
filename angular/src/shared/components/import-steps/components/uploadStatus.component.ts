@@ -693,6 +693,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   LinkToNewParentItemCodeFromAssociatedData(record) {
     record._isLinkNewParent = true;
+    this.setRecordValue(record, this.mapColumnNameToKey('Code'), '');
+
+
     // Scroll after DOM updated
     setTimeout(() => {
       const container = this.codeInputContainers.find(
@@ -716,6 +719,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   LinkToNewItemVariantCodeFromAssociatedData(record) {
     record._isLinkNewItemColor = true;
+    this.setRecordValue(record, this.mapColumnNameToKey('Code'), '');
+
 
     // Scroll after DOM updated
     setTimeout(() => {
@@ -739,6 +744,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   LinkToNewColorLookupCodeFromAssociatedData(record) {
     record._isLinkNewColorLookup = true;
+    this.setRecordValue(record, this.mapColumnNameToKey('colorCode'), '');
 
     setTimeout(() => {
       const container = this.colorCodeInputContainers.find(
@@ -885,7 +891,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   onAssCodeInputChange(record: any, value: string) {
-    //I44-FE open dropdowm with ass codes (3 cases)
     record._selectionMade = false;
 
     if (record._isLinkNewParent || record._isLinkNewItemColor) {
@@ -906,6 +911,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   private getAssCodeSuggestions(value: string, record: any): any[] {
+    //I44-FE open dropdowm with ass codes (3 cases)
     return [
       { id: 1, displayName: `${value}-Option1` },
       { id: 2, displayName: `${value}-Option2` },

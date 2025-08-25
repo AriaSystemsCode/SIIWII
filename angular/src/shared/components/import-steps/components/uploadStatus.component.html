@@ -334,7 +334,7 @@
 
                             <ng-container
                               *ngIf="column.name === 'Code' && (record._isLinkNewParent ||  record._isLinkNewItemColor) ">
-                              <input #codeInputContainer [attr.data-record-id]="record.id" class="position-relative"
+                              <input  (focus)="activeRecord = record" #codeInputContainer [attr.data-record-id]="record.id" class="position-relative"
                                 type="text" class="form-control" [ngModel]="getRecordValue(record, 'code')"
                                 (ngModelChange)="setRecordValue(record, 'code', $event)" [ngClass]="{
                                         'border-danger': !getRecordValue(record, 'code')
@@ -345,7 +345,7 @@
 
                               <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
                                 *ngIf="activeRecord === record && record._isLinkNewParent  && linkNewParentItem_Data?.length > 0">
-                                <li *ngFor="let item of LinkToExistingITEM_Ret_Data"
+                                <li *ngFor="let item of linkNewParentItem_Data"
                                   (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
                                   {{item.displayName}}
                                 </li>
