@@ -989,6 +989,7 @@ export class MainImportComponent
                         record,
                         newData: result
                     };
+
                 });
         }
 

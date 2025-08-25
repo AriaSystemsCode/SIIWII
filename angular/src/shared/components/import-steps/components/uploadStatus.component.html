@@ -103,14 +103,17 @@
                             Create to NEW COLOR LOOKUP and Link IMAGE
                           </li>
                           <li
+                          *ngIf="hasDataRecords"
                             (click)="handleAction(record, UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData)">
                             Link to NEW PARENT ITEM CODE FROM ASSOCIATED DATA
                           </li>
                           <li
+                          *ngIf="hasDataRecords"
                             (click)="handleAction(record, UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData)">
                             Link to NEW ITEM VARIANT CODE FROM ASSOCIATED DATA
                           </li>
                           <li
+                          *ngIf="hasDataRecords"
                             (click)="handleAction(record, UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData)">
                             Link to NEW COLOR LOOKUP CODE FROM ASSOCIATED DATA
                           </li>

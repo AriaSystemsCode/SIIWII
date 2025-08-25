@@ -462,11 +462,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   handleAction(record: any, action: UploadActionEnum) {
-  
-    //i44 index in array 
-    //i44 color lookup
-    //i44 actions not display when not data
-
     const originalIndex = record.__originalIndex;
 
     this.resetRecords(record, originalIndex);
@@ -537,7 +532,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   ValidateRecord(record) {
-    //I44-BE - last 3 links actions call validate API or set record passed  without calling validation ? 
     this._validateRecord.emit(record);
   }
 
@@ -916,7 +910,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   private getAssCodeSuggestions(value: string, record: any): any[] {
-    //I44-FE open dropdowm with ass codes (3 cases)
     if (record._isLinkNewParent) {
       return this.uploadingResult.excelRecords
         .filter(r =>
@@ -978,7 +971,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
     if (((record._isLinkingParent || record._isLinkingItemColor) && codeValue) || (record._isLinkingColorLookup && ColorCodeValue)
       || ((record._isCreateColorLookup) && ColorCodeValue && ColorCodeNameValue)
-
+      || (this.isCreateNewCases(record) && record._selectionMade)
     ) {
       record.fieldsErrors = [];
       record.errorMessage = "";
@@ -988,7 +981,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
 
-    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor) {
+    if (record._isDataRecord || record._isCreateParent || record._isCreateItemColor || this.isCreateNewCases(record)) {
       this.isConfirm = true;
       this.ValidateRecord(record);
     }
@@ -1036,25 +1029,26 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
+
   selectSuggestion(record: any, selectedItem: any) {
-    //I44-FE select from 3 link new cases
-    if (record._isLinkingParent || record._isLinkingItemColor) {
+    if (record._isLinkingParent || record._isLinkingItemColor || record._isLinkNewParent || record._isLinkNewItemColor) {
       this.setRecordValue(record, 'code', selectedItem.displayName);
       record.excelDto.code = selectedItem.id
     }
 
-    else if (record._isLinkingColorLookup) {
+    else if (record._isLinkingColorLookup || record._isLinkNewColorLookup) {
       this.setRecordValue(record, 'colorCode', selectedItem.displayName);
       record.excelDto.code = selectedItem.id
     }
-
 
 
     setTimeout(() => {
       record._selectionMade = true;
       this.activeRecord = null;
     }, 0);
-    this.selectSugItemCode.emit({ selectedItem, record });
+
+    if (!this.isCreateNewCases)
+      this.selectSugItemCode.emit({ selectedItem, record });
 
   }
 
@@ -1218,7 +1212,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   onCodeSelected(record: any, selectedCode: string) {
-    //I44-FE call this in 3 cases and bind data 
     record._selectionMade = true;
     this.setRecordValue(record, 'code', selectedCode);
   }
@@ -1235,6 +1228,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   isCreateCase(record: any): boolean {
     return record._isCreateItemColor || record._isCreateColorLookup || record._isCreateParent;
+  }
+
+
+  isCreateNewCases(record: any): boolean {
+    return record._isLinkNewParent || record._isLinkNewItemColor || record._isLinkNewColorLookup;
   }
   hasAllRequiredFields(record: any): boolean {
     const requiredColumnsMap = {
@@ -1256,6 +1254,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     if (this.isCreateCase(record)) {
       return this.hasAllRequiredFields(record);
     }
+    if (this.isCreateNewCases(record))
+      return record._selectionMade;
     return true;
   }
 
