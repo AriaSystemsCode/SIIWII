@@ -727,7 +727,7 @@
                                                                         {{
                                                                         currencySymbol
                                                                         }}
-                                                                        {{ productDetails?.minMSRP }}
+                                                                        {{ productDetails?.minMSRP | number:'1.2-2' }}
                                                                     </h5>
                                                                     <span *ngIf="
                                                                   productDetails?.minMSRP !==
@@ -743,7 +743,7 @@
                                                                         {{
                                                                         currencySymbol
                                                                         }}
-                                                                        {{ productDetails?.maxMSRP }}
+                                                                        {{ productDetails?.maxMSRP | number:'1.2-2' }}
                                                                     </h5>
                                                                     <h5> /EAC </h5>
                                                                 </div>
@@ -758,10 +758,7 @@
 
 
                                                                             <h5 *ngIf="showEditSpecialPrice">
-
-                                                                                {{ productDetails?.maxSpecialPrice ?
-                                                                                productDetails?.maxSpecialPrice : "0" |
-                                                                                currency:' ' }}
+                                                                                {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice ?? 0) | number:'1.2-2' }}
                                                                             </h5>
 
                                                                             <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
@@ -1812,7 +1809,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                     {{
                                                                                     currencySymbol
                                                                                     }}
-                                                                                    {{ productDetails?.minMSRP }}
+                                                                                    {{ productDetails?.minMSRP | number:'1.2-2'}}
                                                                                 </h5>
                                                                                 <span *ngIf="
                                                                 productDetails?.minMSRP !==
@@ -1828,7 +1825,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                     {{
                                                                                     currencySymbol
                                                                                     }}
-                                                                                    {{ productDetails?.maxMSRP }}
+                                                                                    {{ productDetails?.maxMSRP | number:'1.2-2' }}
                                                                                 </h5>
                                                                                 <h5> /EAC </h5>
                                                                             </div>
@@ -1850,7 +1847,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                             productDetails?.maxSpecialPrice
                                                                                             ?
                                                                                             productDetails?.maxSpecialPrice
-                                                                                            : "0" | currency:' ' }}
+                                                                                            : "0" | number:'1.2-2' | currency:' ' }}
                                                                                         </h5>
 
                                                                                         <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
