@@ -462,6 +462,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   handleAction(record: any, action: UploadActionEnum) {
+  
+    //i44 index in array 
+    //i44 color lookup
+    //i44 actions not display when not data
+
     const originalIndex = record.__originalIndex;
 
     this.resetRecords(record, originalIndex);
@@ -912,10 +917,51 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   private getAssCodeSuggestions(value: string, record: any): any[] {
     //I44-FE open dropdowm with ass codes (3 cases)
-    return [
-      { id: 1, displayName: `${value}-Option1` },
-      { id: 2, displayName: `${value}-Option2` },
-    ];
+    if (record._isLinkNewParent) {
+      return this.uploadingResult.excelRecords
+        .filter(r =>
+          r.id !== record.id &&
+          r.recordType === "Item" &&
+          r.code &&
+          r.code.toLowerCase().includes(value.toLowerCase())
+        )
+        .map(r => ({
+          id: r.id,
+          displayName: r.code
+        }));
+
+    }
+
+    else if (record._isLinkNewItemColor) {
+      return this.uploadingResult.excelRecords
+        .filter(r =>
+          r.id !== record.id &&
+          r.recordType === "Item Variant" &&
+          r.code &&
+          r.code.toLowerCase().includes(value.toLowerCase())
+        )
+        .map(r => ({
+          id: r.id,
+          displayName: r.code
+        }));
+    }
+
+    //I44-BE return color records 
+    else if (record._isLinkNewColorLookup) {
+      return this.uploadingResult.excelRecords
+        .filter(r =>
+          r.id !== record.id &&
+          r.recordType === "Color" &&
+          r.code &&
+          r.code.toLowerCase().includes(value.toLowerCase())
+        )
+        .map(r => ({
+          id: r.id,
+          displayName: r.code
+        }));
+    }
+    return [];
+
   }
 
   confirmLinking(record: any): void {
