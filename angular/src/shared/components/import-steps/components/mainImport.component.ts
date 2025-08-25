@@ -1089,6 +1089,7 @@ export class MainImportComponent
     }
 
     onValidateRecord(record) {
+        //I44-BE gives internal error in 3 create actions !
         let _ImportItemInputDto: ImportItemInputDto = new ImportItemInputDto();
         _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
         this.importServiceProxy.validateImportItemData(_ImportItemInputDto)

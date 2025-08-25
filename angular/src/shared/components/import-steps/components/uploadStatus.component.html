@@ -334,15 +334,31 @@
 
                             <ng-container
                               *ngIf="column.name === 'Code' && (record._isLinkNewParent ||  record._isLinkNewItemColor) ">
-                              <input #codeInputContainer  [attr.data-record-id]="record.id"
-                              class="position-relative"  type="text" class="form-control"
-                                [ngModel]="getRecordValue(record, 'code')"
+                              <input #codeInputContainer [attr.data-record-id]="record.id" class="position-relative"
+                                type="text" class="form-control" [ngModel]="getRecordValue(record, 'code')"
                                 (ngModelChange)="setRecordValue(record, 'code', $event)" [ngClass]="{
                                         'border-danger': !getRecordValue(record, 'code')
                                      }" (ngModelChange)="onAssCodeInputChange(record, $event)" />
                               <small class="text-danger" *ngIf="!getRecordValue(record, 'code')">
                                 {{ getExampleTextForCases(record, column.name) }}
                               </small>
+
+                              <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                *ngIf="activeRecord === record && record._isLinkNewParent  && linkNewParentItem_Data?.length > 0">
+                                <li *ngFor="let item of LinkToExistingITEM_Ret_Data"
+                                  (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                  {{item.displayName}}
+                                </li>
+                              </ul>
+
+                              <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                *ngIf="activeRecord === record  && record._isLinkNewItemColor && linkNewItemColor_Data?.length > 0">
+                                <li *ngFor="let item of linkNewItemColor_Data"
+                                  (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                  {{item.displayName}}
+                                </li>
+                              </ul>
+
                             </ng-container>
 
 
@@ -356,6 +372,14 @@
                               <small class="text-danger" *ngIf="!getRecordValue(record, 'colorCode')">
                                 {{ getExampleTextForCases(record, column.name) }}
                               </small>
+
+                              <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                *ngIf="activeRecord === record  && linkNewColorLookup_Data?.length > 0">
+                                <li *ngFor="let item of linkNewColorLookup_Data"
+                                  (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                  {{item.displayName}}
+                                </li>
+                              </ul>
                             </ng-container>
 
 
