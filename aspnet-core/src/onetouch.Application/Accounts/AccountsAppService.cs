@@ -948,7 +948,16 @@ namespace onetouch.Accounts
                 var contactObjectId = await _helper.SystemTables.GetObjectContactId();
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
-
+                //I40[Start]
+                var currentTenantAccount = _appContactRepository.GetAll().Include(z => z.EntityFk)
+                       .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile,
+                                x => x.TenantId == AbpSession.TenantId && x.Id == input.AccountId)
+                       .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.View,
+                        x => x.Id == input.AccountId).FirstOrDefault();
+                //I40[End]
+                var currentTenantAccountSSIN = currentTenantAccount.SSIN;
+                var currentTenantAccountType = currentTenantAccount.EntityFk.EntityObjectTypeId;
+                var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                 var contactInfo = _appContactRepository.GetAll()
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
@@ -956,7 +965,14 @@ namespace onetouch.Accounts
                 .Include(x => x.AccountFk)
                 .Where(x => x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
                 //.WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && x.AccountId == input.AccountId && x.IsProfileData)
-                .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && ((x.AccountId == input.AccountId && x.IsProfileData)||(!x.IsProfileData && x.EntityFk.EntityObjectTypeId== presonEntityObjectTypeId && x.ParentId==null))) //&& (x.EntityFk.TenantOwner==AbpSession.TenantId || x.EntityFk.TenantOwner ==0 || x.EntityFk.TenantOwner ==null )
+                .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile,
+                x => x.TenantId == AbpSession.TenantId && (((x.AccountId == input.AccountId && x.IsProfileData) ||
+                            _appContactRelationshipInfoRepository.GetAll()
+                           .Count(s => s.RecipientContactSSIN  == x.SSIN &&
+                           s.RequesterContactSSIN == currentTenantAccountSSIN && s.ConsiderAsTeamMember == true && s.SharingLevel == 1
+                           && s.EntityObjectStatusId == activeRelationshipStatusId) >0
+                ) ||
+                (!x.IsProfileData && x.EntityFk.EntityObjectTypeId== presonEntityObjectTypeId && x.ParentId==null))) //&& (x.EntityFk.TenantOwner==AbpSession.TenantId || x.EntityFk.TenantOwner ==0 || x.EntityFk.TenantOwner ==null )
                 .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.View, x => x.AccountId == input.AccountId)
                 .WhereIf(input.AccountId == null && input.FilterType == MemberFilterTypeEnum.MarketPlace, x => x.TenantId == null && !x.IsProfileData)
                 .WhereIf(!string.IsNullOrEmpty(input.Filter),
@@ -968,20 +984,11 @@ namespace onetouch.Accounts
 
                 //       .PageBy(input);
 
-                //I40[Start]
-                var currentTenantAccount = _appContactRepository.GetAll().Include(z=>z.EntityFk)
-                       .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile,
-                                x => x.TenantId == AbpSession.TenantId && x.Id == input.AccountId) 
-                       .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.View,
-                        x => x.Id == input.AccountId).FirstOrDefault();
-
-                var currentTenantAccountSSIN = currentTenantAccount.SSIN;
-                var currentTenantAccountType = currentTenantAccount.EntityFk.EntityObjectTypeId;
-                var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
-                var relationships = _appContactRelationshipInfoRepository.GetAll()
+                
+                /*var relationships = _appContactRelationshipInfoRepository.GetAll()
                            .Where(s => s.RecipientContactTypeId == presonEntityObjectTypeId &&
                            s.RequesterContactSSIN == currentTenantAccountSSIN && s.ConsiderAsTeamMember == true && s.SharingLevel == 1
-                           && s.EntityObjectStatusId == activeRelationshipStatusId);
+                           && s.EntityObjectStatusId == activeRelationshipStatusId);*/
                 
                 //I40[Start]
                 DateTime jDate = DateTime.Now;
@@ -989,28 +996,28 @@ namespace onetouch.Accounts
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
                     .Include(x => x.AppContactAddresses)
-                    .Include(x => x.AccountFk)
-                    .Join(relationships, x => x.SSIN, sa => sa.RecipientContactSSIN, (s, sa) => new { account =s });
+                    .Include(x => x.AccountFk);
+                    //.Join(relationships, x => x.SSIN, sa => sa.RecipientContactSSIN, (s, sa) => new { account =s });
 
                 var contactInfoJoin = from o in contactInfoj
                                       select new GetMemberForViewDto()
                                       {
-                                          Id = o.account.Id,
-                                          FirstName = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue) ? "" : o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue,
-                                          SurName = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue) ? "" : o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue,
-                                          JobTitle = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null || o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue) ? "" : o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue,
-                                          EMailAddress = o.account.EMailAddress == null ? "" : o.account.EMailAddress,
-                                          AccountName = o.account.AccountFk.Name,
+                                          Id = o.Id,
+                                          FirstName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue) ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue,
+                                          SurName = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue) ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue,
+                                          JobTitle = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue) ? "" : o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue,
+                                          EMailAddress = o.EMailAddress == null ? "" : o.EMailAddress,
+                                          AccountName = o.AccountFk.Name,
                                           //MMT222
                                           //JoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null ? DateTime.Now : DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue),
-                                          JoinDate = (o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null || o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue)) ? DateTime.Now : (DateTime.TryParse(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue, out jDate) ? DateTime.Parse(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue) : DateTime.Now),
+                                          JoinDate = (o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue)) ? DateTime.Now : (DateTime.TryParse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue, out jDate) ? DateTime.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue) : DateTime.Now),
                                           //MMT222
                                           //IsPublicJoinDate = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic") == null ? false : bool.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeCode == "Join-Date-IsPublic").AttributeValue),
                                           IsActive = false,
-                                          UserId = o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null || o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null || string.IsNullOrEmpty(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue) ? 0 : long.Parse(o.account.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue),
-                                          ImageUrl = string.IsNullOrEmpty(o.account.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
+                                          UserId = o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null || o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null || string.IsNullOrEmpty(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue) ? 0 : long.Parse(o.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue),
+                                          ImageUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                           ""
-                                          : "attachments/" + (o.account.EntityFk.TenantId == null ? "-1" : o.account.EntityFk.TenantId.ToString()) + "/" + o.account.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment
+                                          : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment
                                       };
                 //I40[End]
 
@@ -1213,9 +1220,50 @@ namespace onetouch.Accounts
                 //var branch = ObjectMapper.Map<BranchDto>(account);
                 var mainBranch = await _appContactRepository.GetAll()
                 .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
-                .Include(z => z.CurrencyFk).FirstOrDefaultAsync(x => x.ParentId == id && x.Code=="*Main*"); 
-                var branch = ObjectMapper.Map<BranchDto>(mainBranch);
-                //I40[End]
+                .Include(z => z.CurrencyFk).FirstOrDefaultAsync(x => x.ParentId == id && x.Code== "*Main*-"+account.Code.TrimEnd());
+                if (mainBranch == null && account.TenantId== AbpSession.TenantId)
+                {
+                    BranchDto branchDto = new BranchDto();
+                    branchDto.AccountId = account.Id;
+                    branchDto.ParentId = account.Id;
+                    branchDto.TenantId = AbpSession.TenantId;
+
+                    branchDto.Code = "*Main*-"+account.Code.TrimEnd();
+                    branchDto.Name = account.Name.TrimEnd() + " Main Branch";
+                    branchDto.CurrencyId = account.CurrencyId;
+                    branchDto.EMailAddress = account.EMailAddress;
+                    branchDto.LanguageId = account.LanguageId;
+                    branchDto.Id = 0;
+                    branchDto.Phone1Number = account.Phone1Number;
+                    branchDto.Phone2Number = account.Phone3Number;
+                    branchDto.Phone3Number = account.Phone3Number;
+                    branchDto.Phone1TypeName = account.Phone1TypeName;
+                    branchDto.Phone2TypeName = account.Phone2TypeName;
+                    branchDto.Phone3TypeName = account.Phone3TypeName;
+                    branchDto.Phone1Ext = account.Phone1Ext;
+                    branchDto.Phone3Ext = account.Phone3Ext;
+                    branchDto.Phone2Ext = account.Phone2Ext;
+                    branchDto.Phone1TypeId = account.Phone1TypeId;
+                    branchDto.Phone2TypeId = account.Phone2TypeId;
+                    branchDto.Phone3TypeId = account.Phone3TypeId;
+                    branchDto.TradeName = account.TradeName;
+                    await CreateOrEditBranch(branchDto);
+                    mainBranch = await _appContactRepository.GetAll()
+                        .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                        .Include(z => z.CurrencyFk).FirstOrDefaultAsync(x => x.ParentId == id && x.Code == "*Main*-" + account.Code.TrimEnd() );
+                }
+                BranchDto branch;
+                if (mainBranch != null)
+                {
+                    branch = ObjectMapper.Map<BranchDto>(mainBranch);
+                    //I40[End]
+                    
+                }
+                else
+                {
+                    branch = ObjectMapper.Map<BranchDto>(account);
+                }
+
                 BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
@@ -2755,7 +2803,7 @@ namespace onetouch.Accounts
                 branchDto.ParentId = newId;
                 branchDto.TenantId = AbpSession.TenantId;
                 
-                branchDto.Code = "*Main*";
+                branchDto.Code = "*Main*-" + input.Code.TrimEnd() ;
                 branchDto.Name= contact.Name.TrimEnd()+" Main Branch";
                 branchDto.CurrencyId = input.CurrencyId;
                 branchDto.EMailAddress = input.EMailAddress;
@@ -8435,21 +8483,10 @@ namespace onetouch.Accounts
                 
                 foreach (var account in mainResultAccount)
                 {
-                    //string mainBranchCode = "";
-                    //var existingAcc = await _appContactRepository.GetAll()
-                    //    .Where(z => z.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId && z.Code == account.Code).FirstOrDefaultAsync();
-                    //if (existingAcc != null)
-                    //{
-                    //    var existingMainBranch = await _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == branchEntityObjecttypeId 
-                    //    && z.ParentId == existingAcc.Id && z.Code="*Main*").FirstOrDefaultAsync();
-                    //    if (existingMainBranch != null)
-                    //    {
-                    //        mainBranchCode = existingMainBranch.Code;
-                    //    }
-                    //}
+                    
                     AccountExcelDto branchObject = account.ShallowCopy();
                     branchObject.ParentCode = account.Code;
-                    branchObject.Code = "*Main*";
+                    branchObject.Code = "*Main*-" + account.Code.TrimEnd() ;
                     branchObject.Name = branchObject.Name .TrimEnd()+ " Main Branch";
                     branchObject.RecordType = "Branch";
                     mainBranchesList.Add(branchObject);
@@ -8490,6 +8527,13 @@ namespace onetouch.Accounts
                                 break;
                             case ExcelRecordRepeateHandler.CreateACopy: // override
                                 createOrEditAccountInfoDto.Code = GetAccountCopyCode(code, partnerEntityObjectTypeId);
+                                var mainbr = result.FirstOrDefault(z => z.Code == "*Main*-" + oldCode.TrimEnd() );
+                                if (mainbr != null)
+                                {
+                                    string oldMainBranch = mainbr.Code;
+                                    mainbr.Code = "*Main*-" + createOrEditAccountInfoDto.Code.TrimEnd() ;
+                                    result.Where(z => z.ParentCode == oldMainBranch).ForEach(z => z.ParentCode = mainbr.Code);
+                                }
                                 createOrEditAccountInfoDto.Id = 0;
                                 break;
                             default:
@@ -8638,7 +8682,7 @@ namespace onetouch.Accounts
 
 
                     List<AccountExcelDto> resultExcelAccBranchOnly = result.Where(r => r.RecordType == "Branch"
-                    && !string.IsNullOrEmpty(r.ParentCode) && (r.ParentCode == oldCode || r.ParentCode == "*Main*")
+                    && !string.IsNullOrEmpty(r.ParentCode) && (r.ParentCode == oldCode || r.ParentCode == "*Main*-" + createOrEditAccountInfoDto.Code.TrimEnd() )
                     && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To
                     ).OrderBy(r => r.ParentCode).ToList();
 
@@ -8664,7 +8708,7 @@ namespace onetouch.Accounts
                     }
                     List<BranchDto> resultBranchDtoA = mapperBranchAcc.Map<List<AccountExcelDto>, List<BranchDto>>(resultExcelAccBranchOnly);
                     //XXX
-                    var accountBranchList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).ToList()
+                    var accountBranchList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId).ToList()
                                              join s in resultBranchDtoA on o.Code equals s.Code
                                              select o).ToList();
                     //XXX
@@ -8702,7 +8746,7 @@ namespace onetouch.Accounts
                                         bEntityId = accountA.EntityId;
                                         break;
                                     case ExcelRecordRepeateHandler.CreateACopy: // override
-                                        branchDto.Code = GetAccountCopyCode(codeA, partnerEntityObjectTypeId);
+                                        branchDto.Code = GetAccountCopyCode(codeA, branchEntityObjectTypeId);
                                         oldSSIN = "";
                                         break;
                                     default:
@@ -8799,9 +8843,9 @@ namespace onetouch.Accounts
                             }
                             // branchContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(branchDto.ContactAddresses);
 
-                            if (branchDto.ParentCode == "*Main*")
+                            if (branchDto.ParentCode == "*Main*-" + createOrEditAccountInfoDto.Code.TrimEnd() )
                             {
-                                var mainbr = accountContact.ParentFkList.FirstOrDefault(z => z.Code == "*Main*");
+                                var mainbr = accountContact.ParentFkList.FirstOrDefault(z => z.Code == "*Main*-" + createOrEditAccountInfoDto.Code.TrimEnd() );
                                 if (mainbr != null)
                                 {
                                     if (mainbr.ParentFkList == null)
@@ -8971,6 +9015,8 @@ namespace onetouch.Accounts
                                         });
                                     }
                                     //teamContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(branchDto.ContactAddresses);
+                                    if (branchContact.ParentFkList == null)
+                                        branchContact.ParentFkList = new List<AppContact>();
                                     branchContact.ParentFkList.Add(teamContact);
                                     //var contact = await CreateOrEditContact(personDto);
 
@@ -9038,6 +9084,11 @@ namespace onetouch.Accounts
                                 foreach (var cont in br.ParentFkList)
                                 {
                                     cont.AccountId = acc.Id;
+                                    foreach (var sub in cont.ParentFkList)
+                                    {
+                                        sub.AccountId = acc.Id;
+
+                                    }
                                 }
                             }
                         }

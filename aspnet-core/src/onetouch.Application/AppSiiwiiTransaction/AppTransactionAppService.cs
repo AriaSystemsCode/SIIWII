@@ -2113,10 +2113,10 @@ namespace onetouch.AppSiiwiiTransaction
             var accountsList = _appContactRepository.GetAll()
                 .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                 .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
-                & a.AccountId == accountId & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId
-                &
+                 & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId
+                & (a.AccountId == accountId ||
                     _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountObject.SSIN &&
-                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId == activeRealtionshipStatusId) > 0
+                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId == activeRealtionshipStatusId) > 0)
                 );
 
 
@@ -2386,7 +2386,9 @@ namespace onetouch.AppSiiwiiTransaction
                                 cnt.ContactAddressDetail.ContactEmail = cnt.ContactEmail;
                                 cnt.ContactAddressDetail.ContactPhone = cnt.ContactPhoneNumber;
                             }
-                            if (cnt.BranchSSIN !=null && cnt.BranchName !="*Main*")
+                            //I40[Start]
+                            if (true)//(cnt.BranchSSIN !=null && cnt.BranchName !="*Main*")
+                            //I40[End]
                             {
                                 var branch = _appContactRepository.GetAll().Where(z => z.SSIN == cnt.BranchSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
                                 if (branch != null)
@@ -3522,15 +3524,20 @@ namespace onetouch.AppSiiwiiTransaction
             List<AccountBranchDto> returnList = new List<AccountBranchDto>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                //I40[Start]
+                //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var branchEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
+                //I40[End]
                 var filteredParentId = _appContactRepository.GetAll().Where(z => z.SSIN == accountSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
                 if (filteredParentId != null)
                 {
                     var filteredBranches = _appContactRepository.GetAll()
                             .Include(e => e.ParentFk)
                             // .Include(e => e.ParentFkList)
-                            .Where(e => e.ParentId != null && e.ParentId == filteredParentId.Id && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId);
-
+                            .Where(e => e.ParentId != null && e.ParentId == filteredParentId.Id &&
+                            //I40[Start]
+                            e.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId);
+                            //I40[End]
                     var branches = from o in filteredBranches
                                        //join o2 in _appContactRepository.GetAll() on o.ParentId equals o2.Id into j2
                                        // from s2 in j2.DefaultIfEmpty()
@@ -3549,7 +3556,9 @@ namespace onetouch.AppSiiwiiTransaction
                                    };
                     var totalCount = await filteredBranches.CountAsync();
                     var x = await branches.ToListAsync();
-                    x.Add(new AccountBranchDto { Code = "Main", Name = @"*Main*", Id = filteredParentId.Id, SSIN = accountSSIN });
+                    //I40[Start]
+                    //x.Add(new AccountBranchDto { Code = "Main", Name = @"*Main*", Id = filteredParentId.Id, SSIN = accountSSIN });
+                    //I40[End]
                     var orderedList = x.OrderBy(z => z.Name).ToList();
                     return orderedList;
                 }
@@ -3574,10 +3583,11 @@ namespace onetouch.AppSiiwiiTransaction
                 List<GetContactInformationDto> returnObjectList = new List<GetContactInformationDto>();
                 var accountsList = _appContactRepository.GetAll()
                     .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
-                    .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
-                    & a.AccountId == accountId.Id & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &
+                    .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null 
+                     & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &
+                     (a.AccountId == accountId.Id ||
                     _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountSSIN &&
-                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId== activeRealtionshipStatusId)>0
+                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId== activeRealtionshipStatusId)>0 )
                     );
 
 
