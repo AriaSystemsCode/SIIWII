@@ -60,13 +60,13 @@
                       
                             
                             <div class=" row">
-                                <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                <label for="Name" class="col-sm-2 col-form-label col-form-label-sm label-form">
                                     <span class="text-danger">*</span>
-                                    {{l("Name")}}
+                                    {{l("First Name")}}
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" id="FirstName" class="form-control" name="FirstName" #FirstNameInput="ngModel" [ngModel]="getSrtingValue(701)" required [placeholder]="'PleaseEnterFirstName' | localize "/>
-                                    <validation-messages [formCtrl]="FirstNameInput"></validation-messages>
+                                    <input type="text" id="Name" class="form-control" name="name" #NameInput="ngModel" [(ngModel)]="memberDto.name" required [placeholder]="'PleaseEnterFirstName' | localize "/>
+                                    <validation-messages [formCtrl]="NameInput"></validation-messages>
                                 </div>
                             </div>
                             <hr class="header">
@@ -77,7 +77,15 @@
                                     {{l("Sir Name")}}
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" id="LastName" class="form-control" name="LastName" #LastNameInput="ngModel" [ngModel]="getSrtingValue(702)" required [placeholder]="'PleaseEnterFirstName' | localize "/>
+                                    <input   type="text"
+                                    id="LastName"
+                                    class="form-control"
+                                    name="LastName"
+                                    #LastNameInput="ngModel"
+                                    [ngModel]="getStringValue(702)"
+                                    (ngModelChange)="setStringValue(702, $event)"
+                                    required
+                                    [placeholder]="'PleaseEnterFirstName' | localize"/>
                                     <validation-messages [formCtrl]="LastNameInput"></validation-messages>
                                 </div>
                             </div>
@@ -159,7 +167,13 @@
                                 </label>
                                 <div class="col-md-6">
                                     <div class="input-group">
-                                        <input type="text" (click)="selectBranch()" id="Branch" class="form-control" name="Branch"  #BranchInput="ngModel" [(ngModel)]="selectedBranchName"  disabled [placeholder]="'PleaseSelectBranch'|localize" />
+                                        <input type="text"
+                                        id="Branch"
+                                        class="form-control"
+                                        [ngModel]="selectedBranchName"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        readonly
+                                        [placeholder]="'PleaseSelectBranch' | localize" />
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -170,7 +184,7 @@
                             </div>
                             <hr class="header">
                             <!--Join Date -->
-                            <!-- <div class=" row">
+                            <div class=" row">
                                 <label for="JoinDate" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("JoinDate")}}</label>
                                 <div class="col-md-6">
                                   
@@ -202,7 +216,7 @@
                                   
                                 </div>
                             </div>
-                            <hr class="header"> -->
+                            <hr class="header">
                             <!--User Name -->
                             <!-- <div class="form-group row" *ngIf="!isManualOrExternalContact">
                                 <label for="UserName" class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -222,9 +236,17 @@
                                     {{l("JobTitle")}}
                                 </label>
                                 <div class="col-md-6">
-                                    <input type="text" id="JobTitle" name="JobTitle" class="form-control" minlength="2" maxlength="100"
-                                    required #JobTitleInput="ngModel" [(ngModel)]="jobTitleAttr?.selectedValues[jobTitleAttr.selectedValues.length - 1].value"
-                                    [placeholder]="'PleaseEnterJobTitle' | localize "/>
+                                    <input   type="text"
+                                    id="JobTitle"
+                                    name="JobTitle"
+                                    class="form-control"
+                                    #JobTitleInput="ngModel"
+                                    [ngModel]="getStringValue(706)"
+                                    (ngModelChange)="setStringValue(706, $event)"
+                                    minlength="2"
+                                    maxlength="100"
+                                    required
+                                    [placeholder]="'PleaseEnterJobTitle' | localize"/>
                                     <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
                                 </div>
                             </div>

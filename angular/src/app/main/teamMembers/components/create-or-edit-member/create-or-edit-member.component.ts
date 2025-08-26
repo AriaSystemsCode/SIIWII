@@ -1,7 +1,7 @@
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AccountsServiceProxy, AppEntitiesServiceProxy, SycAttachmentCategoriesServiceProxy, AppEntityAttachmentDto, TreeNodeOfBranchForViewDto, LookupLabelDto, BranchForViewDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, AppEntityExtraDataDto, CreateOrEditAccountInfoDto, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { ViewChild, Component, EventEmitter, Injector, Output, Input } from '@angular/core';
+import { ViewChild, Component, EventEmitter, Injector, Output, Input, ChangeDetectorRef } from '@angular/core';
 import { SelectBranchModalComponent } from '../../../../select-branch/select-branch-modal/select-branch-modal.component';
 import { NgForm } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
@@ -81,6 +81,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     private updateLogoService: UpdateLogoService,
     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
     private _extraAttributeDataService: ExtraAttributeDataService,
+    private cdr: ChangeDetectorRef
   ) {
     super(injector);
 
@@ -330,42 +331,39 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     this.getAccountBranches();
   }
 
-  branchSelected(Branch: any) {
-    const addr = Branch?.contactAddresses?.[0];
-    this.selectedBranchName = '';
-    if (addr) {
-      const parts = [
-        addr.name,
-        addr.addressLine1,
-        addr.addressLine2,
-        addr.city,
-        addr.state,
-        addr.postalCode,
-        addr.countryIdName
-      ];
-      this.selectedBranchName = parts.filter(Boolean).join(' , ');
-    }
-
-    this.selectedBranchId = Branch.id;
-    this.memberDto.parentId = Branch.id;
-
-    const branchForView = BranchForViewDto.fromJS({
-      branch: Branch,
-      subTotal: 0,
-      id: Branch.id
-    });
-
-    const treeNode = new TreeNodeOfBranchForViewDto();
-    treeNode.data = branchForView;
-    treeNode.label = Branch.name || '';
-    treeNode.leaf = true;
-    treeNode.expanded = true;
-    treeNode.children = []; // ✅ empty array instead of [null]
-    treeNode.totalChildrenCount = 0;
-
-    this.memberDto.branches = [treeNode];
+  branchSelected(raw: any) {
+    const b = raw?.branch ?? raw;                // support both shapes
+    if (!b) return;
+  
+    const addr = Array.isArray(b.contactAddresses) && b.contactAddresses.length
+      ? b.contactAddresses[0]
+      : null;
+  
+    const parts = [
+      b.name,                                    // always include name
+      addr?.addressLine1,
+      addr?.addressLine2,
+      addr?.city,
+      addr?.state,
+      addr?.postalCode,
+      addr?.countryIdName,
+    ].filter(p => !!p && p !== '');
+  
+    this.selectedBranchName = parts.join(' , '); // what the input shows
+    this.selectedBranchId = b.id;
+    this.memberDto.parentId = b.id;
+  
+    const node = new TreeNodeOfBranchForViewDto();
+    node.data = BranchForViewDto.fromJS({ branch: b, subTotal: 0, id: b.id });
+    node.label = b.name || '';
+    node.leaf = true;
+    node.expanded = true;
+    node.children = [];
+    node.totalChildrenCount = 0;
+    this.memberDto.branches = [node];
+  
+    this.cdr.detectChanges();                    // ensure UI refresh in case modal runs outside Angular zone
   }
-
 
   branchSelectionCanceled() {
     this.selectBranchModal.close();
@@ -389,8 +387,34 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
 
     this.memberDto.useDTOTenant = true;
+   // ✅ Create a new DTO instance and assign only the valid fields
+   this.setStringValue(701, this.memberDto.name || '');
+    const cleanDto = new CreateOrEditAccountInfoDto();
 
-    this._AccountsServiceProxy.createOrUpdateContact(this.memberDto)
+    const allowedKeys = [
+      'fileToken','tradeName','accountType','accountTypeId','ssin','priceLevel','notes','website','name','code',
+      'phone1Number','phone1Ex','phone2Number','phone2Ex','phone3Number','phone3Ex','eMailAddress',
+      'phone1TypeId','phone2TypeId','phone3TypeId','currencyId','languageId','entityId','tenantId',
+      'attachmentSourceTenantId','useDTOTenant','returnId','accountLevel','entityCategories','entityClassifications',
+      'entityAttachments','branches','contactAddresses','contactPaymentMethods','entityExtraData','id','parentId','accountId'
+    ];
+    
+    for (const key of allowedKeys) (cleanDto as any)[key] = (this.memberDto as any)[key];
+    
+    // Safety: make sure we never send UI-only field even if present
+    (delete (cleanDto as any).extraDataAttributes);
+    
+    // Ensure proper DTO instances in arrays that get serialized
+    cleanDto.entityExtraData = (cleanDto.entityExtraData || []).map(d => {
+      const dto = new AppEntityExtraDataDto();
+      dto.attributeId = d.attributeId;
+      dto.attributeValue = d.attributeValue ?? undefined;
+      dto.attributeValueId = d.attributeValueId ?? undefined;
+      return dto;
+    });
+
+    console.log(this.memberDto,'lllll')
+    this._AccountsServiceProxy.createOrUpdateContact(cleanDto)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe(result => {
         const userId = this.memberDto?.userId || result.userId;
@@ -707,70 +731,100 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   }
   
   onChangejoinDateFromPicker(date: Date) {
-    const joinDateAttr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 707);
+    const iso = moment.utc(date).format();
+  
+    const joinDateAttr = this.memberDto?.extraDataAttributes?.find(a => a.extraAttributeId === 707);
     if (joinDateAttr) {
-      joinDateAttr.selectedValues = [{
-        ...joinDateAttr.selectedValues?.[joinDateAttr.selectedValues.length - 1],
-        value: moment.utc(date).format(),
+      if (!joinDateAttr.selectedValues || joinDateAttr.selectedValues.length === 0) {
+        joinDateAttr.selectedValues = [{ value: iso, init() {}, toJSON() {} } as any];
+      } else {
+        joinDateAttr.selectedValues[joinDateAttr.selectedValues.length - 1].value = iso;
+      }
+    }
+  
+    this.upsertEntityExtraData(707, iso);  // <-- correct persistence
+  }
+  
+  
+  getJoinDateIsPublic(): boolean {
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
+    const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+    return val === 'true' ;
+  }
+  
+  setJoinDateIsPublic(val: boolean) {
+    const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
+    if (attr) {
+      attr.selectedValues = [{
+        ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
         init: function (_data?: any): void {},
         toJSON: function (data?: any) {}
       }];
     }
-
-    const joinDateAttrI = this.memberDto?.entityExtraData?.find(attr => attr.extraAttributeId === 707);
-    if (joinDateAttr) {
-      joinDateAttrI.attributeValue =  moment.utc(date).format()
-    }
   }
-  
-  // getJoinDateIsPublic(): boolean {
-  //   const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
-  //   const val = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-  //   return val === 'true' ;
-  // }
-  
-  // setJoinDateIsPublic(val: boolean) {
-  //   const attr = this.memberDto?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
-  //   if (attr) {
-  //     attr.selectedValues = [{
-  //       ...attr.selectedValues?.[attr.selectedValues.length - 1], value: val.toString(),
-  //       init: function (_data?: any): void {},
-  //       toJSON: function (data?: any) {}
-  //     }];
-  //   }
-  // }
 
 
 
-  getSrtingValue(attrId: number): string {
-    const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
-          const lastValue = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-          return lastValue;
-  }
-  setStringValue(attrId: number, checked: boolean): void {
-    const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
-    if (attr?.selectedValues?.length > 0) {
-      attr.selectedValues[attr.selectedValues.length - 1].value = this.getSrtingValue(attrId);
-    }
-    const attri = this.memberDto?.entityExtraData?.find(x => x.attributeId === attrId);
-    attri.attributeValue = this.getSrtingValue(attrId)
- 
-
-  }
   getBooleanValue(attrId: number): boolean {
     const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
-    return attr?.selectedValues?.[0]?.value?.toLowerCase() === 'true';
+    const v = attr?.selectedValues?.[0]?.value ?? '';
+    return v.toString().toLowerCase() === 'true';
   }
   
   setBooleanValue(attrId: number, checked: boolean): void {
     const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
-    if (attr?.selectedValues?.length > 0) {
-      attr.selectedValues[0].value = checked.toString();
+    // keep UI state in extraDataAttributes if it exists
+    if (attr) {
+      if (!attr.selectedValues || attr.selectedValues.length === 0) {
+        attr.selectedValues = [{ value: checked.toString(), init() {}, toJSON() {} } as any];
+      } else {
+        attr.selectedValues[attr.selectedValues.length - 1].value = checked.toString();
+      }
     }
-    const attri = this.memberDto?.entityExtraData?.find(x => x.attributeId === attrId);
-    attri.attributeValue =  checked.toString()
+    // always persist to entityExtraData
+    this.upsertEntityExtraData(attrId, checked.toString());
+  }
+  
+  getStringValue(attrId: number): string {
+    const attr = this.memberDto?.extraDataAttributes?.find(a => a.extraAttributeId === attrId);
+    return attr?.selectedValues?.[attr.selectedValues.length - 1]?.value ?? '';
+  }
+  
+  setStringValue(attrId: number, val: string): void {
  
+    if (!this.memberDto.extraDataAttributes) this.memberDto.extraDataAttributes = [];
+    let attr = this.memberDto.extraDataAttributes.find(a => a.extraAttributeId === attrId) as any;
+    if (!attr) {
+      attr = { extraAttributeId: attrId, selectedValues: [] };
+      this.memberDto.extraDataAttributes.push(attr);
+    }
+    if (!attr.selectedValues || attr.selectedValues.length === 0) {
+      attr.selectedValues = [{ value: val, init() {}, toJSON() {} }];
+    } else {
+      attr.selectedValues[attr.selectedValues.length - 1].value = val;
+    }
+  
 
+    this.upsertEntityExtraData(attrId, val);
+  }
+  
+  private upsertEntityExtraData(attrId: number, value?: string, valueId?: number) {
+    if (!this.memberDto.entityExtraData) this.memberDto.entityExtraData = [];
+  
+    let row = this.memberDto.entityExtraData.find(d => d.attributeId === attrId);
+    if (!row) {
+      row = new AppEntityExtraDataDto();
+      row.attributeId = attrId;
+      this.memberDto.entityExtraData.push(row);
+    }
+    // Assign either plain value or lookup id
+    if (valueId != null) {
+      row.attributeValueId = valueId;
+      row.attributeValue = undefined as any;
+    } else {
+      row.attributeValue = value ?? null as any;
+      row.attributeValueId = undefined as any;
+    }
   }
   
 

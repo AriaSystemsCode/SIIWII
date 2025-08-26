@@ -80,9 +80,9 @@
                                             </div>
                                         </div>
                                         <div class="col-md-10 title-cover">
-                                            <h5 class="account-name font-weight-bold">{{memberData?.extraDataAttributes[0]?.selectedValues?.[memberData.extraDataAttributes[0].selectedValues.length - 1]?.value}}
-                                                {{" "}} {{memberData?.extraDataAttributes[1]?.selectedValues?.[memberData.extraDataAttributes[1].selectedValues.length - 1]?.value}} </h5>
-                                            <p class="jobTitle-label">{{jobTitleAttr?.selectedValues[jobTitleAttr.selectedValues.length - 1].value}} </p>
+                                            <h5 class="account-name font-weight-bold">{{getStringValue(701)}}
+                                                {{" "}} {{getStringValue(702)}} </h5>
+                                            <p class="jobTitle-label">{{getStringValue(706)}} </p>
                                             <div class="desc">
                                                 <p>
                                                     {{memberData?.notes}}
@@ -117,14 +117,14 @@
                                     <h6 class="text-right font-weight-bold mr-3"><img
                                             src="../../assets/img/input_icons/user.png" class=""> {{ ( "First Name" |
                                         localize ) + " :"}}</h6>
-                                    <p class="text-left " style="color: #595959;">{{getBooleanValue(701)}}</p>
+                                    <p class="text-left " style="color: #595959;">{{getStringValue(701)}}</p>
                                 </div>
                                 <hr class="header">
                                 <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                     <h6 class="text-right font-weight-bold mr-3 "><img
                                             src="../../assets/img/input_icons/user.png" class=""> {{ ( "Sur Name" |
                                         localize ) + " :" }}</h6>
-                                    <p class="text-left " style="color: #595959;">{{getBooleanValue(702)}}</p>
+                                    <p class="text-left " style="color: #595959;">{{getStringValue(702)}}</p>
                                 </div>
                                 <hr class="header">
                                 <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
@@ -132,7 +132,7 @@
                                             src="../../assets/img/input_icons/outline-work.png" class=""> {{ (
                                         "JobTitle" | localize ) + " :" }}</h6>
                                     <p  *ngIf="!editjobTitleValue" class="text-left old_editjobTitle" style="color: #595959;"
-                                        [ngClass]="{'hide':NoteditInfo}">{{jobTitleAttr?.selectedValues[jobTitleAttr.selectedValues.length - 1].value}}</p>
+                                        [ngClass]="{'hide':NoteditInfo}">{{getStringValue(706)}}</p>
                                         <p  *ngIf="editjobTitleValue" class="text-left old_editjobTitle" style="color: #595959;"
                                         [ngClass]="{'hide':NoteditInfo}">{{editjobTitleValue}}</p>
                                     <input style="color: #595959 !important;" type="text"

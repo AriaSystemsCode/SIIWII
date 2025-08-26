@@ -429,6 +429,13 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
           return lastValue;
         }
         
+        
+        getStringValue(attrId: number): string {
+          const attr = this.memberData?.extraDataAttributes?.find(a => a.extraAttributeId === attrId);
+          return attr?.selectedValues?.[attr.selectedValues.length - 1]?.value ?? '';
+        }
+        
+
         // setBooleanValue(attrId: number, checked: boolean): void {
         //   const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
         //   if (attr?.selectedValues?.length > 0) {
