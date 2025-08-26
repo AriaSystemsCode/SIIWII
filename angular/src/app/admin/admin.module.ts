@@ -212,6 +212,7 @@ import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { TreeSelectModule } from 'primeng/treeselect';
 import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
+import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.component';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
@@ -418,7 +419,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         // ManageEntityDynamicParameterValuesModalComponent,
         // EntityDynamicParameterValueManagerComponent,
         StepperComponent,
-        AriaIframeComponent
+        AriaIframeComponent,
+        AriaEnUsSiwiiComponent
 
     ],
     exports: [AddMemberModalComponent, AddRoleModalComponent],

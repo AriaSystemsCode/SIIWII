@@ -53,6 +53,7 @@ import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTe
 import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
 import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
 import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
+import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.component';
 // import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
 // import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
 // import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
@@ -113,6 +114,7 @@ import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
                     { path: 'invoice/:paymentId', component: InvoiceComponent, data: { permission: 'Pages.Administration.Tenant.SubscriptionManagement' } },
                     { path: 'tenantSettings', component: TenantSettingsComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
                     { path: 'AriaSystem', component: AriaIframeComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
+                    { path: 'AriaSystem-en-us', component: AriaEnUsSiwiiComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
                     { path: 'hostDashboard', component: HostDashboardComponent, data: { permission: 'Pages.Administration.Host.Dashboard' } },
                     { path: 'demo-ui-components', component: DemoUiComponentsComponent, data: { permission: 'Pages.DemoUiComponents' } },
                     { path: 'install', component: InstallComponent },
