@@ -81,6 +81,8 @@ using onetouch.AppMarketplaceAccounts;
 using onetouch.EmailingTemplates;
 using onetouch.AppMarketplaceContacts.Dtos;
 using NPOI.POIFS.Properties;
+using onetouch.AppSiiwiiTransaction.Dtos;
+using PayPalCheckoutSdk.Orders;
 
 namespace onetouch.Accounts
 {
@@ -1207,8 +1209,13 @@ namespace onetouch.Accounts
                     accountDto.State = firstAddress.AddressFk.State;
                 }
 
-
-                var branch = ObjectMapper.Map<BranchDto>(account);
+                //I40[Start]
+                //var branch = ObjectMapper.Map<BranchDto>(account);
+                var mainBranch = await _appContactRepository.GetAll()
+                .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                .Include(z => z.CurrencyFk).FirstOrDefaultAsync(x => x.ParentId == id && x.Code=="*Main*"); 
+                var branch = ObjectMapper.Map<BranchDto>(mainBranch);
+                //I40[End]
                 BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
@@ -2738,6 +2745,38 @@ namespace onetouch.Accounts
             await CreateAdminContact();
 
             await CurrentUnitOfWork.SaveChangesAsync();
+
+            //I40[Start]
+            if ((input.Id==0 || input.Id ==null) &&
+                input.ParentId== null && contact.TenantId== AbpSession.TenantId)
+            {
+                BranchDto branchDto = new BranchDto();
+                branchDto.AccountId = newId;
+                branchDto.ParentId = newId;
+                branchDto.TenantId = AbpSession.TenantId;
+                
+                branchDto.Code = "*Main*";
+                branchDto.Name= contact.Name.TrimEnd()+" Main Branch";
+                branchDto.CurrencyId = input.CurrencyId;
+                branchDto.EMailAddress = input.EMailAddress;
+                branchDto.LanguageId = input.LanguageId;
+                branchDto.Id = 0;
+                branchDto.Phone1Number = input.Phone1Number;
+                branchDto.Phone2Number = input.Phone3Number;
+                branchDto.Phone3Number = input.Phone3Number;
+                branchDto.Phone1TypeName = input.Phone1TypeName;
+                branchDto.Phone2TypeName = input.Phone2TypeName;
+                branchDto.Phone3TypeName = input.Phone3TypeName;
+                branchDto.Phone1Ext = input.Phone1Ex;
+                branchDto.Phone3Ext = input.Phone3Ex;
+                branchDto.Phone2Ext = input.Phone2Ex;
+                branchDto.Phone1TypeId = input.Phone1TypeId;
+                branchDto.Phone2TypeId = input.Phone2TypeId;
+                branchDto.Phone3TypeId = input.Phone3TypeId;
+                branchDto.TradeName = input.TradeName;
+                await CreateOrEditBranch(branchDto);
+            }
+            //I40[End]
             return await GetAccountForEdit(new EntityDto<long> { Id = newId });
 
         }
@@ -6583,8 +6622,8 @@ namespace onetouch.Accounts
             if (string.IsNullOrEmpty(branchObject.SSIN))
             {
                 AppEntity entity = new AppEntity();
-                var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
-                entity.EntityObjectTypeCode = entityParent.EntityObjectTypeCode;
+                //var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
+                entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypeBranchCode();
                 var contactObjectId = await _helper.SystemTables.GetObjectContactId();
                 branchObject.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
@@ -6593,12 +6632,13 @@ namespace onetouch.Accounts
             var output = await CreateOrEditAccount(branchObject);
             if (output != null && output.AccountInfo.Id!=null)
             {
-                var contactBranch = _appContactRepository.FirstOrDefault((long)output.AccountInfo.Id);
+                var contactBranch = _appContactRepository.GetAll().Include(p=>p.EntityFk).FirstOrDefault(z=>z.Id==(long)output.AccountInfo.Id);
                 if (contactBranch != null)
                 {
                     contactBranch.ParentCode = contactParent.Code;
                     contactBranch.ParentId = input.ParentId;
                     contactBranch.AccountId = contactParent.AccountId== null? input.ParentId:contactParent.AccountId;
+                    contactBranch.EntityFk.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                     await _appContactRepository.UpdateAsync(contactBranch);
                 }
             }
@@ -8378,10 +8418,50 @@ namespace onetouch.Accounts
                 });
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 var presonEntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                //I40[start]
+                //var branchEntityObjecttypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
+                var branchEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeBranch();
+                var branchEntityObjectTypeId = branchEntityObjectType.Id;
+                var branchEntityObjectTypeCode = branchEntityObjectType.Code;
+                //I40[END]
                 IMapper mapperAccount;
                 mapperAccount = configurationAccount.CreateMapper();
                 List<AppContact> accountsList = new List<AppContact>();
                 List<AppContact> accountsListUpdated = new List<AppContact>();
+                //I40[Start]
+                var mainResultAccount = result.Where(r =>  r.RecordType == "Account" && string.IsNullOrEmpty(r.ParentCode)
+                && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To).ToList();
+                List<AccountExcelDto> mainBranchesList = new List<AccountExcelDto>();
+                
+                foreach (var account in mainResultAccount)
+                {
+                    //string mainBranchCode = "";
+                    //var existingAcc = await _appContactRepository.GetAll()
+                    //    .Where(z => z.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId && z.Code == account.Code).FirstOrDefaultAsync();
+                    //if (existingAcc != null)
+                    //{
+                    //    var existingMainBranch = await _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == branchEntityObjecttypeId 
+                    //    && z.ParentId == existingAcc.Id && z.Code="*Main*").FirstOrDefaultAsync();
+                    //    if (existingMainBranch != null)
+                    //    {
+                    //        mainBranchCode = existingMainBranch.Code;
+                    //    }
+                    //}
+                    AccountExcelDto branchObject = account.ShallowCopy();
+                    branchObject.ParentCode = account.Code;
+                    branchObject.Code = "*Main*";
+                    branchObject.Name = branchObject.Name .TrimEnd()+ " Main Branch";
+                    branchObject.RecordType = "Branch";
+                    mainBranchesList.Add(branchObject);
+
+                }
+                foreach (var br in mainBranchesList)
+                {
+                    result.Where(z => z.ParentCode == br.ParentCode).ForEach(z => z.ParentCode = br.Code);
+                    result.Add(br);
+                    
+                }
+                //I40[End]
                 List<AccountExcelDto> accountsResult = result.Where(r => r.RecordType == "Account" && string.IsNullOrEmpty(r.ParentCode)
                 && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To).ToList();
                 List<CreateOrEditAccountInfoDto> resultAccount = mapperAccount.Map<List<AccountExcelDto>, List<CreateOrEditAccountInfoDto>>(accountsResult);
@@ -8390,6 +8470,7 @@ namespace onetouch.Accounts
                                    join s in resultAccount on o.Code equals s.Code
                                    select o).ToList();
                 //xx
+
                 foreach (CreateOrEditAccountInfoDto createOrEditAccountInfoDto in resultAccount)
                 {
                     AppContact account = accountList.FirstOrDefault(a => a.Code == createOrEditAccountInfoDto.Code);
@@ -8430,7 +8511,9 @@ namespace onetouch.Accounts
                     accountContact.ParentId = null;
                     accountContact.AccountType = createOrEditAccountInfoDto.AccountType;
                     accountContact.AccountTypeId = createOrEditAccountInfoDto.AccountTypeId;
-                    accountContact.AppContactAddresses = ObjectMapper.Map<List<AppContactAddress>>(createOrEditAccountInfoDto.ContactAddresses);
+                    //I40[Start]
+                    //accountContact.AppContactAddresses = ObjectMapper.Map<List<AppContactAddress>>(createOrEditAccountInfoDto.ContactAddresses);
+                    //I40[End]
                     // accountContact.AccountId = null;
                     accountContact.AppContactPaymentMethods = ObjectMapper.Map<List<AppContactPaymentMethod>>(createOrEditAccountInfoDto.ContactPaymentMethods);
                     accountContact.Code = createOrEditAccountInfoDto.Code;
@@ -8474,52 +8557,93 @@ namespace onetouch.Accounts
                     }
                     //accountContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(createOrEditAccountInfoDto.ContactAddresses);
                     accountContact.ParentFkList = new List<AppContact>();
-
-                    //XXa
-                    foreach (var address in createOrEditAccountInfoDto.ContactAddresses)
-                    {
-                        //address.AccountId = createOrEditAccountInfoDto.AccountId;
-                        var addressId = await AddAddress(0, address, countries);
-                        if (addressId != null)
-                            address.AddressId = addressId;
-                    }
-                    List<AppContactAddress> accAddress = new List<AppContactAddress>();
-                    accountContact.AppContactAddresses = new List<AppContactAddress>();
-                    accAddress = ObjectMapper.Map<List<AppContactAddress>>(createOrEditAccountInfoDto.ContactAddresses);
-                    foreach (var address in accAddress)
-                    {
-                        accountContact.AppContactAddresses.Add(new AppContactAddress
-                        {
-                            AddressFk = address.AddressFk,
-                            ContactFk = accountContact,
-                            AddressId = address.AddressId,
-                            AddressCode = address.AddressCode,
-                            ContactCode = accountContact.Code,
-                            ContactId = accountContact.Id,
-                            AddressTypeId = address.AddressTypeId
-                        });
-                    }
+                    //I40[Start]
                     if (accountContact.Id > 0)
                         accountsListUpdated.Add(accountContact);
                     else
                         accountsList.Add(accountContact);
-
+                    //I40[End]
+                    //XXa
+                    //I40[Start]
+                    //foreach (var address in createOrEditAccountInfoDto.ContactAddresses)
+                    //{
+                    //    //address.AccountId = createOrEditAccountInfoDto.AccountId;
+                    //    var addressId = await AddAddress(0, address, countries);
+                    //    if (addressId != null)
+                    //        address.AddressId = addressId;
+                    //}
+                    //List<AppContactAddress> accAddress = new List<AppContactAddress>();
+                    //accountContact.AppContactAddresses = new List<AppContactAddress>();
+                    //accAddress = ObjectMapper.Map<List<AppContactAddress>>(createOrEditAccountInfoDto.ContactAddresses);
+                    //foreach (var address in accAddress)
+                    //{
+                    //    accountContact.AppContactAddresses.Add(new AppContactAddress
+                    //    {
+                    //        AddressFk = address.AddressFk,
+                    //        ContactFk = accountContact,
+                    //        AddressId = address.AddressId,
+                    //        AddressCode = address.AddressCode,
+                    //        ContactCode = accountContact.Code,
+                    //        ContactId = accountContact.Id,
+                    //        AddressTypeId = address.AddressTypeId
+                    //    });
+                    //}
+                    //I40[End]
+                    //I40[Start]
+                    /*if (accountContact.Id > 0)
+                        accountsListUpdated.Add(accountContact);
+                    else
+                        accountsList.Add(accountContact);*/
+                    //I40[End]
                     accountContact.ParentFkList = new List<AppContact>();
                     //XXB
+
+
                     MapperConfiguration configurationBranchAcc;
                     configurationBranchAcc = new MapperConfiguration(a => { a.AddProfile(new BranchDtoProfile(phoneTypes, _currencyIds, languageIds, classIds, addresses, addressTypes)); });
                     IMapper mapperBranchAcc;
                     mapperBranchAcc = configurationBranchAcc.CreateMapper();
                     List<AccountExcelDto> resultExcelAccBranch = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status
                  != ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
-                    List<AccountExcelDto> resultExcelAccBranchOnly = resultExcelAccBranch.Where(r => r.RecordType == "Branch"
-                    && !string.IsNullOrEmpty(r.ParentCode) && r.ParentCode == oldCode
+
+                    ////I40[Start]
+                    //AccountExcelDto mainBranch = new AccountExcelDto();
+                    //mainBranch.ParentCode = oldCode;//accountContact.Code;
+                    //mainBranch.Name = "*Main*";
+                    //mainBranch.Code = "";
+                    //mainBranch.TradeName = accountContact.TradeName;
+                    //var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    //if (tenantObj != null)
+                    //{
+                    //    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("TENANTBRANCH", AbpSession.TenantId);
+                    //    mainBranch.Code = tenantObj.TenancyName.Trim() + "-" + sequance;
+                    //}
+                    //mainBranch.Currency = accountContact.CurrencyCode;
+                    //mainBranch.EmailAddress = accountContact.EMailAddress;
+                    //mainBranch.Language = accountContact.LanguageCode;
+                    //mainBranch.Phone1Number = accountContact.Phone1Number;
+                    //mainBranch.Phone2Number = accountContact.Phone3Number;
+                    //mainBranch.Phone3Number = accountContact.Phone3Number;
+                    //mainBranch.Phone1Type = accountContact.Phone1TypeName;
+                    //mainBranch.Phone2Type = accountContact.Phone2TypeName;
+                    //mainBranch.Phone3Type = accountContact.Phone3TypeName;
+                    //mainBranch.Phone1Ext = accountContact.Phone1Ext;
+                    //mainBranch.Phone2Ext = accountContact.Phone2Ext;
+                    //mainBranch.Phone3Ext = accountContact.Phone3Ext;
+                    //mainBranch.RecordType = "Branch";
+                    //mainBranch.rowNumber = accountExcelResultsDTO.From;
+                    //resultExcelAccBranch.Where(z => z.RecordType == "Branch" && z.ParentCode == oldCode).ForEach(z => z.ParentCode = mainBranch.Code);
+                    //resultExcelAccBranch.Add(mainBranch);
+                    ////I40[End]
+
+
+                    List<AccountExcelDto> resultExcelAccBranchOnly = result.Where(r => r.RecordType == "Branch"
+                    && !string.IsNullOrEmpty(r.ParentCode) && (r.ParentCode == oldCode || r.ParentCode == "*Main*")
                     && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To
                     ).OrderBy(r => r.ParentCode).ToList();
 
-
-
-                    foreach (var branch in resultExcelAccBranchOnly)
+                    
+                    foreach (var branch in resultExcelAccBranchOnly.OrderBy(z => z.ParentCode))
                     {
                         branch.ParentId = 0;
                         try
@@ -8544,8 +8668,18 @@ namespace onetouch.Accounts
                                              join s in resultBranchDtoA on o.Code equals s.Code
                                              select o).ToList();
                     //XXX
-                    foreach (BranchDto branchDto in resultBranchDtoA)
+                    foreach (BranchDto branchDto in resultBranchDtoA.OrderBy(z=>z.Code))
                     {
+                        //I40[Start]
+                        //if (branchDto.Name == "*Main*")
+                        //{
+                        //    branchDto.ContactAddresses = new List<AppContactAddressDto>();
+                        //    foreach (var addrss in createOrEditAccountInfoDto.ContactAddresses)
+                        //    {
+                        //        branchDto.ContactAddresses.Add(addrss);
+                        //    }
+                        //}
+                        //I40[End]
                         string oldSSIN = "";
                         if (true)// (branchDto.ParentId > 0)&& r.ParentCode== oldCode
                         {
@@ -8592,7 +8726,7 @@ namespace onetouch.Accounts
                             AppContact branchContact = new AppContact();
                             branchContact.SSIN = oldSSIN;
                             branchContact.AccountId = null;//accountContact.Id;
-                            branchContact.ParentId = accountContact.Id;
+                            
                             branchContact.AccountType = accountContact.AccountType;
                             branchContact.AccountTypeId = accountContact.AccountTypeId;
                             List<AppContactAddress> bAddress = new List<AppContactAddress>();
@@ -8646,9 +8780,14 @@ namespace onetouch.Accounts
                             branchContact.EntityFk.Name = branchDto.Name;
                             branchContact.EntityFk.Notes = accountContact.EntityFk.Notes;
                             branchContact.EntityFk.ObjectId = contactObjectId;
-                            branchContact.EntityFk.EntityObjectTypeId = partnerEntityObjectTypeId;
-                            branchContact.EntityFk.EntityObjectTypeCode = partnerEntityObjectTypeCode;
-                            branchContact.EntityFk.EntityObjectTypeFk = partnerEntityObjectType;
+                            //I40[Start]
+                            //branchContact.EntityFk.EntityObjectTypeId = partnerEntityObjectTypeId;
+                            //branchContact.EntityFk.EntityObjectTypeCode = partnerEntityObjectTypeCode;
+                            //branchContact.EntityFk.EntityObjectTypeFk = partnerEntityObjectType;
+                            branchContact.EntityFk.EntityObjectTypeId = branchEntityObjectTypeId;
+                            branchContact.EntityFk.EntityObjectTypeCode = branchEntityObjectTypeCode;
+                            branchContact.EntityFk.EntityObjectTypeFk = branchEntityObjectType;
+                            //I40[End]
                             branchContact.EntityFk.EntityCategories = accountContact.EntityFk.EntityCategories;
                             branchContact.EntityFk.EntityAttachments = accountContact.EntityFk.EntityAttachments;
                             //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
@@ -8660,9 +8799,26 @@ namespace onetouch.Accounts
                             }
                             // branchContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(branchDto.ContactAddresses);
 
-
-                            accountContact.ParentFkList.Add(branchContact);
-                            branchContact.ParentFkList = new List<AppContact>();
+                            if (branchDto.ParentCode == "*Main*")
+                            {
+                                var mainbr = accountContact.ParentFkList.FirstOrDefault(z => z.Code == "*Main*");
+                                if (mainbr != null)
+                                {
+                                    if (mainbr.ParentFkList == null)
+                                    {
+                                        mainbr.ParentFkList = new List<AppContact>();
+                                    }
+                                    branchContact.ParentId = mainbr.Id;
+                                    mainbr.ParentFkList.Add(branchContact);
+                                }
+                            }
+                            else
+                            {
+                                branchContact.ParentId = accountContact.Id;
+                                accountContact.ParentFkList.Add(branchContact);
+                            }
+                            
+                            
                             //xxb
                             //xxTM
                             MapperConfiguration configurationContactAcc;
@@ -8877,9 +9033,12 @@ namespace onetouch.Accounts
                         foreach (var br in acc.ParentFkList)
                         {
                             br.AccountId = acc.Id;
-                            foreach (var cont in br.ParentFkList)
+                            if (br.ParentFkList != null)
                             {
-                                cont.AccountId = acc.Id;
+                                foreach (var cont in br.ParentFkList)
+                                {
+                                    cont.AccountId = acc.Id;
+                                }
                             }
                         }
 
@@ -10579,6 +10738,7 @@ namespace onetouch.Accounts
             mappingExpression.ForMember(dest => dest.ParentId, act => act.MapFrom(src => src.ParentId));
             mappingExpression.ForMember(dest => dest.Website, act => act.MapFrom(src => src.Website));
             mappingExpression.ForMember(dest => dest.EMailAddress, act => act.MapFrom(src => src.EmailAddress));
+            mappingExpression.ForMember(dest => dest.ParentCode, act => act.MapFrom(src => src.ParentCode));
             mappingExpression.ForMember(dest => dest.Phone1CountryKey, act => act.Ignore());
             mappingExpression.ForMember(dest => dest.Phone2CountryKey, act => act.Ignore());
             mappingExpression.ForMember(dest => dest.Phone3CountryKey, act => act.Ignore());
