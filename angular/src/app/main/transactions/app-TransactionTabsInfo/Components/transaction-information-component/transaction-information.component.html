@@ -727,7 +727,7 @@
                                                                         {{
                                                                         currencySymbol
                                                                         }}
-                                                                        {{ productDetails?.minMSRP }}
+                                                                        {{ productDetails?.minMSRP | number:'1.2-2' }}
                                                                     </h5>
                                                                     <span *ngIf="
                                                                   productDetails?.minMSRP !==
@@ -743,7 +743,7 @@
                                                                         {{
                                                                         currencySymbol
                                                                         }}
-                                                                        {{ productDetails?.maxMSRP }}
+                                                                        {{ productDetails?.maxMSRP | number:'1.2-2' }}
                                                                     </h5>
                                                                     <h5> /EAC </h5>
                                                                 </div>
@@ -758,10 +758,7 @@
 
 
                                                                             <h5 *ngIf="showEditSpecialPrice">
-
-                                                                                {{ productDetails?.maxSpecialPrice ?
-                                                                                productDetails?.maxSpecialPrice : "0" |
-                                                                                currency:' ' }}
+                                                                                {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice ?? 0) | number:'1.2-2' }}
                                                                             </h5>
 
                                                                             <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
@@ -789,9 +786,8 @@
                                                         border-radius: 8px;
                                                         border: 2px solid #4A0D4A;" formControlName="updatedSpecialPrice">
 
-                                                                                    <div class="input-group-append position-absolute "
-                                                                                        style="    right: 15px;
-                                                                                        top: 18px;  z-index: 99;">
+                                                                                    <div   style="right: 15px;top: 18px;  z-index: 99;" class="input-group-append position-absolute "
+                                                                                      >
                                                                                         <button
                                                                                             class="btn ml-0 pl-2 pt-3 pb-3"
                                                                                             (click)="showEditSpecialPrice= true">
@@ -800,10 +796,7 @@
                                                                                         </button>
                                                                                     </div>
                                                                                     <div class="input-group-append position-absolute"
-                                                                                        style="
-                                                         z-index: 99;     height: 43px;
-                          right: 40px;
-                          top: 4px;">
+                                                                                        style="z-index: 99;     height: 43px;right: 40px;top: 4px;">
 
                                                                                         <button
                                                                                             class="btn btn-save  mr-0 pr-0"
@@ -1816,7 +1809,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                     {{
                                                                                     currencySymbol
                                                                                     }}
-                                                                                    {{ productDetails?.minMSRP }}
+                                                                                    {{ productDetails?.minMSRP | number:'1.2-2'}}
                                                                                 </h5>
                                                                                 <span *ngIf="
                                                                 productDetails?.minMSRP !==
@@ -1832,7 +1825,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                     {{
                                                                                     currencySymbol
                                                                                     }}
-                                                                                    {{ productDetails?.maxMSRP }}
+                                                                                    {{ productDetails?.maxMSRP | number:'1.2-2' }}
                                                                                 </h5>
                                                                                 <h5> /EAC </h5>
                                                                             </div>
@@ -1854,7 +1847,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                             productDetails?.maxSpecialPrice
                                                                                             ?
                                                                                             productDetails?.maxSpecialPrice
-                                                                                            : "0" | currency:' ' }}
+                                                                                            : "0" | number:'1.2-2' | currency:' ' }}
                                                                                         </h5>
 
                                                                                         <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
@@ -1883,9 +1876,8 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                       border-radius: 8px;
                                                       border: 2px solid #4A0D4A;" formControlName="updatedSpecialPrice">
 
-                                                                                                <div class="input-group-append position-absolute "
-                                                                                                    style="    right: 15px;
-                                                                                                               top: 18px;  z-index: 99;">
+                                                                                                <div  style="    right: 15px;top: 18px;  z-index: 99;" class="input-group-append position-absolute "
+                                                                                                   >
                                                                                                     <button
                                                                                                         class="btn ml-0 pl-2 pt-3 pb-3"
                                                                                                         (click)="showEditSpecialPrice= true">
