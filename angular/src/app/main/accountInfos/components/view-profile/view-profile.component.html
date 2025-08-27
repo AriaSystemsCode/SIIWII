@@ -79,7 +79,7 @@
                                         </div>
 
                                         <div class="d-flex view-profile-action-buttons"
-                                            *ngIf="((accountData.isConnected && showEditConnected) ||  accountData.isManual) && !isRecordOwner">
+                                            *ngIf="((accountData.isConnected && showEditConnected && !isRecordOwner && accountData?.accountTypeId !=21) ||  accountData.isManual) ">
                                             <button class="btn mb-3 mt-4 w-100 btn-save"
                                                 (click)="this.showEditConnected =false;editAccount()">
                                                 {{ "Edit" | localize }}
@@ -112,9 +112,11 @@
                                     </div>
                                 </div>
                                 <div class="col title-cover">
-                                    <h5 class="account-name">{{accountData?.name}} <span class="number-connect">
-                                            {{accountData?.connections}} {{'MembersAreConnected'|localize}}</span></h5>
-
+                                    <h5 class="account-name">{{accountData?.name}} 
+                                        <!-- <span class="number-connect">
+                                            {{accountData?.connections}} {{'MembersAreConnected'|localize}}</span> -->
+                                        </h5>
+                                       <p style="font-size: 12px;">{{contactData?.jobTitle}}</p>
                                     <div *ngIf="!personalAccount">
                                         <textarea class="thin-scroll w-100 mt-2" style="
                                             min-height: 80px;
