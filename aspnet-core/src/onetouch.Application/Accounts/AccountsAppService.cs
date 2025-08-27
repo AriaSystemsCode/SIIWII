@@ -743,6 +743,11 @@ namespace onetouch.Accounts
                                         {
                                             account.ConnectionName = "MPAction" + extrDataSharing.AttributeValue;
                                         }
+                                        var extrDataDisconnect = relationType.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
+                                        if (extrDataDisconnect != null)
+                                        {
+                                            account.DisConnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
+                                        }
                                     }
                                     else
                                     {
@@ -773,6 +778,9 @@ namespace onetouch.Accounts
                             }
                             //account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
                             account.AvaliableConnectionName = "";
+
+                            
+                            //account.DisConnectLabel
                             //I40[End]
                         }
                         else
@@ -822,6 +830,16 @@ namespace onetouch.Accounts
                             //account.AvaliableConnectionName = GetAction(account.Account.AccountType, currentTenantAccountTypeCode, true);
                             account.ConnectionName = "";
                         }
+                        //I40[Start]
+                        var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
+                              .Where(z => ((z.RequesterContactSSIN == account.Account.SSIN)
+                              || (z.RecipientContactSSIN == account.Account.SSIN)) &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN) > 0 &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0 &&
+                              z.EntityObjectStatusId == activeRelationshipStatusId &&
+                              (z.SharingLevel == 1)).CountAsync();
+                        account.ConnectionCount = relationshipsConut;
+                        //I40[End]
                     }
                      
                     var x = new PagedResultDto<GetAccountForViewDto>(
