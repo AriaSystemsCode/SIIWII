@@ -65,8 +65,9 @@
                                     {{l("First Name")}}
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" id="Name" class="form-control" name="name" #NameInput="ngModel" [(ngModel)]="memberDto.name" required [placeholder]="'PleaseEnterFirstName' | localize "/>
-                                    <validation-messages [formCtrl]="NameInput"></validation-messages>
+                                    <input type="text" id="FirstName" class="form-control" name="FirstName" #FirstNameInput="ngModel" [ngModel]="getStringValue(701)"   (ngModelChange)="setStringValue(701, $event)" required [placeholder]="'PleaseEnterFirstName' | localize "/>
+                                    <validation-messages [formCtrl]="FirstNameInput"></validation-messages>
+
                                 </div>
                             </div>
                             <hr class="header">

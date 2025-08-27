@@ -35,6 +35,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
     ngOnChanges(changes: SimpleChanges): void {
         this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId
         this.singleItemPerRowMode = false;
+
     }
 
     get id(): number { return this.account.account.id }

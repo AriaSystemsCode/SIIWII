@@ -90,14 +90,14 @@
 
 
                 <div>
-                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" [ngStyle]="{
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-1'" class="mb-1" [ngStyle]="{
                     'font-size': fromOverview ? '11px' : ''
                   }">
                         <img src="../../../../../assets/accounts/followers.png" [ngStyle]="{
                     'width': fromOverview ? '15px' : ''
                   }" />
                         <span class="spanGreyColor">
-                            {{ account?.account?.connectioncount ? account.account?.connectioncount : '0' }} {{ '
+                            {{ account?.connectionCount ? account?.connectionCount : '0' }} {{ '
                             Connections' }}
                         </span>
                     </div>

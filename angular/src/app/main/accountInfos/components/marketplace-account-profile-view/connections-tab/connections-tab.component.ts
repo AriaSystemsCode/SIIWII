@@ -234,24 +234,27 @@ disconnect(account: AccountDto): void {
       });
 }
 
-  createRelation(account,status:boolean = false) {
-    this._accountsServiceProxy
-      .applyRelationOnProfile(account.account.id,account.account.ssin,status,account.availableConnections[0].connectionEntityId)
-      .pipe(
-        finalize(() => {
-          ;
-          this.hideMainSpinner();
-        })
-      )
-      .subscribe((result: string) => {
-        let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.id);
-        if (accountIndx >= 0) {
-          this.accounts[accountIndx] = account;
-          this.accounts[accountIndx].avaliableConnectionName = "";
-          this.accounts[accountIndx].connectionName = this.l(result);
-        }
-      });
-  }
+   createRelation(account, status: boolean = false) {
+        this.showMainSpinner();
+        this._accountsServiceProxy
+            .applyRelationOnProfile(account.account.account.id, undefined, account.relation.defaultVisibility == 'Public' ? true : false, account.relation.connectionEntityId)
+            .pipe(
+                finalize(() => {
+                    ;
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe((result: string) => {
+                let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.account.id);
+                if (accountIndx >= 0) {
+                    this.accounts[accountIndx] = account.account;
+                    this.accounts[accountIndx].avaliableConnectionName = '';
+                    this.accounts[accountIndx].connectionName = this.l(result);
+                    this.accounts[accountIndx].availableConnections.length = 0;
+                }
+            });
+    }
+
 
   setConnectionType(code: number): void {
     this.connectionTypeId = code;

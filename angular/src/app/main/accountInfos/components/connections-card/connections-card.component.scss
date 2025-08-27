@@ -80,3 +80,10 @@
 .fsS {
   font-size: 1rem !important;
 }
+
+::ng-deep {
+  .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+  }
+}

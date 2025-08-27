@@ -388,7 +388,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     this.memberDto.useDTOTenant = true;
    // ✅ Create a new DTO instance and assign only the valid fields
-   this.setStringValue(701, this.memberDto.name || '');
+    this.memberDto.name = this.getStringValue(701) + ' ' + this.getStringValue(702)
     const cleanDto = new CreateOrEditAccountInfoDto();
 
     const allowedKeys = [
@@ -413,7 +413,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       return dto;
     });
 
-    console.log(this.memberDto,'lllll')
+
     this._AccountsServiceProxy.createOrUpdateContact(cleanDto)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe(result => {
