@@ -316,6 +316,9 @@ namespace onetouch.Accounts
             {
                 try
                 {
+                    var currentAccount = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.IsProfileData == true &&
+                    z.ParentId == null).FirstOrDefaultAsync();
+                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                     //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
                     //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
@@ -347,8 +350,14 @@ namespace onetouch.Accounts
                              .WhereIf(input.FilterType == 6,
                                 x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
                                 _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN) == 0)//x.PartnerId == null)
-                                || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
-                                _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN) > 0))//x.PartnerId != null)
+                                || (x.TenantId == AbpSession.TenantId && !x.IsProfileData &&// x.ParentId == null &&
+                                _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN) > 0 &&
+                                _appContactRelationshipInfoRepository.GetAll().Count(
+                                    z=>((z.RecipientContactSSIN==x.SSIN && z.RequesterContactSSIN== currentAccount.SSIN)
+                                    ||(z.RequesterContactSSIN==x.SSIN && z.RecipientContactSSIN==currentAccount.SSIN)) &&
+                                    z.EntityObjectStatusId == activeRelationshipStatusId
+                                    ) >0
+                                ))//x.PartnerId != null)
                                 //&& (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
 
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
@@ -456,7 +465,7 @@ namespace onetouch.Accounts
                     var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
                           .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                     var currentTenantAccountEntityTypeCode = currentTenantAccount.EntityFk.EntityObjectTypeCode;
-                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                    //var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                     var pendingRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipPending();
                     var inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
                     foreach (var account in accountsList)

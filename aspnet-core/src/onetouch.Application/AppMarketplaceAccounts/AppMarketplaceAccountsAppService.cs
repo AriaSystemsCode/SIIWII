@@ -311,8 +311,53 @@ namespace onetouch.AppMarketplaceAccounts
 
                                 }
                             }
+                            //I40[Start]
+                            else
+                            {
+                                account.ConnectionName = "";
+                                foreach (var relationshipCodeLookup in relationShipLookups)
+                                {
+                                    var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
+                                    if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == currentTenantAccountObject.EntityFk.EntityObjectTypeCode.ToLower())
+                                    {
+                                        var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
+                                        if (responseType != null && responseType.AttributeValue.TrimEnd().ToLower() == account.Account.AccountTypeString.ToLower())
+                                        {
+                                            var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
+                                            if (connectLabel != null)
+                                            {
+                                                var sharingLevl = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 605).FirstOrDefault();
+
+                                                account.AvailableConnections.Add(new ConnectionType
+                                                {
+                                                    ConnectionEntityId = relationshipCodeLookup.Id,
+                                                    ConnectLabel = connectLabel.AttributeValue,
+                                                    DefaultVisibility = sharingLevl != null && !string.IsNullOrEmpty(sharingLevl.AttributeValue) ? sharingLevl.AttributeValue : "Public"
+                                                });
+                                            }
+                                        }
+
+                                    }
+                                }
+                                string relationshipCode = currentTenantAccountObject.EntityFk.EntityObjectTypeCode.Substring(0, 1) + "T" +
+                                    account.Account.AccountType.Substring(0, 1);
+
+
+                                var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                    .Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+                                if (relationType != null)
+                                {
+                                    var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
+                                    if (extrDataSharing != null)
+                                    {
+                                        account.AvaliableConnectionName = "MPAction" + extrDataSharing.AttributeValue;
+                                    }
+                                }
+                            }
+                        
+                            //I40[End]
                             //account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
-                            account.AvaliableConnectionName = "";
+                            //account.AvaliableConnectionName = "";
                         }
                         else
                         {
