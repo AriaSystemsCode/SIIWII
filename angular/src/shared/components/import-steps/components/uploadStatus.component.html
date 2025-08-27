@@ -224,11 +224,6 @@
                             </li>
                           </ul>
                         </div>
-
-
-
-
-
                       </div>
 
                       <!-- Default input -->
@@ -350,6 +345,15 @@
                         </div>
 
                         <ng-template #normalInput>
+
+
+                          <ng-container *ngIf="record._isDataRecord; else normalMode">
+                            <input type="text" class="form-control"
+                              [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                              (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)" />
+                          </ng-container>
+
+                          <ng-template #normalMode>
                           <ng-container *ngIf="column.name === 'Product Description'; else normalTextInput">
                             <div class="form-control"
                               [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
@@ -432,6 +436,7 @@
                                    " />
                           </ng-template>
                         </ng-template>
+                        </ng-template>
 
                       </div>
 
@@ -461,7 +466,12 @@
 
         <ng-template #noData>
           <div class="text-center text-muted py-5">
-            {{ "No records to display." | localize }}
+            <ng-container *ngIf="!hasDataRecords">
+              No Data Records
+            </ng-container>
+            <ng-container *ngIf="!hasImageRecords">
+              No Image Records
+            </ng-container>
           </div>
         </ng-template>
 
