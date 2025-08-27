@@ -136,6 +136,7 @@ export class AppNavigationService {
             new AppMenuItem('Settings', 'Pages.Administration.Host.Settings', 'flaticon-settings', '/app/admin/hostSettings'),
             new AppMenuItem('Settings', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/tenantSettings'),
             new AppMenuItem('AriaSystem', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/AriaSystem'),
+            new AppMenuItem('AriaSystem-en-us', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/AriaSystem-en-us'),
             new AppMenuItem('WebhookSubscriptions', 'Pages.Administration.WebhookSubscription', 'flaticon2-world', '/app/admin/webhook-subscriptions'),
             // new AppMenuItem('DynamicParameters', '', 'flaticon-interface-8', '', [], [
             //     new AppMenuItem('Definitions', 'Pages.Administration.DynamicParameters', '', '/app/admin/dynamic-parameter'),
