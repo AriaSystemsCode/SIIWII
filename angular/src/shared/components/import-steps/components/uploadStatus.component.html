@@ -103,14 +103,17 @@
                             Create to NEW COLOR LOOKUP and Link IMAGE
                           </li>
                           <li
+                          *ngIf="hasDataRecords"
                             (click)="handleAction(record, UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData)">
                             Link to NEW PARENT ITEM CODE FROM ASSOCIATED DATA
                           </li>
                           <li
+                          *ngIf="hasDataRecords"
                             (click)="handleAction(record, UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData)">
                             Link to NEW ITEM VARIANT CODE FROM ASSOCIATED DATA
                           </li>
                           <li
+                          *ngIf="hasDataRecords"
                             (click)="handleAction(record, UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData)">
                             Link to NEW COLOR LOOKUP CODE FROM ASSOCIATED DATA
                           </li>
@@ -173,7 +176,6 @@
                         </div>
 
 
-
                         <div *ngIf="column.name === 'Code' && record._isLinkingItemColor"
                           [attr.data-record-id]="record.id" class="position-relative" #codeInputContainer>
                           <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'code')">
@@ -222,7 +224,6 @@
                             </li>
                           </ul>
                         </div>
-
                       </div>
 
                       <!-- Default input -->
@@ -305,24 +306,54 @@
                             </ng-template>
 
                             <ng-template #editableInput>
-                              <input type="text" class="form-control" [attr.data-record-id]="record.id"
-                                [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                                (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
-                                [ngClass]="{
-                                       'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
-                                                        !getRecordValue(record, mapColumnNameToKey(column.name))
-                                     }" />
-                              <small class="text-danger" *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
-                                            !getRecordValue(record, mapColumnNameToKey(column.name))">
-                                {{ getExampleTextForCases(record, column.name) }}
-                              </small>
+                              <!-- Special case for Price Currency Code -->
+                              <ng-container *ngIf="column.name === 'Price Currency Code'; else normalEditableInput">
+                                <input type="text" class="form-control text-uppercase" [attr.data-record-id]="record.id"
+                                  style="text-transform: uppercase;"
+                                  [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                                  (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event?.toUpperCase())"
+                                  [ngClass]="{
+                                                'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
+                                                                 !getRecordValue(record, mapColumnNameToKey(column.name))
+                                              }" />
+                                <small class="text-danger" *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
+                                        !getRecordValue(record, mapColumnNameToKey(column.name))">
+                                  {{ getExampleTextForCases(record, column.name) }}
+                                </small>
+                              </ng-container>
+
+                              <!-- Fallback to normal input -->
+                              <ng-template #normalEditableInput>
+                                <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                  [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                                  (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                                  [ngClass]="{
+                                          'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
+                                                           !getRecordValue(record, mapColumnNameToKey(column.name))
+                                        }" />
+                                <small class="text-danger"
+                                  *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
+                                                                  !getRecordValue(record, mapColumnNameToKey(column.name))">
+                                  {{ getExampleTextForCases(record, column.name) }}
+                                </small>
+                              </ng-template>
                             </ng-template>
+
 
                           </ng-template>
 
                         </div>
 
                         <ng-template #normalInput>
+
+
+                          <ng-container *ngIf="record._isDataRecord; else normalMode">
+                            <input type="text" class="form-control"
+                              [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                              (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)" />
+                          </ng-container>
+
+                          <ng-template #normalMode>
                           <ng-container *ngIf="column.name === 'Product Description'; else normalTextInput">
                             <div class="form-control"
                               [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
@@ -334,15 +365,32 @@
 
                             <ng-container
                               *ngIf="column.name === 'Code' && (record._isLinkNewParent ||  record._isLinkNewItemColor) ">
-                              <input #codeInputContainer  [attr.data-record-id]="record.id"
-                              class="position-relative"  type="text" class="form-control"
-                                [ngModel]="getRecordValue(record, 'code')"
+                              <input (focus)="activeRecord = record" #codeInputContainer
+                                [attr.data-record-id]="record.id" class="position-relative" type="text"
+                                class="form-control" [ngModel]="getRecordValue(record, 'code')"
                                 (ngModelChange)="setRecordValue(record, 'code', $event)" [ngClass]="{
                                         'border-danger': !getRecordValue(record, 'code')
                                      }" (ngModelChange)="onAssCodeInputChange(record, $event)" />
                               <small class="text-danger" *ngIf="!getRecordValue(record, 'code')">
                                 {{ getExampleTextForCases(record, column.name) }}
                               </small>
+
+                              <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                *ngIf="activeRecord === record && record._isLinkNewParent  && linkNewParentItem_Data?.length > 0">
+                                <li *ngFor="let item of linkNewParentItem_Data" (click)="selectSuggestion(record, item)"
+                                  class="dropdown-item pointer">
+                                  {{item.displayName}}
+                                </li>
+                              </ul>
+
+                              <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                *ngIf="activeRecord === record  && record._isLinkNewItemColor && linkNewItemColor_Data?.length > 0">
+                                <li *ngFor="let item of linkNewItemColor_Data" (click)="selectSuggestion(record, item)"
+                                  class="dropdown-item pointer">
+                                  {{item.displayName}}
+                                </li>
+                              </ul>
+
                             </ng-container>
 
 
@@ -356,7 +404,21 @@
                               <small class="text-danger" *ngIf="!getRecordValue(record, 'colorCode')">
                                 {{ getExampleTextForCases(record, column.name) }}
                               </small>
+
+                              <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                *ngIf="activeRecord === record  && linkNewColorLookup_Data?.length > 0">
+                                <li *ngFor="let item of linkNewColorLookup_Data"
+                                  (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                  {{item.displayName}}
+                                </li>
+                              </ul>
                             </ng-container>
+
+                            <input *ngIf="column.name === 'Price Currency Code'" type="text"
+                              class="form-control link-parent-input" style="text-transform: uppercase;"
+                              [ngModel]="getRecordValue(record, 'priceCurrencyCode')"
+                              (ngModelChange)="setRecordValue(record, 'priceCurrencyCode', $event?.toUpperCase())" />
+
 
 
                             <input type="text" class="form-control" style="width: fit-content;"
@@ -369,9 +431,11 @@
                                    }" [hidden]="
                                      (column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor  || record._isLinkNewParent ||  record._isLinkNewItemColor)) ||
                                      (column.name === 'Color Code' &&(record._isLinkingColorLookup ||  record._isLinkNewColorLookup )) ||
-                                     (column.name === 'Image Folder Name')
+                                     (column.name === 'Image Folder Name')||
+                                     (column.name === 'Price Currency Code')
                                    " />
                           </ng-template>
+                        </ng-template>
                         </ng-template>
 
                       </div>
@@ -402,7 +466,12 @@
 
         <ng-template #noData>
           <div class="text-center text-muted py-5">
-            {{ "No records to display." | localize }}
+            <ng-container *ngIf="!hasDataRecords">
+              No Data Records
+            </ng-container>
+            <ng-container *ngIf="!hasImageRecords">
+              No Image Records
+            </ng-container>
           </div>
         </ng-template>
 
