@@ -640,7 +640,7 @@ namespace onetouch.AppItems
                     IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,
                     AttachmentCategoryEnum = 0,
                     AttachmentCategoryId = 3,
-                    FileName = appItemtExcelRecordDTO.ExcelDto.ImagePreview,
+                    FileName = appItemtExcelRecordDTO.image,
                     guid = Guid.NewGuid().ToString(),
                     Index = appEntityDto.EntityAttachments.Count
                 };

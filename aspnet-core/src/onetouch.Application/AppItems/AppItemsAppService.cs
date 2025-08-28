@@ -6182,13 +6182,13 @@ namespace onetouch.AppItems
 
             // temp
             excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "1";
-            excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
-            excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
+            //excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
+            //excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
              
 
             excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
-            excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
-            excelResultsDTO.ExcelRecords[1].ExcelDto.ImagePreview = "SADE2.png";
+            //excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
+            //excelResultsDTO.ExcelRecords[1].ExcelDto.ImagePreview = "SADE2.png";
 
             // temp end
             List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords

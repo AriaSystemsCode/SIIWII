@@ -208,7 +208,7 @@ namespace onetouch.AppItems.Dtos
     }
     public enum ItemType
     { 
-        Item, ItemVariant,
+        Item, ItemVariant,Color
     }
     //MMT
     public class AppItemAttributePriceDto
