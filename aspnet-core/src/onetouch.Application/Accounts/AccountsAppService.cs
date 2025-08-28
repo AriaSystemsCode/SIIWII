@@ -993,7 +993,7 @@ namespace onetouch.Accounts
                 .Where(x => x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
                 //.WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile, x => x.TenantId == AbpSession.TenantId && x.AccountId == input.AccountId && x.IsProfileData)
                 .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile,
-                x => x.TenantId == AbpSession.TenantId && (((x.AccountId == input.AccountId && x.IsProfileData) ||
+                x => x.TenantId == AbpSession.TenantId && (((x.AccountId == input.AccountId) ||
                             _appContactRelationshipInfoRepository.GetAll()
                            .Count(s => s.RecipientContactSSIN  == x.SSIN &&
                            s.RequesterContactSSIN == currentTenantAccountSSIN && s.ConsiderAsTeamMember == true && s.SharingLevel == 1
@@ -2833,21 +2833,18 @@ namespace onetouch.Accounts
                 newId = await _appEntitiesAppService.SaveContact(contact); }
 
             await CurrentUnitOfWork.SaveChangesAsync();
-            await CreateAdminContact();
-
-            await CurrentUnitOfWork.SaveChangesAsync();
 
             //I40[Start]
-            if ((input.Id==0 || input.Id ==null) &&
-                input.ParentId== null && contact.TenantId== AbpSession.TenantId)
+            if ((input.Id == 0 || input.Id == null) &&
+                input.ParentId == null && contact.TenantId == AbpSession.TenantId)
             {
                 BranchDto branchDto = new BranchDto();
                 branchDto.AccountId = newId;
                 branchDto.ParentId = newId;
                 branchDto.TenantId = AbpSession.TenantId;
-                
-                branchDto.Code =  input.Code.TrimEnd() + "-MAIN";
-                branchDto.Name= contact.Name.TrimEnd()+" Main Branch";
+
+                branchDto.Code = input.Code.TrimEnd() + "-MAIN";
+                branchDto.Name = contact.Name.TrimEnd() + " Main Branch";
                 branchDto.CurrencyId = input.CurrencyId;
                 branchDto.EMailAddress = input.EMailAddress;
                 branchDto.LanguageId = input.LanguageId;
@@ -2868,6 +2865,11 @@ namespace onetouch.Accounts
                 await CreateOrEditBranch(branchDto);
             }
             //I40[End]
+            await CreateAdminContact();
+
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+         
             return await GetAccountForEdit(new EntityDto<long> { Id = newId });
 
         }
@@ -2993,6 +2995,7 @@ namespace onetouch.Accounts
                                         accountDto.TradeName = "";
                                         accountDto.EMailAddress = adminUser.EmailAddress;
                                         accountDto.ReturnId = true;
+                                        accountDto.ParentId = account.Id;
                                         accountDto.AccountLevel = AccountLevelEnum.Manual;
                                     }
                                     accountDto.EntityExtraData = new List<AppEntityExtraDataDto>();
