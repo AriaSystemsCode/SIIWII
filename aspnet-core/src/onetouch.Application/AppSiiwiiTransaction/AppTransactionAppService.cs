@@ -3100,52 +3100,50 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
 
-                return true;
-            }
-        }
-        [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
-        public async Task<bool> UpdatePriceByProductSSINColor(long orderId, long parentId, string colorCode, long colorId, decimal price)
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
+           
+        //[AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
+        //public async Task<bool> UpdatePriceByProductSSINColor(long orderId, long parentId, string colorCode, long colorId, decimal price)
+        //{
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
 
-                var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
-                var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
-                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
-                    .ThenInclude(e => e.EntityExtraData)
-                    .Where(e => e.TenantId == AbpSession.TenantId
-                && e.CreatorUserId == AbpSession.UserId
-                && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
-                && e.Id == orderId).FirstOrDefault();
+        //        var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+        //        var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+        //        var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
+        //            .ThenInclude(e => e.EntityExtraData)
+        //            .Where(e => e.TenantId == AbpSession.TenantId
+        //        && e.CreatorUserId == AbpSession.UserId
+        //        && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
+        //        && e.Id == orderId).FirstOrDefault();
 
-                if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
-                {
-                    var itemMajor = filteredAppTransactions.AppTransactionDetails.Where(e => e.Id == parentId).FirstOrDefault();
-                    if (itemMajor != null)
-                    {
-                        var itemsList = filteredAppTransactions.AppTransactionDetails.Where(e => e.ParentId == itemMajor.Id
-                        && e.EntityExtraData.Where(x => x.AttributeId == 101 &&
-                        ((!string.IsNullOrEmpty(colorCode) && x.AttributeValue.ToUpper() == colorCode.ToUpper())
-                        || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
-                            .ToList();
+        //        if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
+        //        {
+        //            var itemMajor = filteredAppTransactions.AppTransactionDetails.Where(e => e.Id == parentId).FirstOrDefault();
+        //            if (itemMajor != null)
+        //            {
+        //                var itemsList = filteredAppTransactions.AppTransactionDetails.Where(e => e.ParentId == itemMajor.Id
+        //                && e.EntityExtraData.Where(x => x.AttributeId == 101 &&
+        //                ((!string.IsNullOrEmpty(colorCode) && x.AttributeValue.ToUpper() == colorCode.ToUpper())
+        //                || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
+        //                    .ToList();
                         
-                        foreach (var e in itemsList)
-                        {
+        //                foreach (var e in itemsList)
+        //                {
                             
-                            e.NetPrice= price;
-                            e.GrossPrice = price;
-                            e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
+        //                    e.NetPrice= price;
+        //                    e.GrossPrice = price;
+        //                    e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
                             
-                        };
-                        await CurrentUnitOfWork.SaveChangesAsync();
-                    }
-                }
-                filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
-                filteredAppTransactions.TimeStamp = DateTime.UtcNow;
-                await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
-                return true;
-            }
-        }
+        //                };
+        //                await CurrentUnitOfWork.SaveChangesAsync();
+        //            }
+        //        }
+        //        filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+        //        filteredAppTransactions.TimeStamp = DateTime.UtcNow;
+        //        await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+        //        return true;
+        //    }
+        //}
 
         //MMT2025[End]
 
