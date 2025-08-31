@@ -61,7 +61,7 @@
       </div>
   
   
-      <button class="btnPost" (click)="isUserReviewedEntityBefore()" [disabled]="reviewText === ''">Post</button>
+      <button class="btnPost" (click)="isUserReviewedEntityBefore()" [disabled]="!reviewText?.trim() || selectedRating < 1">Post</button>
     </div>
   
   

@@ -752,11 +752,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     getCotactData(event){
         this.editedContactPerData = event
         // this.accountInfoTemp.entityAttachments =  this.editedContactPerData?.entityAttachments
-        console.log(this.editedContactPerData ,'editedContactPerData')
+ 
 
     }
     savePerData(event) {
-        console.log(event,'event')
+  
        
         this.accountInfoTemp = event
         if (!this.accountInfoTemp.entityExtraData) {
@@ -909,22 +909,22 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
 
     saveMyAccount() {
-        console.log(this.accountInfoTemp,'this.accountInfoTemp')
+    
 
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
                 this.saving = false;
-                // if (!this.accountId && newId) {
-                //     // Redirect to view page with ProfileView tab
-                // this._router.navigate([`/app/main/account`], {
-                //     queryParams: { tab: 'ProfileView' }
-                // });
-                // } else {
+                if (!this.accountId ) {
+                    // Redirect to view page with ProfileView tab
+                this._router.navigate([`/app/main/account`], {
+                    queryParams: { tab: 'ProfileView' }
+                });
+                } else {
                 this.getAccountDataForView()
 
                 this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
 
-                // }
+                }
             }))
             .subscribe(result => {
                 if (result) {
