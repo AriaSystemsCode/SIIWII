@@ -198,35 +198,56 @@ export class AddCommentComponent extends AppComponentBase {
         this.showContactSuggstions=false;
       }
     }
-    saveComment(){
-        this.saving = true
-        if(!this.comment.subject)this.comment.subject = `${MesasgeObjectType[MesasgeObjectType.Comment]} on ${this.comment.body.slice(0,10)}...`
-        this.mentionedUsers=[];
-        let newMentiondUser:MentionedUserInfo= new MentionedUserInfo();
-        this.CommentTextArea.nativeElement?.childNodes?.forEach((mentionContact)=>{
-         if(mentionContact.localName=='span'){
-        newMentiondUser.userId=parseInt(mentionContact.attributes.userid.value);
-         newMentiondUser.tenantId=parseInt(mentionContact.attributes.tenantid.value);
-         this.mentionedUsers.push(newMentiondUser)
-         }
-
-        })
-        this.comment.mentionedUsers=this.mentionedUsers;
-        this.comment.bodyFormat = this.comment.body
-        this.comment.messageCategory="UPDATEMESSAGE" ;
-        debugger
-        if(!this.comment.relatedEntityId&&this.relatedEntityId)this.comment.relatedEntityId=this.relatedEntityId;
-        this._messageServiceProxy.createMessage(this.comment)
-        .pipe(
-            finalize( ()=> {this.saving = false ;this.refresh.emit(true)})
-        )
-        .subscribe((res)=>{
-            this.reset()
-            const comment = res[res.length-1]
-            comment.messages.profilePictureUrl = this.profilePicture
-            this.saveDone.emit(comment);
-        })
+    saveComment() {
+      this.saving = true;
+    
+      if (!this.comment.subject) {
+        this.comment.subject = `${MesasgeObjectType[MesasgeObjectType.Comment]} on ${this.comment.body.slice(0, 10)}...`;
+      }
+    
+      // pick only the spans we added
+      const nodes = this.CommentTextArea?.nativeElement
+        ?.querySelectorAll('span.selectedContact') as NodeListOf<HTMLElement> | null;
+    
+      this.mentionedUsers = [];
+    
+      nodes?.forEach((el) => {
+        // be tolerant to old spans that might have different attrs
+        const userIdStr =
+          el.getAttribute('data-user-id') ||
+          el.getAttribute('userid') ||
+          el.getAttribute('userId');
+    
+        const tenantIdStr =
+          el.getAttribute('data-tenant-id') ||
+          el.getAttribute('tenantid') ||
+          el.getAttribute('tenantId');
+    
+        if (userIdStr && tenantIdStr) {
+          const u = new MentionedUserInfo();
+          u.userId = Number(userIdStr);
+          u.tenantId = Number(tenantIdStr);
+          this.mentionedUsers.push(u);
+        }
+      });
+    
+      this.comment.mentionedUsers = this.mentionedUsers;
+      this.comment.bodyFormat = this.comment.body;
+      this.comment.messageCategory = 'UPDATEMESSAGE';
+      if (!this.comment.relatedEntityId && this.relatedEntityId) {
+        this.comment.relatedEntityId = this.relatedEntityId;
+      }
+    
+      this._messageServiceProxy.createMessage(this.comment)
+        .pipe(finalize(() => this.saving = false))
+        .subscribe((res) => {
+          this.reset();
+          const comment = res[res.length - 1];
+          comment.messages.profilePictureUrl = this.profilePicture;
+          this.saveDone.emit(comment);
+        });
     }
+    
     show(comment:any){
         this.active = true
         this.commentObject = comment
