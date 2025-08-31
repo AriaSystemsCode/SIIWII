@@ -22,10 +22,13 @@ export class CTAComponent extends AppComponentBase implements OnInit {
         .subscribe((res)=>{
             this.sycAttachmentCategoryCTASlider = res[0]
         })
+        localStorage.removeItem("productFilters");
     }
 
     ctaSeeMore(){}
     handleStorageData(){
+ 
+
     localStorage.setItem("fromSellerRoom",JSON.stringify(false));
     localStorage.setItem("fromMarketPlace",JSON.stringify(true));
     localStorage.removeItem("productFilters");

@@ -74,6 +74,7 @@ using onetouch.Globals;
 using MimeKit;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
+using onetouch.AppMarketplaceContacts;
 using MimeKit;
 using onetouch.AppTenantsActivitiesLogs;
 
@@ -135,8 +136,11 @@ namespace onetouch.AppSiiwiiTransaction
         //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
         //I46[Start]
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I46[End]
-       
+        //I40[Start]
+        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        //I40[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
@@ -159,8 +163,10 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
-             TimeZoneInfoAppService timeZoneInfoAppService, IRepository<AppEntityLog, long> appEntityLogRepository,
-             IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService)
+             TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
+             IRepository<AppEntityLog, long> appEntityLogRepository, IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository,
+             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
+             )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
             _accountAppService = accountAppService;
@@ -210,7 +216,11 @@ namespace onetouch.AppSiiwiiTransaction
             //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
             //I46[Start]
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
             //I46{End}
+            //I40[Start]
+            _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
+            //I40[End]
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -2098,12 +2108,18 @@ namespace onetouch.AppSiiwiiTransaction
         }
         public async Task<List<GetContactInformationDto>> GetAccountRelatedContacts(long accountId, string filter)
         {
+            var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             List<GetContactInformationDto> returnObjectList = new List<GetContactInformationDto>();
+            var accountObject = await _appContactRepository.GetAll().Where(z => z.Id == accountId).FirstOrDefaultAsync();
             var accountsList = _appContactRepository.GetAll()
                 .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                 .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
-                & a.AccountId == accountId & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+                 & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId
+                & (a.AccountId == accountId ||
+                    _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountObject.SSIN &&
+                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId == activeRealtionshipStatusId) > 0)
+                );
 
 
             var pagedAndFilteredAccounts = accountsList.OrderBy("name asc");
@@ -2372,7 +2388,9 @@ namespace onetouch.AppSiiwiiTransaction
                                 cnt.ContactAddressDetail.ContactEmail = cnt.ContactEmail;
                                 cnt.ContactAddressDetail.ContactPhone = cnt.ContactPhoneNumber;
                             }
-                            if (cnt.BranchSSIN !=null && cnt.BranchName !="*Main*")
+                            //I40[Start]
+                            if (true)//(cnt.BranchSSIN !=null && cnt.BranchName !="*Main*")
+                            //I40[End]
                             {
                                 var branch = _appContactRepository.GetAll().Where(z => z.SSIN == cnt.BranchSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
                                 if (branch != null)
@@ -3082,6 +3100,53 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
 
+                return true;
+            }
+        }
+        [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
+        public async Task<bool> UpdatePriceByProductSSINColor(long orderId, long parentId, string colorCode, long colorId, decimal price)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+
+                var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+                var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
+                    .ThenInclude(e => e.EntityExtraData)
+                    .Where(e => e.TenantId == AbpSession.TenantId
+                && e.CreatorUserId == AbpSession.UserId
+                && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
+                && e.Id == orderId).FirstOrDefault();
+
+                if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
+                {
+                    var itemMajor = filteredAppTransactions.AppTransactionDetails.Where(e => e.Id == parentId).FirstOrDefault();
+                    if (itemMajor != null)
+                    {
+                        var itemsList = filteredAppTransactions.AppTransactionDetails.Where(e => e.ParentId == itemMajor.Id
+                        && e.EntityExtraData.Where(x => x.AttributeId == 101 &&
+                        ((!string.IsNullOrEmpty(colorCode) && x.AttributeValue.ToUpper() == colorCode.ToUpper())
+                        || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
+                            .ToList();
+                        
+                        foreach (var e in itemsList)
+                        {
+                            
+                            e.NetPrice= price;
+                            e.GrossPrice = price;
+                            e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
+                            
+                        };
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                }
+                filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                filteredAppTransactions.TimeStamp = DateTime.UtcNow;
+                await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                return true;
+            }
+        }
+
         //MMT2025[End]
 
         [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
@@ -3322,14 +3387,24 @@ namespace onetouch.AppSiiwiiTransaction
                                 }
                                 if (detParent.EntityAttachments != null)
                                 {
+                                    detParent.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                                     foreach (var parentAttach in detParent.EntityAttachments)
                                     {
-                                        parentAttach.Id = 0;
 
+                                        parentAttach.Id = 0;
                                         parentAttach.EntityId = 0;
                                         parentAttach.EntityFk = null;
                                         parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                        MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                        if (marketplaceItemMain.TenantOwner == AbpSession.TenantId)
+                                        {
+                                            string fileName = System.Guid.NewGuid().ToString() +"."+parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                            MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                            parentAttach.AttachmentFk.Attachment = fileName;
+                                        }
+                                        else
+                                        {
+                                            MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
+                                        }
                                         parentAttach.AttachmentId = 0;
                                         parentAttach.AttachmentFk.Id = 0;
                                     }
@@ -3423,14 +3498,28 @@ namespace onetouch.AppSiiwiiTransaction
                                         }
                                         if (det.EntityAttachments != null)
                                         {
+                                            det.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                                             foreach (var parentAttach in det.EntityAttachments)
                                             {
+
                                                 parentAttach.Id = 0;
 
                                                 parentAttach.EntityId = 0;
                                                 parentAttach.EntityFk = null;
                                                 parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                                //I40
+                                                //MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId,null);
+                                                if (marketplaceItem.TenantOwner == AbpSession.TenantId)
+                                                {
+                                                    string fileName = System.Guid.NewGuid().ToString() + "." + parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                                    parentAttach.AttachmentFk.Attachment = fileName;
+                                                }
+                                                else
+                                                {
+                                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, null);
+                                                }
+                                                //I40
                                                 parentAttach.AttachmentId = 0;
                                                 parentAttach.AttachmentFk.Id = 0;
                                             }
@@ -3457,14 +3546,17 @@ namespace onetouch.AppSiiwiiTransaction
                 }
             }
         }
-        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId,string? newFileName)
         {
             if (sourceTenantId == null) sourceTenantId = -1;
             if (distinationTenantId == null) distinationTenantId = -1;
 
+            if (string.IsNullOrEmpty(newFileName))
+                newFileName = fileName;
+
             var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
             var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
-            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + newFileName;
 
             if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
             {
@@ -3493,15 +3585,20 @@ namespace onetouch.AppSiiwiiTransaction
             List<AccountBranchDto> returnList = new List<AccountBranchDto>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                //I40[Start]
+                //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var branchEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
+                //I40[End]
                 var filteredParentId = _appContactRepository.GetAll().Where(z => z.SSIN == accountSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefault();
                 if (filteredParentId != null)
                 {
                     var filteredBranches = _appContactRepository.GetAll()
                             .Include(e => e.ParentFk)
                             // .Include(e => e.ParentFkList)
-                            .Where(e => e.ParentId != null && e.ParentId == filteredParentId.Id && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId);
-
+                            .Where(e => e.ParentId != null && e.ParentId == filteredParentId.Id &&
+                            //I40[Start]
+                            e.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId);
+                            //I40[End]
                     var branches = from o in filteredBranches
                                        //join o2 in _appContactRepository.GetAll() on o.ParentId equals o2.Id into j2
                                        // from s2 in j2.DefaultIfEmpty()
@@ -3520,7 +3617,9 @@ namespace onetouch.AppSiiwiiTransaction
                                    };
                     var totalCount = await filteredBranches.CountAsync();
                     var x = await branches.ToListAsync();
-                    x.Add(new AccountBranchDto { Code = "Main", Name = @"*Main*", Id = filteredParentId.Id, SSIN = accountSSIN });
+                    //I40[Start]
+                    //x.Add(new AccountBranchDto { Code = "Main", Name = @"*Main*", Id = filteredParentId.Id, SSIN = accountSSIN });
+                    //I40[End]
                     var orderedList = x.OrderBy(z => z.Name).ToList();
                     return orderedList;
                 }
@@ -3540,12 +3639,17 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     return returnList;
                 }
+                var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 List<GetContactInformationDto> returnObjectList = new List<GetContactInformationDto>();
                 var accountsList = _appContactRepository.GetAll()
                     .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
-                    .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
-                    & a.AccountId == accountId.Id & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+                    .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null 
+                     & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &
+                     (a.AccountId == accountId.Id ||
+                    _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountSSIN &&
+                    z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId== activeRealtionshipStatusId)>0 )
+                    );
 
 
                 var pagedAndFilteredAccounts = accountsList.OrderBy("name asc");
@@ -3965,7 +4069,7 @@ namespace onetouch.AppSiiwiiTransaction
                             appAtt.AttachmentFk.Name = attch.AttachmentFk.Name;
                             appAtt.AttachmentFk.Attributes = attch.AttachmentFk.Attributes;
 
-                            MoveFile(attch.AttachmentFk.Attachment, -1, tenantId);
+                            MoveFile(attch.AttachmentFk.Attachment, -1, tenantId,null);
                             appAtt.AttachmentId = 0;
                             appAtt.IsDefault = attch.IsDefault;
                             entityMain.EntityAttachments.Add(appAtt);
@@ -4093,7 +4197,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         extr.EntityCode = tenantVariation.Code;
 
                                         if (ext.AttributeId == 202 && !string.IsNullOrEmpty(ext.AttributeValue))
-                                            MoveFile(ext.AttributeValue, -1, tenantId);
+                                            MoveFile(ext.AttributeValue, -1, tenantId,null);
 
                                         tenantVariation.EntityFk.EntityExtraData.Add(extr);
                                     }
@@ -4149,7 +4253,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         appAtt.AttachmentFk.Code = attch.AttachmentFk.Code;
                                         appAtt.AttachmentFk.Name = attch.AttachmentFk.Name;
                                         appAtt.AttachmentFk.Attributes = attch.AttachmentFk.Attributes;
-                                        MoveFile(attch.AttachmentFk.Attachment, -1, tenantId);
+                                        MoveFile(attch.AttachmentFk.Attachment, -1, tenantId,null);
                                         appAtt.AttachmentId = 0;
                                         appAtt.IsDefault = attch.IsDefault;
                                         tenantVariation.EntityFk.EntityAttachments.Add(appAtt);
@@ -4666,7 +4770,7 @@ namespace onetouch.AppSiiwiiTransaction
                        // viewTrans.Additional = new List<ExtraDataAttrDto>();
                        // var recommended = GetAppTransactionExtraDataWithPaging(transactionId,viewTrans.EntityObjectTypeId, RecommandedOrAdditional.RECOMMENDED).Result.Items.ToList();
                         //var additional= GetAppTransactionExtraDataWithPaging(transactionId, viewTrans.EntityObjectTypeId, RecommandedOrAdditional.ADDITIONAL).Result.Items.ToList();
-                        viewTrans.ExtraDataAttributes = GetAppTransactionExtraDataWithPaging(transactionId, viewTrans.EntityObjectTypeId).Result.Items.ToList();
+                        viewTrans.ExtraDataAttributes =_appEntitiesAppService.GetAppEntityExtraDataWithPaging(transactionId, viewTrans.EntityObjectTypeId).Result.Items.ToList();
                         //I46[End]
                         return viewTrans;
                     }
@@ -5326,7 +5430,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 newExt.Id = 0;
                                 //newExt.EntityFk = tenantTransaction;
                                 newExt.AttachmentFk.TenantId = tenantId;
-                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                 newExt.AttachmentId = 0;
                                 newExt.AttachmentFk.Id = 0;
                                 tenantTransaction.EntityAttachments.Add(newExt);
@@ -5382,7 +5486,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         newExt.Id = 0;
                                         newExt.EntityFk = null;
                                         newExt.AttachmentFk.TenantId = tenantId;
-                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                         newExt.AttachmentId = 0;
                                         newExt.AttachmentFk.Id = 0;
                                         detail.EntityAttachments.Add(newExt);
@@ -5461,7 +5565,7 @@ namespace onetouch.AppSiiwiiTransaction
                                                 newExt.Id = 0;
                                                 newExt.EntityFk = null;
                                                 newExt.AttachmentFk.TenantId = null;
-                                                MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1);
+                                                MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1,null);
                                                 newExt.AttachmentId = 0;
                                                 newExt.AttachmentFk.Id = 0;
                                                 detailch.EntityAttachments.Add(newExt);
@@ -5612,7 +5716,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 newExt.Id = 0;
                                 newExt.EntityFk = null;
                                 newExt.AttachmentFk.TenantId = tenantId;
-                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                 newExt.AttachmentId = 0;
                                 newExt.AttachmentFk.Id = 0;
                                 tenantTransactionObj.EntityAttachments.Add(newExt);
@@ -5672,7 +5776,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         newExt.Id = 0;
                                         newExt.EntityFk = null;
                                         newExt.AttachmentFk.TenantId = tenantId;
-                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
+                                        MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId,null);
                                         newExt.AttachmentId = 0;
                                         newExt.AttachmentFk.Id = 0;
                                         detail.EntityAttachments.Add(newExt);
@@ -5750,7 +5854,7 @@ namespace onetouch.AppSiiwiiTransaction
                                                 newExt.Id = 0;
                                                 newExt.EntityFk = null;
                                                 newExt.AttachmentFk.TenantId = tenantId;
-                                                MoveFile(ext.AttachmentFk.Attachment, -1, tenantId);
+                                                MoveFile(ext.AttachmentFk.Attachment, -1, tenantId,null);
                                                 newExt.AttachmentId = 0;
                                                 newExt.AttachmentFk.Id = 0;
                                                 detailch.EntityAttachments.Add(newExt);
@@ -5830,7 +5934,7 @@ namespace onetouch.AppSiiwiiTransaction
                             newExt.Id = 0;
                             newExt.EntityFk = null;
                             newExt.AttachmentFk.TenantId = null;
-                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1);
+                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1,null);
                             newExt.AttachmentId = 0;
                             newExt.AttachmentFk.Id = 0;
                             marketplaceTransaction.EntityAttachments.Add(newExt);
@@ -5927,7 +6031,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     newExt.Id = 0;
                                     newExt.EntityFk = null;
                                     newExt.AttachmentFk.TenantId = null;
-                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1);
+                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1,null);
                                     newExt.AttachmentId = 0;
                                     newExt.AttachmentFk.Id = 0;
                                     detail.EntityAttachments.Add(newExt);
@@ -6003,7 +6107,7 @@ namespace onetouch.AppSiiwiiTransaction
                                             newExt.Id = 0;
                                             newExt.EntityFk = null;
                                             newExt.AttachmentFk.TenantId = null;
-                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1);
+                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1,null);
                                             newExt.AttachmentId = 0;
                                             newExt.AttachmentFk.Id = 0;
                                             detailch.EntityAttachments.Add(newExt);
@@ -6060,7 +6164,7 @@ namespace onetouch.AppSiiwiiTransaction
                             newExt.Id = 0;
                             newExt.EntityFk = null;
                             newExt.AttachmentFk.TenantId = null;
-                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1);
+                            MoveFile(newExt.AttachmentFk.Attachment, marketplaceTransaction.TenantOwner, -1,null);
                             newExt.AttachmentId = 0;
                             newExt.AttachmentFk.Id = 0;
                             marketplaceTransaction.EntityAttachments.Add(newExt);
@@ -6145,7 +6249,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     newExt.Id = 0;
                                     newExt.EntityFk = null;
                                     newExt.AttachmentFk.TenantId = null;
-                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1);
+                                    MoveFile(newExt.AttachmentFk.Attachment, detail.TenantOwner, -1,null);
                                     newExt.AttachmentId = 0;
                                     newExt.AttachmentFk.Id = 0;
                                     detail.EntityAttachments.Add(newExt);
@@ -6223,7 +6327,7 @@ namespace onetouch.AppSiiwiiTransaction
                                             newExt.Id = 0;
                                             newExt.EntityFk = null;
                                             newExt.AttachmentFk.TenantId = null;
-                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1);
+                                            MoveFile(ext.AttachmentFk.Attachment, detailch.TenantOwner, -1,null);
                                             newExt.AttachmentId = 0;
                                             newExt.AttachmentFk.Id = 0;
                                             detailch.EntityAttachments.Add(newExt);
@@ -6844,6 +6948,7 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                             if (detParent.EntityAttachments != null)
                             {
+                                detParent.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                                 foreach (var parentAttach in detParent.EntityAttachments)
                                 {
                                     parentAttach.Id = 0;
@@ -6851,7 +6956,18 @@ namespace onetouch.AppSiiwiiTransaction
                                     parentAttach.EntityId = 0;
                                     parentAttach.EntityFk = null;
                                     parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                    //I40
+                                    if (marketplaceVariationParent.TenantOwner== AbpSession.TenantId)
+                                    {
+                                        string fileName = System.Guid.NewGuid().ToString() + "." + parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                        MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                        parentAttach.AttachmentFk.Attachment = fileName;
+                                    }
+                                    else
+                                    {
+                                    //I40
+                                        MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, null);
+                                    }
                                     parentAttach.AttachmentId = 0;
                                     parentAttach.AttachmentFk.Id = 0;
                                 }
@@ -6934,6 +7050,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         if (det.EntityAttachments != null)
                         {
+                            det.EntityAttachments.RemoveAll(z => z.IsDefault == false);
                             foreach (var parentAttach in det.EntityAttachments)
                             {
                                 parentAttach.Id = 0;
@@ -6941,7 +7058,18 @@ namespace onetouch.AppSiiwiiTransaction
                                 parentAttach.EntityId = 0;
                                 parentAttach.EntityFk = null;
                                 parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
-                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                //I40
+                                if (marketplaceVariationParent.TenantOwner == AbpSession.TenantId)
+                                {
+                                    string fileName = System.Guid.NewGuid().ToString() + "." + parentAttach.AttachmentFk.Attachment.Split('.')[1];
+                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, fileName);
+                                    parentAttach.AttachmentFk.Attachment = fileName;
+                                }
+                                else
+                                {
+                                    //I40
+                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId, null);
+                                }
                                 parentAttach.AttachmentId = 0;
                                 parentAttach.AttachmentFk.Id = 0;
                             }
@@ -7220,9 +7348,9 @@ namespace onetouch.AppSiiwiiTransaction
 
                     }
                     //share
-                    accountOrg = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                    var accountOrgin = await _appMarketplaceContactRepository.GetAll().Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
                         //.Include(z=>z.ParentFkList).ThenInclude(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
-                        .Where(z => z.SSIN == accountSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                        .Where(z => z.SSIN == accountSSIN && z.TenantId == null && z.IsHidden == false).FirstOrDefaultAsync();
                     //share
                     if (accountOrg != null)// && accountOrg.PartnerId != null)
                     {
@@ -7232,7 +7360,7 @@ namespace onetouch.AppSiiwiiTransaction
                         //    .FirstOrDefaultAsync();
                         // if(publishedAcc!=null)
                         {
-                            await _accountAppService.Connect(accountOrg.Id, int.Parse(tenantId.ToString()));
+                            await _accountAppService.ConnectContactsProfiles(accountOrgin.Id, int.Parse(tenantId.ToString()));
                             /* var otherAccount = await _appContactRepository.GetAll().Where(z => z.Id == publishedAcc.PartnerId && z.TenantId != null)
                              .FirstOrDefaultAsync();
                              if (otherAccount!=null)

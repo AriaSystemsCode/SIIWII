@@ -1,5 +1,5 @@
-<h4>Reviews</h4>
-<hr>
+<h4 *ngIf="!fromOverview">Reviews</h4>
+<hr *ngIf="!fromOverview">
 <div *ngIf="totalCount > 0" class="review-summary mb-3">
   <h5 class="font-weight-bold">
     {{ reviews.length }} over {{ totalCount }} {{ 'Results Of' | localize }} "{{ 'Customers Reviews' | localize }}"

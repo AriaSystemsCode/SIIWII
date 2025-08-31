@@ -188,7 +188,7 @@ namespace onetouch.AppSubScriptionPlan
         {
 
             var filteredAppTenantSubscriptionPlans = _appTenantSubscriptionPlanRepository.GetAll()
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.Contains(input.Filter) || e.SubscriptionPlanCode.Contains(input.Filter) || e.BillingPeriod.Contains(input.Filter))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.Contains(input.Filter) || e.SubscriptionPlanCode.ToUpper().Contains(input.Filter) || e.BillingPeriod.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName == input.TenantNameFilter)
                         .WhereIf(input.MinAppSubscriptionHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId >= input.MinAppSubscriptionHeaderIdFilter)
                         .WhereIf(input.MaxAppSubscriptionHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId <= input.MaxAppSubscriptionHeaderIdFilter)

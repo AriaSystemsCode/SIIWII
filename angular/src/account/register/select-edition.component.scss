@@ -270,7 +270,7 @@ display: block;
  }
 
  .FreeEdition_child{
-    background-color: $bold-color;
+    background-color: #4A0D4A;
  }
 
  .editionName{
@@ -307,7 +307,10 @@ display: block;
 }
 
 
-
+.kt-content {
+    overflow: hidden !important;
+    padding: 0 !important;
+}
 
 
 

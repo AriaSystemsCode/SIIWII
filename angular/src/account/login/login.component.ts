@@ -93,22 +93,21 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     login(): void {
-        const recaptchaCallback = (token: string) => {
+
+        let recaptchaCallback = (token: string) => {
             this.showMainSpinner();
+
             this.submitting = true;
-    
-            setTimeout(() => {
-                this.loginService.authenticate(
-                    () => {
-                        this.submitting = false;
-                        this.hideMainSpinner();
-                    },
-                    null,
-                    token
-                );
-            }, 2000); // 2 seconds delay
+            this.loginService.authenticate(
+                () => {
+                    this.submitting = false;
+                    this.hideMainSpinner();
+                },
+                null,
+                token
+            );
         };
-     
+
         if (this.useCaptcha) {
             this._reCaptchaV3Service.execute(
                 this.recaptchaSiteKey,
@@ -121,7 +120,6 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             recaptchaCallback(null);
         }
     }
-    
 
     externalLogin(provider: ExternalLoginProvider) {
         this.loginService.externalAuthenticate(provider);

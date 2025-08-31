@@ -325,4 +325,18 @@
     display: block;
     width: 100%;
     margin-top: 10px;
+  }
+  
+
+  .addPadding {
+    padding-right: 80px;
+  }
+  @media only screen and (min-width: 1400px) {
+  .addMargin {
+    margin-right: 40px;
+  }
+}
+
+.marketplace-mg {
+    margin-right: 70px !important;
 }

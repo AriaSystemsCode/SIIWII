@@ -32,7 +32,7 @@ import { PostListService } from "../Services/post-list.service";
 })
 export class PostCardComponent
     extends AppComponentBase
-    implements OnChanges, OnDestroy, AfterViewInit
+    implements OnChanges, OnDestroy
 {
     @Input() isCurrentVideo: boolean;
     @Input() post: GetAppPostForViewDto = null;
@@ -51,6 +51,10 @@ export class PostCardComponent
     InteractionsComponent: InteractionsComponent;
     getAppEntityForViewDto: AppEntitiesRelationshipDto = null;
     appEntityTypes = AppEntityTypes;
+    @Input() fromMarketplaceProfile: boolean;
+
+    
+   
 
     constructor(
         private _postService: AppPostsServiceProxy,
@@ -62,12 +66,8 @@ export class PostCardComponent
         super(injector);
         this.isHost = !this.appSession.tenantId;
     }
-    ngAfterViewInit(): void {
-        throw new Error("Method not implemented.");
-    }
-
+  
     ngOnChanges(changes: SimpleChanges) {
-       
         if (this.post) {
             //Get ProfilePicture
             this.getProfilePictureById(this.post.appPost.profilePictureId);

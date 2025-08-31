@@ -375,6 +375,8 @@ export class NewsBrowseComponent extends AppComponentBase {
             undefined,
             undefined,
             0,
+            undefined, 
+            undefined, 
             filters?.sorting.value,
             this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
             this.primengTableHelper.getMaxResultCount(this.paginator, event)

@@ -33,7 +33,7 @@
                 </div>
                 <div class="modal-footer">
                     <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
-                    <button type="submit" (click)="selectBranch()" class="btn btn-primary blue btn-blue" [disabled]="!selectedBranch" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("select")}}</span></button>
+                    <button type="submit" (click)="selectBranch()" class="btn bgPurple" [disabled]="!selectedBranch" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("select")}}</span></button>
                 </div>
             </div>
         </div>

@@ -27,6 +27,7 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
+    AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -48,6 +49,7 @@ import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { Dropdown } from "primeng/dropdown";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
+import Swal from "sweetalert2";
 
 export enum MarketPlace {
     Accounts,
@@ -179,7 +181,8 @@ export class TopBarComponent
         private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
+        private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
 
@@ -529,8 +532,54 @@ export class TopBarComponent
             });
             
     }
+    
+    CreateBusiness_GroupAccount(accout_type: string, account_name: string): void {
+        
+        let type = accout_type;
+        let accountname = account_name;
+        let email = this.appSession.user.emailAddress;
+        let url =  this.appUrlService.appRootUrl;
+        let tenantName =this.appSession.tenant.name;
+        //let tenantName =this.appSession.tenancyName;
+        let firstName=btoa(this.appSession.user.name);
+        let lastName=btoa(this.appSession.user.surname);
+        let relatedTenantId=this.appSession.tenantId;
+        const htmlTitle: string = `<div class="font-weight-bold"><p class="text-left alarmInfo_title"> <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"/> A registration mail has been Sent to ` + email  + ` </p> </div> `;
+        const htmlContent: string = `<p class="pleaseClick" style="color: #9E9E9E;">*Please Click on the register link in the email in order to create the new  Business | group account. </p> `;
+        var tenantId;
+        if (this.appSession?.tenantId)
+            tenantId = this.appSession?.tenantId?.toString();
+        else tenantId = null;
+        let link = url + "/account/select-edition?editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
+        Swal.fire({
+            title: htmlTitle,
+            html: htmlContent,
+            showCancelButton: false,
+            //cancelButtonText: this.l("No"),
+            confirmButtonText: "okay",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+            customClass: {
+                popup: 'popup_container popup_container_CreateBusiness_GroupAccount',
+                content: 'popup_content',
+                actions: 'popup_actions',
+                confirmButton: 'popp_confirm-button',
+
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                 
+                this._accountsServiceProxy.sendRegistrationEmail(email, tenantId, type, link , tenantName).subscribe(
+                    response => {
+                        console.log('Email sent successfully', response);
+                    })
+            }
+        })
+    }
 
 }
+
 
 export interface TopbardropDown {
     title: string;

@@ -14,7 +14,8 @@ import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/imag
 
 export class AllReviewsListComponent extends AppComponentBase implements OnInit {
   @Input() entityID : number
-
+  @Input() fromOverview : boolean
+  
   @Output() refreshRating : EventEmitter<boolean> = new EventEmitter<boolean>()
   
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;
@@ -327,9 +328,12 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
       .subscribe(() => {
         this.messageServiceProxy
           .createUserEntityRating(this.selectedRating, this.entityID)
+          .pipe(finalize(() => {
+            this.refreshRating.emit(true)
+            
+          }))
 
           .subscribe(() => {
-
           });
 
       });

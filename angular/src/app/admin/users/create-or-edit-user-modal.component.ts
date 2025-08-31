@@ -21,7 +21,8 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     @ViewChild('organizationUnitTree') organizationUnitTree: OrganizationUnitsTreeComponent;
 
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
-
+    @Output() refreshData: EventEmitter<any> = new EventEmitter<any>();
+    
     active = false;
     saving = false;
     canChangeUserName = true;
@@ -42,7 +43,8 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     tenancyName:string;
     defaultTenancyName:string="SIIWII.NET"; 
     entityObjectType:string ="TENANTCONTACT";
-
+    fromTeamMember:boolean=false;
+    teamMemberId:number;
     constructor(
         injector: Injector,
         private _userService: UserServiceProxy,
@@ -51,7 +53,6 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
     ) {
         super(injector);
     }
-
     show(userId?: number): void {
         if (!userId) {
             this.active = true;
@@ -60,7 +61,9 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
         }
 
         this._userService.getUserForEdit(userId).subscribe(userResult => {
+            if(!this.fromTeamMember)
             this.user = userResult.user;
+        
             this.roles = userResult.roles;
             this.tenancyName=userResult.tenancyName;
             this.canChangeUserName = this.user.userName !== AppConsts.userManagement.defaultAdminUserName;
@@ -144,9 +147,9 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
         let  sequance="";
         this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,this.appSession.tenantId).subscribe
         ((res) => { 
-            let tenancyName = this.appSession.tenancyName;
+            // let tenancyName = this.appSession.tenancyName;
             sequance=res;
-        input.code= tenancyName+"-C"+sequance; 
+        input.code= sequance; 
         input.user = this.user;
         input.setRandomPassword = this.setRandomPassword;
         input.sendActivationEmail = this.sendActivationEmail;
@@ -158,9 +161,13 @@ export class CreateOrEditUserModalComponent extends AppComponentBase {
         input.organizationUnits = this.organizationUnitTree.getSelectedOrganizations();
 
         this.saving = true;
-        
+        input.contactId = this.teamMemberId
         this._userService.createOrUpdateUser(input)
-            .pipe(finalize(() => { this.saving = false; }))
+            .pipe(finalize(() => {
+                 this.saving = false; 
+                 this.refreshData.emit(true);
+
+                }))
             .subscribe(() => {
                 this.notify.info(this.l('SavedSuccessfully'));
                 this.close();

@@ -1,4 +1,4 @@
-<div [ngClass]="[!active  ? 'd-none ' : 'pt-2 ', cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ,parentId || fromOverview ? 'addParSec': 'parSec' ]"
+<div [ngClass]="[!active ? 'd-none ' : '', active && !fromOverview ? 'pt-4':'',cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ,parentId || fromOverview ? 'addParSec': 'parSec' ]"
     *ngIf="!addReplyScreen">
 
 
@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<div *ngIf="!addReplyScreen" [ngClass]="fromOverview ? '' :'pb-3'">
+<div *ngIf="!addReplyScreen"  [ngClass]="fromOverview?'':'pb-3'">
     <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'"
         [cartStyle]="cartStyle" (saveDone)="newCommentAddedHandler($event)" [relatedEntityId]="entityId"
         #AddCommentComponent>

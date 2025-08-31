@@ -12,6 +12,9 @@ namespace onetouch.Authorization.Users
     /// </summary>
     public class User : AbpUser<User>
     {
+        //I40[Start]
+        public int RelatedTenantId { get; set; }
+        //I40[End]
         public virtual Guid? ProfilePictureId { get; set; }
 
         public virtual bool ShouldChangePasswordOnNextLogin { get; set; }
@@ -40,10 +43,11 @@ namespace onetouch.Authorization.Users
         /// <returns>Created <see cref="User"/> object</returns>
          //public static User CreateTenantAdminUser(int tenantId, string emailAddress)
          //Mariam 
-         public static User CreateTenantAdminUser(int tenantId, string emailAddress,string tenancyName,string firstName,string lastName)
+         public static User CreateTenantAdminUser(int tenantId, string emailAddress,string tenancyName,string firstName,string lastName ,int relatedTenantId = 0)
         {
             var user = new User
             {
+                RelatedTenantId = relatedTenantId,
                 TenantId = tenantId,
                 UserName = AdminUserName+ (string.IsNullOrEmpty(tenancyName) ? "": "@"+ tenancyName),
                 Name = string.IsNullOrEmpty(firstName) ? AdminUserName : firstName,

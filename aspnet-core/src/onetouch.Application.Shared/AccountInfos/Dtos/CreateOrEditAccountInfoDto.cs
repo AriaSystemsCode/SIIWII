@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using onetouch.AppEntities.Dtos;
 using onetouch.Common;
 using onetouch.AppContacts.Dtos;
+using onetouch.AppItems.Dtos;
 
 namespace onetouch.AccountInfos.Dtos
 {
@@ -93,6 +94,23 @@ namespace onetouch.AccountInfos.Dtos
         public long? CurrencyId { get; set; }
 
         public long? LanguageId { get; set; }
+        //I40[Start]
+        public string LanguageName { get; set; }
+        public string Phone1TypeName { get; set; }
+
+        public string Phone2TypeName { get; set; }
+        public string Phone3TypeName { get; set; }
+        public string BranchName { get; set; }
+        public string ZipCode { get; set; }
+        public string State { get; set; }
+        public long CountryId { get; set; }
+        public string CountryName { get; set; }
+        public string City { get; set; }
+        public string AddressLine2 { get; set; }
+        public string AddressLine1 { get; set; }
+        public long? ParentId { get; set; }
+        public long? PartnerId { get; set; }
+        //I40[End]
         public long? EntityId { get; set; }
         public int? TenantId { get; set; }
         public int? AttachmentSourceTenantId { get; set; }
@@ -111,9 +129,15 @@ namespace onetouch.AccountInfos.Dtos
         public virtual IList<AppContactAddressDto> ContactAddresses { get; set; }
 
         public virtual IList<AppContactPaymentMethodDto> ContactPaymentMethods { get; set; }
+        //MMT40[Start]
+        public virtual long? TenantOwner { set; get; } 
+        public virtual IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
+        public virtual long? AccountId { set; get; }
+        //MMT40[end]
         //I46[Start]
         public virtual long? ShipViaId { set; get; }
         public virtual long? PaymentTermsId { set; get; }
+        public List<ExtraDataAttrDto> ExtraDataAttributes { get; set; }
         //I46[End]
     }
 }

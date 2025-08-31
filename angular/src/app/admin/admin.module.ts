@@ -382,7 +382,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         AriaEnUsSiwiiComponent
 
     ],
-    exports: [AddMemberModalComponent, AddRoleModalComponent],
+    exports: [AddMemberModalComponent, AddRoleModalComponent,CreateOrEditUserModalComponent],
     providers: [
         ImpersonationService,
         TreeDragDropService,
