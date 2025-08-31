@@ -590,7 +590,7 @@ namespace onetouch.AppItems
         {
                 string tempId = colorEntityId;
                 #region create color lookup
-                if (colorEntityId == "0" && appItemtExcelRecordDTO.ExcelDto.Actions=="6")
+                if (colorEntityId == "0" && appItemtExcelRecordDTO.ExcelDto.Actions=="7")
                 {
                      
                

@@ -6181,18 +6181,18 @@ namespace onetouch.AppItems
             // remove from result
 
             // temp
-            excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "1";
+            //excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "2";
             //excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
             //excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
              
 
-            excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
+            //excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
             //excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
             //excelResultsDTO.ExcelRecords[1].ExcelDto.ImagePreview = "SADE2.png";
 
             // temp end
             List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
-                .Where(r => r.Status.ToUpper() == "PASSED" && (r.ExcelDto.Actions == "1" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
+                .Where(r => r.Status.ToUpper() == "PASSED" && (r.ExcelDto.Actions == "7" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
                 || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6")
                 && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
             foreach (var excelDto in result123)
