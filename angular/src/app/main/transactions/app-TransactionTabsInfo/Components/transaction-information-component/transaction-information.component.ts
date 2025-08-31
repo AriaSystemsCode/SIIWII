@@ -531,7 +531,7 @@ export class TransactionInformationComponent
 
     this.temp = temp;
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined, undefined, undefined, false, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined, undefined, undefined, false, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .pipe(finalize(() => {
         this.hideMainSpinner();
       }))
@@ -1002,7 +1002,7 @@ export class TransactionInformationComponent
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames = this.companeyNames;
         this.appTransactionsForViewDto = res;
@@ -1135,7 +1135,7 @@ export class TransactionInformationComponent
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, Intl.DateTimeFormat().resolvedOptions().timeZone, undefined, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
 
