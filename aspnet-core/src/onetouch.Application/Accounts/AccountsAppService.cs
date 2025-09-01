@@ -299,7 +299,7 @@ namespace onetouch.Accounts
 
                     var pagedAndFilteredAccounts = entities.OrderBy("Id desc").PageBy(input);
                     retrunResult = await pagedAndFilteredAccounts.ToListAsync();
-                    totalCount = await pagedAndFilteredAccounts.CountAsync();
+                    totalCount = await entities.CountAsync();
 
 
 
