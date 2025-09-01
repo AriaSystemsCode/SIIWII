@@ -939,7 +939,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         }));
     }
 
-    //I44-BE return color records 
+    //I44-BE not return color records 
     else if (record._isLinkNewColorLookup) {
       return this.uploadingResult.excelRecords
         .filter(r =>
@@ -1047,7 +1047,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.activeRecord = null;
     }, 0);
 
-    if (!this.isCreateNewCases)
+    if (!this.isCreateNewCases(record))
       this.selectSugItemCode.emit({ selectedItem, record });
 
   }

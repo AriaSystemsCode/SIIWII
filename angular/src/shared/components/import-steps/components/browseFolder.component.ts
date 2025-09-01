@@ -151,8 +151,9 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     this.isAnyOptionSelected = this.imData || this.imImages;
   }
 
-  openVideoModal() {
-    this._openVideoModal.emit(true);
+  openVideoModal(event: boolean = false) {
+    if (event)
+      this._openVideoModal.emit(event);
   }
 
   extractFolderName(file: File): string {

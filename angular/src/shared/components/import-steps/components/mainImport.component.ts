@@ -568,7 +568,7 @@ export class MainImportComponent
             }))
             .subscribe((result) => {
 
-                if (this.imData && iterationNo == this.uploadingResult.fromList.length - 1) {
+                if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
                     this.logFileUrl = result.excelLogPath;
                     this.logFileName = result.excelLogFileName;
 
