@@ -913,6 +913,8 @@ export class MainImportComponent
 
     onSelectSugItemCode(event: { selectedItem: any, record: AppItemtExcelRecordDTO }) {
         const { selectedItem, record } = event;
+        this.showMainSpinner();
+
         if (record?.isCodeItem || record?._isLinkingParent) {
             this.importServiceProxy.getAppItemForEditData(
                 selectedItem.id,
@@ -984,6 +986,11 @@ export class MainImportComponent
                 record.imageType,
                 record.image
             )
+                .pipe(
+                    finalize(() => {
+                        this.hideMainSpinner();
+                    })
+                )
                 .subscribe((result) => {
                     this.updatedRecordData = {
                         record,
@@ -1064,16 +1071,26 @@ export class MainImportComponent
                 record.errorMessage,
                 record.imageType,
                 record.image
-            ).subscribe((result) => {
-                this.updatedRecordData = {
-                    record,
-                    newData: result
-                };
-            });
+            )
+                .pipe(
+                    finalize(() => {
+                        this.hideMainSpinner();
+                    })
+                ).subscribe((result) => {
+                    this.updatedRecordData = {
+                        record,
+                        newData: result
+                    };
+                });
         }
 
         else if (record?.isCodeColorLookup || record?._isLinkingColorLookup) {
             this._appEntitiesServiceProxy.getAppEntityForEdit(selectedItem.id)
+                .pipe(
+                    finalize(() => {
+                        this.hideMainSpinner();
+                    })
+                )
                 .subscribe((result: GetAppEntityForEditOutput) => {
                     record.excelDto.colorCode = result.appEntity.code;
                     record.excelDto.colorName = result.appEntity.name;
