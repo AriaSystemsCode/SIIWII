@@ -1185,7 +1185,7 @@ namespace onetouch.Accounts
 
                     if (publishedRecord != null)
                     {
-                        bReturn = (publishedRecord.LastModificationTime < account.LastModificationTime);
+                        bReturn = (publishedRecord.LastModificationTime == null && account.LastModificationTime !=null)? true:(publishedRecord.LastModificationTime < account.LastModificationTime);
                     }
                 }
             }
