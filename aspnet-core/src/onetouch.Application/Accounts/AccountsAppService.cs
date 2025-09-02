@@ -3575,14 +3575,20 @@ namespace onetouch.Accounts
                 {
                     var accountLoc = await _appContactRepository.GetAll().Where(z => z.Id == input).FirstOrDefaultAsync();
                     if (accountLoc != null)
+                    {
                         ssin = accountLoc.SSIN;
+                        account = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN== ssin && z.IsHidden == false).FirstOrDefaultAsync();
+                    }
                 }
             }
             if ((input == 0 || input == null) && !string.IsNullOrEmpty(ssin))
             {
                 account = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == ssin && z.IsHidden== false).FirstOrDefaultAsync();
                 if (account != null)
+                {
                     input = account.Id;
+
+                }
             }
             await ConnectContactsProfiles(input);
             string returnVal = "";
