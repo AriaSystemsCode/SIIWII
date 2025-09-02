@@ -604,7 +604,7 @@ namespace onetouch.Accounts
                     //var businessId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
 
 
-                    bool excludeGroupAccount = (currentTenantAccountType == groupAccountEntityObjectTypeId);
+                    bool excludeGroupAccount = false;// (currentTenantAccountType == groupAccountEntityObjectTypeId);
 
                     var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
                     var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
