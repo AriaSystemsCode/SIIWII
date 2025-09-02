@@ -109,7 +109,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.handleAccountData()
             this.initDepartmentVariables(true);
             this.initClassificationVariables(true);
-            // this.getContactSync();
+            this.getContactSync();
             this.getLanguages()
             this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
         }
@@ -377,7 +377,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                     this.notify.success(this.l("Account sync Successfully"));
                     // this.showIsSync = !response;
                     // this.isSync = !response;
-                    this.isSync = !response;
+                    this.isSync = false;
                     
                 });
 
@@ -399,13 +399,13 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
 
-    // getContactSync() {
-    //     this._AccountsServiceProxy.getContactSync(this.accountData.id)
-    //         .subscribe((res: boolean) => {
-    //             this.isSync = res;
-    //         });
+    getContactSync() {
+        this._AccountsServiceProxy.getContactSync(this.accountData.id)
+            .subscribe((res: boolean) => {
+                this.isSync = res;
+            });
 
-    // }
+    }
 
     isNotManualLevel(): boolean {
      

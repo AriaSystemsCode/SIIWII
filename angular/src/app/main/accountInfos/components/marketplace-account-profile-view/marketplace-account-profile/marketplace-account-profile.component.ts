@@ -102,7 +102,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
 
         this.marketPlaceData.avaliableConnectionName = "";
         this.marketPlaceData.connectionName = this.l(result);
-        this.marketPlaceData.availableConnections[0].connectLabel = this.l(result);
+        this.marketPlaceData.availableConnections.length =0;
       });
   }
 
