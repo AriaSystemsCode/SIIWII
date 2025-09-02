@@ -76325,8 +76325,8 @@ export class ImportItemInputDto implements IImportItemInputDto {
     price!: string;
     priceCurrencyCode!: string;
     imageType!: string | undefined;
-    colorCode!: string | undefined;
-    colorName!: string | undefined;
+    colorCode!: string;
+    colorName!: string;
     sizeScaleName!: string | undefined;
     scaleSizesOrder!: string | undefined;
     sizeRatioName!: string | undefined;
@@ -76484,8 +76484,8 @@ export interface IImportItemInputDto {
     price: string;
     priceCurrencyCode: string;
     imageType: string | undefined;
-    colorCode: string | undefined;
-    colorName: string | undefined;
+    colorCode: string;
+    colorName: string;
     sizeScaleName: string | undefined;
     scaleSizesOrder: string | undefined;
     sizeRatioName: string | undefined;
