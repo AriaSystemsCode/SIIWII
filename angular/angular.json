@@ -208,7 +208,7 @@
           "options": {
             "protractorConfig": "./protractor.conf.js",
             "devServerTarget": "abp-zero-template:serve",
-            "port": 4212 
+            "port": 4213 
           }
         }
       }
