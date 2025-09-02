@@ -147,7 +147,7 @@ namespace onetouch.AppItems
             //   );
             var GetAllRet = _appItemRepository.GetAll()
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) )
-                .Where(a => a.TenantOwner == AbpSession.TenantId && a.ParentId == null);
+                .Where(a => a.TenantId == AbpSession.TenantId && a.ParentId == null);
             var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "id asc").PageBy(input);
             var totalCount = await GetAllRet.CountAsync();
             List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
