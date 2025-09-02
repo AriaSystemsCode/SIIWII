@@ -579,7 +579,7 @@ export class MainImportComponent
                 }
             }
                 , (error) => {
-                    if (this.imData && iterationNo == this.uploadingResult.fromList.length - 1) {
+                    if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
                         this.successfullyImportModal.show(this.importType);
                     }
                     else {
