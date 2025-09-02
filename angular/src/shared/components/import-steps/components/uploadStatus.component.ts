@@ -610,10 +610,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   CreateNewParentItemAndLinkAsDefaultImage(record) {
     record._isCreateParent = true;
 
-    this.editableColumnsForCreateNewParent.forEach(colName => {
+   /*  this.editableColumnsForCreateNewParent.forEach(colName => {
       this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
     });
-
+ */
     // Scroll after DOM updated
     setTimeout(() => {
       const container = this.codeInputContainers.find(
@@ -637,9 +637,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   CreateNewItemColorAndLinkImageAsDefaultImage(record) {
     record._isCreateItemColor = true;
 
-    this.editableColumnsForCreateNewItemColor.forEach(colName => {
+ /*    this.editableColumnsForCreateNewItemColor.forEach(colName => {
       this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
-    });
+    }); */
 
     // Scroll after DOM updated
     setTimeout(() => {
@@ -665,9 +665,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record._isCreateColorLookup = true;
 
 
-    this.editableColumnsForCreateNewColorLookup.forEach(colName => {
+    /* this.editableColumnsForCreateNewColorLookup.forEach(colName => {
       this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
-    });
+    }); */
 
     // Scroll after DOM updated
     setTimeout(() => {
