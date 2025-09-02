@@ -1441,13 +1441,17 @@ namespace onetouch.Accounts
                    (x.RequesterContactSSIN == account.SSIN && x.RecipientContactTypeId == long.Parse(personId.ToString())) ||
                    (x.RecipientContactSSIN == account.SSIN && x.RequesterContactTypeId == long.Parse(personId.ToString()))).CountAsync();
 
-                var relationships =await _appContactRelationshipInfoRepository.GetAll()
+               var relationships =await _appContactRelationshipInfoRepository.GetAll()
                               .Where(z => ((z.RequesterContactSSIN == account.SSIN)
-                              || (z.RecipientContactSSIN == account.SSIN) &&
-                              _appMarketplaceContactRepository.GetAll().Count(x=>x.SSIN == z.RecipientContactSSIN) > 0 &&
-                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0
+                              || (z.RecipientContactSSIN == account.SSIN)) &&
+                              (_appMarketplaceContactRepository.GetAll().Count(x=>x.SSIN == z.RecipientContactSSIN && z.IsDeleted == false) > 0 &&
+                              _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN && z.IsDeleted == false) > 0
                               ) && z.EntityObjectStatusId == activeRelationshipStatusId &&
-                              (z.SharingLevel == 1)).CountAsync();// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
+                              (z.SharingLevel == 1)).CountAsync();// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)));
+                /*var relationships =  _appContactRelationshipInfoRepository.GetAll()
+                              .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                              || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                              (z.SharingLevel == 1)).Count();*/
 
                 output.ConnectionCount = relationships;
 
