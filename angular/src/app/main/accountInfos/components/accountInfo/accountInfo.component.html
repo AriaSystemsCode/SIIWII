@@ -6,7 +6,7 @@
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
                             <span  class="pageTitle">
-                                <span *ngIf="isRecordOwner">{{l("MyAccount")}}</span>
+                                <span *ngIf="isRecordOwner || (!accountDataForView?.isConnected && !accountDataForView?.isManual)">{{l("MyAccount")}}</span>
                                 <span *ngIf="(accountDataForView?.isConnected) && !isRecordOwner">{{l("Connected Account")}}</span>
                                 <span *ngIf="(accountDataForView?.isManual) && !isRecordOwner">{{l("ManualAccount")}}</span>
                             </span>
