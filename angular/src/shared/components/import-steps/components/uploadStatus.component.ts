@@ -1075,7 +1075,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price A',
     'Price B',
     'Price C',
-    'Price D'
+    'Price D',
+    'Color Code',
+    'Color Name'
   ];
 
   editableColumnsForCreateNewItemColor = [
@@ -1098,7 +1100,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price A',
     'Price B',
     'Price C',
-    'Price D'
+    'Price D',
+    'Color Code',
+    'Color Name'
   ];
 
 
@@ -1110,7 +1114,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   exampleTextsForCreateNewParent: { [key: string]: string } = {
     'Code': 'Example: SAM001',
-    'Price Currency Code': 'Example: USD , GBP'
+    'Price Currency Code': 'Example: USD , GBP',
+    'Color Code': 'Example: BLK',
+    'Color Name': 'Example: Black',
   };
 
   exampleTextsForCreateNewItemColor: { [key: string]: string } = {
@@ -1148,7 +1154,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Name',
     'Product Description',
     'Price',
-    'Price Currency Code'
+    'Price Currency Code',
+    'Color Code',
+    'Color Name',
   ];
 
 
@@ -1163,6 +1171,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Color Name',
     'Size Scale Name',
     'Scale Sizes Order',
+    'Color Code',
+    'Color Name',
   ];
 
   requiredColumnsForCreateNewColorLookup: string[] = [
