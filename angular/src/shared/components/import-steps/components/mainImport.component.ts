@@ -1175,6 +1175,7 @@ export class MainImportComponent
         ret.dimension1Position = dto.dimension1Position;
         ret.dimension2Position = dto.dimension2Position;
         ret.dimension3Position = dto.dimension3Position;
+        ret.priceCurrencyCode=dto.currency
 
         return ret;
     }
