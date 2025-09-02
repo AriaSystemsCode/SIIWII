@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "https://localhost:44311/",
+      "applicationUrl": "https://localhost:44312/",
       "sslPort": 44316
     }
   },
@@ -22,7 +22,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://0.0.0.0:44311"
+      "applicationUrl": "https://0.0.0.0:44312"
     },
     "onetouch.Web.Host": {
       "commandName": "Project",
@@ -30,7 +30,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:44311"
+      "applicationUrl": "https://localhost:44312"
     },
     "Docker": {
       "commandName": "Docker",
