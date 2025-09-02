@@ -261,7 +261,7 @@ namespace onetouch.Accounts
 
 
                     var appEntityAttach = _appEntityAttachmentRepository.GetAll().Include(z=>z.EntityFk).Include(z => z.AttachmentFk)
-                                   .Where(z => (z.AttachmentCategoryId == catgImage || z.AttachmentCategoryId == catgVideo) &&
+                                   .Where(z => //(z.AttachmentCategoryId == catgImage || z.AttachmentCategoryId == catgVideo) &&
                                    z.EntityFk.TenantId == null && //(z.EntityFk.TenantId== account.OwnerId ||
                                    z.EntityFk.TenantOwner == account.OwnerId)
                                  .Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
