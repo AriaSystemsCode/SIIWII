@@ -6189,11 +6189,11 @@ namespace onetouch.AppItems
 
 
 
-            #region handle 1,2,3 actions
+            #region handle 4,2,3 actions
             // select type images
-            // action 1 add to item
-            // action 2 add to item code
-            // action 3 add to color
+            // action 2 add to item
+            // action 3 add to item code
+            // action 4 add to color
             // remove from result
 
             // temp
@@ -6214,12 +6214,12 @@ namespace onetouch.AppItems
             foreach (var excelDto in result123)
             {
                 int number = Int32.Parse(excelDto.ExcelDto.Actions);
-                if (number == 1 || number == 2 || number == 3 || number == 6)
+                if (number == 2 || number == 3 || number == 4 || number == 7)
                 {
                     foreach (var id in excelDto.ExcelDto.Code.Split(","))
                     { var ret1 = SaveImageToColor(id, excelDto).Result; }
                 }
-                if (number == 4 )
+                if (number == 5 )
                 {
                     if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
                     excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
@@ -6229,7 +6229,7 @@ namespace onetouch.AppItems
 
 
                 }
-                if (number == 5)
+                if (number == 6)
                 {
                     // search for parent record and get ScaleSizesOrder
                     // replace record type as 'Item Variant', and consider as base record
