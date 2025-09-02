@@ -5142,6 +5142,22 @@ namespace onetouch.AppItems
                     List<AppItemExcelDto> result;
                     try
                     {
+                         
+                        {
+                            foreach (DataRow itemExcelDto in ds.Tables["Products"].Rows)
+                            {
+                                if (itemExcelDto["RecordType"].ToString() == "Color")
+                                {
+                                    itemExcelDto["Code"] = "-";
+                                    itemExcelDto["Name"] = "-";
+                                    itemExcelDto["ProductDescription"] = " - ";
+                                    itemExcelDto["Price"] = "1";
+                                    itemExcelDto["ParentCode"] = " - ";
+                                    itemExcelDto["Currency"] = " - ";
+                                }
+                            }
+                        }
+
                         result = mapper.Map<List<DataRow>, List<AppItemExcelDto>>(new List<DataRow>(ds.Tables[0].Rows.OfType<DataRow>()));
                     }
                     catch (Exception exObj)
@@ -5196,11 +5212,11 @@ namespace onetouch.AppItems
 
                     foreach (AppItemExcelDto itemExcelDto in result)
                     {
-                        if (itemExcelDto.ProductType == "Product Type")
+                        if (itemExcelDto.ProductType == "Product Type" || itemExcelDto.RecordType == "Color")
                         {
                             continue;
                         }
-
+                    
                         MapperConfiguration configurationMap;
                         configurationMap = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes)); });
                         IMapper mapperc;

@@ -102,7 +102,9 @@ namespace onetouch.AppItems.Dtos
         [Required(ErrorMessage = "Currency must have a value.")]
         public string PriceCurrencyCode { set; get; }
         public string ImageType { set; get; }
+        [Required(ErrorMessage = "Color Code must have a value.")]
         public string ColorCode { set; get; }
+        [Required(ErrorMessage = "Color Name must have a value.")]
         public string ColorName{ set; get; }
         public string SizeScaleName { set; get; }
         public string ScaleSizesOrder { set; get; }
