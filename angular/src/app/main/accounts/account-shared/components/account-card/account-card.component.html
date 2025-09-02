@@ -160,7 +160,7 @@
                                     <!-- Main button = first option -->
                                     <button type="button" class="relation_button" dropdownToggle
                                        >
-                                        <img class="pb-1" style="width: 20px;"
+                                        <img class="pb-1" style="width: 20px;" (click)="createRelation(options[0])"
                                             [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
                                         <span  (click)="createRelation(options[0])" class="ml-1">{{ options[0]?.connectLabel }}</span>
 
