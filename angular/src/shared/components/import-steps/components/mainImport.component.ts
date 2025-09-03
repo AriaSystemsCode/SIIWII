@@ -1108,6 +1108,19 @@ export class MainImportComponent
     onValidateRecord(record) {
         let _ImportItemInputDto: ImportItemInputDto = new ImportItemInputDto();
         _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
+
+        if (record._isCreateParent) {
+            record.recordType = "Item";
+            record.excelDto.recordType = "Item";
+            //I44 record.NoOfDimensions="1"
+        }
+
+        if (record._isCreateItemColor) {
+            record.recordType = "Item Variant";
+            record.excelDto.recordType = "Item Variant";
+            //I44 record.NoOfDimensions="1"
+        }
+
         this.importServiceProxy.validateImportItemData(_ImportItemInputDto)
             .subscribe((result: ImportItemReturnDto[]) => {
                 const hasErrors = Array.isArray(result) && result.length > 0;
@@ -1115,6 +1128,10 @@ export class MainImportComponent
                 record.fieldsErrors = hasErrors ? result : [];
                 record.errorMessage = hasErrors ? "" : record.errorMessage;
                 record.status = hasErrors ? "Failed" : "Passed";
+                if (record._isCreateParent || record._isCreateItemColor) {
+                    record.recordType = "Image";
+                    record.excelDto.recordType = "Image";
+                }
 
                 this.updatedRecordData = {
                     record,
@@ -1173,7 +1190,7 @@ export class MainImportComponent
         ret.dimension1Position = dto.dimension1Position;
         ret.dimension2Position = dto.dimension2Position;
         ret.dimension3Position = dto.dimension3Position;
-        ret.priceCurrencyCode=dto.currency
+        ret.priceCurrencyCode = dto.currency
 
         return ret;
     }

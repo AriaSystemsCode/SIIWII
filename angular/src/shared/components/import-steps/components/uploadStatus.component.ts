@@ -610,10 +610,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   CreateNewParentItemAndLinkAsDefaultImage(record) {
     record._isCreateParent = true;
 
-   /*  this.editableColumnsForCreateNewParent.forEach(colName => {
-      this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
-    });
- */
+    /*  this.editableColumnsForCreateNewParent.forEach(colName => {
+       this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
+     });
+  */
     // Scroll after DOM updated
     setTimeout(() => {
       const container = this.codeInputContainers.find(
@@ -637,9 +637,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   CreateNewItemColorAndLinkImageAsDefaultImage(record) {
     record._isCreateItemColor = true;
 
- /*    this.editableColumnsForCreateNewItemColor.forEach(colName => {
-      this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
-    }); */
+    /*    this.editableColumnsForCreateNewItemColor.forEach(colName => {
+         this.setRecordValue(record, this.mapColumnNameToKey(colName), '');
+       }); */
 
     // Scroll after DOM updated
     setTimeout(() => {
@@ -910,6 +910,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   private getAssCodeSuggestions(value: string, record: any): any[] {
+
     if (record._isLinkNewParent) {
       return this.uploadingResult.excelRecords
         .filter(r =>
@@ -945,12 +946,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         .filter(r =>
           r.id !== record.id &&
           r.recordType === "Color" &&
-          r.code &&
-          r.code.toLowerCase().includes(value.toLowerCase())
+          r.excelDto.colorCode &&
+          r.excelDto.colorCode.toLowerCase().includes(value.toLowerCase())
         )
         .map(r => ({
           id: r.id,
-          displayName: r.code
+          displayName: r.excelDto.colorCode,
+          colorName: r.excelDto.colorName
         }));
     }
     return [];
@@ -1039,8 +1041,12 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     else if (record._isLinkingColorLookup || record._isLinkNewColorLookup) {
       this.setRecordValue(record, 'colorCode', selectedItem.displayName);
       record.excelDto.code = selectedItem.id
-    }
 
+      if (record._isLinkNewColorLookup) {
+        this.setRecordValue(record, 'colorName', selectedItem.colorName);
+        record.colorName = selectedItem?.colorName;
+      }
+    }
 
     setTimeout(() => {
       record._selectionMade = true;

@@ -162,7 +162,8 @@
 
                           <input type="text" class="form-control link-parent-input"
                             [ngModel]="getRecordValue(record, 'code')"
-                            (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.." #codeInputRef
+                            (ngModelChange)="onCodeInputChange(record, $event)" 
+                            placeholder="🔍Search.." #codeInputRef
                             (focus)="activeRecord = record" />
 
                           <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
@@ -396,6 +397,7 @@
 
                             <ng-container *ngIf="column.name === 'Color Code' && record._isLinkNewColorLookup">
                               <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                              (focus)="activeRecord = record"
                                 #colorCodeInputContainer [ngModel]="getRecordValue(record, 'colorCode')"
                                 (ngModelChange)="onAssCodeInputChange(record, $event)" [ngClass]="{
                                        'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
@@ -406,7 +408,7 @@
                               </small>
 
                               <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
-                                *ngIf="activeRecord === record  && linkNewColorLookup_Data?.length > 0">
+                                *ngIf="activeRecord === record   && record._isLinkNewColorLookup  && linkNewColorLookup_Data?.length > 0">
                                 <li *ngFor="let item of linkNewColorLookup_Data"
                                   (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
                                   {{item.displayName}}
