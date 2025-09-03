@@ -927,17 +927,35 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
     else if (record._isLinkNewItemColor) {
-      return this.uploadingResult.excelRecords
-        .filter(r =>
-          r.id !== record.id &&
-          r.recordType === "Item Variant" &&
-          r.code &&
-          r.code.toLowerCase().includes(value.toLowerCase())
-        )
-        .map(r => ({
-          id: r.id,
-          displayName: r.code
-        }));
+      const uniqueRecords = Object.values(
+        this.uploadingResult.excelRecords
+          .filter(r =>
+            r.id !== record.id &&
+            r.recordType === "Item Variant" &&
+            r.code &&
+            r.code.toLowerCase().includes(value.toLowerCase())
+          )
+          .reduce((acc, r) => {
+            const baseName = r.code.replace(/-([^-]+)$/, "").trim();
+      
+            if (!acc[baseName]) {
+              acc[baseName] = {
+                id: r.id,
+                ids: "",
+                displayName: baseName
+              };
+            }
+      
+            acc[baseName].ids = acc[baseName].ids
+              ? acc[baseName].ids + "," + r.id
+              : String(r.id);
+      
+            return acc;
+          }, {} as Record<string, { id: number; ids: string; displayName: string }>)
+      );
+      
+      return uniqueRecords;
+      
     }
 
     //I44-BE not return color records 
@@ -1035,7 +1053,12 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   selectSuggestion(record: any, selectedItem: any) {
     if (record._isLinkingParent || record._isLinkingItemColor || record._isLinkNewParent || record._isLinkNewItemColor) {
       this.setRecordValue(record, 'code', selectedItem.displayName);
-      record.excelDto.code = selectedItem.id
+
+      if (record._isLinkNewItemColor) 
+          record.excelDto.code = selectedItem.ids ;
+      else
+        record.excelDto.code = selectedItem.id
+
     }
 
     else if (record._isLinkingColorLookup || record._isLinkNewColorLookup) {
