@@ -186,7 +186,7 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
                            //.Where(e => (e.SSIN != currentTenantAccountSSIN && e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
-                           .Where(e => ((e.IsHidden != true && e.ParentId==null))); //&& e.SSIN != currentTenantAccountSSIN);
+                           .Where(e => ((e.SharingLevel == 1 && e.ParentId==null))); //&& e.SSIN != currentTenantAccountSSIN);
 
                     //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 
@@ -656,8 +656,8 @@ namespace onetouch.AppMarketplaceAccounts
                         accountDto.ZipCode = firstAddress.AddressFk.PostalCode;
                         accountDto.State = firstAddress.AddressFk.State;
                     }
-                    if (account.OwnerId != null)
-                        accountDto.TenantId = ((int)account.OwnerId);
+                    if (account.TenantOwner != null)
+                        accountDto.TenantId = ((int)account.TenantOwner);
 
                     var branch = ObjectMapper.Map<BranchDto>(account);
                     BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
@@ -716,8 +716,8 @@ namespace onetouch.AppMarketplaceAccounts
                                       .AsNoTracking()
                                       .FirstOrDefaultAsync(x => x.TenantId == null
                                       && x.IsProfileData == true
-                                      && x.IsHidden == false
-                                      && x.OwnerId == account.TenantId
+                                      && x.SharingLevel == 1
+                                      && x.TenantOwner == account.TenantId
                                       && x.SSIN == account.SSIN);
                     output.IsSync = false;
                     output.IsPublished = false;
@@ -935,8 +935,12 @@ namespace onetouch.AppMarketplaceAccounts
 
                 var ret = await _appMarketplaceContactRepository.FirstOrDefaultAsync(e => e.TenantId == null && e.SSIN == SSIN);
                 if (ret != null)
-                    ret.IsHidden = true;
-
+                {
+                    ret.SharingLevel = 4;
+                    var relatedContacts = await _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId==ret.Id).ToListAsync();
+                    if (relatedContacts != null && relatedContacts.Count() > 0)
+                        _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId == ret.Id).ForEach(z=>z.SharingLevel=4);
+                }
 
                 //I40[Start]
                 var itemObjectId = await _helper.SystemTables.GetObjectListingId();
@@ -997,13 +1001,13 @@ namespace onetouch.AppMarketplaceAccounts
                                                   .AsNoTracking().Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
                                                   .FirstOrDefaultAsync(x => x.TenantId == null
                                                   && x.IsProfileData == true
-                                                  && x.OwnerId == input.TenantId
+                                                  && x.TenantOwner == input.TenantId
                                                   && x.SSIN == input.SSIN);
 
                 #region if sync remove old data
                 if (FoundPublishContact != null)
                 {
-                    FoundPublishContact.IsHidden = false;
+                    FoundPublishContact.SharingLevel = 1;
                     sync = true;
                 }
                 if (sync)
@@ -1133,10 +1137,10 @@ namespace onetouch.AppMarketplaceAccounts
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
                 appMarketplaceContact.EntityObjectTypeId = foundEntity.EntityObjectTypeId;
                 appMarketplaceContact.EntityObjectTypeCode = foundEntity.EntityObjectTypeCode;
-
+                appMarketplaceContact.SharingLevel = 1;
                 appMarketplaceContact.Name = input.Name;
                 appMarketplaceContact.Notes = input.Notes;
-                appMarketplaceContact.OwnerId = input.TenantId;
+                //appMarketplaceContact.TenantOwner = input.TenantOwner;
                 appMarketplaceContact.TenantOwner = int.Parse(input.TenantId.ToString());
                 appMarketplaceContact.TenantId = null;
                 appMarketplaceContact.Code = input.SSIN;
@@ -1613,12 +1617,12 @@ namespace onetouch.AppMarketplaceAccounts
                 appMarketplaceContact.ParentId = parentId;
                 appMarketplaceContact.Name = input.Name;
                 appMarketplaceContact.Notes = foundEntity.Notes;
-                appMarketplaceContact.OwnerId = input.TenantId;
+                appMarketplaceContact.TenantOwner = int.Parse(input.TenantId.ToString());
                 appMarketplaceContact.TenantId = null;
                 appMarketplaceContact.Code = input.SSIN;
                 appMarketplaceContact.SSIN = input.SSIN;
                 appMarketplaceContact.AccountId = newAccountID;
-
+                appMarketplaceContact.SharingLevel = 1;
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
                 {
                     contactAddress.Id = 0;
@@ -1683,12 +1687,12 @@ namespace onetouch.AppMarketplaceAccounts
             appMarketplaceContact.ParentId = parentId;
             appMarketplaceContact.Name = input.Name;
             appMarketplaceContact.Notes = foundEntity.Notes;
-            appMarketplaceContact.OwnerId = input.TenantId;
+            appMarketplaceContact.TenantOwner =int.Parse(input.TenantId.ToString());
             appMarketplaceContact.TenantId = null;
             appMarketplaceContact.Code = input.SSIN;
             appMarketplaceContact.SSIN = input.SSIN;
             appMarketplaceContact.AccountId = newAccountID;
-
+            appMarketplaceContact.SharingLevel = 1;
             foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
             {
                 contactAddress.Id = 0;

@@ -4,9 +4,9 @@ max-width: 90% !important;
 margin-top: 0px !important;
 padding: 50px 20px;     border-left: 20px solid #4A0D4A;">
     <h4 class="text-left alarmInfo_title CreatedSuccessfullyLabel font-weight-bold text-black"> 
-        <img src="../../assets/img/input_icons/true.png" class="alarmInfo mr-2"> {{"YourAccountCreatedSuccessfully" | localize}}</h4>
+        <img src="../../assets/img/input_icons/true.png" class="alarmInfo mr-2"> {{"Your Account Created Successfully" | localize}}</h4>
     <div class="mt-5">
-        <label class="AccountCredentials font-weight-bold text-black mb-3"> {{"AccountCredentials" | localize}} :</label>
+        <label class="AccountCredentials font-weight-bold text-black mb-3"> {{"Account Credentials" | localize}} :</label>
 
         <ul class="row">
             <li class="col-4 pl-0"><span class="confirmLabel font-weight-bold text-black pr-2">{{"FirstName" | localize}}:</span><label style="color:#595959">{{model.firstName}} </label></li>
@@ -26,13 +26,13 @@ margin-top: 0px !important;
 padding: 50px 20px;">
     <div class="MB20">
         <h4 class="text-left alarmInfo_title CreatedSuccessfullyLabel font-weight-bold text-black"> 
-            <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"> {{"ConfirmationMail" | localize}}</h4>
+            <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"> {{"Confirmation Mail" | localize}}</h4>
     </div>
-    <div *ngIf="model.isEmailConfirmationRequired" class="">
+    <!-- <div *ngIf="model.isEmailConfirmationRequired" class="">
         {{"ConfirmationMailSentPleaseClickLinkInTheEmail1" | localize:model.emailAddress}}
-    </div>
+    </div> -->
     <div *ngIf="model.isEmailConfirmationRequired" class="">
-        *{{"ConfirmationMailSentPleaseClickLinkInTheEmail2" | localize}}
+        *{{"Confirmation Mail Sent Please Click Link In  The Email" | localize}}
     </div>
 
     <div *ngIf="!model.isActive" class="">

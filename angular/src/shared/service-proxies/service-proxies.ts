@@ -67849,7 +67849,6 @@ export interface IAppMarketplaceContactAddress {
 }
 
 export class AppMarketplaceContact implements IAppMarketplaceContact {
-    ownerId!: number | undefined;
     tradeName!: string;
     languageId!: number | undefined;
     languageCode!: string | undefined;
@@ -67863,7 +67862,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
     accountType!: string | undefined;
     accountTypeId!: number;
     isProfileData!: boolean;
-    isHidden!: boolean;
+    sharingLevel!: number;
     phone1TypeId!: number | undefined;
     phone1TypeName!: string | undefined;
     phone1CountryKey!: string | undefined;
@@ -67940,7 +67939,6 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.ownerId = _data["ownerId"];
             this.tradeName = _data["tradeName"];
             this.languageId = _data["languageId"];
             this.languageCode = _data["languageCode"];
@@ -67954,7 +67952,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
             this.isProfileData = _data["isProfileData"];
-            this.isHidden = _data["isHidden"];
+            this.sharingLevel = _data["sharingLevel"];
             this.phone1TypeId = _data["phone1TypeId"];
             this.phone1TypeName = _data["phone1TypeName"];
             this.phone1CountryKey = _data["phone1CountryKey"];
@@ -68069,7 +68067,6 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["ownerId"] = this.ownerId;
         data["tradeName"] = this.tradeName;
         data["languageId"] = this.languageId;
         data["languageCode"] = this.languageCode;
@@ -68083,7 +68080,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
         data["isProfileData"] = this.isProfileData;
-        data["isHidden"] = this.isHidden;
+        data["sharingLevel"] = this.sharingLevel;
         data["phone1TypeId"] = this.phone1TypeId;
         data["phone1TypeName"] = this.phone1TypeName;
         data["phone1CountryKey"] = this.phone1CountryKey;
@@ -68187,7 +68184,6 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
 }
 
 export interface IAppMarketplaceContact {
-    ownerId: number | undefined;
     tradeName: string;
     languageId: number | undefined;
     languageCode: string | undefined;
@@ -68201,7 +68197,7 @@ export interface IAppMarketplaceContact {
     accountType: string | undefined;
     accountTypeId: number;
     isProfileData: boolean;
-    isHidden: boolean;
+    sharingLevel: number;
     phone1TypeId: number | undefined;
     phone1TypeName: string | undefined;
     phone1CountryKey: string | undefined;

@@ -7410,7 +7410,7 @@ namespace onetouch.AppSiiwiiTransaction
                     //share
                     var accountOrgin = await _appMarketplaceContactRepository.GetAll().Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
                         //.Include(z=>z.ParentFkList).ThenInclude(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
-                        .Where(z => z.SSIN == accountSSIN && z.TenantId == null && z.IsHidden == false).FirstOrDefaultAsync();
+                        .Where(z => z.SSIN == accountSSIN && z.TenantId == null && z.SharingLevel == 1).FirstOrDefaultAsync();
                     //share
                     if (accountOrg != null)// && accountOrg.PartnerId != null)
                     {
