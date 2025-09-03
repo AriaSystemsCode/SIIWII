@@ -5153,13 +5153,24 @@ namespace onetouch.AppItems
                                     itemExcelDto["ProductDescription"] = " - ";
                                     itemExcelDto["Price"] = "1";
                                     itemExcelDto["ParentCode"] = " - ";
-                                    itemExcelDto["Currency"] = " - ";
+                                    itemExcelDto["PriceCurrencyCode"] = " - ";
                                 }
                             }
                         }
 
                         result = mapper.Map<List<DataRow>, List<AppItemExcelDto>>(new List<DataRow>(ds.Tables[0].Rows.OfType<DataRow>()));
-                    }
+                        int index = -1;
+                        foreach (DataRow itemExcelDto in ds.Tables["Products"].Rows)
+                        {
+                            index++;
+                            if (itemExcelDto["RecordType"].ToString() == "Color")
+                            {
+                                
+                                result[index].ColorCode = itemExcelDto["COLORCode"].ToString();
+                                result[index].ColorName = itemExcelDto["COLORName"].ToString();
+                            }
+                        }
+                        }
                     catch (Exception exObj)
                     {
                         throw new UserFriendlyException("This Excel file format is invalid");
@@ -5212,28 +5223,34 @@ namespace onetouch.AppItems
 
                     foreach (AppItemExcelDto itemExcelDto in result)
                     {
-                        if (itemExcelDto.ProductType == "Product Type" || itemExcelDto.RecordType == "Color")
+                        if (itemExcelDto.ProductType == "Product Type")
                         {
                             continue;
                         }
-                    
-                        MapperConfiguration configurationMap;
-                        configurationMap = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes)); });
-                        IMapper mapperc;
-                        mapperc = configurationMap.CreateMapper();
-                        ImportItemInputDto importItemInputDto;
-                        try
+                        List<ImportItemReturnDto> validationList = new List<ImportItemReturnDto>();
+                        if (itemExcelDto.RecordType != "Color")
                         {
-                            importItemInputDto = mapperc.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
-                        }
-                        catch (Exception exObj)
-                        {
-                            throw new UserFriendlyException("This Excel file format is invalid");
-                        }
-                        x.Add(importItemInputDto);
 
-                        //importList = ObjectMapper.Map<ImportItemInputDto>(itemExcelDto);
-                        var validationList = await ValidateImportItemData(importItemInputDto);
+
+
+                            MapperConfiguration configurationMap;
+                            configurationMap = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes)); });
+                            IMapper mapperc;
+                            mapperc = configurationMap.CreateMapper();
+                            ImportItemInputDto importItemInputDto;
+                            try
+                            {
+                                importItemInputDto = mapperc.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
+                            }
+                            catch (Exception exObj)
+                            {
+                                throw new UserFriendlyException("This Excel file format is invalid");
+                            }
+                            x.Add(importItemInputDto);
+
+                            //importList = ObjectMapper.Map<ImportItemInputDto>(itemExcelDto);
+                            validationList = await ValidateImportItemData(importItemInputDto);
+                        }
                         ////if (rowNumber > 2)
                         ////{ itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
                         ////itemExcelResultsDTO.FromList.Add(rowNumber);
@@ -5347,6 +5364,29 @@ namespace onetouch.AppItems
                                     itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
 
                             }
+                            if (itemExcelDto.RecordType == "Color")
+                            {
+                                var colorImage = imagesList.Where(x => x.ToUpper().StartsWith(("C-") + itemExcelDto.ColorCode.ToUpper())).ToList();
+                                if (colorImage.Count == 0)
+                                {
+                                  
+                                    {
+                                        hasWarning = true;
+                                        itemExcelRecordErrorDTO.FieldsErrors.Add("Color Code :" + itemExcelDto.ColorCode + " does not have an image in images folder.!");
+                                        recordErrorMEssage = "Color Code :" + itemExcelDto.ColorCode + " does not have an image in images folder.!";
+                                        itemExcelDto.Images.Add(new AppItemImage { ImageFileName = "noimage_item.jpg" });//, ImageGuid = (new Guid("noimage_item.jpg")).ToString() 
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (var img in colorImage)
+                                    {    itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
+                                    }
+                                    itemExcelDto.ImageFolderName = colorImage[0];
+
+                                }
+                            }
+
                         }
                         #endregion check images
                         if (validationList != null && validationList.Count > 0)
@@ -5865,6 +5905,7 @@ namespace onetouch.AppItems
                         returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage, ErrorType = "Stopper" });
                     }
                 }
+                
                 if (itemExcelDto.RecordType == "Item")
                 {
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
@@ -6209,13 +6250,20 @@ namespace onetouch.AppItems
             // temp end
             List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
                 .Where(r => r.Status.ToUpper() == "PASSED" && (r.ExcelDto.Actions == "7" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
-                || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6")
+                || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6"
+                || r.ExcelDto.Actions == "8"
+                || r.ExcelDto.Actions == "9"
+                || r.ExcelDto.Actions == "10" || r.RecordType=="Color")
                 && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
             foreach (var excelDto in result123)
             {
-                int number = Int32.Parse(excelDto.ExcelDto.Actions);
-                if (number == 2 || number == 3 || number == 4 || number == 7)
+                int number = 0;
+                if (excelDto.ExcelDto.Actions != null)
+                { number = Int32.Parse(excelDto.ExcelDto.Actions); }
+
+                if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType=="Color")
                 {
+                    if (number == 10) { excelDto.ExcelDto.Code = "-"; }
                     foreach (var id in excelDto.ExcelDto.Code.Split(","))
                     { var ret1 = SaveImageToColor(id, excelDto).Result; }
                 }
@@ -6229,6 +6277,7 @@ namespace onetouch.AppItems
 
 
                 }
+
                 if (number == 6)
                 {
                     // search for parent record and get ScaleSizesOrder
@@ -6263,11 +6312,36 @@ namespace onetouch.AppItems
                     //excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
 
                 }
+                if (number == 8 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
+                {
+                    var images = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto.Images;
+                    if (images is null) { images = new List<AppItemImage>(); }
+                    images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    //excelDto.ExcelDto.Actions = "";
+                    //excelDto.ExcelDto.RecordType = "Item";
+                    //excelDto.RecordType = "Item";
 
+
+                }
+                if (number == 9 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
+                {
+                    foreach (var id in excelDto.ExcelDto.Code.Split(","))
+                    {
+                        var images = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Images;
+                        if (images is null) { images = new List<AppItemImage>(); }
+                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                        //excelDto.ExcelDto.Actions = "";
+                        //excelDto.ExcelDto.RecordType = "Item";
+                        //excelDto.RecordType = "Item";
+                    }
+
+
+                }
             }
-            result = result.Select(r => r).Where(r => (r.Actions != "1" && r.Actions != "2" && r.Actions != "3"
-            && r.Actions != "5"
-            && r.Actions != "6" && r.RecordType!="Image" && r.RecordType != "Color") ).ToList();
+            result = result.Select(r => r).Where(r => (r.Actions != "2" && r.Actions != "3" && r.Actions != "4"
+            && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
+            && r.Actions != "8" && r.Actions != "9" && r.Actions != "10" 
+            && r.RecordType!="Image" && r.RecordType != "Color") ).ToList();
            
             if(result.Count<= 0) { return excelResultsDTO.ExcelLogDTO; }
             #endregion
