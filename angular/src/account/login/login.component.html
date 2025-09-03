@@ -27,7 +27,7 @@
             <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width">
             <input #passwordInput="ngModel" [(ngModel)]="loginService.authenticateModel.password"
                 class="form-control m-input MT0" type="password" autocomplete="new-password"
-                placeholder="{{'EnterYourPassword' | localize}} *" name="password" required maxlength="32" /></div>
+                placeholder="{{'Enter Your Password' | localize}} *" name="password" required maxlength="32" /></div>
             <validation-messages [formCtrl]="passwordInput" *ngIf="!passwordInput.touched"></validation-messages>
         </div>
         <div class="row">
