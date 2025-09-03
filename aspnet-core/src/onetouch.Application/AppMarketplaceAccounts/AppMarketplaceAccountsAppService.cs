@@ -257,6 +257,14 @@ namespace onetouch.AppMarketplaceAccounts
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN== account.Account.SSIN);
                         if (accountConnection != null && accountConnection.Id > 0)
                         {
+                            if(accountConnection.IsProfileData)
+                            {
+                                account.DisConnectLabel = "";
+                                account.ConnectionName = "";
+                                account.AvaliableConnectionName = "";
+                                account.AvailableConnections = new List<ConnectionType>();
+                                continue;
+                            }
                             var relationship = await _appContactRelationshipInfoRepository .GetAll()
                                 .Where(z=> ((z.RecipientContactSSIN== currentTenantAccountObject.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
                                 || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccountObject.SSIN)) 

@@ -138,6 +138,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
                     .subscribe((result: string) => {
 
                       account.visibility == 'Public' ? account.visibility = 'Private' :  account.visibility   = 'Public'
+                      account.visibility == 'Public' ? this.notify.success('Account is Shared') : this.notify.success('Account is Private')
                     });
       }
 
