@@ -19,7 +19,7 @@ namespace onetouch.AppMarketplaceContacts
     public class AppMarketplaceContact : AppEntity
     {
 		//public int? TenantId { get; set; }
-        public int? OwnerId { get; set; }
+       // public int? OwnerId { get; set; }
 
 		//[Required]
 		//[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
@@ -71,7 +71,7 @@ namespace onetouch.AppMarketplaceContacts
         //public virtual string PriceLevel { get; set; }
         //public virtual DateTime TimeStamp { get; set; }
         public virtual bool IsProfileData { get; set; }
-        public virtual bool IsHidden { get; set; }
+        public virtual int SharingLevel{ get; set; }
         public virtual long? Phone1TypeId { get; set; }
 
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
