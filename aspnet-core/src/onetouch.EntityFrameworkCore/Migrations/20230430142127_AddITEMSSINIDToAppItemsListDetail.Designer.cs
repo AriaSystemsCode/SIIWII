@@ -12,7 +12,7 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    [Migration("20230430142137_AddITEMSSINIDToAppItemsListDetail")]
+    [Migration("20230430142147_AddITEMSSINIDToAppItemsListDetail")]
     partial class AddITEMSSINIDToAppItemsListDetail
     {
         /// <inheritdoc />
