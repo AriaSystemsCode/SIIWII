@@ -1095,6 +1095,35 @@ namespace onetouch
                    : (ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk != null ? ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment : null))
                : null));
             //MMR45
+              #region Iteration44 temp till iteration 46 tested
+            configuration.CreateMap<AppItemtExcelRecordDTO, ImportItemInputDto>()
+                .ForMember(d => d.NoOfDimensions, s => s.MapFrom(ss => ss.ExcelDto.NoOfDim))
+                .ForMember(d => d.Dimension1Name, s => s.MapFrom(ss => ss.ExcelDto.D1Name))
+                .ForMember(d => d.Dimension2Name, s => s.MapFrom(ss => ss.ExcelDto.D2Name))
+                .ForMember(d => d.Dimension3Name, s => s.MapFrom(ss => ss.ExcelDto.D3Name))
+                .ForMember(d => d.Dimension1Position, s => s.MapFrom(ss => ss.ExcelDto.D1Pos))
+                .ForMember(d => d.Dimension2Position, s => s.MapFrom(ss => ss.ExcelDto.D2Pos))
+                .ForMember(d => d.Dimension3Position, s => s.MapFrom(ss => ss.ExcelDto.D3Pos))
+                .ForMember(d => d.PriceC, s => s.MapFrom(ss => ss.ExcelDto.PriceC))
+                .ForMember(d => d.Price, s => s.MapFrom(ss => ss.ExcelDto.Price))
+                .ForMember(d => d.PriceA, s => s.MapFrom(ss => ss.ExcelDto.PriceA))
+                .ForMember(d => d.PriceB, s => s.MapFrom(ss => ss.ExcelDto.PriceB))
+                .ForMember(d => d.PriceD, s => s.MapFrom(ss => ss.ExcelDto.PriceD))
+                .ForMember(d => d.PriceCurrencyCode, s => s.MapFrom(ss => ss.ExcelDto.Currency))
+                .ForMember(d => d.ProductType, s => s.MapFrom(ss => ss.ExcelDto.ProductType))
+                .ForMember(d => d.ProductCategoryCode, s => s.MapFrom(ss => ss.ExcelDto.ProductCategoryCode))
+                .ForMember(d => d.ProductCategoryDescription, s => s.MapFrom(ss => ss.ExcelDto.ProductCategoryDescription))
+                .ForMember(d => d.ProductClassificationCode, s => s.MapFrom(ss => ss.ExcelDto.ProductClassificationCode))
+                .ForMember(d => d.ProductClassificationDescription, s => s.MapFrom(ss => ss.ExcelDto.ProductClassificationDescription))
+                // .ForMember(d => d.ColorCode, s => s.MapFrom(ss => ss.ExcelDto.))
+                //.ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
+                //  .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
+                // .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
+                .ForMember(d => d.SizeRatioValue, s => s.MapFrom(ss => ss.ExcelDto.SizeRatioValue))
+                ;
+            configuration.CreateMap<AppItemExcelDto, AppItem>();
+            #endregion
+            
             configuration.CreateMap <GetAllAppTenantActivitiesLogForExcelInput, GetAllAppTenantActivitiesLogInput>();
             //I46
             //configuration.CreateMap<ImportItemInputDto, AppItemExcelDto>()

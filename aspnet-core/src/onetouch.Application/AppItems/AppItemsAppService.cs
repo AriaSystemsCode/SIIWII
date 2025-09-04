@@ -80,11 +80,12 @@ using Z.Expressions;
 using onetouch.Migrations;
 using Newtonsoft.Json;
 using System.Drawing;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
-    public class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IExcelImporter<AppItemExcelResultsDTO>
+    public partial class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IAppItemsAppImportService, IExcelImporter<AppItemExcelResultsDTO>
     {
         //i46[Start]
         public static IUnitOfWorkManager _unitOfWorkManagerValid;
@@ -206,7 +207,7 @@ namespace onetouch.AppItems
             _appItemSelectorRepository = appItemSelectorRepository;
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _validationRuleRepo = validationRuleRepo;
-          
+
         }
         //mmt
         //MMT2024
@@ -320,29 +321,29 @@ namespace onetouch.AppItems
                     .Include(z => z.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault))
                     //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                     .Include(x => x.ItemSizeScaleHeadersFkList).Select(x => new
-                {
-                    x.PublishedListingItemFkList,
-                    x.TenantId,
-                    x.Code,
-                    x.Price,
-                    x.Name,
-                    x.EntityFk.Notes,
-                    x.Id,
-                    x.EntityFk,
-                    x.ParentFkList,
-                    x.ListingItemFkList,
-                    x.Description,
-                    x.ParentId,
-                    x.SharingLevel,
-                    x.ItemType,
-                    x.PublishedListingItemFk,
-                    x.TenantOwner,
-                    x.SSIN,
-                    x.ItemSizeScaleHeadersFkList,
-                    x.ManufacturerCode,
-                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
-                    x.ItemPricesFkList
-                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
+                    {
+                        x.PublishedListingItemFkList,
+                        x.TenantId,
+                        x.Code,
+                        x.Price,
+                        x.Name,
+                        x.EntityFk.Notes,
+                        x.Id,
+                        x.EntityFk,
+                        x.ParentFkList,
+                        x.ListingItemFkList,
+                        x.Description,
+                        x.ParentId,
+                        x.SharingLevel,
+                        x.ItemType,
+                        x.PublishedListingItemFk,
+                        x.TenantOwner,
+                        x.SSIN,
+                        x.ItemSizeScaleHeadersFkList,
+                        x.ManufacturerCode,
+                        //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
+                        x.ItemPricesFkList
+                        //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
 
                     })
                 .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
@@ -441,7 +442,7 @@ namespace onetouch.AppItems
                                    Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(d.Id)) ? true : false,
                                    EntityObjectCategoryNames = d.EntityFk.EntityCategories.Where(z => z.EntityObjectCategoryFk.TenantId != null).Select(z => z.EntityObjectCategoryFk.Name).ToList(),
                                    EntityClassificationNames = d.EntityFk.EntityClassifications.Select(z => z.EntityObjectClassificationFk.Name).ToList(),
-                                   
+
 
                                };
                 }
@@ -500,7 +501,7 @@ namespace onetouch.AppItems
                                            Code = d.Code,
                                            Name = d.Name,
                                            Description = d.EntityFk.Notes,
-                                           ManufacturerCode = (d.ManufacturerCode == null && (d.TenantOwner == AbpSession.TenantId || d.TenantOwner==0 || d.TenantOwner==null ) ? d.Code : d.ManufacturerCode),
+                                           ManufacturerCode = (d.ManufacturerCode == null && (d.TenantOwner == AbpSession.TenantId || d.TenantOwner == 0 || d.TenantOwner == null) ? d.Code : d.ManufacturerCode),
                                            //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
                                            //Price = d.Price,
                                            Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault() != null ? d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price : d.Price,
@@ -904,7 +905,7 @@ namespace onetouch.AppItems
 
 
                 var output = new GetAppItemDetailForViewDto { AppItem = ObjectMapper.Map<AppItemForViewDto>(appItem) };
-                if (appItem.ManufacturerCode == null && (appItem.TenantOwner == AbpSession.TenantId || appItem.TenantOwner == null || appItem.TenantOwner ==0))
+                if (appItem.ManufacturerCode == null && (appItem.TenantOwner == AbpSession.TenantId || appItem.TenantOwner == null || appItem.TenantOwner == 0))
                 {
                     output.AppItem.ManufacturerCode = appItem.Code;
                 }
@@ -1831,10 +1832,10 @@ namespace onetouch.AppItems
             return output;
         }
         //I46-POC
-        public FluentValidation.Results.ValidationResult  ValidateItem(CreateOrEditAppItemDto input)
+        public FluentValidation.Results.ValidationResult ValidateItem(CreateOrEditAppItemDto input)
         {
             _unitOfWorkManagerValid = UnitOfWorkManager;
-            var validator = new DynamicValidator<CreateOrEditAppItemDto>(_validationRuleRepo,typeof(AppItemsAppService));
+            var validator = new DynamicValidator<CreateOrEditAppItemDto>(_validationRuleRepo, typeof(AppItemsAppService));
             var result = validator.Validate(input);
             return result;
         }
@@ -1843,11 +1844,12 @@ namespace onetouch.AppItems
         {
             List<AppItemValidationInputDTO> validateInput = new List<AppItemValidationInputDTO>();
             validateInput.Add(ObjectMapper.Map<AppItemValidationInputDTO>(input));
-            var  returnList =   await ValidateItemData(validateInput);
-            if (returnList!=null && returnList.Count>0)
+            var returnList = await ValidateItemData(validateInput);
+            if (returnList != null && returnList.Count > 0)
             {
                 string errorList = "";
-                foreach (var item in returnList) {
+                foreach (var item in returnList)
+                {
                     foreach (var err in item.ErrorMessages)
                     {
                         errorList += err + "\n";
@@ -1855,7 +1857,7 @@ namespace onetouch.AppItems
 
                 }
                 if (!string.IsNullOrEmpty(errorList))
-                throw new UserFriendlyException(errorList);
+                    throw new UserFriendlyException(errorList);
             }
             if (input.Id == 0)
             {
@@ -2398,7 +2400,7 @@ namespace onetouch.AppItems
                 List<AppEntity> colorsList = new List<AppEntity>();
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
-                   
+
                     foreach (var child in input.VariationItems)
                     {
                         var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
@@ -2593,7 +2595,7 @@ namespace onetouch.AppItems
                                     {
                                         var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
 
-                                      //  if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
+                                        //  if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
                                             {
@@ -4964,551 +4966,611 @@ namespace onetouch.AppItems
 
             return itemExcelTemplateDto;
         }
-        public async Task<AppItemExcelResultsDTO>ValidateExcel(string guidFile, string[] imagesList)
+        public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         {
-
-            string currentExcelTemplateVersion = _appConfiguration[$"ItemTemplates:ItemExcelTemplateVersion:CurrentVersion"];
-            string validExcelTemplates = _appConfiguration[$"ItemTemplates:ItemExcelTemplateVersion:SupportedVersions"];
-
             AppItemExcelResultsDTO itemExcelResultsDTO = new AppItemExcelResultsDTO();
-            itemExcelResultsDTO.TotalRecords = 0;
-            itemExcelResultsDTO.TotalPassedRecords = 0;
-            itemExcelResultsDTO.TotalFailedRecords = 0;
-            itemExcelResultsDTO.FilePath = "";
-            itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>() { };
-            try
-            {
+            itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>();
 
-                #region open the excel
-                var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
-                var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".xlsx";
-                var ds = _helper.ExcelHelper.GetExcelDataSet(path);
-                //Validation Rules
+            if (!string.IsNullOrEmpty(guidFile))
+            {
+                string currentExcelTemplateVersion = _appConfiguration[$"ItemTemplates:ItemExcelTemplateVersion:CurrentVersion"];
+                string validExcelTemplates = _appConfiguration[$"ItemTemplates:ItemExcelTemplateVersion:SupportedVersions"];
+
+                //AppItemExcelResultsDTO itemExcelResultsDTO = new AppItemExcelResultsDTO();
+                itemExcelResultsDTO.TotalRecords = 0;
+                itemExcelResultsDTO.TotalPassedRecords = 0;
+                itemExcelResultsDTO.TotalFailedRecords = 0;
+                itemExcelResultsDTO.FilePath = "";
+                itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>() { };
                 try
                 {
-                    var validationRuleSheet = ds.Tables["Validation Rules"];
-                    if (validationRuleSheet != null)
+
+                    #region open the excel
+                    var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+                    var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".xlsx";
+                    var ds = _helper.ExcelHelper.GetExcelDataSet(path);
+                    //Validation Rules
+                    try
                     {
-                        string version = ds.Tables["Validation Rules"].Rows[1].ItemArray[2].ToString();
-                        if (version.ToString() != currentExcelTemplateVersion && !validExcelTemplates.Contains(version.ToString()))
+                        var validationRuleSheet = ds.Tables["Validation Rules"];
+                        if (validationRuleSheet != null)
                         {
-                            throw new UserFriendlyException("This Excel version does not match any of the supported Excel versions");
-                        }
-                    }
-                    else
-                    {
-                        throw new UserFriendlyException("This Excel file format is invalid");
-                    }
-                }
-                catch (Exception exObj)
-                {
-                    throw new UserFriendlyException("This Excel file format is invalid");
-                }
-
-
-                //rename columns
-                for (int icounter = 0; icounter < ds.Tables[0].Columns.Count; icounter++)
-                {
-                    string fieldName = ds.Tables[0].Rows[0][icounter].ToString().Trim().Replace(" ", "").Replace(".", "");
-                    if (!string.IsNullOrEmpty(fieldName))
-                        ds.Tables[0].Columns[icounter].ColumnName = fieldName;
-                }
-                List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
-                // get Product Departments
-                //PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
-                //get classifications for contacts
-                PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput());
-
-                PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categoriesIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name" });
-                // get Product Categories
-                List<SycEntityObjectCategorySycEntityObjectCategoryLookupTableDto> productTypes = await _sycEntityObjectCategoriesAppService.GetAllSycEntityObjectCategoryForTableDropdown();
-
-                List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
-
-                string productType = ds.Tables["Products"].Rows[1].ItemArray[0].ToString();
-                GetAllEntityObjectTypeOutput productTypeId = null;
-                if (!string.IsNullOrEmpty(productType))
-                {
-                    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
-                    productTypeId = pdtyp.FirstOrDefault();
-                }
-                else
-                {
-                    var itemObjectId = await _helper.SystemTables.GetObjectItemId();
-                    var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z => z.Code).FirstOrDefault();
-                    if (defaultProductType == null)
-                        throw new UserFriendlyException("No Product type is marked as default.");
-                    else
-                    {
-                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
-                        productTypeId = pdtyp.FirstOrDefault();
-                        for (int cnt = 1; cnt < ds.Tables["Products"].Rows.Count; cnt++)
-                        {
-                            ds.Tables["Products"].Rows[cnt]["ProductType"] = defaultProductType;
-                        }
-
-                    }
-                }
-                //var productTypeId = productTypes.FirstOrDefault(x => x.DisplayName == productType);
-                //MMT
-                var productColumn = ds.Tables["Products"].Columns["ProductType"];
-                if (productColumn == null)
-                    throw new UserFriendlyException("Product Type column is missing.");
-
-                var colData = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "ProductType" });
-
-                if (colData.Rows.Count > 2)
-                    throw new UserFriendlyException("Product Type column must have the same value in all data rows.");
-
-                if (productTypeId == null)
-                    throw new UserFriendlyException("Invalid Product Type");
-                //MMT
-                // var entityObjectExtraAttribute = await  _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));//.Result.Select(X => X.Code).ToArray();
-                var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));
-                var entityextr = entityObjectExtraAttribute.FirstOrDefault();
-                List<ExtraAttribute> entityExtraAttributes = null;
-                if (entityextr != null && entityextr.ExtraAttributes != null)
-                    entityExtraAttributes = entityextr.ExtraAttributes.ExtraAttributes;
-
-                //xx
-                if (entityExtraAttributes != null)
-                {
-                    foreach (var extraAtt in entityExtraAttributes)
-                    {
-                        string attName = extraAtt.Name;
-                        if (extraAtt.IsLookup)
-                        {
-                            var colCode = ds.Tables["Products"].Columns[attName.Replace(" ", "") + "Code"];
-                            if (colCode == null)
+                            string version = ds.Tables["Validation Rules"].Rows[1].ItemArray[2].ToString();
+                            if (version.ToString() != currentExcelTemplateVersion && !validExcelTemplates.Contains(version.ToString()))
                             {
-                                throw new UserFriendlyException(attName + " Code column is missing.");
-                            }
-                            else
-                            {
-                                if (extraAtt.IsVariation)
-                                {
-                                    var codeRows = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "RecordType", attName.Replace(" ", "") + "Code" });
-                                    if (codeRows.Rows != null)
-                                    {
-                                        foreach (DataRow rowValue in codeRows.Rows)
-                                        {
-
-                                            if (rowValue[0].ToString() == "Item Variant" & string.IsNullOrEmpty(rowValue[1].ToString()))
-                                                throw new UserFriendlyException(attName + " Code column has empty value in some rows.");
-
-                                        }
-                                    }
-
-                                }
-                            }
-                            var colName = ds.Tables["Products"].Columns[attName.Replace(" ", "") + "Name"];
-                            if (colName == null)
-                            {
-                                throw new UserFriendlyException(attName + " Name column is missing.");
-                            }
-                            else
-                            {
-                                if (extraAtt.IsVariation)
-                                {
-                                    var codeRows = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "RecordType", attName.Replace(" ", "") + "Name" });
-                                    if (codeRows.Rows != null)
-                                    {
-                                        foreach (DataRow rowValue in codeRows.Rows)
-                                        {
-
-                                            if (rowValue[0].ToString() == "Item Variant" & string.IsNullOrEmpty(rowValue[1].ToString()))
-                                                throw new UserFriendlyException(attName + " Name column has empty value in some rows.");
-
-                                        }
-                                    }
-
-                                }
+                                throw new UserFriendlyException("This Excel version does not match any of the supported Excel versions");
                             }
                         }
                         else
                         {
-                            //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[Start]
-                            var colAtt = ds.Tables["Products"].Columns[attName.Replace(" ", "")];
-                            //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[End]
-                            if (!string.IsNullOrEmpty(attName) && colAtt == null)
-                                //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[Start]
-                                throw new UserFriendlyException(attName + " column is missing.");
-                            //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[End]
+                            throw new UserFriendlyException("This Excel file format is invalid");
                         }
-                    }
-                }
-                //xx
-
-                #endregion
-                #region create mapper to middle layer AppItemExcelDto list of objects
-                MapperConfiguration configuration;
-                configuration = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelDtoProfile(entityExtraAttributes)); });
-                IMapper mapper;
-                mapper = configuration.CreateMapper();
-                List<AppItemExcelDto> result;
-                try
-                {
-                    result = mapper.Map<List<DataRow>, List<AppItemExcelDto>>(new List<DataRow>(ds.Tables[0].Rows.OfType<DataRow>()));
-                }
-                catch (Exception exObj)
-                {
-                    throw new UserFriendlyException("This Excel file format is invalid");
-                }
-                #endregion create mapper to middle layer AccountExcelDto list of objects
-                #region Excel validateion rules only.
-                // 0.Record images array existance in the images array
-                // 1.Record duplicated in excel
-                // 2.Sheet.Code and Sheet.Name are not empty
-                // 3.Sheet.Email Address is not empty, then it has a valid email address
-                // 4.Sheet.Website is not empty, then it has a valid website
-                // 5.Sheet.RecordType shuold be either 'Account', 'Branch' or 'Contact'
-                // 6.Sheet.AccountType shuold be either 'Seller', 'Buyer' and 'Seller & Buyer'
-                Int32 rowNumber = 1;
-                //foreach (var rec in result)
-                //{
-                //    if (rec.ImageType != "Image Type")
-                //    {
-                //        rowNumber++;
-                //        rec.rowNumber = rowNumber;
-                //        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == rec.Code);
-                //        if (itemExists != null)
-                //        {
-                //            rec.Id = itemExists.Id;
-                //        }
-
-                //    }
-                //}
-                //Spreadsheet document = new Spreadsheet();
-                //document.LoadFromFile(itemExcelResultsDTO.FilePath);
-                //Worksheet Sheet = document.Workbook.Worksheets[0];
-                //// Set current cell
-                //Sheet.Cell("CA1").Value = "Processing Status";
-                //Sheet.Cell("CB1").Value = "Processing Error Message";
-                //Sheet.Cell("CC1").Value = "Processing Error Details";
-
-                //itemExcelResultsDTO.CodesFromList = new List<string>();
-                //itemExcelResultsDTO.FromList = new List<Int32>();
-                //itemExcelResultsDTO.ToList = new List<Int32>();
-                itemExcelResultsDTO.TotalRecords = result.Count();
-                itemExcelResultsDTO.TotalPassedRecords = 0;
-                itemExcelResultsDTO.TotalFailedRecords = 0;
-                itemExcelResultsDTO.FilePath = path;
-                itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>() { };
-                #region Excel validation rules only.
-                List<string> RecordsCodes = result.Select(r => r.Code).ToList();
-                List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
-
-                List<ImportItemInputDto> x = new List<ImportItemInputDto>();
-
-                foreach (AppItemExcelDto itemExcelDto in result)
-                {
-                    if (itemExcelDto.ProductType == "Product Type")
-                    {
-                        continue;
-                    }
-                    
-                    MapperConfiguration configurationMap;
-                    configurationMap = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes)); });
-                    IMapper mapperc;
-                    mapperc = configurationMap.CreateMapper();
-                    ImportItemInputDto importItemInputDto;
-                    try
-                    {
-                        importItemInputDto = mapperc.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
                     }
                     catch (Exception exObj)
                     {
                         throw new UserFriendlyException("This Excel file format is invalid");
                     }
-                    x.Add(importItemInputDto);
 
-                    //importList = ObjectMapper.Map<ImportItemInputDto>(itemExcelDto);
-                    var validationList = await ValidateImportItemData(importItemInputDto);
-                    ////if (rowNumber > 2)
-                    ////{ itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
-                    ////itemExcelResultsDTO.FromList.Add(rowNumber);
-                    ////itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("D" + rowNumber.ToString()).Value.ToString());
 
-                    AppItemtExcelRecordDTO itemExcelRecordErrorDTO = new AppItemtExcelRecordDTO();
-                    itemExcelRecordErrorDTO.RecordType = itemExcelDto.RecordType;
-                    itemExcelRecordErrorDTO.ParentCode = itemExcelDto.ParentCode;
-                    itemExcelRecordErrorDTO.Code = itemExcelDto.Code;
-                    itemExcelRecordErrorDTO.Name = itemExcelDto.Name;
-                    itemExcelRecordErrorDTO.Status = ExcelRecordStatus.Passed.ToString();
-                    itemExcelRecordErrorDTO.ErrorMessage = "";
-                    itemExcelRecordErrorDTO.FieldsErrors = new List<string>() { };
-
-                    string recordErrorMEssage = "Wrong data in this " + itemExcelRecordErrorDTO.RecordType + ". check this record in the sheet and update";
-                    bool hasWarning = false;
-
-                    rowNumber++;
-                    itemExcelDto.rowNumber = rowNumber;
-                   
-
-                    //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[Start]
-                    //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code);
-                    var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
-                    //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[End]
-                    if (itemExists != null)
+                    //rename columns
+                    for (int icounter = 0; icounter < ds.Tables[0].Columns.Count; icounter++)
                     {
-                        itemExcelDto.Id = itemExists.Id;
-                        //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[Start]
-                        //itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
-                        //recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
-                      //  itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
-                        recordErrorMEssage = "Code :" + itemExcelDto.Code + " already exists!";
-                        //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[End]
-                        itemExcelResultsDTO.HasDuplication = true;
-                        hasWarning = true;
+                        string fieldName = ds.Tables[0].Rows[0][icounter].ToString().Trim().Replace(" ", "").Replace(".", "");
+                        if (!string.IsNullOrEmpty(fieldName))
+                            ds.Tables[0].Columns[icounter].ColumnName = fieldName;
                     }
+                    List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+                    // get Product Departments
+                    //PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
+                    //get classifications for contacts
+                    PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput());
 
+                    PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categoriesIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name" });
+                    // get Product Categories
+                    List<SycEntityObjectCategorySycEntityObjectCategoryLookupTableDto> productTypes = await _sycEntityObjectCategoriesAppService.GetAllSycEntityObjectCategoryForTableDropdown();
 
-                    itemExcelRecordErrorDTO.ExcelDto = itemExcelDto;
-                    //var ValidateResults = new List<ValidationResult>();
+                    List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
 
-                    //Validator.TryValidateObject(itemExcelDto, new System.ComponentModel.DataAnnotations.ValidationContext(itemExcelDto), ValidateResults, true);
-
-                    //if (ValidateResults.Count > 0)
-                    //{
-                    //    foreach (var res in ValidateResults)
-                    //    {
-                    //        itemExcelRecordErrorDTO.FieldsErrors.Add(res.ErrorMessage);
-                    //    }
-                    //}
-                    //MMT
-                    //if (itemExcelDto.RecordType == "Item")
-                    //{
-                    //    //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
-                    //    //if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & string.IsNullOrEmpty(itemExcelDto.ScaleSizesOrder))
-                    //    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Size Scale order cannot be empty if size scale name is not empty");
-                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 1 & string.IsNullOrEmpty(itemExcelDto.D1Name))
-                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
-                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 2 &
-                    //        (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name)))
-                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name and Dimension 2 name cannot be empty if size scale number of dimesions is 2");
-                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 3 &
-                    //        (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name) | string.IsNullOrEmpty(itemExcelDto.D3Name)))
-                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name, Dimension 2 name, and Dimension 3 name cannot be empty if size scale number of dimesions is 3");
-                    //    //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
-                    //    if (!string.IsNullOrEmpty(itemExcelDto.SizeRatioName) & string.IsNullOrEmpty(itemExcelDto.SizeRatioValue))
-                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Size ratio value cannot be empty if size ratio name is not empty");
-
-                    //}
-                    //MMT
-                    #region check images
-                    bool hasError = false;
-                    //if (itemExcelDto.RecordType != "Item" && string.IsNullOrEmpty(itemExcelDto.ParentCode))
-                    //{
-                    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code cannot be empty.");
-                    //    hasError = true;
-
-                    //}
-                    if (imagesList != null && imagesList.Count() > 0)
+                    string productType = ds.Tables["Products"].Rows[1].ItemArray[0].ToString();
+                    GetAllEntityObjectTypeOutput productTypeId = null;
+                    if (!string.IsNullOrEmpty(productType))
                     {
-                        itemExcelDto.Images = new List<AppItemImage>();
-                        //if (!string.IsNullOrEmpty(itemExcelDto.ImageFolderName) && !imagesList.Contains(itemExcelDto.ImageFolderName.ToUpper()))
-                        //{
-                        //    itemExcelRecordErrorDTO.FieldsErrors.Add("Image Folder Name: Not found.");
-                        //    hasError = true;
-                        //}
-                        //if (!string.IsNullOrEmpty(itemExcelDto.ImageType))
-                        //{
-                        //    var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(itemExcelDto.ImageType.ToUpper().TrimEnd());
-                        //    if (attCoverId == 0)
-                        //    {
-                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Invalid Image Type.");
-                        //        hasError = true;
-                        //    }
-                        //}
-                        var productImage = imagesList.Where(x => x.ToUpper().StartsWith((itemExcelDto.RecordType == "Item" ? "I-" : "V-") + itemExcelDto.Code.ToUpper())).ToList();
-                        if (productImage.Count == 0)
-                        {
-                            if (itemExcelDto.RecordType == "Item")
-                            {
-                                hasWarning = true;
-                                itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " does not have an image in images folder.!");
-                                recordErrorMEssage = "Code :" + itemExcelDto.Code + " does not have an image in images folder.!";
-                                itemExcelDto.Images.Add(new AppItemImage { ImageFileName = "noimage_item.jpg" });//, ImageGuid = (new Guid("noimage_item.jpg")).ToString() 
-                            }
-                        }
-                        else
-                        {
-                            foreach (var img in productImage)
-                                itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
-
-                        }
-                    }
-                    #endregion check images
-                    if (validationList != null && validationList.Count > 0)
-                    {
-                        foreach (var err in validationList)
-                        {
-                            itemExcelRecordErrorDTO.FieldsErrors.Add(err.ErrorMessage);
-                            switch (err.ErrorType)
-                            {
-                                case "Warning":
-                                    hasWarning = true;
-                                    break;
-                                case "Stopper":
-                                    hasError = true;
-                                    break;
-                                case "Duplication":
-                                    itemExcelResultsDTO.HasDuplication = true;
-                                    break;
-                            }
-                        }
-                    }
-                    #region code, name, email and website validation    
-                    //if (RecordsCodes.Where(r => r == itemExcelDto.Code).ToList().Count() > 1)
-                    //{
-                    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Code: must be used Once."); hasError = true;
-                    //    recordErrorMEssage = "Duplicated " + itemExcelRecordErrorDTO.RecordType;
-                    //}
-                    ItemType itemExcelRecordType;
-                    //if (string.IsNullOrEmpty(itemExcelDto.Code)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Code: Should Have a Value."); hasError = true; }
-                    //if (string.IsNullOrEmpty(itemExcelDto.Name)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Name: Should Have a Value."); hasError = true; }
-                    //if (string.IsNullOrEmpty(itemExcelDto.ProductDescription)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Product Description: Should Have a Value."); hasError = true; }
-                    //if (string.IsNullOrEmpty(itemExcelDto.ProductCategoryCode)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Category Code: Should Have a Value."); hasError = true; }
-                    //if (string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Classification Code: Should Have a Value."); hasError = true; }
-                    //if (string.IsNullOrEmpty(itemExcelDto.RecordType) && Enum.TryParse<ItemType>(itemExcelDto.RecordType.Replace (" ",""), out itemExcelRecordType))
-                    //{ itemExcelRecordErrorDTO.FieldsErrors.Add("Record Type: Item|Item Variant"); hasError = true; }
-
-                    //if (itemExcelDto.RecordType.Replace(" ", "") == ItemType.ItemVariant.ToString() && result.Where(r => r.Code == itemExcelDto.ParentCode && r.RecordType.Replace(" ", "") == ItemType.Item.ToString()).ToList().Count() == 0)
-                    //{
-                    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code: Item variant parent should be of Type Item."); hasError = true;
-                    //}
-
-                    //if (!string.IsNullOrEmpty(itemExcelDto.Currency) && GetTypeId(itemExcelDto.Currency, currencyIds) == 0)
-                    //{ itemExcelRecordErrorDTO.FieldsErrors.Add("Currency: Should Have a Valid Currency Value."); hasError = true; }
-
-                    //if (!string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode))
-                    //{
-                    //    var returnResult = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput { NameFilter = itemExcelDto.ProductClassificationCode });
-                    //    long classId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectClassification.Id : 0; //GetClassId(itemExcelDto.ProductClassificationDescription, classIds);
-                    //    if (classId == 0)
-                    //    {
-                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Product Classification is not found.");
-                    //        hasWarning = true;
-                    //    }
-                    //    else { itemExcelDto.EntityObjectClassificaionID = classId; }
-                    //}
-
-                    //if (!string.IsNullOrEmpty(itemExcelDto.ProductCategoryCode))
-                    //{
-                    //    var returnResult = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name", NameFilter = itemExcelDto.ProductCategoryCode });
-                    //    long categId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectCategory.Id : 0;
-                    //    if (categId == 0)
-                    //    {
-                    //        itemExcelRecordErrorDTO.FieldsErrors.Add("Product Category is not found.");
-                    //        hasWarning = true;
-                    //    }
-                    //    else
-                    //    {
-                    //        itemExcelDto.EntityObjectCategoryID = categId;
-                    //    }
-                    //}
-
-
-                    //xxxx
-                    #endregion code, name validation 
-                    if (hasError)
-                    {
-                        itemExcelRecordErrorDTO.Status = ExcelRecordStatus.Failed.ToString();
-                        itemExcelRecordErrorDTO.ErrorMessage = recordErrorMEssage;
+                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
+                        productTypeId = pdtyp.FirstOrDefault();
                     }
                     else
                     {
-                        if (hasWarning)
+                        var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+                        var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z => z.Code).FirstOrDefault();
+                        if (defaultProductType == null)
+                            throw new UserFriendlyException("No Product type is marked as default.");
+                        else
                         {
-                            itemExcelRecordErrorDTO.Status = ExcelRecordStatus.Warning.ToString();
-                            itemExcelRecordErrorDTO.ErrorMessage = recordErrorMEssage;
+                            var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
+                            productTypeId = pdtyp.FirstOrDefault();
+                            for (int cnt = 1; cnt < ds.Tables["Products"].Rows.Count; cnt++)
+                            {
+                                ds.Tables["Products"].Rows[cnt]["ProductType"] = defaultProductType;
+                            }
+
+                        }
+                    }
+                    //var productTypeId = productTypes.FirstOrDefault(x => x.DisplayName == productType);
+                    //MMT
+                    var productColumn = ds.Tables["Products"].Columns["ProductType"];
+                    if (productColumn == null)
+                        throw new UserFriendlyException("Product Type column is missing.");
+
+                    var colData = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "ProductType" });
+
+                    if (colData.Rows.Count > 2)
+                        throw new UserFriendlyException("Product Type column must have the same value in all data rows.");
+
+                    if (productTypeId == null)
+                        throw new UserFriendlyException("Invalid Product Type");
+                    //MMT
+                    // var entityObjectExtraAttribute = await  _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));//.Result.Select(X => X.Code).ToArray();
+                    var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));
+                    var entityextr = entityObjectExtraAttribute.FirstOrDefault();
+                    List<ExtraAttribute> entityExtraAttributes = null;
+                    if (entityextr != null && entityextr.ExtraAttributes != null)
+                        entityExtraAttributes = entityextr.ExtraAttributes.ExtraAttributes;
+
+                    //xx
+                    if (entityExtraAttributes != null)
+                    {
+                        foreach (var extraAtt in entityExtraAttributes)
+                        {
+                            string attName = extraAtt.Name;
+                            if (extraAtt.IsLookup)
+                            {
+                                var colCode = ds.Tables["Products"].Columns[attName.Replace(" ", "") + "Code"];
+                                if (colCode == null)
+                                {
+                                    throw new UserFriendlyException(attName + " Code column is missing.");
+                                }
+                                else
+                                {
+                                    if (extraAtt.IsVariation)
+                                    {
+                                        var codeRows = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "RecordType", attName.Replace(" ", "") + "Code" });
+                                        if (codeRows.Rows != null)
+                                        {
+                                            foreach (DataRow rowValue in codeRows.Rows)
+                                            {
+
+                                                if (rowValue[0].ToString() == "Item Variant" & string.IsNullOrEmpty(rowValue[1].ToString()))
+                                                    throw new UserFriendlyException(attName + " Code column has empty value in some rows.");
+
+                                            }
+                                        }
+
+                                    }
+                                }
+                                var colName = ds.Tables["Products"].Columns[attName.Replace(" ", "") + "Name"];
+                                if (colName == null)
+                                {
+                                    throw new UserFriendlyException(attName + " Name column is missing.");
+                                }
+                                else
+                                {
+                                    if (extraAtt.IsVariation)
+                                    {
+                                        var codeRows = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "RecordType", attName.Replace(" ", "") + "Name" });
+                                        if (codeRows.Rows != null)
+                                        {
+                                            foreach (DataRow rowValue in codeRows.Rows)
+                                            {
+
+                                                if (rowValue[0].ToString() == "Item Variant" & string.IsNullOrEmpty(rowValue[1].ToString()))
+                                                    throw new UserFriendlyException(attName + " Name column has empty value in some rows.");
+
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[Start]
+                                var colAtt = ds.Tables["Products"].Columns[attName.Replace(" ", "")];
+                                //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[End]
+                                if (!string.IsNullOrEmpty(attName) && colAtt == null)
+                                    //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[Start]
+                                    throw new UserFriendlyException(attName + " column is missing.");
+                                //T-SII-20230223.0002,1 MMT 02/28/2023 -Import Items program : Product Type attributes[End]
+                            }
+                        }
+                    }
+                    //xx
+
+                    #endregion
+                    #region create mapper to middle layer AppItemExcelDto list of objects
+                    MapperConfiguration configuration;
+                    configuration = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelDtoProfile(entityExtraAttributes)); });
+                    IMapper mapper;
+                    mapper = configuration.CreateMapper();
+                    List<AppItemExcelDto> result;
+                    try
+                    {
+                         
+                        {
+                            foreach (DataRow itemExcelDto in ds.Tables["Products"].Rows)
+                            {
+                                if (itemExcelDto["RecordType"].ToString() == "Color")
+                                {
+                                    itemExcelDto["Code"] = "-";
+                                    itemExcelDto["Name"] = "-";
+                                    itemExcelDto["ProductDescription"] = " - ";
+                                    itemExcelDto["Price"] = "1";
+                                    itemExcelDto["ParentCode"] = " - ";
+                                    itemExcelDto["PriceCurrencyCode"] = " - ";
+                                }
+                            }
                         }
 
-                    }
-
-                    itemExcelRecordErrorDTO.image = itemExcelDto.ImageFolderName;
-                    itemExcelRecordErrorDTO.imageType = itemExcelDto.ImageType;
-                    itemExcelResultsDTO.ExcelRecords.Add(itemExcelRecordErrorDTO);
-                }
-                #endregion
-                #region if parent failed then children are failed
-                List<AppItemtExcelRecordDTO> resultSorted = itemExcelResultsDTO.ExcelRecords.OrderBy(r => r.ParentCode).ThenBy(r => r.Code).ToList();
-                foreach (AppItemtExcelRecordDTO itemExcelRecord in resultSorted)
-                {
-                    if (itemExcelRecord.Status == ExcelRecordStatus.Failed.ToString())
+                        result = mapper.Map<List<DataRow>, List<AppItemExcelDto>>(new List<DataRow>(ds.Tables[0].Rows.OfType<DataRow>()));
+                        int index = -1;
+                        foreach (DataRow itemExcelDto in ds.Tables["Products"].Rows)
+                        {
+                            index++;
+                            if (itemExcelDto["RecordType"].ToString() == "Color")
+                            {
+                                
+                                result[index].ColorCode = itemExcelDto["COLORCode"].ToString();
+                                result[index].ColorName = itemExcelDto["COLORName"].ToString();
+                            }
+                        }
+                        }
+                    catch (Exception exObj)
                     {
-                        itemExcelResultsDTO.ExcelRecords.Where(r => r.ParentCode ==
-                        itemExcelRecord.Code).ToList()
-                        .ForEach(r => r.Status = ExcelRecordStatus.Failed.ToString());
+                        throw new UserFriendlyException("This Excel file format is invalid");
                     }
-                }
-                #endregion if parent failed then children are failed
+                    #endregion create mapper to middle layer AccountExcelDto list of objects
+                    #region Excel validateion rules only.
+                    // 0.Record images array existance in the images array
+                    // 1.Record duplicated in excel
+                    // 2.Sheet.Code and Sheet.Name are not empty
+                    // 3.Sheet.Email Address is not empty, then it has a valid email address
+                    // 4.Sheet.Website is not empty, then it has a valid website
+                    // 5.Sheet.RecordType shuold be either 'Account', 'Branch' or 'Contact'
+                    // 6.Sheet.AccountType shuold be either 'Seller', 'Buyer' and 'Seller & Buyer'
+                    Int32 rowNumber = 1;
+                    //foreach (var rec in result)
+                    //{
+                    //    if (rec.ImageType != "Image Type")
+                    //    {
+                    //        rowNumber++;
+                    //        rec.rowNumber = rowNumber;
+                    //        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == rec.Code);
+                    //        if (itemExists != null)
+                    //        {
+                    //            rec.Id = itemExists.Id;
+                    //        }
 
-                itemExcelResultsDTO.TotalPassedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Passed.ToString() || r.Status == ExcelRecordStatus.Warning.ToString()).Count();
-                itemExcelResultsDTO.TotalFailedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Failed.ToString()).Count();
-                #endregion Excel validateion rules only.
+                    //    }
+                    //}
+                    //Spreadsheet document = new Spreadsheet();
+                    //document.LoadFromFile(itemExcelResultsDTO.FilePath);
+                    //Worksheet Sheet = document.Workbook.Worksheets[0];
+                    //// Set current cell
+                    //Sheet.Cell("CA1").Value = "Processing Status";
+                    //Sheet.Cell("CB1").Value = "Processing Error Message";
+                    //Sheet.Cell("CC1").Value = "Processing Error Details";
 
-                #region update the excel sheet with errors
-                // Create new Spreadsheet
-                itemExcelResultsDTO.CodesFromList = new List<string>();
-                itemExcelResultsDTO.FromList = new List<Int32>();
-                itemExcelResultsDTO.ToList = new List<Int32>();
-                Spreadsheet document = new Spreadsheet();
-                document.LoadFromFile(itemExcelResultsDTO.FilePath);
+                    //itemExcelResultsDTO.CodesFromList = new List<string>();
+                    //itemExcelResultsDTO.FromList = new List<Int32>();
+                    //itemExcelResultsDTO.ToList = new List<Int32>();
+                    itemExcelResultsDTO.TotalRecords = result.Count();
+                    itemExcelResultsDTO.TotalPassedRecords = 0;
+                    itemExcelResultsDTO.TotalFailedRecords = 0;
+                    itemExcelResultsDTO.FilePath = path;
+                    itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>() { };
+                    #region Excel validation rules only.
+                    List<string> RecordsCodes = result.Select(r => r.Code).ToList();
+                    List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
 
-                // Get worksheet by name
-                Worksheet Sheet = document.Workbook.Worksheets[0];
-                // Set current cell
-                //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
-                //Sheet.Cell("AA1").Value = "Processing Status";
-                //Sheet.Cell("AB1").Value = "Processing Error Message";
-                //Sheet.Cell("AC1").Value = "Processing Error Details";
-                Sheet.Cell("AB1").Value = "Processing Status";
-                Sheet.Cell("AC1").Value = "Processing Error Message";
-                Sheet.Cell("AD1").Value = "Processing Error Details";
-                //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[End]
-                rowNumber = 1;
-                //accountExcelResultsDTO.FromList.Add(1);
-                foreach (AppItemtExcelRecordDTO logRecord in itemExcelResultsDTO.ExcelRecords)
-                {
-                    rowNumber++;
-                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value == null)
-                    //  break;
+                    List<ImportItemInputDto> x = new List<ImportItemInputDto>();
 
-                    if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
+                    foreach (AppItemExcelDto itemExcelDto in result)
                     {
-                        if (rowNumber > 2)
-                        { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
-                        itemExcelResultsDTO.FromList.Add(rowNumber);
+                        if (itemExcelDto.ProductType == "Product Type")
+                        {
+                            continue;
+                        }
+                        List<ImportItemReturnDto> validationList = new List<ImportItemReturnDto>();
+                        if (itemExcelDto.RecordType != "Color")
+                        {
 
-                        if (Sheet.Cell("D" + rowNumber.ToString()).Value != null)
-                            itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("D" + rowNumber.ToString()).Value.ToString());
+
+
+                            MapperConfiguration configurationMap;
+                            configurationMap = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes)); });
+                            IMapper mapperc;
+                            mapperc = configurationMap.CreateMapper();
+                            ImportItemInputDto importItemInputDto;
+                            try
+                            {
+                                importItemInputDto = mapperc.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
+                            }
+                            catch (Exception exObj)
+                            {
+                                throw new UserFriendlyException("This Excel file format is invalid");
+                            }
+                            x.Add(importItemInputDto);
+
+                            //importList = ObjectMapper.Map<ImportItemInputDto>(itemExcelDto);
+                            validationList = await ValidateImportItemData(importItemInputDto);
+                        }
+                        ////if (rowNumber > 2)
+                        ////{ itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
+                        ////itemExcelResultsDTO.FromList.Add(rowNumber);
+                        ////itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("D" + rowNumber.ToString()).Value.ToString());
+
+                        AppItemtExcelRecordDTO itemExcelRecordErrorDTO = new AppItemtExcelRecordDTO();
+                        itemExcelRecordErrorDTO.RecordType = itemExcelDto.RecordType;
+                        itemExcelRecordErrorDTO.ParentCode = itemExcelDto.ParentCode;
+                        itemExcelRecordErrorDTO.Code = itemExcelDto.Code;
+                        itemExcelRecordErrorDTO.Name = itemExcelDto.Name;
+                        itemExcelRecordErrorDTO.Status = ExcelRecordStatus.Passed.ToString();
+                        itemExcelRecordErrorDTO.ErrorMessage = "";
+                        itemExcelRecordErrorDTO.FieldsErrors = new List<string>() { };
+
+                        string recordErrorMEssage = "Wrong data in this " + itemExcelRecordErrorDTO.RecordType + ". check this record in the sheet and update";
+                        bool hasWarning = false;
+
+                        rowNumber++;
+                        itemExcelDto.rowNumber = rowNumber;
+
+
+                        //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[Start]
+                        //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code);
+                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
+                        //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[End]
+                        if (itemExists != null)
+                        {
+                            itemExcelDto.Id = itemExists.Id;
+                            //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[Start]
+                            //itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
+                            //recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
+                            //  itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
+                            recordErrorMEssage = "Code :" + itemExcelDto.Code + " already exists!";
+                            //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[End]
+                            itemExcelResultsDTO.HasDuplication = true;
+                            hasWarning = true;
+                        }
+
+
+                        itemExcelRecordErrorDTO.ExcelDto = itemExcelDto;
+                        //var ValidateResults = new List<ValidationResult>();
+
+                        //Validator.TryValidateObject(itemExcelDto, new System.ComponentModel.DataAnnotations.ValidationContext(itemExcelDto), ValidateResults, true);
+
+                        //if (ValidateResults.Count > 0)
+                        //{
+                        //    foreach (var res in ValidateResults)
+                        //    {
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add(res.ErrorMessage);
+                        //    }
+                        //}
+                        //MMT
+                        //if (itemExcelDto.RecordType == "Item")
+                        //{
+                        //    //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+                        //    //if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & string.IsNullOrEmpty(itemExcelDto.ScaleSizesOrder))
+                        //    //    itemExcelRecordErrorDTO.FieldsErrors.Add("Size Scale order cannot be empty if size scale name is not empty");
+                        //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 1 & string.IsNullOrEmpty(itemExcelDto.D1Name))
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
+                        //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 2 &
+                        //        (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name)))
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name and Dimension 2 name cannot be empty if size scale number of dimesions is 2");
+                        //    if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 3 &
+                        //        (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name) | string.IsNullOrEmpty(itemExcelDto.D3Name)))
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name, Dimension 2 name, and Dimension 3 name cannot be empty if size scale number of dimesions is 3");
+                        //    //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
+                        //    if (!string.IsNullOrEmpty(itemExcelDto.SizeRatioName) & string.IsNullOrEmpty(itemExcelDto.SizeRatioValue))
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Size ratio value cannot be empty if size ratio name is not empty");
+
+                        //}
+                        //MMT
+                        #region check images
+                        bool hasError = false;
+                        //if (itemExcelDto.RecordType != "Item" && string.IsNullOrEmpty(itemExcelDto.ParentCode))
+                        //{
+                        //    itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code cannot be empty.");
+                        //    hasError = true;
+
+                        //}
+                        if (imagesList != null && imagesList.Count() > 0)
+                        {
+                            itemExcelDto.Images = new List<AppItemImage>();
+                            //if (!string.IsNullOrEmpty(itemExcelDto.ImageFolderName) && !imagesList.Contains(itemExcelDto.ImageFolderName.ToUpper()))
+                            //{
+                            //    itemExcelRecordErrorDTO.FieldsErrors.Add("Image Folder Name: Not found.");
+                            //    hasError = true;
+                            //}
+                            //if (!string.IsNullOrEmpty(itemExcelDto.ImageType))
+                            //{
+                            //    var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(itemExcelDto.ImageType.ToUpper().TrimEnd());
+                            //    if (attCoverId == 0)
+                            //    {
+                            //        itemExcelRecordErrorDTO.FieldsErrors.Add("Invalid Image Type.");
+                            //        hasError = true;
+                            //    }
+                            //}
+                            var productImage = imagesList.Where(x => x.ToUpper().StartsWith((itemExcelDto.RecordType == "Item" ? "I-" : "V-") + itemExcelDto.Code.ToUpper())).ToList();
+                            if (productImage.Count == 0)
+                            {
+                                if (itemExcelDto.RecordType == "Item")
+                                {
+                                    hasWarning = true;
+                                    itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " does not have an image in images folder.!");
+                                    recordErrorMEssage = "Code :" + itemExcelDto.Code + " does not have an image in images folder.!";
+                                    itemExcelDto.Images.Add(new AppItemImage { ImageFileName = "noimage_item.jpg" });//, ImageGuid = (new Guid("noimage_item.jpg")).ToString() 
+                                }
+                            }
+                            else
+                            {
+                                foreach (var img in productImage)
+                                    itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
+
+                            }
+                            if (itemExcelDto.RecordType == "Color")
+                            {
+                                var colorImage = imagesList.Where(x => x.ToUpper().StartsWith(("C-") + itemExcelDto.ColorCode.ToUpper())).ToList();
+                                if (colorImage.Count == 0)
+                                {
+                                  
+                                    {
+                                        hasWarning = true;
+                                        itemExcelRecordErrorDTO.FieldsErrors.Add("Color Code :" + itemExcelDto.ColorCode + " does not have an image in images folder.!");
+                                        recordErrorMEssage = "Color Code :" + itemExcelDto.ColorCode + " does not have an image in images folder.!";
+                                        itemExcelDto.Images.Add(new AppItemImage { ImageFileName = "noimage_item.jpg" });//, ImageGuid = (new Guid("noimage_item.jpg")).ToString() 
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (var img in colorImage)
+                                    {    itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
+                                    }
+                                    itemExcelDto.ImageFolderName = colorImage[0];
+
+                                }
+                            }
+
+                        }
+                        #endregion check images
+                        if (validationList != null && validationList.Count > 0)
+                        {
+                            foreach (var err in validationList)
+                            {
+                                itemExcelRecordErrorDTO.FieldsErrors.Add(err.ErrorMessage);
+                                switch (err.ErrorType)
+                                {
+                                    case "Warning":
+                                        hasWarning = true;
+                                        break;
+                                    case "Stopper":
+                                        hasError = true;
+                                        break;
+                                    case "Duplication":
+                                        itemExcelResultsDTO.HasDuplication = true;
+                                        break;
+                                }
+                            }
+                        }
+                        #region code, name, email and website validation    
+                        //if (RecordsCodes.Where(r => r == itemExcelDto.Code).ToList().Count() > 1)
+                        //{
+                        //    itemExcelRecordErrorDTO.FieldsErrors.Add("Code: must be used Once."); hasError = true;
+                        //    recordErrorMEssage = "Duplicated " + itemExcelRecordErrorDTO.RecordType;
+                        //}
+                        ItemType itemExcelRecordType;
+                        //if (string.IsNullOrEmpty(itemExcelDto.Code)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Code: Should Have a Value."); hasError = true; }
+                        //if (string.IsNullOrEmpty(itemExcelDto.Name)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Name: Should Have a Value."); hasError = true; }
+                        //if (string.IsNullOrEmpty(itemExcelDto.ProductDescription)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Product Description: Should Have a Value."); hasError = true; }
+                        //if (string.IsNullOrEmpty(itemExcelDto.ProductCategoryCode)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Category Code: Should Have a Value."); hasError = true; }
+                        //if (string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode)) { itemExcelRecordErrorDTO.FieldsErrors.Add("Classification Code: Should Have a Value."); hasError = true; }
+                        //if (string.IsNullOrEmpty(itemExcelDto.RecordType) && Enum.TryParse<ItemType>(itemExcelDto.RecordType.Replace (" ",""), out itemExcelRecordType))
+                        //{ itemExcelRecordErrorDTO.FieldsErrors.Add("Record Type: Item|Item Variant"); hasError = true; }
+
+                        //if (itemExcelDto.RecordType.Replace(" ", "") == ItemType.ItemVariant.ToString() && result.Where(r => r.Code == itemExcelDto.ParentCode && r.RecordType.Replace(" ", "") == ItemType.Item.ToString()).ToList().Count() == 0)
+                        //{
+                        //    itemExcelRecordErrorDTO.FieldsErrors.Add("Parent Code: Item variant parent should be of Type Item."); hasError = true;
+                        //}
+
+                        //if (!string.IsNullOrEmpty(itemExcelDto.Currency) && GetTypeId(itemExcelDto.Currency, currencyIds) == 0)
+                        //{ itemExcelRecordErrorDTO.FieldsErrors.Add("Currency: Should Have a Valid Currency Value."); hasError = true; }
+
+                        //if (!string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode))
+                        //{
+                        //    var returnResult = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput { NameFilter = itemExcelDto.ProductClassificationCode });
+                        //    long classId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectClassification.Id : 0; //GetClassId(itemExcelDto.ProductClassificationDescription, classIds);
+                        //    if (classId == 0)
+                        //    {
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Product Classification is not found.");
+                        //        hasWarning = true;
+                        //    }
+                        //    else { itemExcelDto.EntityObjectClassificaionID = classId; }
+                        //}
+
+                        //if (!string.IsNullOrEmpty(itemExcelDto.ProductCategoryCode))
+                        //{
+                        //    var returnResult = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name", NameFilter = itemExcelDto.ProductCategoryCode });
+                        //    long categId = returnResult.Items.Count > 0 ? returnResult.Items.First().Data.SycEntityObjectCategory.Id : 0;
+                        //    if (categId == 0)
+                        //    {
+                        //        itemExcelRecordErrorDTO.FieldsErrors.Add("Product Category is not found.");
+                        //        hasWarning = true;
+                        //    }
+                        //    else
+                        //    {
+                        //        itemExcelDto.EntityObjectCategoryID = categId;
+                        //    }
+                        //}
+
+
+                        //xxxx
+                        #endregion code, name validation 
+                        if (hasError)
+                        {
+                            itemExcelRecordErrorDTO.Status = ExcelRecordStatus.Failed.ToString();
+                            itemExcelRecordErrorDTO.ErrorMessage = recordErrorMEssage;
+                        }
+                        else
+                        {
+                            if (hasWarning)
+                            {
+                                itemExcelRecordErrorDTO.Status = ExcelRecordStatus.Warning.ToString();
+                                itemExcelRecordErrorDTO.ErrorMessage = recordErrorMEssage;
+                            }
+
+                        }
+
+                        itemExcelRecordErrorDTO.image = itemExcelDto.ImageFolderName;
+                        itemExcelRecordErrorDTO.imageType = itemExcelDto.ImageType;
+                        itemExcelResultsDTO.ExcelRecords.Add(itemExcelRecordErrorDTO);
                     }
-                    //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
-                    //Sheet.Cell("AA" + rowNumber.ToString()).Value = logRecord.Status;
-                    //Sheet.Cell("AB" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
-                    //Sheet.Cell("AC" + rowNumber.ToString()).Value = logRecord.FieldsErrors.ToList().JoinAsString(",");
-                    Sheet.Cell("AB" + rowNumber.ToString()).Value = logRecord.Status;
-                    Sheet.Cell("AC" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
-                    Sheet.Cell("AD" + rowNumber.ToString()).Value = logRecord.FieldsErrors.ToList().JoinAsString(",");
-                    //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
-                }
-                itemExcelResultsDTO.ToList.Add(rowNumber);
-                //move to attachment folder and save
-                itemExcelResultsDTO.FilePath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:PathTemp"], _appConfiguration[$"Attachment:Path"]);
-                //accountExcelResultsDTO.FilePath = accountExcelResultsDTO.FilePath.ToString().ToUpper().Replace("XLSX", "XLS");
-                //MMT
-                string attachmentFolder = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId;
-                System.IO.DirectoryInfo dire = new DirectoryInfo(attachmentFolder);
-                if (!dire.Exists)
-                    dire.Create();
-                //MMT
-                document.SaveAsXLSX(itemExcelResultsDTO.FilePath);
+                    #endregion
+                    #region if parent failed then children are failed
+                    List<AppItemtExcelRecordDTO> resultSorted = itemExcelResultsDTO.ExcelRecords.OrderBy(r => r.ParentCode).ThenBy(r => r.Code).ToList();
+                    foreach (AppItemtExcelRecordDTO itemExcelRecord in resultSorted)
+                    {
+                        if (itemExcelRecord.Status == ExcelRecordStatus.Failed.ToString())
+                        {
+                            itemExcelResultsDTO.ExcelRecords.Where(r => r.ParentCode ==
+                            itemExcelRecord.Code).ToList()
+                            .ForEach(r => r.Status = ExcelRecordStatus.Failed.ToString());
+                        }
+                    }
+                    #endregion if parent failed then children are failed
 
-                // Close document
-                document.Close();
+                    itemExcelResultsDTO.TotalPassedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Passed.ToString() || r.Status == ExcelRecordStatus.Warning.ToString()).Count();
+                    itemExcelResultsDTO.TotalFailedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Failed.ToString()).Count();
+                    #endregion Excel validateion rules only.
 
-                itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
+                    #region update the excel sheet with errors
+                    // Create new Spreadsheet
+                    itemExcelResultsDTO.CodesFromList = new List<string>();
+                    itemExcelResultsDTO.FromList = new List<Int32>();
+                    itemExcelResultsDTO.ToList = new List<Int32>();
+                    Spreadsheet document = new Spreadsheet();
+                    document.LoadFromFile(itemExcelResultsDTO.FilePath);
+
+                    // Get worksheet by name
+                    Worksheet Sheet = document.Workbook.Worksheets[0];
+                    // Set current cell
+                    //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
+                    //Sheet.Cell("AA1").Value = "Processing Status";
+                    //Sheet.Cell("AB1").Value = "Processing Error Message";
+                    //Sheet.Cell("AC1").Value = "Processing Error Details";
+                    Sheet.Cell("AB1").Value = "Processing Status";
+                    Sheet.Cell("AC1").Value = "Processing Error Message";
+                    Sheet.Cell("AD1").Value = "Processing Error Details";
+                    //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[End]
+                    rowNumber = 1;
+                    //accountExcelResultsDTO.FromList.Add(1);
+                    foreach (AppItemtExcelRecordDTO logRecord in itemExcelResultsDTO.ExcelRecords)
+                    {
+                        rowNumber++;
+                        //if (Sheet.Cell("B" + rowNumber.ToString()).Value == null)
+                        //  break;
+
+                        if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
+                        {
+                            if (rowNumber > 2)
+                            { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
+                            itemExcelResultsDTO.FromList.Add(rowNumber);
+
+                            if (Sheet.Cell("D" + rowNumber.ToString()).Value != null)
+                                itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("D" + rowNumber.ToString()).Value.ToString());
+                        }
+                        //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
+                        //Sheet.Cell("AA" + rowNumber.ToString()).Value = logRecord.Status;
+                        //Sheet.Cell("AB" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
+                        //Sheet.Cell("AC" + rowNumber.ToString()).Value = logRecord.FieldsErrors.ToList().JoinAsString(",");
+                        Sheet.Cell("AB" + rowNumber.ToString()).Value = logRecord.Status;
+                        Sheet.Cell("AC" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
+                        Sheet.Cell("AD" + rowNumber.ToString()).Value = logRecord.FieldsErrors.ToList().JoinAsString(",");
+                        //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
+                    }
+                    itemExcelResultsDTO.ToList.Add(rowNumber);
+                    //move to attachment folder and save
+                    itemExcelResultsDTO.FilePath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:PathTemp"], _appConfiguration[$"Attachment:Path"]);
+                    //accountExcelResultsDTO.FilePath = accountExcelResultsDTO.FilePath.ToString().ToUpper().Replace("XLSX", "XLS");
+                    //MMT
+                    string attachmentFolder = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId;
+                    System.IO.DirectoryInfo dire = new DirectoryInfo(attachmentFolder);
+                    if (!dire.Exists)
+                        dire.Create();
+                    //MMT
+                    document.SaveAsXLSX(itemExcelResultsDTO.FilePath);
+
+                    // Close document
+                    document.Close();
+
+                    itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
                 itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
                 // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44303/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
@@ -5518,17 +5580,116 @@ namespace onetouch.AppItems
                 ////I46 test
 
 
-                //// x = ObjectMapper.Map<List<ImportItemInputDto>>(itemExcelResultsDTO.ExcelRecords);
-                //await ImportItem(x, ExcelRecordRepeateHandler.CreateACopy);
-                ////I46 Test
+                    //// x = ObjectMapper.Map<List<ImportItemInputDto>>(itemExcelResultsDTO.ExcelRecords);
+                    //await ImportItem(x, ExcelRecordRepeateHandler.CreateACopy);
+                    ////I46 Test
 
+                }
+                catch (Exception ex)
+                {
+                    throw new UserFriendlyException(ex.Message);
+                }
+
+                // ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
             }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
+
+
+            #region Iteration 44 save not used images
+            //var uniqueImageFileNamesUsed = itemExcelResultsDTO.ExcelRecords
+            //.SelectMany(item => item.ExcelDto.Images)
+            //.Select(image => image.ImageFileName)
+            //.Where(name =>
+            //    !string.IsNullOrWhiteSpace(name)).Distinct();   // Exclude names already in ImagesList
+
+            var imageUsages = itemExcelResultsDTO.ExcelRecords.Select(e => e).Where(e => e.ExcelDto.Images != null)
+                .SelectMany(record => record.ExcelDto.Images
+                    .Where(image => !string.IsNullOrWhiteSpace(image.ImageFileName))
+                    .Select(image => new
+                    {
+                        ImageFileName = image.ImageFileName,
+                        Code = record.Code,
+                        Name = record.Name
+                    }))
+                .Distinct()
+                .ToList();
+
+            //var uniqueImageFileNamesNotUsed = imagesList.ToList().Select(e => e).Where(e => 
+            //(uniqueImageFileNamesUsed !=null && !uniqueImageFileNamesUsed.ToList().Contains(e))
+            //|| true ).ToList();
+
+            var usedImageNames = imageUsages
+                .Select(x => x.ImageFileName)
+                .Distinct()
+                .ToHashSet();
+
+            var uniqueImageFileNamesNotUsed = imagesList
+                .Where(img => !string.IsNullOrWhiteSpace(img))
+                .Where(img => !usedImageNames.Contains(img))
+                .ToList();
+
+            foreach (var img in imageUsages)
+            {//add line to each image into the excel dto(s) to return to FE
+                AppItemtExcelRecordDTO appItemExcelRecordDto = new AppItemtExcelRecordDTO();
+
+                appItemExcelRecordDto.Status = "Passed";
+                appItemExcelRecordDto.ErrorMessage = "";
+                appItemExcelRecordDto.Code = img.Code;
+                appItemExcelRecordDto.Name = img.Name;
+
+                // Fill needed prop(s)
+                appItemExcelRecordDto.ParentCode = "";
+                appItemExcelRecordDto.image = img.ImageFileName;
+
+                appItemExcelRecordDto.RecordType = "Image";
+                appItemExcelRecordDto.ExcelDto = new AppItemExcelDto();
+                appItemExcelRecordDto.ExcelDto.RecordType = "Image";
+                appItemExcelRecordDto.ExcelDto.ProductType = "UnAssigned";
+
+                appItemExcelRecordDto.ExcelDto.ProductDescription = "-";
+                appItemExcelRecordDto.ExcelDto.Name = "-";
+                appItemExcelRecordDto.ExcelDto.Code = "-";
+                appItemExcelRecordDto.ExcelDto.ParentCode = "-";
+                appItemExcelRecordDto.ExcelDto.ParentId = 0;
+
+
+                appItemExcelRecordDto.ExcelDto.Actions = "";
+                appItemExcelRecordDto.ExcelDto.ImagePreview = _appConfiguration[$"Attachment:PathTemp"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + img;
+
+                itemExcelResultsDTO.ExcelRecords.Add(appItemExcelRecordDto);
             }
-            
-            // ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
+
+            foreach (var img in uniqueImageFileNamesNotUsed)
+            {//add line to each image into the excel dto(s) to return to FE
+                AppItemtExcelRecordDTO appItemExcelRecordDto = new AppItemtExcelRecordDTO();
+
+                appItemExcelRecordDto.Status = "Failed";
+                appItemExcelRecordDto.ErrorMessage = "Image is not linked to data";
+                appItemExcelRecordDto.Code = "";
+                appItemExcelRecordDto.Name = "";
+
+                // Fill needed prop(s)
+                appItemExcelRecordDto.ParentCode = "";
+
+                appItemExcelRecordDto.image = img;
+
+                appItemExcelRecordDto.RecordType = "Image";
+                appItemExcelRecordDto.ExcelDto = new AppItemExcelDto();
+                appItemExcelRecordDto.ExcelDto.RecordType = "Image";
+                appItemExcelRecordDto.ExcelDto.ProductType = "UnAssigned";
+
+                appItemExcelRecordDto.ExcelDto.ProductDescription = "-";
+                appItemExcelRecordDto.ExcelDto.Name = "-";
+                appItemExcelRecordDto.ExcelDto.Code = "-";
+
+                appItemExcelRecordDto.ExcelDto.Actions = "";
+                appItemExcelRecordDto.ExcelDto.ImagePreview = _appConfiguration[$"Attachment:PathTemp"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + img;
+
+                itemExcelResultsDTO.ExcelRecords.Add(appItemExcelRecordDto);
+            }
+
+            #endregion Iteration 44 save not used images
+
+
             return itemExcelResultsDTO;
         }
         //Iteation#46[Start]
@@ -5573,7 +5734,7 @@ namespace onetouch.AppItems
             if (!string.IsNullOrEmpty(categoryDescription))
             {
 
-                PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentsIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name", NameFilter = categoryDescription});
+                PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentsIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name", NameFilter = categoryDescription });
                 List<GetSycEntityObjectCategoryForViewDto> getSycEntityObjectClassificationForViewDtos = departmentsIds.Items.Select(r => r.Data).Where(r => r.SycEntityObjectCategory.Name == categoryDescription).ToList();
                 if (getSycEntityObjectClassificationForViewDtos.Count == 0)
                 {
@@ -5602,7 +5763,7 @@ namespace onetouch.AppItems
             }
             return returnCategory;
         }
-        
+
         public async Task<List<ImportItemReturnDto>> ImportItem(List<ImportItemInputDto> itemExcelDtoList, string repeatHandler)
         {
             AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
@@ -5611,7 +5772,7 @@ namespace onetouch.AppItems
             saveExcelinput.FromList = new List<int>();
             saveExcelinput.ErrorMessage = "";
             saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
-            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString()); 
+            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
             saveExcelinput.To = 0;
             saveExcelinput.From = 0;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
@@ -5621,15 +5782,15 @@ namespace onetouch.AppItems
                     continue;
                 long id = 0;
                 bool canBeSaved = true;
-               var list = await ValidateImportItemData(excelDto);
-                if (list != null && list.Count>0)
+                var list = await ValidateImportItemData(excelDto);
+                if (list != null && list.Count > 0)
                 {
                     foreach (var err in list)
                     {
                         returnList.Add(err);
-                        canBeSaved = err.ErrorType != "Stopper"? canBeSaved :false;
+                        canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
                         if (err.ErrorType == "Duplication")
-                            id =long.Parse(err.Id.ToString());
+                            id = long.Parse(err.Id.ToString());
                     }
                 }
                 if (canBeSaved == true)
@@ -5653,16 +5814,16 @@ namespace onetouch.AppItems
                     //IMapper mapperc;
                     //mapperc = configurationMap.CreateMapper();
                     AppItemExcelDto importItemInputDto;
-                   // try
+                    // try
                     {
-                       // DataRow dr = mapper.Map<ImportItemInputDto, DataRow>(excelDto); 
+                        // DataRow dr = mapper.Map<ImportItemInputDto, DataRow>(excelDto); 
                         importItemInputDto = mapper.Map<ImportItemInputDto, AppItemExcelDto>(excelDto);
                         importItemInputDto.Id = id;
                     }
-                   // catch (Exception exObj)
-                  //  {
-                  //      throw new UserFriendlyException("This Excel file format is invalid");
-                   // }
+                    // catch (Exception exObj)
+                    //  {
+                    //      throw new UserFriendlyException("This Excel file format is invalid");
+                    // }
 
                     saveExcelinput.ExcelRecords.Add(new AppItemtExcelRecordDTO
                     {
@@ -5679,7 +5840,7 @@ namespace onetouch.AppItems
                             AppItemExcelDto importItemInputDtoChild;
                             importItemInputDtoChild = mapper.Map<ImportItemInputDto, AppItemExcelDto>(child);
                             //importItemInputDto.Id = id;
-                            
+
 
                             saveExcelinput.ExcelRecords.Add(new AppItemtExcelRecordDTO
                             {
@@ -5715,7 +5876,7 @@ namespace onetouch.AppItems
                 //if (!dire.Exists)
                 //    dire.Create();
                 string fileName = "ImportItemResult-" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xlsx";
-                string outFile = attachmentFolder + "//"+ fileName;
+                string outFile = attachmentFolder + "//" + fileName;
 
                 string jsonData = JsonConvert.SerializeObject(returnList);
                 string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
@@ -5742,10 +5903,10 @@ namespace onetouch.AppItems
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             //foreach (var itemExcelDto in input) 
             {
-                 //if (itemExcelDto.ProductType == "Product Type")
-                 //   {
-                 //       continue;
-                 //   }
+                //if (itemExcelDto.ProductType == "Product Type")
+                //   {
+                //       continue;
+                //   }
                 var ValidateResults = new List<ValidationResult>();
                 Validator.TryValidateObject(itemExcelDto, new System.ComponentModel.DataAnnotations.ValidationContext(itemExcelDto), ValidateResults, true);
 
@@ -5753,49 +5914,62 @@ namespace onetouch.AppItems
                 {
                     foreach (var res in ValidateResults)
                     {
-                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage,ErrorType = "Stopper" });
+                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage, ErrorType = "Stopper" });
                     }
                 }
+                
                 if (itemExcelDto.RecordType == "Item")
                 {
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
                         && string.IsNullOrEmpty(itemExcelDto.Dimension1Name))
                     {
-                        returnList.Add(new ImportItemReturnDto {RecordKey= itemExcelDto.Code,
-                            ErrorMessage= "Dimension 1 name cannot be empty if size scale number of dimesions is 1",
+                        returnList.Add(new ImportItemReturnDto
+                        {
+                            RecordKey = itemExcelDto.Code,
+                            ErrorMessage = "Dimension 1 name cannot be empty if size scale number of dimesions is 1",
                             ErrorType = "Stopper"
                         });
                     }
-                        //itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
+                    //itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 2 &&
                         (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) | string.IsNullOrEmpty(itemExcelDto.Dimension2Name)))
-                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, 
+                        returnList.Add(new ImportItemReturnDto
+                        {
+                            RecordKey = itemExcelDto.Code,
                             ErrorMessage = "Dimension 1 name and Dimension 2 name cannot be empty if size scale number of dimesions is 2",
                             ErrorType = "Stopper"
                         });
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 3 &
                         (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) | string.IsNullOrEmpty(itemExcelDto.Dimension2Name) |
                         string.IsNullOrEmpty(itemExcelDto.Dimension3Name)))
-                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code,
+                        returnList.Add(new ImportItemReturnDto
+                        {
+                            RecordKey = itemExcelDto.Code,
                             ErrorMessage = "Dimension 1 name, Dimension 2 name, and Dimension 3 name cannot be empty if size scale number of dimesions is 3",
                             ErrorType = "Stopper"
                         });
                     //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeRatioName) & string.IsNullOrEmpty(itemExcelDto.SizeRatioValue))
-                        returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code,
+                        returnList.Add(new ImportItemReturnDto
+                        {
+                            RecordKey = itemExcelDto.Code,
                             ErrorMessage = "Size ratio value cannot be empty if size ratio name is not empty",
                             ErrorType = "Stopper"
                         });
 
                 }
                 var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
-                
+
                 if (itemExists != null)
                 {
-                   returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code,
-                       ErrorMessage = "Code :" + itemExcelDto.Code + " already exists!", ErrorType = "Duplication",Id= itemExists.Id
-                   });
-                   
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Code :" + itemExcelDto.Code + " already exists!",
+                        ErrorType = "Duplication",
+                        Id = itemExists.Id
+                    });
+
                 }
                 if (!string.IsNullOrEmpty(itemExcelDto.ImageType))
                 {
@@ -5807,9 +5981,34 @@ namespace onetouch.AppItems
                 }
                 if (itemExcelDto.RecordType != "Item" && string.IsNullOrEmpty(itemExcelDto.ParentCode))
                 {
-                    returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = "Parent Code cannot be empty.",
-                        ErrorType = "Stopper" });
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Parent Code cannot be empty.",
+                        ErrorType = "Stopper"
+                    });
                 }
+
+                if (itemExcelDto.RecordType != "Item Variant" && string.IsNullOrEmpty(itemExcelDto.ColorCode))
+                {
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Color Code cannot be empty.",
+                        ErrorType = "Stopper"
+                    });
+                }
+
+                if (itemExcelDto.RecordType != "Item Variant" && string.IsNullOrEmpty(itemExcelDto.ColorName))
+                {
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Color Name cannot be empty.",
+                        ErrorType = "Stopper"
+                    });
+                }
+
                 //if (input.Where(r => r.Code == itemExcelDto.Code).ToList().Count() > 1)
                 //{
                 //    returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = "Code: must be used Once." });
@@ -5828,7 +6027,7 @@ namespace onetouch.AppItems
                         ErrorMessage = "Currency: Should Have a Valid Currency Value.",
                         ErrorType = "Stopper"
                     });
-                } 
+                }
                 if (!string.IsNullOrEmpty(itemExcelDto.ProductClassificationCode))
                 {
                     var returnResult = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput { NameFilter = itemExcelDto.ProductClassificationCode });
@@ -5837,9 +6036,11 @@ namespace onetouch.AppItems
                     {
                         returnList.Add(new ImportItemReturnDto
                         {
-                            RecordKey = itemExcelDto.Code, 
-                            ErrorMessage = "Product Classification is not found.", ErrorType = "Warning"});
-                        
+                            RecordKey = itemExcelDto.Code,
+                            ErrorMessage = "Product Classification is not found.",
+                            ErrorType = "Warning"
+                        });
+
                     }
                     //else { itemExcelDto.EntityObjectClassificaionID = classId; }
                 }
@@ -5856,11 +6057,11 @@ namespace onetouch.AppItems
                             ErrorMessage = "Product Category is not found.",
                             ErrorType = "Warning"
                         });
-                        
+
                     }
                 }
             }
-            
+
             return returnList;
         }
         public async Task<List<AppItemValidationInputDTO>> ValidateItemData(List<AppItemValidationInputDTO> input)
@@ -6039,6 +6240,126 @@ namespace onetouch.AppItems
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
 
+
+
+            #region handle 4,2,3 actions
+            // select type images
+            // action 2 add to item
+            // action 3 add to item code
+            // action 4 add to color
+            // remove from result
+
+            // temp
+            //excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "2";
+            //excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
+            //excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
+             
+
+            //excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
+            //excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
+            //excelResultsDTO.ExcelRecords[1].ExcelDto.ImagePreview = "SADE2.png";
+
+            // temp end
+            List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
+                .Where(r => r.Status.ToUpper() == "PASSED" && (r.ExcelDto.Actions == "7" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
+                || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6"
+                || r.ExcelDto.Actions == "8"
+                || r.ExcelDto.Actions == "9"
+                || r.ExcelDto.Actions == "10" || r.RecordType=="Color")
+                && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
+            foreach (var excelDto in result123)
+            {
+                int number = 0;
+                if (excelDto.ExcelDto.Actions != null)
+                { number = Int32.Parse(excelDto.ExcelDto.Actions); }
+
+                if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType=="Color")
+                {
+                    if (number == 10) { excelDto.ExcelDto.Code = "-"; }
+                    foreach (var id in excelDto.ExcelDto.Code.Split(","))
+                    { var ret1 = SaveImageToColor(id, excelDto).Result; }
+                }
+                if (number == 5 )
+                {
+                    if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    excelDto.ExcelDto.Actions = "";
+                    excelDto.ExcelDto.RecordType = "Item";
+                    excelDto.RecordType = "Item";
+
+
+                }
+
+                if (number == 6)
+                {
+                    // search for parent record and get ScaleSizesOrder
+                    // replace record type as 'Item Variant', and consider as base record
+                    // for length of ScaleSizesOrder[] repeat the record and update code as code+'-'+ ScaleSizesOrder[i] split for '|' 
+                    // remove the base record
+                    int index = excelResultsDTO.ExcelRecords.FindIndex(x => x.Code == excelDto.ParentCode);
+                    //var parent = excelResultsDTO.ExcelRecords.Select(e => e).Where(e => e.Code == excelDto.ParentCode).FirstOrDefault();
+                    if (index > -1)
+                    {
+                        var parent = excelResultsDTO.ExcelRecords[index];
+                        int childNo = 0;
+                        foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
+                        {
+                            var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            
+                            thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+                            thirdItemCopy.RecordType = "Item Variant";
+
+                            thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+                            thirdItemCopy.ExcelDto.RecordType = "Item Variant";
+                            thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
+                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                            thirdItemCopy.ExcelDto.Actions = "";
+                            childNo = +1;
+                            excelResultsDTO.ExcelRecords.Insert(index+ childNo, thirdItemCopy);
+
+                        }
+                    }
+
+                    //if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+                    //excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+
+                }
+                if (number == 8 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
+                {
+                    var images = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto.Images;
+                    if (images is null) { images = new List<AppItemImage>(); }
+                    images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    //excelDto.ExcelDto.Actions = "";
+                    //excelDto.ExcelDto.RecordType = "Item";
+                    //excelDto.RecordType = "Item";
+
+
+                }
+                if (number == 9 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
+                {
+                    foreach (var id in excelDto.ExcelDto.Code.Split(","))
+                    {
+                        var images = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Images;
+                        if (images is null) { images = new List<AppItemImage>(); }
+                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                        //excelDto.ExcelDto.Actions = "";
+                        //excelDto.ExcelDto.RecordType = "Item";
+                        //excelDto.RecordType = "Item";
+                    }
+
+
+                }
+            }
+            result = result.Select(r => r).Where(r => (r.Actions != "2" && r.Actions != "3" && r.Actions != "4"
+            && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
+            && r.Actions != "8" && r.Actions != "9" && r.Actions != "10" 
+            && r.RecordType!="Image" && r.RecordType != "Color") ).ToList();
+           
+            if(result.Count<= 0) { return excelResultsDTO.ExcelLogDTO; }
+            #endregion
+
+           
+
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
             await AddCategories(result);
@@ -6202,7 +6523,7 @@ namespace onetouch.AppItems
                                .Include(x => x.EntityFk).AsNoTracking()
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x=> x.AttachmentFk)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
@@ -7316,7 +7637,7 @@ namespace onetouch.AppItems
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
-                            IsDefault =true
+                            IsDefault = true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceB))
@@ -8964,16 +9285,16 @@ namespace onetouch.AppItems
                                 Name = extra.Name.ToString(),
 
                                 Code = extra.IsLookup ?
-                                (source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Code", 
-                                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source))!=null?
-                                source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Code", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source).ToString():""
+                                (source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Code",
+                                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source)) != null ?
+                                source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Code", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source).ToString() : ""
                                 : (source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance) != null &&
-                                source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source)!=null
+                                source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source) != null
                                 ? source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source).ToString() : ""),
-                                Value = extra.IsLookup ? (source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Name", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source)!=null?
-                                source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Name", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source).ToString():""
-                                ) : (source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)!=null &&
-                                source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source) !=null? source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source).ToString():"")
+                                Value = extra.IsLookup ? (source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Name", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source) != null ?
+                                source.GetType().GetProperty(extra.Name.Replace(" ", "") + "Name", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source).ToString() : ""
+                                ) : (source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance) != null &&
+                                source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source) != null ? source.GetType().GetProperty(extra.Name.Replace(" ", ""), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(source).ToString() : "")
                             });
 
                         }
@@ -8993,11 +9314,11 @@ namespace onetouch.AppItems
             IMappingExpression<DataRow, ImportItemInputDto> mappingExpression;
 
             mappingExpression = CreateMap<DataRow, ImportItemInputDto>();
-           // mappingExpression.ForMember(dest => dest.Id, act => act.MapFrom(src => 0));
+            // mappingExpression.ForMember(dest => dest.Id, act => act.MapFrom(src => 0));
             mappingExpression.ForMember(dest => dest.ProductType, act => act.MapFrom(src => src["ProductType"].ToString()));
             mappingExpression.ForMember(dest => dest.RecordType, act => act.MapFrom(src => src["RecordType"].ToString()));
             mappingExpression.ForMember(dest => dest.ParentCode, act => act.MapFrom(src => src["ParentCode"].ToString().TrimEnd()));
-           // mappingExpression.ForMember(dest => dest.ParentId, act => act.MapFrom(src => 0));
+            // mappingExpression.ForMember(dest => dest.ParentId, act => act.MapFrom(src => 0));
             mappingExpression.ForMember(dest => dest.Code, act => act.MapFrom(src => src["Code"].ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.Name, act => act.MapFrom(src => src["Name"].ToString()));
             mappingExpression.ForMember(dest => dest.ProductDescription, act => act.MapFrom(src => src["ProductDescription"].ToString()));
@@ -9058,10 +9379,10 @@ namespace onetouch.AppItems
             //.ForPath(dest => dest["ImageType"], act => act.MapFrom(src => src.ImageType.ToString()))
             ////mappingExpression.ForMember(dest => dest.ImageFolderName, act => act.MapFrom(src => src["ImageFolderName"].ToString()));
             //.ForPath(dest => dest["SizeScaleName"], act => act.MapFrom(src => src.SizeScaleName.ToString()))
-            
+
             //.ForPath(dest => dest["SizeRatioName"], act => act.MapFrom(src => src.SizeRatioName.ToString()))
             //.ForPath(dest => dest["SizeRatioValue"], act => act.MapFrom(src => src.SizeRatioValue.ToString()))
-                  
+
             //.ForPath(dest => dest["NoOfDimensions"], act => act.MapFrom(src => src.NoOfDimensions.ToString()))
             //.ForPath(dest => dest["Dimension1Name"], act => act.MapFrom(src => src.Dimension1Name.ToString()))
             //.ForPath(dest => dest["Dimension2Name"], act => act.MapFrom(src => src.Dimension2Name.ToString()))
@@ -9076,7 +9397,7 @@ namespace onetouch.AppItems
             //.ForPath(dest => dest["SizeName"], act => act.MapFrom(src => src.SizeName.ToString()))
             //.ForPath(dest => dest["ColorCode"], act => act.MapFrom(src => src.ColorCode.ToString()))
             //.ForPath(dest => dest["ColorName"], act => act.MapFrom(src => src.ColorName.ToString()))
-            
+
             //.ForPath(dest => dest["PriceA"], act => act.MapFrom(src => src.PriceA.ToString().TrimEnd()))
             //.ForPath(dest => dest["PriceB"], act => act.MapFrom(src => src.PriceB.ToString().TrimEnd()))
             //.ForPath(dest => dest["PriceC"], act => act.MapFrom(src => src.PriceC.ToString().TrimEnd()))
@@ -9087,22 +9408,22 @@ namespace onetouch.AppItems
     public class ItemValidator : AbstractValidator<CreateOrEditAppItemDto>
     {
         public ItemValidator(onetouchDbContext x)
-        {            
+        {
             RuleFor(x => x.Code).NotEmpty().WithMessage("Item code cannot be empty");
             RuleFor(x => x.Code).Length(10, 50).WithMessage("Item code length cannot be less than 10 chars");
             RuleFor(x => x.Name).NotEmpty().WithMessage("Item Name cannot be empty");
             RuleFor(x => x.Description).NotEmpty().WithMessage("Item Descripion cannot be empty");
-            RuleFor(x => x.EntityAttachments).NotNull().Must(x=>x.Count>0).WithMessage("Item must have an image");
+            RuleFor(x => x.EntityAttachments).NotNull().Must(x => x.Count > 0).WithMessage("Item must have an image");
             // var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
             RuleFor(x => x.Code).Custom((z, context) => {
-                if (x.AppItems.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == z.Replace(" ", string.Empty) && x.ItemType == 0) !=null )
+                if (x.AppItems.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == z.Replace(" ", string.Empty) && x.ItemType == 0) != null)
                 {
-                    context.AddFailure("The code:"+z+"is already existing.");
+                    context.AddFailure("The code:" + z + "is already existing.");
                 }
             });
 
         }
-      //MMT46-POC
+        //MMT46-POC
     }
     //i46-poc
     //public class DynamicValidator<T> : AbstractValidator<T>
@@ -9277,7 +9598,7 @@ namespace onetouch.AppItems
     //        var lambda = System.Linq.Expressions.Expression.Lambda<Func<T, TProperty>>(propertyAccess, parameter);
     //        return lambda;//.Compile();
     //    }
-  
+
     //}
     //46-poc
 

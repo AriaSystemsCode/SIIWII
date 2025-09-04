@@ -385,7 +385,7 @@
                     <Item2 Ref="199" ControlType="XRTableCell" Name="xrTableCell14" Weight="2.0366281270768831" Multiline="true" Text="Description" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
                       <StylePriority Ref="200" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item2>
-                    <Item3 Ref="201" ControlType="XRTableCell" Name="xrTableCell15" Weight="0.86719914206686566" Multiline="true" Text="Total Qty" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
+                    <Item3 Ref="201" ControlType="XRTableCell" Name="xrTableCell15" Weight="0.86719914213686566" Multiline="true" Text="Total Qty" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
                       <StylePriority Ref="202" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item3>
                     <Item4 Ref="203" ControlType="XRTableCell" Name="xrTableCell16" Weight="0.65663691253760226" Multiline="true" Text="Price" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
@@ -413,7 +413,7 @@
                       </ExpressionBindings>
                       <StylePriority Ref="214" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item2>
-                    <Item3 Ref="215" ControlType="XRTableCell" Name="tableCell4" Weight="0.86719914206686588" Multiline="true" Text="tableCell4" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="Transparent">
+                    <Item3 Ref="215" ControlType="XRTableCell" Name="tableCell4" Weight="0.86719914213686588" Multiline="true" Text="tableCell4" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="Transparent">
                       <Summary Ref="216" Running="Group" />
                       <ExpressionBindings>
                         <Item1 Ref="217" EventName="BeforePrint" PropertyName="Text" Expression="sumSum([Quantity])" />
@@ -453,7 +453,7 @@
               </ExpressionBindings>
               <StylePriority Ref="233" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="234" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.420502" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
+            <Item2 Ref="234" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.421302" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
               <ExpressionBindings>
                 <Item1 Ref="235" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeSizeCode]" />
                 <Item2 Ref="236" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.RowCount] &gt; 4" />

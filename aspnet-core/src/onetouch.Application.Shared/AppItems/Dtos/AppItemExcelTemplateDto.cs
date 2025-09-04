@@ -10,12 +10,12 @@ using System.Runtime.CompilerServices;
 using System.Data;
 namespace onetouch.AppItems.Dtos
 {
-    public class AppItemExcelDto
+    public partial class AppItemExcelDto
     {
         public long Id { get; set; }
         public Int32 rowNumber { get; set; }
         [Required(ErrorMessage = "Record Type must have a value.")]
-        [Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
+        [RecordTypeValidation]
         public string RecordType { get; set; }
         [Required(ErrorMessage = "Product Type must have a value.")]
         public string ProductType { get; set; }
@@ -79,21 +79,32 @@ namespace onetouch.AppItems.Dtos
     {
         [Required(ErrorMessage = "Product Type must have a value.")]
         public string ProductType { get; set; }
+
         [Required(ErrorMessage = "Record Type must have a value.")]
-        [Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
+        //[Range(typeof(string), "Item", "Item Variant", ErrorMessage = "Record Type must be Item or Item Variant")]
+        [RecordTypeValidation]
         public string RecordType{ set; get; }
+
         [Required(ErrorMessage = "Code must have a value.")]
         public string Code { set; get; }
+
         [Required(ErrorMessage = "Name must have a value.")]
         public string Name { set; get; }
         [Required(ErrorMessage = "Product Description must have a value.")]
         public string ProductDescription { set; get; }
         public string ProductClassificationCode { set; get; }
         public string ProductCategoryCode { set; get; }
+
+        //[Range(1, long.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        [Required(ErrorMessage = "Price must have a value.")]
         public string Price { set; get; }
+
+        [Required(ErrorMessage = "Currency must have a value.")]
         public string PriceCurrencyCode { set; get; }
         public string ImageType { set; get; }
+        [Required(ErrorMessage = "Color Code must have a value.")]
         public string ColorCode { set; get; }
+        [Required(ErrorMessage = "Color Name must have a value.")]
         public string ColorName{ set; get; }
         public string SizeScaleName { set; get; }
         public string ScaleSizesOrder { set; get; }
@@ -115,6 +126,7 @@ namespace onetouch.AppItems.Dtos
         public string PriceB { set; get; }
         public string PriceC { set; get; }
         public string PriceD { set; get; }
+
         public string ParentCode  { set; get; }
         public string ProductClassificationDescription { set; get; }
         public string ProductCategoryDescription { set; get; }
@@ -143,7 +155,7 @@ namespace onetouch.AppItems.Dtos
         public string Code { set; get; }
         public string Value { set; get; }
     }
-    public class AppItemExcelResultsDTO
+    public partial class AppItemExcelResultsDTO
     {
         public ExcelLogDto ExcelLogDTO { get; set; }
         public Int32 TotalRecords { get; set; }
@@ -198,7 +210,7 @@ namespace onetouch.AppItems.Dtos
     }
     public enum ItemType
     { 
-        Item, ItemVariant,
+        Item, ItemVariant,Color
     }
     //MMT
     public class AppItemAttributePriceDto
