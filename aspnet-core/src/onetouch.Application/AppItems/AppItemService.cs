@@ -585,7 +585,25 @@ namespace onetouch.AppItems
 
             return x;
         }
+        public bool RenameFileToGuid(string fileName, string guid)
+        {
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
 
+            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString();
+
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+
+            try
+            {
+                System.IO.File.Copy(path + @"\" + fileName, path + @"\" + guid + "." + fileName.Split('.')[1], true);
+
+            }
+            catch { }
+            return true;
+        }
         public async Task<long> SaveImageToColor(string colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
             string tempId = colorEntityId;
@@ -663,11 +681,13 @@ namespace onetouch.AppItems
 
                 appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
 
-
-                foreach (var item1 in appEntityDto.EntityAttachments)
+                if (appEntityAttachmentDto.IsDefault)
                 {
-                    item1.IsDefault = false;
+                    foreach (var item1 in appEntityDto.EntityAttachments)
+                    {
+                        item1.IsDefault = false;
 
+                    }
                 }
                 appEntityDto.TenantId = tenantId;
                 appEntityDto.EntityAttachments.Add(appEntityAttachmentDto);

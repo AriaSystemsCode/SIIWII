@@ -141,6 +141,9 @@ namespace onetouch.AppItems.Dtos
     {
         public string ImageFileName { get; set; }
         public string ImageGuid { get; set; }
+        public bool IsDefault { get; set; }
+        public string Attributes { get; set; }
+
 
     }
     public class AppItemExtraDto

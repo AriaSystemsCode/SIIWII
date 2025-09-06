@@ -81,6 +81,8 @@ using onetouch.Migrations;
 using Newtonsoft.Json;
 using System.Drawing;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using NPOI.HSSF.Util;
+using DocumentFormat.OpenXml.Presentation;
 
 namespace onetouch.AppItems
 {
@@ -6273,16 +6275,22 @@ namespace onetouch.AppItems
                 if (excelDto.ExcelDto.Actions != null)
                 { number = Int32.Parse(excelDto.ExcelDto.Actions); }
 
-                if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType=="Color")
+                if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType == "Color")
                 {
                     if (number == 10) { excelDto.ExcelDto.Code = "-"; }
                     foreach (var id in excelDto.ExcelDto.Code.Split(","))
                     { var ret1 = SaveImageToColor(id, excelDto).Result; }
                 }
-                if (number == 5 )
+                if (number == 5)
                 {
                     if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
-                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    string guid = System.Guid.NewGuid().ToString();
+
+                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = guid,
+                        IsDefault = excelDto.ExcelDto.ImageIsDefault
+
+                    });
+                    RenameFileToGuid(excelDto.image, guid);
                     excelDto.ExcelDto.Actions = "";
                     excelDto.ExcelDto.RecordType = "Item";
                     excelDto.RecordType = "Item";
@@ -6305,17 +6313,25 @@ namespace onetouch.AppItems
                         foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
                         {
                             var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
-                            
+
                             thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.RecordType = "Item Variant";
 
                             thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.ExcelDto.RecordType = "Item Variant";
                             thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
-                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                            string guid = System.Guid.NewGuid().ToString();
+                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+                            {
+                                ImageFileName = excelDto.image,
+                                ImageGuid = guid,
+                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                            });
+                            RenameFileToGuid(excelDto.image, guid);
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo = +1;
-                            excelResultsDTO.ExcelRecords.Insert(index+ childNo, thirdItemCopy);
+                            excelResultsDTO.ExcelRecords.Insert(index + childNo, thirdItemCopy);
 
                         }
                     }
@@ -6326,9 +6342,18 @@ namespace onetouch.AppItems
                 }
                 if (number == 8 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
                 {
-                    var images = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto.Images;
-                    if (images is null) { images = new List<AppItemImage>(); }
-                    images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    var record = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto;
+                    var images = record.Images;
+                    if (images is null || (images !=null && images.Count==1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
+                    
+                    string guid = System.Guid.NewGuid().ToString();
+
+                    images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = guid,
+                        IsDefault = excelDto.ExcelDto.ImageIsDefault
+                        // Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                    });
+                    RenameFileToGuid(excelDto.image, guid);
+                    record.Images = images;
                     //excelDto.ExcelDto.Actions = "";
                     //excelDto.ExcelDto.RecordType = "Item";
                     //excelDto.RecordType = "Item";
@@ -6339,10 +6364,16 @@ namespace onetouch.AppItems
                 {
                     foreach (var id in excelDto.ExcelDto.Code.Split(","))
                     {
-                        var images = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Images;
-                        if (images is null) { images = new List<AppItemImage>(); }
-                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image
-                             });
+                        var record = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto;
+                        var images = record.Images;
+                        if (images is null || (images != null && images.Count == 1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
+                        string guid = System.Guid.NewGuid().ToString();
+                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = guid,
+                            IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                            Attributes = "101=" + excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Code.Split('-')[1]
+                        });
+                        RenameFileToGuid(excelDto.image, guid);
+                        record.Images = images;
                         //excelDto.ExcelDto.Actions = "";
                         //excelDto.ExcelDto.RecordType = "Item";
                         //excelDto.RecordType = "Item";
@@ -6921,7 +6952,7 @@ namespace onetouch.AppItems
                 if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
                 {
                     var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == excelDto.ImageType.ToUpper()).FirstOrDefault();
-                    var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default")).FirstOrDefault();
+                    var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") || x.IsDefault ).FirstOrDefault();
                     foreach (var img in excelDto.Images)
                     {
                         if (img.ImageFileName == "noimage_item.jpg")
@@ -6954,9 +6985,10 @@ namespace onetouch.AppItems
                         AppEntityAttachment appEntityAttachment = new AppEntityAttachment();
                         appEntityAttachment.AttachmentFk = new Attachments.AppAttachment { Name = img.ImageFileName, Attachment = img.ImageGuid + "." + img.ImageFileName.Split('.')[1], TenantId = AbpSession.TenantId };
                         appEntityAttachment.AttachmentCategoryId = attachCategory.Id;
+                        appEntityAttachment.Attributes = img.Attributes;
                         appEntityAttachment.AttachmentCategoryCode = attachCategory.Code;
                         appEntityAttachment.EntityCode = excelDto.Code;
-                        if (img.ImageFileName.ToLower().Contains("_default"))
+                        if (img.ImageFileName.ToLower().Contains("_default") || img.IsDefault)
                         {
                             appEntityAttachment.IsDefault = true;
 
