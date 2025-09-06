@@ -634,6 +634,14 @@ namespace onetouch.AppItems
                     guid = Guid.NewGuid().ToString(),
                     Index = appEntityDto.EntityAttachments.Count
                 };
+                if(appItemtExcelRecordDTO.ExcelDto.Actions == "3")
+                {
+                    appEntityAttachmentDto.Attributes = "101=" + appEntity.Code.Split('-')[1];
+                }
+                if (appItemtExcelRecordDTO.ExcelDto.Actions == "9" || appItemtExcelRecordDTO.ExcelDto.Actions == "6")
+                {
+                    appEntityAttachmentDto.Attributes = "101=" + appItemtExcelRecordDTO.ExcelDto.Code.Split('-')[1];
+                }
 
                 // rename image at temp attachment folder with guid and keep image name in variable
                 // copy it to attachment folder

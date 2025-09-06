@@ -6341,7 +6341,8 @@ namespace onetouch.AppItems
                     {
                         var images = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Images;
                         if (images is null) { images = new List<AppItemImage>(); }
-                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image
+                             });
                         //excelDto.ExcelDto.Actions = "";
                         //excelDto.ExcelDto.RecordType = "Item";
                         //excelDto.RecordType = "Item";
@@ -6464,7 +6465,7 @@ namespace onetouch.AppItems
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
             List<string> sizeScaleNames = new List<string>();
-            foreach (var excelDto in result)
+            foreach (AppItemExcelDto excelDto in result)
             {
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
                     continue;
