@@ -7855,7 +7855,7 @@ namespace onetouch.AppItems
 
 
 
-                                    if (img.ImageFileName.ToLower().Contains("_default"))
+                                    if (img.ImageFileName.ToLower().Contains("_default") || img.IsDefault)
                                     {
                                         appEntityAttachment.IsDefault = true;
                                         firstAttributteImageDefaults.Add(imagesUrl + img.ImageGuid + "." + img.ImageFileName.Split('.')[1]);
