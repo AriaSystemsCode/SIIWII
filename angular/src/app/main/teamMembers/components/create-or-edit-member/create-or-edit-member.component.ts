@@ -72,6 +72,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   activeAccordionIndexes: number[] = [0]; // open first tab by default
   hasUnsavedChanges = false;
 
+  joinDateModel: Date | null = null;
 
   constructor(injector: Injector,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -89,8 +90,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
 
   ngOnInit(): void {
-  
-    // this.getAppItemTypeExtraAttributesById()
+
   }
   async show(memberId?: number, accId?: number, isManualOrExternalContact?: boolean) {
     this.showMainSpinner();
@@ -107,7 +107,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   
       await this.getContactDataForView(memberId); // ✅ fills memberDto
      
-      this.getAppItemTypeExtraAttributesById(); // ✅ call AFTER memberDto is filled
+      // this.getAppItemTypeExtraAttributesById(); // ✅ call AFTER memberDto is filled
     } else { // create logic
       this.canCreate = this.permission.isGranted('Pages.Accounts.Member.Create');
       if (!this.canCreate) return this.notify.error("You don't have permission to create");
@@ -115,7 +115,6 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       this.memberDto = new CreateOrEditAccountInfoDto();
       this.memberDto.accountId = accId;
   
-      this.getAppItemTypeExtraAttributesById(); // ✅ call AFTER setting accountId
     }
   
     this.phonelist.push(new Object(), new Object(), new Object());
@@ -191,8 +190,12 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       this.memberDto = Object.assign(new CreateOrEditAccountInfoDto(), result);
       this.memberDto.emailAddressIsPublic = true
 
-    if (result?.contact?.joinDate)
-      this.joinDate = moment(result?.contact?.joinDate).toDate();
+  // set join date model once
+  const iso = this.memberDto?.extraDataAttributes
+    ?.find(a => a.extraAttributeId === 707)
+    ?.selectedValues?.at(-1)?.value as string | undefined;
+
+  this.joinDateModel = iso ? new Date(iso) : null;
 
     // if (result?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + result?.coverUrl
     // if (result?.imageUrl) this.ProfileImg = this.attachmentBaseUrl + '/' + result?.imageUrl
@@ -215,7 +218,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     this.selectedBranchName += result?.zipCode && result?.zipCode != '' ? (this.selectedBranchName != '' ? ' , ' + result?.zipCode : result?.zipCode) : '';
     this.selectedBranchName += result?.countryName && result?.countryName != '' ? (this.selectedBranchName != '' ? ' , ' + result?.countryName : result?.countryName) : '';
     this.selectedBranchId = result.parentId;
-    this.getAppItemTypeExtraAttributesById(); // ✅ Now called AFTER memberDto is set
+
 
   }
 
@@ -731,19 +734,19 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   }
   
   onChangejoinDateFromPicker(date: Date) {
+    this.joinDateModel = date;
     const iso = moment.utc(date).format();
-  
     const joinDateAttr = this.memberDto?.extraDataAttributes?.find(a => a.extraAttributeId === 707);
     if (joinDateAttr) {
-      if (!joinDateAttr.selectedValues || joinDateAttr.selectedValues.length === 0) {
+      if (!joinDateAttr.selectedValues?.length) {
         joinDateAttr.selectedValues = [{ value: iso, init() {}, toJSON() {} } as any];
       } else {
-        joinDateAttr.selectedValues[joinDateAttr.selectedValues.length - 1].value = iso;
+        joinDateAttr.selectedValues.at(-1)!.value = iso;
       }
     }
-  
-    this.upsertEntityExtraData(707, iso);  // <-- correct persistence
+    this.upsertEntityExtraData(707, iso);
   }
+  
   
   
   getJoinDateIsPublic(): boolean {

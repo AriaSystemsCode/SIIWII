@@ -48,7 +48,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     @Input('accountId') accountId: number = this.appSession?.user?.accountId
     @Input('AccountInfo') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
     @Input('fromMarketplace') fromMarketplace: boolean = false;
-
+    @Input('fromManualAcc') fromManualAcc: boolean ;
+    
     primengTableHelperClass = new PrimengTableHelper();
     primengTableHelperCateg = new PrimengTableHelper();
 

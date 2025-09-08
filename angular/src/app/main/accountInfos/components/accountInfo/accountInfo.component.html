@@ -802,7 +802,7 @@
                                 #createOrEditMember></app-create-or-edit-member>
                         </div>
                         <div class="tab7" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.ViewMember}">
-                            <app-view-member-profile #viewMemberProfile (edit)="createOrEditMemberHandler($event)"
+                            <app-view-member-profile #viewMemberProfile [fromManualAcc]="fromManualAcc" (edit)="createOrEditMemberHandler($event)"
                                 (delete)="onDeleteMemberHandler($event)"></app-view-member-profile>
                         </div>
                         <div class="tab8" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling">
