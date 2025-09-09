@@ -38,7 +38,9 @@ namespace onetouch.AccountInfos.Dtos
         [StringLength(AccountInfoTempConsts.MaxTradeNameLength, MinimumLength = AccountInfoTempConsts.MinTradeNameLength)]
         public string TradeName { get; set; } = "";
 
-
+        //I40[Start]
+        public DateTime? TimeStamp { get; set; }
+        //I40[End]
         public string AccountType { get; set; }
         public long AccountTypeId { get; set; }
         public string SSIN { get; set; }
@@ -133,6 +135,7 @@ namespace onetouch.AccountInfos.Dtos
         public virtual long? TenantOwner { set; get; } 
         public virtual IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
         public virtual long? AccountId { set; get; }
+        public virtual string ContactRecordType { set; get; }
         //MMT40[end]
         //I46[Start]
         public virtual long? ShipViaId { set; get; }

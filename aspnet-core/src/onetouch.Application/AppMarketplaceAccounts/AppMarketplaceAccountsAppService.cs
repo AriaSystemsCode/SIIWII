@@ -645,16 +645,29 @@ namespace onetouch.AppMarketplaceAccounts
 
                     int ConnectionCount = relationships;//_appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted == false);
                     accountDto.EntityId = entity.Id;
-                    var firstAddress = account.ContactAddresses.FirstOrDefault();
-                    if (account.ContactAddresses.Count() > 0 && firstAddress.AddressFk != null)
+                    //I40[Start]
+                    var branchEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
+                    var firstAddressBranch = await _appMarketplaceContactRepository.GetAll().Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk).ThenInclude(z => z.CountryFk)
+                        .Where(x => x.ParentId == id && x.EntityObjectTypeId == branchEntityObjectTypeId && x.Code == account.Code.TrimEnd() + "-MAIN").FirstOrDefaultAsync();
+                    if (firstAddressBranch == null)
                     {
-                        accountDto.AddressLine1 = firstAddress.AddressFk.AddressLine1;
-                        accountDto.AddressLine2 = firstAddress.AddressFk.AddressLine2;
-                        accountDto.City = firstAddress.AddressFk.City;
-                        accountDto.CountryId = firstAddress.AddressFk.CountryId;
-                        accountDto.CountryName = firstAddress.AddressFk.CountryFk.Name;
-                        accountDto.ZipCode = firstAddress.AddressFk.PostalCode;
-                        accountDto.State = firstAddress.AddressFk.State;
+                        firstAddressBranch = await _appMarketplaceContactRepository.GetAll().Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk).ThenInclude(z => z.CountryFk)
+                        .Where(x => x.ParentId == id && x.EntityObjectTypeId == branchEntityObjectTypeId).FirstOrDefaultAsync();
+                    }
+                    //I40[End]
+                    if (firstAddressBranch != null)
+                    {
+                        var firstAddress = firstAddressBranch.ContactAddresses.FirstOrDefault();
+                        if (firstAddressBranch.ContactAddresses.Count() > 0 && firstAddress.AddressFk != null)
+                        {
+                            accountDto.AddressLine1 = firstAddress.AddressFk.AddressLine1;
+                            accountDto.AddressLine2 = firstAddress.AddressFk.AddressLine2;
+                            accountDto.City = firstAddress.AddressFk.City;
+                            accountDto.CountryId = firstAddress.AddressFk.CountryId;
+                            accountDto.CountryName = firstAddress.AddressFk.CountryFk.Name;
+                            accountDto.ZipCode = firstAddress.AddressFk.PostalCode;
+                            accountDto.State = firstAddress.AddressFk.State;
+                        }
                     }
                     if (account.TenantOwner != null)
                         accountDto.TenantId = ((int)account.TenantOwner);
@@ -1019,9 +1032,9 @@ namespace onetouch.AppMarketplaceAccounts
                         // Collect the related persons
                         var personsInfoDelete = _appMarketplaceContactRepository.GetAll().
                             Include(e => e.EntityExtraData)
-                            .Include(e => e.EntityAttachments)
+                            .Include(e => e.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                         .Where(x => x.IsProfileData
-                               && x.AccountId == FoundPublishContact.Id
+                               && x.SSIN == FoundPublishContact.SSIN
                                && x.TenantId == null
                                && x.EntityObjectTypeId == personEntityObjectTypeId).ToList();
 
@@ -1038,7 +1051,8 @@ namespace onetouch.AppMarketplaceAccounts
                             // Delete related persons attachments
                             if (psrsonObj.EntityAttachments.Count() > 0)
                             {  // DeleteBehavior attachments then entity attachments
-                                _appAttachmentsRepository.RemoveRange(psrsonObj.EntityAttachments.Select(e => e.AttachmentFk));
+                                var rangeToRemove = psrsonObj.EntityAttachments.Select(e => e.AttachmentFk).ToList();
+                                _appAttachmentsRepository.RemoveRange(rangeToRemove);
                                 _appEntityAttachmentsRepository.RemoveRange(psrsonObj.EntityAttachments);
                             };
                             // delete related person
@@ -1324,8 +1338,9 @@ namespace onetouch.AppMarketplaceAccounts
                 //HIA - share Account related branches [Start]
 
                 var branchInfo = _appContactRepository.GetAll()
-                    .Where(x => x.IsProfileData
-                           && x.AccountId == mainAccountID
+                    .Where(x => //x.IsProfileData
+                           //&&
+                           x.AccountId == mainAccountID
                            && x.TenantId == AbpSession.TenantId
                            && x.ParentId == mainAccountID
                            && x.EntityFk.EntityObjectTypeId != personEntityObjectTypeId).ToList();
@@ -1598,8 +1613,9 @@ namespace onetouch.AppMarketplaceAccounts
                 var input = await _appContactRepository.GetAll().AsNoTracking()
                     .Include(x => x.AppContactAddresses)
                     .ThenInclude(x => x.AddressFk).AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId &&
-                    x.IsProfileData == true && x.Id == branchId);
+                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
+                    //x.IsProfileData == true
+                    && x.Id == branchId);
 
                 var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
                                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId

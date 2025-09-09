@@ -889,17 +889,17 @@ namespace onetouch.Helpers
         }
         public async Task<long> GetEntityObjectTypeBranchId()
         {
-            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "TenantBranch");
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "BRANCH");
             return obj.Id;
         }
         public async Task<string> GetEntityObjectTypeBranchCode()
         {
-            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "TenantBranch");
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "BRANCH");
             return obj.Code;
         }
         public async Task<SycEntityObjectType> GetEntityObjectTypeBranch()
         {
-            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "TenantBranch");
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "BRANCH");
             return obj;
         }
         //MMT40[End]

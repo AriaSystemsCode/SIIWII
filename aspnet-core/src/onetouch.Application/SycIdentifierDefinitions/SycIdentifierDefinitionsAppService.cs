@@ -226,7 +226,7 @@ namespace onetouch.SycIdentifierDefinitions
                     }
                 }
                 //MMT - 09-02-2024[Start]
-                if (code == "MANUALACCOUNTCONTACT" && !string.IsNullOrEmpty(output))
+                if (code == "PERSONAL" && !string.IsNullOrEmpty(output))
                 {
                     var tenantObject = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                     var existCode = await _appEntityRepository.GetAll().Where(z => z.Code == tenantObject.TenancyName + "-C" + output && z.TenantId == tenantId).FirstOrDefaultAsync();
@@ -235,7 +235,7 @@ namespace onetouch.SycIdentifierDefinitions
                         output = await GetNextEntityCode(code, tenantId);
                     }
                 }
-                if (code == "TENANTCONTACT" && !string.IsNullOrEmpty(output))
+                if (code == "BUSINESS" && !string.IsNullOrEmpty(output))
                 {
                     var tenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                     var existCode = await _appEntityRepository.GetAll().Where(z => z.Code == tenantObject.TenancyName + "-M" + output && z.TenantId == tenantId).FirstOrDefaultAsync();
@@ -244,7 +244,7 @@ namespace onetouch.SycIdentifierDefinitions
                         output = await GetNextEntityCode(code, tenantId);
                     }
                 }
-                if (code == "TENANTBRANCH" && !string.IsNullOrEmpty(output))
+                if (code == "BRANCH" && !string.IsNullOrEmpty(output))
                 {
                     var tenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                     var existCode = await _appEntityRepository.GetAll().Where(z => z.Code == tenantObject.TenancyName + "-" + output && z.TenantId == tenantId).FirstOrDefaultAsync();
