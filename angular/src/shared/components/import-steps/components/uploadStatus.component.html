@@ -358,7 +358,7 @@
                           <ng-container *ngIf="column.name === 'Product Description'; else normalTextInput">
                             <div class="form-control"
                               [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
-                              style="background-color: #f4f4f4 !important; opacity: 1; cursor: not-allowed;">
+                              style="background-color: #f4f4f4 !important; opacity: 1; cursor: not-allowed;height: auto;">
                             </div>
                           </ng-container>
 
@@ -449,7 +449,7 @@
 
                       <a *ngSwitchCase="'Image Preview'" class="selectImageActive">
                         <img [src]="getImageSource(record)" class="pointer" #imgRef
-                          (error)="imgRef.style.display = 'none'; fallbackText.style.display = 'inline'" [ngStyle]="{
+                          (error)="fallbackText.style.display = 'inline'" [ngStyle]="{
                             'object-fit': 'cover',
                             'border-radius.px': 4,
                             'width.px': 60,
