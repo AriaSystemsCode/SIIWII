@@ -1353,7 +1353,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                 //Publish contacts
                 //if (personEntityObjectTypeId)
-                /*var contactInfo = _appContactRepository.GetAll()
+                var contactInfo = _appContactRepository.GetAll()
                     .Where(x => //x.IsProfileData 
                            x.TenantId == AbpSession.TenantId
                            && x.ParentId == mainAccountID
@@ -1361,7 +1361,9 @@ namespace onetouch.AppMarketplaceAccounts
                 foreach (var contactObj in contactInfo)
                 {
                     await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
-                }*/
+                    //await HideAccount(contactObj.SSIN);
+                    await CreateOrEditMarketplaceContactRelationship(input.SSIN, contactObj.SSIN, false,null, null);
+                }
                 return newId;
             }
 
