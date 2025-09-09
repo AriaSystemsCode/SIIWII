@@ -60,33 +60,36 @@
             Head Quarter :
           </div>
           <div class="col-8 row-item-desc">
-
-            <p class="title-account mb-0 ml-md-4">
-
-              <span class="ml-5" *ngIf=" accountDataForView?.addressLine1" style="white-space: nowrap;">
-                {{ accountDataForView.addressLine1 + ', '}}
+            <p class="title-account mb-0 ml-1">
+              <span class="ml-5" *ngIf="accountDataForView?.addressLine1" style="white-space: nowrap;">
+                {{ (accountDataForView.addressLine1 | slice:0:20) + ', ' }}
               </span>
-
-
             </p>
           </div>
+          
           <div class="ml-5">
+            <!-- Remainder of line1 BEFORE line2 -->
+            <span *ngIf="accountDataForView?.addressLine1?.length > 20" class="row-item-desc">
+              {{ (accountDataForView.addressLine1 | slice:20) + ', ' }}
+            </span>
+          
             <span *ngIf="accountDataForView?.addressLine2" class="row-item-desc">
-              {{ accountDataForView?.addressLine2 + ', '}}
+              {{ accountDataForView.addressLine2 + ', ' }}
             </span>
             <span *ngIf="accountDataForView?.city" class="row-item-desc">
-              {{ accountDataForView?.city + ', '}}
+              {{ accountDataForView.city + ', ' }}
             </span>
             <span *ngIf="accountDataForView?.state" class="row-item-desc">
-              {{ accountDataForView?.state + ', ' }}
+              {{ accountDataForView.state + ', ' }}
             </span>
             <span *ngIf="accountDataForView?.zipCode" class="row-item-desc">
-              {{accountDataForView?.zipCode }}{{accountDataForView?.countryName ? ', ' : '' }}
+              {{ accountDataForView.zipCode }}{{ accountDataForView?.countryName ? ', ' : '' }}
             </span>
             <span *ngIf="accountDataForView?.countryName" class="row-item-desc">
-              {{ accountDataForView?.countryName }} .
+              {{ accountDataForView.countryName }} .
             </span>
           </div>
+          
         </div>
         <div *ngIf="accountDataForView?.accountType == 'BUSINESS'" class="mb-3">
           <div class="row-item-title">
@@ -105,7 +108,7 @@
           </div>
           <div class="d-flex py-1 flex-wrap">
             <div *ngFor="let class of accountDataForView?.classfications">
-              <span class="Classification mr-2"> {{class}} </span>
+              <span class="Classification mr-2 mb-2"> {{class}} </span>
 
             </div>
           </div>
@@ -125,11 +128,11 @@
 
 
 
-            Company Department :
+        Department :
           </div>
           <div class="d-flex py-1 flex-wrap">
             <div *ngFor="let category of accountDataForView?.categories">
-              <span class="Classification mr-2"> {{category}} </span>
+              <span class="Classification mr-2 mb-2"> {{category}} </span>
 
             </div>
           </div>

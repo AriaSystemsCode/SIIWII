@@ -93,7 +93,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       .applyRelationOnProfile(this.accountId, undefined, relation.defaultVisibility == 'Public' ? true : false, relation.connectionEntityId)
       .pipe(
         finalize(() => {
-          ;
+          this.getAccountDataForView()
           this.hideMainSpinner();
         })
       )

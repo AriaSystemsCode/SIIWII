@@ -26,7 +26,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   @ViewChild("createOrEditUserModal", { static: true }) createOrEditUserModal: CreateOrEditUserModalComponent;
 
   @Input('accountInfoTemp') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
-
+  @Input('fromManualAcc') fromManualAcc: boolean 
+  
   @Output() edit: EventEmitter<number> = new EventEmitter<number>()
   @Output() delete: EventEmitter<number> = new EventEmitter<number>()
 
@@ -90,7 +91,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     this.userAdminId =  Number(this.route.snapshot.queryParamMap.get('userId')) 
     this.userAdminId != 0 ? this.adminContact = true : this.adminContact = false
     
-    if (!this.adminContact && !this.isManualOrExternalContact) {
+    if (!this.fromManualAcc) {
       this.editInfo = false;
       this.NoteditInfo = true;
       this.editjobTitleValue = this.jobTitleAttr?.selectedValues[this.jobTitleAttr.selectedValues.length - 1].value;

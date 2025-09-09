@@ -6,7 +6,8 @@ import {
     AccountsServiceProxy,
     LookupLabelDto,
     AppEntitiesServiceProxy,
-    AppContactAddressDto
+    AppContactAddressDto,
+    AppAddressDto
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
@@ -129,7 +130,10 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
                 if (this.branch.parentId) this.branch.accountId = accountId
                 let x1 = this.branch.contactAddresses.find(x => x.addressTypeId == this.billingAddressDef.value)
-                if (x1 != undefined) this.address1 = x1;
+                if (x1 != undefined) {
+                    this.address1 = x1;
+               
+                }
 
                 let x2 = this.branch.contactAddresses.find(x => x.addressTypeId == this.directShippingAddressDef.value)
                 if (x2 != undefined) this.address2 = x2;
@@ -244,19 +248,87 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
         this.branch.contactAddresses = []
         if (this.address1.addressId > 0) {
-            this.address1.addressTypeId = this.billingAddressDef.value
+            // this.address1.addressTypeId = this.billingAddressDef.value
+            // this.address1.addressFk.id  = this.address1.addressId
+            // this.address1.addressFk.code  = this.address1.code
+            // this.address1.addressFk.addressLine1  = this.address1.addressLine1
+            // this.address1.addressFk.addressLine2  = this.address1.addressLine2
+            // this.address1.addressFk.state  = this.address1.state
+            // this.address1.addressFk.postalCode  = this.address1.postalCode
+            // this.address1.addressFk.countryId  = this.address1.countryId
+        
+            this.address1.addressFk = Object.assign(new AppAddressDto(), {
+              id: this.address1.addressId,
+              code: this.address1.code,
+              name: this.address1.name,
+              addressLine1: this.address1.addressLine1,
+              addressLine2: this.address1.addressLine2,
+              city: this.address1.city,
+              state: this.address1.state,
+              postalCode: this.address1.postalCode,
+              countryId: this.address1.countryId,
+              countryCode: this.address1.countryCode,
+              tenantId:this.branch.tenantId
+
+            });
+
+
             this.branch.contactAddresses.push(this.address1)
         }
         if (this.address2.addressId > 0) {
             this.address2.addressTypeId = this.directShippingAddressDef.value
+            this.address2.addressFk = Object.assign(new AppAddressDto(), {
+                id: this.address2.addressId,
+                code: this.address2.code,
+                name: this.address2.name,
+                addressLine1: this.address2.addressLine1,
+                addressLine2: this.address2.addressLine2,
+                city: this.address2.city,
+                state: this.address2.state,
+                postalCode: this.address2.postalCode,
+                countryId: this.address2.countryId,
+                countryCode: this.address2.countryCode,
+                tenantId:this.branch.tenantId
+
+              });
+  
             this.branch.contactAddresses.push(this.address2)
         }
         if (this.address3.addressId > 0) {
             this.address3.addressTypeId = this.distributionCenterAddressDef.value
+            this.address3.addressFk = Object.assign(new AppAddressDto(), {
+                id: this.address3.addressId,
+                code: this.address3.code,
+                name: this.address3.name,
+                addressLine1: this.address3.addressLine1,
+                addressLine2: this.address3.addressLine2,
+                city: this.address3.city,
+                state: this.address3.state,
+                postalCode: this.address3.postalCode,
+                countryId: this.address3.countryId,
+                countryCode: this.address3.countryCode,
+                tenantId:this.branch.tenantId
+
+              });
             this.branch.contactAddresses.push(this.address3)
         }
         if (this.address4.addressId > 0) {
             this.address4.addressTypeId = this.mailingAddressDef.value
+
+            this.address4.addressFk = Object.assign(new AppAddressDto(), {
+                id: this.address4.addressId,
+                code: this.address4.code,
+                name: this.address4.name,
+                addressLine1: this.address4.addressLine1,
+                addressLine2: this.address4.addressLine2,
+                city: this.address4.city,
+                state: this.address4.state,
+                postalCode: this.address4.postalCode,
+                countryId: this.address4.countryId,
+                countryCode: this.address4.countryCode,
+                tenantId:this.branch.tenantId
+
+              });
             this.branch.contactAddresses.push(this.address4)
         }
 
