@@ -245,7 +245,6 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     
             this.branch.code =  this.branchCode;
 
-
         this.branch.contactAddresses = []
         if (this.address1.addressId > 0) {
             this.address1.addressTypeId = this.billingAddressDef.value
@@ -274,6 +273,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
             this.address2.addressTypeId = this.directShippingAddressDef.value
             this.address2.accountId = 0
             this.address2.contactId = this.address1.contactId
+            
             this.address2.addressFk = Object.assign(new AppAddressDto(), {
                 id: this.address2.addressId,
                 code: this.address2.code,
