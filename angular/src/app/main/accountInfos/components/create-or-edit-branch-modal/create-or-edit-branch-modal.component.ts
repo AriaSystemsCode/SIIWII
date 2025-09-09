@@ -248,14 +248,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
         this.branch.contactAddresses = []
         if (this.address1.addressId > 0) {
-            // this.address1.addressTypeId = this.billingAddressDef.value
-            // this.address1.addressFk.id  = this.address1.addressId
-            // this.address1.addressFk.code  = this.address1.code
-            // this.address1.addressFk.addressLine1  = this.address1.addressLine1
-            // this.address1.addressFk.addressLine2  = this.address1.addressLine2
-            // this.address1.addressFk.state  = this.address1.state
-            // this.address1.addressFk.postalCode  = this.address1.postalCode
-            // this.address1.addressFk.countryId  = this.address1.countryId
+            this.address1.addressTypeId = this.billingAddressDef.value
+
         
             this.address1.addressFk = Object.assign(new AppAddressDto(), {
               id: this.address1.addressId,
@@ -274,9 +268,11 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
 
             this.branch.contactAddresses.push(this.address1)
+
         }
         if (this.address2.addressId > 0) {
             this.address2.addressTypeId = this.directShippingAddressDef.value
+            this.address2.accountId = this.branch.accountId
             this.address2.addressFk = Object.assign(new AppAddressDto(), {
                 id: this.address2.addressId,
                 code: this.address2.code,
@@ -333,6 +329,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         }
 
         let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
+
         this._AccountsServiceProxy.createOrEditBranch(this.branch)
             .pipe(finalize(() => { this.saving = false; }))
             .subscribe((value) => {
