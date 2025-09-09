@@ -88,6 +88,7 @@ using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext
 using Abp.EntityFrameworkCore.Repositories;
 using System.Management.Automation.Language;
 using Namotion.Reflection;
+using Abp.MultiTenancy;
 
 namespace onetouch.Accounts
 {
@@ -1206,6 +1207,7 @@ namespace onetouch.Accounts
                 .Include(z=>z.CurrencyFk)
                 //I40
                 .FirstOrDefaultAsync(x => x.Id == id);
+                var currentAccount = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
 
                 var entity = await _appEntityRepository.GetAll()
                     .Include(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk)
@@ -1474,8 +1476,33 @@ namespace onetouch.Accounts
                               (z.SharingLevel == 1)).Count();*/
 
                 output.ConnectionCount = relationships;
+                //40
+                var relationship = await _appContactRelationshipInfoRepository.GetAll()
+                                .Where(z => ((z.RecipientContactSSIN == account.SSIN && z.RequesterContactSSIN == currentAccount.SSIN)
+                                || (z.RecipientContactSSIN == currentAccount.SSIN && z.RequesterContactSSIN == account.SSIN))
+                               ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();
+                if (relationship != null)
+                {
+                    var relationshipCode = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
+                    if (relationshipCode != null)
+                    {
+                        var extrDataDisconnect = relationshipCode.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
+                        if (extrDataDisconnect != null)
+                        {
+                            output.DisConnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
+                        }
+                        if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
+                        {
+                            var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                            if (extrDataSharing != null)
+                            {
+                                output.ConnectionName = "MPAction" + extrDataSharing.AttributeValue;
+                            }
+                        }
 
-
+                    }
+                }
+                //40
                 //I40[End]
                 return output;
             }
