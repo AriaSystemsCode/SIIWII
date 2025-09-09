@@ -739,7 +739,7 @@ namespace onetouch.Accounts
                     foreach (var account in accountsList)
                     {
                         var accountConnection = _appContactRepository.GetAll()
-                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN && !e.IsProfileData && e.ParentId == null);
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN && !e.IsProfileData);
 
                         if (accountConnection != null && accountConnection.Id > 0)
                         {
