@@ -526,40 +526,48 @@ export class MainImportComponent
     uploadStartTime = Date.now();
     uploadedFilesCount = 1;
     callImport(iterationNo: number) {
-        if (iterationNo === 0) {
+        if (iterationNo === 0)
             this.uploadStartTime = Date.now();
+
+
+        const hasImageRecords = this.uploadindResultExcelList.some(r => r.recordType === 'Image');
+        if (hasImageRecords) {
+            this.importServiceProxy
+                .saveFromExcel(this.uploadingResult)
+                .pipe(finalize(() => {
+                    this.spinnerService.hide();
+                    this.ProgressModal.hide();
+                }))
+                .subscribe((result) => {
+                    this.logFileUrl = result.excelLogPath;
+                    this.logFileName = result.excelLogFileName;
+                    this.successfullyImportModal.show(this.importType);
+                }, (error) => {
+                    this.successfullyImportModal.show(this.importType);
+                });
+            return;
         }
 
         if (this.imData) {
             var toValue = this.uploadingResult?.toList[iterationNo];
             if (toValue > 1) { toValue = toValue - 1; }
             this.progress = Math.ceil((toValue / this.uploadingResult?.totalRecords) * 100);
-            this.ProgressDetail = this.uploadingResult?.codesFromList[iterationNo] + "[" + this.uploadingResult?.fromList[iterationNo] + "-" + this.uploadingResult?.toList[iterationNo] + "]";
+            this.ProgressDetail = `${this.uploadingResult?.codesFromList[iterationNo]}[${this.uploadingResult?.fromList[iterationNo]}-${this.uploadingResult?.toList[iterationNo]}]`;
 
             if (iterationNo < this.uploadingResult?.fromList.length) {
                 this.uploadingResult.from = this.uploadingResult?.fromList[iterationNo]
                 this.uploadingResult.to = this.uploadingResult?.toList[iterationNo]
 
-                /*   this.uploadingResult.excelRecords = this.uploadindResultExcelList.slice(
-                      this.uploadingResult.from - 2, this.uploadingResult.to - 2 + 1);
-   */
+                this.uploadingResult.excelRecords = this.uploadindResultExcelList.slice(
+                    this.uploadingResult.from - 2, this.uploadingResult.to - 2 + 1);
             }
         }
-
-        if (Array.isArray(this.uploadingResult.excelRecords)) {
-            this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map(item => {
-                return item instanceof AppItemtExcelRecordDTO
-                    ? item
-                    : AppItemtExcelRecordDTO.fromJS(item);
-            });
-        }
-
 
         this.importServiceProxy
             .saveFromExcel(this.uploadingResult)
             .pipe(finalize(() => {
 
-                if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
+                if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
                     this.spinnerService.hide()
                     this.ProgressModal.hide();
                 }
@@ -567,7 +575,7 @@ export class MainImportComponent
             }))
             .subscribe((result) => {
 
-                if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
+                if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
                     this.logFileUrl = result.excelLogPath;
                     this.logFileName = result.excelLogFileName;
 
@@ -578,7 +586,7 @@ export class MainImportComponent
                 }
             }
                 , (error) => {
-                    if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
+                    if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
                         this.successfullyImportModal.show(this.importType);
                     }
                     else {
@@ -729,7 +737,7 @@ export class MainImportComponent
                     var toValue = this.passedImages.length * (progress.loaded / progress.total);
                     if (toValue > 1) { toValue = toValue - 1; }
                     this.remainingFiles = this.uploadingResult.totalRecords - toValue;
-
+                    this.remainingFiles = this.remainingFiles >= 0 ? this.remainingFiles : 1;
 
                     const uploadedSoFar = toValue;
                     this.uploadedFilesCount = Math.floor(uploadedSoFar);
@@ -738,11 +746,23 @@ export class MainImportComponent
                     const elapsedSeconds = (now - this.uploadStartTime) / 1000;
 
                     if (uploadedSoFar > 0) {
-                        const avgTimePerFile = elapsedSeconds / uploadedSoFar;
-                        const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
-                        const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
+                        let estimatedRemainingMinutes: number;
+
+                        if (uploadedSoFar < 3) {
+                            estimatedRemainingMinutes = 1;
+                        } else {
+                            const avgTimePerFile = elapsedSeconds / uploadedSoFar;
+                            const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
+                            estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
+
+                            if (estimatedRemainingMinutes > 120) {
+                                estimatedRemainingMinutes = 120;
+                            }
+                        }
+
                         this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes);
-                    } else {
+                    }
+                    else {
                         this.estimatedRemainingTime = 0;
                     }
 
@@ -760,7 +780,29 @@ export class MainImportComponent
 
                     var ret = this.serviceUtilitesProxy.setImagesGuids(this.uploadingResult, this.finalUploadedImages);
                     this.uploadingResult = ret;
-                    this.uploadindResultExcelList = this.uploadingResult.excelRecords.slice();
+                    debugger
+                    if (Array.isArray(this.uploadingResult.excelRecords)) {
+                        this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map(item => {
+                            if (item?.image) {
+                                const match = this.finalUploadedImages.find(img =>
+                                    img.code.toLowerCase() === item.image.toLowerCase()
+                                );
+
+                                if (match) {
+                                    const ext = item.image.includes(".")
+                                        ? item.image.substring(item.image.lastIndexOf(".")).toLowerCase()
+                                        : "";
+                                    item.image = match.Guid + ext;
+                                }
+                            }
+
+                            return item instanceof AppItemtExcelRecordDTO
+                                ? item
+                                : AppItemtExcelRecordDTO.fromJS(item);
+                        });
+                    }
+                    this.uploadindResultExcelList = this.uploadingResult.excelRecords;
+
                     this.callImport(0);
 
                 };
