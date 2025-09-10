@@ -260,8 +260,11 @@
                     <button
                         class="next-btn pointer"
                         (click)="goNextStep()"
-                        [disabled]="!finish"
-                        [ngClass]="{ disabled: !finish }"
+                        [disabled]="!finish || _imagePassed ==0"
+                        [ngClass]="{
+                            'disabled':!finish || _imagePassed ==0,
+                            'disabled-Btn-bg':!finish || _imagePassed ==0
+                        }" 
                     >
                         {{ "Next" | localize }}
                     </button>
