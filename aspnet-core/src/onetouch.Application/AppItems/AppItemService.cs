@@ -648,8 +648,8 @@ namespace onetouch.AppItems
                     IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,
                     AttachmentCategoryEnum = 0,
                     AttachmentCategoryId = 3,
-                    FileName = appItemtExcelRecordDTO.image,
-                    guid = Guid.NewGuid().ToString(),
+                    FileName = Path.GetFileName(appItemtExcelRecordDTO.ExcelDto.ImagePreview),
+                    guid = Path.GetFileNameWithoutExtension(appItemtExcelRecordDTO.image),
                     Index = appEntityDto.EntityAttachments.Count
                 };
                 if(appItemtExcelRecordDTO.ExcelDto.Actions == "3")
@@ -666,17 +666,17 @@ namespace onetouch.AppItems
                 // add record attachments tables
                 // add record to appitem entity attachements
 
-                if (!System.IO.Directory.Exists(path))
-                {
-                    System.IO.Directory.CreateDirectory(path);
-                }
+                //if (!System.IO.Directory.Exists(path))
+                //{
+                //    System.IO.Directory.CreateDirectory(path);
+                //}
 
-                try
-                {
-                    System.IO.File.Copy(path + @"\" + appEntityAttachmentDto.FileName, path + @"\" + appEntityAttachmentDto.guid + "." + appEntityAttachmentDto.FileName.Split('.')[1], true);
+                //try
+                //{
+                //     System.IO.File.Copy(path + @"\" + appEntityAttachmentDto.FileName, path + @"\" + appEntityAttachmentDto.guid + "." + appEntityAttachmentDto.FileName.Split('.')[1], true);
 
-                }
-                catch { }
+                //}
+                //catch { }
 
 
                 appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
