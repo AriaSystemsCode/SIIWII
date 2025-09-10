@@ -219,42 +219,63 @@ connect(account: AccountDto): void {
       });
 }
 
-disconnect(account: AccountDto): void {
-  this.showMainSpinner();
-  this._accountsServiceProxy
-      .disconnect(account.id)
-      .pipe(
-          finalize(() => {
-              this.hideMainSpinner();
-          })
-      )
-      .subscribe(() => {
-          this.notify.success(this.l("SuccessfullyDisconnected"));
-          account.status = false;
-      });
-}
 
-   createRelation(account, status: boolean = false) {
+
+  createRelation(account, status: boolean = false) {
         this.showMainSpinner();
         this._accountsServiceProxy
-            .applyRelationOnProfile(account.account.account.id, undefined, account.relation.defaultVisibility == 'Public' ? true : false, account.relation.connectionEntityId)
-            .pipe(
-                finalize(() => {
-                    ;
-                    this.hideMainSpinner();
-                })
-            )
-            .subscribe((result: string) => {
-                let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.account.id);
-                if (accountIndx >= 0) {
-                    this.accounts[accountIndx] = account.account;
-                    this.accounts[accountIndx].avaliableConnectionName = '';
-                    this.accounts[accountIndx].connectionName = this.l(result);
-                    this.accounts[accountIndx].availableConnections.length = 0;
-                }
-            });
+          .applyRelationOnProfile(
+            account.account.account.id,
+            undefined,
+            account.relation.defaultVisibility === 'Public',
+            account.relation.connectionEntityId
+          )
+          .pipe(finalize(() => this.hideMainSpinner()))
+          .subscribe((result: any) => {
+          
+            const raw = typeof result === 'string' ? result : result?.result ?? '';
+            const { connectionName, disConnectLabel } = this.splitLabels(raw);
+      
+            const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
+            if (i >= 0) {
+              
+              this.accounts[i] = account.account;
+      
+              this.accounts[i].availableConnections = [];
+              this.accounts[i].avaliableConnectionName = '';
+      
+              this.accounts[i].connectionName   = this.l(connectionName);
+              this.accounts[i].disConnectLabel  = this.l(disConnectLabel);
+            }
+          });
+      }
+
+    private splitLabels(raw: string) {
+      // split at the first '-' that precedes the second "MPAction..."
+      const m = /^(.*?)-(MPAction.+)$/.exec(raw || '');
+      return m
+        ? { connectionName: m[1], disConnectLabel: m[2] }
+        : { connectionName: raw || '', disConnectLabel: '' };
     }
 
+    disconnect(account: AccountDto): void {
+
+      this.showMainSpinner();
+      this._accountsServiceProxy
+          .disconnect(account.account.id)
+          .pipe(
+              finalize(() => {
+                  this.hideMainSpinner();
+              })
+          )
+          .subscribe((res) => {
+              this.notify.success(this.l("SuccessfullyDisconnected"));
+              account.status = false;
+              account.connectionName = "";
+              account.avaliableConnectionName = res[0].connectLabel
+              account.availableConnections = res
+          });
+  }
 
   setConnectionType(code: number): void {
     this.connectionTypeId = code;

@@ -49,11 +49,11 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     inputObj1: any;
     entityObjectType: string = "TENANTBRANCH";
     stylesObj = {
-   
+
         'height': "47px"
     };
     branchCode: string = "";
-    
+
     constructor(
         injector: Injector,
         private _AccountsServiceProxy: AccountsServiceProxy,
@@ -132,7 +132,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
                 let x1 = this.branch.contactAddresses.find(x => x.addressTypeId == this.billingAddressDef.value)
                 if (x1 != undefined) {
                     this.address1 = x1;
-               
+
                 }
 
                 let x2 = this.branch.contactAddresses.find(x => x.addressTypeId == this.directShippingAddressDef.value)
@@ -188,7 +188,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     onCountryChangephone1Number(e) {
         this.branch.phone1CountryKey = e.iso2
     }
-  
+
     getNumberphone2Number(e) {
         this.branch.phone2Number = e;
     }
@@ -202,7 +202,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.branch.phone2CountryKey = e.iso2
 
     }
- 
+
     getNumberphone3Number(e) {
         this.branch.phone3Number = e;
     }
@@ -240,110 +240,65 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         }
     }
 
+    // Add inside the component (private helpers)
+    private toAppAddressDto(src: any, tenantId: number): AppAddressDto {
+        return Object.assign(new AppAddressDto(), {
+            id: src.addressId,
+            code: src.code,
+            name: src.name,
+            addressLine1: src.addressLine1,
+            addressLine2: src.addressLine2,
+            city: src.city,
+            state: src.state,
+            postalCode: src.postalCode,
+            countryId: src.countryId,
+            countryCode: src.countryCode,
+            tenantId: tenantId
+        });
+    }
+
+    private pushAddress(
+        contactAddr: any,
+        addressTypeId: number,
+        patch?: Record<string, any>
+    ): void {
+        if (!contactAddr || !(contactAddr.addressId > 0)) return;
+
+        contactAddr.addressTypeId = addressTypeId;
+        if (patch) Object.assign(contactAddr, patch);
+
+        contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
+        this.branch.contactAddresses.push(contactAddr);
+    }
+
     save(): void {
         this.saving = true;
-    
-            this.branch.code =  this.branchCode;
 
-        this.branch.contactAddresses = []
-        if (this.address1.addressId > 0) {
-            this.address1.addressTypeId = this.billingAddressDef.value
+        this.branch.code = this.branchCode;
+        this.branch.contactAddresses = [];
 
-        
-            this.address1.addressFk = Object.assign(new AppAddressDto(), {
-              id: this.address1.addressId,
-              code: this.address1.code,
-              name: this.address1.name,
-              addressLine1: this.address1.addressLine1,
-              addressLine2: this.address1.addressLine2,
-              city: this.address1.city,
-              state: this.address1.state,
-              postalCode: this.address1.postalCode,
-              countryId: this.address1.countryId,
-              countryCode: this.address1.countryCode,
-              tenantId:this.branch.tenantId
+        this.pushAddress(this.address1, this.billingAddressDef.value);
 
-            });
+        this.pushAddress(
+            this.address2,
+            this.directShippingAddressDef.value,
+            { accountId: 0, contactId: this.address1?.contactId }
+        );
 
-
-            this.branch.contactAddresses.push(this.address1)
-
-        }
-        if (this.address2.addressId > 0) {
-            this.address2.addressTypeId = this.directShippingAddressDef.value
-            this.address2.accountId = 0
-            this.address2.contactId = this.address1.contactId
-            
-            this.address2.addressFk = Object.assign(new AppAddressDto(), {
-                id: this.address2.addressId,
-                code: this.address2.code,
-                name: this.address2.name,
-                addressLine1: this.address2.addressLine1,
-                addressLine2: this.address2.addressLine2,
-                city: this.address2.city,
-                state: this.address2.state,
-                postalCode: this.address2.postalCode,
-                countryId: this.address2.countryId,
-                countryCode: this.address2.countryCode,
-                tenantId:this.branch.tenantId
-
-              });
-  
-            this.branch.contactAddresses.push(this.address2)
-        }
-        if (this.address3.addressId > 0) {
-            this.address3.addressTypeId = this.distributionCenterAddressDef.value
-            this.address3.addressFk = Object.assign(new AppAddressDto(), {
-                id: this.address3.addressId,
-                code: this.address3.code,
-                name: this.address3.name,
-                addressLine1: this.address3.addressLine1,
-                addressLine2: this.address3.addressLine2,
-                city: this.address3.city,
-                state: this.address3.state,
-                postalCode: this.address3.postalCode,
-                countryId: this.address3.countryId,
-                countryCode: this.address3.countryCode,
-                tenantId:this.branch.tenantId
-
-              });
-            this.branch.contactAddresses.push(this.address3)
-        }
-        if (this.address4.addressId > 0) {
-            this.address4.addressTypeId = this.mailingAddressDef.value
-
-            this.address4.addressFk = Object.assign(new AppAddressDto(), {
-                id: this.address4.addressId,
-                code: this.address4.code,
-                name: this.address4.name,
-                addressLine1: this.address4.addressLine1,
-                addressLine2: this.address4.addressLine2,
-                city: this.address4.city,
-                state: this.address4.state,
-                postalCode: this.address4.postalCode,
-                countryId: this.address4.countryId,
-                countryCode: this.address4.countryCode,
-                tenantId:this.branch.tenantId
-
-              });
-            this.branch.contactAddresses.push(this.address4)
-        }
+        this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
+        this.pushAddress(this.address4, this.mailingAddressDef.value);
 
         let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
 
         this._AccountsServiceProxy.createOrEditBranch(this.branch)
             .pipe(finalize(() => { this.saving = false; }))
-            .subscribe((value) => {
+            .subscribe(value => {
                 this.notify.info(this.l('SavedSuccessfully'));
                 this.close();
-                if (addNew) {
-                    this.branchAdded.emit(value);
-                }
-                else {
-                    this.branchUpdated.emit(value);
-                }
+                addNew ? this.branchAdded.emit(value) : this.branchUpdated.emit(value);
             });
     }
+
 
 
 

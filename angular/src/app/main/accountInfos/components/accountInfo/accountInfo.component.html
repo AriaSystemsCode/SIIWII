@@ -99,7 +99,7 @@
                                     <button type="button"
                                         *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner"
                                         class="btn mb-3 mt-4 w-100 btn-danger" (click)="disConnect()">
-                                        {{ accData?.disConnectLabel != null ? accData.disConnectLabel : "Disconnect" | localize }}
+                                        {{ accData?.disConnectLabel != null ? getFormattedConnectionName()  : "Disconnect" | localize }}
                                     </button>
                                 </div>
                             </div>

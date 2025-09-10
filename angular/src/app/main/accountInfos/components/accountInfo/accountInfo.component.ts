@@ -500,7 +500,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                         this.hideMainSpinner()
                     }
                 )
-            this.accData = JSON.parse(JSON.stringify(result.account));
+            this.accData = JSON.parse(JSON.stringify(result));
 
         }
 
@@ -1537,5 +1537,26 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         attri.attributeValue =  checked.toString()
      
     
+      }
+
+      getFormattedConnectionName(): string | null {
+        let raw: string | undefined;
+      
+      
+          raw = this.accData?.disConnectLabel?.trim();
+      
+      
+        if (!raw) return null;
+      
+  
+      
+        // Format only if starts with 'MPAction'
+        if (raw.startsWith('MPAction')) {
+          const label = raw.replace('MPAction', '');
+          return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+        }
+      
+        // For anything else, return null (or raw if you prefer)
+        return null;
       }
 }

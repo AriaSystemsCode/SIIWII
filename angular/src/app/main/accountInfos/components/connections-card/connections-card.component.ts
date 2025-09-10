@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
-
+import { finalize } from "rxjs/operators";
 @Component({
     selector: 'app-connections-card',
     templateUrl: './connections-card.component.html',
@@ -47,8 +47,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
         this.connectMe.emit()
     }
 
-    disconnect(): void {
-        this.disconnectMe.emit()
+    disconnect(account): void {
+        this.disconnectMe.emit(account)
     }
 
     edit(): void {
@@ -106,26 +106,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
         // For anything else, return null (or raw if you prefer)
         return null;
       }
-      removeRelation(account){
-        this._accountsServiceProxy
-        .disconnect(account.account.id)
-        // .pipe(
-        //     finalize(() => {
-        //         ;
-        //         this.hideMainSpinner();
-        //     })
-        // )
-        .subscribe(
-        //     (result: string) => {
-        //     let accountIndx = this.accounts.findIndex(x => x.account.id == account.account.id);
-        //     if (accountIndx >= 0) {
-        //         this.accounts[accountIndx] = account;
-        //         this.accounts[accountIndx].avaliableConnectionName = "";
-        //         this.accounts[accountIndx].connectionName = this.l(result);
-        //     }
-        // }
-    );
-      }
+
 
       private readonly ICONS: Record<string, string> = {
         FOLLOW: 'assets/accounts/FOLLOW.png',
