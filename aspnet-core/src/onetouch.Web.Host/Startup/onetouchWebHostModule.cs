@@ -29,6 +29,8 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 using System.Data.SqlClient;
+using onetouch.Accounts;
+using onetouch.Web.Configuration;
 
 namespace onetouch.Web.Startup
 {
@@ -38,13 +40,16 @@ namespace onetouch.Web.Startup
     public class OriginBasedConnectionStringResolver : DefaultConnectionStringResolver
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppConfigurationAccessor _configurationAccessor;
 
         public OriginBasedConnectionStringResolver(
             IAbpStartupConfiguration configuration,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+             AppConfigurationAccessor appConfiguration
         ) : base(configuration)
         {
             _httpContextAccessor = httpContextAccessor;
+            _configurationAccessor = appConfiguration;
         }
 
         public override string GetNameOrConnectionString(ConnectionStringResolveArgs args)
@@ -66,6 +71,11 @@ namespace onetouch.Web.Startup
                         var result = cmd.ExecuteScalar();
                         if (result!=null && !string.IsNullOrEmpty(result.ToString()))
                         {
+                            var _appConfiguration = _configurationAccessor.Configuration;
+                            _appConfiguration["App:ClientRootAddress"] = origin;
+                            _appConfiguration[$"Attachment:Path"] = "..\\onetouch.Web.Host\\wwwroot\\attachments123";
+                            //_appConfiguration[$"Attachment:PathTemp"] = origin;
+                            //_appConfiguration[$"Attachment:Omitt"] = origin;
                             return result?.ToString();
                         }
                         else
