@@ -103,7 +103,10 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     if (input.files && input.files.length > 0) {
       const files = input.files;
       this.showUploadModal = true;
-      this.totalFiles = files.length;
+      //this.totalFiles = files.length;
+      const cleanFiles = Array.from(files).filter(file => !file.name.startsWith("~$"));
+      this.totalFiles = cleanFiles.length;
+
       this.totalSizeMB = this.getTotalSizeInMB(files);
       this.folderName = this.extractFolderName(files[0]);
       this._totalFiles.emit(this.totalFiles);

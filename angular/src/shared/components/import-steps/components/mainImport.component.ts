@@ -223,6 +223,8 @@ export class MainImportComponent
 
         for (let i = 0; i < this.UploadedFolder.length; i++) {
             const file = this.UploadedFolder[i];
+            if (file.name.startsWith("~$")) 
+                continue;
 
             if (this.imData && file.type.includes("sheet")) {
                 hasExcelFile = true;
@@ -523,6 +525,7 @@ export class MainImportComponent
 
     remainingFiles;
     estimatedRemainingTime = 0;
+    avgTimePerFile = 0;
     uploadStartTime = Date.now();
     uploadedFilesCount = 1;
     callImport(iterationNo: number) {
@@ -738,12 +741,17 @@ export class MainImportComponent
                     const elapsedSeconds = (now - this.uploadStartTime) / 1000;
 
                     if (uploadedSoFar > 0) {
-                        const avgTimePerFile = elapsedSeconds / uploadedSoFar;
+                        const avgTimePerFile =
+                            (this.avgTimePerFile * (uploadedSoFar - 1) + (elapsedSeconds / uploadedSoFar)) / uploadedSoFar;
+
                         const estimatedRemainingSeconds = avgTimePerFile * this.remainingFiles;
                         const estimatedRemainingMinutes = estimatedRemainingSeconds / 60;
                         this.estimatedRemainingTime = Math.ceil(estimatedRemainingMinutes);
+
+                        this.avgTimePerFile = avgTimePerFile
                     } else {
                         this.estimatedRemainingTime = 0;
+                        this.avgTimePerFile = 0;
                     }
 
 
