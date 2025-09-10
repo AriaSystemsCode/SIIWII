@@ -3038,7 +3038,16 @@ namespace onetouch.Accounts
             else
             {
                 newId = await _appEntitiesAppService.SaveContact(contact); }
-
+            //I40[Start]
+            //var dbContxt =  CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
+            //var addressList = contact.ContactAddresses.Where(z=>z.AddressFk!=null).Select(z => z.AddressFk).ToList();
+            //foreach (var contactAddress in addressList)
+            //{
+            //     AppAddress address = ObjectMapper.Map<AppAddress>(contactAddress);
+            //    if (dbContxt.AppAddresss.Entry(address).State != EntityState.Unchanged)
+            //     dbContxt.AppAddresss.Entry(address).State = EntityState.Unchanged;
+            //}
+            //I40[End]
             await CurrentUnitOfWork.SaveChangesAsync();
 
             //I40[Start]
@@ -7167,7 +7176,7 @@ namespace onetouch.Accounts
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<IList<AppAddressDto>> GetAllAccountAddresses(long accountId)
         {
-            var branch = await _appAddressRepository.GetAll().Where(x => x.AccountId == accountId).ToListAsync();
+            var branch = await _appAddressRepository.GetAll().AsNoTracking().Where(x => x.AccountId == accountId).ToListAsync();
 
             var output = new List<AppAddressDto>();
             output = ObjectMapper.Map<List<AppAddressDto>>(branch);

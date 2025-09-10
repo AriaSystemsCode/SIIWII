@@ -1469,6 +1469,13 @@ namespace onetouch.AppMarketplaceAccounts
                             {
                                 returnLabel = "MPAction" + extrDataConnect.AttributeValue;
                             }
+                            //I40 return disconnect label[Start]
+                            var extrDataDisconnect = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
+                            if (extrDataDisconnect != null)
+                            {
+                                returnLabel +=  "-MPAction" + extrDataDisconnect.AttributeValue;
+                            }
+                            //I40 return disconnect label[End]
                             var extrDataSharing = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 605).FirstOrDefault();
                             if (extrDataSharing != null)
                             {
