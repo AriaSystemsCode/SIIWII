@@ -253,7 +253,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
             postalCode: src.postalCode,
             countryId: src.countryId,
             countryCode: src.countryCode,
-            tenantId: tenantId
+            tenantId: tenantId,
+        
         });
     }
 
@@ -265,6 +266,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         if (!contactAddr || !(contactAddr.addressId > 0)) return;
 
         contactAddr.addressTypeId = addressTypeId;
+        contactAddr.accountId = this.appSession.user.accountId
         if (patch) Object.assign(contactAddr, patch);
 
         contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
@@ -282,14 +284,14 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.pushAddress(
             this.address2,
             this.directShippingAddressDef.value,
-            { accountId: 0, contactId: this.address1?.contactId }
+            { accountId: this.appSession.user.accountId, contactId: this.address1?.contactId }
         );
 
         this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
         this.pushAddress(this.address4, this.mailingAddressDef.value);
 
         let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
-
+        this.branch.accountId = this.appSession.user.accountId
         this._AccountsServiceProxy.createOrEditBranch(this.branch)
             .pipe(finalize(() => { this.saving = false; }))
             .subscribe(value => {
