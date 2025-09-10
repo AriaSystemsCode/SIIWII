@@ -567,7 +567,7 @@ export class MainImportComponent
             .saveFromExcel(this.uploadingResult)
             .pipe(finalize(() => {
 
-                if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
+                if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
                     this.spinnerService.hide()
                     this.ProgressModal.hide();
                 }
@@ -575,7 +575,7 @@ export class MainImportComponent
             }))
             .subscribe((result) => {
 
-                if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
+                if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
                     this.logFileUrl = result.excelLogPath;
                     this.logFileName = result.excelLogFileName;
 
@@ -586,7 +586,7 @@ export class MainImportComponent
                 }
             }
                 , (error) => {
-                    if ((this.imData && iterationNo == this.uploadingResult.fromList.length - 1) || !this.imData) {
+                    if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
                         this.successfullyImportModal.show(this.importType);
                     }
                     else {
