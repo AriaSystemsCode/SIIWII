@@ -5900,7 +5900,10 @@ namespace onetouch.AppItems
             return returnList;
         }
         public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto)
-        {
+        {   if(itemExcelDto.RecordType == "Image") { itemExcelDto.RecordType = "Item"; }
+            //HIA HIA as per Sam
+            if (itemExcelDto.NoOfDimensions == null) { itemExcelDto.NoOfDimensions = "1"; }
+
             List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             //foreach (var itemExcelDto in input) 
@@ -5933,6 +5936,7 @@ namespace onetouch.AppItems
                         });
                     }
                     //itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
+                    
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 2 &&
                         (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) | string.IsNullOrEmpty(itemExcelDto.Dimension2Name)))
                         returnList.Add(new ImportItemReturnDto
@@ -6293,6 +6297,10 @@ namespace onetouch.AppItems
 
                     });
                     //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
+
+                    if (excelDto.ExcelDto.Code == "-") { excelDto.ExcelDto.Code = excelDto.Code; }
+                    if (excelDto.ExcelDto.NoOfDim == null) { excelDto.ExcelDto.NoOfDim = "1"; }
+                    if(string.IsNullOrEmpty(excelDto.ExcelDto.ImageType)){excelDto.ExcelDto.ImageType = "Image";}
                     excelDto.ExcelDto.Actions = "";
                     excelDto.ExcelDto.RecordType = "Item";
                     excelDto.RecordType = "Item";
@@ -7829,7 +7837,9 @@ namespace onetouch.AppItems
                             { }
                             if (etx == 0)
                                 firstAttributteValues.Add(item.ExtraAttributesValues[etx].Value);
-
+                            //hia hia
+                            //var attPhotoId = _helper.SystemTables.GetAttachmentCategoryId("Image").Result;
+                            if (string.IsNullOrEmpty(item.ImageType)) { item.ImageType = "Image"; }
                             if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && item.Images != null && item.Images.Count > 0)
                             {
                                 var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == item.ImageType.ToUpper()).FirstOrDefault();
