@@ -6284,13 +6284,15 @@ namespace onetouch.AppItems
                 if (number == 5)
                 {
                     if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
-                    string guid = System.Guid.NewGuid().ToString();
+                    //string guid = System.Guid.NewGuid().ToString();
 
-                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = guid,
+                    excelDto.ExcelDto.Images.Add(new AppItemImage { 
+                        ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                        ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
                         IsDefault = excelDto.ExcelDto.ImageIsDefault
 
                     });
-                    RenameFileToGuid(excelDto.image, guid);
+                    //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                     excelDto.ExcelDto.Actions = "";
                     excelDto.ExcelDto.RecordType = "Item";
                     excelDto.RecordType = "Item";
@@ -6320,15 +6322,15 @@ namespace onetouch.AppItems
                             thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.ExcelDto.RecordType = "Item Variant";
                             thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
-                            string guid = System.Guid.NewGuid().ToString();
+                            //string guid = System.Guid.NewGuid().ToString();
                             thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
                             {
-                                ImageFileName = excelDto.image,
-                                ImageGuid = guid,
+                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
                                 IsDefault = excelDto.ExcelDto.ImageIsDefault,
                                 Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
                             });
-                            RenameFileToGuid(excelDto.image, guid);
+                            //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo = +1;
                             excelResultsDTO.ExcelRecords.Insert(index + childNo, thirdItemCopy);
@@ -6343,16 +6345,18 @@ namespace onetouch.AppItems
                 if (number == 8 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
                 {
                     var record = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto;
+                    //var record = excelResultsDTO.ExcelRecords.Where(e=> e.Code == record.Code).FirstOrDefault();
                     var images = record.Images;
                     if (images is null || (images !=null && images.Count==1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
                     
                     string guid = System.Guid.NewGuid().ToString();
 
-                    images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = guid,
+                    images.Add(new AppItemImage { ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                        ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
                         IsDefault = excelDto.ExcelDto.ImageIsDefault
                         // Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
                     });
-                    RenameFileToGuid(excelDto.image, guid);
+                    //RenameFileToGuid(excelDto.image, guid);
                     record.Images = images;
                     //excelDto.ExcelDto.Actions = "";
                     //excelDto.ExcelDto.RecordType = "Item";
@@ -6367,12 +6371,13 @@ namespace onetouch.AppItems
                         var record = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto;
                         var images = record.Images;
                         if (images is null || (images != null && images.Count == 1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
-                        string guid = System.Guid.NewGuid().ToString();
-                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = guid,
+                        //string guid = System.Guid.NewGuid().ToString();
+                        images.Add(new AppItemImage { ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                            ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
                             IsDefault = excelDto.ExcelDto.ImageIsDefault,
                             Attributes = "101=" + excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Code.Split('-')[1]
                         });
-                        RenameFileToGuid(excelDto.image, guid);
+                        //RenameFileToGuid(excelDto.image, guid);
                         record.Images = images;
                         //excelDto.ExcelDto.Actions = "";
                         //excelDto.ExcelDto.RecordType = "Item";
