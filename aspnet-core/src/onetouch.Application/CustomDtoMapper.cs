@@ -474,7 +474,10 @@ namespace onetouch
             configuration.CreateMap<AppContact, AccountDto>()
                 .ForMember(d => d.AccountType, s => s.Ignore());
 
-            configuration.CreateMap<AppAddressDto, AppAddress>().ReverseMap();
+            configuration.CreateMap<AppAddressDto, AppAddress>();
+            configuration.CreateMap<AppAddress, AppAddressDto>()
+                .ForMember(d => d.CountryId, s => s.MapFrom(ss => ss.CountryId));
+                
 
             configuration.CreateMap<AppContactAddressDto, AppContactAddress>();
             configuration.CreateMap<AppContactAddress, AppContactAddressDto>()
