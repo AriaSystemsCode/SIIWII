@@ -1,0 +1,6 @@
+{
+  "MessageSubject": "Welcome to SIIWII Portal, please verify your email address",
+  "MessageBody": "<!DOCTYPE html><html><head/><body><p>Hello,<br><br>Are you ready to gain access to all of the assets we prepared for clients of SIIWII Portal?<br><br>You're almost ready to start enjoying SIIWII Portal, before being able to use your account you need to verify that this is your email address by clicking here:<a href=\"{param1}\" style=\"color: MediumSeaGreen;\">Verify</a><br><br>This link will verify your email address, and then you'll officially be a part of the SIIWII Portal community.<br><br><p style=\"text-align:center;\">Domain name:{param2}</p><p style=\"text-align:center;\">Account name:{param3}</p><p style=\"text-align:center;\">User name:{param4}</p><p style=\"text-align:center;\">Password:{param5}</p><br><br>See you there!<br><br>Kind Regards, SIIWII Team</p></body></html>"
+
+
+}

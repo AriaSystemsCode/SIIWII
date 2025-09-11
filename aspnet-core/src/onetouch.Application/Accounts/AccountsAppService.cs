@@ -1012,10 +1012,10 @@ namespace onetouch.Accounts
                 .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile,
                 x => x.TenantId == AbpSession.TenantId && (((x.AccountId == input.AccountId) ||
                             _appContactRelationshipInfoRepository.GetAll()
-                            .WhereIf(input.FilterType == MemberFilterTypeEnum.Profile, s=> s.ConsiderAsTeamMember == true)
-                           .Where(s => s.RecipientContactSSIN  == x.SSIN &&
+                            //.WhereIf(input.FilterType == MemberFilterTypeEnum.Profile, s=> s.ConsiderAsTeamMember == true)
+                           .Count(s => s.RecipientContactSSIN  == x.SSIN &&  s.ConsiderAsTeamMember == true &&
                            s.RequesterContactSSIN == currentTenantAccountSSIN && s.SharingLevel == 1
-                           && s.EntityObjectStatusId == activeRelationshipStatusId).Count() >0
+                           && s.EntityObjectStatusId == activeRelationshipStatusId) >0
                 ) ||
                 (!x.IsProfileData && x.EntityFk.EntityObjectTypeId== presonEntityObjectTypeId && x.ParentId==null))) //&& (x.EntityFk.TenantOwner==AbpSession.TenantId || x.EntityFk.TenantOwner ==0 || x.EntityFk.TenantOwner ==null )
                 .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.View, x => x.AccountId == input.AccountId)
@@ -6730,7 +6730,7 @@ namespace onetouch.Accounts
                         var publishContactAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                             .Include(x => x.ContactAddresses)
                             .FirstOrDefaultAsync(x => x.SSIN == account.SSIN);
-                        if (publishContactAccount != null)
+                        if (publishContactAccount != null && publishContactAccount.TenantOwner==AbpSession.TenantId)
                         {
                             //await PublishMember(contact.Id);
                             await _iCreateMarketplaceAccount.PublishMember(contact.Id, publishContactAccount.Id, presonEntityObjectTypeId, account.Id, publishContactAccount.Id);

@@ -1,0 +1,4 @@
+﻿{
+  "MessageSubject": "You have been invited to join SIIWII by {param3} {param4}",
+  "MessageBody": "<!DOCTYPE html><html><head/><body><p>Hello,<br><br>{param3} {param4} is happy to invite you to become part of the SIIWII community to start connecting and collaborating with them and like - minded businesses in the apparel and fashion industry.<br><br>Ready to get started? Click the link below to set up your account to start connecting, collaborating and transacting.<br><a href=\"{param2}/account/register?Tenantid={param5}&TenantName={param1}\">{param2}/account/register?Tenantid={param5}&TenantName={param1}</a><br><br>We look forward to welcoming you as a new member of the SIIWII community.<br><br>Best regards<br><br>The SIIWII team</p></body></html>"
+}
