@@ -1178,6 +1178,12 @@ namespace onetouch.AppMarketplaceAccounts
                     ext.EntityId = 0;
                     ext.Id = 0;
                     ext.EntityFk = null;
+                    //I40
+                    if (ext.AttributeId==715)
+                    {
+                        ext.AttributeValue = "";
+                    }
+                    //I40
                     appMarketplaceContact.EntityExtraData.Add(ext);
                 }
                 foreach (var EntityExtraData in input.EntityExtraData) 
