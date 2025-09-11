@@ -2380,7 +2380,7 @@ namespace onetouch.Accounts
                 {
                     //var dbContxt = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
                     var connectedBranchContactQ = _appContactRepository.GetAll().AsNoTracking().IgnoreQueryFilters()
-                    .Where(x => x.TenantId == connectTenant)
+                    .Where(x => x.TenantId == connectTenant && x.IsDeleted==false)
                     .Where(x=> x.SSIN.ToLower().Trim() == branchesPublishedParentContact.SSIN.ToLower().Trim());
 
                     /*var connectedBranchContact = await dbContxt.AppContacts.IgnoreQueryFilters()
