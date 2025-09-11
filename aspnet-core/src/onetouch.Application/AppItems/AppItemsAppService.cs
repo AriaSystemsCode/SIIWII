@@ -6241,7 +6241,7 @@ namespace onetouch.AppItems
             //excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "2";
             //excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
             //excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
-             
+
 
             //excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
             //excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
@@ -6253,7 +6253,7 @@ namespace onetouch.AppItems
                 || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6"
                 || r.ExcelDto.Actions == "8"
                 || r.ExcelDto.Actions == "9"
-                || r.ExcelDto.Actions == "10" || r.RecordType=="Color")
+                || r.ExcelDto.Actions == "10" || r.RecordType == "Color")
                 && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
             foreach (var excelDto in result123)
             {
@@ -6261,16 +6261,25 @@ namespace onetouch.AppItems
                 if (excelDto.ExcelDto.Actions != null)
                 { number = Int32.Parse(excelDto.ExcelDto.Actions); }
 
-                if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType=="Color")
+                if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType == "Color")
                 {
                     if (number == 10) { excelDto.ExcelDto.Code = "-"; }
                     foreach (var id in excelDto.ExcelDto.Code.Split(","))
                     { var ret1 = SaveImageToColor(id, excelDto).Result; }
                 }
-                if (number == 5 )
+                if (number == 5)
                 {
                     if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
-                    excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    //string guid = System.Guid.NewGuid().ToString();
+
+                    excelDto.ExcelDto.Images.Add(new AppItemImage
+                    {
+                        ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                        ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                        IsDefault = excelDto.ExcelDto.ImageIsDefault
+
+                    });
+                    //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                     excelDto.ExcelDto.Actions = "";
                     excelDto.ExcelDto.RecordType = "Item";
                     excelDto.RecordType = "Item";
@@ -6293,17 +6302,25 @@ namespace onetouch.AppItems
                         foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
                         {
                             var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
-                            
+
                             thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.RecordType = "Item Variant";
 
                             thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.ExcelDto.RecordType = "Item Variant";
                             thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
-                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                            //string guid = System.Guid.NewGuid().ToString();
+                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+                            {
+                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                            });
+                            //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo = +1;
-                            excelResultsDTO.ExcelRecords.Insert(index+ childNo, thirdItemCopy);
+                            excelResultsDTO.ExcelRecords.Insert(index + childNo, thirdItemCopy);
 
                         }
                     }
@@ -6314,9 +6331,22 @@ namespace onetouch.AppItems
                 }
                 if (number == 8 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
                 {
-                    var images = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto.Images;
-                    if (images is null) { images = new List<AppItemImage>(); }
-                    images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                    var record = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto;
+                    //var record = excelResultsDTO.ExcelRecords.Where(e=> e.Code == record.Code).FirstOrDefault();
+                    var images = record.Images;
+                    if (images is null || (images != null && images.Count == 1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
+
+                    string guid = System.Guid.NewGuid().ToString();
+
+                    images.Add(new AppItemImage
+                    {
+                        ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                        ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                        IsDefault = excelDto.ExcelDto.ImageIsDefault
+                        // Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                    });
+                    //RenameFileToGuid(excelDto.image, guid);
+                    record.Images = images;
                     //excelDto.ExcelDto.Actions = "";
                     //excelDto.ExcelDto.RecordType = "Item";
                     //excelDto.RecordType = "Item";
@@ -6327,9 +6357,19 @@ namespace onetouch.AppItems
                 {
                     foreach (var id in excelDto.ExcelDto.Code.Split(","))
                     {
-                        var images = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Images;
-                        if (images is null) { images = new List<AppItemImage>(); }
-                        images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+                        var record = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto;
+                        var images = record.Images;
+                        if (images is null || (images != null && images.Count == 1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
+                        //string guid = System.Guid.NewGuid().ToString();
+                        images.Add(new AppItemImage
+                        {
+                            ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                            ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                            IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                            Attributes = "101=" + excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Code.Split('-')[1]
+                        });
+                        //RenameFileToGuid(excelDto.image, guid);
+                        record.Images = images;
                         //excelDto.ExcelDto.Actions = "";
                         //excelDto.ExcelDto.RecordType = "Item";
                         //excelDto.RecordType = "Item";
@@ -6340,13 +6380,13 @@ namespace onetouch.AppItems
             }
             result = result.Select(r => r).Where(r => (r.Actions != "2" && r.Actions != "3" && r.Actions != "4"
             && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
-            && r.Actions != "8" && r.Actions != "9" && r.Actions != "10" 
-            && r.RecordType!="Image" && r.RecordType != "Color") ).ToList();
-           
-            if(result.Count<= 0) { return excelResultsDTO.ExcelLogDTO; }
+            && r.Actions != "8" && r.Actions != "9" && r.Actions != "10"
+            && r.RecordType != "Image" && r.RecordType != "Color")).ToList();
+
+            if (result.Count <= 0) { return excelResultsDTO.ExcelLogDTO; }
             #endregion
 
-           
+
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
@@ -6451,8 +6491,8 @@ namespace onetouch.AppItems
             List<AppEntityClassification> appEntityClassificationDeleteList = new List<AppEntityClassification>();
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
-
-            foreach (var excelDto in result)
+            List<string> sizeScaleNames = new List<string>();
+            foreach (AppItemExcelDto excelDto in result)
             {
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
                     continue;
@@ -6908,7 +6948,7 @@ namespace onetouch.AppItems
                 if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
                 {
                     var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == excelDto.ImageType.ToUpper()).FirstOrDefault();
-                    var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default")).FirstOrDefault();
+                    var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") || x.IsDefault).FirstOrDefault();
                     foreach (var img in excelDto.Images)
                     {
                         if (img.ImageFileName == "noimage_item.jpg")
@@ -6941,9 +6981,10 @@ namespace onetouch.AppItems
                         AppEntityAttachment appEntityAttachment = new AppEntityAttachment();
                         appEntityAttachment.AttachmentFk = new Attachments.AppAttachment { Name = img.ImageFileName, Attachment = img.ImageGuid + "." + img.ImageFileName.Split('.')[1], TenantId = AbpSession.TenantId };
                         appEntityAttachment.AttachmentCategoryId = attachCategory.Id;
+                        appEntityAttachment.Attributes = img.Attributes;
                         appEntityAttachment.AttachmentCategoryCode = attachCategory.Code;
                         appEntityAttachment.EntityCode = excelDto.Code;
-                        if (img.ImageFileName.ToLower().Contains("_default"))
+                        if (img.ImageFileName.ToLower().Contains("_default") || img.IsDefault)
                         {
                             appEntityAttachment.IsDefault = true;
 
@@ -7087,8 +7128,24 @@ namespace onetouch.AppItems
 
                         appSizeScaleForEditDto.Dimesion1Name = excelDto.SizeScaleName;
                         appSizeScaleForEditDto.Name = excelDto.SizeScaleName;
-                        var sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
-                        var sizeScaleSavedId = sizescale.Result.Id;
+                        long? sizeScaleSavedId = 0;
+                        Task<AppSizeScaleForEditDto> sizescale = null;
+                        try
+                        {
+                            //var sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+                            // var sizeScaleSavedId = sizescale.Result.Id;
+                            sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+                            sizeScaleSavedId = sizescale.Result.Id;
+                            sizeScaleNames.Add(excelDto.SizeScaleName);
+                        }
+                        catch
+                        {
+                            if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
+                            {
+                                sizescale = _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleForEditDto.Id.ToString()));
+                                sizeScaleSavedId = sizescale.Result.Id;
+                            }
+                        }
                         ////if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
                         ////{
                         ////    AppSizeScaleForEditDto appSizeScaleRatioForEditDto = new AppSizeScaleForEditDto();
@@ -7341,16 +7398,22 @@ namespace onetouch.AppItems
                                     }
 
                                 }
-
+                                if (appItem.ItemSizeScaleHeadersFkList.Count == 0)
+                                {
+                                    appItemSizeScalesHeader.AppItemId = appItem.Id;
+                                    appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                                }
                                 appItemSizeScalesHeaderRatio.AppItemId = appItem.Id;
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
 
                         }
-                        appItemSizeScalesHeader.AppItemId = appItem.Id;
-
-                        appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                        if (appItem.ItemSizeScaleHeadersFkList.Count == 0)
+                        {
+                            appItemSizeScalesHeader.AppItemId = appItem.Id;
+                            appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                        }
                         // string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
                         // scaleHeader.SizeScaleCode = (scaleHeader.ParentId == null ? "SizeScale-" : "SizeRatio-") + seq;
 
@@ -7789,7 +7852,7 @@ namespace onetouch.AppItems
 
 
 
-                                    if (img.ImageFileName.ToLower().Contains("_default"))
+                                    if (img.ImageFileName.ToLower().Contains("_default") || img.IsDefault)
                                     {
                                         appEntityAttachment.IsDefault = true;
                                         firstAttributteImageDefaults.Add(imagesUrl + img.ImageGuid + "." + img.ImageFileName.Split('.')[1]);
@@ -8018,8 +8081,7 @@ namespace onetouch.AppItems
                 await x.SaveChangesAsync();*/
             //MMT46
             return excelResultsDTO.ExcelLogDTO;
-        }
-        //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+        }   //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         //{
         //    ExcelResultsDTO itemExcelResultsDTO = new ExcelResultsDTO();
         //    itemExcelResultsDTO.TotalRecords = 0;
