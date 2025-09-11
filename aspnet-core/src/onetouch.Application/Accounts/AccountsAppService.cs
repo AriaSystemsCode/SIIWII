@@ -6730,7 +6730,7 @@ namespace onetouch.Accounts
                         var publishContactAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                             .Include(x => x.ContactAddresses)
                             .FirstOrDefaultAsync(x => x.SSIN == account.SSIN);
-                        if (publishContactAccount != null)
+                        if (publishContactAccount != null && publishContactAccount.TenantOwner==AbpSession.TenantId)
                         {
                             //await PublishMember(contact.Id);
                             await _iCreateMarketplaceAccount.PublishMember(contact.Id, publishContactAccount.Id, presonEntityObjectTypeId, account.Id, publishContactAccount.Id);
