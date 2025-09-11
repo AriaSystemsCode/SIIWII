@@ -237,7 +237,7 @@ namespace onetouch.SycIdentifierDefinitions
                 }
                 if (code == "BUSINESS" && !string.IsNullOrEmpty(output))
                 {
-                    var tenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    var tenantObject = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                     var existCode = await _appEntityRepository.GetAll().Where(z => z.Code == tenantObject.TenancyName + "-M" + output && z.TenantId == tenantId).FirstOrDefaultAsync();
                     if (existCode != null)
                     {
@@ -246,7 +246,7 @@ namespace onetouch.SycIdentifierDefinitions
                 }
                 if (code == "BRANCH" && !string.IsNullOrEmpty(output))
                 {
-                    var tenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    var tenantObject = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                     var existCode = await _appEntityRepository.GetAll().Where(z => z.Code == tenantObject.TenancyName + "-" + output && z.TenantId == tenantId).FirstOrDefaultAsync();
                     if (existCode != null)
                     {
