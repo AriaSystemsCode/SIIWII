@@ -1818,19 +1818,10 @@ namespace onetouch.AppMarketplaceAccounts
             //Extra Attributes[End]
             long newId = 0;
             {
-                var marketplaceRecord = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(z=>z.SSIN == appMarketplaceContact.SSIN &&
+                var marketplaceRecord = await _appMarketplaceContactRepository.GetAll().FirstOrDefaultAsync(z=>z.SSIN == appMarketplaceContact.SSIN &&
                 z.Code== appMarketplaceContact.Code);
-                if (marketplaceRecord == null)
-                    newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact);
-                else
-                {
-                    try
-                    {
-                        appMarketplaceContact.Id = marketplaceRecord.Id;
-                        await _appMarketplaceContactRepository.UpdateAsync(appMarketplaceContact);
-                    }
-                    catch{ }
-                }
+                if (marketplaceRecord==null)
+                    newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); 
             }
             await CurrentUnitOfWork.SaveChangesAsync();
 
