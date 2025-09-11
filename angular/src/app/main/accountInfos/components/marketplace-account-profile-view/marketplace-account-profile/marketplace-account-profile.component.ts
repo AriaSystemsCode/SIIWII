@@ -93,16 +93,21 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       .applyRelationOnProfile(this.accountId, undefined, relation.defaultVisibility == 'Public' ? true : false, relation.connectionEntityId)
       .pipe(
         finalize(() => {
-          this.getAccountDataForView()
+        
           this.hideMainSpinner();
         })
       )
-      .subscribe((result: string) => {
+      .subscribe((result:any) => {
+        const raw = typeof result === 'string' ? result : result?.result ?? '';
+        const { connectionName, disConnectLabel } = this.splitLabels(raw);
 
+        
+        this.marketPlaceData.availableConnections = [];
+        this.marketPlaceData.avaliableConnectionName = '';
 
-        this.marketPlaceData.avaliableConnectionName = "";
-        this.marketPlaceData.connectionName = this.l(result);
-        this.marketPlaceData.availableConnections.length =0;
+        this.marketPlaceData.connectionName   = this.l(connectionName);
+        this.marketPlaceData.disConnectLabel  = this.l(disConnectLabel);
+
       });
   }
 
@@ -167,5 +172,13 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       if (t.includes(key)) return this.ICONS[key];
     }
     return 'assets/accounts/CONNECT.png'; // fallback
+  }
+
+  private splitLabels(raw: string) {
+    // split at the first '-' that precedes the second "MPAction..."
+    const m = /^(.*?)-(MPAction.+)$/.exec(raw || '');
+    return m
+      ? { connectionName: m[1], disConnectLabel: m[2] }
+      : { connectionName: raw || '', disConnectLabel: '' };
   }
 }
