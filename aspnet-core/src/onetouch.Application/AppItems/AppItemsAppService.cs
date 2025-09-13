@@ -6322,13 +6322,19 @@ namespace onetouch.AppItems
                         int childNo = 0;
                         foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
                         {
-                            var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            ////var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            //var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO, AppItemtExcelRecordDTO>(excelDto);
+                            var json = JsonConvert.SerializeObject(excelDto);
+                            var thirdItemCopy = JsonConvert.DeserializeObject<AppItemtExcelRecordDTO>(json);
 
                             thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.RecordType = "Item Variant";
 
                             thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.ExcelDto.RecordType = "Item Variant";
+                            thirdItemCopy.ExcelDto.SizeCode = size.TrimEnd();
+                            thirdItemCopy.ExcelDto.SizeName = size.TrimEnd();
+                            
                             thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
                             //string guid = System.Guid.NewGuid().ToString();
                             thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
@@ -6340,7 +6346,8 @@ namespace onetouch.AppItems
                             });
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
-                            childNo = +1;
+                            childNo += 1;
+                            thirdItemCopy.ExcelDto.D1Pos = childNo.ToString();
                             excelResultsDTO.ExcelRecords.Insert(index + childNo, thirdItemCopy);
 
                         }
@@ -7038,9 +7045,9 @@ namespace onetouch.AppItems
                     {
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
                         //var sizesArray = excelDto.ScaleSizesOrder.Split('|');
-                        var d1sizesArray = excelDto.D1Sizes.Split('|');
-                        var d2sizesArray = excelDto.D2Sizes.Split('|');
-                        var d3sizesArray = excelDto.D3Sizes.Split('|');
+                        var d1sizesArray = !string.IsNullOrEmpty(excelDto.D1Sizes) ? excelDto.D1Sizes.Split('|') : "".Split('|');
+                        var d2sizesArray = !string.IsNullOrEmpty(excelDto.D2Sizes)?excelDto.D2Sizes.Split('|'):"".Split('|');
+                        var d3sizesArray = !string.IsNullOrEmpty(excelDto.D3Sizes) ? excelDto.D3Sizes.Split('|') : "".Split('|'); ;
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                         List<AppSizeScalesDetailDto> appSizeScalesDetailDtoList = new List<AppSizeScalesDetailDto>();
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
