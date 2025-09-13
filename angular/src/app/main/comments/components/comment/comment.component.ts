@@ -52,7 +52,7 @@ export class CommentComponent implements OnChanges {
       }
       
       toggleExpand() {
-        const bodyFormat = this.comment?.messages?.bodyFormat || '';
+        const bodyFormat = this.comment?.messages?.body || '';
         this.isExpanded = !this.isExpanded;
         this.displayedContent = this.isExpanded
           ? bodyFormat
