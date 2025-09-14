@@ -2892,6 +2892,7 @@ namespace onetouch.Accounts
             AppContactDto contact = new AppContactDto();
             //var contactSavedId = contact.Id;
             ObjectMapper.Map(input, contact);
+
             //I46[Start]
             if (input.ShipViaId != null)
             {
@@ -3054,43 +3055,19 @@ namespace onetouch.Accounts
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
 
             contact.EntityId = savedEntity;
-
+            //I40[Start]
+            foreach (var contactAddress in contact.ContactAddresses)
+            {
+                contactAddress.AddressFk = null;
+            }
+            //I40[End]
             long newId = 0;
             if (input.ReturnId)
             { newId = await _appEntitiesAppService.SaveContact(contact); }
             else
             {
                 newId = await _appEntitiesAppService.SaveContact(contact); }
-            //I40[Start]
-            var dbContxt =  CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
-            string addressIds = "";
-            ////var addressList = contact.ContactAddresses.Where(z=>z.AddressFk!=null).Select(z => z.AddressFk).ToList();
-            List<AppContactAddressDto> contactAddressList = new List<AppContactAddressDto>();
-            foreach (var contactAddress in contact.ContactAddresses)
-            {
-                //contactAddressList.Add(contactAddress);
-              // contactAddress.AddressFk = null;
-               
-              //  await _appContactAddressRepository.InsertOrUpdateAndGetIdAsync(ObjectMapper.Map<AppContactAddress>(contactAddress));
-               // await CurrentUnitOfWork.SaveChangesAsync();
-                // contactAddress.AddressFk = null;
-                //if (contactAddress.AddressFk.Id != 0 && contactAddress.AddressFk.Id != null && !addressIds.Contains(contactAddress.AddressFk.Id.ToString()))
-                //{
-                    AppAddress address = ObjectMapper.Map<AppAddress>(contactAddress.AddressFk);
-                //    dbContxt.AppAddresss.Update(address);
-                  
-                if(!addressIds.Contains(contactAddress.AddressFk.Id.ToString()))
-                {
-                    dbContxt.Entry(address).State = EntityState.Detached;
-                    addressIds += "," + address.Id.ToString();
-                }
-                
-                //    //await CurrentUnitOfWork.SaveChangesAsync();
-                //}
-                // dbContxt.AppAddresss.s
-            }
-            //contact.ContactAddresses = null;
-            //I40[End]
+            
              await CurrentUnitOfWork.SaveChangesAsync();
             //I40[Start]
 
