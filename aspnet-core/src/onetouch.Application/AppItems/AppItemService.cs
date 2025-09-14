@@ -609,11 +609,11 @@ namespace onetouch.AppItems
             string tempId = colorEntityId;
             long saveEntity = 0;
             #region create color lookup
-            if ((string.IsNullOrEmpty(colorEntityId) ||  colorEntityId == "0" || colorEntityId == "-") && (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Actions) || appItemtExcelRecordDTO.ExcelDto.Actions=="7" || appItemtExcelRecordDTO.ExcelDto.Actions == "10"))
-                {    
-                    var codeExist = _appEntityRepository.GetAll().FirstOrDefaultAsync(x => 
-                    x.Code == appItemtExcelRecordDTO.ExcelDto.ColorCode && x.EntityObjectTypeId == 16
-                    && (x.TenantId == null || x.TenantId == AbpSession.TenantId)).Result;
+            if ((string.IsNullOrEmpty(colorEntityId) || colorEntityId == "0" || colorEntityId == "-") && (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Actions) || appItemtExcelRecordDTO.ExcelDto.Actions == "7" || appItemtExcelRecordDTO.ExcelDto.Actions == "10"))
+            {
+                var codeExist = _appEntityRepository.GetAll().FirstOrDefaultAsync(x =>
+                x.Code == appItemtExcelRecordDTO.ExcelDto.ColorCode && x.EntityObjectTypeId == 16
+                && (x.TenantId == null || x.TenantId == AbpSession.TenantId)).Result;
 
                 if (codeExist == null)
                 {
@@ -626,9 +626,9 @@ namespace onetouch.AppItems
 
                     var returnColorEntityCreation = _appEntitiesAppService.SaveEntity(colorEntity).Result;
                     tempId = returnColorEntityCreation.ToString();
-                }else { tempId = codeExist.Id.ToString(); }
-                 
-                }
+                } else { tempId = codeExist.Id.ToString(); }
+
+            }
             #endregion create color lookup
             if (!string.IsNullOrEmpty(appItemtExcelRecordDTO.image))
             {
@@ -652,7 +652,7 @@ namespace onetouch.AppItems
                     guid = Path.GetFileNameWithoutExtension(appItemtExcelRecordDTO.image),
                     Index = appEntityDto.EntityAttachments.Count
                 };
-                if(appItemtExcelRecordDTO.ExcelDto.Actions == "3")
+                if (appItemtExcelRecordDTO.ExcelDto.Actions == "3")
                 {
                     appEntityAttachmentDto.Attributes = "101=" + appEntity.Code.Split('-')[1];
                 }
@@ -678,15 +678,23 @@ namespace onetouch.AppItems
                 //}
                 //catch { }
 
-
-                appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
-
-                if (appEntityAttachmentDto.IsDefault)
+                if (appItemtExcelRecordDTO.ExcelDto.Actions == "4" ||
+                    appItemtExcelRecordDTO.ExcelDto.Actions == "7" ||
+                    appItemtExcelRecordDTO.ExcelDto.Actions == "10")
                 {
-                    foreach (var item1 in appEntityDto.EntityAttachments)
-                    {
-                        item1.IsDefault = false;
+                    appEntityDto.EntityAttachments = new List<AppEntityAttachmentDto>();
+                }
+                else
+                {
+                    appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
 
+                    if (appEntityAttachmentDto.IsDefault)
+                    {
+                        foreach (var item1 in appEntityDto.EntityAttachments)
+                        {
+                            item1.IsDefault = false;
+
+                        }
                     }
                 }
                 appEntityDto.TenantId = tenantId;

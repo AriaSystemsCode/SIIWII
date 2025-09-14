@@ -83,6 +83,7 @@ using System.Drawing;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using NPOI.HSSF.Util;
 using DocumentFormat.OpenXml.Presentation;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace onetouch.AppItems
 {
@@ -5592,6 +5593,7 @@ namespace onetouch.AppItems
                     throw new UserFriendlyException(ex.Message);
                 }
 
+
                 // ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
             }
 
@@ -5900,7 +5902,10 @@ namespace onetouch.AppItems
             return returnList;
         }
         public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto)
-        {
+        {   if(itemExcelDto.RecordType == "Image") { itemExcelDto.RecordType = "Item"; }
+            //HIA HIA as per Sam
+            if (itemExcelDto.NoOfDimensions == null) { itemExcelDto.NoOfDimensions = "1"; }
+
             List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             //foreach (var itemExcelDto in input) 
@@ -5933,6 +5938,7 @@ namespace onetouch.AppItems
                         });
                     }
                     //itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
+                    
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 2 &&
                         (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) | string.IsNullOrEmpty(itemExcelDto.Dimension2Name)))
                         returnList.Add(new ImportItemReturnDto
@@ -6236,6 +6242,65 @@ namespace onetouch.AppItems
             #endregion add classifications
 
         }
+
+        public async Task<AppItemtExcelRecordDTO> AddExtraAttrs (AppItemtExcelRecordDTO input )
+        {
+            var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+            var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z => z.Code).FirstOrDefault();
+            if (defaultProductType == null)
+                throw new UserFriendlyException("No Product type is marked as default.");
+            else
+            {
+                var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
+                var productTypeId = pdtyp.FirstOrDefault();
+                
+                 input.ExcelDto.ProductType = defaultProductType;
+                var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));
+                var entityextr = entityObjectExtraAttribute.FirstOrDefault();
+                List<ExtraAttribute> entityExtraAttributes = null;
+                if (entityextr != null && entityextr.ExtraAttributes != null)
+                    entityExtraAttributes = entityextr.ExtraAttributes.ExtraAttributes;
+                input.ExcelDto.ExtraAttributes = entityExtraAttributes;
+                input.ExcelDto.ExtraAttributesValues = new List<AppItemImpExtrAttributes>();
+
+                foreach (var extra in entityExtraAttributes)
+                {
+
+                    if (extra != null)
+                    {
+                        var xCode = extra.IsLookup ? extra.Name.Replace(" ", "") + "Code" : extra.Name.Replace(" ", "");
+                        var xName = extra.IsLookup ? extra.Name.Replace(" ", "") + "Name" : extra.Name.Replace(" ", "");
+
+                        var valueCode = input.ExcelDto.GetType()
+                          .GetProperty(xCode,
+                              System.Reflection.BindingFlags.IgnoreCase
+                              | System.Reflection.BindingFlags.Public
+                              | System.Reflection.BindingFlags.Instance)
+                          ?.GetValue(input.ExcelDto, null);
+
+                        var valueName = input.ExcelDto.GetType()
+                          .GetProperty(xName,
+                              System.Reflection.BindingFlags.IgnoreCase
+                              | System.Reflection.BindingFlags.Public
+                              | System.Reflection.BindingFlags.Instance)
+                          ?.GetValue(input.ExcelDto, null);
+
+
+                        input.ExcelDto.ExtraAttributesValues.Add(new AppItemImpExtrAttributes
+                        {
+                            Name = extra.Name.ToString(),
+                            Code = valueCode==null?"":valueCode.ToString(),
+                            Value = valueName == null ? "" : valueName.ToString(),
+                        });
+
+                    }
+                }
+
+
+            }
+            return input; 
+        }
+
         //Mariama
         public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
         {
@@ -6293,6 +6358,15 @@ namespace onetouch.AppItems
 
                     });
                     //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
+
+                    if (excelDto.ExcelDto.Code == "-") { excelDto.ExcelDto.Code = excelDto.Code; }
+                    if (excelDto.ExcelDto.NoOfDim == null) { excelDto.ExcelDto.NoOfDim = "1"; }
+                    if(string.IsNullOrEmpty(excelDto.ExcelDto.ImageType)){excelDto.ExcelDto.ImageType = "Image";}
+                    
+                    var xexcelDto = AddExtraAttrs(excelDto).Result;
+                    excelDto.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
+                    excelDto.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
+
                     excelDto.ExcelDto.Actions = "";
                     excelDto.ExcelDto.RecordType = "Item";
                     excelDto.RecordType = "Item";
@@ -6314,13 +6388,19 @@ namespace onetouch.AppItems
                         int childNo = 0;
                         foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
                         {
-                            var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            ////var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            //var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO, AppItemtExcelRecordDTO>(excelDto);
+                            var json = JsonConvert.SerializeObject(excelDto);
+                            var thirdItemCopy = JsonConvert.DeserializeObject<AppItemtExcelRecordDTO>(json);
 
                             thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.RecordType = "Item Variant";
 
-                            thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+                            thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd();
                             thirdItemCopy.ExcelDto.RecordType = "Item Variant";
+                            thirdItemCopy.ExcelDto.SizeCode = size.TrimEnd();
+                            thirdItemCopy.ExcelDto.SizeName = size.TrimEnd();
+                            
                             thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
                             //string guid = System.Guid.NewGuid().ToString();
                             thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
@@ -6332,10 +6412,19 @@ namespace onetouch.AppItems
                             });
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
-                            childNo = +1;
+                            childNo += 1;
+                            thirdItemCopy.ExcelDto.D1Pos = childNo.ToString();
+                            
+                            var xexcelDto = AddExtraAttrs(thirdItemCopy).Result;
+                            thirdItemCopy.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
+                            thirdItemCopy.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
+                            thirdItemCopy.ExcelDto.ParentCode = thirdItemCopy.ParentCode;
                             excelResultsDTO.ExcelRecords.Insert(index + childNo, thirdItemCopy);
 
                         }
+                        // call validate to add extra fields
+                        //var xx = this.ValidateExcel(excelResultsDTO.ExcelRecords);
+
                     }
 
                     //if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
@@ -6387,6 +6476,9 @@ namespace onetouch.AppItems
 
                 }
             }
+            result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
+            ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
+
             result = result.Select(r => r).Where(r => (r.Actions != "2" && r.Actions != "3" && r.Actions != "4"
             && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
             && r.Actions != "8" && r.Actions != "9" && r.Actions != "10" 
@@ -7030,9 +7122,9 @@ namespace onetouch.AppItems
                     {
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
                         //var sizesArray = excelDto.ScaleSizesOrder.Split('|');
-                        var d1sizesArray = excelDto.D1Sizes.Split('|');
-                        var d2sizesArray = excelDto.D2Sizes.Split('|');
-                        var d3sizesArray = excelDto.D3Sizes.Split('|');
+                        var d1sizesArray = !string.IsNullOrEmpty(excelDto.D1Sizes) ? excelDto.D1Sizes.Split('|') : "".Split('|');
+                        var d2sizesArray = !string.IsNullOrEmpty(excelDto.D2Sizes)?excelDto.D2Sizes.Split('|'):"".Split('|');
+                        var d3sizesArray = !string.IsNullOrEmpty(excelDto.D3Sizes) ? excelDto.D3Sizes.Split('|') : "".Split('|'); ;
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                         List<AppSizeScalesDetailDto> appSizeScalesDetailDtoList = new List<AppSizeScalesDetailDto>();
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
@@ -7099,9 +7191,9 @@ namespace onetouch.AppItems
                             foreach (var sz in sizes)
                             {
                                 var exist = appSizeScalesDetailDtoList.FirstOrDefault(z => z.SizeCode == sz.SizeCode &&
-                                   z.D1Position == (sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
-                                   z.D2Position == (sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
-                                   z.D3Position == (sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
+                                   z.D1Position == (sz.D1Pos == null || sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
+                                   z.D2Position == (sz.D2Pos == null || sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
+                                   z.D3Position == (sz.D3Pos == null || sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
                                 if (exist == null)
                                     appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
                                     {
@@ -7829,7 +7921,9 @@ namespace onetouch.AppItems
                             { }
                             if (etx == 0)
                                 firstAttributteValues.Add(item.ExtraAttributesValues[etx].Value);
-
+                            //hia hia
+                            //var attPhotoId = _helper.SystemTables.GetAttachmentCategoryId("Image").Result;
+                            if (string.IsNullOrEmpty(item.ImageType)) { item.ImageType = "Image"; }
                             if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && item.Images != null && item.Images.Count > 0)
                             {
                                 var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == item.ImageType.ToUpper()).FirstOrDefault();
