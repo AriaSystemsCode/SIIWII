@@ -1296,7 +1296,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connectContactsProfiles(this.accountDataForView.partnerId, null)
+        this._AccountsServiceProxy.connectContactsProfiles(this.accountDataForView.partnerId, null,null)
             .subscribe(() => {
                 this.notify.success(this.l('SuccessfullyConnected'));
                 this.accountDataForView.status = true

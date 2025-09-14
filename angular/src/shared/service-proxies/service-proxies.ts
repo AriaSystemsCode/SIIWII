@@ -1967,9 +1967,10 @@ export class AccountsServiceProxy {
     /**
      * @param id (optional) 
      * @param tenantId (optional) 
+     * @param sync (optional) 
      * @return Success
      */
-    connectContactsProfiles(id: number | undefined, tenantId: number | null | undefined): Observable<void> {
+    connectContactsProfiles(id: number | undefined, tenantId: number | null | undefined, sync: boolean | null | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ConnectContactsProfiles?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -1977,6 +1978,8 @@ export class AccountsServiceProxy {
             url_ += "id=" + encodeURIComponent("" + id) + "&";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (sync !== undefined && sync !== null)
+            url_ += "sync=" + encodeURIComponent("" + sync) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

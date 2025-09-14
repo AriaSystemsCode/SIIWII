@@ -207,7 +207,7 @@ this.accountsTypes=result.items;
 connect(account: AccountDto): void {
   this.showMainSpinner();
   this._accountsServiceProxy
-      .connectContactsProfiles(account.id,null)
+      .connectContactsProfiles(account.id,null,null)
       .pipe(
           finalize(() => {
               this.hideMainSpinner();
