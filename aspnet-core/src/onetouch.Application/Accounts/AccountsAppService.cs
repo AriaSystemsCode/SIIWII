@@ -1012,8 +1012,8 @@ namespace onetouch.Accounts
                 .WhereIf(input.AccountId != null && input.FilterType == MemberFilterTypeEnum.Profile,
                 x => x.TenantId == AbpSession.TenantId && (((x.AccountId == input.AccountId) ||
                             _appContactRelationshipInfoRepository.GetAll()
-                            .WhereIf(input.FilterType == MemberFilterTypeEnum.Profile, s=> s.ConsiderAsTeamMember == true)
-                           .Where(s => s.RecipientContactSSIN  == x.SSIN &&
+                            //.WhereIf(input.FilterType == MemberFilterTypeEnum.Profile, s=> s.ConsiderAsTeamMember == true)
+                           .Where(s => s.RecipientContactSSIN  == x.SSIN && s.ConsiderAsTeamMember == true &&
                            s.RequesterContactSSIN == currentTenantAccountSSIN && s.SharingLevel == 1
                            && s.EntityObjectStatusId == activeRelationshipStatusId).Count() >0
                 ) ||
