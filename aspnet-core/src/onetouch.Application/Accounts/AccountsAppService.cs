@@ -1666,7 +1666,7 @@ namespace onetouch.Accounts
             return output;
         }
 
-        public async Task ConnectContactsProfiles(long id, int? tenantId = null)
+        public async Task ConnectContactsProfiles(long id, int? tenantId = null, bool? sync = false)
         {
             //I45
             if (tenantId == null)
@@ -1731,7 +1731,7 @@ namespace onetouch.Accounts
                             .Include(z => z.EntityFk).ThenInclude(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                             .Include(z=> z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
                             .FirstOrDefaultAsync(x => x.TenantId == originalContact.TenantOwner && x.SSIN == originalPublishContactFortCurrTenant.SSIN);
-                        if (existed == null)
+                        if (existed == null && sync == false)
                         {
                             CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
                             createOrEditAccountInfoDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(originalPublishContactFortCurrTenant);
@@ -1826,7 +1826,7 @@ namespace onetouch.Accounts
                             .Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
                    .FirstOrDefaultAsync(x => x.TenantId == tenantId && x.SSIN == originalContact.SSIN);
 
-                    if (existed == null)
+                    if (existed == null && sync == false)
                     {
                         //I40, Mariam[Start]
                         CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
@@ -1958,6 +1958,8 @@ namespace onetouch.Accounts
                         createOrEditAccountInfoDto.TenantId = tenantId;
                         createOrEditAccountInfoDto.Id = existed.Id;
                         createOrEditAccountInfoDto.Code = existed.Code;
+                        createOrEditAccountInfoDto.ParentId = existed.ParentId;
+                        createOrEditAccountInfoDto.AccountId = existed.AccountId;
                         createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
                         createOrEditAccountInfoDto.TimeStamp = originalContact.TimeStamp;
                         createOrEditAccountInfoDto.ContactAddresses = null;
@@ -2080,15 +2082,15 @@ namespace onetouch.Accounts
                     //MMT33-3
 
                     //Connect Current Account branches with the other account
-                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId)
+                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync==false)
                     await ConnectBranches(originalPublishContactFortCurrTenant.Id, id);
 
-                    if(originalContact.EntityObjectTypeId != presonEntityObjectTypeId)
+                    if(originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
                     await ConnectBranches(id, originalPublishContactFortCurrTenant.Id);
 
                     //Mariam[End]
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
-                    if (originalContact != null && originalContact.TenantOwner != null)
+                    if (originalContact != null && originalContact.TenantOwner != null && sync == false)
                     {
                         var tenantObject = await TenantManager.GetByIdAsync(int.Parse(originalContact.TenantOwner.ToString()));
                         if (tenantObject != null)
@@ -3492,8 +3494,7 @@ namespace onetouch.Accounts
                                     //    // collect related branches
                                     //    var branchInfoDelete = _appContactRepository.GetAll().Include(z=>z.EntityFk).
                                     //       Include(e => e.AppContactAddresses).ThenInclude(e => e.AddressFk)
-                                    //   .Where(x => x.IsProfileData
-                                    //          && x.AccountId == personsInfoDelete.Id
+                                    //   .Where(                                    //          && x.AccountId == personsInfoDelete.Id
                                     //          && x.TenantId == connectedAcc.TenantId
                                     //          && x.EntityFk.EntityObjectTypeId != personEntityObjectTypeId).ToList().OrderByDescending(e => e.Id);
 
@@ -3557,7 +3558,7 @@ namespace onetouch.Accounts
 
                                     //}
                                     //End
-                                    await ConnectContactsProfiles(FoundPublishContact.Id, connectedAcc.TenantId);
+                                    await ConnectContactsProfiles(FoundPublishContact.Id, connectedAcc.TenantId,true);
                                 }
                             }
                         }
