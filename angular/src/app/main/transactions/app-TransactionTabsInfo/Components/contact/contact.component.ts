@@ -177,7 +177,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         let sequance = "";
 
 
-        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTBRANCH', this.appSession.tenantId).toPromise()
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('BRANCH', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
             sequance = getNextEntityCodeRes;
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = sequance;
@@ -187,7 +187,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     async saveManualContact() {
         let sequance = "";
 
-        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('MANUALACCOUNTCONTACT', this.appSession.tenantId).toPromise()
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('BUSINESS', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
             sequance = getNextEntityCodeRes;
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = sequance;

@@ -45,7 +45,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   phonelist: Object[] = [];
   active = false;
   phonesLoaded: boolean = false
-  entityObjectType: string = "MANUALACCOUNTCONTACT";
+  entityObjectType: string = "BUSINESS";
   joinDate = new Date();
 
 

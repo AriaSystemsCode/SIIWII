@@ -47,7 +47,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     phoneTypesLoaded: any;
     currSelectAddress: number;
     inputObj1: any;
-    entityObjectType: string = "TENANTBRANCH";
+    entityObjectType: string = "BRANCH";
     stylesObj = {
 
         'height': "47px"
@@ -123,9 +123,9 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
             this._AccountsServiceProxy.getBranchForEdit(branchId).subscribe(result => {
                 this.branch = result;
                 var subCode = this.branch.code.indexOf("-");
-                if (subCode >= 0)
-                    this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
-                else
+                // if (subCode >= 0)
+                //     this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
+                // else
                     this.branchCode = this.branch.code
 
                 if (this.branch.parentId) this.branch.accountId = accountId
@@ -266,7 +266,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         if (!contactAddr || !(contactAddr.addressId > 0)) return;
 
         contactAddr.addressTypeId = addressTypeId;
-        contactAddr.accountId = this.appSession.user.accountId
+        // contactAddr.accountId = this.appSession.user.accountId
         if (patch) Object.assign(contactAddr, patch);
 
         contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
@@ -284,7 +284,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.pushAddress(
             this.address2,
             this.directShippingAddressDef.value,
-            { accountId: this.appSession.user.accountId, contactId: this.address1?.contactId }
+            { accountId: 0, contactId: this.address1?.contactId }
         );
 
         this.pushAddress(this.address3, this.distributionCenterAddressDef.value);

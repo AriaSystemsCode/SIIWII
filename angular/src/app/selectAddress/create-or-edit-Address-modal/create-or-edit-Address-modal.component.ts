@@ -31,7 +31,7 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
 
     allCountries: LookupLabelDto[];
     branchId: number
-    entityObjectType: string = "TENANTADDRESS";
+    entityObjectType: string = "ADDRESS";
     addressCode: string = "";
     constructor(
         injector: Injector,
