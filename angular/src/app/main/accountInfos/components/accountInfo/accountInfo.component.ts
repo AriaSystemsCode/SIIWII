@@ -423,11 +423,19 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     getAccountTypes() {
         this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-          .subscribe(result => {
-            this.accountTypes = (result ?? []).filter(t =>
-             t.label === 'Business'
-            );
-          });
+        .subscribe(result => {
+          const list = result ?? [];
+      
+          const business = list.find(x => x.label === 'Business'); // x is scoped here
+          this.accountTypes = business ? [business] : [];
+      
+     
+          
+        });
+             // pick the id field your DTO actually uses:
+             this.accountInfoTemp.accountTypeId = 19;
+             this.accountInfoTemp.accountType = 'Business' ;
+      
       }
       
 
