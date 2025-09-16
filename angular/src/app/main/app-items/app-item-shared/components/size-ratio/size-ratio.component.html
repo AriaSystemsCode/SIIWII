@@ -54,6 +54,7 @@
                             [readOnly]="readOnly"
                             [pattern]="sizeScale.sizeRatio > 0 ? patterns.positiveInteger : null"
                             #sizeRatio="ngModel"
+                            class="pl-3"
                         />
                     </div>
                     <validation-messages [formCtrl]="sizeRatio" ></validation-messages>
