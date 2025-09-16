@@ -54,6 +54,7 @@ namespace onetouch.Web.Startup
 
         public override string GetNameOrConnectionString(ConnectionStringResolveArgs args)
         {
+
             var origin = _httpContextAccessor.HttpContext?.Items["XXXRequestOrigin"]?.ToString();
             //return "Server=AriaSQL\\AriaNexus; Database=onetouchDevDb3;TrustServerCertificate=True; User=sa; Password=Aria@2021;";
             //Aria.MASTER
@@ -64,41 +65,50 @@ namespace onetouch.Web.Startup
                 {
                     conn.Open();
 
-                    using (var cmd = new SqlCommand("SELECT TOP 1 ConnectionString FROM Clients WHERE Url = @Url", conn))
+                    using (var cmd = new SqlCommand("SELECT TOP 1 * FROM Clients WHERE Url = @Url", conn))
                     {
                         cmd.Parameters.AddWithValue("@Url", origin);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read()) // only first row
+                            {
+                                var connectionString = reader["ConnectionString"]?.ToString();
+                                var url = reader["Url"]?.ToString();
+                                var path = reader["Path"]?.ToString();   // <-- Path column
+                                var pathTemp = reader["TempPath"]?.ToString();   // <-- Path Temp column
+                                var omitt = reader["Omitt"]?.ToString();   // <-- Omitt column
 
-                        var result = cmd.ExecuteScalar();
-                        if (result!=null && !string.IsNullOrEmpty(result.ToString()))
-                        {
-                            var _appConfiguration = _configurationAccessor.Configuration;
-                            _appConfiguration["App:ClientRootAddress"] = origin;
-                            _appConfiguration[$"Attachment:Path"] = "..\\onetouch.Web.Host\\wwwroot\\attachments123";
-                            //_appConfiguration[$"Attachment:PathTemp"] = origin;
-                            //_appConfiguration[$"Attachment:Omitt"] = origin;
-                            return result?.ToString();
-                        }
-                        else
-                        {
+                                if (!string.IsNullOrEmpty(connectionString))
+                                {
+                                    var _appConfiguration = _configurationAccessor.Configuration;
+                                    _appConfiguration["App:ClientRootAddress"] = url;
+                                    _appConfiguration["Attachment:Path"] = @path;   // <-- set from DB
+                                    _appConfiguration["Attachment:PathTemp"] = @pathTemp;   // <-- set from DB
+                                    _appConfiguration["Attachment:Omitt"] = @omitt;   // <-- set from DB
+
+                                    return connectionString;
+                                }
+                            }
+
+                            // fallback if no row or no valid connection string
                             return base.GetNameOrConnectionString(args);
                         }
                     }
+
                 }
             }
-
-            //return "Server=WEBAPP-DEV\\SIIWII; Database=onetouchDevDb3_05192024;TrustServerCertificate=True;User ID=sa;Password=Siiwii@2024;";
-            //if (!string.IsNullOrEmpty(origin))
-            //{
-            //    if (origin.Contains("url1.com"))
-            //        return "Server=sqlserver1;Database=DB1;User Id=sa;Password=pass;";
-
-            //    if (origin.Contains("url2.com"))
-            //        return "Server=sqlserver2;Database=DB2;User Id=sa;Password=pass;";
-            //}
-
-            // fallback to default
+             
             return base.GetNameOrConnectionString(args);
         }
+  
+    
+    
+    
+    
+    
+    
+    
+    
     }
 
 
