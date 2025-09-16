@@ -29,6 +29,7 @@ import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
 import { imageCroppingComponent } from "./imageCropping.Component";
+import { debug } from "console";
 
 @Component({
     selector: "MainImportModal",
@@ -1144,8 +1145,9 @@ export class MainImportComponent
     }
 
     onValidateRecord(record) {
+        
         let _ImportItemInputDto: ImportItemInputDto = new ImportItemInputDto();
-        _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
+       
 
         if (record._isCreateParent) {
             record.recordType = "Item";
@@ -1158,7 +1160,8 @@ export class MainImportComponent
             record.excelDto.recordType = "Item Variant";
             //I44 record.NoOfDimensions="1"
         }
-
+         _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
+         
         this.importServiceProxy.validateImportItemData(_ImportItemInputDto)
             .subscribe((result: ImportItemReturnDto[]) => {
                 const hasErrors = Array.isArray(result) && result.length > 0;
@@ -1188,9 +1191,10 @@ export class MainImportComponent
             return ret;
 
         ret.brandCode = dto.brandCode;
+        ret.parentCode = record.parentCode;
         ret.productType = dto.productType;
         ret.recordType = dto.recordType;
-        ret.code = dto.code;
+        ret.code = record.code;
         ret.name = dto.name;
         ret.productDescription = dto.productDescription;
         ret.productClassificationCode = dto.productClassificationCode;
@@ -1212,19 +1216,20 @@ export class MainImportComponent
         ret.dimension1Sizes = dto.dimension1Sizes;
         ret.dimension2Sizes = dto.dimension2Sizes;
         ret.dimension3Sizes = dto.dimension3Sizes;
-        ret.dimension1Name = dto.dimension1Name;
-        ret.dimension2Name = dto.dimension2Name;
-        ret.dimension3Name = dto.dimension3Name;
+        ret.dimension1Name = dto.d1Name;
+        ret.dimension2Name = dto.d2Name;
+        ret.dimension3Name = dto.d3Name;
         ret.noOfDimensions = dto.noOfDimensions;
         ret.priceA = dto.priceA;
         ret.priceB = dto.priceB;
         ret.priceC = dto.priceC;
         ret.priceD = dto.priceD;
-        ret.parentCode = dto.parentCode;
+        //ret.parentCode = dto.parentCode;
         ret.productClassificationDescription = dto.productClassificationDescription;
         ret.productCategoryDescription = dto.productCategoryDescription;
         ret.sizeCode = dto.sizeCode;
         ret.sizeName = dto.sizeName;
+        
         ret.dimension1Position = dto.dimension1Position;
         ret.dimension2Position = dto.dimension2Position;
         ret.dimension3Position = dto.dimension3Position;

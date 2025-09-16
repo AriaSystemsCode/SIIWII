@@ -1111,7 +1111,17 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price C',
     'Price D',
     'Color Code',
-    'Color Name'
+    'Color Name',
+    'SIZE Code','SIZE Name','Size Scale Name',	'Scale Sizes Order',
+    'Size Ratio Value',
+    'Start Ship Date',
+    'Dimension 1 sizes',
+    'Dimension 1 Name',
+    'Dimension 2 sizes',
+    'Dimension 2 Name',
+    'Dimension 3 sizes',
+    'Dimension 3 Name',
+    'No of Dimensions'
   ];
 
   editableColumnsForCreateNewItemColor = [
@@ -1135,8 +1145,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price B',
     'Price C',
     'Price D',
-    'Color Code',
-    'Color Name'
+    'SIZE Code',
+    'SIZE Name',
+    'Dimension1Position',
+    'Dimension2Position',
+    'Dimension3Position',
+    'Dimension4Position',    
+
   ];
 
 
