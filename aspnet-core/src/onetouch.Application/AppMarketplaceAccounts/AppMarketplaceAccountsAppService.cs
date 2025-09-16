@@ -667,6 +667,7 @@ namespace onetouch.AppMarketplaceAccounts
                             accountDto.CountryName = firstAddress.AddressFk.CountryFk.Name;
                             accountDto.ZipCode = firstAddress.AddressFk.PostalCode;
                             accountDto.State = firstAddress.AddressFk.State;
+                            accountDto.Phone1Number = firstAddressBranch.Phone1Number;
                         }
                     }
                     if (account.TenantOwner != null)
@@ -950,17 +951,17 @@ namespace onetouch.AppMarketplaceAccounts
                 if (ret != null)
                 {
                     ret.SharingLevel = 4;
-                    var relatedContacts = await _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId==ret.Id).ToListAsync();
+                    var relatedContacts = await _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId == ret.Id).ToListAsync();
                     if (relatedContacts != null && relatedContacts.Count() > 0)
-                        _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId == ret.Id).ForEach(z=>z.SharingLevel=4);
+                        _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId == ret.Id).ForEach(z => z.SharingLevel = 4);
+
+
+                    //I40[Start]
+                    var itemObjectId = await _helper.SystemTables.GetObjectListingId();
+                    onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
+                    dbContext.AppMarketplaceItems.Where(z => z.TenantOwner == ret.TenantOwner && z.ObjectId == itemObjectId && z.SharingLevel != 4)
+                        .ForEach(z => z.SharingLevel = 4);
                 }
-
-                //I40[Start]
-                var itemObjectId = await _helper.SystemTables.GetObjectListingId();
-                onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
-                dbContext.AppMarketplaceItems.Where(z => z.TenantOwner == AbpSession.TenantId && z.ObjectId == itemObjectId && z.SharingLevel != 4)
-                    .ForEach(z=>z.SharingLevel= 4);
-
                 //var marketplaceItems = await _appMarketplaceItemRepository.GetAll().Where(z => z.TenantOwner == AbpSession.TenantId && z.ObjectId == itemObjectId && z.SharingLevel !=4).ToListAsync();
                 //if (marketplaceItems != null && marketplaceItems.Count() > 0)
                 //{
@@ -1793,6 +1794,7 @@ namespace onetouch.AppMarketplaceAccounts
                             if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 // entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713));
+                                if (appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707)!= null)
                                 appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue = null;
                             }
 
@@ -1803,7 +1805,8 @@ namespace onetouch.AppMarketplaceAccounts
                             if (extraAtt.AttributeValue == null || extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 //entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714));
-                                appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue = null;
+                                if (appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703) != null)
+                                    appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue = null;
                             }
                             //entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703));
                             break;
