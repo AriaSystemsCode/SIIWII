@@ -237,10 +237,33 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
         }))
         .subscribe((res) => {
           if (res) {
-        this.appTransactionsForViewDto.paymentTermsId =res?.account?.paymentTermsId
-        this.appTransactionsForViewDto.paymentTermsName =res?.account?.paymentTermsName
-        this.appTransactionsForViewDto.shipViaId =res?.account?.shipViaId
-        this.appTransactionsForViewDto.shipViaName =res?.account?.shipViaName
+
+            if(!res?.account?.shipViaId || res?.account?.paymentTermsId){
+              this._AccountsServiceProxy.getAccountForView(this.appSession?.user?.accountId,5)
+              .subscribe((result)=>{ 
+                if(!res?.account?.shipViaId) {
+                  this.appTransactionsForViewDto.shipViaId= result?.account?.shipViaId; 
+                  this.appTransactionsForViewDto.shipViaName =result?.account?.shipViaName
+                } else {
+                  this.appTransactionsForViewDto.shipViaId= res?.account?.shipViaId; 
+                  this.appTransactionsForViewDto.shipViaName =res?.account?.shipViaName
+                }
+
+                if(!res?.account?.paymentTermsId) {
+                  this.appTransactionsForViewDto.paymentTermsId= result?.account?.paymentTermsId; 
+                  this.appTransactionsForViewDto.paymentTermsName =result?.account?.paymentTermsName
+                } else {
+                  this.appTransactionsForViewDto.paymentTermsId= res?.account?.paymentTermsId; 
+                  this.appTransactionsForViewDto.paymentTermsName =res?.account?.paymentTermsName
+                }
+              });
+            } else {
+              this.appTransactionsForViewDto.shipViaId= res?.account?.shipViaId; 
+              this.appTransactionsForViewDto.shipViaName =res?.account?.shipViaName
+              this.appTransactionsForViewDto.paymentTermsId= res?.account?.paymentTermsId; 
+              this.appTransactionsForViewDto.paymentTermsName =res?.account?.paymentTermsName
+            }
+
      
           }
         });
@@ -248,6 +271,8 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
    
  
   }
+
+
 
   saveDates() {
     let enteredDate = moment(this.appTransactionsForViewDto?.enteredDate).toDate();
