@@ -686,15 +686,23 @@ namespace onetouch.AppItems
                 //}
                 //catch { }
 
-
-                appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
-
-                if (appEntityAttachmentDto.IsDefault)
+                if (appItemtExcelRecordDTO.ExcelDto.Actions == "4" ||
+                    appItemtExcelRecordDTO.ExcelDto.Actions == "7" ||
+                    appItemtExcelRecordDTO.ExcelDto.Actions == "10")
                 {
-                    foreach (var item1 in appEntityDto.EntityAttachments)
-                    {
-                        item1.IsDefault = false;
+                    appEntityDto.EntityAttachments = new List<AppEntityAttachmentDto>();
+                }
+                else
+                {
+                    appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
 
+                    if (appEntityAttachmentDto.IsDefault)
+                    {
+                        foreach (var item1 in appEntityDto.EntityAttachments)
+                        {
+                            item1.IsDefault = false;
+
+                        }
                     }
                 }
                 appEntityDto.TenantId = tenantId;
