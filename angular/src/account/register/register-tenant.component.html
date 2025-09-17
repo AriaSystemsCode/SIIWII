@@ -20,21 +20,10 @@
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/workSpaceIcon.png" class="user_icon icon-width">
                 <input #tenancyName="ngModel" class="mb-3 form-control" autoFocus type="text"
-                    placeholder="{{ 'EnterYourWorkSpaceName' | localize }} " [(ngModel)]="model.tenancyName" name="tenancyName"
+                    placeholder="{{ 'Enter Your Work Space Name' | localize }} " [(ngModel)]="model.tenancyName" name="tenancyName"
                     required maxlength="64" [pattern]="domainPattern" /></div>
             </div>
-            <!-- <div class="col-1 pl-0 pt-3">
-                        <a class="_tooltip pt-1">
-                            <img src="../../assets/accounts/Form_Input Btn.svg" width="50px" height="50px" />
-                            <span class="tooltiptext">
-                                <h6 style="
-                            font-weight: 100;
-                        ">{{
-                                    "WorkspaceTooltip" | localize
-                                    }}</h6>
-                            </span>
-                        </a>
-                    </div> -->
+      
 
             <div *ngIf="!tenancyName.valid && !tenancyName.pristine">
                 <span class="form-text text-danger text-left">{{
@@ -42,41 +31,17 @@
                     }}</span>
             </div>
         </div>
-        <!--   <div class="form-group col-9 col-lg-12 col-md-10 col-sm-7 m-0">
-                <p-dropdown
-                #accountTypeInput="ngModel"
-              placeholder="{{ 'Account Type' | localize }} *"
-              [options]="accountTypes"
-               styleClass="ticket-dropdown form-control aria-select text-left"
-                [filter]="false"
-               name="accountType"
-               (onChange)="changeAccountType($event)"
-               [(ngModel)]="accountType"
-              required>
-               </p-dropdown>
 
-                <validation-messages
-                    [formCtrl]="accountTypeInput"
-                ></validation-messages>
-            </div>
- -->
 
         <div *ngIf="model.edition" class="form-group col-9 col-lg-12 MB20">
             <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"AccountName"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <div class="user_p_relative">
             <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width">
             <input #nameInput="ngModel" class="mb-3 form-control" type="text"
-                placeholder="{{ 'EnterAccountName' | localize }}" [(ngModel)]="model.name" name="Name" required
+                placeholder="{{ 'Enter Account Name' | localize }}" [(ngModel)]="model.name" name="Name" required
                 maxlength="128" /></div>
             <validation-messages [formCtrl]="nameInput"></validation-messages>
         </div>
-
-        <!-- <h5 class="mt-2" *ngIf="!accountTypeLabel?.includes('PERSONAL')">
-            {{ "AdminInformation" | localize }}
-        </h5> -->
-        <!-- <h5 class="mt-2" *ngIf="accountTypeLabel?.includes('PERSONAL')">
-            {{ "PersonalInformations" | localize }}
-        </h5> -->
 
 
 
@@ -88,9 +53,9 @@
                 <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
                 <input #firstNameInput="ngModel" class="mb-3 form-control" type="text"
              
-                    [placeholder]="('EnterYourFirstName' | localize )" [(ngModel)]="model.firstName" name="adminFirstName"
+                    [placeholder]="('Enter Your First Name' | localize )" [(ngModel)]="model.firstName" name="adminFirstName"
                     required /></div>
-                    <!-- firstName.length > 0 ? firstName : ('EnterYourFirstName' | localize ) -->
+    
                 <span class="form-text text-danger">
                     <validation-messages [formCtrl]="firstNameInput"></validation-messages>
                 </span>
@@ -101,7 +66,7 @@
                 <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
                 <input #lastNameInput="ngModel" class="mb-3 form-control" type="text"
              
-                   [placeholder]="('EnterYourLastName' | localize )" [(ngModel)]="model.lastName" name="adminLastName"
+                   [placeholder]="('Enter Your Last Name' | localize )" [(ngModel)]="model.lastName" name="adminLastName"
                     required/></div>
                     <!-- lastName.length > 0  ? lastName : ( 'EnterYourLastName' | localize ) -->
                 <span class="form-text text-danger">
@@ -117,7 +82,7 @@
             <div class="user_p_relative">
             <img src="../../assets/img/input_icons/letter.png" class="user_icon icon-width">
             <input #adminEmailAddressInput="ngModel" class="mb-3 form-control" type="email"
-                [placeholder]="!accountTypeLabel?.includes('PERSONAL') ? ('EnterTheAdminEmailAddress' | localize) : ( 'EnterYourPersonalEmailAdress '| localize)"
+                [placeholder]="!accountTypeLabel?.includes('PERSONAL') ? ('Enter The Admin EmailAddress' | localize) : ( 'Enter Your Personal EmailAdress '| localize)"
                 [(ngModel)]="model.adminEmailAddress" name="adminEmailAddress" required maxlength="256" email /></div>
 
             <span class="form-text text-danger">
@@ -132,7 +97,7 @@
                 <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width SmallUser_icon">
                 <input type="password" name="Password" class="mb-3 form-control" [(ngModel)]="model.adminPassword"
                     #Password="ngModel"
-                    [placeholder]="'EnterYourPassword' | localize "
+                    [placeholder]="'Enter Your Password' | localize "
                     validateEqual="PasswordRepeat" reverse="true"
                     [requireDigit]="passwordComplexitySetting.requireDigit" [requireLowercase]="
                         passwordComplexitySetting.requireLowercase
@@ -188,7 +153,7 @@
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width SmallUser_icon">
                 <input type="password" name="PasswordRepeat" class="mb-3 form-control" [ngModel]="model.passwordRepeat"
-                    #PasswordRepeat="ngModel" placeholder="{{'EnterYourConfirmPassword' | localize}}" validateEqual="Password"
+                    #PasswordRepeat="ngModel" placeholder="{{'Enter Your Confirm Password' | localize}}" validateEqual="Password"
                     reverse="false" [requireDigit]="passwordComplexitySetting.requireDigit" [requireLowercase]="
                         passwordComplexitySetting.requireLowercase
                     " [requireUppercase]="
