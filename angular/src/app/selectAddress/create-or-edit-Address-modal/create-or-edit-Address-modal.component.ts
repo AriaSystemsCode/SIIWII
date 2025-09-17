@@ -36,7 +36,7 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     ) {
         super(injector);
 
@@ -67,6 +67,15 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
             let noneOption: LookupLabelDto = Object.assign(new LookupLabelDto(), { label: "None", value: null })
             this.allCountries.unshift(noneOption)
         });
+        if(this.address.id == null || this.address.id == undefined || this.address.id == 0){
+            this._accountsServiceProxy.getAccountForView(this.appSession?.user?.accountId,5)
+            .subscribe((result)=>{ 
+         
+                this.address.countryId = result?.account?.countryId
+          
+            });
+   
+        }
 
     }
 

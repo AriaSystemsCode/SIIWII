@@ -90,7 +90,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     showHide = true;
     hidUshare = false;
-    // showIsSync = false;
+    showIsSync = false;
     showShare = true;
     hideshowShare = false;
     editedPersonalData:any
@@ -119,7 +119,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.getAllForAccountInfo()
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
-        
+
     
     
     }
@@ -375,8 +375,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             )).subscribe(
                 (response: boolean) => {
                     this.notify.success(this.l("Account sync Successfully"));
-                    // this.showIsSync = !response;
-                    // this.isSync = !response;
+                    this.showIsSync = !response;
+                    this.isSync = !response;
                     this.isSync = false;
                     
                 });
