@@ -7633,7 +7633,7 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone2Type) && GetTypeId(accountExcelDto.Phone2Type, phoneTypes) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
