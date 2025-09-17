@@ -2741,6 +2741,9 @@ namespace onetouch.AppSiiwiiTransaction
                     //Iteration45[End]
                     await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                     await CurrentUnitOfWork.SaveChangesAsync();
+                    //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                    UpdateAppEntityLog(filteredAppTransactions.Id);
+                    //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                 }
                 return true;
             }
@@ -2790,6 +2793,9 @@ namespace onetouch.AppSiiwiiTransaction
                     //Iteration45[End]
                     await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                     await CurrentUnitOfWork.SaveChangesAsync();
+                    //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                    UpdateAppEntityLog(filteredAppTransactions.Id);
+                    //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                 }
                 return true;
             }
@@ -2827,6 +2833,9 @@ namespace onetouch.AppSiiwiiTransaction
                     //Iteration45[End]
                     await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                     await CurrentUnitOfWork.SaveChangesAsync();
+                    //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                    UpdateAppEntityLog(filteredAppTransactions.Id);
+                    //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                 }
 
                 return true;
@@ -2971,6 +2980,12 @@ namespace onetouch.AppSiiwiiTransaction
                                                             : "attachments/" + (line.TenantId.HasValue ? line.TenantId : -1) + "/" +
                                                             lineAttachmentDefault.AttachmentFk.Attachment);
                                             }
+                                            //T-SII-20241108.0007,1 MMT 09/17/2024 - Transaction - Styles without images show with crash image[Start]
+                                            if (string.IsNullOrEmpty(sizeColorDetailView.Data.Image))
+                                            {
+                                                sizeColorDetailView.Data.Image = majorDetailView.Data.Image;
+                                            }
+                                            //T-SII-20241108.0007,1 MMT 09/17/2024 - Transaction - Styles without images show with crash image[End]
                                             //I45
                                             if (!string.IsNullOrEmpty(sizeColorDetailView.Data.Image))
                                             {
@@ -3052,6 +3067,10 @@ namespace onetouch.AppSiiwiiTransaction
                         filteredAppTransactions.TimeStamp = DateTime.UtcNow;
                         await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                         await CurrentUnitOfWork.SaveChangesAsync();
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                        UpdateAppEntityLog(filteredAppTransactions.Id);
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
+
                     }
                 }
 
@@ -3093,6 +3112,9 @@ namespace onetouch.AppSiiwiiTransaction
                             
                         };
                         await CurrentUnitOfWork.SaveChangesAsync();
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                        UpdateAppEntityLog(filteredAppTransactions.Id);
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                     }
                 }
                 filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
@@ -3133,6 +3155,9 @@ namespace onetouch.AppSiiwiiTransaction
                         await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                         //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                         await CurrentUnitOfWork.SaveChangesAsync();
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                        UpdateAppEntityLog(filteredAppTransactions.Id);
+                        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                     }
                 }
 
@@ -3199,6 +3224,10 @@ namespace onetouch.AppSiiwiiTransaction
                 //Iteration45[End]
                 await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
                 //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
+                //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+                await CurrentUnitOfWork.SaveChangesAsync();
+                UpdateAppEntityLog(filteredAppTransactions.Id);
+                //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
                 return true;
             }
         }
@@ -5007,11 +5036,16 @@ namespace onetouch.AppSiiwiiTransaction
                 //                   on o.ContactSSIN equals a.SSIN into j
                 //                   from s in j.DefaultIfEmpty()
                 //                   select new { TenantId = s.TenantId, Role = o.ContactRole };
-                var transTenants = transContacts.Join(
+                //T-SII-20250313.0001-Transaction-Creating orders without selecting contact name after sharing - the order type will be the same for the creator and recipient[Start]
+                /*var transTenants = transContacts.Join(
                     _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantId != null && z.PartnerId == null && z.IsProfileData),
                                                       x => x.ContactSSIN, z => z.SSIN,
-                                                      (s, sa) => new { TenantId = sa.TenantId, Role = s.ContactRole });
-
+                                                      (s, sa) => new { TenantId = sa.TenantId, Role = s.ContactRole });*/
+                var transTenants = transContacts.Join(
+    _appContactRepository.GetAll().Where(z => z.TenantId != null && z.PartnerId == null && z.IsProfileData),
+                                      x => (x.ContactSSIN == null ? x.CompanySSIN : x.ContactSSIN), z => z.SSIN,
+                                      (s, sa) => new { TenantId = sa.TenantId, Role = s.ContactRole });
+                //T-SII-20250313.0001-Transaction-Creating orders without selecting contact name after sharing - the order type will be the same for the creator and recipient[End]
                 var transTenantsList = transTenants.ToList();
 
 
@@ -7395,6 +7429,47 @@ namespace onetouch.AppSiiwiiTransaction
                 return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
             }
         }
+        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
+        protected void UpdateAppEntityLog(long filteredAppTransactionsId)
+        {
+            var entityOpenObjectStatusId = _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+            var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
+                .Where(e => e.TenantId == AbpSession.TenantId
+                && e.CreatorUserId == AbpSession.UserId
+                && (e.EntityObjectStatusId == long.Parse(entityOpenObjectStatusId.Result.ToString()))
+                && e.Id == filteredAppTransactionsId).FirstOrDefault();
+            if (filteredAppTransactions != null)
+            {
+
+                if (filteredAppTransactions.EntityObjectStatusId != long.Parse(entityOpenObjectStatusId.Result.ToString()))
+                {
+                    return;
+                }
+
+                var statusCodeNotSent = _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                var logExist = _appEntityLogRepository.GetAll().Where(z => z.EntityId == filteredAppTransactions.Id &&
+                z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == filteredAppTransactions.EntityObjectTypeId &&
+                z.EntityObjectStatusId == long.Parse(statusCodeNotSent.Result.ToString())
+                ).FirstOrDefault();
+                if (logExist == null)
+                {
+                    logExist = new AppEntityLog();
+                    logExist.EntityObjectStatusId = long.Parse(statusCodeNotSent.Result.ToString());
+                    logExist.EntityObjectStatusCode = "Ready to be Sent";
+                    logExist.EntityId = filteredAppTransactions.Id;
+                    logExist.EntityCode = filteredAppTransactions.Code;
+                    logExist.EntityObjectTypeId = filteredAppTransactions.EntityObjectTypeId;
+                    logExist.EntityObjectTypeCode = filteredAppTransactions.EntityObjectTypeCode;
+                    logExist.PartnerCode = "ARIAERP";
+                    logExist.TenantId = int.Parse(AbpSession.TenantId.ToString());
+                    logExist.ObjectId = filteredAppTransactions.ObjectId;
+                    logExist.ObjectCode = "TRANSACTION";
+                    _appEntityLogRepository.Insert(logExist);
+                    CurrentUnitOfWork.SaveChanges();
+                }
+            }
+        }
+        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
         //I46{End}
     }
 
