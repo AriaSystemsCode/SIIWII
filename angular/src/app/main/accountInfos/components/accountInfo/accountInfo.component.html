@@ -6,7 +6,7 @@
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
                             <span  class="pageTitle">
-                                <span *ngIf="isRecordOwner || (!accountDataForView?.isConnected && !accountDataForView?.isManual)">{{l("MyAccount")}}</span>
+                                <span *ngIf="isRecordOwner || (!accountDataForView?.isConnected && accountLevel != accountLevelEnum.Manual)">{{l("MyAccount")}}</span>
                                 <span *ngIf="(accountDataForView?.isConnected) && !isRecordOwner">{{l("Connected Account")}}</span>
                                 <span *ngIf="(accountDataForView?.isManual) && !isRecordOwner">{{l("ManualAccount")}}</span>
                             </span>
@@ -99,7 +99,7 @@
                                     <button type="button"
                                         *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner"
                                         class="btn mb-3 mt-4 w-100 btn-danger" (click)="disConnect()">
-                                        {{ accData?.disConnectLabel != null ? accData.disConnectLabel : "Disconnect" | localize }}
+                                        {{ accData?.disConnectLabel != null ? getFormattedConnectionName()  : "Disconnect" | localize }}
                                     </button>
                                 </div>
                             </div>
@@ -441,7 +441,7 @@
                                                 <div class="d-flex flex-grow-1">
                                                     <div class="flex-grow-1 mr-1 account-page">
 
-                                                        <p-dropdown *ngIf="accountLevel == accountLevelEnum.Manual"
+                                                  <p-dropdown *ngIf="accountLevel == accountLevelEnum.Manual"
                                                             (onChange)="changeTouchState()"
                                                             #manualAccountTypeInput="ngModel"
                                                             placeholder="{{ 'Account Type' | localize }} *"
@@ -450,13 +450,7 @@
                                                             [filter]="false" name="accountType"
                                                             [(ngModel)]="accountInfoTemp.accountTypeId" required>
                                                         </p-dropdown>
-                                                        <!-- <input *ngIf="accountLevel != accountLevelEnum.Manual"
-                                                            type="text" id="AccountInfoTemp_AccountType"
-                                                            #accountTypeInput="ngModel"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [(ngModel)]="accountInfoTemp.accountType" name="accountType"
-                                                            minlength="2" maxlength="100" readonly
-                                                            [placeholder]="'AccountType' | localize " /> -->
+                                                   
                                                             <input
                                                             *ngIf="accountLevel != accountLevelEnum.Manual"
                                                             type="text"
@@ -802,7 +796,7 @@
                                 #createOrEditMember></app-create-or-edit-member>
                         </div>
                         <div class="tab7" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.ViewMember}">
-                            <app-view-member-profile #viewMemberProfile (edit)="createOrEditMemberHandler($event)"
+                            <app-view-member-profile #viewMemberProfile [fromManualAcc]="fromManualAcc" (edit)="createOrEditMemberHandler($event)"
                                 (delete)="onDeleteMemberHandler($event)"></app-view-member-profile>
                         </div>
                         <div class="tab8" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling">

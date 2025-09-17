@@ -1967,9 +1967,10 @@ export class AccountsServiceProxy {
     /**
      * @param id (optional) 
      * @param tenantId (optional) 
+     * @param sync (optional) 
      * @return Success
      */
-    connectContactsProfiles(id: number | undefined, tenantId: number | null | undefined): Observable<void> {
+    connectContactsProfiles(id: number | undefined, tenantId: number | null | undefined, sync: boolean | null | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ConnectContactsProfiles?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -1977,6 +1978,8 @@ export class AccountsServiceProxy {
             url_ += "id=" + encodeURIComponent("" + id) + "&";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (sync !== undefined && sync !== null)
+            url_ += "sync=" + encodeURIComponent("" + sync) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -63823,6 +63826,7 @@ export interface IExtraDataAttrDto {
 export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     fileToken!: string | undefined;
     tradeName!: string | undefined;
+    timeStamp!: moment.Moment | undefined;
     accountType!: string | undefined;
     accountTypeId!: number;
     ssin!: string | undefined;
@@ -63872,6 +63876,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     tenantOwner!: number | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
     accountId!: number | undefined;
+    contactRecordType!: string | undefined;
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
@@ -63896,6 +63901,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             }
             this.fileToken = _data["fileToken"];
             this.tradeName = _data["tradeName"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
             this.ssin = _data["ssin"];
@@ -63973,6 +63979,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                     this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
             }
             this.accountId = _data["accountId"];
+            this.contactRecordType = _data["contactRecordType"];
             this.shipViaId = _data["shipViaId"];
             this.paymentTermsId = _data["paymentTermsId"];
             if (Array.isArray(_data["extraDataAttributes"])) {
@@ -63999,6 +64006,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
         }
         data["fileToken"] = this.fileToken;
         data["tradeName"] = this.tradeName;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
         data["ssin"] = this.ssin;
@@ -64076,6 +64084,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 data["entityExtraData"].push(item.toJSON());
         }
         data["accountId"] = this.accountId;
+        data["contactRecordType"] = this.contactRecordType;
         data["shipViaId"] = this.shipViaId;
         data["paymentTermsId"] = this.paymentTermsId;
         if (Array.isArray(this.extraDataAttributes)) {
@@ -64091,6 +64100,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
 export interface ICreateOrEditAccountInfoDto {
     fileToken: string | undefined;
     tradeName: string | undefined;
+    timeStamp: moment.Moment | undefined;
     accountType: string | undefined;
     accountTypeId: number;
     ssin: string | undefined;
@@ -64140,6 +64150,7 @@ export interface ICreateOrEditAccountInfoDto {
     tenantOwner: number | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
     accountId: number | undefined;
+    contactRecordType: string | undefined;
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
@@ -65372,6 +65383,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     errorMessages!: string[] | undefined;
     fileToken!: string | undefined;
     tradeName!: string | undefined;
+    timeStamp!: moment.Moment | undefined;
     accountType!: string | undefined;
     accountTypeId!: number;
     ssin!: string | undefined;
@@ -65421,6 +65433,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     tenantOwner!: number | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
     accountId!: number | undefined;
+    contactRecordType!: string | undefined;
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
@@ -65450,6 +65463,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             }
             this.fileToken = _data["fileToken"];
             this.tradeName = _data["tradeName"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
             this.ssin = _data["ssin"];
@@ -65527,6 +65541,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                     this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
             }
             this.accountId = _data["accountId"];
+            this.contactRecordType = _data["contactRecordType"];
             this.shipViaId = _data["shipViaId"];
             this.paymentTermsId = _data["paymentTermsId"];
             if (Array.isArray(_data["extraDataAttributes"])) {
@@ -65558,6 +65573,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
         }
         data["fileToken"] = this.fileToken;
         data["tradeName"] = this.tradeName;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
         data["ssin"] = this.ssin;
@@ -65635,6 +65651,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 data["entityExtraData"].push(item.toJSON());
         }
         data["accountId"] = this.accountId;
+        data["contactRecordType"] = this.contactRecordType;
         data["shipViaId"] = this.shipViaId;
         data["paymentTermsId"] = this.paymentTermsId;
         if (Array.isArray(this.extraDataAttributes)) {
@@ -65651,6 +65668,7 @@ export interface IAppContactValidationInputDTO {
     errorMessages: string[] | undefined;
     fileToken: string | undefined;
     tradeName: string | undefined;
+    timeStamp: moment.Moment | undefined;
     accountType: string | undefined;
     accountTypeId: number;
     ssin: string | undefined;
@@ -65700,6 +65718,7 @@ export interface IAppContactValidationInputDTO {
     tenantOwner: number | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
     accountId: number | undefined;
+    contactRecordType: string | undefined;
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;

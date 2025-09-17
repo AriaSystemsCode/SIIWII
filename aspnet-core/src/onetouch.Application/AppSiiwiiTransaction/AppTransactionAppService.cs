@@ -333,11 +333,18 @@ namespace onetouch.AppSiiwiiTransaction
                         accountInput.Phone1Number = buyerContact.ContactPhoneNumber;
                         accountInput.TenantId = AbpSession.TenantId;
                         accountInput.ReturnId = true;
-                        var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
-                        if (tenantObj != null)
+                        if (string.IsNullOrEmpty(buyerContact.CompanyCode))
                         {
-                            string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("TENANTCONTACT");
-                            accountInput.Code = tenantObj.TenancyName.Trim() + "-M" + sequance;
+                            var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                            if (tenantObj != null)
+                            {
+                                string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("BUSINESS");
+                                accountInput.Code = "M" + sequance; //tenantObj.TenancyName.Trim() +
+                            }
+                        }
+                        else 
+                        {
+                            accountInput.Code = buyerContact.CompanyCode;
                         }
                         accountInput.AccountLevel = AccountLevelEnum.Manual;
                         var businessType = await _helper.SystemTables.GetEntityObjectTypeParetner();
@@ -483,11 +490,18 @@ namespace onetouch.AppSiiwiiTransaction
                         contactDto.Phone1Number = buyerContact.ContactPhoneNumber;
                         contactDto.TenantId = AbpSession.TenantId;
                         contactDto.ParentId = accountObj.Id;
-                        var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
-                        if (tenantObj != null)
+                        if (string.IsNullOrEmpty(buyerContact.ContactCode))
                         {
-                            string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("MANUALACCOUNTCONTACT");
-                            contactDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
+                            var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                            if (tenantObj != null)
+                            {
+                                string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("BUSINESS");
+                                contactDto.Code = "C" + sequance;//tenantObj.TenancyName.Trim() + 
+                            }
+                        }
+                        else
+                        {
+                            contactDto.Code = buyerContact.ContactCode;
                         }
                         ContactDto savedContactDto = await _accountAppService.CreateOrEditContact(contactDto);
                         if (savedContactDto != null)
@@ -2084,9 +2098,9 @@ namespace onetouch.AppSiiwiiTransaction
                 returnObject.AccountSSIN = account.SSIN;
                 returnObject.CurrencyCode = new CurrencyInfoDto
                 {
-                    Code = account.CurrencyFk.Code,
-                    Value = (long)account.CurrencyId,
-                    Label = account.CurrencyFk.Name,
+                    Code = account.CurrencyFk != null ?account.CurrencyFk.Code:"",
+                    Value = account.CurrencyId!=null?(long)account.CurrencyId:0,
+                    Label = account.CurrencyFk != null ? account.CurrencyFk.Name:"",
                     Symbol = (account.CurrencyFk != null && account.CurrencyFk.EntityExtraData != null) &&
                         account.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ?
                         account.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
@@ -2116,7 +2130,7 @@ namespace onetouch.AppSiiwiiTransaction
                 .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                 .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
                  & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId
-                & (a.AccountId == accountId ||
+                & (a.AccountId == accountId &&
                     _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountObject.SSIN &&
                     z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId == activeRealtionshipStatusId) > 0)
                 );
@@ -2184,7 +2198,7 @@ namespace onetouch.AppSiiwiiTransaction
 
             var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
             //T-SII-20240610.0002
-            var manualAccountEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeManual();
+            //var manualAccountEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeManual();
 
             //T-SII-20240103.0001,1 MMT 01/04/2024 - Transactions - (Order info) and(Buyer / Seller Contact Info) accordions are not show the company information[Start]
             AppContact myAccount = null;
@@ -2202,7 +2216,9 @@ namespace onetouch.AppSiiwiiTransaction
                 .WhereIf(myAccount != null, z => z.Id != myAccount.Id)
                 //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
                 .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null &&
-                ((string.IsNullOrEmpty(transactionType) || transactionType == "SO") ? (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id) : a.PartnerId != null)); //a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id
+                        ((string.IsNullOrEmpty(transactionType) || transactionType == "SO") ? (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id) :
+                         _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == a.SSIN) > 0));
+               
                                                                                                                                                                                                                                                   //&& (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || ((string.IsNullOrEmpty(transactionType) || transactionType =="PO") ? false :a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id)));
 
 
@@ -3706,7 +3722,7 @@ namespace onetouch.AppSiiwiiTransaction
                     .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                     .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null 
                      & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &
-                     (a.AccountId == accountId.Id ||
+                     (a.AccountId == accountId.Id &&
                     _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountSSIN &&
                     z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId== activeRealtionshipStatusId)>0 )
                     );
@@ -7225,8 +7241,8 @@ namespace onetouch.AppSiiwiiTransaction
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenantObj != null)
                         {
-                            string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("TENANTCONTACT", tenantId);
-                            accountInput.Code = tenantObj.TenancyName.Trim() + "-M" + sequance;
+                            string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("BUSINESS", tenantId);
+                            accountInput.Code =  "M" + sequance;//tenantObj.TenancyName.Trim() 
                         }
                         if (accountOrg.PartnerId == null)
                         {
@@ -7270,8 +7286,8 @@ namespace onetouch.AppSiiwiiTransaction
                                     contactDto.UseDTOTenant = true;
                                     if (tenantObj != null)
                                     {
-                                        string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("TENANTBRANCH", tenantId);
-                                        contactDto.Code = tenantObj.TenancyName.Trim() + "-" + sequance;
+                                        string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("BRANCH", tenantId);
+                                        contactDto.Code =   "B" + sequance;//tenantObj.TenancyName.Trim()
                                     }
                                     if (accountOrg.PartnerId == null)
                                     {
@@ -7306,8 +7322,8 @@ namespace onetouch.AppSiiwiiTransaction
                                     }
                                     if (tenantObj != null)
                                     {
-                                        string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("MANUALACCOUNTCONTACT", tenantId);
-                                        contactDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
+                                        string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("BUSINESS", tenantId);
+                                        contactDto.Code =  "C" + sequance; //tenantObj.TenancyName.Trim()
                                     }
                                     if (accountOrg.PartnerId == null)
                                     {

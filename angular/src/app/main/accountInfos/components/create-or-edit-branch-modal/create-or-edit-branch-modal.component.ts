@@ -6,7 +6,8 @@ import {
     AccountsServiceProxy,
     LookupLabelDto,
     AppEntitiesServiceProxy,
-    AppContactAddressDto
+    AppContactAddressDto,
+    AppAddressDto
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
@@ -46,13 +47,13 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     phoneTypesLoaded: any;
     currSelectAddress: number;
     inputObj1: any;
-    entityObjectType: string = "TENANTBRANCH";
+    entityObjectType: string = "BRANCH";
     stylesObj = {
-   
+
         'height': "47px"
     };
     branchCode: string = "";
-    
+
     constructor(
         injector: Injector,
         private _AccountsServiceProxy: AccountsServiceProxy,
@@ -122,14 +123,17 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
             this._AccountsServiceProxy.getBranchForEdit(branchId).subscribe(result => {
                 this.branch = result;
                 var subCode = this.branch.code.indexOf("-");
-                if (subCode >= 0)
-                    this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
-                else
+                // if (subCode >= 0)
+                //     this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
+                // else
                     this.branchCode = this.branch.code
 
                 if (this.branch.parentId) this.branch.accountId = accountId
                 let x1 = this.branch.contactAddresses.find(x => x.addressTypeId == this.billingAddressDef.value)
-                if (x1 != undefined) this.address1 = x1;
+                if (x1 != undefined) {
+                    this.address1 = x1;
+
+                }
 
                 let x2 = this.branch.contactAddresses.find(x => x.addressTypeId == this.directShippingAddressDef.value)
                 if (x2 != undefined) this.address2 = x2;
@@ -184,7 +188,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     onCountryChangephone1Number(e) {
         this.branch.phone1CountryKey = e.iso2
     }
-  
+
     getNumberphone2Number(e) {
         this.branch.phone2Number = e;
     }
@@ -198,7 +202,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.branch.phone2CountryKey = e.iso2
 
     }
- 
+
     getNumberphone3Number(e) {
         this.branch.phone3Number = e;
     }
@@ -236,44 +240,67 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         }
     }
 
+    // Add inside the component (private helpers)
+    private toAppAddressDto(src: any, tenantId: number): AppAddressDto {
+        return Object.assign(new AppAddressDto(), {
+            id: src.addressId,
+            code: src.code,
+            name: src.name,
+            addressLine1: src.addressLine1,
+            addressLine2: src.addressLine2,
+            city: src.city,
+            state: src.state,
+            postalCode: src.postalCode,
+            countryId: src.countryId,
+            countryCode: src.countryCode,
+            tenantId: tenantId,
+        
+        });
+    }
+
+    private pushAddress(
+        contactAddr: any,
+        addressTypeId: number,
+        patch?: Record<string, any>
+    ): void {
+        if (!contactAddr || !(contactAddr.addressId > 0)) return;
+
+        contactAddr.addressTypeId = addressTypeId;
+        // contactAddr.accountId = this.appSession.user.accountId
+        if (patch) Object.assign(contactAddr, patch);
+
+        contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
+        this.branch.contactAddresses.push(contactAddr);
+    }
+
     save(): void {
         this.saving = true;
-    
-            this.branch.code =  this.branchCode;
 
+        this.branch.code = this.branchCode;
+        this.branch.contactAddresses = [];
 
-        this.branch.contactAddresses = []
-        if (this.address1.addressId > 0) {
-            this.address1.addressTypeId = this.billingAddressDef.value
-            this.branch.contactAddresses.push(this.address1)
-        }
-        if (this.address2.addressId > 0) {
-            this.address2.addressTypeId = this.directShippingAddressDef.value
-            this.branch.contactAddresses.push(this.address2)
-        }
-        if (this.address3.addressId > 0) {
-            this.address3.addressTypeId = this.distributionCenterAddressDef.value
-            this.branch.contactAddresses.push(this.address3)
-        }
-        if (this.address4.addressId > 0) {
-            this.address4.addressTypeId = this.mailingAddressDef.value
-            this.branch.contactAddresses.push(this.address4)
-        }
+        this.pushAddress(this.address1, this.billingAddressDef.value);
+
+        this.pushAddress(
+            this.address2,
+            this.directShippingAddressDef.value,
+            { accountId: 0, contactId: this.address1?.contactId }
+        );
+
+        this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
+        this.pushAddress(this.address4, this.mailingAddressDef.value);
 
         let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
+        this.branch.accountId = this.appSession.user.accountId
         this._AccountsServiceProxy.createOrEditBranch(this.branch)
             .pipe(finalize(() => { this.saving = false; }))
-            .subscribe((value) => {
+            .subscribe(value => {
                 this.notify.info(this.l('SavedSuccessfully'));
                 this.close();
-                if (addNew) {
-                    this.branchAdded.emit(value);
-                }
-                else {
-                    this.branchUpdated.emit(value);
-                }
+                addNew ? this.branchAdded.emit(value) : this.branchUpdated.emit(value);
             });
     }
+
 
 
 

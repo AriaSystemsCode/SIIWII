@@ -24,7 +24,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   loginAccoutType: string = "";
   isModalOpen : boolean = false;
   selectedIndex : number = 0; 
-
+  totalImgs : number =0
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy
 
   ) {
@@ -53,6 +53,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     ).subscribe((res) => {
 
       this.mediaItems = res?.items
+      this.totalImgs = res?.totalCount
 
     })
   }

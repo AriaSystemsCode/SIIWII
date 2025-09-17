@@ -48,7 +48,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     @Input('accountId') accountId: number = this.appSession?.user?.accountId
     @Input('AccountInfo') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
     @Input('fromMarketplace') fromMarketplace: boolean = false;
-
+    @Input('fromManualAcc') fromManualAcc: boolean ;
+    
     primengTableHelperClass = new PrimengTableHelper();
     primengTableHelperCateg = new PrimengTableHelper();
 
@@ -422,11 +423,19 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     getAccountTypes() {
         this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-          .subscribe(result => {
-            this.accountTypes = (result ?? []).filter(t =>
-             t.label === 'Business'
-            );
-          });
+        .subscribe(result => {
+          const list = result ?? [];
+      
+          const business = list.find(x => x.label === 'Business'); // x is scoped here
+          this.accountTypes = business ? [business] : [];
+      
+     
+          
+        });
+             // pick the id field your DTO actually uses:
+             this.accountInfoTemp.accountTypeId = 19;
+             this.accountInfoTemp.accountType = 'Business' ;
+      
       }
       
 
@@ -499,7 +508,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                         this.hideMainSpinner()
                     }
                 )
-            this.accData = JSON.parse(JSON.stringify(result.account));
+            this.accData = JSON.parse(JSON.stringify(result));
 
         }
 
@@ -1295,7 +1304,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connectContactsProfiles(this.accountDataForView.partnerId, null)
+        this._AccountsServiceProxy.connectContactsProfiles(this.accountDataForView.partnerId, null,null)
             .subscribe(() => {
                 this.notify.success(this.l('SuccessfullyConnected'));
                 this.accountDataForView.status = true
@@ -1536,5 +1545,26 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         attri.attributeValue =  checked.toString()
      
     
+      }
+
+      getFormattedConnectionName(): string | null {
+        let raw: string | undefined;
+      
+      
+          raw = this.accData?.disConnectLabel?.trim();
+      
+      
+        if (!raw) return null;
+      
+  
+      
+        // Format only if starts with 'MPAction'
+        if (raw.startsWith('MPAction')) {
+          const label = raw.replace('MPAction', '');
+          return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+        }
+      
+        // For anything else, return null (or raw if you prefer)
+        return null;
       }
 }

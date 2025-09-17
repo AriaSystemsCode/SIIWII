@@ -210,7 +210,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTCONTACT', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
             sequance = getNextEntityCodeRes;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = sequance;
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = "M" + sequance;
         this.cdr.detectChanges(); // ✅ Add this line!
 
     }
@@ -219,20 +219,20 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         let sequance = "";
 
 
-        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('TENANTBRANCH', this.appSession.tenantId).toPromise()
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('BRANCH', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
             sequance = getNextEntityCodeRes;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = sequance;
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code = "B"+ sequance;
         this.cdr.detectChanges();
 
     }
     async saveManualContact() {
         let sequance = "";
 
-        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('MANUALACCOUNTCONTACT', this.appSession.tenantId).toPromise()
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode('BUSINESS', this.appSession.tenantId).toPromise()
         if (getNextEntityCodeRes)
             sequance = getNextEntityCodeRes;
-        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = sequance;
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code = "C" + sequance;
         this.cdr.detectChanges();
 
     }

@@ -922,7 +922,7 @@ export class MarketplaceViewProductComponent
     connect(): void {
         this.showMainSpinner();
         this.AccountsServiceProxy
-            .connectContactsProfiles(this.productData.sellerMarketPlaceAccountId,null)
+            .connectContactsProfiles(this.productData.sellerMarketPlaceAccountId,null,null)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();

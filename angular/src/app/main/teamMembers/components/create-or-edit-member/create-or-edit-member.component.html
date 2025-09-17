@@ -191,7 +191,7 @@
                                   
                                     <p-calendar
                                     name="JoinDate"
-                                    [ngModel]="getJoinDateAsDate()"
+                                    [(ngModel)]="joinDateModel"
                                     (ngModelChange)="onChangejoinDateFromPicker($event)"
                                     [disabled]="memberDto?.id > 0"
                                     [readonlyInput]="memberDto?.id > 0"

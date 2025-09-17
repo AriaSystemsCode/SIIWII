@@ -27,7 +27,9 @@
         top: 10px;
     }
 }
-
+.kt-portlet {
+    margin-top: 0px !important;
+}
 .m-input {
     padding-left: 35px;
 }
@@ -50,9 +52,7 @@
         padding-top: 0px !important;
     }
 
-    .kt-portlet {
-        margin-top: 0px !important;
-    }
+
 
     .btn-group>.btn:not(:last-child):not(.dropdown-toggle),
     .btn-group>.btn-group:not(:last-child)>.btn {
