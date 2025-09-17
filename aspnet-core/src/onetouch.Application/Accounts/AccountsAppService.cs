@@ -90,6 +90,7 @@ using System.Management.Automation.Language;
 using Namotion.Reflection;
 using Abp.MultiTenancy;
 using System.Drawing;
+using SixLabors.Fonts;
 
 namespace onetouch.Accounts
 {
@@ -9688,82 +9689,99 @@ namespace onetouch.Accounts
                 // {
                 //  var oldChange = con.ChangeTracker.AutoDetectChangesEnabled;
                 //   con.ChangeTracker.AutoDetectChangesEnabled = false;
+                List<AppContact> contacts = new List<AppContact>();
                 try
                 {
-                    if (accountsList.Count > 0)
-                        con.AppContacts.AddRange(accountsList);
-
-                    if (accountsListUpdated.Count > 0)
-                        con.AppContacts.UpdateRange(accountsListUpdated);
-
-                    await con.SaveChangesAsync();
-
-                    // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
-                    // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
-
-                    foreach (var acc in accountsList)
+                   // using (var dbContextTransaction = con.Database.BeginTransaction())
                     {
-                        //I40 publiah manula account[start]
-                        //I40
-                       
+                        if (accountsList.Count > 0)
+                            con.AppContacts.AddRange(accountsList);
+
+                        if (accountsListUpdated.Count > 0)
+                            con.AppContacts.UpdateRange(accountsListUpdated);
+
+                        await con.SaveChangesAsync();
+
+                        // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
+                        // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
+                        
+                        foreach (var acc in accountsList)
                         {
-                            var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
-                            if (publishedAcc == null)
+                            //I40 publiah manula account[start]
+                            //I40
+
                             {
-                                var tenant = acc.TenantId == null ? AbpSession.TenantId : acc.TenantId;
-                                await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
-                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
-                            }
-                        }
-                        //I40
-                        //I40][end]
-                        foreach (var br in acc.ParentFkList)
-                        {
-                            br.AccountId = acc.Id;
-                            if (br.ParentFkList != null)
-                            {
-                                foreach (var cont in br.ParentFkList)
+                                var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                                if (publishedAcc == null)
                                 {
-                                    cont.AccountId = acc.Id;
-                                    if (cont.ParentFkList != null && cont.ParentFkList.Count > 0)
+                                    var tenant = acc.TenantId == null ? AbpSession.TenantId : acc.TenantId;
+                                    await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+                                    await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                                }
+                            }
+                            //I40
+                            //I40][end]
+                            foreach (var br in acc.ParentFkList)
+                            {
+                                br.AccountId = acc.Id;
+                                
+                                if (br.EntityFk.EntityObjectTypeId== presonEntityObjectTypeId)
+                                    contacts.Add(br);
+
+                                if (br.ParentFkList != null)
+                                {
+                                    foreach (var cont in br.ParentFkList)
                                     {
-                                        foreach (var sub in cont.ParentFkList)
+                                        cont.AccountId = acc.Id;
+                                        contacts.Add(cont);
+                                        if (cont.ParentFkList != null && cont.ParentFkList.Count > 0)
                                         {
-                                            sub.AccountId = acc.Id;
+                                            contacts.Add(cont);
+                                            foreach (var sub in cont.ParentFkList)
+                                            {
+                                                sub.AccountId = acc.Id;
 
 
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
+                        }
+                        con.AppContacts.UpdateRange(accountsList);
+                        await con.SaveChangesAsync();
+                        //I40[Start]
+                      //  dbContextTransaction.Commit();
                     }
-                    con.AppContacts.UpdateRange(accountsList);
-                    await con.SaveChangesAsync();
-                    //I40[Start]
-                    
                     foreach (var acc in accountsList)
                     {
-                        var contactList = await _appContactRepository.GetAll().Include(z=>z.EntityFk)
-                            .Where(z => z.AccountId == acc.Id && acc.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
-
-                        if (contactList != null && contactList.Count() > 0)
+                        var account = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                            .Where(z => z.Code == acc.Code && z.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).FirstOrDefaultAsync();
+                        if (account != null)
                         {
-                            foreach (var cont in contactList)
-                            {
-                                if (cont.ParentId != null && cont.AccountId != null)
-                                {
-                                    var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == cont.AccountId).FirstOrDefaultAsync();
-                                    if (accountObj != null)
-                                    {
-                                        var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
-                                        if (publishedAccount != null)
-                                        {
-                                            //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                                            await _iCreateMarketplaceAccount.PublishMember(cont.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
-                                            await _iCreateMarketplaceAccount.HideAccount(accountObj.SSIN);
+                            //var contactList = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                            //.Where(z => z.AccountId == account.Id && acc.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
+                            var contactList = contacts.Where(z => z.AccountId == account.Id).ToList();
 
+                            if (contactList != null && contactList.Count() > 0)
+                            {
+                                foreach (var cont in contactList)
+                                {
+                                    if (cont.ParentId != null && cont.AccountId != null)
+                                    {
+                                        var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == cont.AccountId).FirstOrDefaultAsync();
+                                        if (accountObj != null)
+                                        {
+                                            var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
+                                            if (publishedAccount != null)
+                                            {
+                                                //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                                                await _iCreateMarketplaceAccount.PublishMember(cont.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
+                                                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishedAccount.SSIN, cont.SSIN, false, null, null);
+                                                await _iCreateMarketplaceAccount.HideAccount(accountObj.SSIN);
+
+                                            }
                                         }
                                     }
                                 }
