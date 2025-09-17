@@ -123,7 +123,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   
     if (!this.memberDto.code) {
       const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType, null).toPromise();
-      this.memberDto.code = sequance;
+      this.memberDto.code = "C" + sequance;
     }
 
     this.active = true;
@@ -386,7 +386,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     if (!this.memberDto.code) {
       const sequance = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType, null).toPromise();
-      this.memberDto.code = sequance;
+      this.memberDto.code = "C" + sequance
     }
 
     this.memberDto.useDTOTenant = true;

@@ -580,7 +580,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                             if (getNextEntityCodeRes)
                                 sequance = getNextEntityCodeRes;
 
-                            this.accountInfoTemp.code = sequance;
+                            this.accountInfoTemp.code = "M" + sequance;
                         }
 
                         this.languageIdName = result.languageName;
@@ -981,7 +981,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             if (getNextEntityCodeRes)
                 sequance = getNextEntityCodeRes;
 
-            this.accountInfoTemp.code = sequance;
+            this.accountInfoTemp.code = "M" + sequance;
         }
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
