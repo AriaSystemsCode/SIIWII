@@ -48,8 +48,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     @Input('accountId') accountId: number = this.appSession?.user?.accountId
     @Input('AccountInfo') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
     @Input('fromMarketplace') fromMarketplace: boolean = false;
-    @Input('fromManualAcc') fromManualAcc: boolean ;
-    
+    @Input('fromManualAcc') fromManualAcc: boolean;
+
     primengTableHelperClass = new PrimengTableHelper();
     primengTableHelperCateg = new PrimengTableHelper();
 
@@ -137,7 +137,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     imgCropperModalRef: BsModalRef
     accData: GetAccountForViewDto
-    editedContactPerData : any
+    editedContactPerData: any
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -245,14 +245,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
 
-
-    // defineAccountTypes() {
-    //     this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-    //         .subscribe((res) => {
-
-    //             this.allAccountTypes = res
-    //         })
-    // }
 
     showDialogSaveAccount() {
         this.save();
@@ -423,21 +415,21 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     getAccountTypes() {
         this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-        .subscribe(result => {
-          const list = result ?? [];
-      
-          const business = list.find(x => x.label === 'Business'); // x is scoped here
-          this.accountTypes = business ? [business] : [];
-      
-     
-          
-        });
-             // pick the id field your DTO actually uses:
-             this.accountInfoTemp.accountTypeId = 19;
-             this.accountInfoTemp.accountType = 'Business' ;
-      
-      }
-      
+            .subscribe(result => {
+                const list = result ?? [];
+
+                const business = list.find(x => x.label === 'Business'); // x is scoped here
+                this.accountTypes = business ? [business] : [];
+
+
+
+            });
+        // pick the id field your DTO actually uses:
+        this.accountInfoTemp.accountTypeId = 19;
+        this.accountInfoTemp.accountType = 'Business';
+
+    }
+
 
 
     getAccountDataForEdit(): void {
@@ -588,15 +580,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                             if (getNextEntityCodeRes)
                                 sequance = getNextEntityCodeRes;
 
-                            this.accountInfoTemp.code = sequance;
+                            this.accountInfoTemp.code = "M" + sequance;
                         }
 
                         this.languageIdName = result.languageName;
                         this.accountInfoTemp.languageId = result.accountInfo.languageId;
-                        this.accountInfoTemp.paymentTermsId = !this.accountInfoTemp?.id ? this.paymentTermsId :
+
+
+                        this.accountInfoTemp.paymentTermsId = !result?.accountInfo?.id ? this.paymentTermsId :
                             result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
                         this.accountInfoTemp.shipViaId =
-                            !this.accountInfoTemp?.id ? this.shipViaId :
+                            !result?.accountInfo?.id ? this.shipViaId :
                                 result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
                     }
 
@@ -610,6 +604,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             this.accountInfoTemp.shipViaId =
                 !this.accountInfoTemp?.id ? this.shipViaId :
                     result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
+
         }
 
 
@@ -758,20 +753,20 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
         if (!this.accountDataForView) this.getMyAccountDataForView()
     }
-    getCotactData(event){
+    getCotactData(event) {
         this.editedContactPerData = event
         // this.accountInfoTemp.entityAttachments =  this.editedContactPerData?.entityAttachments
- 
+
 
     }
     savePerData(event) {
-  
-       
+
+
         this.accountInfoTemp = event
         if (!this.accountInfoTemp.entityExtraData) {
-          this.accountInfoTemp.entityExtraData = [];
+            this.accountInfoTemp.entityExtraData = [];
         }
-        this.accountInfoTemp.entityAttachments =  this.editedContactPerData?.entityAttachments
+        this.accountInfoTemp.entityAttachments = this.editedContactPerData?.entityAttachments
         // Ensure attributes exist
         this.ensureAttribute(701); // first name
         this.ensureAttribute(702); // last name
@@ -789,85 +784,85 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.ensureAttribute(714); // username is public > public
 
 
-      
+
         // Set values using helper functions
         if (event?.firstName != null) {
-          this.setStringValue(701, event?.firstName); 
+            this.setStringValue(701, event?.firstName);
         }
-      
+
         if (event?.lastName != null) {
             this.setStringValue(702, event?.lastName);
-          }
+        }
 
-          if (this.editedContactPerData?.titleId != null) {
-            this.setStringValue(705, this.editedContactPerData?.titleId );
-          }
-          if (this.editedContactPerData?.joinDate?._i != null) {
-            this.setStringValue(707, this.editedContactPerData?.joinDate?._i ); 
-          }
+        if (this.editedContactPerData?.titleId != null) {
+            this.setStringValue(705, this.editedContactPerData?.titleId);
+        }
+        if (this.editedContactPerData?.joinDate?._i != null) {
+            this.setStringValue(707, this.editedContactPerData?.joinDate?._i);
+        }
 
-          if (event?.jobTitle != null) {
-            this.setStringValue(706, event?.jobTitle); 
-          }
-          if (this.editedContactPerData?.joinDateIsPublic != null) {
+        if (event?.jobTitle != null) {
+            this.setStringValue(706, event?.jobTitle);
+        }
+        if (this.editedContactPerData?.joinDateIsPublic != null) {
 
-            
-            this.setBooleanValue(713, true); 
-          }
-          
-          if (this.editedContactPerData?.languageIsPublic != null) {
-            this.setBooleanValue(708, this.editedContactPerData?.languageIsPublic); 
-          }
-          
-      
+
+            this.setBooleanValue(713, true);
+        }
+
+        if (this.editedContactPerData?.languageIsPublic != null) {
+            this.setBooleanValue(708, this.editedContactPerData?.languageIsPublic);
+        }
+
+
         if (event?.phone1IsPublic != null) {
-          this.setBooleanValue(710, event.phone1IsPublic); // boolean
+            this.setBooleanValue(710, event.phone1IsPublic); // boolean
         }
         if (this.editedContactPerData?.userId != null) {
             this.setStringValue(715, this.editedContactPerData?.userId);
-          }
-          if (event?.phone1IsPublic != null) {
+        }
+        if (event?.phone1IsPublic != null) {
             this.setBooleanValue(711, event.phone1IsPublic); // boolean
-          }
-          if (this.editedContactPerData?.phone2IsPublic != null) {
+        }
+        if (this.editedContactPerData?.phone2IsPublic != null) {
             this.setBooleanValue(712, this.editedContactPerData.phone2IsPublic); // boolean
-          }
+        }
         if (event?.emailAddressIsPublic != null) {
             this.setBooleanValue(709, event.emailAddressIsPublic); // boolean
-          }
+        }
 
-          if (this.editedContactPerData?.userName != null) {
+        if (this.editedContactPerData?.userName != null) {
             this.setStringValue(703, this.editedContactPerData?.userName);
-          }
-          if (this.editedContactPerData?.userNameIsPublic != null) {
+        }
+        if (this.editedContactPerData?.userNameIsPublic != null) {
             this.setBooleanValue(714, this.editedContactPerData.userNameIsPublic); // boolean
-          }
-          
+        }
+
         this.saveMyAccount();
 
-      }
-      
+    }
+
     private ensureAttribute(attrId: number): void {
         const exists = this.accountInfoTemp.entityExtraData?.some(attr => attr.attributeId === attrId);
         if (!exists) {
-          const newAttr = new AppEntityExtraDataDto();
-          newAttr.init({
-            attributeId: attrId,
-            attributeValue: '',
-            entityId: 0,
-            entityObjectTypeId: 0,
-            entityObjectTypeCode: '',
-            entityObjectTypeName: '',
-            attributeValueId: 0,
-            attributeValueFkName: '',
-            attributeValueFkCode: '',
-            attributeCode: '',
-            id: 0
-          });
-          this.accountInfoTemp.entityExtraData.push(newAttr);
+            const newAttr = new AppEntityExtraDataDto();
+            newAttr.init({
+                attributeId: attrId,
+                attributeValue: '',
+                entityId: 0,
+                entityObjectTypeId: 0,
+                entityObjectTypeCode: '',
+                entityObjectTypeName: '',
+                attributeValueId: 0,
+                attributeValueFkName: '',
+                attributeValueFkCode: '',
+                attributeCode: '',
+                id: 0
+            });
+            this.accountInfoTemp.entityExtraData.push(newAttr);
         }
-      }
-      
+    }
+
     changeTouchState(bool: boolean = true) {
         this.touched = bool
     }
@@ -918,20 +913,42 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
 
     saveMyAccount() {
-    
+        this.accountInfoTemp.entityExtraData ??= [];
+
+                if (!this.accountInfoTemp.id) {
+                    const mustHave = [701,702,703,706,707,708,709,710,711,712,713,714,715];
+                    mustHave.forEach(id => this.ensureAttribute(id));
+
+                    // now it's safe to set values
+                    this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
+                    this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
+                    this.setStringValue(707, '');     // instead of null
+                    this.setStringValue(706, '');     // instead of null
+                    this.setBooleanValue(713, true);
+                    this.setBooleanValue(708, true);
+                    this.setBooleanValue(710, true);
+                    this.setStringValue(715, '');     // instead of null
+                    this.setBooleanValue(711, true);
+                    this.setBooleanValue(712, true);
+                    this.setBooleanValue(709, true);
+                    this.setStringValue(703, '');     // instead of null
+                    this.setBooleanValue(714, true);
+
+                }
+
 
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
                 this.saving = false;
-                if (!this.accountId ) {
+                if (!this.accountId) {
                     // Redirect to view page with ProfileView tab
-                this._router.navigate([`/app/main/account`], {
-                    queryParams: { tab: 'ProfileView' }
-                });
+                    this._router.navigate([`/app/main/account`], {
+                        queryParams: { tab: 'ProfileView' }
+                    });
                 } else {
-                this.getAccountDataForView()
+                    this.getAccountDataForView()
 
-                this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
+                    this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
 
                 }
             }))
@@ -964,7 +981,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             if (getNextEntityCodeRes)
                 sequance = getNextEntityCodeRes;
 
-            this.accountInfoTemp.code = sequance;
+            this.accountInfoTemp.code = "M" + sequance;
         }
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
@@ -1304,7 +1321,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connectContactsProfiles(this.accountDataForView.partnerId, null,null)
+        this._AccountsServiceProxy.connectContactsProfiles(this.accountDataForView.partnerId, null, null)
             .subscribe(() => {
                 this.notify.success(this.l('SuccessfullyConnected'));
                 this.accountDataForView.status = true
@@ -1518,53 +1535,53 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     getSrtingValue(attrId: number): string {
         const attr = this.accountInfoTemp?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
-              const lastValue = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-              return lastValue;
-      }
-      setStringValue(attrId: number, value: string): void {
+        const lastValue = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
+        return lastValue;
+    }
+    setStringValue(attrId: number, value: string): void {
         const attr = this.accountInfoTemp?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
         if (attr?.selectedValues?.length > 0) {
-          attr.selectedValues[attr.selectedValues.length - 1].value = value;
+            attr.selectedValues[attr.selectedValues.length - 1].value = value;
         }
         const attri = this.accountInfoTemp?.entityExtraData?.find(x => x.attributeId === attrId);
         attri.attributeValue = value
-     
-    
-      }
-      getBooleanValue(attrId: number): boolean {
+
+
+    }
+    getBooleanValue(attrId: number): boolean {
         const attr = this.accountInfoTemp?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
         return attr?.selectedValues?.[0]?.value?.toLowerCase() === 'true';
-      }
-      
-      setBooleanValue(attrId: number, checked: boolean): void {
+    }
+
+    setBooleanValue(attrId: number, checked: boolean): void {
         const attr = this.accountInfoTemp?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
         if (attr?.selectedValues?.length > 0) {
-          attr.selectedValues[0].value = checked.toString();
+            attr.selectedValues[0].value = checked.toString();
         }
         const attri = this.accountInfoTemp?.entityExtraData?.find(x => x.attributeId === attrId);
-        attri.attributeValue =  checked.toString()
-     
-    
-      }
+        attri.attributeValue = checked.toString()
 
-      getFormattedConnectionName(): string | null {
+
+    }
+
+    getFormattedConnectionName(): string | null {
         let raw: string | undefined;
-      
-      
-          raw = this.accData?.disConnectLabel?.trim();
-      
-      
+
+
+        raw = this.accData?.disConnectLabel?.trim();
+
+
         if (!raw) return null;
-      
-  
-      
+
+
+
         // Format only if starts with 'MPAction'
         if (raw.startsWith('MPAction')) {
-          const label = raw.replace('MPAction', '');
-          return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+            const label = raw.replace('MPAction', '');
+            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
         }
-      
+
         // For anything else, return null (or raw if you prefer)
         return null;
-      }
+    }
 }

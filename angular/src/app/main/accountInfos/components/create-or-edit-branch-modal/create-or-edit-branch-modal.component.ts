@@ -287,8 +287,10 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
             { accountId: 0, contactId: this.address1?.contactId }
         );
 
-        this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
-        this.pushAddress(this.address4, this.mailingAddressDef.value);
+        this.pushAddress(this.address3, this.distributionCenterAddressDef.value,
+            { accountId: 0, contactId: this.address1?.contactId });
+        this.pushAddress(this.address4, this.mailingAddressDef.value,
+            { accountId: 0, contactId: this.address1?.contactId });
 
         let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
         this.branch.accountId = this.appSession.user.accountId

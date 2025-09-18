@@ -591,7 +591,7 @@
             <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn float-right">
                 Cancel
             </button>
-            <button *ngIf="showSaveBtn" [disabled]="!(isContactsValid && isSalesOrderValidForm())" (click)="save()"
+            <button *ngIf="showSaveBtn" [disabled]="!( isSalesOrderValidForm())" (click)="save()"
                 class="previewbtn text-center btn float-right">
                 Save
             </button>
