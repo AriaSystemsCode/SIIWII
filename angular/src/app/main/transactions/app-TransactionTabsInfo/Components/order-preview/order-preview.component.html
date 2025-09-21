@@ -1,0 +1,55 @@
+<div class="orderForm position-relative">
+    <div class="container-fluid orderInfoForm thin-scroll">
+        <div class="row " [ngClass]="showReport ? 'd-block' : 'd-none'">
+            <iframe id="pdfViewer" class="w-100 pt-4" [ngStyle]="{
+                    height: !loadingError ? '800px' : '0px'
+                }" frameborder="0" (error)="loadingError = true"></iframe>
+            <div *ngIf="loadingError">
+                <p>
+                    Unable to display PDF file.
+                    <span *ngIf="transactionFormPath">
+                        <a [href]="transactionFormPath" target="_blank">Download</a> instead.
+                    </span>
+                </p>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Download button for mobile and tablet -->
+    <div class="download-section d-flex d-lg-none justify-content-center pt-4" [ngStyle]="{
+            height: !loadingError ? '150px' : '0px' 
+        }" *ngIf="transactionFormPath">
+        <a class="btn btnPdf  mt-3" [href]="transactionFormPath" target="_blank">
+            Download PDF
+        </a>
+    </div>
+</div>
+
+
+
+
+
+<p-dialog [(visible)]="visible && startload" [modal]="true" [style]="{ width: '500px' }" [draggable]="false">
+    <div class="d-flex justify-content-start  mb-3">
+
+
+
+        <span class=" ml-2 regText ">Regenerating order confirmation</span>
+    </div>
+    <div class=" con-body">
+
+        <p class="mb-3 text-center">
+            <p-progressBar *ngIf="showbar" mode="indeterminate" [style]="{'height': '6px'}" />
+
+        </p>
+        <div *ngIf="SuccessMsg" class="d-flex justify-content-center btns">
+
+
+            <button (click)="onDialogClose()" label="Ok" class="p-button-text">Ok</button>
+        </div>
+    </div>
+
+
+</p-dialog>

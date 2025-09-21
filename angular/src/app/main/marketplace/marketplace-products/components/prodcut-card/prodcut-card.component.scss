@@ -74,3 +74,37 @@ font-weight: 700;
         width: 100%;
     }
 }
+
+
+  .star-rating {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .stars-outer {
+    position: relative;
+    display: inline-block;
+    font-size: 26px;
+    color: #ccc;
+    line-height: 1;
+  }
+  
+  .stars-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    color: #F6851D;
+    overflow: hidden;
+  }
+
+
+  .rateNum {
+  
+
+  
+  
+    color: #1B101B;
+  
+  }

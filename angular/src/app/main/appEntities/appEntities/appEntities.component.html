@@ -112,6 +112,10 @@
                                                         {{l('Notes')}}
                                                         <p-sortIcon field="appEntity.notes"></p-sortIcon>
                                                     </th>
+                                                    <th style="width: 150px" pSortableColumn="isDefault">
+                                                        {{l('Is Default')}}
+                                                        <p-sortIcon field="appEntity.isDefault"></p-sortIcon>
+                                                    </th>
                                                     <th style="width: 130px"
                                                         [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
                                                         {{l('Actions')}}</th>
@@ -137,6 +141,12 @@
 
                                                         <span>{{record.appEntity.notes}}</span>
                                                     </td>
+                                                    <td style="width:150px">
+                                                        <span class="p-column-title"> {{l('Is Default')}}</span>
+
+                                                        <span>{{record.appEntity?.isDefault}}</span>
+                                                    </td>
+                                                    
                                                     <td style="width: 130px"
                                                         [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
                                                         <div class="btn-group dropdown " dropdown container="body" insideClick="false">
@@ -159,6 +169,9 @@
                                                                         *ngIf="permission.isGranted('Pages.AppEntities.Delete')"
                                                                         (click)="deleteAppEntity(record.appEntity)">{{l('Delete')}}</a>
                                                                 </li>
+                            <li>
+                                <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
+                            </li>
                                                                 <li>
                                                                     <a href="javascript:;" *ngIf="entityHistoryEnabled"
                                                                         (click)="showHistory(record.appEntity)">{{l('History')}}</a>
@@ -293,6 +306,10 @@
                                                             {{l('Notes')}}
                                                             <p-sortIcon field="appEntity.notes"></p-sortIcon>
                                                         </th>
+                                                        <th style="width: 150px" pSortableColumn="isDefault">
+                                                            {{l('Is Default')}}
+                                                            <p-sortIcon field="appEntity.isDefault"></p-sortIcon>
+                                                        </th>
                                                         <th style="width: 130px"
                                                             [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
                                                             {{l('Actions')}}</th>
@@ -316,6 +333,12 @@
                                                             <span class="p-column-title"> {{l('Notes')}}</span>
 
                                                             <span>{{record.appEntity.notes}}</span>
+
+                                                        </td>
+                                                        <td style="width:150px">
+                                                            <span class="p-column-title"> {{l('Is Default')}}</span>
+
+                                                            <span>{{record.appEntity.isDefault ? 'Yes' : '-'}}</span>
 
                                                         </td>
                                                         <td style="width: 130px"
@@ -346,6 +369,9 @@
                                                                             <a href="javascript:;"
                                                                                 *ngIf="permission.isGranted('Pages.AppEntities.Delete')"
                                                                                 (click)="deleteEntity(record.appEntity)">{{l('Delete')}}</a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
                                                                         </li>
                                                                         <li>
                                                                             <a href="javascript:;"

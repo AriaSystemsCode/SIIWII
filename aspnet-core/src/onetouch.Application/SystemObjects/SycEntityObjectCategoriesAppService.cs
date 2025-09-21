@@ -395,7 +395,8 @@ namespace onetouch.SystemObjects
                                                         {
                                                             Code = o.Code,
                                                             Name = o.Name,
-                                                            Id = o.Id
+                                                            Id = o.Id,
+                                                            ParentId = o.ParentId
                                                         },
                                                         SydObjectName = s1 == null ? "" : s1.Name.ToString(),
                                                         SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()

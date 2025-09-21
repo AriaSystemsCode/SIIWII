@@ -126,7 +126,7 @@
         </Item2>
       </Controls>
     </Item7>
-    <Item8 Ref="81" ControlType="GroupHeaderBand" Name="GroupHeader3" HeightF="1927.79968" Dpi="254">
+    <Item8 Ref="81" ControlType="GroupHeaderBand" Name="GroupHeader3" HeightF="1908.9613" Dpi="254">
       <GroupFields>
         <Item1 Ref="82" FieldName="ItemCode" />
       </GroupFields>
@@ -151,49 +151,49 @@
         </Item1>
         <Item2 Ref="92" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="1551.53015,893.0961" LocationFloat="1232.95837,333.552551" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
           <Controls>
-            <Item1 Ref="93" ControlType="XRLabel" Name="label11" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="940.062866,60" LocationFloat="46.16333,327.270874" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item1 Ref="93" ControlType="XRLabel" Name="label15" TextFormatString="{0:MM/dd/yyyy}" CanGrow="false" CanShrink="true" TextAlignment="MiddleJustify" SizeF="939.3159,59.99994" LocationFloat="46.16333,543.7633" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="94" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showPrice  And (([ItemMSRPPriceFrom] &gt; 0 and [ItemMSRPPriceFrom]!= [MajorMSRP]) Or ([ItemMSRPPriceTo] &gt; 0 and [ItemMSRPPriceTo]!= [MajorMSRP])), Iif(?muserCountry=='RRP','RRP','MSRP')+':  '+[currencySymbol]+ToStr([ItemMSRPPriceFrom])+' - '+[currencySymbol]+ToStr( [ItemMSRPPriceTo]),'' )" />
+                <Item1 Ref="94" EventName="BeforePrint" PropertyName="Visible" Expression="[StartShipDate] != null &amp;&amp; [StartShipDate] != ''&#xA;" />
+                <Item2 Ref="95" EventName="BeforePrint" PropertyName="Text" Expression="'Start Ship Date: '+[StartShipDate]&#xA;" />
               </ExpressionBindings>
-              <StylePriority Ref="95" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
+              <StylePriority Ref="96" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="96" ControlType="XRLabel" Name="label15" TextFormatString="{0:MM/dd/yyyy}" CanGrow="false" CanShrink="true" TextAlignment="MiddleJustify" SizeF="939.3159,59.99994" LocationFloat="46.16333,543.7633" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item2 Ref="97" ControlType="XRBarCode" Name="barCode1" Module="5.08" AutoModule="true" Alignment="TopCenter" TextAlignment="BottomCenter" ShowText="false" SizeF="367.770752,442.0205" LocationFloat="1138.64771,40.875" Dpi="254" Padding="26,26,0,0,254">
+              <Symbology Ref="98" Name="QRCode" ErrorCorrectionLevel="H" Version="Version5" />
               <ExpressionBindings>
-                <Item1 Ref="97" EventName="BeforePrint" PropertyName="Visible" Expression="[StartShipDate] != null &amp;&amp; [StartShipDate] != ''&#xA;" />
-                <Item2 Ref="98" EventName="BeforePrint" PropertyName="Text" Expression="'Start Ship Date: '+[StartShipDate]&#xA;" />
+                <Item1 Ref="99" EventName="BeforePrint" PropertyName="Text" Expression="[ssin]" />
               </ExpressionBindings>
-              <StylePriority Ref="99" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
+              <StylePriority Ref="100" UseTextAlignment="false" />
             </Item2>
-            <Item3 Ref="100" ControlType="XRBarCode" Name="barCode1" Module="5.08" AutoModule="true" Alignment="TopCenter" TextAlignment="BottomCenter" ShowText="false" SizeF="367.770752,442.0205" LocationFloat="1138.64771,40.875" Dpi="254" Padding="26,26,0,0,254">
-              <Symbology Ref="101" Name="QRCode" ErrorCorrectionLevel="H" Version="Version5" />
+            <Item3 Ref="101" ControlType="XRLabel" Name="label8" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="1013.85645,59.99997" LocationFloat="45.4161377,230.229233" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="102" EventName="BeforePrint" PropertyName="Text" Expression="[ssin]" />
+                <Item1 Ref="102" EventName="BeforePrint" PropertyName="Text" Expression="[SizeScaleName]" />
               </ExpressionBindings>
-              <StylePriority Ref="103" UseTextAlignment="false" />
+              <StylePriority Ref="103" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item3>
-            <Item4 Ref="104" ControlType="XRLabel" Name="label8" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="1013.85645,59.99997" LocationFloat="45.4161377,230.229233" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item4 Ref="104" ControlType="XRLabel" Name="label1" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="940.062866,60.00003" LocationFloat="46.16333,650.5335" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="105" EventName="BeforePrint" PropertyName="Text" Expression="[SizeScaleName]" />
+                <Item1 Ref="105" EventName="BeforePrint" PropertyName="Text" Expression="[Ratio]" />
               </ExpressionBindings>
               <StylePriority Ref="106" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item4>
-            <Item5 Ref="107" ControlType="XRLabel" Name="label1" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="940.062866,60.00003" LocationFloat="46.16333,650.5335" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item5 Ref="107" ControlType="XRLabel" Name="label3" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="1013.85645,76.43753" LocationFloat="45.4161377,127.333389" Dpi="254" Font="Arial, 14pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="108" EventName="BeforePrint" PropertyName="Text" Expression="[Ratio]" />
+                <Item1 Ref="108" EventName="BeforePrint" PropertyName="Text" Expression="[ItemName]" />
               </ExpressionBindings>
               <StylePriority Ref="109" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item5>
-            <Item6 Ref="110" ControlType="XRLabel" Name="label3" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="1013.85645,76.43753" LocationFloat="45.4161377,127.333389" Dpi="254" Font="Arial, 14pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item6 Ref="110" ControlType="XRLabel" Name="label2" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="1000.77246,75.87505" LocationFloat="45.4161377,25.0000076" Dpi="254" Font="Arial, 16pt, style=Bold" ForeColor="IndianRed" BackColor="0,0,0,0" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="None" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="111" EventName="BeforePrint" PropertyName="Text" Expression="[ItemName]" />
+                <Item1 Ref="111" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showCode, [ItemCode],'' )" />
               </ExpressionBindings>
-              <StylePriority Ref="112" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
+              <StylePriority Ref="112" UseFont="false" UseForeColor="false" UseBackColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item6>
-            <Item7 Ref="113" ControlType="XRLabel" Name="label2" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="1000.77246,75.87505" LocationFloat="45.4161377,25.0000076" Dpi="254" Font="Arial, 16pt, style=Bold" ForeColor="IndianRed" BackColor="0,0,0,0" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="None" BorderWidth="2">
+            <Item7 Ref="113" ControlType="XRLabel" Name="label11" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="940.062866,60" LocationFloat="45.4161377,327.270874" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="114" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showCode, [ItemCode],'' )" />
+                <Item1 Ref="114" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showPrice  And (([ItemMSRPPriceFrom] &gt;= 0 and [ItemMSRPPriceFrom]!= [MajorMSRP]) Or ([ItemMSRPPriceTo] &gt; 0 and [ItemMSRPPriceTo]!= [MajorMSRP])), Iif(?muserCountry=='RRP','RRP','MSRP')+':  '+[currencySymbol]+ToStr([ItemMSRPPriceFrom])+' - '+[currencySymbol]+ToStr( [ItemMSRPPriceTo]),'' )" />
               </ExpressionBindings>
-              <StylePriority Ref="115" UseFont="false" UseForeColor="false" UseBackColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
+              <StylePriority Ref="115" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item7>
             <Item8 Ref="116" ControlType="XRLabel" Name="label4" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleLeft" SizeF="940.062866,60" LocationFloat="45.4161377,327.270874" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>

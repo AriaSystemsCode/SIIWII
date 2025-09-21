@@ -1,4 +1,4 @@
 export enum EExtraAttributeUsage {
     Recommended = "RECOMMENDED",
-    Additional = "ADDITIONAL"
+    Additional = "ADDITIONAL",
 }

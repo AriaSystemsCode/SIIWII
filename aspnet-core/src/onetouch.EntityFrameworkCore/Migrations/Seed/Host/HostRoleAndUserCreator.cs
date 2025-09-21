@@ -332,9 +332,9 @@ namespace onetouch.Migrations.Seed.Host
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice".Split(',');
+            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA".ToUpper().Split(',');
+            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION".ToUpper().Split(',');
+            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -497,6 +497,37 @@ namespace onetouch.Migrations.Seed.Host
             }
             #endregion
             //MMT43[End]
+            //MMT-EntityLog[Start]
+            ObjectCode = "TRANSACTION";
+            codes = "READYTOBESENT,SENT".ToUpper().Split(',');
+            names = "Ready to be Sent,Sent".Split(',');
+            for (int i = 0; i < codes.Length; i++)
+            {
+                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                    r => r.Code == ObjectCode);
+                if (sydObjects != null && sydObjects.Id > 0)
+                {
+                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
+                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
+
+                    if (sydObjects != null && sydObjects.Id > 0 &&
+                        SycEntityObjectStatuses == null)
+                    {
+                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
+                        {
+                            Code = codes[i],
+                            Name = names[i],
+                            ObjectId = sydObjects.Id,
+                            ObjectCode = sydObjects.Code,
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
+
+                        };
+                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            //MMT-EntityLog[End]
 
         }
 

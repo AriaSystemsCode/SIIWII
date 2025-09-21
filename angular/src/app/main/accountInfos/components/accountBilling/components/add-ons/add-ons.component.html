@@ -1,104 +1,105 @@
+<div class="container mt-4">
+  <div class="row w-100">
 
-<div class=" mt-4" >
-    <div class="row w-100">
-        
-        <div class="col-8 mt-1 pr-0" style="height: 75vh; overflow-y: scroll;">
-          <table *ngFor="let record of addons" class="table table-bordered p-datatable-gridlines">
-            <!-- Table Header -->
-            <thead>
-                <tr>
-                    <th colspan="2" class="head">{{ record?.appSubscriptionPlanDetail?.featureCategory }}</th>
-                </tr>
-            </thead>
-        
-            <!-- Table Body -->
-            <tbody>
-                <tr >
-                    <td>
-                        <div class="d-flex gap-2 first-col">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
-                                <path d="M16 8.5V5.5L19 2.5L20 4.5L22 5.5L19 8.5H16ZM16 8.5L12 12.4999M22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5C2 6.97715 6.47715 2.5 12 2.5M17 12.5C17 15.2614 14.7614 17.5 12 17.5C9.23858 17.5 7 15.2614 7 12.5C7 9.73858 9.23858 7.5 12 7.5" stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <h5>{{ record?.appSubscriptionPlanDetail?.featureName }}</h5>
-                        </div>
-                    </td>
-        
-                    <td>
-                        <div class="d-flex flex-column gap-2 justify-content-center" style="align-items: end;">
-                            <p>${{ record?.appSubscriptionPlanDetail?.unitPrice }}/ <span class="measure">{{ record?.appSubscriptionPlanDetail?.unitOfMeasurementName }}</span></p>
-                            <button class="btn btn-add" (click)="addToCart(record)" [disabled]="isRecordInCart(record)">
-                                {{ isRecordInCart(record) ? 'Added' : 'Add' }}
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        
-        </div>
+    <div class="col-7 mt-1 pr-0 firstSec">
+      <table *ngFor="let record of addons" class="table table-bordered p-datatable-gridlines">
+        <thead>
+          <tr>
+            <th colspan="2" class="featureCat">{{ record?.appSubscriptionPlanDetail?.featureCategory }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="d-flex gap-2 first-col">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                  <path
+                    d="M16 8.5V5.5L19 2.5L20 4.5L22 5.5L19 8.5H16ZM16 8.5L12 12.4999M22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5C2 6.97715 6.47715 2.5 12 2.5M17 12.5C17 15.2614 14.7614 17.5 12 17.5C9.23858 17.5 7 15.2614 7 12.5C7 9.73858 9.23858 7.5 12 7.5"
+                    stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <h5>{{ record?.appSubscriptionPlanDetail?.featureName }}</h5>
+              </div>
+            </td>
 
-        <div class="col-4 mt-1 pl-2" style="height: 60vh;">
-            <div class="summary border d-flex flex-column" style="height: 100%; overflow-x: hidden;width: 290px;">
-              
-            
-              <div class="header d-flex justify-content-between">
-                <h6 class="p-0 m-0 add-head">Add-on Cart</h6>
-                <button type="button" class="btn close border rounded-circle m-0 p-0" (click)="clearCart()">
-                  <i class="fas fa-times p-0 m-0"></i>
+            <td>
+              <div class="d-flex flex-column gap-2 justify-content-center" style="align-items: end;">
+                <p class="unitss">${{ record?.appSubscriptionPlanDetail?.unitPrice }}/ <span class="measure">{{
+                    record?.appSubscriptionPlanDetail?.unitOfMeasurementName }}</span></p>
+                <button class="btn btn-add" (click)="addToCart(record)" [disabled]="isRecordInCart(record)">
+                  {{ isRecordInCart(record) ? 'Added' : 'Add' }}
                 </button>
               </div>
-              <hr />
-              
-            
-              <div class="totals d-flex justify-content-between">
-                <p class="p-0 m-0 qty">qty : {{ totalQuantity }}</p>
-                <p class="p-0 m-0 qty">Amount : {{ totalAmount | number: '1.2-2' }}</p>
-              </div>
-          
-       
-              <div class="orderedSummary flex-grow-1" style="overflow-y: auto;overflow-x: hidden;" *ngIf="cart.length != 0">
-                <div class="summaryTables">
-                  <table class="table table-bordered">
-                    <thead>
-                      <tr class="head-th">
-                        <th>Feature</th>
-                        <th>QTY</th>
-                        <th>Price</th>
-                        <th>Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let cartItem of cart">
-                        <td class="feature">{{ cartItem?.appSubscriptionPlanDetail?.featureName }}</td>
-                        <td>
-                          <p-inputNumber mode="decimal"
-                                         [showButtons]="true"
-                                         inputId="minmax-buttons"
-                                         [min]="0"
-                                         [(ngModel)]="cartItem.featureUsedQty"></p-inputNumber>
-                        </td>
-                        <td>{{ cartItem?.appSubscriptionPlanDetail?.unitPrice }}</td>
-                        <td>
-                          <div class="d-flex flex-column">
-                            <p>{{ (cartItem?.appSubscriptionPlanDetail?.unitPrice * cartItem?.featureUsedQty) | number: '1.2-2' }}</p>
-                            <a type="button" style="color: #F6851D; font-size: 10px;" class="btn p-0" (click)="removeRecord(cartItem)">
-                              Remove
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-          
-              <div class=" d-flex justify-content-center purchase-btn-wrapper" [ngClass]=" cart.length == 0 ? 'noCart' :'hasCart'" style=" background-color: white;">
-                <button class="btn m-0 add-p" (click)="purchaseAddons()" [disabled]="cart.length == 0">Purchase Add-Ons</button>
-              </div>
-          
-            </div>
-          </div>
-          
-    </div>
-</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
+    </div>
+
+    <div class="col-5 mt-1 pl-2" style="height: 70vh;">
+      <div class="summary border d-flex flex-column">
+
+
+        <div class="header d-flex justify-content-between">
+          <h6 class="p-0 m-0 add-head">Add-on Cart</h6>
+          <button type="button" class="btn close border rounded-circle m-0 p-0"  (click)="clearCart()">
+            <i class="fas fa-times p-0 m-0"></i>
+          </button>
+        </div>
+        <hr />
+
+
+
+        <!-- merge -->
+        <div class="totals d-flex justify-content-between">
+          <p class="p-0 m-0 qty">QTY : {{ totalQuantity  }}</p>
+          <p class="p-0 m-0 qty">Amount : {{ totalAmount | number: '1.2-2' }}</p>
+        </div>
+
+
+        <div class="orderedSummary flex-grow-1" *ngIf="cart.length != 0">
+          <div class="summaryTables">
+            <table class="table table-bordered">
+              <thead>
+                <tr class="head-th">
+                  <th>Feature</th>
+                  <th>QTY</th>
+                  <th>Price</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cartItem of cart">
+                  <td class="feature">{{ cartItem?.appSubscriptionPlanDetail?.featureName }}</td>
+                  <td>
+                    <p-inputNumber mode="decimal" [showButtons]="true" inputId="minmax-buttons" [min]="0"
+                      [(ngModel)]="cartItem.featureUsedQty"></p-inputNumber>
+                  </td>
+                  <td style="text-align: end;">{{ cartItem?.appSubscriptionPlanDetail?.unitPrice | number: '1.2-2' }}</td>
+                  <td style="text-align: end;">
+                    <div class="d-flex flex-column">
+                      <p>{{ (cartItem?.appSubscriptionPlanDetail?.unitPrice * cartItem?.featureUsedQty) | number:
+                        '1.2-2' }}</p>
+                      <a type="button" class="btn removeBtn p-0"
+                        (click)="removeRecord(cartItem)">
+                        Remove
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class=" d-flex justify-content-center purchase-btn-wrapper"
+          [ngClass]=" cart.length == 0 ? 'noCart' :'hasCart'" style=" background-color: white;">
+          <button class="btn m-0 add-p" (click)="purchaseAddons()" [disabled]="cart.length == 0">Purchase
+            Add-Ons</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

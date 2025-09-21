@@ -19,11 +19,14 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     @Input() staticHeight:number
     @Input() showGuidelines:boolean = false
     @Input() image : string
+    @Input() fromReview : string
     inputID : string
     mbToByteConversionFactor = 1e+6
     acceptedExtensions:string =""
-    acceptedExtensionsArr:string[] = []
+    acceptedExtensionsArr:string[] = [] 
     imgFile : File
+    @Input() isDisabled : boolean =  false;
+    
     constructor(injector:Injector) {
         super(injector)
         this.inputID = this.guid()
@@ -67,7 +70,8 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
             let subs = onCropDone.subscribe((res)=>{
                 if(data.isCropDone) {
                     this.image = data.croppedImageAsBase64 as string
-                    this.imgFile = new File([data.croppedImage], imgFile.name);
+                    this.imgFile = new File([data.croppedImage], imgFile.name, { type: imgFile.type || 'image/png' });
+
                     this.imageBrowseDone.emit({file : this.imgFile,image:this.image})
                 }
                 // reset input

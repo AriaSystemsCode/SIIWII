@@ -1,9 +1,13 @@
-﻿using ExcelDataReader;
+﻿using Bytescout.Spreadsheet.COM;
+using ClosedXML.Excel;
+using ExcelDataReader;
+using Newtonsoft.Json.Linq;
 using onetouch.AppEntities.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -61,8 +65,42 @@ namespace onetouch.Helpers
         {
             return Regex.Match(number, @"^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$").Success;
         }
+        //I46 [Start]
+        public  void ExportJsonToExcel(string filePath, string jsonData)
+        {
+            JArray dataArray = JArray.Parse(jsonData);
+            
+            using (XLWorkbook workbook = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = workbook.Worksheets.Add();
 
-       
+                // handle weird JSON formatted data
+                var headers = dataArray.First?.ToObject<JObject>().Properties().Select(z=>z.Name).ToList();
+                if (headers == null || !headers.Any())
+                {
+                    throw new ArgumentException();
+                }
+
+                headers.Select((header, i) => worksheet.Cell(1, i + 1).Value = header).ToList();
+
+                for (int rowIndex = 0; rowIndex < dataArray.Count; rowIndex++)
+                {
+                    JObject rowObj = (JObject)dataArray[rowIndex];
+                    for (int colIndex = 0; colIndex < headers.Count; colIndex++)
+                    {
+                        string header = headers[colIndex];
+                        worksheet.Cell(rowIndex + 2, colIndex + 1).Value = rowObj[header]?.ToString() ?? string.Empty;
+                    }
+                }
+
+                // save as neat table
+                worksheet.Range(1, 1, dataArray.Count + 1, headers.Count).CreateTable();
+
+                workbook.SaveAs(filePath);
+            }
+        }
+        //I46 {End}
+
         //public static void getExcelFile()
         //{
 

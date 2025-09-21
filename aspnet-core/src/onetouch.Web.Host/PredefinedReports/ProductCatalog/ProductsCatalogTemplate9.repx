@@ -109,15 +109,15 @@
               </ExpressionBindings>
               <StylePriority Ref="71" UseBorders="false" />
             </Item1>
-            <Item2 Ref="72" ControlType="XRLabel" Name="label2" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="593.1691,60" LocationFloat="25.0000076,1043.222" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DimGray" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="None" BorderWidth="2">
+            <Item2 Ref="72" ControlType="XRLabel" Name="label2" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="593.1691,60" LocationFloat="25.0000076,1103.22192" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DimGray" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="None" BorderWidth="2">
               <ExpressionBindings>
                 <Item1 Ref="73" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showCode, [ItemCode],'' )" />
               </ExpressionBindings>
               <StylePriority Ref="74" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item2>
-            <Item3 Ref="75" ControlType="XRLabel" Name="label11" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="581.8772,60" LocationFloat="36.2919235,1103.22192" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item3 Ref="75" ControlType="XRLabel" Name="label11" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="593.1691,60" LocationFloat="36.2919273,1043.222" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="76" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showPrice  And (([ItemMSRPPriceFrom] &gt; 0 and [ItemMSRPPriceFrom]!= [MajorMSRP]) Or ([ItemMSRPPriceTo] &gt; 0 and [ItemMSRPPriceTo]!= [MajorMSRP])), &#xA;Iif(?muserCountry=='RRP','RRP','MSRP')+'  '+[currencySymbol]+ToStr([ItemMSRPPriceFrom])+' - '+[currencySymbol]+ToStr( [ItemMSRPPriceTo]),'' )" />
+                <Item1 Ref="76" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showPrice  And (([ItemMSRPPriceFrom] &gt;= 0 and [ItemMSRPPriceFrom]!= [MajorMSRP]) Or ([ItemMSRPPriceTo] &gt; 0 and [ItemMSRPPriceTo]!= [MajorMSRP])), &#xA;Iif(?muserCountry=='RRP','RRP','MSRP')+'  '+[currencySymbol]+ToStr([ItemMSRPPriceFrom])+' - '+[currencySymbol]+ToStr( [ItemMSRPPriceTo]),'' )" />
               </ExpressionBindings>
               <StylePriority Ref="77" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item3>
@@ -127,7 +127,7 @@
               </ExpressionBindings>
               <StylePriority Ref="80" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item4>
-            <Item5 Ref="81" ControlType="XRLabel" Name="label6" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="587.6458,60" LocationFloat="25.0000076,1163.22192" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item5 Ref="81" ControlType="XRLabel" Name="label6" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="593.1691,60" LocationFloat="25.0000076,1163.22192" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
                 <Item1 Ref="82" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showSpecialPrice And (([ItemPriceFrom]== [MajorPricePerLevel] And [ItemPriceTo]== [MajorPricePerLevel]) or ([ItemPriceFrom]=0 and [ItemPriceTo]=0)), 'Special Price '+[currencySymbol]+ToStr([MajorPricePerLevel]),'' )" />
               </ExpressionBindings>

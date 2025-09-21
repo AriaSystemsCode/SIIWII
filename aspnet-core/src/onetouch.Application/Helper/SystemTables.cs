@@ -355,10 +355,21 @@ namespace onetouch.Helpers
             return obj.Id;
         }
 
+        //I40-X527[Start]
+        public async Task<long> GetEntityObjectTypeReview()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "REVIEW");
+            return obj.Id;
+        }
+        //I40-X527[End]
+        //I48[Start]
+        public async Task<long> GetEntityObjectTypeQuestion()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "QUESTION");
+            return obj.Id;
+        }
+        //I48[End]
 
-
-
-       
 
         public async Task<long> GetEntityObjectStatusUnreadMessageID()
         {
@@ -715,5 +726,23 @@ namespace onetouch.Helpers
             return obj.Id;
         }
         //MMT33[End]
+        //MMT-Entity log[Start]
+        public async Task<long> GetEntityObjectStatusSentEntityLog()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "SENT" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetEntityObjectStatusReadyToSendEntityLog()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "READYTOBESENT" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        //MMT-Entity log [End]
     }
 }

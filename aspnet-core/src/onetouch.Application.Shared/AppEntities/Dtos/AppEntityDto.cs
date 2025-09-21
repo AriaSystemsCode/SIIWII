@@ -49,6 +49,10 @@ namespace onetouch.AppEntities.Dtos
         public virtual long TenantOwner { get; set; }
         public virtual DateTime TimeStamp { get; set; }
         //MMT30[End]
+        //MMT46[Start]
+        public virtual bool IsDefault { set; get; }
+        //MMT46[End]
+
     }
 
     public class GetAppEntityAttributesInput : PagedAndSortedResultRequestDto

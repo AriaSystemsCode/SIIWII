@@ -46,24 +46,24 @@ namespace onetouch.AppSubScriptionPlan
         {
 
             var filteredAppTenantActivitiesLog = _appTenantActivityLogRepository.GetAll()
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.Contains(input.Filter) || e.ActivityType.Contains(input.Filter) || e.AppSubscriptionPlanCode.Contains(input.Filter) || e.UserName.Contains(input.Filter) || e.FeatureCode.Contains(input.Filter) || e.FeatureName.Contains(input.Filter) || e.Reference.Contains(input.Filter) || e.InvoiceNumber.Contains(input.Filter) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.ToUpper().Contains(input.Filter.ToUpper()) || e.ActivityType.ToUpper().Contains(input.Filter.ToUpper()) || e.AppSubscriptionPlanCode.ToUpper().Contains(input.Filter.ToUpper()) || e.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureCode.ToUpper().Contains(input.Filter) || e.FeatureName.ToUpper().Contains(input.Filter.ToUpper()) || e.Reference.ToUpper().Contains(input.Filter.ToUpper()) || e.InvoiceNumber.ToUpper().Contains(input.Filter.ToUpper()) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
                         .WhereIf(input.MinTenantIdFilter != null, e => e.TenantId >= input.MinTenantIdFilter)
                         .WhereIf(input.MaxTenantIdFilter != null, e => e.TenantId <= input.MaxTenantIdFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName == input.TenantNameFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName.ToUpper().Contains(input.TenantNameFilter.ToUpper()))
                         .WhereIf(input.MinUserIdFilter != null, e => e.UserId >= input.MinUserIdFilter)
                         .WhereIf(input.MaxUserIdFilter != null, e => e.UserId <= input.MaxUserIdFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.ActivityTypeFilter), e => e.ActivityType == input.ActivityTypeFilter)
                         .WhereIf(input.MinAppSubscriptionPlanHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId >= input.MinAppSubscriptionPlanHeaderIdFilter)
                         .WhereIf(input.MaxAppSubscriptionPlanHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId <= input.MaxAppSubscriptionPlanHeaderIdFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanCodeFilter), e => e.AppSubscriptionPlanCode == input.AppSubscriptionPlanCodeFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanCodeFilter), e => e.AppSubscriptionPlanCode.ToUpper().Contains(input.AppSubscriptionPlanCodeFilter.ToUpper()))
                         .WhereIf(input.MinActivityDateTimeFilter != null, e => e.ActivityDateTime >= input.MinActivityDateTimeFilter)
                         .WhereIf(input.MaxActivityDateTimeFilter != null, e => e.ActivityDateTime <= input.MaxActivityDateTimeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.UserNameFilter), e => e.UserName == input.UserNameFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCodeFilter), e => e.FeatureCode == input.FeatureCodeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureNameFilter), e => e.FeatureName == input.FeatureNameFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.UserNameFilter), e => e.UserName.ToUpper().Contains(input.UserNameFilter.ToUpper()))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCodeFilter), e => e.FeatureCode.ToUpper().Contains(input.FeatureCodeFilter.ToUpper()))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureNameFilter), e => e.FeatureName.ToUpper().Contains(input.FeatureNameFilter.ToUpper()))
                         .WhereIf(input.BillableFilter.HasValue && input.BillableFilter > -1, e => (input.BillableFilter == 1 && e.Billable) || (input.BillableFilter == 0 && !e.Billable))
                         .WhereIf(input.InvoicedFilter.HasValue && input.InvoicedFilter > -1, e => (input.InvoicedFilter == 1 && e.Invoiced) || (input.InvoicedFilter == 0 && !e.Invoiced))
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.ReferenceFilter), e => e.Reference == input.ReferenceFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.ReferenceFilter), e => e.Reference.ToUpper().Contains(input.ReferenceFilter.ToUpper()))
                         .WhereIf(input.MinQtyFilter != null, e => e.Qty >= input.MinQtyFilter)
                         .WhereIf(input.MaxQtyFilter != null, e => e.Qty <= input.MaxQtyFilter)
                         .WhereIf(input.MinConsumedQtyFilter != null, e => e.ConsumedQty >= input.MinConsumedQtyFilter)
@@ -565,7 +565,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.Reference = reference;
                     obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? 0 : tenantPlan.AppSubscriptionPlanHeaderId;
                     obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString();
+                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     obj.Name = obj.Code;
                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -610,7 +610,7 @@ namespace onetouch.AppSubScriptionPlan
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
                     obj.EntityObjectTypeId = entityActivityObjectType.Id;
                     obj.EntityObjectTypeCode = entityActivityObjectType.Code;
-                    obj.Code = featureCode.Trim() + " " + DateTime.Now.ToString();
+                    obj.Code = featureCode.Trim() + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     obj.RelatedEntityCode = relatedEntityCode;
                     obj.RelatedEntityId = relatedEntityId;
                     obj.RelatedEntityObjectTypeId = relatedEntityOvbjectTypeId;

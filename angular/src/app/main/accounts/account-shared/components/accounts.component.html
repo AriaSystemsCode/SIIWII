@@ -127,15 +127,16 @@
                                                     padding-right: 3px;
                                                     padding-left: 9px;
                                                 "
+                                                     class="btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn"
+                                                     [routerLink]="[
+                                                         '/app/main/account/create-manual'
+                                                     ]"
                                                 *ngIf="!this.isHost"
                                                 [title]="
                                                     'AddManualAccount'
                                                         | localize
                                                 "
-                                                class="btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn"
-                                                [routerLink]="[
-                                                    '/app/main/account/create-manual'
-                                                ]"
+                                           
                                             >
                                                 <i
                                                     class="d-inline-block w-100 fas fa-user-plus icon-center"
