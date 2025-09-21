@@ -9745,7 +9745,7 @@ namespace onetouch.Accounts
 
                         // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
                         // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
-                        
+
                         foreach (var acc in accountsList)
                         {
                             //I40 publiah manula account[start]
@@ -9765,8 +9765,8 @@ namespace onetouch.Accounts
                             foreach (var br in acc.ParentFkList)
                             {
                                 br.AccountId = acc.Id;
-                                
-                                if (br.EntityFk.EntityObjectTypeId== presonEntityObjectTypeId)
+
+                                if (br.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
                                     contacts.Add(br);
 
                                 if (br.ParentFkList != null)
@@ -9781,56 +9781,24 @@ namespace onetouch.Accounts
                                             foreach (var sub in cont.ParentFkList)
                                             {
                                                 sub.AccountId = acc.Id;
-                    // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
-                    // ac  ol6tttttt5countsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
-
-                    foreach (var acc in accountsList)
-                    {
-                        //xx
-                        foreach (var z in acc.AppContactAddresses)
-                        {
-                            if (z.AddressFk!=null)
-                            z.AddressFk.AccountId = acc.Id;
-                        }
-                        //xx
-                        foreach (var br in acc.ParentFkList)
-                        {
-                            //xx
-                            foreach (var z in br.AppContactAddresses)
-                            {
-                                if (z.AddressFk != null)
-                                    z.AddressFk.AccountId = acc.Id;
-                            }
-                            //xx
-                            br.AccountId = acc.Id;
-                            if (br.ParentFkList != null)
-                            {
-                                foreach (var cont in br.ParentFkList)
-                                {
-                                    cont.AccountId = acc.Id;
-                                    if (cont.ParentFkList != null && cont.ParentFkList.Count > 0)
-                                    {
-                                        foreach (var sub in cont.ParentFkList)
-                                        {
-                                            sub.AccountId = acc.Id;
-
+                                                // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
+                                                // ac  ol6tttttt5countsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
 
                                             }
                                         }
                                     }
                                 }
                             }
-
                         }
                         con.AppContacts.UpdateRange(accountsList);
                         await con.SaveChangesAsync();
                         //I40[Start]
                       //  dbContextTransaction.Commit();
                     }
-                    foreach (var acc in accountsList)
+                    foreach (var acct in accountsList)
                     {
                         var account = await _appContactRepository.GetAll().Include(z => z.EntityFk)
-                            .Where(z => z.Code == acc.Code && z.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).FirstOrDefaultAsync();
+                            .Where(z => z.Code == acct.Code && z.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).FirstOrDefaultAsync();
                         if (account != null)
                         {
                             //var contactList = await _appContactRepository.GetAll().Include(z => z.EntityFk)
@@ -9839,19 +9807,19 @@ namespace onetouch.Accounts
 
                             if (contactList != null && contactList.Count() > 0)
                             {
-                                foreach (var cont in contactList)
+                                foreach (var contactObj in contactList)
                                 {
-                                    if (cont.ParentId != null && cont.AccountId != null)
+                                    if (contactObj.ParentId != null && contactObj.AccountId != null)
                                     {
-                                        var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == cont.AccountId).FirstOrDefaultAsync();
+                                        var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == contactObj.AccountId).FirstOrDefaultAsync();
                                         if (accountObj != null)
                                         {
                                             var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
                                             if (publishedAccount != null)
                                             {
                                                 //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                                                await _iCreateMarketplaceAccount.PublishMember(cont.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
-                                                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishedAccount.SSIN, cont.SSIN, false, null, null);
+                                                await _iCreateMarketplaceAccount.PublishMember(contactObj.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
+                                                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishedAccount.SSIN, contactObj.SSIN, false, null, null);
                                                 await _iCreateMarketplaceAccount.HideAccount(accountObj.SSIN);
 
                                             }

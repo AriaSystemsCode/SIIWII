@@ -7528,47 +7528,8 @@ namespace onetouch.AppSiiwiiTransaction
                 return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
             }
         }
-        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[Start]
-        protected void UpdateAppEntityLog(long filteredAppTransactionsId)
-        {
-            var entityOpenObjectStatusId = _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
-            var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
-                .Where(e => e.TenantId == AbpSession.TenantId
-                && e.CreatorUserId == AbpSession.UserId
-                && (e.EntityObjectStatusId == long.Parse(entityOpenObjectStatusId.Result.ToString()))
-                && e.Id == filteredAppTransactionsId).FirstOrDefault();
-            if (filteredAppTransactions != null)
-            {
-
-                if (filteredAppTransactions.EntityObjectStatusId != long.Parse(entityOpenObjectStatusId.Result.ToString()))
-                {
-                    return;
-                }
-
-                var statusCodeNotSent = _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                var logExist = _appEntityLogRepository.GetAll().Where(z => z.EntityId == filteredAppTransactions.Id &&
-                z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == filteredAppTransactions.EntityObjectTypeId &&
-                z.EntityObjectStatusId == long.Parse(statusCodeNotSent.Result.ToString())
-                ).FirstOrDefault();
-                if (logExist == null)
-                {
-                    logExist = new AppEntityLog();
-                    logExist.EntityObjectStatusId = long.Parse(statusCodeNotSent.Result.ToString());
-                    logExist.EntityObjectStatusCode = "Ready to be Sent";
-                    logExist.EntityId = filteredAppTransactions.Id;
-                    logExist.EntityCode = filteredAppTransactions.Code;
-                    logExist.EntityObjectTypeId = filteredAppTransactions.EntityObjectTypeId;
-                    logExist.EntityObjectTypeCode = filteredAppTransactions.EntityObjectTypeCode;
-                    logExist.PartnerCode = "ARIAERP";
-                    logExist.TenantId = int.Parse(AbpSession.TenantId.ToString());
-                    logExist.ObjectId = filteredAppTransactions.ObjectId;
-                    logExist.ObjectCode = "TRANSACTION";
-                    _appEntityLogRepository.Insert(logExist);
-                    CurrentUnitOfWork.SaveChanges();
-                }
-            }
-        }
-        //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
+       
+   
         //I46{End}
     }
 
