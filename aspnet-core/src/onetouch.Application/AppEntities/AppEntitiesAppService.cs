@@ -1263,6 +1263,7 @@ namespace onetouch.AppEntities
 
                     }
                 }
+
                 if (entity.Id > 0 && input.RelatedEntityId != null && input.RelatedEntityId > 0)
                 {
                     var relatedEntityFK = _appEntityRepository.GetAll().FirstOrDefault(r => r.Id == input.RelatedEntityId);
@@ -1278,6 +1279,26 @@ namespace onetouch.AppEntities
                     };
                     entitiesRelationship = _appEntitiesRelationshipRepository.Insert(entitiesRelationship);
                 }
+
+                foreach (var related in input.RelatedEntitiesIds)
+                {
+                    if (entity.Id > 0 && related != null && related > 0)
+                    {
+                        var relatedEntityFK = _appEntityRepository.GetAll().FirstOrDefault(r => r.Id == related);
+
+                        var entitiesRelationship = new AppEntitiesRelationship
+                        {
+                            EntityId = entity.Id,
+                            EntityCode = entity.Code,
+                            EntityTypeCode = entity.EntityObjectTypeFk.Code,
+                            RelatedEntityId = (long)related,
+                            RelatedEntityTypeCode = relatedEntityFK.EntityObjectTypeCode,
+                            RelatedEntityCode = relatedEntityFK.Code
+                        };
+                        entitiesRelationship = _appEntitiesRelationshipRepository.Insert(entitiesRelationship);
+                    }
+                }
+
                 return entity.Id;
             }
         }

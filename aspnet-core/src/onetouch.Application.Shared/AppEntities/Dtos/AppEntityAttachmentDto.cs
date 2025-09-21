@@ -22,8 +22,9 @@ namespace onetouch.AppEntities.Dtos
 		public virtual string Url { get; set; }
 
 		public virtual string guid { get; set; }
+        public virtual bool IsPublic{ get; set; }
 
-		public virtual string Attributes { get; set; }
+        public virtual string Attributes { get; set; }
 
 		public virtual int Index { get; set; }
 
