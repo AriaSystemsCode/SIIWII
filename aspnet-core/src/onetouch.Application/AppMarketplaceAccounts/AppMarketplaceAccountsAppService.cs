@@ -1360,11 +1360,23 @@ namespace onetouch.AppMarketplaceAccounts
 
                 //Publish contacts
                 //if (personEntityObjectTypeId)
-                var contactInfo = _appContactRepository.GetAll()
+                /*var contactInfo = _appContactRepository.GetAll()
                     .Where(x => //x.IsProfileData 
                            x.TenantId == AbpSession.TenantId
                            && x.ParentId == mainAccountID
-                           && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();
+                           && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();*/
+                var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                var contactInfo = _appContactRepository.GetAll()
+                    .Where(x => //x.IsProfileData 
+                           x.TenantId == AbpSession.TenantId &&
+                            _appContactRelationshipInfoRepository.GetAll()
+                           .Where(s => s.RecipientContactSSIN == x.SSIN && s.ConsiderAsTeamMember == true &&
+                           s.RequesterContactSSIN == input.SSIN //&& s.SharingLevel == 1
+                           && s.EntityObjectStatusId == activeRelationshipStatusId).Count() > 0
+                           //&& x.ParentId == mainAccountID
+                           //&& x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId
+                           ).ToList();
+               
                 foreach (var contactObj in contactInfo)
                 {
                     await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
