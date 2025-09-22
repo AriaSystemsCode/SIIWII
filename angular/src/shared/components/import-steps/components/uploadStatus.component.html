@@ -43,7 +43,7 @@
             <table class="browser-table min-width-table" style="min-width: 1000px;">
               <thead>
                 <tr>
-                  <th class="sticky-action-col sticky-header">Actions</th>
+                  <th class="sticky-action-col sticky-header" *ngIf="this.importType == ImportTypes.Items">Actions</th>
                   <th *ngFor="let column of uploadStatsColumnsName" class="sticky-header"
                     [hidden]="column.showFor && column.showFor !== activeRecordType">
                     {{ column.name }}
@@ -54,7 +54,7 @@
                 <tr #rowRef *ngFor="let record of records; let i = index" [attr.data-record-id]="record.id"
                   [class.in-action]="record._inAction" [class.active-record]="activeRecord === record"
                   [class.disabled-row]="currentActionRecord && record !== currentActionRecord">
-                  <td class="sticky-action-col"
+                  <td class="sticky-action-col" *ngIf="this.importType == ImportTypes.Items" 
                     [class.pointer-events-none]="currentActionRecord && record !== currentActionRecord">
                     <div class="dropdown" #dropdownRef>
                       <!-- IF not in action mode -->

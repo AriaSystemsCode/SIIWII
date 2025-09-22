@@ -193,9 +193,11 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
         _UploadedFolder.push(file);
     }
 
+    if(this.importType == ImportTypes.Items){
     this._imData.emit(this.imData);
     this._imImages.emit(this.imImages);
     this._hasImages.emit(this.imImages);
+    }
     this.UploadedFolder.emit(_UploadedFolder);
     event.target.value = "";
 
