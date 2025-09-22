@@ -310,7 +310,7 @@
                             class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-lg"
                             [attr.aria-label]="l('Languages')">
                             <ul class="kt-nav kt-margin-t-10 kt-margin-b-10">
-                                <li class="kt-nav__item text-center">
+                                <li class="kt-nav__item text-center" *ngIf="appSession?.tenant?.edition?.displayName == 'Personal Edition'">
                                     <button id="businessAccount" class="pt-2 border-0 createButtons"
                                         (click)="CreateBusiness_GroupAccount('BUSINESS','Business')"> <img
                                             src="../../assets/img/input_icons/user-plus.png"

@@ -11,14 +11,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <h4>{{accountDataForView?.name}}</h4>
 
-          <button class="connect-btn d-md-none d-flex" style="height: 32px;"> <svg width="24" height="24"
-              viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M16.9 10.2V6M14.8 8.1H19M14.8 17.9V17.06C14.8 15.8839 14.8 15.2958 14.5711 14.8466C14.3698 14.4515 14.0485 14.1302 13.6534 13.9289C13.2042 13.7 12.6161 13.7 11.44 13.7H8.36C7.18389 13.7 6.59583 13.7 6.14662 13.9289C5.75148 14.1302 5.43022 14.4515 5.22889 14.8466C5 15.2958 5 15.8839 5 17.06V17.9M12.35 8.45C12.35 9.8031 11.2531 10.9 9.9 10.9C8.5469 10.9 7.45 9.8031 7.45 8.45C7.45 7.0969 8.5469 6 9.9 6C11.2531 6 12.35 7.0969 12.35 8.45Z"
-                stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <p class="m-0">connect</p>
-          </button>
+  
         </div>
         <div class="d-flex justify-content-between">
           <div class="d-md-flex d-none gap-3 justify-content-start align-items-center"
@@ -55,7 +48,7 @@
           <ng-container *ngIf="marketPlaceData?.availableConnections as options">
               <div
             
-                  style="white-space: nowrap; position: absolute; right: 5px;" dropdown>
+                  style="white-space: nowrap; position: absolute; right: 5px;    top: 5px;" dropdown>
                   <!-- Main button = first option -->
                   <button type="button" class="relation_button" dropdownToggle
                      >
