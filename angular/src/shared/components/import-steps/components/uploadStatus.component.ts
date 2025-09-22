@@ -786,6 +786,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         ? item?.tempBase64
         : item?.croppedbase64;
     }
+
+    else
+      return "-";
   }
 
   getStatusClass(columnName: string, value: any): string {

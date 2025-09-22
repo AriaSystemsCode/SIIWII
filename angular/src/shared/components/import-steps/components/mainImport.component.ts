@@ -208,7 +208,7 @@ export class MainImportComponent
         }, 100);
 
 
-        if (this.imImages) {
+        if (this.importType == ImportTypes.Items && this.imImages) {
             let limitUploadImage = this.imData ? this.limitImImages + 1 : this.limitImImages;
 
             if (this._totalFiles > limitUploadImage) {
@@ -227,16 +227,20 @@ export class MainImportComponent
             if (file.name.startsWith("~$")) 
                 continue;
 
-            if (this.imData && file.type.includes("sheet")) {
+            const isSheet = file.type.includes("sheet");
+            const isImage =   file.type.includes("image")
+            if (isSheet && (this.importType !== ImportTypes.Items || this.imData)) {   
                 hasExcelFile = true;
                 this.uploader.addToQueue(new Array<File>(file));
             }
 
-            if (this.imImages && file.type.includes("image")) {
+           
+                if (isImage && (this.importType !== ImportTypes.Items || this.imImages)) {  
                 hasImageFile = true;
                 if (file.type.includes("image") && this.hasImages) {
                     totalImageFiles++;
-                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMPORT")) {
+                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMPORT") 
+                    ||  this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMAGE")  ) {
                         this.imagesName.push(file.name.toUpperCase());
                         var imgFile = new ImageFile();
                         imgFile.file = file;
@@ -250,7 +254,7 @@ export class MainImportComponent
 
 
 
-        if (this.imData && !hasExcelFile) {
+            if (!hasExcelFile && (this.imData || this.importType !== ImportTypes.Items)) {
             this.invalidImport = true;
             Swal.fire(
                 " ",
@@ -290,7 +294,8 @@ export class MainImportComponent
             }
         }
 
-        if (this.uploader.queue.length == 0 && this.imData) {
+       
+            if (this.uploader.queue.length == 0  && (this.imData || this.importType !== ImportTypes.Items)) {
             this.invalidImport = true;
             var _fileName = "";
             _fileName = ImportTypes[this.importType] + ".xlsx";
@@ -305,7 +310,7 @@ export class MainImportComponent
             return;
         }
 
-        if (!this.invalidImport && this.imData) {
+            if (!this.invalidImport && (this.imData || this.importType !== ImportTypes.Items)) {
             this.uploader.onSuccessItem = (item, response, status) => {
                 const ajaxResponse = <IAjaxResponse>JSON.parse(response);
                 if (ajaxResponse?.success) {
@@ -371,7 +376,7 @@ export class MainImportComponent
             }; */
         }
 
-        if (!this.invalidImport && !this.imData) {
+            if (!this.invalidImport && (this.importType !== ImportTypes.Items || this.imData)) {   
             setTimeout(() => {
                 this.CheckRatio();
             }, 0);
@@ -552,7 +557,7 @@ export class MainImportComponent
             return;
         }
 
-        if (this.imData) {
+            if (this.importType !== ImportTypes.Items || this.imData) {   
             var toValue = this.uploadingResult?.toList[iterationNo];
             if (toValue > 1) { toValue = toValue - 1; }
             this.progress = Math.ceil((toValue / this.uploadingResult?.totalRecords) * 100);
@@ -567,19 +572,30 @@ export class MainImportComponent
             }
         }
 
+        const isLastIteration = iterationNo === this.uploadingResult?.fromList?.length - 1;
+        const isItemsImport = this.importType === ImportTypes.Items;
+        const hasImData = !!this.imData;
+
         this.importServiceProxy
             .saveFromExcel(this.uploadingResult)
             .pipe(finalize(() => {
-
-                if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
+              
+                
+                if (
+                  (isLastIteration && (hasImData || !isItemsImport)) ||
+                  (isItemsImport && !hasImData)
+                ) {
+ 
                     this.spinnerService.hide()
                     this.ProgressModal.hide();
                 }
 
             }))
             .subscribe((result) => {
-
-                if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
+                    if (
+                        (isLastIteration && (hasImData || !isItemsImport)) ||
+                        (isItemsImport && !hasImData)
+                      ){
                     this.logFileUrl = result.excelLogPath;
                     this.logFileName = result.excelLogFileName;
 
@@ -590,7 +606,10 @@ export class MainImportComponent
                 }
             }
                 , (error) => {
-                    if ((this.imData && iterationNo == this.uploadingResult?.fromList?.length - 1) || !this.imData) {
+                    if (
+                        (isLastIteration && (hasImData || !isItemsImport)) ||
+                        (isItemsImport && !hasImData)
+                      ){
                         this.successfullyImportModal.show(this.importType);
                     }
                     else {

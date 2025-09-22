@@ -13,7 +13,7 @@
                 </div>
               </div>
 
-                  <div>
+                  <div *ngIf="importType==ImportTypes.Items">
                     <label class="option-tab">
                       <input type="checkbox" [(ngModel)]="imData" (change)="onOptionChange()" class="mr-2"/>
                       <span>Product Data</span>
@@ -31,7 +31,7 @@
                     <img src="../../../../assets/accounts/importAccounts/Vector.png" /><br /><br />
 
                     <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
-                        multiple  [disabled]="!isAnyOptionSelected" class="upload-input"                        />
+                        multiple  [disabled]="importType==ImportTypes.Items && !isAnyOptionSelected" class="upload-input"/>
 
                         
                     <h5>{{"Dropyourfolderhereorclickheretoupload" | localize}} </h5>
@@ -43,7 +43,7 @@
 
 
 
-            <div class="video-info-box mb-3">
+            <div class="video-info-box mb-3" *ngIf="importType==ImportTypes.Items">
                 <img src="../../../../assets/accounts/importAccounts/VideoTutr.png" alt="Video" class="video-icon" />
               
                 <div class="video-content">
