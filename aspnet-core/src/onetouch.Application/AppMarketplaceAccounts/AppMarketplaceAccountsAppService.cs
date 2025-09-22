@@ -829,7 +829,7 @@ namespace onetouch.AppMarketplaceAccounts
                 }
                 //I40[Start]
                 output.Account.CurrencyId = account.CurrencyId;
-                output.Account.CurrencyCode = account.CurrencyCode;
+                output.Account.CurrencyCode = account.CurrencyFk == null ? account.CurrencyCode : account.CurrencyFk.Code;
                 output.Account.CurrencyName = account.CurrencyFk==null?"":account.CurrencyFk.Name;
                 //I40[Start]
                 var groupAccountEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeGroupId();
@@ -1180,10 +1180,10 @@ namespace onetouch.AppMarketplaceAccounts
                     ext.Id = 0;
                     ext.EntityFk = null;
                     //I40
-                    if (ext.AttributeId==715)
-                    {
-                        ext.AttributeValue = "";
-                    }
+                    //if (ext.AttributeId==715)
+                    //{
+                    //    ext.AttributeValue = "";
+                    //}
                     //I40
                     appMarketplaceContact.EntityExtraData.Add(ext);
                 }

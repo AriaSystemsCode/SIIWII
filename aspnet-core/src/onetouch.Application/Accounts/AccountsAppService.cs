@@ -204,7 +204,7 @@ namespace onetouch.Accounts
             _binaryObjectManager = binaryObjectManager;
             _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
-            //_appEntityRelationShipRepository = appEntityRelationShipRepository;
+            _appEntityRelationShipRepository = appEntityRelationShipRepository;
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             _sycEntityObjectTypesAppService= sycEntityObjectTypesAppService;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
@@ -281,7 +281,9 @@ namespace onetouch.Accounts
                                  //  z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId)
                                  //.Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
                                  //&& z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId && z.EntityFk.EntityAttachments.Count() > 0) ||
-                        .Where(z=> ((z.EntityFk.ObjectId == postObjectId || z.EntityFk.ObjectId == eventObjectId) && z.EntityFk.TenantId == account.TenantOwner)
+                        .Where(z=> (((z.EntityFk.ObjectId == postObjectId && 
+                        _appEntityRelationShipRepository.GetAll().Count(x=>x.EntityId== z.EntityFk.Id && x.RelatedEntityTypeCode=="EVENT")==0 
+                        ) || z.EntityFk.ObjectId == eventObjectId) && z.EntityFk.TenantId == account.TenantOwner )
                         || (z.EntityFk.ObjectId ==contactObjectId && z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.TenantOwner &&
                         _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.EntityFk.SSIN && x.SharingLevel == 1)>0) ||
                         (z.EntityFk.ObjectId == itemListObjectId && z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.TenantOwner &&
@@ -3231,7 +3233,7 @@ namespace onetouch.Accounts
                     var adminUser = await _userManager.FindByNameAsync("admin@" + tenantObj.TenancyName);
                     if (adminUser != null && adminUser.Id != 0)
                     {
-                        var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == adminUser.Id.ToString());
+                        var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z=>z.EntityFk).FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == adminUser.Id.ToString());
                         if (contactEntityExtraData == null)
                         {
                             //I40[Start]

@@ -59,10 +59,10 @@
 
 
 
-                <div [ngClass]="singleItemPerRowMode?'pt-0 pt-3' : ''">
+                <div [ngClass]="singleItemPerRowMode?'pt-0 pt-3' : ''" class="accTpye">
                     <!-- Account Type -->
                     <b class="accountType_label" [ngStyle]="{
-                      'color': singleItemPerRowMode ? 'black' : '#595959','font-size': fromOverview ? '11px':''
+                      'color': singleItemPerRowMode ? 'black' : '#595959','font-size': fromOverview ? '10px':''
                     }" >
                         {{ "AccountType" | localize }}:
                     </b>
