@@ -104,6 +104,8 @@
     .view-img-overlay {
         opacity: 0;
         z-index: 0;
+        border: 1px solid;
+        border-radius: 12px !important;
         @extend %transition-all-3ms;
     }
 

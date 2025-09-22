@@ -31,7 +31,8 @@
                     </h4>
                     <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E; font-size: 10px !important;">
                         <div class="price pt-2" style="float: right;
-                        clear: both;">
+                        clear: both;font-weight: bold;
+                        font-size: small;">
                             {{ languageSettingName!='en-GB' ? "MSRP" : "RRP" }}:
                             {{ tenantDefaultCurrency.symbol
                             }}{{item?.appItem?.price }}
@@ -83,7 +84,7 @@
                 </p>
 
 
-                <div class="share-level" [ngClass]=" { 'share-level-div': singleItemPerRowMode }">
+                <div class="share-level mb-4" [ngClass]=" { 'share-level-div': singleItemPerRowMode }">
                     <span *ngIf="item?.appItem?.sharingLevel === '1' || item?.appItem?.sharingLevel === '2' ">
                         <div class="fa fa-check-circle" style="color: #2DC74F;"></div> Shared
                     </span>
