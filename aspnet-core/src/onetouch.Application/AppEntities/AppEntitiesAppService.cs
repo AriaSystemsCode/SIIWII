@@ -1979,7 +1979,7 @@ namespace onetouch.AppEntities
                                                  ""
                                                  : "attachments/" + (contact.EntityFk.TenantId == null ? "-1" : contact.EntityFk.TenantId.ToString()) + "/" + contact.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
                     userInformationDto.JobTitle = contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
-                    userInformationDto.AccountName = contact.AccountFk.Name;
+                    userInformationDto.AccountName = contact.AccountFk== null?"":contact.AccountFk.Name;
                     userInformationDto.UserName = contact.Name;
                 }
                 return userInformationDto;
