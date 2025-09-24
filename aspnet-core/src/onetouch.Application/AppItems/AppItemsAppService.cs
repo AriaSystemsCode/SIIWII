@@ -6830,7 +6830,7 @@ namespace onetouch.AppItems
                             sizeScaleNames.Add(excelDto.SizeScaleName);
 
                         }
-                        catch
+                        catch(Exception ex)
                         {
                             if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
                             {
@@ -7034,16 +7034,30 @@ namespace onetouch.AppItems
                                     appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
 
                                 }
+                                //MMT2025
+                                //var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
+                                AppSizeScaleForEditDto sizescaleRatio=null;
+                                
+                                try
+                                {
+                                    sizescaleRatio =await _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
 
-                                var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
-
+                                }
+                                 catch(Exception ex)
+                                {
+                                    if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
+                                    {
+                                        sizescaleRatio =await _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleRatioForEditDto.Id.ToString()));
+                                    }
+                                }
+                                //MMT2025
                                 AppItemSizeScalesHeader appItemSizeScalesHeaderRatio = new AppItemSizeScalesHeader();
-                                appItemSizeScalesHeaderRatio.SizeScaleId = sizescaleRatio.Result.Id;
+                                appItemSizeScalesHeaderRatio.SizeScaleId = sizescaleRatio.Id;
                                 appItemSizeScalesHeaderRatio.Id = sizeRatioId;
-                                appItemSizeScalesHeaderRatio.Name = sizescaleRatio.Result.Name;
-                                appItemSizeScalesHeaderRatio.SizeScaleCode = sizescaleRatio.Result.Code;
-                                appItemSizeScalesHeaderRatio.NoOfDimensions = sizescaleRatio.Result.NoOfDimensions;
-                                appItemSizeScalesHeaderRatio.Dimesion1Name = sizescaleRatio.Result.Dimesion1Name;
+                                appItemSizeScalesHeaderRatio.Name = sizescaleRatio.Name;
+                                appItemSizeScalesHeaderRatio.SizeScaleCode = sizescaleRatio.Code;
+                                appItemSizeScalesHeaderRatio.NoOfDimensions = sizescaleRatio.NoOfDimensions;
+                                appItemSizeScalesHeaderRatio.Dimesion1Name = sizescaleRatio.Dimesion1Name;
                                 appItemSizeScalesHeaderRatio.ParentId = null;// appItemSizeScalesHeader.Id;
                                 appItemSizeScalesHeaderRatio.TenantId = AbpSession.TenantId;
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesRatioDetailDtoList);
