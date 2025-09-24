@@ -29,8 +29,7 @@ import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
 import { imageCroppingComponent } from "./imageCropping.Component";
-import { debug } from "console";
-import { debug } from "console";
+ 
 
 @Component({
     selector: "MainImportModal",
