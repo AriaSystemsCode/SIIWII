@@ -6320,7 +6320,7 @@ namespace onetouch.AppItems
             //excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "2";
             //excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
             //excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
-             
+
 
             //excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
             //excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
@@ -6332,7 +6332,7 @@ namespace onetouch.AppItems
                 || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6"
                 || r.ExcelDto.Actions == "8"
                 || r.ExcelDto.Actions == "9"
-                || r.ExcelDto.Actions == "10" || r.RecordType=="Color")
+                || r.ExcelDto.Actions == "10" || r.RecordType == "Color")
                 && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
             foreach (var excelDto in result123)
             {
@@ -6341,11 +6341,13 @@ namespace onetouch.AppItems
                 { number = Int32.Parse(excelDto.ExcelDto.Actions); }
 
                 if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType == "Color")
+                if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType == "Color")
                 {
                     if (number == 10) { excelDto.ExcelDto.Code = "-"; }
                     foreach (var id in excelDto.ExcelDto.Code.Split(","))
                     { var ret1 = SaveImageToColor(id, excelDto).Result; }
                 }
+                if (number == 5)
                 if (number == 5)
                 {
                     if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
@@ -6402,6 +6404,15 @@ namespace onetouch.AppItems
                             thirdItemCopy.ExcelDto.SizeName = size.TrimEnd();
                             
                             thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
+                            //string guid = System.Guid.NewGuid().ToString();
+                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+                            {
+                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                            });
+                            //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             //string guid = System.Guid.NewGuid().ToString();
                             thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
                             {
@@ -6481,13 +6492,13 @@ namespace onetouch.AppItems
 
             result = result.Select(r => r).Where(r => (r.Actions != "2" && r.Actions != "3" && r.Actions != "4"
             && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
-            && r.Actions != "8" && r.Actions != "9" && r.Actions != "10" 
-            && r.RecordType!="Image" && r.RecordType != "Color") ).ToList();
-           
-            if(result.Count<= 0) { return excelResultsDTO.ExcelLogDTO; }
+            && r.Actions != "8" && r.Actions != "9" && r.Actions != "10"
+            && r.RecordType != "Image" && r.RecordType != "Color")).ToList();
+
+            if (result.Count <= 0) { return excelResultsDTO.ExcelLogDTO; }
             #endregion
 
-           
+
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
@@ -8183,8 +8194,7 @@ namespace onetouch.AppItems
                 await x.SaveChangesAsync();*/
             //MMT46
             return excelResultsDTO.ExcelLogDTO;
-        }
-        //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+        }   //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         //{
         //    ExcelResultsDTO itemExcelResultsDTO = new ExcelResultsDTO();
         //    itemExcelResultsDTO.TotalRecords = 0;

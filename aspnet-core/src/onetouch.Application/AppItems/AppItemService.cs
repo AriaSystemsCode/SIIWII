@@ -146,7 +146,7 @@ namespace onetouch.AppItems
             //       lookupAccountOrTenantDtoList
             //   );
             var GetAllRet = _appItemRepository.GetAll()
-                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) )
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
                 .Where(a => a.TenantId == AbpSession.TenantId && a.ParentId == null);
             var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "id asc").PageBy(input);
             var totalCount = await GetAllRet.CountAsync();
@@ -262,7 +262,7 @@ namespace onetouch.AppItems
             var GetAllRetItems = GetAllRet.OrderBy(input.Sorting ?? "Code asc").PageBy(input);
 
             List<LookupItems> lookupAccountOrTenantDtoList = new List<LookupItems>();
-            lookupAccountOrTenantDtoList = GetAllRetItems.Select(e => new LookupItems() { DisplayName = e.Code, Id = e.IdList}).ToList();
+            lookupAccountOrTenantDtoList = GetAllRetItems.Select(e => new LookupItems() { DisplayName = e.Code, Id = e.IdList }).ToList();
             var totalCount = await GetAllRet.CountAsync();
             return new PagedResultDto<LookupItems>(
                    totalCount,
@@ -273,8 +273,8 @@ namespace onetouch.AppItems
 
         public async Task<AppItemtExcelRecordDTO> GetAppItemForEditData(string input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
-            var appItemId = _appItemRepository.GetAll().Where(e=> e.EntityId == Int32.Parse(input)).FirstOrDefault();
-            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId= appItemId.Id };
+            var appItemId = _appItemRepository.GetAll().Where(e => e.EntityId == Int32.Parse(input)).FirstOrDefault();
+            var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = appItemId.Id };
             var y = await GetAppItemForEdit(xInput);
             appItemtExcelRecordDTO.Name = y.AppItem.Name;
             appItemtExcelRecordDTO.ExcelDto.Price = y.AppItem.Price.ToString();
@@ -383,7 +383,7 @@ namespace onetouch.AppItems
 
             return appItemtExcelRecordDTO;
         }
-             
+
         public async Task<List<LookupAccountOrTenantDto>> GetWithColors(long input)
         {
             var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = input };
@@ -408,7 +408,8 @@ namespace onetouch.AppItems
         }
 
         public async Task<AppItemtExcelRecordDTO> GetAppItemColorForEditData(string input, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
-        {   var longinput = input.Split(',');
+        {
+            var longinput = input.Split(',');
             var appItemId = _appItemRepository.GetAll().Where(e => e.EntityId == Int32.Parse(longinput[0])).FirstOrDefault();
             var xInput = new GetAppItemWithPagedAttributesForEditInput() { ItemId = ((long)appItemId.ParentId) };
             var y = await GetAppItemForEdit(xInput);
@@ -545,9 +546,15 @@ namespace onetouch.AppItems
                 appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid = Guid.NewGuid().ToString();
             }
             if (y.AppItem.EntityAttachments.Count == 0) { y.AppItem.EntityAttachments = new List<AppEntityAttachmentDto>(); }
-            var z = new AppEntityAttachmentDto {    IsDefault= appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,  
-                AttachmentCategoryEnum=0,AttachmentCategoryId = 3, FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
-                guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid, Index = y.AppItem.EntityAttachments.Count };
+            var z = new AppEntityAttachmentDto
+            {
+                IsDefault = appItemtExcelRecordDTO.ExcelDto.ImageIsDefault,
+                AttachmentCategoryEnum = 0,
+                AttachmentCategoryId = 3,
+                FileName = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageFileName,
+                guid = appItemtExcelRecordDTO.ExcelDto.Images[0].ImageGuid,
+                Index = y.AppItem.EntityAttachments.Count
+            };
 
 
 
@@ -584,6 +591,25 @@ namespace onetouch.AppItems
 
 
             return x;
+        }
+        public bool RenameFileToGuid(string fileName, string guid)
+        {
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+
+            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString();
+
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+
+            try
+            {
+                System.IO.File.Copy(path + @"\" + fileName, path + @"\" + guid + "." + fileName.Split('.')[1], true);
+
+            }
+            catch { }
+            return true;
         }
         public bool RenameFileToGuid(string fileName, string guid)
         {
