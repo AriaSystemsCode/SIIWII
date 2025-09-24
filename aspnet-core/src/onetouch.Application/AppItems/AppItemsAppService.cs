@@ -6404,10 +6404,12 @@ namespace onetouch.AppItems
                 {
                     if (appItem.ItemPricesFkList.Count > 0)
                     {
-                        foreach (var itmPrc in appItem.ItemPricesFkList)
-                        {
-                            itmPrc.IsDeleted = true;
-                        }
+                        //foreach (var itmPrc in appItem.ItemPricesFkList)
+                        // {
+                        //  itmPrc.IsDeleted = true;
+                        //}
+                        await _appItemPricesRepository.DeleteAsync(z => z.AppItemId == appItem.Id);
+                        appItem.ItemPricesFkList = new List<AppItemPrices>();
                     }
                 }
                 //if (appItem.Price > 0)
@@ -7034,9 +7036,9 @@ namespace onetouch.AppItems
                                     appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
 
                                 }
-                                //MMT2025
+                                //T-SII-20250725.0002,1 MMT 09/24/2025 Fix import item issues[Start]
                                 //var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
-                                AppSizeScaleForEditDto sizescaleRatio=null;
+                                AppSizeScaleForEditDto sizescaleRatio =null;
                                 
                                 try
                                 {
@@ -7050,7 +7052,7 @@ namespace onetouch.AppItems
                                         sizescaleRatio =await _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleRatioForEditDto.Id.ToString()));
                                     }
                                 }
-                                //MMT2025
+                                //T-SII-20250725.0002,1 MMT 09/24/2025 Fix import item issues[End]
                                 AppItemSizeScalesHeader appItemSizeScalesHeaderRatio = new AppItemSizeScalesHeader();
                                 appItemSizeScalesHeaderRatio.SizeScaleId = sizescaleRatio.Id;
                                 appItemSizeScalesHeaderRatio.Id = sizeRatioId;
@@ -7324,10 +7326,12 @@ namespace onetouch.AppItems
                     {
                         if (appChildItem.ItemPricesFkList.Count > 0)
                         {
-                            foreach (var prc in appChildItem.ItemPricesFkList)
-                            {
-                                prc.IsDeleted = true;
-                            }
+                            //foreach (var prc in appChildItem.ItemPricesFkList)
+                            //{
+                            await _appItemPricesRepository.DeleteAsync(z=>z.AppItemId==appChildItem.Id);
+                            appChildItem.ItemPricesFkList = new List<AppItemPrices>();
+                            //prc.IsDeleted = true;
+                            //}
                         }
                     }
                     if (string.IsNullOrEmpty(appChildItem.Price.ToString()))
