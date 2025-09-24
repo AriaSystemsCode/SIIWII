@@ -380,7 +380,7 @@ export class MainImportComponent
             }; */
         }
 
-            if (!this.callValid  && !this.invalidImport && this.importType == ImportTypes.Items || !this.imData) {   
+            if (!this.callValid  && !this.invalidImport && this.importType == ImportTypes.Items && !this.imData) {   
             setTimeout(() => {
                 this.CheckRatio();
             }, 0);
