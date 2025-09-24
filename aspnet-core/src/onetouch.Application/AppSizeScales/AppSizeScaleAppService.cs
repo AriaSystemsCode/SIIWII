@@ -68,7 +68,7 @@ namespace onetouch.AppSizeScales
         public async Task<AppSizeScaleForEditDto> GetSizeScaleForEdit(long sizeScaleId)
         {
             AppSizeScaleForEditDto returnObj = new AppSizeScaleForEditDto();
-            var sizeScale = await _appSizeScaleHeaderRepository.GetAll().Include(x => x.AppSizeScalesDetails).FirstOrDefaultAsync(x => x.Id == sizeScaleId);
+            var sizeScale = await _appSizeScaleHeaderRepository.GetAll().AsNoTracking().Include(x => x.AppSizeScalesDetails).FirstOrDefaultAsync(x => x.Id == sizeScaleId);
             if (sizeScale != null)
             {
                 returnObj = ObjectMapper.Map<AppSizeScaleForEditDto>(sizeScale);
