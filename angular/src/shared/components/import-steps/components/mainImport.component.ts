@@ -119,6 +119,7 @@ export class MainImportComponent
     limitImImages = 100;
     updatedRecordData;
     _resetRecords: boolean = false;
+    callValid: boolean = false;
 
     public constructor(
         private _httpClient: HttpClient,
@@ -309,6 +310,7 @@ export class MainImportComponent
             );
             return;
         }
+        this.callValid=false;
 
             if (!this.invalidImport && (this.imData || this.importType !== ImportTypes.Items)) {
             this.uploader.onSuccessItem = (item, response, status) => {
@@ -317,6 +319,8 @@ export class MainImportComponent
                     setTimeout(() => {
                         this.CheckRatio();
                     }, 0);
+
+                    this.callValid=true;
 
                     this.importServiceProxy
                         .validateExcel(this._guid, this.imagesName)
@@ -376,7 +380,7 @@ export class MainImportComponent
             }; */
         }
 
-            if (!this.invalidImport && (this.importType !== ImportTypes.Items || this.imData)) {   
+            if (!this.callValid  && !this.invalidImport && this.importType == ImportTypes.Items || !this.imData) {   
             setTimeout(() => {
                 this.CheckRatio();
             }, 0);
