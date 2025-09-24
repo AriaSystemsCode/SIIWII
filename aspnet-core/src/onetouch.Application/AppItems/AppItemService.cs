@@ -611,25 +611,7 @@ namespace onetouch.AppItems
             catch { }
             return true;
         }
-        public bool RenameFileToGuid(string fileName, string guid)
-        {
-            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
-
-            var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString();
-
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
-
-            try
-            {
-                System.IO.File.Copy(path + @"\" + fileName, path + @"\" + guid + "." + fileName.Split('.')[1], true);
-
-            }
-            catch { }
-            return true;
-        }
+        
         public async Task<long> SaveImageToColor(string colorEntityId, AppItemtExcelRecordDTO appItemtExcelRecordDTO)
         {
             string tempId = colorEntityId;
