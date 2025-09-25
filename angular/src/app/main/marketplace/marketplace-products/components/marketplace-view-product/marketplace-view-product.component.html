@@ -947,6 +947,31 @@ top: 4px;">
 
 
             <div></div>
+
+            <div class="bg-white rounded p-4 m-2">
+          <h4>Related products</h4>
+
+            <p-carousel
+            [value]="items"
+            [numVisible]="5"
+            [numScroll]="5"
+            [circular]="false"
+            [showIndicators]="false"
+            [showNavigators]="true"
+            [responsiveOptions]="responsiveOptions"
+            class="p-4 m-2  rounded"
+          >
+            <!-- -->
+            <ng-template pTemplate="item" let-product>
+              <div class="px-2 my-2">
+                <app-prodcut-card
+                  [product]="product.appItem"
+                  [productCard]="product"
+                ></app-prodcut-card>
+              </div>
+            </ng-template>
+          </p-carousel>
+        </div>
             <div class="mb-2 p-2 m-2 bg-white rounded row">
              <div class="col-lg-4 col-6">
             <app-overallRating [overRating]="overRating"  ></app-overallRating>
@@ -1701,7 +1726,7 @@ top: 4px;">
                             </div>
                         </div>
                     </div>
-
+              
                     <div class="mb-2 p-2 m-2 bg-white rounded row">
                         <div class="col-12">
                        <app-overallRating [overRating]="overRating"  ></app-overallRating>
