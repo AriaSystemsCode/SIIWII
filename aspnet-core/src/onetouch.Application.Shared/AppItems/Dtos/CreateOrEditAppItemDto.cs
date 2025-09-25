@@ -168,6 +168,7 @@ namespace onetouch.AppItems.Dtos
 
         public virtual PagedResultDto<AppEntityCategoryDto> EntityCategories { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesAdded { get; set; }
+        public virtual IList<AppEntitiesRelationshipDto> EntitiesRelationships { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesRemoved { get; set; }
 
         public virtual PagedResultDto<AppEntityCategoryDto> EntityDepartments { get; set; }

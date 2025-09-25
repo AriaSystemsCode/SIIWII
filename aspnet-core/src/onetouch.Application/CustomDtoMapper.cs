@@ -306,6 +306,7 @@ namespace onetouch
                 .ForMember(d => d.EntityDepartments, opt => opt.Ignore())
                 .ForMember(d => d.EntityClassifications, opt => opt.Ignore())
                 .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments))
+                .ForMember(d => d.EntitiesRelationships, s => s.MapFrom(ss => ss.EntityFk.EntitiesRelationships))
                 .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData))
                 .ForMember(d => d.VariationItems, s => s.MapFrom(ss => ss.ParentFkList))
                 .ForMember(d => d.EntityObjectTypeId, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeId))
