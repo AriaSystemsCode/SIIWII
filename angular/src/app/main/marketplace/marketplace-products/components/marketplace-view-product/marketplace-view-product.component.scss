@@ -42,6 +42,8 @@
 .msrp h5,
 .msrp span {
     color: #595959 !important;
+    // filter: blur(5px);
+    // transition: filter 0.3s;
 }
 
 td {
@@ -296,6 +298,7 @@ table th {
         border: none !important;
         margin-top: 10px !important
     }
+
 }
 
 .p-tabview .p-tabview-nav li .p-tabview-nav-link {
@@ -887,3 +890,4 @@ p-dialog {
     color: #9E9E9E;
     font-weight: 500;
 }
+
