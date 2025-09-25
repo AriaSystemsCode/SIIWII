@@ -1279,23 +1279,25 @@ namespace onetouch.AppEntities
                     };
                     entitiesRelationship = _appEntitiesRelationshipRepository.Insert(entitiesRelationship);
                 }
-
-                foreach (var related in input.RelatedEntitiesIds)
+                if (input.RelatedEntitiesIds != null)
                 {
-                    if (entity.Id > 0 && related != null && related > 0)
+                    foreach (var related in input.RelatedEntitiesIds)
                     {
-                        var relatedEntityFK = _appEntityRepository.GetAll().FirstOrDefault(r => r.Id == related);
-
-                        var entitiesRelationship = new AppEntitiesRelationship
+                        if (entity.Id > 0 && related != null && related > 0)
                         {
-                            EntityId = entity.Id,
-                            EntityCode = entity.Code,
-                            EntityTypeCode = entity.EntityObjectTypeFk.Code,
-                            RelatedEntityId = (long)related,
-                            RelatedEntityTypeCode = relatedEntityFK.EntityObjectTypeCode,
-                            RelatedEntityCode = relatedEntityFK.Code
-                        };
-                        entitiesRelationship = _appEntitiesRelationshipRepository.Insert(entitiesRelationship);
+                            var relatedEntityFK = _appEntityRepository.GetAll().FirstOrDefault(r => r.Id == related);
+
+                            var entitiesRelationship = new AppEntitiesRelationship
+                            {
+                                EntityId = entity.Id,
+                                EntityCode = entity.Code,
+                                EntityTypeCode = entity.EntityObjectTypeFk.Code,
+                                RelatedEntityId = (long)related,
+                                RelatedEntityTypeCode = relatedEntityFK.EntityObjectTypeCode,
+                                RelatedEntityCode = relatedEntityFK.Code
+                            };
+                            entitiesRelationship = _appEntitiesRelationshipRepository.Insert(entitiesRelationship);
+                        }
                     }
                 }
 

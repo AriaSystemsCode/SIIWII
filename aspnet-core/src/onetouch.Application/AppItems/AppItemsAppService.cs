@@ -902,7 +902,10 @@ namespace onetouch.AppItems
                 // .Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk).ThenInclude(x => x.EntityExtraData)
                 // .AsNoTracking().Where(x => x.ParentId == input.ItemId).ToListAsync();
 
-
+                if (appItem.EntityFk != null && appItem.EntityFk.EntitiesRelationships == null)
+                {
+                    appItem.EntityFk.EntitiesRelationships = new List<AppEntitiesRelationship>();
+                }
 
                 var output = new GetAppItemDetailForViewDto { AppItem = ObjectMapper.Map<AppItemForViewDto>(appItem) };
                 if (appItem.ManufacturerCode == null && (appItem.TenantOwner == AbpSession.TenantId || appItem.TenantOwner == null || appItem.TenantOwner == 0))
@@ -1699,6 +1702,7 @@ namespace onetouch.AppItems
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+                .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                 .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                 .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
@@ -1706,7 +1710,10 @@ namespace onetouch.AppItems
                 .Include(x => x.ListingItemFkList)
                 .Include(x => x.PublishedListingItemFkList)
                 .FirstOrDefaultAsync(x => x.Id == input.ItemId);
-
+            if(appItem.EntityFk != null && appItem.EntityFk.EntitiesRelationships == null)
+            {
+                appItem.EntityFk.EntitiesRelationships = new List<AppEntitiesRelationship>();
+            }
             var output = new GetAppItemForEditOutput { AppItem = ObjectMapper.Map<AppItemForEditDto>(appItem) };
             //mmt
             var ab = await _appItemSizeScalesHeaderRepository.GetAll()
