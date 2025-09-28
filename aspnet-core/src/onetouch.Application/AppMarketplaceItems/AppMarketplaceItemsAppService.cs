@@ -32,6 +32,8 @@ using onetouch.Sessions.Dto;
 using Abp.UI;
 using onetouch.Message;
 using Nito.AsyncEx;
+using Microsoft.AspNetCore.Authorization;
+using Abp.Authorization;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -82,7 +84,9 @@ namespace onetouch.AppMarketplaceItems
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
         }
-        public async Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAll(GetAllAppMarketItemsInput input)
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[Start]
+       [AbpAllowAnonymous]
+       public async Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAll(GetAllAppMarketItemsInput input)
        {
 
             var stopwatch = new System.Diagnostics.Stopwatch();
@@ -303,12 +307,20 @@ namespace onetouch.AppMarketplaceItems
                 //var appItemsList = await appItems.ToListAs ync();
                 var appItemsList = await orderedItems.ToListAsync();
                 //I48[Start]
+                
                 foreach (var item in appItemsList)
                 {
-                    item.NumberOfReviews = await _messageAppService.GetAllReviewsCount(item.AppItem.Id);
-                    var rating = await _messageAppService.GetOverAllRatings(item.AppItem.Id);
-                    item.AverageRating = rating.OverAllRating;
+                   item.NumberOfReviews = await _messageAppService.GetAllReviewsCount(item.AppItem.Id);
+                   var rating = await _messageAppService.GetOverAllRatings(item.AppItem.Id);
+                   item.AverageRating = rating.OverAllRating;
+                    //I49
+                    if (!AbpSession.UserId.HasValue)
+                    {
+                        item.AppItem.Price = 0;
+                    }
+                    //I49
                 }
+                
                 //I48[End]
                 if (input.SelectorOnly != null && input.SelectorOnly == true)
                 {
@@ -452,6 +464,9 @@ namespace onetouch.AppMarketplaceItems
             }
             
         }
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input)
         {
             try
@@ -1342,6 +1357,30 @@ namespace onetouch.AppMarketplaceItems
                             }
                         }
                         //I46[End]
+                        //I49[Start]
+                        if (!AbpSession.UserId.HasValue)
+                        {
+                            output.AppItem.AppItemPriceInfos = null;
+                            output.AppItem.MinMSRP = 0;
+                            output.AppItem.MaxMSRP = 0;
+                            output.AppItem.MinSpecialPrice = 0;
+                            output.AppItem.MaxSpecialPrice = 0;
+                            foreach (var vari in output.AppItem.variations)
+                            {
+                                foreach (var val in vari.selectedValues)
+                                {
+                                    foreach (var inVal in val.EDRestAttributes)
+                                    {
+                                        foreach (var ext in inVal.Values)
+                                        {
+                                            ext.Price = 0;
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                        //I49[End]
                         //MMT
                         stopwatch.Stop();
                         var elapsed_time = stopwatch.ElapsedMilliseconds;
@@ -1352,6 +1391,9 @@ namespace onetouch.AppMarketplaceItems
             }
             catch { throw new UserFriendlyException("This product has an issue. Please ask the product owner to re-share it."); }
         }
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppItemDepartmentsWithFullNameWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1377,6 +1419,9 @@ namespace onetouch.AppMarketplaceItems
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<string>> GetAppItemCategoriesNamesWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1394,7 +1439,9 @@ namespace onetouch.AppMarketplaceItems
                 return new PagedResultDto<string>(0, new List<string>());
             }
         }
-
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<string>> GetAppItemClassificationsNamesWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))

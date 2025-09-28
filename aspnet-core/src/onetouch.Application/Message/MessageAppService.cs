@@ -2075,6 +2075,7 @@ namespace onetouch.Message
                 }
             }
         }
+        [AbpAllowAnonymous]
         public async Task<OverAllRatingDto> GetOverAllRatings(long entityId)
         {
             OverAllRatingDto ratingDto = new OverAllRatingDto();
