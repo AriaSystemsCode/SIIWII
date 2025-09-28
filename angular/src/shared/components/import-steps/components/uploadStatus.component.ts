@@ -782,9 +782,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       let item = this.imagesList.find(x => x.code.toLowerCase() == imageItem.toLowerCase());
 
 
-      return item?.croppedbase64 === ''
+     let ret=  item?.croppedbase64 === ''
         ? item?.tempBase64
         : item?.croppedbase64;
+
+        return  !ret ? '' : ret;
     }
 
     else

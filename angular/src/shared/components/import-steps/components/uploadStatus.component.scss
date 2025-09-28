@@ -400,3 +400,10 @@
   overflow: auto;
   max-height: 200px;
 }
+
+._body
+{
+  max-height: 500px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
