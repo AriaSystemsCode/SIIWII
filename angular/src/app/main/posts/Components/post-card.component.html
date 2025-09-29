@@ -16,9 +16,8 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
                 />
             </div>
 
-            <div class="col-9" [ngClass]="fromMarketplaceProfile ? 'ml-lg-1  ml-5':''">
-                <a class="pt-2 h6"
-                style="color: #1B101B !important; font-weight: bold;"
+            <div class="col-9">
+                <a class="pt-2 addFont"
                 *ngIf="post?.appPost?.accountId"
                     [routerLink]="[
                         '/app/main/account/view/',
@@ -26,7 +25,7 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
                     ]"  >
                     {{ post.appPost.accountName }}
                 </a>
-                <a class="pt-2 h6"
+                <a class="pt-2 addFont"
                 *ngIf="!post?.appPost?.accountId"
                       >
                     {{ post.appPost.accountName }}
@@ -61,13 +60,13 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
                         <a class="dropdown-item" (click)="editPost()">
                             <img
                                 src="assets/posts/Edit_ic.svg"
-                                class="mr-3"
+                                class="mr-3" style="width: 15px;"
                             />{{ "Editpost" | localize }}
                         </a>
                         <a class="dropdown-item" (click)="deletePost()">
                             <img
                                 src="assets/posts/Delete_ic.svg"
-                                class="mr-3"
+                                class="mr-3" style="width: 15px;"
                             />{{ "RemovePost" | localize }}
                         </a>
                     </div>

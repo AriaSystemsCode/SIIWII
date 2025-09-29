@@ -34,13 +34,13 @@ a{
 .three-dots:after {
     cursor: pointer;
     color: #777777;
-    content: "\2807";
+    content: "⠇";
     font-size: 20px;
     padding: 0 5px;
 }
 #dropdownMenuButton{
-   // background-color: #700066 !important;
-    background-color: white !important;
+    background-color: transparent !important;
+    //background-color: white !important;
     border: none !important;
 }
 
@@ -48,9 +48,7 @@ a{
     left: -140px !important;
 }
 .dropdown-toggle {
-    background: #e1f0ff 0% 0% no-repeat padding-box;
-    border-radius: 3px;
-    color: white;
+    border: none;
 }
 
 .dropdown-toggle::after {
@@ -59,10 +57,13 @@ a{
 
 .dropdown-toggle:focus {
     outline: none;
-    background: #3599ff 0% 0% no-repeat padding-box;
+   
     .three-dots:after {
-        color: #777777;
-        content: "\2026";
+        cursor: pointer;
+    color: #777777;
+    content: "⠇";
+    font-size: 20px;
+    padding: 0 5px;
     }
 }
 
@@ -176,3 +177,8 @@ a{
 }
  
  */
+
+
+ .addFont {
+    font-weight: 600;
+ }
