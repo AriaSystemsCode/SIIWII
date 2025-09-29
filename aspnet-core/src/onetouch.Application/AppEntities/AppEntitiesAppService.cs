@@ -1224,6 +1224,7 @@ namespace onetouch.AppEntities
                                     existed.AttachmentFk.Name = item.DisplayName;
                                     //existed.AttachmentFk.Attachment = filename;
                                     existed.IsDefault = item.IsDefault;
+                                    existed.IsPublic = item.IsPublic;
                                     existed.Attributes = item.Attributes;
                                 }
 
