@@ -18,7 +18,7 @@
     <div class="kt-grid kt-grid--hor kt-grid--root">
         <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
             <!-- BEGIN: Left Aside -->
-            <div [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
+            <div *ngIf="isAuthenticated" [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
                 <div class="text-center">
                 <img *ngIf="!tenantLogo" [src]="defaultLogo" alt="logo" height="38" class="rounded-circle" />
 
@@ -311,65 +311,12 @@
               </div>
               
             <!-- END: Left Aside -->
-            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor kt-wrapper" id="kt_wrapper">
+            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="isAuthenticated ?'kt-wrapper':'' " id="kt_wrapper">
                 <!-- BEGIN: Header -->
                 <div class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
 
-                      <!-- <div class=" mb-3" style="    display: -webkit-box;
-                      display: -ms-flexbox;
-                      display: flex;
-                      -webkit-box-align: stretch;
-                      -ms-flex-align: stretch;
-                      align-items: stretch;
-                      margin: 0;">
-
-                      </div> -->
-                    <div class="kt-header-menu-wrapper" id="kt_header_menu_wrapper"></div>
-                    <!-- <div class="search-bar" style="width: 43%;
-                    z-index: 99999999999999;
-                    z-index: 99999999999999;
-                    position: relative;
-                    left: 4%;
-                    top: 22%;">
-                        <div class="input-group mb-3" style="">
-                            <div class="input-group-prepend" style="background-color: #EDEDED;height: 39px;width: 77px;
-                            border-radius: 5px;">
-
-                                <div class="btn-group">
-                                    <button class="btn btn-secondary btn-sm dropdown-toggle" style="width:77px;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                      All
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#">Action</a>
-                                        <a class="dropdown-item" href="#">Another action</a>
-                                        <a class="dropdown-item" href="#">Something else here</a>
-                                      </div>
-                                  </div>
-                            </div>
-                            <input type="text" class="form-control" style="background-color: #F3F6F9;height: 39px;" placeholder="I am looking for…">
-                            <div class="input-group-append p-2" style="background-color: #3699FF;height: 39px;    width: 8%;
-                            border-radius: 4px">
-                              <img src="assets/profile/tools-and-utensils-white.svg" style="margin: 0 auto;" >
-                            </div>
-
-                          </div>
-                          <div *ngIf="false" class="save-icon" style="    position: absolute;
-                          width: 32px;
-                          height: 32px;
-                          padding: 5px 0;
-                          text-align: center;
-                          margin-left: 10px;
-                          border-radius: 5px;
-                          background-color: #F3F6F9;
-                          cursor: pointer;
-                          left: 100%;
-                          /* background-color: antiquewhite; */
-                          top: 4%;">
-                            <img src="assets/profile/interface.svg">
-
-                        </div>
-                    </div> -->
-
+                
+                  
                     <topbar [displayMarketPlace]="displayMarketPlace"></topbar>
 
                 </div>

@@ -5682,6 +5682,99 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
+     * @param filter (optional) 
+     * @param nameFilter (optional) 
+     * @param codeFilter (optional) 
+     * @param descriptionFilter (optional) 
+     * @param extraDataFilter (optional) 
+     * @param sycEntityObjectTypeNameFilter (optional) 
+     * @param sycEntityObjectStatusNameFilter (optional) 
+     * @param sydObjectNameFilter (optional) 
+     * @param entityObjectTypeId (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllSearchedEntities(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEntityForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllSearchedEntities?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (nameFilter !== undefined && nameFilter !== null)
+            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
+        if (codeFilter !== undefined && codeFilter !== null)
+            url_ += "CodeFilter=" + encodeURIComponent("" + codeFilter) + "&";
+        if (descriptionFilter !== undefined && descriptionFilter !== null)
+            url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
+        if (extraDataFilter !== undefined && extraDataFilter !== null)
+            url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
+            url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
+        if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
+            url_ += "SycEntityObjectStatusNameFilter=" + encodeURIComponent("" + sycEntityObjectStatusNameFilter) + "&";
+        if (sydObjectNameFilter !== undefined && sydObjectNameFilter !== null)
+            url_ += "SydObjectNameFilter=" + encodeURIComponent("" + sydObjectNameFilter) + "&";
+        if (entityObjectTypeId === null)
+            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
+        else if (entityObjectTypeId !== undefined)
+            url_ += "EntityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSearchedEntities(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSearchedEntities(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppEntityForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppEntityForViewDto>;
+        }));
+    }
+
+    protected processGetAllSearchedEntities(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppEntityForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAppEntityForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -59107,6 +59200,7 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
     displayName!: string | undefined;
     url!: string | undefined;
     guid!: string | undefined;
+    isPublic!: boolean;
     attributes!: string | undefined;
     index!: number;
     isDefault!: boolean;
@@ -59135,6 +59229,7 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
             this.displayName = _data["displayName"];
             this.url = _data["url"];
             this.guid = _data["guid"];
+            this.isPublic = _data["isPublic"];
             this.attributes = _data["attributes"];
             this.index = _data["index"];
             this.isDefault = _data["isDefault"];
@@ -59161,6 +59256,7 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
         data["displayName"] = this.displayName;
         data["url"] = this.url;
         data["guid"] = this.guid;
+        data["isPublic"] = this.isPublic;
         data["attributes"] = this.attributes;
         data["index"] = this.index;
         data["isDefault"] = this.isDefault;
@@ -59176,6 +59272,7 @@ export interface IAppEntityAttachmentDto {
     displayName: string | undefined;
     url: string | undefined;
     guid: string | undefined;
+    isPublic: boolean;
     attributes: string | undefined;
     index: number;
     isDefault: boolean;
@@ -65059,6 +65156,7 @@ export interface ISycAttachmentCategory {
 export class AppEntityAttachment implements IAppEntityAttachment {
     entityId!: number;
     entityCode!: string | undefined;
+    isPublic!: boolean;
     attachmentId!: number;
     attachmentCode!: string | undefined;
     attachmentCategoryId!: number;
@@ -65089,6 +65187,7 @@ export class AppEntityAttachment implements IAppEntityAttachment {
             }
             this.entityId = _data["entityId"];
             this.entityCode = _data["entityCode"];
+            this.isPublic = _data["isPublic"];
             this.attachmentId = _data["attachmentId"];
             this.attachmentCode = _data["attachmentCode"];
             this.attachmentCategoryId = _data["attachmentCategoryId"];
@@ -65117,6 +65216,7 @@ export class AppEntityAttachment implements IAppEntityAttachment {
         }
         data["entityId"] = this.entityId;
         data["entityCode"] = this.entityCode;
+        data["isPublic"] = this.isPublic;
         data["attachmentId"] = this.attachmentId;
         data["attachmentCode"] = this.attachmentCode;
         data["attachmentCategoryId"] = this.attachmentCategoryId;
@@ -65134,6 +65234,7 @@ export class AppEntityAttachment implements IAppEntityAttachment {
 export interface IAppEntityAttachment {
     entityId: number;
     entityCode: string | undefined;
+    isPublic: boolean;
     attachmentId: number;
     attachmentCode: string | undefined;
     attachmentCategoryId: number;
@@ -67557,6 +67658,7 @@ export class AppEntityDto implements IAppEntityDto {
     isHostRecord!: boolean;
     addFromAttachments!: boolean;
     relatedEntityId!: number | undefined;
+    relatedEntitiesIds!: number[] | undefined;
     entityObjectTypeId!: number;
     entityObjectTypeCode!: string | undefined;
     entityObjectStatusId!: number | undefined;
@@ -67600,6 +67702,11 @@ export class AppEntityDto implements IAppEntityDto {
             this.isHostRecord = _data["isHostRecord"];
             this.addFromAttachments = _data["addFromAttachments"];
             this.relatedEntityId = _data["relatedEntityId"];
+            if (Array.isArray(_data["relatedEntitiesIds"])) {
+                this.relatedEntitiesIds = [] as any;
+                for (let item of _data["relatedEntitiesIds"])
+                    this.relatedEntitiesIds!.push(item);
+            }
             this.entityObjectTypeId = _data["entityObjectTypeId"];
             this.entityObjectTypeCode = _data["entityObjectTypeCode"];
             this.entityObjectStatusId = _data["entityObjectStatusId"];
@@ -67669,6 +67776,11 @@ export class AppEntityDto implements IAppEntityDto {
         data["isHostRecord"] = this.isHostRecord;
         data["addFromAttachments"] = this.addFromAttachments;
         data["relatedEntityId"] = this.relatedEntityId;
+        if (Array.isArray(this.relatedEntitiesIds)) {
+            data["relatedEntitiesIds"] = [];
+            for (let item of this.relatedEntitiesIds)
+                data["relatedEntitiesIds"].push(item);
+        }
         data["entityObjectTypeId"] = this.entityObjectTypeId;
         data["entityObjectTypeCode"] = this.entityObjectTypeCode;
         data["entityObjectStatusId"] = this.entityObjectStatusId;
@@ -67727,6 +67839,7 @@ export interface IAppEntityDto {
     isHostRecord: boolean;
     addFromAttachments: boolean;
     relatedEntityId: number | undefined;
+    relatedEntitiesIds: number[] | undefined;
     entityObjectTypeId: number;
     entityObjectTypeCode: string | undefined;
     entityObjectStatusId: number | undefined;
@@ -72171,6 +72284,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
     itemSharing!: ItemSharingDto[] | undefined;
     entityCategories!: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
+    entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
@@ -72236,6 +72350,11 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
                 this.entityCategoriesAdded = [] as any;
                 for (let item of _data["entityCategoriesAdded"])
                     this.entityCategoriesAdded!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entitiesRelationships"])) {
+                this.entitiesRelationships = [] as any;
+                for (let item of _data["entitiesRelationships"])
+                    this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
             }
             if (Array.isArray(_data["entityCategoriesRemoved"])) {
                 this.entityCategoriesRemoved = [] as any;
@@ -72353,6 +72472,11 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
             for (let item of this.entityCategoriesAdded)
                 data["entityCategoriesAdded"].push(item.toJSON());
         }
+        if (Array.isArray(this.entitiesRelationships)) {
+            data["entitiesRelationships"] = [];
+            for (let item of this.entitiesRelationships)
+                data["entitiesRelationships"].push(item.toJSON());
+        }
         if (Array.isArray(this.entityCategoriesRemoved)) {
             data["entityCategoriesRemoved"] = [];
             for (let item of this.entityCategoriesRemoved)
@@ -72446,6 +72570,7 @@ export interface IAppItemVariationsDto {
     itemSharing: ItemSharingDto[] | undefined;
     entityCategories: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
+    entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
@@ -72679,6 +72804,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
     itemSharing!: ItemSharingDto[] | undefined;
     entityCategories!: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
+    entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
@@ -72760,6 +72886,11 @@ export class AppItemForViewDto implements IAppItemForViewDto {
                 this.entityCategoriesAdded = [] as any;
                 for (let item of _data["entityCategoriesAdded"])
                     this.entityCategoriesAdded!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entitiesRelationships"])) {
+                this.entitiesRelationships = [] as any;
+                for (let item of _data["entitiesRelationships"])
+                    this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
             }
             if (Array.isArray(_data["entityCategoriesRemoved"])) {
                 this.entityCategoriesRemoved = [] as any;
@@ -72897,6 +73028,11 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             for (let item of this.entityCategoriesAdded)
                 data["entityCategoriesAdded"].push(item.toJSON());
         }
+        if (Array.isArray(this.entitiesRelationships)) {
+            data["entitiesRelationships"] = [];
+            for (let item of this.entitiesRelationships)
+                data["entitiesRelationships"].push(item.toJSON());
+        }
         if (Array.isArray(this.entityCategoriesRemoved)) {
             data["entityCategoriesRemoved"] = [];
             for (let item of this.entityCategoriesRemoved)
@@ -73010,6 +73146,7 @@ export interface IAppItemForViewDto {
     itemSharing: ItemSharingDto[] | undefined;
     entityCategories: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
+    entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
@@ -73171,6 +73308,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
     itemSharing!: ItemSharingDto[] | undefined;
     entityCategories!: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
+    entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
@@ -73232,6 +73370,11 @@ export class AppItemForEditDto implements IAppItemForEditDto {
                 this.entityCategoriesAdded = [] as any;
                 for (let item of _data["entityCategoriesAdded"])
                     this.entityCategoriesAdded!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entitiesRelationships"])) {
+                this.entitiesRelationships = [] as any;
+                for (let item of _data["entitiesRelationships"])
+                    this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
             }
             if (Array.isArray(_data["entityCategoriesRemoved"])) {
                 this.entityCategoriesRemoved = [] as any;
@@ -73349,6 +73492,11 @@ export class AppItemForEditDto implements IAppItemForEditDto {
             for (let item of this.entityCategoriesAdded)
                 data["entityCategoriesAdded"].push(item.toJSON());
         }
+        if (Array.isArray(this.entitiesRelationships)) {
+            data["entitiesRelationships"] = [];
+            for (let item of this.entitiesRelationships)
+                data["entitiesRelationships"].push(item.toJSON());
+        }
         if (Array.isArray(this.entityCategoriesRemoved)) {
             data["entityCategoriesRemoved"] = [];
             for (let item of this.entityCategoriesRemoved)
@@ -73446,6 +73594,7 @@ export interface IAppItemForEditDto {
     itemSharing: ItemSharingDto[] | undefined;
     entityCategories: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
+    entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
@@ -78159,6 +78308,7 @@ export interface IAppMarketplaceItemForViewDto {
 }
 
 export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplaceItemDetailForViewDto {
+    relatedItems!: GetAppMarketItemForViewDto[] | undefined;
     appItem!: AppMarketplaceItemForViewDto;
     sellerSSIN!: string | undefined;
     sellerCompanyName!: string | undefined;
@@ -78183,6 +78333,11 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            if (Array.isArray(_data["relatedItems"])) {
+                this.relatedItems = [] as any;
+                for (let item of _data["relatedItems"])
+                    this.relatedItems!.push(GetAppMarketItemForViewDto.fromJS(item));
+            }
             this.appItem = _data["appItem"] ? AppMarketplaceItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
             this.sellerSSIN = _data["sellerSSIN"];
             this.sellerCompanyName = _data["sellerCompanyName"];
@@ -78205,6 +78360,11 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        if (Array.isArray(this.relatedItems)) {
+            data["relatedItems"] = [];
+            for (let item of this.relatedItems)
+                data["relatedItems"].push(item.toJSON());
+        }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["sellerSSIN"] = this.sellerSSIN;
         data["sellerCompanyName"] = this.sellerCompanyName;
@@ -78216,6 +78376,7 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
 }
 
 export interface IGetAppMarketplaceItemDetailForViewDto {
+    relatedItems: GetAppMarketItemForViewDto[] | undefined;
     appItem: AppMarketplaceItemForViewDto;
     sellerSSIN: string | undefined;
     sellerCompanyName: string | undefined;
@@ -83149,6 +83310,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     isHostRecord!: boolean;
     addFromAttachments!: boolean;
     relatedEntityId!: number | undefined;
+    relatedEntitiesIds!: number[] | undefined;
     entityObjectTypeId!: number;
     entityObjectTypeCode!: string | undefined;
     entityObjectStatusId!: number | undefined;
@@ -83273,6 +83435,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.isHostRecord = _data["isHostRecord"];
             this.addFromAttachments = _data["addFromAttachments"];
             this.relatedEntityId = _data["relatedEntityId"];
+            if (Array.isArray(_data["relatedEntitiesIds"])) {
+                this.relatedEntitiesIds = [] as any;
+                for (let item of _data["relatedEntitiesIds"])
+                    this.relatedEntitiesIds!.push(item);
+            }
             this.entityObjectTypeId = _data["entityObjectTypeId"];
             this.entityObjectTypeCode = _data["entityObjectTypeCode"];
             this.entityObjectStatusId = _data["entityObjectStatusId"];
@@ -83423,6 +83590,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["isHostRecord"] = this.isHostRecord;
         data["addFromAttachments"] = this.addFromAttachments;
         data["relatedEntityId"] = this.relatedEntityId;
+        if (Array.isArray(this.relatedEntitiesIds)) {
+            data["relatedEntitiesIds"] = [];
+            for (let item of this.relatedEntitiesIds)
+                data["relatedEntitiesIds"].push(item);
+        }
         data["entityObjectTypeId"] = this.entityObjectTypeId;
         data["entityObjectTypeCode"] = this.entityObjectTypeCode;
         data["entityObjectStatusId"] = this.entityObjectStatusId;
@@ -83546,6 +83718,7 @@ export interface IGetAppTransactionsForViewDto {
     isHostRecord: boolean;
     addFromAttachments: boolean;
     relatedEntityId: number | undefined;
+    relatedEntitiesIds: number[] | undefined;
     entityObjectTypeId: number;
     entityObjectTypeCode: string | undefined;
     entityObjectStatusId: number | undefined;
@@ -83620,6 +83793,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     isHostRecord!: boolean;
     addFromAttachments!: boolean;
     relatedEntityId!: number | undefined;
+    relatedEntitiesIds!: number[] | undefined;
     entityObjectTypeId!: number;
     entityObjectTypeCode!: string | undefined;
     entityObjectStatusId!: number | undefined;
@@ -83715,6 +83889,11 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.isHostRecord = _data["isHostRecord"];
             this.addFromAttachments = _data["addFromAttachments"];
             this.relatedEntityId = _data["relatedEntityId"];
+            if (Array.isArray(_data["relatedEntitiesIds"])) {
+                this.relatedEntitiesIds = [] as any;
+                for (let item of _data["relatedEntitiesIds"])
+                    this.relatedEntitiesIds!.push(item);
+            }
             this.entityObjectTypeId = _data["entityObjectTypeId"];
             this.entityObjectTypeCode = _data["entityObjectTypeCode"];
             this.entityObjectStatusId = _data["entityObjectStatusId"];
@@ -83836,6 +84015,11 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["isHostRecord"] = this.isHostRecord;
         data["addFromAttachments"] = this.addFromAttachments;
         data["relatedEntityId"] = this.relatedEntityId;
+        if (Array.isArray(this.relatedEntitiesIds)) {
+            data["relatedEntitiesIds"] = [];
+            for (let item of this.relatedEntitiesIds)
+                data["relatedEntitiesIds"].push(item);
+        }
         data["entityObjectTypeId"] = this.entityObjectTypeId;
         data["entityObjectTypeCode"] = this.entityObjectTypeCode;
         data["entityObjectStatusId"] = this.entityObjectStatusId;
@@ -83938,6 +84122,7 @@ export interface ICreateOrEditAppTransactionsDto {
     isHostRecord: boolean;
     addFromAttachments: boolean;
     relatedEntityId: number | undefined;
+    relatedEntitiesIds: number[] | undefined;
     entityObjectTypeId: number;
     entityObjectTypeCode: string | undefined;
     entityObjectStatusId: number | undefined;
@@ -84238,6 +84423,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     isHostRecord!: boolean;
     addFromAttachments!: boolean;
     relatedEntityId!: number | undefined;
+    relatedEntitiesIds!: number[] | undefined;
     entityObjectTypeId!: number;
     entityObjectTypeCode!: string | undefined;
     entityObjectStatusId!: number | undefined;
@@ -84371,6 +84557,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.isHostRecord = _data["isHostRecord"];
             this.addFromAttachments = _data["addFromAttachments"];
             this.relatedEntityId = _data["relatedEntityId"];
+            if (Array.isArray(_data["relatedEntitiesIds"])) {
+                this.relatedEntitiesIds = [] as any;
+                for (let item of _data["relatedEntitiesIds"])
+                    this.relatedEntitiesIds!.push(item);
+            }
             this.entityObjectTypeId = _data["entityObjectTypeId"];
             this.entityObjectTypeCode = _data["entityObjectTypeCode"];
             this.entityObjectStatusId = _data["entityObjectStatusId"];
@@ -84530,6 +84721,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["isHostRecord"] = this.isHostRecord;
         data["addFromAttachments"] = this.addFromAttachments;
         data["relatedEntityId"] = this.relatedEntityId;
+        if (Array.isArray(this.relatedEntitiesIds)) {
+            data["relatedEntitiesIds"] = [];
+            for (let item of this.relatedEntitiesIds)
+                data["relatedEntitiesIds"].push(item);
+        }
         data["entityObjectTypeId"] = this.entityObjectTypeId;
         data["entityObjectTypeCode"] = this.entityObjectTypeCode;
         data["entityObjectStatusId"] = this.entityObjectStatusId;
@@ -84662,6 +84858,7 @@ export interface IGetAllAppTransactionsForViewDto {
     isHostRecord: boolean;
     addFromAttachments: boolean;
     relatedEntityId: number | undefined;
+    relatedEntitiesIds: number[] | undefined;
     entityObjectTypeId: number;
     entityObjectTypeCode: string | undefined;
     entityObjectStatusId: number | undefined;
@@ -85079,6 +85276,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     isHostRecord!: boolean;
     addFromAttachments!: boolean;
     relatedEntityId!: number | undefined;
+    relatedEntitiesIds!: number[] | undefined;
     entityObjectTypeId!: number;
     entityObjectTypeCode!: string | undefined;
     entityObjectStatusId!: number | undefined;
@@ -85193,6 +85391,11 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.isHostRecord = _data["isHostRecord"];
             this.addFromAttachments = _data["addFromAttachments"];
             this.relatedEntityId = _data["relatedEntityId"];
+            if (Array.isArray(_data["relatedEntitiesIds"])) {
+                this.relatedEntitiesIds = [] as any;
+                for (let item of _data["relatedEntitiesIds"])
+                    this.relatedEntitiesIds!.push(item);
+            }
             this.entityObjectTypeId = _data["entityObjectTypeId"];
             this.entityObjectTypeCode = _data["entityObjectTypeCode"];
             this.entityObjectStatusId = _data["entityObjectStatusId"];
@@ -85333,6 +85536,11 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["isHostRecord"] = this.isHostRecord;
         data["addFromAttachments"] = this.addFromAttachments;
         data["relatedEntityId"] = this.relatedEntityId;
+        if (Array.isArray(this.relatedEntitiesIds)) {
+            data["relatedEntitiesIds"] = [];
+            for (let item of this.relatedEntitiesIds)
+                data["relatedEntitiesIds"].push(item);
+        }
         data["entityObjectTypeId"] = this.entityObjectTypeId;
         data["entityObjectTypeCode"] = this.entityObjectTypeCode;
         data["entityObjectStatusId"] = this.entityObjectStatusId;
@@ -85442,6 +85650,7 @@ export interface IGetOrderDetailsForViewDto {
     isHostRecord: boolean;
     addFromAttachments: boolean;
     relatedEntityId: number | undefined;
+    relatedEntitiesIds: number[] | undefined;
     entityObjectTypeId: number;
     entityObjectTypeCode: string | undefined;
     entityObjectStatusId: number | undefined;

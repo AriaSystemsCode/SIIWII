@@ -42,6 +42,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openSub = false
     openAdSub= false
     tenantLogo:any;
+    isAuthenticated = this.appSession?.user
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,

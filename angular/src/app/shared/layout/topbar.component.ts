@@ -161,6 +161,8 @@ export class TopBarComponent
     visible:boolean =false;
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
+    isAuthenticated = this.appSession?.user
+
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -236,13 +238,11 @@ export class TopBarComponent
     }
 
     ngOnInit() {
+        console.log(this.isAuthenticated,'this.isAuthenticated');
+
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
-        // this._AppTransactionServiceProxy
-        // .getRelatedAccounts()
-        // .subscribe((res: any) => {
-        //     console.log(res);
-        // });
+
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "refreshShoppingInfoInTopbar") {
                 this.getShoppingCartInfo();
@@ -269,27 +269,30 @@ export class TopBarComponent
         this.isMultiTenancyEnabled = this._abpMultiTenancyService.isEnabled;
         this.isImpersonatedLogin =
             this._abpSessionService.impersonatorUserId > 0;
-        this.setCurrentLoginInformations();
-        this.getProfilePicture();
-        this.getRecentlyLinkedUsers();
-        this.appSession.user.memberId;
-        this.appSession.user.id;
-        this.registerToEvents();
-        this.getUnreadMessageCount();
-        if(!this.isHost)
-          this.getShoppingCartInfo();
-
-        this.messageReadService.readMessageSubject$.subscribe((res) => {
-            if (res) {
+            if(this.isAuthenticated != undefined) {
+                this.setCurrentLoginInformations();
+                // this.getProfilePicture();
+                this.getRecentlyLinkedUsers();
+                this.appSession.user.memberId;
+                this.appSession.user.id;
+                this.registerToEvents();
                 this.getUnreadMessageCount();
+                if(!this.isHost)
+                  this.getShoppingCartInfo();
+        
+                this.messageReadService.readMessageSubject$.subscribe((res) => {
+                    if (res) {
+                        this.getUnreadMessageCount();
+                    }
+                });
+                this.getBelowBar();
             }
-        });
-        this.getBelowBar();
+       
     }
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
-            this.getProfilePicture();
+            // this.getProfilePicture();
         });
 
         abp.event.on("app.chat.unreadMessageCountChanged", (messageCount) => {

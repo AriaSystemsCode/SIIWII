@@ -75,6 +75,7 @@ export class MarketplaceProductsComponent
     selectedDepartments: any;
  
     acceptedAspectRatio;
+    isAuthenticate= this.appSession?.user
     constructor(
         injector: Injector,
         private _router: Router,
@@ -123,7 +124,10 @@ export class MarketplaceProductsComponent
             { label: "Shared With Me", value: 1 },
         ];
         (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
-            this.getAllCurrencies();
+
+    
+
+   
 
 
         this.setCurrency();
@@ -132,7 +136,10 @@ export class MarketplaceProductsComponent
 
 
         this.checkMediaQuery();
-        this.getAspectatio();
+        if(this.isAuthenticate){
+            this.getAllCurrencies();
+            this.getAspectatio();
+        }
         
     }
     ngOnInit() {

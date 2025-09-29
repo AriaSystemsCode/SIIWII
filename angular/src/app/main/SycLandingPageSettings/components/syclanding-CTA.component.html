@@ -57,8 +57,33 @@
             </ng-template>
         </p-carousel>
     </div>
+
+
+
 </div>
 
+<div class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin: 30px 50px !important;">
+    <h4 class="text-center">Our Brands</h4>
+
+      <p-carousel
+      [value]="brands"
+      [numVisible]="8"
+      [numScroll]="8"
+      [circular]="false"
+      [showIndicators]="false"
+      [showNavigators]="true"
+    
+      class="p-4 m-2  rounded"
+    >
+      <!-- -->
+      <ng-template pTemplate="item" let-brand>
+        <div class="px-2 my-2">
+          <!-- <h5>{{brand?.name}}</h5> -->
+           <img [src]="brand?.img" style="width: 80px;" alt="" srcset="" onerror="'../../../../assets/placeholders/_logo-placeholder.png'">
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
 
 
 <div class="d-md-none d-flex row flexContainer w-100"  *ngIf="sycLangingPageSetting">

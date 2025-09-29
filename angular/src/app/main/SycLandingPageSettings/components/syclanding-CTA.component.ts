@@ -12,8 +12,21 @@ export class CTAComponent extends AppComponentBase implements OnInit {
     numVisible: number = 4;
     numScroll: number = 4;
     appBaseUrl: string=AppConsts.appBaseUrl;
+    brands:any
     constructor(injector: Injector) {
         super(injector);
+        this.brands = [
+            { name: 'Apple',        img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'Samsung',      img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'Nike',         img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'Adidas',       img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'Sony',         img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'LG',           img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'Microsoft',    img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'Huawei',       img: 'assets/placeholders/_logo-placeholder.png' },
+            { name: 'Xiaomi',       img: 'assets/brands/xiaomi.svg' },
+            { name: 'Lenovo',       img: 'assets/brands/lenovo.svg' },
+          ];
     }
     sycAttachmentCategoryCTASlider : SycAttachmentCategoryDto
     ngOnInit(){
