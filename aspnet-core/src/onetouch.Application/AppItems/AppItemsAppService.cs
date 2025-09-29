@@ -94,6 +94,7 @@ namespace onetouch.AppItems
         private readonly IAppItemsExcelExporter _appItemsExcelExporter;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<AppEntity, long> _appEntityRepository;
+        private readonly IRepository<AppEntitiesRelationship, long> _appEntitiesRelationship;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
         private readonly IRepository<SycEntityObjectClassification, long> _sycEntityObjectClassificationRepository;
         private readonly IRepository<AppEntityCategory, long> _appEntityCategoryRepository;
@@ -159,9 +160,11 @@ namespace onetouch.AppItems
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
             IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
             IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
-             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails, IRepository<ValidationRule> validationRuleRepo
+             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails, IRepository<ValidationRule> validationRuleRepo,
+             IRepository<AppEntitiesRelationship, long> appEntitiesRelationship
             )
         {
+            _appEntitiesRelationship = appEntitiesRelationship;
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             //MMT33-2
             _appMarketplaceItemsListDetails = appMarketplaceItemsListDetails;
@@ -1686,6 +1689,120 @@ namespace onetouch.AppItems
 
         #endregion get class/category/depts by page objects/names
 
+        [AbpAllowAnonymous]
+        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForProductWithPaging(GetAllSycEntityObjectCategoriesInput input)
+        {
+            input.ObjectId = await _helper.SystemTables.GetObjectItemId();
+            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+
+            if (input.EntityId != 0)
+            {
+                var query0 = _appEntitiesRelationship.GetAll()
+                    .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId) && (e.RelatedEntityTypeCode == "ITEM" && e.EntityTypeCode == "ITEM"))
+                     .Select(e => new
+                     {
+                         Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId
+                     });
+                var exceptList = query0.Select(e=> e.Id).ToList();
+
+                var query = _appEntityRepository.GetAll()
+                   .Where(e => !exceptList.Contains(e.Id) && e.ObjectCode == "ITEM")
+                   .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk);
+                    
+                var totalCount = await query.CountAsync();
+
+                var entityRelated = await query
+                    .OrderBy(!string.IsNullOrEmpty(input.Sorting) ? input.Sorting : "Id asc")
+                    .PageBy(input)
+                    .Select(e => new TreeNode<GetSycEntityObjectCategoryForViewDto>
+                    {
+                        Data = new GetSycEntityObjectCategoryForViewDto
+                        {
+                            SycEntityObjectCategoryName="",
+                            SydObjectName="ITEM",
+                            SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.Id, Id = e.Id,
+                            //DefaultAttachment = e.EntityAttachments[0].AttachmentFk.Attachment,
+                            AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment : "",
+                            AppItemImageName = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name : ""
+
+                            }
+                        },
+                        // if TreeNode has Children or other props, map them here
+                    })
+                    .ToListAsync();
+
+                return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(
+                    totalCount,
+                    entityRelated
+                );
+            }
+
+            return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(0, new List<TreeNode<GetSycEntityObjectCategoryForViewDto>>());
+        }
+
+        public async Task<PagedResultDto<AppItemLookupDto>> GetAppItemRelatedProductsWithPaging(GetAllSycEntityObjectCategoriesInput input)
+        {   
+            //input.ObjectId = await _helper.SystemTables.GetObjectItemId();
+
+            if (input.EntityId != 0)
+            {
+                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+               
+                //var query0 = _appEntitiesRelationship.GetAll()
+                //    .Where(e => e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
+                //    .Include(e=> e.EntityFk).ThenInclude(e=> e.EntityAttachments).ThenInclude(e=> e.AttachmentFk)
+                //    .Include(e => e.RelatedEntityFk).ThenInclude(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
+                //     .Select(e => new
+                //     {
+                //         Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId,
+                //         Code = e.EntityId == input.EntityId ? e.RelatedEntityFk.Code : e.EntityFk.Code,
+                //         Name = e.EntityId == input.EntityId ? e.RelatedEntityFk.Name : e.EntityFk.Name,
+                //         EntityFk = e.EntityId == input.EntityId ? e.RelatedEntityFk : e.EntityFk,
+                //         TenantId = e.EntityId == input.EntityId ? e.RelatedTenantId : e.TenantId,
+                //         EntityAttachments = e.EntityId == input.EntityId ? e.RelatedEntityFk.EntityAttachments.Where(e=> e.IsDefault).ToList() : e.EntityFk.EntityAttachments.Where(e=> e.IsDefault).ToList()
+                //     }).ToList();
+                
+                var query = _appEntitiesRelationship.GetAll()
+                    .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId) && (e.RelatedEntityTypeCode=="ITEM" && e.EntityTypeCode == "ITEM"))
+                    .Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
+                    .Include(e => e.RelatedEntityFk).ThenInclude(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
+                     .Select(e => new
+                     {
+                         Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId,
+                         Code = e.EntityId == input.EntityId ? e.RelatedEntityFk.Code : e.EntityFk.Code,
+                         Name = e.EntityId == input.EntityId ? e.RelatedEntityFk.Name : e.EntityFk.Name,
+                         EntityFk = e.EntityId == input.EntityId ? e.RelatedEntityFk : e.EntityFk,
+                         TenantId = e.EntityId == input.EntityId ? e.RelatedTenantId : e.TenantId,
+                         EntityAttachments = e.EntityId == input.EntityId ? e.RelatedEntityFk.EntityAttachments.Where(e => e.IsDefault).ToList() : e.EntityFk.EntityAttachments.Where(e => e.IsDefault).ToList()
+                     });
+
+                var totalCount = await query.CountAsync();
+
+                var entityRelated = await query
+                    .OrderBy(!string.IsNullOrEmpty(input.Sorting)? input.Sorting: "Id asc")
+                    //.OrderBy(e => e.Id)
+                    .PageBy(input)
+                    .Select(e => new AppItemLookupDto
+                    {           AppItemCode = e.EntityFk.Code,
+                                AppItemName = e.EntityFk.Name,
+                                AppItemId = e.EntityFk.Id,
+                                AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0)? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment:"",
+                                AppItemImageName = (e.EntityAttachments!= null  && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name: ""
+
+                    })
+                    .ToListAsync();
+
+                return new PagedResultDto<AppItemLookupDto>(
+                    totalCount,
+                    entityRelated
+                );
+            }
+
+            return new PagedResultDto<AppItemLookupDto>(0, new List<AppItemLookupDto>());
+        }
+
+
+
         [AbpAuthorize(AppPermissions.Pages_AppItems_Edit)]
         public async Task<GetAppItemForEditOutput> GetAppItemForEdit(GetAppItemWithPagedAttributesForEditInput input)
         {
@@ -1699,6 +1816,8 @@ namespace onetouch.AppItems
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+                .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
+                .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
                 .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                 .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
@@ -1706,7 +1825,14 @@ namespace onetouch.AppItems
                 .Include(x => x.ListingItemFkList)
                 .Include(x => x.PublishedListingItemFkList)
                 .FirstOrDefaultAsync(x => x.Id == input.ItemId);
-
+            if(appItem.EntityFk != null && appItem.EntityFk.EntitiesRelationships == null)
+            {
+                appItem.EntityFk.EntitiesRelationships = new List<AppEntitiesRelationship>();
+            }
+            if (appItem.EntityFk != null && appItem.EntityFk.RelatedEntitiesRelationships == null)
+            {
+                appItem.EntityFk.RelatedEntitiesRelationships = new List<AppEntitiesRelationship>();
+            }
             var output = new GetAppItemForEditOutput { AppItem = ObjectMapper.Map<AppItemForEditDto>(appItem) };
             //mmt
             var ab = await _appItemSizeScalesHeaderRepository.GetAll()
@@ -1715,6 +1841,14 @@ namespace onetouch.AppItems
 
             var prcItem = await _appItemPricesRepository.GetAll().Include(a => a.CurrencyFk).Where(a => a.AppItemId == appItem.Id).ToListAsync();
             output.AppItem.AppItemPriceInfos = ObjectMapper.Map<List<AppItemPriceInfo>>(prcItem);
+            if(input.GetAppItemAttributesInputForRelatedItems == null)
+            {
+                input.GetAppItemAttributesInputForRelatedItems = new GetAppItemAttributesInput();
+                input.GetAppItemAttributesInputForRelatedItems.Sorting = "Id";
+                input.GetAppItemAttributesInputForRelatedItems.SkipCount = 0;
+                input.GetAppItemAttributesInputForRelatedItems.MaxResultCount = 10;
+            }
+            output.AppItem.RelatedAppItems = GetAppItemRelatedProductsWithPaging(new GetAllSycEntityObjectCategoriesInput() { EntityId = appItem.EntityId, SkipCount = input.GetAppItemAttributesInputForRelatedItems.SkipCount, MaxResultCount = input.GetAppItemAttributesInputForRelatedItems.MaxResultCount, Sorting = input.GetAppItemAttributesInputForRelatedItems.Sorting }).Result;
             //MMT
 
             var varAppItems = appItem.ParentFkList;
