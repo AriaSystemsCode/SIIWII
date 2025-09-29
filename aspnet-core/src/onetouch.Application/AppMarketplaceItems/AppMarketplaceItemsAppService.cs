@@ -49,6 +49,7 @@ namespace onetouch.AppMarketplaceItems
         private readonly IRepository<AppMarketplaceItemsListDetails, long> _appMarketplaceItemsListDetail;
         private readonly IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> _appMarketplaceItemList;
         private readonly IRepository<AppMarketplaceItems, long> _appMarketplaceItem;
+        private readonly IRepository<AppEntitiesRelationship,long> _appEntitiesRelationship;
         private readonly Helper _helper;
         private readonly IRepository<SycEntityObjectType, long> _sycEntityObjectTypeRepository;
         private readonly IRepository<AppContact, long> _appContactRepository;
@@ -65,7 +66,7 @@ namespace onetouch.AppMarketplaceItems
             IRepository<onetouch.AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevels,
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<AppTransactionDetails, long> appTransactionDetailsRepository,
             IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
-        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService)
+        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService, IRepository<AppEntitiesRelationship, long> appEntitiesRelationship)
         {
             _messageAppService = messageAppService;
             _appTransactionHeadersRepository = appTransactionHeadersRepository;
@@ -76,16 +77,17 @@ namespace onetouch.AppMarketplaceItems
             _appMarketplaceItemList = appMarketplaceItemList;
             _appMarketplaceItemsListDetail = appMarketplaceItemsListDetail;
             _appMarketplaceItemsSelector = appMarketplaceItemsSelector;
-            _helper= helper;
+            _helper = helper;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
             _appContactRepository = appContactRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
+            _appEntitiesRelationship = appEntitiesRelationship;
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[Start]
-       [AbpAllowAnonymous]
+        [AbpAllowAnonymous]
        public async Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAll(GetAllAppMarketItemsInput input)
        {
 
@@ -1380,6 +1382,34 @@ namespace onetouch.AppMarketplaceItems
                                 }
                             }
                         }
+                        output.RelatedItems = new List<GetAppMarketItemForViewDto>();
+                                                //if (relateditems != null && relateditems.Count > 0)
+                        //{
+                            var joined = _appMarketplaceItem.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk).Join(
+                                _appEntitiesRelationship.GetAll().Where(z => z.EntityId == input.ItemId && z.RelatedEntityTypeCode == "LISTING"),
+                             x => x.Id, sa => sa.RelatedEntityId, (s, sa) => new { marketplaceItem = s, relation = sa });
+                            var related = from u in joined.DefaultIfEmpty()
+                            select new GetAppMarketItemForViewDto()
+                            {
+                                AppItem = new AppItemDto
+                                {
+                                    ManufacturerCode =  u.marketplaceItem.ManufacturerCode,
+                                    SSIN = u.marketplaceItem.Code,
+                                    Code = u.marketplaceItem.Code,
+                                    Name = u.marketplaceItem.Name,
+                                    Description = u.marketplaceItem.Notes,
+                                    Price = 0,
+                                    Id = u.marketplaceItem.Id,
+                                    ImageUrl = (u.marketplaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                     (u.marketplaceItem.EntityAttachments.FirstOrDefault() == null ? "attachments/" + u.marketplaceItem.TenantId +
+                                     "/" + u.marketplaceItem.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                     : "attachments/" + (u.marketplaceItem.TenantId.HasValue ? u.marketplaceItem.TenantId : -1) + "/" +
+                                     u.marketplaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) 
+                                },
+                            };
+
+                        //}
+                        output.RelatedItems.AddRange(related);
                         //I49[End]
                         //MMT
                         stopwatch.Stop();
