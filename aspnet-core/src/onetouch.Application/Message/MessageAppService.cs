@@ -6,6 +6,7 @@ using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
+using Abp.Net.Mail;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Management.Automation.Language;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
@@ -66,6 +68,9 @@ namespace onetouch.Message
         private readonly RoleManager _roleManager;
         private readonly IRepository<AppContact, long> _appContactRepository;
         private readonly IRepository<AppMarketplaceTransactionHeaders, long> _appMarketplaceTransactionHeaders;
+        //I49[Start]
+        private readonly IEmailSender _emailSender;
+        //I49[End]
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
@@ -77,7 +82,7 @@ namespace onetouch.Message
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IRepository<AppEntityRating, long> appEntityRatingRepository, RoleManager roleManager,
             IRepository<AppContact, long> appContactRepository,
-            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders
+            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders, IEmailSender emailSender
             )
         {
             _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
@@ -96,6 +101,9 @@ namespace onetouch.Message
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _AppMarketplaceMessagesRepository = appMarketplaceMessagesRepository;
             _appPostRepo = appPostRepo;
+            //I49[Start]
+            _emailSender = emailSender;
+            //I49[end]
         }
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
@@ -1079,10 +1087,14 @@ namespace onetouch.Message
             for (int i = 0; i < input.UsersList.Length; i++)
             {
                 int? tenantId = null;
+                //I49[Start]
+                string recipientEmail = "";
+                //I49[End]
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
                     var id = (long)Convert.ToInt32(input.UsersList[i]);
                     tenantId = UserManager.Users.Where(x => x.Id == id).Select(x => x.TenantId).FirstOrDefault();
+                    recipientEmail = UserManager.Users.Where(x => x.Id == id).Select(x => x.EmailAddress).FirstOrDefault();
                 }
                 //Insert record into AppEntities table [Start]
                 AppEntityDto appEntity = new AppEntityDto();
@@ -1227,6 +1239,18 @@ namespace onetouch.Message
                 }
                 message.ThreadId = input.ThreadId;
                 await _MessagesRepository.InsertAsync(message);
+                //I49[Start]
+                if (appEntity.Name == "Message" && !string.IsNullOrEmpty(recipientEmail))
+                {
+                    await _emailSender.SendAsync(new MailMessage
+                    {
+                        To = { recipientEmail },
+                        Subject = message.Subject,
+                        Body = @"Dear,\r\n"+"Please note that you have a new message on Siiwii",
+                        IsBodyHtml = true
+                    });
+                }
+                //I49[End]
             }
         }
 
