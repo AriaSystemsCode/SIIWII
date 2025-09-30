@@ -1394,6 +1394,9 @@ export class TransactionInformationComponent
         undefined,
         undefined,
         undefined,
+        undefined,
+        undefined,
+        undefined,
         0,
         10
       )

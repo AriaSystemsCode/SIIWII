@@ -1693,7 +1693,7 @@ namespace onetouch.AppItems
         #endregion get class/category/depts by page objects/names
 
         [AbpAllowAnonymous]
-        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForProductWithPaging(GetAllSycEntityObjectCategoriesInput input)
+        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsExceptSelectedForProductWithPaging(GetAllSycEntityObjectCategoriesInput input)
         {
             input.ObjectId = await _helper.SystemTables.GetObjectItemId();
             string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
