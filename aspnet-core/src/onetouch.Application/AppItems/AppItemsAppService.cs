@@ -923,7 +923,7 @@ namespace onetouch.AppItems
                 if (appItem != null)
                 {
                     string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-
+                    output.AppItem.RelatedAppItems = GetAppItemRelatedProductsWithPaging(new GetAllSycEntityObjectCategoriesInput() { EntityId = appItem.EntityId, SkipCount = input.GetAppItemAttributesInputForRelatedItems.SkipCount, MaxResultCount = input.GetAppItemAttributesInputForRelatedItems.MaxResultCount, Sorting = input.GetAppItemAttributesInputForRelatedItems.Sorting }).Result;
 
                     if (output.AppItem != null && output.AppItem.EntityAttachments != null && output.AppItem.EntityAttachments.Count > 0)
                     { output.AppItem.EntityAttachments = output.AppItem.EntityAttachments.OrderByDescending(r => r.IsDefault).ToList(); }
@@ -1710,6 +1710,7 @@ namespace onetouch.AppItems
 
                 var query = _appEntityRepository.GetAll()
                    .Where(e => !exceptList.Contains(e.Id) && e.ObjectCode == "ITEM")
+                   .WhereIf( !string.IsNullOrEmpty(input.Filter), e=> e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
                    .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk);
                     
                 var totalCount = await query.CountAsync();
