@@ -7,6 +7,9 @@ using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.Net.Mail;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.ExtendedProperties;
+using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +36,7 @@ using onetouch.Message.Dto;
 using onetouch.Migrations;
 using onetouch.MultiTenancy;
 using onetouch.SystemObjects;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -43,7 +47,9 @@ using System.Management.Automation.Language;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Twilio.TwiML.Fax;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace onetouch.Message
 {
@@ -1088,12 +1094,19 @@ namespace onetouch.Message
             {
                 int? tenantId = null;
                 //I49[Start]
+                string recipientTenantName = "";
                 string recipientEmail = "";
+                string recipientFirstName = "";
                 //I49[End]
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
                     var id = (long)Convert.ToInt32(input.UsersList[i]);
                     tenantId = UserManager.Users.Where(x => x.Id == id).Select(x => x.TenantId).FirstOrDefault();
+                    recipientFirstName = UserManager.Users.Where(x => x.Id == id).Select(x => x.Name).FirstOrDefault();
+                    var tenant = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
+                    if (tenant != null)
+                        recipientTenantName = tenant.TenancyName;
+
                     recipientEmail = UserManager.Users.Where(x => x.Id == id).Select(x => x.EmailAddress).FirstOrDefault();
                 }
                 //Insert record into AppEntities table [Start]
@@ -1246,7 +1259,18 @@ namespace onetouch.Message
                     {
                         To = { recipientEmail },
                         Subject = message.Subject,
-                        Body = @"Dear,\r\n"+"Please note that you have a new message on Siiwii",
+                        //Body = @"Hello "+ recipientFirstName+","+ Environment.NewLine+
+                        //"You’ve received a new direct message in your " + recipientTenantName.TrimEnd() + " account.Please log in to view and respond."+ Environment.NewLine +
+                        //"to view message open the following link: " + _appConfiguration["App:ClientRootAddress"]+ "/account/login" + Environment.NewLine +
+                        //"Thank you for using" + recipientTenantName.TrimEnd()+"."+ Environment.NewLine +
+                        //"— The " + recipientTenantName.TrimEnd()+" Team",
+                        Body = "<!DOCTYPE html><html><head/><body><p>Hello " + recipientFirstName +
+                        ",<br><br>You’ve received a new direct message in your "+ recipientTenantName.TrimEnd() +
+                        " account.Please log in to view and respond.<br><br><a class=\"btn\"" +
+                        " href=\""+_appConfiguration["App:ClientRootAddress"]+ @"/app/main/Messages"+ "\">"+
+                        "<button  style=\r\n        \"background-color: #4A0D4A; \r\n        color: white;\" >Open Message</button></a>" +
+                        "<br><br>Thank you for using " + recipientTenantName.TrimEnd()+
+                        ".<br><br> — The "+ recipientTenantName.TrimEnd()+ " Team</p></body></html>",
                         IsBodyHtml = true
                     });
                 }
