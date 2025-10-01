@@ -149,7 +149,7 @@ namespace onetouch.AppItemsLists
                                                  Published = rr1 != null,
                                                  CreatorUserId = il.CreatorUserId,
                                                  ItemsCount = il.AppItemsListDetails.Count(x => x.ItemFK.ParentId == null),
-                                                 TenantId = il.TenantId,
+                                                 TenantId = etyrr1.TenantOwner !=null && etyrr1.TenantOwner != 0 ? etyrr1.TenantOwner  :il.TenantId,
                                                  StatusCode = etyrr1.EntityObjectStatusCode,
                                                  StatusId = etyrr1.EntityObjectStatusId
                                              }); ;
@@ -829,7 +829,14 @@ namespace onetouch.AppItemsLists
                 appItemlist.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, entity);
                 entity.SSIN = appItemlist.SSIN;
             }
-            entity.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+            //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[Start]
+            if (input.TenantOwner != null)
+            {
+                entity.TenantOwner = long.Parse(input.TenantOwner.ToString());
+            }
+            else
+                //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[End]
+                entity.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
             //MMT33-2[End]
 
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
@@ -1438,20 +1445,50 @@ namespace onetouch.AppItemsLists
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                AppItemsList existingList = null;
                 int retutnval = 0;
                 var itmList = await _appMarketplaceItemListRepository.GetAll().Where(z => z.Id == appItemListId).Include(z => z.AppItemsListDetails).FirstOrDefaultAsync();
                 if (itmList == null)
                     return retutnval;
                 else
                 {
-
+                    //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[Start]
+                    long savedList =0;
+                    existingList = await _appItemsListRepository.GetAll().Include(z=>z.AppItemsListDetails).Where(z => z.TenantId == AbpSession.TenantId && z.SSIN == itmList.SSIN).FirstOrDefaultAsync();
+                    if (existingList == null)
+                    {
+                        CreateOrEditAppItemsListDto createOrEditAppItemsListDto = ObjectMapper.Map<CreateOrEditAppItemsListDto>(itmList);
+                        createOrEditAppItemsListDto.Id = 0;
+                        createOrEditAppItemsListDto.SharingLevel = 0;
+                        var savedItemList = await DoCreateOrEdit(createOrEditAppItemsListDto);
+                        if (savedItemList != null)
+                            savedList = long.Parse(savedItemList.AppItemsList.Id.ToString());
+                    }
+                    else
+                    {
+                        savedList = existingList.Id;
+                    }
+                    //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[End]
                     if (itmList.AppItemsListDetails != null && itmList.AppItemsListDetails.Count > 0)
                     {
+                        //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[Start]
+                        List<AppItemsListDetail> appItemsListDetailsMajorList = new List<AppItemsListDetail>();
+                        List<AppItemsListDetail> appItemsListDetailsVariationList = new List<AppItemsListDetail>();
+                        //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[End]
                         foreach (var det in itmList.AppItemsListDetails)
                         {
-                            var itemExist = await _appItemRepository.GetAll().Where(z => z.SSIN == det.AppMarketplaceItemSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
-                            if (itemExist != null) continue;
-
+                            var itemExist = await _appItemRepository.GetAll().Include(z=>z.ParentFkList).Where(z => z.SSIN == det.AppMarketplaceItemSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                            if (itemExist != null)
+                            {
+                                //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[Start]
+                                if (existingList == null ||existingList.AppItemsListDetails== null || (existingList.AppItemsListDetails!= null && existingList.AppItemsListDetails.Where(z => z.ItemSSIN == itemExist.SSIN).FirstOrDefault() == null))
+                                {
+                                    appItemsListDetailsMajorList.Add(new AppItemsListDetail { ItemId = itemExist.Id, ItemsListId = savedList, State = StateEnum.ToBeAdded.ToString() });
+                                    appItemsListDetailsVariationList.AddRange(itemExist.ParentFkList.Select(x => new AppItemsListDetail { ItemId = x.Id, ItemsListId = savedList, State = StateEnum.ToBeAdded.ToString() }).ToList());
+                                }
+                                //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[End]
+                                continue;
+                            }
                             AppMarketplaceItems.AppMarketplaceItems marketItem = await _appMarketplaceItem.GetAll()
                                 .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                                 .Include(z => z.EntityCategories)
@@ -1561,9 +1598,30 @@ namespace onetouch.AppItemsLists
                                 retutnval++;
                                 itemC.NonLookupValues = new List<LookupLabelDto>();
                                 var created = await _appItemsAppService.CreateOrEdit(itemC);
+                                //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[Start]
+                                var AddeditemExist = await _appItemRepository.GetAll().Include(z => z.ParentFkList).Where(z => z.Id == created && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                                if (AddeditemExist != null)
+                                {
+                                    if (existingList == null || existingList.AppItemsListDetails == null || (existingList.AppItemsListDetails != null && existingList.AppItemsListDetails.Where(z => z.ItemSSIN == itemExist.SSIN).FirstOrDefault() == null))
+                                    {
+                                        appItemsListDetailsMajorList.Add(new AppItemsListDetail { ItemId = AddeditemExist.Id, ItemsListId = savedList, State = StateEnum.ToBeAdded.ToString() });
+                                        appItemsListDetailsVariationList.AddRange(AddeditemExist.ParentFkList.Select(x => new AppItemsListDetail { ItemId = x.Id, ItemsListId = savedList, State = StateEnum.ToBeAdded.ToString() }).ToList());
+                                    }
+                                }
+                                //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[End]
 
                             }
                         }
+                        //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[Start]
+                        foreach (var x in appItemsListDetailsMajorList)
+                        {
+                            await _appItemsListDetailRepository.InsertAsync(x);
+                        }
+                        foreach (var x in appItemsListDetailsVariationList)
+                        {
+                            await _appItemsListDetailRepository.InsertAsync(x);
+                        }
+                        //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[End]
                     }
                 }
                 return retutnval;

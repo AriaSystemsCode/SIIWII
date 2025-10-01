@@ -29,7 +29,10 @@ namespace onetouch.AppItemsLists.Dtos
         public int UsersCount { get; set; }
         public string StatusCode { get; set; }
         public long? StatusId { get; set; }
-
+        //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[Start]
+        public string SSIN { set; get; }
+        public long? TenantOwner { set; get; }
+        //T-SII-20250212.0001,1 MMT 10/01/2025 Product List - unable to print shared product list and performance issue check video and description[End]
     }
 
     public class UserInfoDto
