@@ -45,6 +45,7 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     }
 
     ngOnInit(): void {
+        
         this.loadNotifications();
         this.registerToEvents();
     }
@@ -53,8 +54,8 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
         if (UrlHelper.isInstallUrl(location.href)) {
             return;
         }
-
-        this._notificationService.getUserNotifications(undefined, undefined, undefined, 3, 0).subscribe(result => {
+        const timeZoneValue=  Intl.DateTimeFormat().resolvedOptions().timeZone ;
+        this._notificationService.getUserNotifications(undefined, undefined, undefined,timeZoneValue, 3, 0).subscribe(result => {
             this.unreadNotificationCount = result.unreadCount;
             this.notifications = [];
             _.forEach(result.items, (item: UserNotification) => {
