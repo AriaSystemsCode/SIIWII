@@ -82,7 +82,16 @@ namespace onetouch.Web.Controllers
                     }
                     else
                     {
-                        guid = Request.Form["guid"][0];
+                        try
+                        {
+                            guid = Request.Form["guid"][0];
+                        }
+                        catch (Exception ex)
+                        {
+                            iFiles = iFiles + 1;
+                            guid = Request.Form["guid" + iFiles.ToString()][0];
+
+                        }
                     }
 
                     string extension="";
