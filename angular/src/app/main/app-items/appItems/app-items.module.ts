@@ -38,6 +38,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 import { SharedDynamicInputsModule } from '@shared/shared-module';
+import { relatedItemModule } from '@app/relatedItems/relatedItem.module';
 
 
 @NgModule({
@@ -70,6 +71,7 @@ import { SharedDynamicInputsModule } from '@shared/shared-module';
     AccordionModule,
     CategoriesModule,
     ClassificationModule,
+    relatedItemModule,
     AppItemTypeModule,
     SelectButtonModule,
     AppEntityDynamicModalModule,

@@ -210,10 +210,13 @@ export class MarketplaceViewProductComponent
                         undefined,
                         undefined,
                         undefined,
+                        undefined,
+                        undefined,
+                        undefined,
                         0,
                         10
                     )
-                    .pipe(
+                    .pipe( 
                         finalize(() => {
                             this.getOverAllRatings()
                             this.hideMainSpinner();

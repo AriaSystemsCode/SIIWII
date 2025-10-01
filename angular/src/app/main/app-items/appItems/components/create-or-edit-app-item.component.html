@@ -303,6 +303,55 @@
                     </div>
                 </div>
             </div>
+
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body">
+                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg"  style="border-radius: 12px;">
+                            <div class="">
+                                <h6 class="font-weight-bold">{{ 'Relatedproducts' | localize}}:</h6>
+                            </div>
+                            <div>
+                                <div
+                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
+                                    <div class="mb-3" *ngIf="!relatedItems?.length;else relatedItemElse">{{
+                                        'noproductsarelinked' | localize}} ...</div>
+                                    <ng-template #relatedItemElse>
+                                        <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
+                                            *ngFor="let relatedItem of relatedItems;index  as i"
+                                            [ngClass]="{'removed' : relatedItem.removed}">
+                                            {{relatedItem?.entityDto?.appItemName}}
+                                            <span *ngIf="!relatedItem.removed"
+                                                class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
+                                                (click)="removeRelatedItem(relatedItem,i)">
+                                                <i class="flaticon2-delete"></i>
+                                            </span>
+                                            <span *ngIf="relatedItem?.removed"
+                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle "
+                                                (click)="undoRelatedItem(relatedItem)">
+                                                <i class="flaticon2-circular-arrow"></i>
+                                            </span>
+                                        </a>
+                                        <a class="font-weight-bold mt-2 text-primary pointer"
+                                            (click)="loadMoreRelatedItems()"
+                                            *ngIf="relatedItems.length < relatedItemsTotalCount">
+                                            {{ 'showmore' | localize }} ...
+                                        </a>
+                                    </ng-template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                                <a class="text-primary pointer font-weight-bold border p-3"  style="border-radius: 6px;" (click)="openSelectRelatedItemsModal()">
+                                    <span class="mr-1">+</span>   {{ relatedItems?.length ? 'Add' : 'Select' }}
+                                    {{ 'Relatedproducts' | localize}}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body  p-0">

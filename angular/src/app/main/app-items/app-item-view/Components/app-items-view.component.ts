@@ -126,6 +126,18 @@ export class AppItemsViewComponent
     scrollClassification: boolean = false;
     maxClassificationCnt: number;
 
+    //RelatedItems
+    showMoreRelatedItems: boolean = false;
+    showLessRelatedItems: boolean = false;
+    totalRelatedItems: number;
+    noOfRelatedItemsToShowInitially: number;
+    maxRelatedItemsCount: number;
+    skipRelatedItemsCount: number;
+    relatedItemsToLoad: number;
+    initRelatedItems: string[] = [];
+    scrollRelatedItems: boolean = false;
+    maxRelatedItemsCnt: number;
+
     //Recommended
     initRecommended: ExtraDataAttrDto[] = [];
     showLessRecommended: boolean = false;
@@ -586,6 +598,76 @@ export class AppItemsViewComponent
         }
     }
 
+
+    //Related items
+    initRelatedItemsVariables(firstInit: boolean) {
+        //i49-FE
+       // if (firstInit)
+           // this.initRelatedItems = this.appItemForViewDto.relatedAppItems.items;
+       // else
+          //  this.appItemForViewDto.relatedAppItems.items =this.initRelatedItems;
+        this.noOfRelatedItemsToShowInitially = 10;
+        this.maxRelatedItemsCount = 10;
+        this.scrollRelatedItems = false;
+        this.maxRelatedItemsCnt = 40;
+        this.relatedItemsToLoad = 20;
+        this.totalRelatedItems =
+            this.appItemForViewDto.relatedAppItems.totalCount;
+        if (this.noOfRelatedItemsToShowInitially < this.totalRelatedItems)
+            this.showMoreRelatedItems= true;
+        else this.showMoreRelatedItems = false;
+        this.showLessRelatedItems = false;
+    }
+
+    showRelatedItems() {
+        if (this.noOfRelatedItemsToShowInitially < this.totalRelatedItems) {
+            this.maxRelatedItemsCount = this.relatedItemsToLoad;
+            this.skipRelatedItemsCount =
+                this.noOfRelatedItemsToShowInitially;
+            this.noOfRelatedItemsToShowInitially += this.relatedItemsToLoad;
+
+        
+                this._appItemsServiceProxy
+                .getAppItemRelatedProductsWithPaging(
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                    undefined,
+                    this.appItemForViewDto.entityId,
+                    undefined,
+                    undefined,
+                    this.skipClassificationCount,
+                    this.maxClassificationCount
+                )
+                .subscribe((res) => {
+                    if (
+                        this.noOfRelatedItemsToShowInitially >=
+                        this.totalRelatedItems
+                    ) {
+                        this.showMoreRelatedItems = false;
+                        this.showLessRelatedItems = true;
+                    }
+
+                    this.appItemForViewDto.relatedAppItems.items =
+                        this.appItemForViewDto.relatedAppItems.items.concat(
+                            res.items
+                        );
+                    if (
+                        this.appItemForViewDto.relatedAppItems.items
+                            .length >= this.maxRelatedItemsCnt
+                    )
+                        this.scrollRelatedItems= true;
+                });
+        } else {
+            this.initRelatedItemsVariables(false);
+        }
+    }
+
     //Recommended
     initRecommendedVariables(firstInit: boolean) {
         if (firstInit)
@@ -920,6 +1002,9 @@ export class AppItemsViewComponent
                 undefined,
                 timeZoneValue,
                 this.productId,
+                undefined,
+                undefined,
+                undefined,
                 undefined,
                 undefined,
                 undefined,
