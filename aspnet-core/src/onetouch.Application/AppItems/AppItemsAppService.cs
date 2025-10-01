@@ -1720,10 +1720,13 @@ namespace onetouch.AppItems
                     .PageBy(input)
                     .Select(e => new TreeNode<GetSycEntityObjectCategoryForViewDto>
                     {
+                        Leaf = true,
+                        label = e.Code,
                         Data = new GetSycEntityObjectCategoryForViewDto
                         {
                             SycEntityObjectCategoryName="",
                             SydObjectName="ITEM",
+                            
                             SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.Id, Id = e.Id,
                             //DefaultAttachment = e.EntityAttachments[0].AttachmentFk.Attachment,
                             AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment : "",
@@ -2449,6 +2452,8 @@ namespace onetouch.AppItems
                 entity.AttachmentSourceTenantId = -1;
             }
             //MMT30[End]
+            //Iteration49
+            entity.RelatedEntitiesIds = input.RelatedEntitiesIds;
 
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             await CurrentUnitOfWork.SaveChangesAsync();

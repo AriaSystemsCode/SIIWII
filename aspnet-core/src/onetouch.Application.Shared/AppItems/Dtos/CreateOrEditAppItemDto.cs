@@ -50,7 +50,7 @@ namespace onetouch.AppItems.Dtos
         public virtual IList<AppEntityCategoryDto> EntityCategories { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesAdded { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesRemoved { get; set; }
-        
+        public long[]? RelatedEntitiesIds { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityDepartments { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityDepartmentsAdded { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityDepartmentsRemoved { get; set; }
