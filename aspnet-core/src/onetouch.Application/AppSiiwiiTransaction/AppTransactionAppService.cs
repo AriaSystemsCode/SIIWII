@@ -1174,6 +1174,7 @@ namespace onetouch.AppSiiwiiTransaction
                         appTrans.CreatorUserId = AbpSession.UserId;
 
                     obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
+                    UpdateAppEntityLog(obj.Id);
                 }
                 else
                 {
@@ -1185,43 +1186,43 @@ namespace onetouch.AppSiiwiiTransaction
                     //ObjectMapper..Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input) ;
                     appTrans.EnteredDate = input.EnteredDate;
                     obj = await _appTransactionsHeaderRepository.InsertAsync(appTrans);
-
+                    UpdateAppEntityLog(obj.Id);
                    // obj = await _appTransactionsHeaderRepository.UpdateAsync(obj);
                 }
                 //log[start]
-                var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
-                if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
-                {
-                    var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                    var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
-                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
-                    z.EntityObjectStatusId == statusCodeNotSent
-                    ).FirstOrDefaultAsync();
-                    if (logExist != null)
-                    {
+                //var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                //if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
+                //{
+                //    var statusCodeNotSent = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                //    var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
+                //    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
+                //    z.EntityObjectStatusId == statusCodeNotSent
+                //    ).FirstOrDefaultAsync();
+                //    if (logExist != null)
+                //    {
                         
-                        //logExist.EntityObjectStatusId = statusCodeNotSent;
-                        //logExist.EntityObjectStatusCode = "Ready to be Sent";
-                        //await _appEntityLogRepository.UpdateAsync(logExist);
-                    }
-                    else
-                    {
-                        logExist = new AppEntityLog();
-                        //var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                        logExist.EntityObjectStatusId = statusCodeNotSent;
-                        logExist.EntityObjectStatusCode = "Ready to be Sent";
-                        logExist.EntityId = appTrans.Id;
-                        logExist.EntityCode = appTrans.Code;
-                        logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
-                        logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
-                        logExist.PartnerCode = "ARIAERP";
-                        logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
-                        logExist.ObjectId = appTrans.ObjectId;
-                        logExist.ObjectCode="TRANSACTION";
-                        await _appEntityLogRepository.InsertAsync(logExist);
+                //        //logExist.EntityObjectStatusId = statusCodeNotSent;
+                //        //logExist.EntityObjectStatusCode = "Ready to be Sent";
+                //        //await _appEntityLogRepository.UpdateAsync(logExist);
+                //    }
+                //    else
+                //    {
+                //        logExist = new AppEntityLog();
+                //        //var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                //        logExist.EntityObjectStatusId = statusCodeNotSent;
+                //        logExist.EntityObjectStatusCode = "Ready to be Sent";
+                //        logExist.EntityId = appTrans.Id;
+                //        logExist.EntityCode = appTrans.Code;
+                //        logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
+                //        logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
+                //        logExist.PartnerCode = "ARIAERP";
+                //        logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
+                //        logExist.ObjectId = appTrans.ObjectId;
+                //        logExist.ObjectCode="TRANSACTION";
+                //        await _appEntityLogRepository.InsertAsync(logExist);
 
-                    }
-                }
+                //    }
+                //}
                 //log[End]
                 await CurrentUnitOfWork.SaveChangesAsync();
                 return obj.Id;
@@ -1747,42 +1748,43 @@ namespace onetouch.AppSiiwiiTransaction
                         appTrans.PaymentTermsName = ent.Name;
                 }
                 //log[start]
-                var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
-                if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
-                {
-                    var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                    var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
-                    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
-                    z.EntityObjectStatusId == statusCode
-                    ).FirstOrDefaultAsync();
-                    if (logExist != null)
-                    {
+                //var openStatus = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                //if (input.lFromPlaceOrder || (appTrans.EntityObjectStatusId == openStatus))
+                //{
+                //    var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                //    var logExist = await _appEntityLogRepository.GetAll().Where(z => z.EntityId == appTrans.Id &&
+                //    z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == appTrans.EntityObjectTypeId &&
+                //    z.EntityObjectStatusId == statusCode
+                //    ).FirstOrDefaultAsync();
+                //    if (logExist != null)
+                //    {
                        
-                       // logExist.EntityObjectStatusId = statusCode;
-                       // logExist.EntityObjectStatusCode = "Ready to be Sent";
-                       // await _appEntityLogRepository.UpdateAsync(logExist);
-                    }
-                    else
-                    {
-                        logExist = new AppEntityLog();
-                       // var statusCode =await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                        logExist.EntityObjectStatusId  = statusCode;
-                        logExist.EntityObjectStatusCode= "Ready to be Sent";
-                        logExist.EntityId = appTrans.Id;
-                        logExist.EntityCode = appTrans.Code;
-                        logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
-                        logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
-                        logExist.PartnerCode = "ARIAERP";
-                        logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
-                        logExist.ObjectId = appTrans.ObjectId;
-                        logExist.ObjectCode = "TRANSACTION";
-                        await _appEntityLogRepository.InsertAsync(logExist);
+                //       // logExist.EntityObjectStatusId = statusCode;
+                //       // logExist.EntityObjectStatusCode = "Ready to be Sent";
+                //       // await _appEntityLogRepository.UpdateAsync(logExist);
+                //    }
+                //    else
+                //    {
+                //        logExist = new AppEntityLog();
+                //       // var statusCode =await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
+                //        logExist.EntityObjectStatusId  = statusCode;
+                //        logExist.EntityObjectStatusCode= "Ready to be Sent";
+                //        logExist.EntityId = appTrans.Id;
+                //        logExist.EntityCode = appTrans.Code;
+                //        logExist.EntityObjectTypeId = appTrans.EntityObjectTypeId;
+                //        logExist.EntityObjectTypeCode = appTrans.EntityObjectTypeCode;
+                //        logExist.PartnerCode = "ARIAERP";
+                //        logExist.TenantId =int.Parse(AbpSession.TenantId.ToString());
+                //        logExist.ObjectId = appTrans.ObjectId;
+                //        logExist.ObjectCode = "TRANSACTION";
+                //        await _appEntityLogRepository.InsertAsync(logExist);
 
-                    }
-                }
+                //    }
+                //}
                 //log[End]
                 appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
+                UpdateAppEntityLog(obj.Id);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 return obj.Id;
             }
