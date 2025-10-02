@@ -1292,7 +1292,7 @@ namespace onetouch.AppEntities
                             {
                                 EntityId = entity.Id,
                                 EntityCode = entity.Code,
-                                EntityTypeCode = entity.EntityObjectTypeFk.Code,
+                                EntityTypeCode = entity.EntityObjectTypeCode,
                                 RelatedEntityId = (long)related,
                                 RelatedEntityTypeCode = relatedEntityFK.EntityObjectTypeCode,
                                 RelatedEntityCode = relatedEntityFK.Code
