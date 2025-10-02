@@ -2455,7 +2455,7 @@ namespace onetouch.AppItems
             //Iteration49
             entity.RelatedEntitiesIds = new List<long>();
             entity.RelatedEntitiesIds = input.entityRelatedItemAdded.Select(e=> e.EntityObjectCategoryId).ToList();
-            entity.RelatedEntitiesIds.Add(165477);
+            //entity.RelatedEntitiesIds.Add(165477);
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             await CurrentUnitOfWork.SaveChangesAsync();
             //MMT
