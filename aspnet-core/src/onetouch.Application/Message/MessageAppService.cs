@@ -1253,7 +1253,7 @@ namespace onetouch.Message
                 message.ThreadId = input.ThreadId;
                 await _MessagesRepository.InsertAsync(message);
                 //I49[Start]
-                if (appEntity.Name == "Message" && !string.IsNullOrEmpty(recipientEmail))
+                if ((appEntity.Name == "Message" || appEntity.Name == "COMMENT") && !string.IsNullOrEmpty(recipientEmail))
                 {
                     await _emailSender.SendAsync(new MailMessage
                     {
@@ -1269,8 +1269,8 @@ namespace onetouch.Message
                         " account.Please log in to view and respond.<br><br><a class=\"btn\"" +
                         " href=\""+_appConfiguration["App:ClientRootAddress"]+ @"/app/main/Messages"+ "\">"+
                         "<button  style=\r\n        \"background-color: #4A0D4A; \r\n        color: white;\" >Open Message</button></a>" +
-                        "<br><br>Thank you for using " + recipientTenantName.TrimEnd()+
-                        ".<br><br> — The "+ recipientTenantName.TrimEnd()+ " Team</p></body></html>",
+                        "<br><br>Thank you for using " +"SIIWII" +//recipientTenantName.TrimEnd()+
+                        ".<br><br> — The "+"SIIWII" + " Team</p></body></html>",//recipientTenantName.TrimEnd()
                         IsBodyHtml = true
                     });
                 }
