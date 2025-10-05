@@ -74112,6 +74112,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     entityCategories!: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemAdded!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved!: AppEntityCategoryDto[] | undefined;
@@ -74190,6 +74191,11 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
                 this.entityCategoriesRemoved = [] as any;
                 for (let item of _data["entityCategoriesRemoved"])
                     this.entityCategoriesRemoved!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityRelatedItemAdded"])) {
+                this.entityRelatedItemAdded = [] as any;
+                for (let item of _data["entityRelatedItemAdded"])
+                    this.entityRelatedItemAdded!.push(AppEntityCategoryDto.fromJS(item));
             }
             if (Array.isArray(_data["entityDepartments"])) {
                 this.entityDepartments = [] as any;
@@ -74332,6 +74338,11 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             for (let item of this.entityCategoriesRemoved)
                 data["entityCategoriesRemoved"].push(item.toJSON());
         }
+        if (Array.isArray(this.entityRelatedItemAdded)) {
+            data["entityRelatedItemAdded"] = [];
+            for (let item of this.entityRelatedItemAdded)
+                data["entityRelatedItemAdded"].push(item.toJSON());
+        }
         if (Array.isArray(this.entityDepartments)) {
             data["entityDepartments"] = [];
             for (let item of this.entityDepartments)
@@ -74446,6 +74457,7 @@ export interface ICreateOrEditAppItemDto {
     entityCategories: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemAdded: AppEntityCategoryDto[] | undefined;
     entityDepartments: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved: AppEntityCategoryDto[] | undefined;
@@ -75687,6 +75699,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
     entityCategories!: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemAdded!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved!: AppEntityCategoryDto[] | undefined;
@@ -75770,6 +75783,11 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
                 this.entityCategoriesRemoved = [] as any;
                 for (let item of _data["entityCategoriesRemoved"])
                     this.entityCategoriesRemoved!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityRelatedItemAdded"])) {
+                this.entityRelatedItemAdded = [] as any;
+                for (let item of _data["entityRelatedItemAdded"])
+                    this.entityRelatedItemAdded!.push(AppEntityCategoryDto.fromJS(item));
             }
             if (Array.isArray(_data["entityDepartments"])) {
                 this.entityDepartments = [] as any;
@@ -75917,6 +75935,11 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
             for (let item of this.entityCategoriesRemoved)
                 data["entityCategoriesRemoved"].push(item.toJSON());
         }
+        if (Array.isArray(this.entityRelatedItemAdded)) {
+            data["entityRelatedItemAdded"] = [];
+            for (let item of this.entityRelatedItemAdded)
+                data["entityRelatedItemAdded"].push(item.toJSON());
+        }
         if (Array.isArray(this.entityDepartments)) {
             data["entityDepartments"] = [];
             for (let item of this.entityDepartments)
@@ -76032,6 +76055,7 @@ export interface IAppItemValidationInputDTO {
     entityCategories: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemAdded: AppEntityCategoryDto[] | undefined;
     entityDepartments: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved: AppEntityCategoryDto[] | undefined;

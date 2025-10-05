@@ -194,7 +194,7 @@ export class CreateOrEditAppItemComponent
             selectedIds = this.relatedItems.reduce((accum, elem) => {
                 const addedAndNotSavedYet: boolean = !elem.entityDto.id;
                 if (addedAndNotSavedYet)
-                    accum.push(elem.entityDto.appItemCode);
+                    accum.push(elem.entityDto.appItemId); //i49 appItemId ? not have entityObjectCategoryId
                 return accum;
             }, []);
         }
@@ -851,7 +851,9 @@ export class CreateOrEditAppItemComponent
             else if (!relatedItem.entityDto.id)
                 newlyAddedRelatedItems.push(relatedItem.entityDto);
         });
-        this.appItem.entityRelatedItemAdded = newlyAddedRelatedItems;
+        //i49 "AppItemLookupDto"  not type "AppEntityCategoryDto" 
+       // I49 fill entityRelatedItemAdded.EntityObjectCategoryId = lookup.AppItemId
+       // this.appItem.entityRelatedItemAdded = newlyAddedRelatedItems;
         this.appItem.entityRelatedItemSRemoved = removedRelatedItems;
     }
 
