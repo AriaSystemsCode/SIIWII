@@ -166,7 +166,7 @@
             this.pageInfo3.LocationFloat = new DevExpress.Utils.PointFloat(2485.321F, 1797.768F);
             this.pageInfo3.Name = "pageInfo3";
             this.pageInfo3.PageInfo = DevExpress.XtraPrinting.PageInfo.DateTime;
-            this.pageInfo3.SizeF = new System.Drawing.SizeF(227.5417F, 58.42034F);
+            this.pageInfo3.SizeF = new System.Drawing.SizeF(227.5417F, 58.42504F);
             this.pageInfo3.StylePriority.UseFont = false;
             this.pageInfo3.StylePriority.UseForeColor = false;
             this.pageInfo3.TextFormatString = "{0:MMM dd, yyyy}";
