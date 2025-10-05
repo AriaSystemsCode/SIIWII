@@ -194,8 +194,8 @@ export class CreateOrEditAppItemComponent
             selectedIds = this.relatedItems.reduce((accum, elem) => {
                 const addedAndNotSavedYet: boolean = !elem.entityDto.id;
                 if (addedAndNotSavedYet)
-                    accum.push(elem.entityDto.appItemId); //i49 appItemId ? not have entityObjectCategoryId
-                return accum;
+                    accum.push(elem.entityDto.appItemId); 
+                  return accum;
             }, []);
         }
         return selectedIds;
@@ -842,20 +842,38 @@ export class CreateOrEditAppItemComponent
         this.appItem.entityDepartmentsRemoved = removedDepartments;
     }
 
+   
+
     seperateNewAndRemovedRelatedItems() {
         const newlyAddedRelatedItems: AppItemLookupDto[] = [];
         const removedRelatedItems: AppItemLookupDto[] = [];
+    
         this.relatedItems.forEach((relatedItem) => {
-            if (relatedItem.removed)
+            if (relatedItem.removed) {
                 removedRelatedItems.push(relatedItem.entityDto);
-            else if (!relatedItem.entityDto.id)
+            } else if (!relatedItem.entityDto.id) {
                 newlyAddedRelatedItems.push(relatedItem.entityDto);
+            }
         });
-        //i49 "AppItemLookupDto"  not type "AppEntityCategoryDto" 
-       // I49 fill entityRelatedItemAdded.EntityObjectCategoryId = lookup.AppItemId
-       // this.appItem.entityRelatedItemAdded = newlyAddedRelatedItems;
-        this.appItem.entityRelatedItemSRemoved = removedRelatedItems;
+
+           const _entityRelatedItemAdded: AppEntityCategoryDto[] = newlyAddedRelatedItems.map(item => {
+            const dto = new AppEntityCategoryDto();
+            dto.entityObjectCategoryId = item.appItemId;
+            dto.entityObjectCategoryCode = item.appItemCode;
+            dto.entityObjectCategoryName = item.appItemName;
+            dto.id = 0;
+            //dto.appEntityId = this.appItem.id;
+           // dto.appEntityName = this.appItem.name;
+            return dto;
+        });
+
+        this.appItem.entityRelatedItemAdded=_entityRelatedItemAdded
+        
+       //i49 entityRelatedItemSRemoved ?
+       //  this.appItem.entityRelatedItemSRemoved = removedRelatedItems;
     }
+    
+    
 
     // Departmetns
     openSelectDepartmentsModal() {
