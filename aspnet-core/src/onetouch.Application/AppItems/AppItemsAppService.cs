@@ -1697,54 +1697,54 @@ namespace onetouch.AppItems
         {
             input.ObjectId = await _helper.SystemTables.GetObjectItemId();
             string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-
+            List<long> exceptList = new List<long>();
             if (input.EntityId != 0)
             {
-                var query0 = _appEntitiesRelationship.GetAll()
+               var query0 = _appEntitiesRelationship.GetAll()
                     .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId) && (e.RelatedEntityTypeCode == "ITEM" && e.EntityTypeCode == "ITEM"))
                      .Select(e => new
                      {
                          Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId
                      });
-                var exceptList = query0.Select(e=> e.Id).ToList();
-
-                var query = _appEntityRepository.GetAll()
-                   .Where(e => !exceptList.Contains(e.Id) && e.ObjectCode == "ITEM")
-                   .WhereIf( !string.IsNullOrEmpty(input.Filter), e=> e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
-                   .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk);
-                    
-                var totalCount = await query.CountAsync();
-
-                var entityRelated = await query
-                    .OrderBy(!string.IsNullOrEmpty(input.Sorting) ? input.Sorting : "Id asc")
-                    .PageBy(input)
-                    .Select(e => new TreeNode<GetSycEntityObjectCategoryForViewDto>
-                    {
-                        Leaf = true,
-                        label = e.Code,
-                        Data = new GetSycEntityObjectCategoryForViewDto
-                        {
-                            SycEntityObjectCategoryName="",
-                            SydObjectName="ITEM",
-                            
-                            SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.Id, Id = e.Id,
-                            //DefaultAttachment = e.EntityAttachments[0].AttachmentFk.Attachment,
-                            AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment : "",
-                            AppItemImageName = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name : ""
-
-                            }
-                        },
-                        // if TreeNode has Children or other props, map them here
-                    })
-                    .ToListAsync();
-
-                return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(
-                    totalCount,
-                    entityRelated
-                );
+                exceptList = query0.Select(e => e.Id).ToList();
             }
+            var query = _appItemRepository.GetAll().Include(e=> e.EntityFk).ThenInclude(e=> e.EntityAttachments)
+                .Where(e => !exceptList.Contains(e.EntityId) && (e.ParentId ==0 || e.ParentId==null ) )
+                .WhereIf( !string.IsNullOrEmpty(input.Filter), e=> e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
+                .Include(e => e.EntityFk.EntityAttachments).ThenInclude(e => e.AttachmentFk);
+                    
+            var totalCount = await query.CountAsync();
 
-            return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(0, new List<TreeNode<GetSycEntityObjectCategoryForViewDto>>());
+            var entityRelated = await query
+                .OrderBy(!string.IsNullOrEmpty(input.Sorting) ? input.Sorting : "Id asc")
+                .PageBy(input)
+                .Select(e => new TreeNode<GetSycEntityObjectCategoryForViewDto>
+                {
+                    Leaf = true,
+                    label = e.Code,
+                    Data = new GetSycEntityObjectCategoryForViewDto
+                    {
+                        SycEntityObjectCategoryName="",
+                        SydObjectName="ITEM",
+                            
+                        SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.Id, Id = e.Id,
+                        //DefaultAttachment = e.EntityAttachments[0].AttachmentFk.Attachment,
+                        AppItemImageUrl = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityFk.EntityAttachments[0].AttachmentFk.Attachment : "",
+                        AppItemImageName = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? e.EntityFk.EntityAttachments[0].AttachmentFk.Name : ""
+
+                        }
+                    },
+                    // if TreeNode has Children or other props, map them here
+                })
+                .ToListAsync();
+
+            return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(
+                totalCount,
+                entityRelated
+            );
+            
+
+            //return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(0, new List<TreeNode<GetSycEntityObjectCategoryForViewDto>>());
         }
 
         public async Task<PagedResultDto<AppItemLookupDto>> GetAppItemRelatedProductsWithPaging(GetAllSycEntityObjectCategoriesInput input)
