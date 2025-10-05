@@ -19,6 +19,7 @@ import {
     AppEntityAttachmentDto,
     AppItemAttributePriceDto,
     AppItemForViewDto,
+    AppItemLookupDto,
     AppItemPriceInfo,
     AppItemSizesScaleInfo,
     AppItemsListsServiceProxy,
@@ -134,7 +135,7 @@ export class AppItemsViewComponent
     maxRelatedItemsCount: number;
     skipRelatedItemsCount: number;
     relatedItemsToLoad: number;
-    initRelatedItems: string[] = [];
+    initRelatedItems: AppItemLookupDto[] = [];
     scrollRelatedItems: boolean = false;
     maxRelatedItemsCnt: number;
 
@@ -601,11 +602,11 @@ export class AppItemsViewComponent
 
     //Related items
     initRelatedItemsVariables(firstInit: boolean) {
-        //i49-FE
-       // if (firstInit)
-           // this.initRelatedItems = this.appItemForViewDto.relatedAppItems.items;
-       // else
-          //  this.appItemForViewDto.relatedAppItems.items =this.initRelatedItems;
+        //i49-error 
+       if (firstInit)
+           this.initRelatedItems = this.appItemForViewDto.relatedAppItems.items;
+       else
+           this.appItemForViewDto.relatedAppItems.items =this.initRelatedItems;
         this.noOfRelatedItemsToShowInitially = 10;
         this.maxRelatedItemsCount = 10;
         this.scrollRelatedItems = false;
