@@ -24,13 +24,14 @@ export class NotificationsComponent extends AppComponentBase {
     readStateFilter = 'ALL';
     dateRange: Date[] = [moment().startOf('day').toDate(), moment().endOf('day').toDate()];
     loading = false;
-
+    
     constructor(
         injector: Injector,
         private _notificationService: NotificationServiceProxy,
         private _userNotificationHelper: UserNotificationHelper
     ) {
         super(injector);
+        
     }
 
     reloadPage(): void {
@@ -82,11 +83,11 @@ export class NotificationsComponent extends AppComponentBase {
         }
 
         this.primengTableHelper.showLoadingIndicator();
-
+        const timeZoneValue=  Intl.DateTimeFormat().resolvedOptions().timeZone ;
         this._notificationService.getUserNotifications(
             this.readStateFilter === 'ALL' ? undefined : UserNotificationState.Unread,
             moment(this.dateRange[0]),
-            moment(this.dateRange[1]).endOf('day'),
+            moment(this.dateRange[1]).endOf('day'),timeZoneValue,
             this.primengTableHelper.getMaxResultCount(this.paginator, event),
             this.primengTableHelper.getSkipCount(this.paginator, event)
         ).pipe(finalize(() => this.primengTableHelper.hideLoadingIndicator())).subscribe((result) => {

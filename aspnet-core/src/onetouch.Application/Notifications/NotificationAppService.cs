@@ -9,6 +9,7 @@ using Abp.Configuration;
 using Abp.Notifications;
 using Abp.Runtime.Session;
 using Abp.UI;
+using onetouch.Globals;
 using onetouch.Notifications.Dto;
 
 namespace onetouch.Notifications
@@ -19,15 +20,21 @@ namespace onetouch.Notifications
         private readonly INotificationDefinitionManager _notificationDefinitionManager;
         private readonly IUserNotificationManager _userNotificationManager;
         private readonly INotificationSubscriptionManager _notificationSubscriptionManager;
-
+        //2025
+        TimeZoneInfoAppService _timeZoneInfoAppService;
+        //2025
         public NotificationAppService(
             INotificationDefinitionManager notificationDefinitionManager,
             IUserNotificationManager userNotificationManager,
-            INotificationSubscriptionManager notificationSubscriptionManager)
+            INotificationSubscriptionManager notificationSubscriptionManager,
+            TimeZoneInfoAppService timeZoneInfoAppService)
         {
             _notificationDefinitionManager = notificationDefinitionManager;
             _userNotificationManager = userNotificationManager;
             _notificationSubscriptionManager = notificationSubscriptionManager;
+            //2025
+            _timeZoneInfoAppService = timeZoneInfoAppService;
+            //2025
         }
 
         [DisableAuditing]
@@ -43,7 +50,17 @@ namespace onetouch.Notifications
             var notifications = await _userNotificationManager.GetUserNotificationsAsync(
                 AbpSession.ToUserIdentifier(), input.State, input.SkipCount, input.MaxResultCount, input.StartDate, input.EndDate
                 );
-
+            //T-SII-20250730.0003,1 MMT 10/01/2025 - Home page - The notifications time on SIIWII Shows (8 hours ago) for a notification that the user  just received[Start]
+            if (!string.IsNullOrEmpty(input.TimeZone) && notifications != null && notifications.Count>0)
+            {
+                var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                foreach (var note in notifications)
+                {
+                    var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(note.Notification.CreationTime, currentTimeZone);
+                    note.Notification.CreationTime = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZone);
+                }
+            }
+            //T-SII-20250730.0003,1 MMT 10/01/2025 - Home page - The notifications time on SIIWII Shows (8 hours ago) for a notification that the user  just received[End]
             return new GetNotificationsOutput(totalCount, unreadCount, notifications);
         }
 

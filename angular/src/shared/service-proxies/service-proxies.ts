@@ -34467,11 +34467,12 @@ export class NotificationServiceProxy {
      * @param state (optional) 
      * @param startDate (optional) 
      * @param endDate (optional) 
+     * @param timeZone (optional) 
      * @param maxResultCount (optional) 
      * @param skipCount (optional) 
      * @return Success
      */
-    getUserNotifications(state: UserNotificationState | undefined, startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, maxResultCount: number | undefined, skipCount: number | undefined): Observable<GetNotificationsOutput> {
+    getUserNotifications(state: UserNotificationState | undefined, startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, timeZone: string | null | undefined, maxResultCount: number | undefined, skipCount: number | undefined): Observable<GetNotificationsOutput> {
         let url_ = this.baseUrl + "/api/services/app/Notification/GetUserNotifications?";
         if (state === null)
             throw new Error("The parameter 'state' cannot be null.");
@@ -34481,6 +34482,8 @@ export class NotificationServiceProxy {
             url_ += "StartDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
         if (endDate !== undefined && endDate !== null)
             url_ += "EndDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        if (timeZone !== undefined && timeZone !== null)
+            url_ += "TimeZone=" + encodeURIComponent("" + timeZone) + "&";
         if (maxResultCount === null)
             throw new Error("The parameter 'maxResultCount' cannot be null.");
         else if (maxResultCount !== undefined)
