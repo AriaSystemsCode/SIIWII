@@ -867,10 +867,22 @@ export class CreateOrEditAppItemComponent
             return dto;
         });
 
+
+        const _entityRelatedItemSRemoved: AppEntityCategoryDto[] = removedRelatedItems.map(item => {
+            const dto = new AppEntityCategoryDto();
+            dto.entityObjectCategoryId = item.appItemId;
+            dto.entityObjectCategoryCode = item.appItemCode;
+            dto.entityObjectCategoryName = item.appItemName;
+            dto.id = 0;
+            //dto.appEntityId = this.appItem.id;
+           // dto.appEntityName = this.appItem.name;
+            return dto;
+        });
+
         this.appItem.entityRelatedItemAdded=_entityRelatedItemAdded
         
        //i49 entityRelatedItemSRemoved ?
-       //  this.appItem.entityRelatedItemSRemoved = removedRelatedItems;
+       //  this.appItem.entityRelatedItemSRemoved = _entityRelatedItemSRemoved;
     }
     
     
