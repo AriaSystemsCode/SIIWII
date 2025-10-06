@@ -602,7 +602,7 @@ export class AppItemsViewComponent
 
     //Related items
     initRelatedItemsVariables(firstInit: boolean) {
-        //i49-error 
+        //i49-view 
        if (firstInit)
            this.initRelatedItems = this.appItemForViewDto.relatedAppItems.items;
        else
@@ -1013,8 +1013,8 @@ export class AppItemsViewComponent
                 undefined,
                 undefined,
                 undefined,
-                undefined,
-                undefined,
+                0,
+                10,
                 undefined,
                 0,
                 10
