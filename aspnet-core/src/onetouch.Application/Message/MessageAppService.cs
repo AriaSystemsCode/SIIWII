@@ -2153,6 +2153,7 @@ namespace onetouch.Message
         }
         //I40-X527[End]
         //I48[Start]
+        [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllQuestions(GetAllMessagesInput input)
         {
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeQuestion();

@@ -651,6 +651,7 @@ namespace onetouch.AppEntities
         //MMT30
 
         #region get all with paging
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input)
         {
             //var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId(); *Abdo : Not used variable 
