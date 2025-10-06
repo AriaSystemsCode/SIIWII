@@ -1282,6 +1282,8 @@ namespace onetouch.AppEntities
                 }
                 if (input.RelatedEntitiesIds != null)
                 {
+                    _appEntitiesRelationshipRepository.Delete(e => e.EntityId == input.Id);
+                    
                     foreach (var related in input.RelatedEntitiesIds)
                     {
                         if (entity.Id > 0 && related != null && related > 0)

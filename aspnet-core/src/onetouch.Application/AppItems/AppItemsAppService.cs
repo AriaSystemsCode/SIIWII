@@ -2453,8 +2453,23 @@ namespace onetouch.AppItems
             }
             //MMT30[End]
             //Iteration49
+            #region Iteration49 handle the related items
+            if (input.Id == 0)
+            { input.entityRelatedItems = new List<AppEntityCategoryDto>() ; }
+            
+            if (input.entityRelatedItemsRemoved != null && input.entityRelatedItemsRemoved.Count > 0)
+            {
+                List<long> tempIds = input.entityRelatedItemsRemoved.Select(r => r.EntityObjectCategoryId).ToList();
+                input.entityRelatedItems = input.entityRelatedItems.Where(r => tempIds.Contains(r.EntityObjectCategoryId) == false).ToList();
+            }
+
+            if (input.entityRelatedItemAdded != null && input.entityRelatedItemAdded.Count > 0)
+            { ((List<AppEntityCategoryDto>)input.entityRelatedItems).AddRange(input.entityRelatedItemAdded); }
+
             entity.RelatedEntitiesIds = new List<long>();
-            entity.RelatedEntitiesIds = input.entityRelatedItemAdded.Select(e=> e.EntityObjectCategoryId).ToList();
+            entity.RelatedEntitiesIds = input.entityRelatedItems.Select(e=> e.EntityObjectCategoryId).ToList();
+
+            #endregion Iteration49 handle the related items
             //entity.RelatedEntitiesIds.Add(165477);
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             await CurrentUnitOfWork.SaveChangesAsync();
