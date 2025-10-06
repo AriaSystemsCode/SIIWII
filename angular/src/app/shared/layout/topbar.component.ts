@@ -2,9 +2,6 @@ import {
     Injector,
     Component,
     OnInit,
-    ViewEncapsulation,
-    Output,
-    EventEmitter,
     Input,
     ViewChild,
 } from "@angular/core";
@@ -27,6 +24,7 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
+    LanguageServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -36,17 +34,12 @@ import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
-import { ClientAuthError } from "msal";
 import { MenuItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
-    FormGroupName,
-    Validators,
 } from "@angular/forms";
 import { DatePipe } from "@angular/common";
-import { finalize } from "rxjs";
-import { Dropdown } from "primeng/dropdown";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 
 export enum MarketPlace {
@@ -161,6 +154,8 @@ export class TopBarComponent
     visible:boolean =false;
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -179,7 +174,8 @@ export class TopBarComponent
         private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
+        private LanguageServiceProxy:LanguageServiceProxy
     ) {
         super(injector);
 
@@ -236,13 +232,9 @@ export class TopBarComponent
     }
 
     ngOnInit() {
+        this.getCurrentLang()
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
-        // this._AppTransactionServiceProxy
-        // .getRelatedAccounts()
-        // .subscribe((res: any) => {
-        //     console.log(res);
-        // });
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "refreshShoppingInfoInTopbar") {
                 this.getShoppingCartInfo();
@@ -285,6 +277,15 @@ export class TopBarComponent
             }
         });
         this.getBelowBar();
+    }
+
+    getCurrentLang(){
+        this.LanguageServiceProxy
+        .getDefaultLanguage()
+        .subscribe((result) => {
+            this.currentLang = result;
+            console.log(this.currentLang,'lang')
+        });
     }
 
     registerToEvents() {
