@@ -1449,10 +1449,7 @@ export class CreateOrEditAppItemComponent
                 this.uploadBlobAttachment(file, att);
 
                 this.appItem.entityAttachments[index] = att;
-            if (index === 0) {
-                this.setDefaultImage(0);
-            }
-    
+         
     
             // if all is filled with images add new input
             if (
@@ -1615,7 +1612,7 @@ export class CreateOrEditAppItemComponent
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
         
-        //i49
+        //i49-BE Test create or edit for related items
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
