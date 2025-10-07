@@ -30,7 +30,9 @@ namespace onetouch.AppEntities.Dtos
 
 		public virtual bool IsDefault { get; set; }
 
-	}
+        public virtual string? FileType { get; set; }
+
+    }
 	public enum AttachmentsCategories
 	{
 		LOGO,

@@ -362,7 +362,7 @@
                                         <h6 class="font-weight-bold p-3" style="
                                         background-color: #EEEEEEEE;
                                         border-radius: 5px;">
-                                          <span class="text-danger">*</span>  {{ 'ProductPhotos' | localize}}
+                                          <span class="text-danger">*</span>  {{ 'Parent Item Attachments' | localize}}
                                         </h6>
                                             <p class="hint m-0 p-0 pl-5 ml-5 mt-4">
                                                 <!-- <i class="pr-2 fa fa-bell"></i>  -->
@@ -383,7 +383,7 @@
                             </div>
                             <div class="col-12 item-photos-body pt-4 pb-5 ml-5 pl-5">
                                 <div class="row pt-3 pb-3 pl-3">
-                                    <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ;
+                                    <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ; margin-bottom: 115px !important;
     border-radius: 12px !important;" [ngClass]="{'upload':!attachment}"
                                         *ngFor="let attachment of attachmentsSrcs; index as i"
                                         (dragover)="onDragOver($event)"
@@ -424,7 +424,7 @@
 
                                                 <a class="btn btn-primary btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
                                                     <!-- {{ 'AddAttachedFile' | localize}} -->
-                                                    {{ 'Browse File' | localize}}
+                                                    {{ 'Add Attachment' | localize}}
                                                 </a>
                                             </div>
                                         </label>
@@ -435,7 +435,7 @@
                                                 <div class="text-center mb-3">
                                                     <i class="fa-photo-video fas bg-transparent text-white fa-3x"></i>
                                                 </div>
-                                                <div class="text-center">
+                                                <div class="text-center" *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/')  || !appItem.entityAttachments[i].fileType">
                                                     <button type="button"
                                                         class="btn btn-dark text-white border-lg border-white"
                                                         (click)="openImageViewer(attachment)">
@@ -443,7 +443,7 @@
                                                     </button>
                                                 </div>
                                                 <div class="bg-white kt-avatar__upload" for="file"
-                                                    (click)="removePhoto(i)">
+                                                    (click)="removeAttach(i)">
                                                     <!-- <i class="fa fa-times text-danger"></i> -->
                                                     <img  class="mr-2"  src="../../../../../assets/Items/Frame 1707478667.png"/>
                                                 </div>
@@ -451,6 +451,7 @@
                                             <!-- <img *ngIf="!appItem.entityAttachments && !appItem.entityAttachments.length" src="../../../../../assets/img/Untitled.png"/> -->
                                             <img *ngIf="attachment" [src]="attachment" />
                                             <a class="select-default-image p-2"
+                                            *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/') || !appItem.entityAttachments[i].fileType"
                                             style="    border: 1px solid #EEEEEEEE !important;
     border-radius: 12px;"
                                                 [ngClass]="{'d-block' : defaultImageIndex == i}"
@@ -459,6 +460,21 @@
                                                     [ngClass]="defaultImageIndex == i? 'text-purple':'text-grey' "> </i>
                                              <label class="text-purple">  {{ 'Default Image' | localize}}</label> 
                                             </a>
+
+
+                                            <a class="p-2"
+                                            style="position: absolute; bottom: -100px;">
+                                           <label class="text-purple d-flex align-items-center cursor-pointer">
+                                             <input 
+                                               type="checkbox" 
+                                               class="mr-2" 
+                                               [checked]="appItem?.entityAttachments[i]?.isPublic" 
+                                               (change)="setVisibleinMarketplaceImage(i)"
+                                             />
+                                             {{ 'Visible in Marketplace' | localize }}
+                                           </label>
+                                         </a>
+                                         
                                         </a>
                                         <input type="file" id="file_{{i}}" class="d-none" #file
                                             (change)="fileChange($event,productImageCategory,i,undefined,true)"
