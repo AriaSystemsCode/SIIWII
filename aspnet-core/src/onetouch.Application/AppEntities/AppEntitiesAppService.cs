@@ -1280,7 +1280,7 @@ namespace onetouch.AppEntities
                     };
                     entitiesRelationship = _appEntitiesRelationshipRepository.Insert(entitiesRelationship);
                 }
-                if (input.RelatedEntitiesIds != null)
+                if (input.RelatedEntitiesIds != null && input.RelatedEntitiesIds.Count >0)
                 {
                     _appEntitiesRelationshipRepository.Delete(e => e.EntityId == input.Id);
                     
