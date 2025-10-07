@@ -383,7 +383,7 @@
                             </div>
                             <div class="col-12 item-photos-body pt-4 pb-5 ml-5 pl-5">
                                 <div class="row pt-3 pb-3 pl-3">
-                                    <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ;
+                                    <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ; margin-bottom: 115px !important;
     border-radius: 12px !important;" [ngClass]="{'upload':!attachment}"
                                         *ngFor="let attachment of attachmentsSrcs; index as i"
                                         (dragover)="onDragOver($event)"
@@ -435,7 +435,7 @@
                                                 <div class="text-center mb-3">
                                                     <i class="fa-photo-video fas bg-transparent text-white fa-3x"></i>
                                                 </div>
-                                                <div class="text-center" *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/')">
+                                                <div class="text-center" *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/')  || !appItem.entityAttachments[i].fileType">
                                                     <button type="button"
                                                         class="btn btn-dark text-white border-lg border-white"
                                                         (click)="openImageViewer(attachment)">
@@ -451,7 +451,7 @@
                                             <!-- <img *ngIf="!appItem.entityAttachments && !appItem.entityAttachments.length" src="../../../../../assets/img/Untitled.png"/> -->
                                             <img *ngIf="attachment" [src]="attachment" />
                                             <a class="select-default-image p-2"
-                                            *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/')"
+                                            *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/') || !appItem.entityAttachments[i].fileType"
                                             style="    border: 1px solid #EEEEEEEE !important;
     border-radius: 12px;"
                                                 [ngClass]="{'d-block' : defaultImageIndex == i}"

@@ -878,9 +878,7 @@ export class CreateOrEditAppItemComponent
            // dto.appEntityName = this.appItem.name;
             return dto;
         });
- //i49 
-        this.appItem.entityRelatedItemAdded=_entityRelatedItemAdded
-        
+        this.appItem.entityRelatedItemAdded=_entityRelatedItemAdded;
         this.appItem.entityRelatedItemsRemoved = _entityRelatedItemSRemoved;
     }
     
@@ -1453,7 +1451,7 @@ export class CreateOrEditAppItemComponent
 
             const reader = new FileReader();
             reader.onload = () => {
-                this.attachmentsSrcs[index] = reader.result as string;
+                //this.attachmentsSrcs[index] = reader.result as string;
                 this.uploadBlobAttachment(file, att);
 
                 this.appItem.entityAttachments[index] = att;
@@ -1610,6 +1608,7 @@ export class CreateOrEditAppItemComponent
         this.extraSelectedValuesExtraData();
         if (this.appItem.sycIdentifierId == 0)
             this.appItem.sycIdentifierId = null;
+        //i49
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
