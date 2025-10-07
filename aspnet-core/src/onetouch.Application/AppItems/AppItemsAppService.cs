@@ -1797,6 +1797,7 @@ namespace onetouch.AppItems
                     {           AppItemCode = e.EntityFk.Code,
                                 AppItemName = e.EntityFk.Name,
                                 AppItemId = e.EntityFk.Id,
+                                Id = e.EntityFk.Id,
                                 AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0)? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment:"",
                                 AppItemImageName = (e.EntityAttachments!= null  && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name: ""
 
