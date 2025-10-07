@@ -1701,7 +1701,9 @@ namespace onetouch.AppItems
             if (input.EntityId != 0)
             {
                var query0 = _appEntitiesRelationship.GetAll()
-                    .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId) && (e.RelatedEntityTypeCode == "ITEM" && e.EntityTypeCode == "ITEM"))
+                    .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
+                    //&& (e.RelatedEntityTypeCode == "ITEM" && e.EntityTypeCode == "ITEM")
+                    )
                      .Select(e => new
                      {
                          Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId
@@ -1770,7 +1772,9 @@ namespace onetouch.AppItems
                 //     }).ToList();
                 
                 var query = _appEntitiesRelationship.GetAll()
-                    .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId) && (e.RelatedEntityTypeCode=="ITEM" && e.EntityTypeCode == "ITEM"))
+                    .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
+                    //&& (e.RelatedEntityTypeCode=="ITEM" && e.EntityTypeCode == "ITEM")
+                    )
                     .Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
                     .Include(e => e.RelatedEntityFk).ThenInclude(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
                      .Select(e => new

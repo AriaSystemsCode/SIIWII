@@ -1296,6 +1296,7 @@ namespace onetouch.AppEntities
                                 EntityCode = entity.Code,
                                 EntityTypeCode = entity.EntityObjectTypeCode,
                                 RelatedEntityId = (long)related,
+                                TenantId = AbpSession.TenantId,
                                 RelatedEntityTypeCode = relatedEntityFK.EntityObjectTypeCode,
                                 RelatedEntityCode = relatedEntityFK.Code
                             };
