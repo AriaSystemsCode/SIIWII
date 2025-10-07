@@ -878,11 +878,10 @@ export class CreateOrEditAppItemComponent
            // dto.appEntityName = this.appItem.name;
             return dto;
         });
-
+ //i49 
         this.appItem.entityRelatedItemAdded=_entityRelatedItemAdded
         
-       //i49 entityRelatedItemSRemoved ?
-       //  this.appItem.entityRelatedItemSRemoved = _entityRelatedItemSRemoved;
+        this.appItem.entityRelatedItemsRemoved = _entityRelatedItemSRemoved;
     }
     
     
@@ -1337,6 +1336,8 @@ export class CreateOrEditAppItemComponent
     ) {
         this.formTouched = true;
         if (event.target.value) {
+        let file = event.target?.files[0];
+            const fileType = file.type.toLowerCase();
 
             //get aspectRatio 
             if (!aspectRatio)
@@ -1344,6 +1345,8 @@ export class CreateOrEditAppItemComponent
 
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
+            
+        if (fileType.startsWith('image/')) {
             let { onCropDone, data } = this.openImageCropper(
                 event,
                 aspectRatio,
@@ -1363,6 +1366,20 @@ export class CreateOrEditAppItemComponent
                 subs.unsubscribe();
             });
         }
+
+        else {
+            this.tempUploadImage(
+                event,
+                attachmentCategory,
+                null,
+                index
+            );
+            event.target.value = null;
+        }
+    }
+
+
+
     }
 
     tempUploadImage(
@@ -1371,10 +1388,16 @@ export class CreateOrEditAppItemComponent
         croppedImageContent: ImageCropperComponent,
         index?: number
     ) {
-        const file = (event.target as HTMLInputElement).files[0];
-        attachmentCategory.imgURL =
-            croppedImageContent.croppedImageAsBase64 as string;
 
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        const fileType = file.type;
+        const isImage = fileType.startsWith('image/');
+        const isPDF = fileType === 'application/pdf';
+        const isVideo = fileType.startsWith('video/');
+
+            
         if (
             this.appItem.entityAttachments == null ||
             this.appItem.entityAttachments == undefined
@@ -1389,24 +1412,68 @@ export class CreateOrEditAppItemComponent
         att.fileName = file?.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
+        att.isPublic=false;
+        att.fileType=fileType;
         const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
-        this.addTempAttachments([tempFile]);
+        this.addTempAttachments([    
+
+
+        ]);
+
+        if (isImage) {
+        attachmentCategory.imgURL =
+            croppedImageContent.croppedImageAsBase64 as string;
+            
         // save image as a base64
         this.attachmentsSrcs[index] =
             croppedImageContent.croppedImageAsBase64 as string;
-        this.appItem.entityAttachments[index] = att;
-        if (index === 0) {
-            this.setDefaultImage(0);
+
+            this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+
+            this.appItem.entityAttachments[index] = att;
+            if (index === 0) {
+                this.setDefaultImage(0);
+            }
+    
+    
+            // if all is filled with images add new input
+            if (
+                this.attachmentsSrcs.every((elem) => elem) &&
+                this.attachmentsSrcs.length < 10
+            )
+                this.attachmentsSrcs.push("");
         }
 
-        this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+        else if (isPDF || isVideo) {
+            if(isPDF)
+         this.attachmentsSrcs[index] = 'assets/Items/pdf-Icon.png';
 
-        // if all is filled with images add new input
-        if (
-            this.attachmentsSrcs.every((elem) => elem) &&
-            this.attachmentsSrcs.length < 10
-        )
-            this.attachmentsSrcs.push("");
+            if(isVideo)
+                this.attachmentsSrcs[index] ='assets/Items/video-Icon.png';
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                this.attachmentsSrcs[index] = reader.result as string;
+                this.uploadBlobAttachment(file, att);
+
+                this.appItem.entityAttachments[index] = att;
+            if (index === 0) {
+                this.setDefaultImage(0);
+            }
+    
+    
+            // if all is filled with images add new input
+            if (
+                this.attachmentsSrcs.every((elem) => elem) &&
+                this.attachmentsSrcs.length < 10
+            )
+                this.attachmentsSrcs.push("");
+            };
+            reader.readAsDataURL(file);
+        }
+
+           
+       
     }
 
     setDefaultImage(index) {
@@ -1423,7 +1490,7 @@ export class CreateOrEditAppItemComponent
             return item;
         });
     }
-    removePhoto(i: number) {
+    removeAttach(i: number) {
         this.formTouched = true;
         if (
             this.defaultImageIndex === i &&
@@ -2014,5 +2081,15 @@ export class CreateOrEditAppItemComponent
     convertTodecimal(value) {
         let inputvalue = value % 1 == 0 ? Math.round(value * 100 / 100).toFixed(2) : value;
         return inputvalue;
+    }
+
+    setVisibleinMarketplaceImage(index) {
+        this.formTouched = true;
+        this.appItem.entityAttachments?.map((item, i) => {
+            if (index == i) {
+                item.isPublic = !item.isPublic;
+                return item;
+            }
+        });
     }
 }

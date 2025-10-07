@@ -59364,6 +59364,7 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
     attributes!: string | undefined;
     index!: number;
     isDefault!: boolean;
+    fileType!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -59393,6 +59394,7 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
             this.attributes = _data["attributes"];
             this.index = _data["index"];
             this.isDefault = _data["isDefault"];
+            this.fileType = _data["fileType"];
             this.id = _data["id"];
         }
     }
@@ -59420,6 +59422,7 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
         data["attributes"] = this.attributes;
         data["index"] = this.index;
         data["isDefault"] = this.isDefault;
+        data["fileType"] = this.fileType;
         data["id"] = this.id;
         return data;
     }
@@ -59436,6 +59439,7 @@ export interface IAppEntityAttachmentDto {
     attributes: string | undefined;
     index: number;
     isDefault: boolean;
+    fileType: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -74112,7 +74116,9 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     entityCategories!: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
+    entityRelatedItems!: AppEntityCategoryDto[] | undefined;
     entityRelatedItemAdded!: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemsRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved!: AppEntityCategoryDto[] | undefined;
@@ -74192,10 +74198,20 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
                 for (let item of _data["entityCategoriesRemoved"])
                     this.entityCategoriesRemoved!.push(AppEntityCategoryDto.fromJS(item));
             }
+            if (Array.isArray(_data["entityRelatedItems"])) {
+                this.entityRelatedItems = [] as any;
+                for (let item of _data["entityRelatedItems"])
+                    this.entityRelatedItems!.push(AppEntityCategoryDto.fromJS(item));
+            }
             if (Array.isArray(_data["entityRelatedItemAdded"])) {
                 this.entityRelatedItemAdded = [] as any;
                 for (let item of _data["entityRelatedItemAdded"])
                     this.entityRelatedItemAdded!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityRelatedItemsRemoved"])) {
+                this.entityRelatedItemsRemoved = [] as any;
+                for (let item of _data["entityRelatedItemsRemoved"])
+                    this.entityRelatedItemsRemoved!.push(AppEntityCategoryDto.fromJS(item));
             }
             if (Array.isArray(_data["entityDepartments"])) {
                 this.entityDepartments = [] as any;
@@ -74338,10 +74354,20 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             for (let item of this.entityCategoriesRemoved)
                 data["entityCategoriesRemoved"].push(item.toJSON());
         }
+        if (Array.isArray(this.entityRelatedItems)) {
+            data["entityRelatedItems"] = [];
+            for (let item of this.entityRelatedItems)
+                data["entityRelatedItems"].push(item.toJSON());
+        }
         if (Array.isArray(this.entityRelatedItemAdded)) {
             data["entityRelatedItemAdded"] = [];
             for (let item of this.entityRelatedItemAdded)
                 data["entityRelatedItemAdded"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityRelatedItemsRemoved)) {
+            data["entityRelatedItemsRemoved"] = [];
+            for (let item of this.entityRelatedItemsRemoved)
+                data["entityRelatedItemsRemoved"].push(item.toJSON());
         }
         if (Array.isArray(this.entityDepartments)) {
             data["entityDepartments"] = [];
@@ -74457,7 +74483,9 @@ export interface ICreateOrEditAppItemDto {
     entityCategories: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
+    entityRelatedItems: AppEntityCategoryDto[] | undefined;
     entityRelatedItemAdded: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemsRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved: AppEntityCategoryDto[] | undefined;
@@ -75699,7 +75727,9 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
     entityCategories!: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
+    entityRelatedItems!: AppEntityCategoryDto[] | undefined;
     entityRelatedItemAdded!: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemsRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved!: AppEntityCategoryDto[] | undefined;
@@ -75784,10 +75814,20 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
                 for (let item of _data["entityCategoriesRemoved"])
                     this.entityCategoriesRemoved!.push(AppEntityCategoryDto.fromJS(item));
             }
+            if (Array.isArray(_data["entityRelatedItems"])) {
+                this.entityRelatedItems = [] as any;
+                for (let item of _data["entityRelatedItems"])
+                    this.entityRelatedItems!.push(AppEntityCategoryDto.fromJS(item));
+            }
             if (Array.isArray(_data["entityRelatedItemAdded"])) {
                 this.entityRelatedItemAdded = [] as any;
                 for (let item of _data["entityRelatedItemAdded"])
                     this.entityRelatedItemAdded!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityRelatedItemsRemoved"])) {
+                this.entityRelatedItemsRemoved = [] as any;
+                for (let item of _data["entityRelatedItemsRemoved"])
+                    this.entityRelatedItemsRemoved!.push(AppEntityCategoryDto.fromJS(item));
             }
             if (Array.isArray(_data["entityDepartments"])) {
                 this.entityDepartments = [] as any;
@@ -75935,10 +75975,20 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
             for (let item of this.entityCategoriesRemoved)
                 data["entityCategoriesRemoved"].push(item.toJSON());
         }
+        if (Array.isArray(this.entityRelatedItems)) {
+            data["entityRelatedItems"] = [];
+            for (let item of this.entityRelatedItems)
+                data["entityRelatedItems"].push(item.toJSON());
+        }
         if (Array.isArray(this.entityRelatedItemAdded)) {
             data["entityRelatedItemAdded"] = [];
             for (let item of this.entityRelatedItemAdded)
                 data["entityRelatedItemAdded"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityRelatedItemsRemoved)) {
+            data["entityRelatedItemsRemoved"] = [];
+            for (let item of this.entityRelatedItemsRemoved)
+                data["entityRelatedItemsRemoved"].push(item.toJSON());
         }
         if (Array.isArray(this.entityDepartments)) {
             data["entityDepartments"] = [];
@@ -76055,7 +76105,9 @@ export interface IAppItemValidationInputDTO {
     entityCategories: AppEntityCategoryDto[] | undefined;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
+    entityRelatedItems: AppEntityCategoryDto[] | undefined;
     entityRelatedItemAdded: AppEntityCategoryDto[] | undefined;
+    entityRelatedItemsRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: AppEntityCategoryDto[] | undefined;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
     entityDepartmentsRemoved: AppEntityCategoryDto[] | undefined;
