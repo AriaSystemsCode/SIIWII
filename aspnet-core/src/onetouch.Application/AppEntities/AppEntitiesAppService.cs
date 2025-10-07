@@ -1280,10 +1280,11 @@ namespace onetouch.AppEntities
                     };
                     entitiesRelationship = _appEntitiesRelationshipRepository.Insert(entitiesRelationship);
                 }
+
+                #region Iteration49 update the related items
+                _appEntitiesRelationshipRepository.Delete(e => e.EntityId == input.Id);
                 if (input.RelatedEntitiesIds != null && input.RelatedEntitiesIds.Count >0)
-                {
-                    _appEntitiesRelationshipRepository.Delete(e => e.EntityId == input.Id);
-                    
+                {   
                     foreach (var related in input.RelatedEntitiesIds)
                     {
                         if (entity.Id > 0 && related != null && related > 0)
@@ -1304,7 +1305,7 @@ namespace onetouch.AppEntities
                         }
                     }
                 }
-
+                #endregion Iteration49 update the related items
                 return entity.Id;
             }
         }

@@ -2459,7 +2459,7 @@ namespace onetouch.AppItems
             //MMT30[End]
             //Iteration49
             #region Iteration49 handle the related items
-            if (input.Id == 0)
+            if (input.Id == 0 || input.entityRelatedItems == null)
             { input.entityRelatedItems = new List<AppEntityCategoryDto>() ; }
             
             if (input.entityRelatedItemsRemoved != null && input.entityRelatedItemsRemoved.Count > 0)
