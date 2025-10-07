@@ -434,15 +434,21 @@
                                         </td>
                                         <td style="width:150px">
                                             <span class="p-column-title"> {{l('DateCreated')}}</span>
-                                            <span *ngIf="record.creationTime">
-                                                {{record.creationTime | momentFormat:'L' }}
+                                            <span *ngIf="record.creationTime && appSession.tenant.currencyInfoDto.code == 'GBP'">
+                                                {{  record.creationTime | momentFormat:'DD/MM/YYYY'}}
+                                            </span>
+                                            <span *ngIf="record.creationTime && appSession.tenant.currencyInfoDto.code != 'GBP'">
+                                                {{  record.creationTime | momentFormat:'MM/DD/YYYY'}}
                                             </span>
                                             <span *ngIf="!record.creationTime">-</span>
                                         </td>
                                         <td style="width:150px">
                                             <span class="p-column-title"> {{l('CompleteDate')}}</span>
-                                            <span *ngIf="record.completeDate">
-                                                {{record.completeDate | momentFormat:'L' }}
+                                            <span *ngIf="record.completeDate  && appSession.tenant.currencyInfoDto.code == 'GBP'">
+                                                {{record.completeDate |  momentFormat:'DD/MM/YYYY' }}
+                                            </span>
+                                            <span *ngIf="record.completeDate && appSession.tenant.currencyInfoDto.code != 'GBP'">
+                                                {{record.completeDate |  momentFormat:'MM/DD/YYYY' }}
                                             </span>
                                             <span *ngIf="!record.completeDate">-</span>
                                         </td>

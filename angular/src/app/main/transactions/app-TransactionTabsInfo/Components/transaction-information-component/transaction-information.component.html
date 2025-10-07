@@ -58,8 +58,11 @@
                     </div>
                     <div class="px-4 py-2" style="line-height: 10px;">
                         <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
-                        <div class="purpleColor" style="white-space: nowrap;">
-                            {{appTransactionsForViewDto?.creationDate?.toString() | date: 'MMM d y, h:mm a'}}
+                        <div class="purpleColor" style="white-space: nowrap;" *ngIf="appSession.tenant.currencyInfoDto.code != 'GBP'">
+                            {{appTransactionsForViewDto?.creationDate | momentFormat: 'MMM d y, h:mm a'}}
+                        </div>
+                        <div class="purpleColor" style="white-space: nowrap;" *ngIf="appSession.tenant.currencyInfoDto.code == 'GBP'">
+                            {{appTransactionsForViewDto?.creationDate | momentFormat: 'd MMM  y, h:mm a'}}
                         </div>
                     </div>
                 </div>
@@ -216,9 +219,13 @@
                             </div>
                         </div>
                     </div>
-                    <p *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'"
+                    <p *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN' && appSession.tenant.currencyInfoDto.code != 'GBP'"
                         style="color: #1B101B;" class="ml-2">Last Edit :
                         {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'MMM d y, h:mm a'}}</p>
+
+                        <p *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN' && appSession.tenant.currencyInfoDto.code == 'GBP'"
+                        style="color: #1B101B;" class="ml-2">Last Edit :
+                        {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'd MMM y, h:mm a'}}</p>
 
                 </div>
                 <div *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'">
@@ -236,8 +243,11 @@
                             {{l("DiscardShopping")}}
                         </button>
                     </div>
-                    <p style="color: #1B101B;" class="ml-2">Last Edit :
+                    <p style="color: #1B101B;" class="ml-2" *ngIf="appSession.tenant.currencyInfoDto.code != 'GBP'">Last Edit :
                         {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'MMM d y, h:mm a'}}</p>
+
+                        <p style="color: #1B101B;" class="ml-2" *ngIf="appSession.tenant.currencyInfoDto.code == 'GBP'">Last Edit :
+                            {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'd MMM y, h:mm a'}}</p>
 
                 </div>
 
@@ -565,12 +575,7 @@
 
                                                     <td class="p-treeTable text-center" style="width: 5rem;"
                                                         *ngIf="canChange">
-                                                        <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
-                                                class="imgIcon" (click)="onDelete(rowNode)" />
-                                            <img *ngIf="rowNode?.node?.data?.editQty" src=""
-                                                class="editIcon fa fa-edit ml-3 fa-1x"
-                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty" /> -->
-
+                             
                                                         <div class="dropdown" dropdown>
                                                             <button class="btn btn-secondary dropdown-toggle p-0"
                                                                 type="button" id="dropdownMenuButton"
