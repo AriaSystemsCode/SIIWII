@@ -1700,18 +1700,18 @@ namespace onetouch.AppItems
             List<long> exceptList = new List<long>();
             if (input.EntityId != 0)
             {
-               var query0 = _appEntitiesRelationship.GetAll()
-                    .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
-                    //&& (e.RelatedEntityTypeCode == "ITEM" && e.EntityTypeCode == "ITEM")
-                    )
-                     .Select(e => new
-                     {
-                         Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId
-                     });
+                var query0 = _appEntitiesRelationship.GetAll()
+                     .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
+                     //&& (e.RelatedEntityTypeCode == "ITEM" && e.EntityTypeCode == "ITEM")
+                     )
+                      .Select(e => new
+                      {
+                          Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId
+                      });
                 exceptList = query0.Select(e => e.Id).ToList();
             }
-            var query = _appItemRepository.GetAll().Include(e=> e.EntityFk).ThenInclude(e=> e.EntityAttachments)
-                .Where(e => !exceptList.Contains(e.EntityId) && (e.ParentId ==0 || e.ParentId==null ) )
+            var query = _appItemRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
+                .Where(e => !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted==false))
                 .WhereIf( !string.IsNullOrEmpty(input.Filter), e=> e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
                 .Include(e => e.EntityFk.EntityAttachments).ThenInclude(e => e.AttachmentFk);
                     
@@ -1729,7 +1729,7 @@ namespace onetouch.AppItems
                         SycEntityObjectCategoryName="",
                         SydObjectName="ITEM",
                             
-                        SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.Id, Id = e.Id,
+                        SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.EntityId, Id = e.EntityId,
                         //DefaultAttachment = e.EntityAttachments[0].AttachmentFk.Attachment,
                         AppItemImageUrl = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityFk.EntityAttachments[0].AttachmentFk.Attachment : "",
                         AppItemImageName = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? e.EntityFk.EntityAttachments[0].AttachmentFk.Name : ""
