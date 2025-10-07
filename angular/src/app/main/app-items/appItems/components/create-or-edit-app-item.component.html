@@ -435,7 +435,7 @@
                                                 <div class="text-center mb-3">
                                                     <i class="fa-photo-video fas bg-transparent text-white fa-3x"></i>
                                                 </div>
-                                                <div class="text-center" *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/')  || !appItem.entityAttachments[i].fileType">
+                                                <div class="text-center" *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)">
                                                     <button type="button"
                                                         class="btn btn-dark text-white border-lg border-white"
                                                         (click)="openImageViewer(attachment)">
@@ -449,9 +449,19 @@
                                                 </div>
                                             </div>
                                             <!-- <img *ngIf="!appItem.entityAttachments && !appItem.entityAttachments.length" src="../../../../../assets/img/Untitled.png"/> -->
-                                            <img *ngIf="attachment" [src]="attachment" />
+                                            <!-- <img *ngIf="attachment" [src]="attachment" /> -->
+                                            <img *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)"
+                                            [src]="attachment" />
+
+                                        <img *ngIf="isVideoFile(appItem.entityAttachments[i]?.fileName)"
+                                            src="../../../../../assets/Items/video-Icon.png" />
+
+                                        <img *ngIf="isPdfFile(appItem.entityAttachments[i]?.fileName)"
+                                            src="../../../../../assets/Items/pdf-Icon.png" />
+
+                                            
                                             <a class="select-default-image p-2"
-                                            *ngIf="appItem.entityAttachments[i].fileType?.startsWith('image/') || !appItem.entityAttachments[i].fileType"
+                                            *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)"
                                             style="    border: 1px solid #EEEEEEEE !important;
     border-radius: 12px;"
                                                 [ngClass]="{'d-block' : defaultImageIndex == i}"
