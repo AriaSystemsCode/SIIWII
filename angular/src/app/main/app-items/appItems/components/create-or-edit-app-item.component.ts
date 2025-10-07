@@ -365,7 +365,7 @@ export class CreateOrEditAppItemComponent
                     ...res.appItem,
                     entityCategories: res.appItem.entityCategories.items,
                     entityDepartments: res.appItem.entityDepartments.items,
-                    entityRelatedItems: res.appItem.relatedAppItems,
+                    entityRelatedItems: res.appItem.relatedAppItems.items,
                     entityClassifications:
                         res.appItem.entityClassifications.items,
                     nonLookupValues: res.nonLookupValues
@@ -1609,6 +1609,19 @@ export class CreateOrEditAppItemComponent
         if (this.appItem.sycIdentifierId == 0)
             this.appItem.sycIdentifierId = null;
         //i49
+
+        let _entityRelatedItems: AppEntityCategoryDto[] = [];
+        _entityRelatedItems= this.appItem?.entityRelatedItems?.map(item => {
+            const dto = new AppEntityCategoryDto();
+            dto.entityObjectCategoryId = item.appItemId;
+            dto.entityObjectCategoryCode = item.appItemCode;
+            dto.entityObjectCategoryName = item.appItemName;
+            dto.id = 0;
+            return dto;
+        });
+
+        this.appItem.entityRelatedItems =_entityRelatedItems;
+
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
