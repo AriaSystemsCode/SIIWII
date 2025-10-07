@@ -294,7 +294,10 @@ namespace onetouch.SystemObjects
                 }
             }
             //MMT2024
-            if (tmpInput.EntityId == 0 && !string.IsNullOrEmpty(tmpInput.Filter))
+            //T-SII-20250307.0003,1 MMT 09/25/2025 departments filter works only in the product add mode[Start]
+            //if (tmpInput.EntityId == 0 && !string.IsNullOrEmpty(tmpInput.Filter))
+            if (!string.IsNullOrEmpty(tmpInput.Filter))
+            //T-SII-20250307.0003,1 MMT 09/25/2025 departments filter works only in the product add mode[End]
             {
                 return await  GetAllDepartmentsByFilterWithChildsForProduct(tmpInput.Filter);
             }
