@@ -103,6 +103,8 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
   oldappTransactionsForViewDto;
   isContactsValid = false;
 
+  currentLang:string
+  isArabic:boolean 
 
   constructor(
     injector: Injector,
@@ -115,6 +117,8 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     super(injector);
   }
   ngOnInit(): void {
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
     if (this.currentTab === TransactionCartoccordionTabs.orderInfo) {
       this.fullName = `${this.appSession.user.name}${this.appSession.user.surname}`;
       this.initDates();

@@ -42,6 +42,7 @@ import {
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 
+
 export enum MarketPlace {
     Accounts,
     Products,
@@ -155,7 +156,7 @@ export class TopBarComponent
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
     currentLang:string
-    isArabic:boolean = true
+    isArabic:boolean 
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -175,7 +176,7 @@ export class TopBarComponent
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
-        private LanguageServiceProxy:LanguageServiceProxy
+       
     ) {
         super(injector);
 
@@ -232,7 +233,9 @@ export class TopBarComponent
     }
 
     ngOnInit() {
-        this.getCurrentLang()
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
@@ -279,14 +282,7 @@ export class TopBarComponent
         this.getBelowBar();
     }
 
-    getCurrentLang(){
-        this.LanguageServiceProxy
-        .getDefaultLanguage()
-        .subscribe((result) => {
-            this.currentLang = result;
-            console.log(this.currentLang,'lang')
-        });
-    }
+
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {

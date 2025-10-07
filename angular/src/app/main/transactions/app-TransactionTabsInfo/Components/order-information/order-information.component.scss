@@ -333,6 +333,17 @@
     }
 }
 
+.dates-ar {
+    img {
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        left: 21px !important;
+        bottom: 12px !important;
+
+    }
+}
+
 ::ng-deep {
     .p-dialog {
         border-radius: 20px;

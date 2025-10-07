@@ -43,20 +43,22 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openAdSub= false
     tenantLogo:any;
     currentLang:string
-    isArabic:boolean = true
+    isArabic:boolean 
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _router:Router,
         private _appNavigationService: AppNavigationService,
-        private LanguageServiceProxy:LanguageServiceProxy
+
     ) {
         super(injector);
         this.subscribeToMarketPlace()
     }
 
     ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
@@ -120,12 +122,5 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.openSideBar=$event
     }
 
-    getCurrentLang(){
-        this.LanguageServiceProxy
-        .getDefaultLanguage()
-        .subscribe((result) => {
-            this.currentLang = result;
-            console.log(this.currentLang,'lang')
-        });
-    }
+
 }

@@ -110,7 +110,7 @@ display: none;
         margin-left: auto !important;
         margin-right: auto;
         text-align: center;
-        // margin-bottom: 10px;
+      
         
       }
 }
@@ -184,12 +184,14 @@ margin-bottom: 30px;
     position: absolute;
     right: 60px;
     top: 70px;
+    transform: rotate(180deg);
 
   }
   .rtl-arr-left {
     position: absolute;
     right: 205px;
     top: 70px;
+    transform: rotate(180deg);
 
   }
 
