@@ -1366,7 +1366,7 @@ namespace onetouch.AppMarketplaceAccounts
                            && x.ParentId == mainAccountID
                            && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();*/
                 var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
-                var contactInfo = _appContactRepository.GetAll()
+                var contactInfo = _appContactRepository.GetAll().Include(z=>z.EntityFk)
                     .Where(x => //x.IsProfileData 
                            x.TenantId == AbpSession.TenantId &&
                             _appContactRelationshipInfoRepository.GetAll()
@@ -1379,6 +1379,10 @@ namespace onetouch.AppMarketplaceAccounts
                
                 foreach (var contactObj in contactInfo)
                 {
+                    if (contactObj.EntityFk.TenantOwner!= foundContactInfo.TenantId)
+                    {
+                        continue;
+                    }
                     await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
                     //await HideAccount(contactObj.SSIN);
                     await CreateOrEditMarketplaceContactRelationship(input.SSIN, contactObj.SSIN, false,null, null);
