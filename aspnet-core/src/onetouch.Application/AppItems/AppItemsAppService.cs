@@ -80,6 +80,7 @@ using Z.Expressions;
 using onetouch.Migrations;
 using Newtonsoft.Json;
 using System.Drawing;
+using Org.BouncyCastle.Crypto.Agreement.JPake;
 
 namespace onetouch.AppItems
 {
@@ -1711,7 +1712,7 @@ namespace onetouch.AppItems
                 exceptList = query0.Select(e => e.Id).ToList();
             }
             var query = _appItemRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
-                .Where(e => !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted==false))
+                .Where(e => (e.EntityId != input.EntityId) && !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted==false))
                 .WhereIf( !string.IsNullOrEmpty(input.Filter), e=> e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
                 .Include(e => e.EntityFk.EntityAttachments).ThenInclude(e => e.AttachmentFk);
                     
@@ -1757,19 +1758,6 @@ namespace onetouch.AppItems
             {
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                
-                //var query0 = _appEntitiesRelationship.GetAll()
-                //    .Where(e => e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
-                //    .Include(e=> e.EntityFk).ThenInclude(e=> e.EntityAttachments).ThenInclude(e=> e.AttachmentFk)
-                //    .Include(e => e.RelatedEntityFk).ThenInclude(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
-                //     .Select(e => new
-                //     {
-                //         Id = e.EntityId == input.EntityId ? e.RelatedEntityId : e.EntityId,
-                //         Code = e.EntityId == input.EntityId ? e.RelatedEntityFk.Code : e.EntityFk.Code,
-                //         Name = e.EntityId == input.EntityId ? e.RelatedEntityFk.Name : e.EntityFk.Name,
-                //         EntityFk = e.EntityId == input.EntityId ? e.RelatedEntityFk : e.EntityFk,
-                //         TenantId = e.EntityId == input.EntityId ? e.RelatedTenantId : e.TenantId,
-                //         EntityAttachments = e.EntityId == input.EntityId ? e.RelatedEntityFk.EntityAttachments.Where(e=> e.IsDefault).ToList() : e.EntityFk.EntityAttachments.Where(e=> e.IsDefault).ToList()
-                //     }).ToList();
                 
                 var query = _appEntitiesRelationship.GetAll()
                     .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
@@ -1789,15 +1777,28 @@ namespace onetouch.AppItems
 
                 var totalCount = await query.CountAsync();
 
-                var entityRelated = await query
+                var sel = from entity in query join item in _appItemRepository.GetAll()
+                          on entity.Id equals item.EntityId into j1
+                          from j2 in j1.DefaultIfEmpty()
+                          select new 
+                          {
+                              Id = entity.Id,
+                              Code= j2.Code,
+                              Name = j2.Name,
+                              EntityFk = entity.EntityFk,
+                              TenantId = entity.TenantId,
+                              EntityAttachments = entity.EntityAttachments
+                          };
+
+                var entityRelated = await sel
                     .OrderBy(!string.IsNullOrEmpty(input.Sorting)? input.Sorting: "Id asc")
                     //.OrderBy(e => e.Id)
                     .PageBy(input)
                     .Select(e => new AppItemLookupDto
-                    {           AppItemCode = e.EntityFk.Code,
-                                AppItemName = e.EntityFk.Name,
-                                AppItemId = e.EntityFk.Id,
-                                Id = e.EntityFk.Id,
+                    {           AppItemCode = e.Code,
+                                AppItemName = e.Name,
+                                AppItemId = e.Id,
+                                Id = e.Id,
                                 AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0)? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment:"",
                                 AppItemImageName = (e.EntityAttachments!= null  && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name: ""
 
