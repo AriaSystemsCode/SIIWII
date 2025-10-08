@@ -1411,7 +1411,6 @@ export class CreateOrEditAppItemComponent
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
         att.isPublic=false;
-        att.fileType=fileType;
         const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
         this.addTempAttachments([    
 
@@ -1443,22 +1442,14 @@ export class CreateOrEditAppItemComponent
         }
 
         else if (isPDF || isVideo) {
-            if(isPDF)
-         this.attachmentsSrcs[index] = 'assets/Items/pdf-Icon.png';
-
-            if(isVideo)
-                this.attachmentsSrcs[index] ='assets/Items/video-Icon.png';
 
             const reader = new FileReader();
             reader.onload = () => {
-                //this.attachmentsSrcs[index] = reader.result as string;
+                this.attachmentsSrcs[index] = reader.result as string;
                 this.uploadBlobAttachment(file, att);
 
                 this.appItem.entityAttachments[index] = att;
-            if (index === 0) {
-                this.setDefaultImage(0);
-            }
-    
+         
     
             // if all is filled with images add new input
             if (
@@ -1608,20 +1599,20 @@ export class CreateOrEditAppItemComponent
         this.extraSelectedValuesExtraData();
         if (this.appItem.sycIdentifierId == 0)
             this.appItem.sycIdentifierId = null;
-        //i49
-
         let _entityRelatedItems: AppEntityCategoryDto[] = [];
         _entityRelatedItems= this.appItem?.entityRelatedItems?.map(item => {
             const dto = new AppEntityCategoryDto();
             dto.entityObjectCategoryId = item.appItemId;
             dto.entityObjectCategoryCode = item.appItemCode;
             dto.entityObjectCategoryName = item.appItemName;
-            dto.id = 0;
+            dto.id = item.id;
             return dto;
         });
 
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
+        
+        //i49-BE Test create or edit for related items
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(

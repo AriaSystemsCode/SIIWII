@@ -59364,7 +59364,6 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
     attributes!: string | undefined;
     index!: number;
     isDefault!: boolean;
-    fileType!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -59394,7 +59393,6 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
             this.attributes = _data["attributes"];
             this.index = _data["index"];
             this.isDefault = _data["isDefault"];
-            this.fileType = _data["fileType"];
             this.id = _data["id"];
         }
     }
@@ -59422,7 +59420,6 @@ export class AppEntityAttachmentDto implements IAppEntityAttachmentDto {
         data["attributes"] = this.attributes;
         data["index"] = this.index;
         data["isDefault"] = this.isDefault;
-        data["fileType"] = this.fileType;
         data["id"] = this.id;
         return data;
     }
@@ -59439,7 +59436,6 @@ export interface IAppEntityAttachmentDto {
     attributes: string | undefined;
     index: number;
     isDefault: boolean;
-    fileType: string | undefined;
     id: number;
 
     [key: string]: any;
