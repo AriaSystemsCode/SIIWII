@@ -2,9 +2,6 @@ import {
     Injector,
     Component,
     OnInit,
-    ViewEncapsulation,
-    Output,
-    EventEmitter,
     Input,
     ViewChild,
 } from "@angular/core";
@@ -28,6 +25,7 @@ import {
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
     AccountsServiceProxy,
+    LanguageServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -37,19 +35,15 @@ import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
-import { ClientAuthError } from "msal";
 import { MenuItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
-    FormGroupName,
-    Validators,
 } from "@angular/forms";
 import { DatePipe } from "@angular/common";
-import { finalize } from "rxjs";
-import { Dropdown } from "primeng/dropdown";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import Swal from "sweetalert2";
+
 
 export enum MarketPlace {
     Accounts,
@@ -163,6 +157,8 @@ export class TopBarComponent
     visible:boolean =false;
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
+    currentLang:string
+    isArabic:boolean 
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -183,6 +179,7 @@ export class TopBarComponent
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
         private _accountsServiceProxy: AccountsServiceProxy,
+       
     ) {
         super(injector);
 
@@ -239,13 +236,11 @@ export class TopBarComponent
     }
 
     ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
-        // this._AppTransactionServiceProxy
-        // .getRelatedAccounts()
-        // .subscribe((res: any) => {
-        //     console.log(res);
-        // });
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "refreshShoppingInfoInTopbar") {
                 this.getShoppingCartInfo();
@@ -289,6 +284,8 @@ export class TopBarComponent
         });
         this.getBelowBar();
     }
+
+
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {

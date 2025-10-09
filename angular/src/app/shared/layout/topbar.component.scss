@@ -22,7 +22,13 @@
     position: absolute;
     right: 0%;
     top: 0;
-    // border-left: 1px solid rgb(255 252 252 / 50%);
+
+}
+.leftList {
+    position: absolute;
+    left: 0%;
+    top: 0;
+
 }
 
 }
@@ -32,10 +38,12 @@
         right: 300px;
     }
 
-    // .rightList {
-    //     position: relative;
-      
-    // }
+    .rt-sec-section {
+        position: absolute;
+        left: 300px;
+    }
+
+
 }
 
 .small {
@@ -77,11 +85,7 @@
 background: #4A0D4A;
 box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
 }
-// @media (min-width: 768px) {
-//     .container {
-//         max-width: 973px !important;
-//     }
-// }
+
 @media (min-width: 1024px) {
     .navbar-expand-lg .navbar-collapse {
 
@@ -91,7 +95,7 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
 @media only screen and (min-width: 768px) and (max-width: 1024px) { 
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
-        // right: -35% !important;
+   
     }
 }
 @media (max-width: 1024px) {
@@ -117,6 +121,11 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
 right: 30px;
     }
 
+    .leftList {
+        position: absolute;
+left: 30px;
+    }
+
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
         right: -35% !important;
@@ -140,6 +149,11 @@ right: 30px;
 right: 30px;
     }
 
+    .leftList {
+        position: absolute;
+left: 30px;
+    }
+
     .navbar-nav {
         flex-direction: row !important;
  
@@ -150,17 +164,8 @@ right: 30px;
     }
 
 }
-@media (min-width: 768px) and (max-width: 991.98px) {
-    // .position-md-absolute {
-    //     position: absolute;
-    // }
-}
 
-@media (min-width: 992px) {
-    .position-lg-static {
-        // position: static;
-    }
-}
+
 @media only screen and (max-width: 767px) {
     .navbar-nav {
         -webkit-box-orient: horizontal !important;
@@ -317,8 +322,13 @@ right: 30px;
 
     @media (min-width: 567px) {
 
-        .navbar {
+        .ltr-navbar {
             margin-left: 75px !important;
+          
+        }
+
+        .rtl-navbar {
+            margin-right: 75px !important;
           
         }
         }

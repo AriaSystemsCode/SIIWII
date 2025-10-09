@@ -104,7 +104,7 @@
 
 
 
-                                <p-autoComplete #autoComplete [dropdown]="true" *ngIf="!isBuyerTempAccount"
+                                <p-autoComplete #autoComplete [dropdown]="true" *ngIf="!isBuyerTempAccount" [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'"
                                     [suggestions]="filteredBuyerContacts" formControlName="buyerContactName"
                                     [(ngModel)]="selectedBuyerContact" (completeMethod)="handleBuyerNameSearch($event)"
                                     (ngModelChange)="handleBuyerNameChange($event)" (click)="loadInitialContacts()"
@@ -274,7 +274,7 @@
                 <span>Seller Information</span>
             </div>
             <form class="form mt-3" [formGroup]="orderForm">
-                <div class="row calendar-form">
+                <div class="row " [ngClass]="isArabic?'calendar-form-ar':'calendar-form'">
 
                     <!-- Seller company Name -->
                     <div class="col-md-6">
@@ -311,7 +311,7 @@
                         <div class="mb-3">
                             <label for="" class="form-label">Seller Contact Name</label>
 
-                            <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredSellerContacts"
+                            <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredSellerContacts" [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'"
                                 formControlName="sellerContactName" [(ngModel)]="selectedSellerContact"
                                 (completeMethod)="handleSellerNameSearch($event)"
                                 (ngModelChange)="handleSellerNameChange($event)" (click)="loadInitialSellerContacts()"
