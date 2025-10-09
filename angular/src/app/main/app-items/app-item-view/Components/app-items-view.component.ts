@@ -184,7 +184,6 @@ export class AppItemsViewComponent
 
     acceptedAspectRatio;
     languageSettingName  =AppConsts.languageSettingName;
-    loadingError=false;
     pdfCache: { [key: string]: string } = {};
     public constructor(
         private _router: Router,
@@ -349,7 +348,7 @@ export class AppItemsViewComponent
 
         if(this.isPdfFile(img.fileName)){
             img.isPdfFile =true;
-          this.loadPdfFromUrl(img.url);
+          this.loadPdfFromUrl(img);
         }
 
          else if(this.isVideoFile(img.fileName))
@@ -362,18 +361,19 @@ export class AppItemsViewComponent
     }
 
    
-    loadPdfFromUrl(pdfPath: string) {
+    loadPdfFromUrl(img) {
+       let  pdfPath: string =  img.url;
         if (this.pdfCache[pdfPath]) {
           const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
           pdfViewer.src = this.pdfCache[pdfPath];
-          this.loadingError = false;
+          img.loadingError = false;
           return;
         }
       
        
         
         //i49 need Base64 from BE
-        this.loadingError = true;
+        img.loadingError = true;
       /*   this.showMainSpinner();
       const subs = this._appItemsServiceProxy.x(pdfPath)
           .pipe(finalize(() => this.hideMainSpinner()))
@@ -393,15 +393,15 @@ export class AppItemsViewComponent
       
                 const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
                 pdfViewer.src = pdfUrl;
-                this.loadingError = false;
+                img.loadingError = false;
               } catch (error) {
                 console.error('Error processing PDF:', error);
-                this.loadingError = true;
+                img.loadingError = true;
               }
             },
             (error) => {
               console.error('Error loading PDF:', error);
-              this.loadingError = true;
+              img.loadingError = true;
             }
           );*/
       }
