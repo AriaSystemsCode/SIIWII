@@ -370,10 +370,12 @@ export class AppItemsViewComponent
           return;
         }
       
-        this.showMainSpinner();
+       
         
         //i49 need Base64 from BE
-      /*  const subs = this._appItemsServiceProxy.x(pdfPath)
+        this.loadingError = true;
+      /*   this.showMainSpinner();
+      const subs = this._appItemsServiceProxy.x(pdfPath)
           .pipe(finalize(() => this.hideMainSpinner()))
           .subscribe(
             async (res) => {

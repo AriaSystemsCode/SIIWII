@@ -152,12 +152,12 @@
 }" frameborder="0" (error)="loadingError = true"></iframe>
 
 <div *ngIf="loadingError">
-    <p>
-        Unable to display PDF file.
+    <h6>
+        Unable to display the PDF file here.
         <span *ngIf="centerImage.url">
-            <a [href]="attachmentBaseUrl +'/' +centerImage.url" target="_blank">Download</a> instead.
+          <a [href]="attachmentBaseUrl + '/' + centerImage.url" target="_blank">Open it in a new tab</a> instead.
         </span>
-    </p>
+      </h6>
 </div>
 
 
