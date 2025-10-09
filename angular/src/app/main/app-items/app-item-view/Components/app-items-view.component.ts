@@ -185,6 +185,7 @@ export class AppItemsViewComponent
     acceptedAspectRatio;
     languageSettingName  =AppConsts.languageSettingName;
     loadingError=false;
+    pdfCache: { [key: string]: string } = {};
     public constructor(
         private _router: Router,
         private _appItemsServiceProxy: AppItemsServiceProxy,
@@ -348,7 +349,7 @@ export class AppItemsViewComponent
 
         if(this.isPdfFile(img.fileName)){
             img.isPdfFile =true;
-           this.loadPdfFromUrl(img.url);
+          this.loadPdfFromUrl(img.url);
         }
 
          else if(this.isVideoFile(img.fileName))
@@ -360,40 +361,49 @@ export class AppItemsViewComponent
         this.centerImage = img;
     }
 
-    loadPdfFromUrl(pdfPath: string){
-        //i49 need Base64 from BE
-        /*const subs = this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
-        .pipe(
-            finalize(() => {
-                this.SuccessMsg = true;
-                if (this.SuccessMsg) {
-                    this.showbar = false;
-                }
-                this.hideMainSpinner();
-                this.showReport = true;
-            })
-        )
-        .subscribe(
-            async (res) => {
-*/
-        try {
-            const byteCharacters = atob(`${this.attachmentBaseUrl}/${pdfPath}`);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/pdf' });
-            const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
-            const url = URL.createObjectURL(blob);
-            pdfViewer.src = url;
-            this.loadingError = false;
-        } catch (error) {
-            console.error('Error processing PDF:', error);
-            this.loadingError = true;
+   
+    loadPdfFromUrl(pdfPath: string) {
+        if (this.pdfCache[pdfPath]) {
+          const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+          pdfViewer.src = this.pdfCache[pdfPath];
+          this.loadingError = false;
+          return;
         }
-    }
+      
+        this.showMainSpinner();
         
+        //i49 need Base64 from BE
+      /*  const subs = this._appItemsServiceProxy.x(pdfPath)
+          .pipe(finalize(() => this.hideMainSpinner()))
+          .subscribe(
+            async (res) => {
+              try {
+                const base64 = res.includes(',') ? res.split(',')[1] : res;
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const pdfUrl = URL.createObjectURL(blob);
+                this.pdfCache[pdfPath] = pdfUrl;
+      
+                const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+                pdfViewer.src = pdfUrl;
+                this.loadingError = false;
+              } catch (error) {
+                console.error('Error processing PDF:', error);
+                this.loadingError = true;
+              }
+            },
+            (error) => {
+              console.error('Error loading PDF:', error);
+              this.loadingError = true;
+            }
+          );*/
+      }
+      
     showImagesOfVaritaionSelectedValues(img: any) {
         this.varitaionSelectedIndex =
             this.appItemForViewDto.variations[0].selectedValues.indexOf(img);

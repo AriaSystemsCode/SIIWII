@@ -146,9 +146,20 @@
 
                                     
                                     <iframe id="pdfViewer" *ngIf="centerImage  && centerImage.isPdfFile"
-                                        style="margin-top: -200px !important;" class="w-100 imageContainer" [ngStyle]="{
+                                        style="margin-top: -200px !important;"
+                                        class="w-100 imageContainer" [ngStyle]="{
   'height.px': loadingError ? 0 : (centerContatiner.clientWidth / acceptedAspectRatio)
 }" frameborder="0" (error)="loadingError = true"></iframe>
+
+<div *ngIf="loadingError">
+    <p>
+        Unable to display PDF file.
+        <span *ngIf="centerImage.url">
+            <a [href]="attachmentBaseUrl +'/' +centerImage.url" target="_blank">Download</a> instead.
+        </span>
+    </p>
+</div>
+
 
                                 <video
                                         *ngIf="centerImage  && centerImage.isVideoFile"
