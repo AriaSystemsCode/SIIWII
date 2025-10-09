@@ -7555,26 +7555,27 @@ namespace onetouch.Accounts
                 });
             }
 
-
-            if (!string.IsNullOrEmpty(accountExcelDto.Website) && !_helper.ExcelHelper.IsValidWebsite(accountExcelDto.Website))
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Website: Not Valid Website Value.",
-                    ErrorType = "Stopper"
-                });
-            }
-
-            if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Email Address: Not Valid Email Value.",
-                    ErrorType = "Stopper"
-                });
-            }
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[Start]
+            //if (!string.IsNullOrEmpty(accountExcelDto.Website) && !_helper.ExcelHelper.IsValidWebsite(accountExcelDto.Website))
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Website: Not Valid Website Value.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
+            
+            //if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Email Address: Not Valid Email Value.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[End]
             AccountExcelAccountType accountExcelAccountType;
             AccountExcelRecordType accountExcelRecordType;
             if (string.IsNullOrEmpty(accountExcelDto.RecordType) ||
@@ -7601,18 +7602,19 @@ namespace onetouch.Accounts
 
 
             #region phone validation
-            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
-                !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
-                !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Phone 1: Phone 1 Is Filled With a InValid Phone# and Code.",
-                    ErrorType = "Stopper"
-                });
-            }
-
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[Start]
+            //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
+            //    !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
+            //    !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Phone 1: Phone 1 Is Filled With a InValid Phone# and Code.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[End]
             if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
@@ -7624,20 +7626,20 @@ namespace onetouch.Accounts
             }
 
 
-
-            if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
-               !string.IsNullOrEmpty(accountExcelDto.Phone2Number) &&
-               !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone2Code + accountExcelDto.Phone2Number))
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Phone 2: Phone 2 Is Filled With a InValid Phone# and Code.",
-                    ErrorType = "Stopper"
-                });
-            }
-
-            if (!string.IsNullOrEmpty(accountExcelDto.Phone2Type) && GetTypeId(accountExcelDto.Phone2Type, phoneTypes) == 0)
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[Start]
+            //if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
+            //   !string.IsNullOrEmpty(accountExcelDto.Phone2Number) &&
+            //   !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone2Code + accountExcelDto.Phone2Number))
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Phone 2: Phone 2 Is Filled With a InValid Phone# and Code.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[End]
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -7648,19 +7650,19 @@ namespace onetouch.Accounts
             }
 
 
-
-            if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
-                !string.IsNullOrEmpty(accountExcelDto.Phone3Number) &&
-                !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone3Code + accountExcelDto.Phone3Number))
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Phone 3: Phone 3 Is Filled With a InValid Phone# and Code.",
-                    ErrorType = "Stopper"
-                });
-            }
-
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[Start]
+            //if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
+            //    !string.IsNullOrEmpty(accountExcelDto.Phone3Number) &&
+            //    !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone3Code + accountExcelDto.Phone3Number))
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Phone 3: Phone 3 Is Filled With a InValid Phone# and Code.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[End]
             if (!string.IsNullOrEmpty(accountExcelDto.Phone3Type) && GetTypeId(accountExcelDto.Phone3Type, phoneTypes) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
@@ -7720,17 +7722,17 @@ namespace onetouch.Accounts
                 });
             }
             else { AddressTypeFound = true; }
-
-            if (!AddressTypeFound)
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Address Type: At Least One Address Type Should Be Valid.",
-                    ErrorType = "Stopper"
-                });
-            }
-
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[Start]
+            //if (!AddressTypeFound)
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Address Type: At Least One Address Type Should Be Valid.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[End]
             if (!string.IsNullOrEmpty(accountExcelDto.Address1Country) && GetTypeId(accountExcelDto.Address1Country, countries) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
@@ -7770,119 +7772,120 @@ namespace onetouch.Accounts
                     ErrorType = "Stopper"
                 });
             }
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[Start]
+            //if ((!string.IsNullOrEmpty(accountExcelDto.Address1City) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1State) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address1Type)) &&
+            //    (string.IsNullOrEmpty(accountExcelDto.Address1City) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1State) ||
+            //    string.IsNullOrEmpty(accountExcelDto.Address1Type))
+            //    )
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Address 1 : Address 1 Field Should be All Filled or Removed.",
+            //        ErrorType = "Stopper"
+            //    });
 
-            if ((!string.IsNullOrEmpty(accountExcelDto.Address1City) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1State) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address1Type)) &&
-                (string.IsNullOrEmpty(accountExcelDto.Address1City) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1State) ||
-                string.IsNullOrEmpty(accountExcelDto.Address1Type))
-                )
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Address 1 : Address 1 Field Should be All Filled or Removed.",
-                    ErrorType = "Stopper"
-                });
+            //}
+            
+            //if ((!string.IsNullOrEmpty(accountExcelDto.Address2City) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Type)) &&
+            //    !(string.IsNullOrEmpty(accountExcelDto.Address2City) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
+            //    !string.IsNullOrEmpty(accountExcelDto.Address2Type))
+            //    )
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Address 2 : Address 2 Field Should be All Filled or Removed.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
 
-            }
+            //if ((!string.IsNullOrEmpty(accountExcelDto.Address3City) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3State) ||
+            //                    !string.IsNullOrEmpty(accountExcelDto.Address3Type)) &&
+            //                    (string.IsNullOrEmpty(accountExcelDto.Address3City) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3State) ||
+            //                    string.IsNullOrEmpty(accountExcelDto.Address3Type))
+            //                    )
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Address 3 : Address 3 Field Should be All Filled or Removed.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
 
-            if ((!string.IsNullOrEmpty(accountExcelDto.Address2City) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Type)) &&
-                !(string.IsNullOrEmpty(accountExcelDto.Address2City) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
-                !string.IsNullOrEmpty(accountExcelDto.Address2Type))
-                )
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Address 2 : Address 2 Field Should be All Filled or Removed.",
-                    ErrorType = "Stopper"
-                });
-            }
-
-            if ((!string.IsNullOrEmpty(accountExcelDto.Address3City) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3State) ||
-                                !string.IsNullOrEmpty(accountExcelDto.Address3Type)) &&
-                                (string.IsNullOrEmpty(accountExcelDto.Address3City) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3State) ||
-                                string.IsNullOrEmpty(accountExcelDto.Address3Type))
-                                )
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Address 3 : Address 3 Field Should be All Filled or Removed.",
-                    ErrorType = "Stopper"
-                });
-            }
-
-            if ((!string.IsNullOrEmpty(accountExcelDto.Address4City) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4State) ||
-                           !string.IsNullOrEmpty(accountExcelDto.Address4Type)) &&
-                           (string.IsNullOrEmpty(accountExcelDto.Address4City) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4State) ||
-                           string.IsNullOrEmpty(accountExcelDto.Address4Type))
-                           )
-            {
-                returnList.Add(new ImportContactReturnDto
-                {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Address 4 : Address 4 Field Should be All Filled or Removed.",
-                    ErrorType = "Stopper"
-                });
-            }
+            //if ((!string.IsNullOrEmpty(accountExcelDto.Address4City) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4State) ||
+            //               !string.IsNullOrEmpty(accountExcelDto.Address4Type)) &&
+            //               (string.IsNullOrEmpty(accountExcelDto.Address4City) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4State) ||
+            //               string.IsNullOrEmpty(accountExcelDto.Address4Type))
+            //               )
+            //{
+            //    returnList.Add(new ImportContactReturnDto
+            //    {
+            //        RecordKey = accountExcelDto.Code,
+            //        ErrorMessage = "Address 4 : Address 4 Field Should be All Filled or Removed.",
+            //        ErrorType = "Stopper"
+            //    });
+            //}
+            //P-SII-20250501.0004,1 MMT 10/08/2025 adjust account validation rules[End]
             #region currency && language validation
             if (!string.IsNullOrEmpty(accountExcelDto.Language) && GetTypeId(accountExcelDto.Language, languageIds) == 0)
             {
