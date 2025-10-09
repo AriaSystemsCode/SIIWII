@@ -47,6 +47,7 @@ import { AppitemListPublishService } from "../../app-items-list/services/appitem
 import { AppItemViewInput } from "../models/app-item-view-input";
 import { EventEmitter } from "stream";
 import { finalize } from "rxjs";
+import { DomSanitizer } from "@node_modules/@angular/platform-browser";
 
 @Component({
     selector: "app-app-items-view",
@@ -183,7 +184,7 @@ export class AppItemsViewComponent
 
     acceptedAspectRatio;
     languageSettingName  =AppConsts.languageSettingName;
-
+    loadingError=false;
     public constructor(
         private _router: Router,
         private _appItemsServiceProxy: AppItemsServiceProxy,
@@ -192,7 +193,8 @@ export class AppItemsViewComponent
         injector: Injector,
         _location: Location,
         public _publishAppItemListingService: PublishAppItemListingService,
-        private datePipe: DatePipe
+        private datePipe: DatePipe,
+        private sanitizer: DomSanitizer
     ) {
         super(injector, _location);
 
@@ -340,8 +342,58 @@ export class AppItemsViewComponent
     }
 
     showImageAtCenter(img) {
+        img.isImageFile =false;
+        img.isPdfFile =false;
+        img.isVideoFile =false;
+
+        if(this.isPdfFile(img.fileName)){
+            img.isPdfFile =true;
+           this.loadPdfFromUrl(img.url);
+        }
+
+         else if(this.isVideoFile(img.fileName))
+            img.isVideoFile =true;
+
+            else 
+            img.isImageFile =true;
+
         this.centerImage = img;
     }
+
+    loadPdfFromUrl(pdfPath: string){
+        //i49 need Base64 from BE
+        /*const subs = this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
+        .pipe(
+            finalize(() => {
+                this.SuccessMsg = true;
+                if (this.SuccessMsg) {
+                    this.showbar = false;
+                }
+                this.hideMainSpinner();
+                this.showReport = true;
+            })
+        )
+        .subscribe(
+            async (res) => {
+*/
+        try {
+            const byteCharacters = atob(`${this.attachmentBaseUrl}/${pdfPath}`);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+            const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+            const url = URL.createObjectURL(blob);
+            pdfViewer.src = url;
+            this.loadingError = false;
+        } catch (error) {
+            console.error('Error processing PDF:', error);
+            this.loadingError = true;
+        }
+    }
+        
     showImagesOfVaritaionSelectedValues(img: any) {
         this.varitaionSelectedIndex =
             this.appItemForViewDto.variations[0].selectedValues.indexOf(img);
@@ -378,6 +430,16 @@ export class AppItemsViewComponent
             this.appItemForViewDto.variations[0].selectedValues[
                 this.varitaionSelectedIndex
             ].entityAttachments[0];
+
+
+            if(this.isPdfFile( this.centerImage.fileName))
+                this.centerImage.isPdfFile =true;
+    
+             else if(this.isVideoFile( this.centerImage.fileName))
+                this.centerImage.isVideoFile =true;
+    
+                else 
+                this.centerImage.isImageFile =true;
 
         this.selectedValuesName =
             this.appItemForViewDto.variations[0].selectedValues[
@@ -826,7 +888,16 @@ export class AppItemsViewComponent
         this.appItemViewInput.publish = true;
     }
     handleFailedImage($event) {
-        $event.target.src = this.defaultLogo;
+        let fileName =  $event.target.src?.split('/').pop();
+         if(this.isPdfFile(fileName))
+            $event.target.src ="/assets/Items/pdf-Icon.png" ; 
+
+         else if(this.isVideoFile(fileName))
+            $event.target.src ="/assets/Items/video-Icon.png" ; 
+
+            else 
+            $event.target.src = this.defaultLogo;
+
     }
     addingToList: boolean = false;
     addToListHandler($event) {

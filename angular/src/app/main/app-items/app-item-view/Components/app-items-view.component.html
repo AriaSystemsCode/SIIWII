@@ -127,11 +127,12 @@
                                     />
                                 </div>
                             </div>
-   <!-- //i49-view attachments -->
                             <div class="p-2 ml-2 center-dev">
                                 <div class="centerContatiner"  #centerContatiner>
+                                   
+                                   
                                     <img
-                                        *ngIf="centerImage"
+                                        *ngIf="centerImage && centerImage.isImageFile"
                                         [src]="
                                             attachmentBaseUrl +
                                             '/' +
@@ -139,9 +140,30 @@
                                         "
                                         alt="defaultImage"
                                         (error)="handleFailedImage($event)"
-                                        class="imageContainer"
+                                        class="w-100 imageContainer"
                                         [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
                                     />
+
+                                    
+                                    <iframe id="pdfViewer" *ngIf="centerImage  && centerImage.isPdfFile"
+                                        style="margin-top: -200px !important;" class="w-100 imageContainer" [ngStyle]="{
+  'height.px': loadingError ? 0 : (centerContatiner.clientWidth / acceptedAspectRatio)
+}" frameborder="0" (error)="loadingError = true"></iframe>
+
+                                <video
+                                        *ngIf="centerImage  && centerImage.isVideoFile"
+                                        [src]="
+                                            attachmentBaseUrl +
+                                            '/' +
+                                            centerImage.url
+                                        "
+                                        controls
+                                        alt="defaultImage"
+                                        style="margin-top: -200px !important;"
+                                        class="w-100 imageContainer"
+                                        [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
+                                    ></video>
+
                                 </div>
                             </div>
                             <div
