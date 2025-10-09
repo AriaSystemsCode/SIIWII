@@ -30,7 +30,6 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     loading:boolean = false
 
     sortBy = 'name'
-
     selectedClassifications: number[]
     selectedCategories: number[]
 
@@ -43,6 +42,8 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     categoriesFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
     classificationsFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>
 
+    currencyFilter: string | undefined;
+    countryFilter: string | undefined;
 
     constructor(
         injector:Injector,
@@ -51,6 +52,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     ) {
         super(injector)
+   
     }
 
     ngOnInit(): void {
@@ -69,6 +71,33 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     ngOnDestroy() {
         this.emitDestroy()
     }
+
+    private resetMeta(m: FilterMetaData<any>) {
+        m.list = [];
+        m.displayedList = [];
+        m.listSkipCount = 0;
+        m.listTotalCount = 0;
+      }
+      
+
+      onLookupSearch(q: string, kind: any, componentRef: any) {
+        const query = q?.trim() || undefined;
+      
+        switch (kind) {
+          case 'country':
+            this.countryFilter = query;
+            this.resetMeta(this.countryFilterMetaData);
+            this.getCountriesList(componentRef);
+            break;
+      
+          case 'currency':
+            this.currencyFilter = query;
+            this.resetMeta(this.currencyFilterMetaData);
+            this.getCurrenciesList(componentRef);
+            break;
+        }
+      }
+
 
     getClassificationsList( componentRef:{  onListLoadCallback  : Function } ){
         this.loading = true
@@ -185,45 +214,34 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     }
 
 
-    getCurrenciesList(componentRef:{  onListLoadCallback  : Function} ){
+    getCurrenciesList(componentRef: { onListLoadCallback: Function }) {
         const subs = this._appEntitiesServiceProxy.getAllCurrencyForTableDropdownWithPaging(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
+            this.currencyFilter,           
+            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             undefined,
             this.sortBy,
             this.currencyFilterMetaData.listSkipCount,
             this.currencyFilterMetaData.listMaxResultCount,
         ).subscribe(result => {
-            componentRef.onListLoadCallback(result)
+            componentRef.onListLoadCallback(result);
         });
-        this.subscriptions.push(subs)
-    }
+        this.subscriptions.push(subs);
+      }
+      
 
-    getCountriesList(componentRef:{  onListLoadCallback  : Function}){
+    getCountriesList(componentRef: { onListLoadCallback: Function }) {
         const subs = this._appEntitiesServiceProxy.getAllCountryForTableDropdowWithPaging(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
+            this.countryFilter,   // ✅ now uses the live query
+            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             undefined,
             this.sortBy,
             this.countryFilterMetaData.listSkipCount,
             this.countryFilterMetaData.listMaxResultCount,
         ).subscribe(result => {
-            componentRef.onListLoadCallback(result)
+            componentRef.onListLoadCallback(result);
         });
-        this.subscriptions.push(subs)
-    }
+        this.subscriptions.push(subs);
+      }
 
     getLanguagesList(componentRef:{  onListLoadCallback  : Function}){
         const subs = this._appEntitiesServiceProxy.getAllLanguageForTableDropdownWithPaging(
