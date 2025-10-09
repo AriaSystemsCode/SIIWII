@@ -155,12 +155,10 @@
     <h6>
         Unable to display the PDF file here.
         <span *ngIf="centerImage.url">
-          <a [href]="attachmentBaseUrl + '/' + centerImage.url" target="_blank">Open it in a new tab</a> instead.
+          <a [href]="attachmentBaseUrl + '/' + centerImage.url" target="_blank">Open</a> instead.
         </span>
       </h6>
 </div>
-
-
                                 <video
                                         *ngIf="centerImage  && centerImage.isVideoFile"
                                         [src]="
