@@ -131,6 +131,8 @@ export class CreateOrEditAppItemComponent
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
     oldnonLookupValues;
+    //i49 get taxCodes
+     taxCodes;
 
     constructor(
         injector: Injector,
@@ -2092,5 +2094,9 @@ export class CreateOrEditAppItemComponent
                 return item;
             }
         });
+    }
+
+    onTaxCodeChange(value: number) {
+        this.appItem.taxPercent = value;
     }
 }
