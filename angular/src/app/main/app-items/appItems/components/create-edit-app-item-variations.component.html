@@ -527,14 +527,14 @@
                                         {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }} {{ "Options" | localize }} /
                                     </span> -->
                                     <span> 
-                                        {{ "Selected " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }}{{"S: "}} 
-                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{"You have been select "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
+                                        {{ "Selected " | localize }} {{toTitleCase(selectedExtraAttributes[activeExtraAttributeIndex].name) }}{{"s : "}} 
+                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{"You have been selected "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
                                     </span>
-                                    <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)" name="search" >
+                                    <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + toTitleCase(selectedExtraAttributes[activeExtraAttributeIndex].name)"  (input)="filterLookup($event)" name="search" >
                                     <button style="border-radius: 5px;
                                     background-color: white !important;
                                     border: 1px solid #EEEEEEEE !important;color: #4A0D4A !important;" class="ml-3 p-3 btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
-                                        <span class="mr-1">+</span> {{ "Add " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name}}
+                                        <span class="mr-1">+</span> {{ "Add " | localize }} {{ toTitleCase(selectedExtraAttributes[activeExtraAttributeIndex].name)}}
                                     </button>
                                 </h6>
                                 
@@ -686,7 +686,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                           <button  type="button" class="bg-white btn btn-hover-primary p-1 text-center" (click)="removeAllAttachments()" >
+                                           <button  type="button" class="bg-white btn  p-1 text-center" (click)="removeAllAttachments()" >
                                                     <i class="flaticon-delete m-0 p-0"></i>
                                                 </button>
                                             </div>
@@ -767,7 +767,7 @@
                                                         </div>
                                                     </div>
                                                     <img *ngIf="attachment" [src]="attachment"  
-                                                    class="w-75" 
+                                                    class="w-100" 
                                                     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
     />
                                                     <a class="select-default-image p-2 col-12 text-center" [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}"  style="    color: #4A0D4A !important;
