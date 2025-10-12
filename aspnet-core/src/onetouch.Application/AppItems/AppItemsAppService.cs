@@ -844,6 +844,17 @@ namespace onetouch.AppItems
             }
         }
         //MMT
+        
+        public async Task<Byte[]> GetFile64FromUrl(string Url)
+        {
+            Byte[] returnList = new Byte[1];
+            if (System.IO.File.Exists(Url))
+            {
+            returnList = System.IO.File.ReadAllBytes(Url);
+            }
+            return returnList;
+        }
+
         public async Task<GetAppItemDetailForViewDto> GetAppItemForView(GetAppItemWithPagedAttributesForViewInput input)
         {
             //MMT
