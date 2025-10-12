@@ -3833,6 +3833,7 @@ namespace onetouch.AppItems
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships) // Iteration49 while 
                     //Mariam
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)//.ThenInclude(x => x.EntityObjectTypeFk)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
@@ -3991,6 +3992,14 @@ namespace onetouch.AppItems
                                     await _appEntityClassificationRepository.DeleteAsync(clas);
                                 }
                             }
+                            //iteration 49 remove market place item old relation
+                            if (marketplaceItemObject.EntitiesRelationships != null)
+                            {
+                                foreach (var clas in marketplaceItemObject.EntitiesRelationships)
+                                {
+                                    await _appEntitiesRelationship.DeleteAsync(clas);
+                                }
+                            }
 
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
@@ -4089,7 +4098,30 @@ namespace onetouch.AppItems
                         foreach (var rela in marketplaceItem.EntitiesRelationships)
                         {
                             rela.Id = 0;
+                            //check if the related item publisehd or not
+                            //rela.RelatedEntityId
+                            var appItemForEntity = _appItemRepository.GetAll()
+                                .Where(e => e.EntityId == rela.RelatedEntityId).FirstOrDefault();
+                            if (appItemForEntity != null)
+                            {
+                                var appMarketplaceItem = await _appMarketplaceItem.GetAll()
+                                .Where(x => x.Code == appItemForEntity.SSIN || (x.ManufacturerCode == appItemForEntity.Code && x.TenantOwner == appItemForEntity.TenantId)).FirstOrDefaultAsync();
+                                if (appMarketplaceItem != null)
+                                {
+                                    rela.RelatedEntityId = appMarketplaceItem.Id;
+                                    rela.RelatedEntityCode = appMarketplaceItem.Code;
+                                }else
+                                {
+                                    rela.RelatedEntityId = 0;
+                                    marketplaceItem.EntitiesRelationships.Remove(rela);
+                                }
+                            }
                         }
+                        var notSharedRelated = marketplaceItem.EntitiesRelationships.Where(e => e.RelatedEntityId == 0).ToList();
+                        foreach (var rela in notSharedRelated)
+                        { marketplaceItem.EntitiesRelationships.Remove(rela); }
+
+
                     }
 
                     // }
