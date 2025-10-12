@@ -1611,8 +1611,6 @@ export class CreateOrEditAppItemComponent
 
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
-        
-        //i49-BE Test create or edit for related items
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
