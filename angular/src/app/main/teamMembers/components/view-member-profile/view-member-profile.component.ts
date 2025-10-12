@@ -148,6 +148,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       .subscribe((result) => {
 
         this.memberData = result;
+        this.memberData.accountId = this.memberData.accountId
         this.userAdminId != 0 ? this.adminContact = true : this.adminContact = false
         const firstName = this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
         const lastName = this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
@@ -244,6 +245,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       .pipe(finalize(() => {
         this.hideMainSpinner();
         this.Editting = false;
+        this.refresh(true);
       }))
       .subscribe(result => {
         this.notify.success(this.l('SuccessfullySaved'));
@@ -253,8 +255,10 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
 
   selectBranch() {
+    if (!this.memberData?.accountId) return; // silent no-op (no warning)
     this.getAccountBranches();
   }
+  
 
   branches: TreeNodeOfBranchForViewDto[] = [];
   selectedBranchid;
