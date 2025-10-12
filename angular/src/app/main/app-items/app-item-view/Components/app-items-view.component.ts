@@ -363,19 +363,17 @@ export class AppItemsViewComponent
    
     loadPdfFromUrl(img) {
        let  pdfPath: string =  img.url;
+       let fullUrl= this.attachmentBaseUrl + '/'+pdfPath;
         if (this.pdfCache[pdfPath]) {
           const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
           pdfViewer.src = this.pdfCache[pdfPath];
           img.loadingError = false;
           return;
         }
-      
-       
-        
-        //i49 need Base64 from BE
         img.loadingError = true;
-      /*   this.showMainSpinner();
-      const subs = this._appItemsServiceProxy.x(pdfPath)
+        this.showMainSpinner();
+       //i49-BE
+       const subs = this._appItemsServiceProxy.getFile64FromUrl(fullUrl)
           .pipe(finalize(() => this.hideMainSpinner()))
           .subscribe(
             async (res) => {
@@ -403,7 +401,7 @@ export class AppItemsViewComponent
               console.error('Error loading PDF:', error);
               img.loadingError = true;
             }
-          );*/
+          );
       }
       
     showImagesOfVaritaionSelectedValues(img: any) {
