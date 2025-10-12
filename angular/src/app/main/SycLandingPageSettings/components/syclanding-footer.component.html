@@ -1,4 +1,19 @@
-<footer class="flex-rw p-4 d-none d-md-block footerBG">   
+<footer class="flex-rw p-4 d-none d-md-block footerBG">
+    <div class=" row mx-4" >
+        <div *ngFor="let brand of brands" class="col-4 text-white">
+            <a>{{brand?.name}}</a>
+         
+         </div>
+
+         <div *ngFor="let brand of brands"  class="col-4  text-white">
+            <a>{{brand?.name}}</a>        
+
+         </div>
+         <div *ngFor="let brand of brands"  class="col-4  text-white">
+            <a>{{brand?.name}}</a>
+         </div>
+    </div>   
+
     <section class="footer-bottom-section flex-rw">
   <div class="footer-bottom-wrapper"> 
     <div class="pb-4"><a href='#'

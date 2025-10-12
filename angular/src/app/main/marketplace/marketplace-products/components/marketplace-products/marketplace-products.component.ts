@@ -8,7 +8,7 @@ import {
     ViewChild,
    SimpleChanges, OnChanges, ViewChildren, ElementRef
 } from "@angular/core";
-import {  Router } from "@angular/router";
+import {  ActivatedRoute, Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
 import { AppItemBrowseEvents } from "@app/main/app-items/app-items-browse/models/appItems-browse-events";
 import { ActionsMenuEventEmitter } from "@app/main/app-items/app-items-browse/models/ActionsMenuEventEmitter";
@@ -76,6 +76,8 @@ export class MarketplaceProductsComponent
  
     acceptedAspectRatio;
     isAuthenticate= this.appSession?.user
+
+    
     constructor(
         injector: Injector,
         private _router: Router,
@@ -84,6 +86,7 @@ export class MarketplaceProductsComponent
         private _pricingHelperService: PricingHelpersService,
         public datepipe: DatePipe,
         public breakpointObserver: BreakpointObserver,
+        private route: ActivatedRoute,   
     ) {
         super(injector);
         this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
@@ -143,33 +146,61 @@ export class MarketplaceProductsComponent
         
     }
     ngOnInit() {
-        
         const savedFilters = localStorage.getItem("productFilters");
-        
         if (savedFilters) {
-            const parsedFilters = JSON.parse(savedFilters);
-            this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? null;
-            this.selectedCurrrency = parsedFilters.selectedCurrency ?? 'USD';
-            this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
-            
-            this.appItemListId = parsedFilters.appItemListId ||   this.appItemListId;
-            this.searchInput = parsedFilters.searchText||    this.searchInput;
-            this.selectedDepartments = parsedFilters.selectedDepartments ||  this.selectedDepartments;
-            this.minimumPrice = parsedFilters.minimumPrice ||  this.minimumPrice;
-            this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
-            this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
-            this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
-            this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) :   this.startShipData;
-            this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) :  this.endShipData;
-            this.brands = parsedFilters.brands || this.brands ;
-            this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
-            this.skipCount = parsedFilters.skipCount ||     this.skipCount;
-            this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
+          const parsedFilters = JSON.parse(savedFilters);
+          this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? null;
+          this.selectedCurrrency = parsedFilters.selectedCurrency ?? 'USD';
+          this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
+      
+          this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
+          this.searchInput = parsedFilters.searchText || this.searchInput;
+          this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
+          this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
+          this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
+          this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData;
+          this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
+          this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : this.startShipData;
+          this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : this.endShipData;
+          this.brands = parsedFilters.brands || this.brands;
+          this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
+          this.skipCount = parsedFilters.skipCount || this.skipCount;
+          this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
+      
+        // 🔗 URL takes priority if present
+        this.route.queryParamMap.subscribe(async (params) => {
+          const brandName = params.get('brand');
+      
+          if (brandName) {
+            // resolve human-readable name -> id
+            const id = await this.resolveBrandNameToId(brandName);
+            this.brands = id ? [id] : [];   // apply real filter value
+          }
+          // If no brand param, we keep the restored localStorage brands as-is.
+      
+          this.getAllProducts(); // ✅ load once after merging URL/local state
+        });
+      }
+      
     
-        this.getAllProducts(); // Fetch products using restored filters
-    }
-    
+    private async resolveBrandNameToId(brandName: string): Promise<number | string | null> {
+        // Call your brands endpoint and find the matching brand by name.
+        // You can optimize this with a dedicated "getByName" if you have one.
+        const res = await this._AppMarketplaceItemsServiceProxy
+          .getAllBrandsWithPaging(
+            null, null, null, null, null, 'BRAND', null, null,
+            86, 'name', 0, 200, this.sellerSSIN
+          )
+          .toPromise();
+      
+        const items = res?.items ?? [];
+        const match = items.find((b: any) =>
+          (b.name ?? b.label ?? '').toLowerCase() === brandName.toLowerCase()
+        );
+      
+        return match ? (match.id ?? match.value) : null;
+      }
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
 
@@ -404,7 +435,7 @@ export class MarketplaceProductsComponent
             this.getAllProducts();
     }
 
-    brands: [] = [];
+    brands: any[] = [];
     selectBrands(value) {
         this.brands = value;
             this.getAllProducts();
