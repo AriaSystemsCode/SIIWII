@@ -250,7 +250,7 @@
                             <div>
                                 <p-dropdown [options]="allPriceLevel" [(ngModel)]="accountInfoTemp.priceLevel"
                                     formControlName="priceLevel" (change)="changePrice($event)"
-                                    placeholder="MSRP"></p-dropdown>
+                                    [placeholder]="languageSettingName!='en-GB' ? 'MSRP' : 'RRP'"></p-dropdown>
                             </div>
 
                             <small class="text-danger" *ngIf="

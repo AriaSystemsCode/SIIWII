@@ -133,6 +133,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     isSeller: boolean = false;
     currentLang:string
     isArabic:boolean = true
+
+    languageSettingName  =AppConsts.languageSettingName;
     constructor(
         injector: Injector,
         private fb: FormBuilder,
