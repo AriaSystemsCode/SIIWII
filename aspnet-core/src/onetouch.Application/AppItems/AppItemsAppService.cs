@@ -848,6 +848,9 @@ namespace onetouch.AppItems
         public async Task<Byte[]> GetFile64FromUrl(string Url)
         {
             Byte[] returnList = new Byte[1];
+            var app = _appConfiguration[$"App:ServerRootAddress"];
+            Url = Url.Replace(_appConfiguration[$"App:ServerRootAddress"],"");
+            Url = _appConfiguration[$"Attachment:Omitt"] + @"\" + Url;
             if (System.IO.File.Exists(Url))
             {
             returnList = System.IO.File.ReadAllBytes(Url);
