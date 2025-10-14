@@ -94,7 +94,12 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     }
 
 
-    this.accountSSIN = localStorage.getItem("SellerSSIN");
+   //this.accountSSIN = localStorage.getItem("SellerSSIN");
+   this.accountSSIN = 
+   (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") ?
+    JSON.parse(sessionStorage.getItem("SellerSSIN")) : localStorage.getItem("SellerSSIN") ;
+
+    
     this.getAllProductCAtalogs();
     this.getParentDepartments();
     this.getAllBrands();
