@@ -146,7 +146,7 @@
 
                                     
                                     <iframe id="pdfViewer" *ngIf="centerImage  && centerImage.isPdfFile"
-                                        style="margin-top: -200px !important;"
+                                       
                                         class="w-100 imageContainer" [ngStyle]="{
   'height.px': centerImage.loadingError ? 0 : (centerContatiner.clientWidth / acceptedAspectRatio)
 }" frameborder="0" (error)="centerImage.loadingError = true"></iframe>
