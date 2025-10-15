@@ -372,7 +372,6 @@ export class AppItemsViewComponent
         }
         img.loadingError = true;
         this.showMainSpinner();
-       //i49 getFile64FromUrl
        const subs = this._appItemsServiceProxy.getFile64FromUrl(fullUrl)
           .pipe(finalize(() => this.hideMainSpinner()))
           .subscribe(
