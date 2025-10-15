@@ -11,9 +11,13 @@ import { AppItemPriceInfo, CurrencyInfoDto, IAppItemPriceInfo } from '@shared/se
 })
 export class PricingHelpersService extends AppComponentBase {
   levels: string[] = ['A', 'B', 'C', 'D']
-  defaultLevel:string="MSRP" ;
+  defaultLevel:string ;
+  languageSettingName  =AppConsts.languageSettingName;
+
   constructor(private injector: Injector) {
-    super(injector);
+
+    super(injector)
+   this.languageSettingName!='en-GB' ?  this.defaultLevel = "MSRP"  : this.defaultLevel= "RRP" 
   }
   getDefaultCols(): MatrixGridColumns {
     const cols: MatrixGridColumns = new MatrixGridColumns({
