@@ -469,8 +469,12 @@
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">Entered Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.enteredDate | momentFormat:'L'  }}
+                            </p>
+
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "dd/MM/yyyy" }}
                             </p>
                         </div>
                     </div>
@@ -488,8 +492,12 @@
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">Start Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.startDate | momentFormat:'L'}}
+                            </p>
+
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "dd/MM/yyyy"}}
                             </p>
                         </div>
                     </div>
@@ -509,8 +517,11 @@
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">
                                 Avaialable Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.availableDate | momentFormat:'L' }}
+                            </p>
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "dd/MM/yyyy"}}
                             </p>
                         </div>
                     </div>
@@ -531,8 +542,11 @@
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">
                                 Complete Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.completeDate | momentFormat:'L' }}
+                            </p>
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "dd/MM/yyyy"}}
                             </p>
                         </div>
                     </div>
