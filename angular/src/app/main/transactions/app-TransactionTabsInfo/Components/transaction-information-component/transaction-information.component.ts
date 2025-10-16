@@ -135,6 +135,7 @@ export class TransactionInformationComponent
   priceLevel:any
   currentLang:string
   isArabic:boolean 
+  languageSettingName  =AppConsts.languageSettingName;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
