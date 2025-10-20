@@ -707,6 +707,8 @@ namespace onetouch.AppItems
                 }
                 appEntityDto.TenantId = tenantId;
                 appEntityDto.EntityAttachments.Add(appEntityAttachmentDto);
+                appEntityDto.TimeStamp = DateTime.Now;
+
                 saveEntity = _appEntitiesAppService.SaveEntity(appEntityDto).Result;
             }
             return saveEntity;

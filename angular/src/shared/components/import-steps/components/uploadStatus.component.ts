@@ -184,7 +184,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     _text = "All " + ImportTypes[this.importType] + " Failed , can not import.";
 
 
-    this.uploadingResult.totalPassedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length;
+    this.uploadingResult.totalPassedRecords =
+    (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length || 0) +
+    (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'warning')?.length || 0);
+  
     this.uploadingResult.totalFailedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
 
     if (this.uploadingResult.totalPassedRecords == 0) {
