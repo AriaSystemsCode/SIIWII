@@ -74,7 +74,9 @@ import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app
 import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
 import { EditorModule } from 'primeng/editor';
 import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-ons-side-bar/app-add-ons-side-bar.component";
-
+import { ChartWidgetCardComponent } from "./customizable-dashboard/widgets/widgit-card/chart-widget-card.component";
+import { ChartModule } from 'primeng/chart';
+import { CardModule } from 'primeng/card';
 @NgModule({
     imports: [
         CommonModule,
@@ -99,7 +101,10 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         ImageCropperModule,
         ScrollingModule,
         CheckboxModule,
-        EditorModule
+        EditorModule,
+        CardModule ,
+        ChartModule
+
     ],
     declarations: [
         TimeZoneComboComponent,
@@ -142,7 +147,9 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         SelectionModalComponent,
         AppSideBarComponent,AppTransactionSideBarComponent,
         SendMessageModalComponent,
-        AppAddOnsSideBarComponent
+        AppAddOnsSideBarComponent,
+        ChartWidgetCardComponent,
+        
 
     ],
     exports: [
