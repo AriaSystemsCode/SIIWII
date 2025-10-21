@@ -15,6 +15,8 @@ import { DashboardCustomizationConst } from './DashboardCustomizationConsts';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import * as rtlDetect from 'rtl-detect';
 import { Observable } from 'rxjs';
+import { ChartConfig } from './widget-types';
+import { WidgetConfigModalComponent } from './widgets/widget-config-modal/widget-config-modal.component';
 
 @Component({
   selector: 'customizable-dashboard',
@@ -31,6 +33,7 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
   @ViewChild('filterModal', { static: true }) modal: ModalDirective;
   @ViewChild('dropdownRenamePage') dropdownRenamePage: BsDropdownDirective;
   @ViewChild('dropdownAddPage') dropdownAddPage: BsDropdownDirective;
+  @ViewChild('configModal') configModal!: WidgetConfigModalComponent;  
 
   loading = true;
   busy = true;
@@ -200,35 +203,33 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
   //     this.notify.success(this.l('SavedSuccessfully'));
   //   });
   // }
+
+
   addWidget(widgetId: string): void {
     if (!widgetId) return;
   
-    const def = this._dashboardViewConfiguration.WidgetViewDefinitions.find(w => w.id === widgetId);
-    if (!def) { this.notify.error(this.l('ThereIsNoViewConfigurationForX', widgetId)); return; }
-  
     const page = this.userDashboard.pages.find(p => p.id === this.selectedPage.id);
+    if (!page) return;
+  
+   
     if (page.widgets.some(w => w.id === widgetId)) return;
   
-    const chartType = this.pickTypeFromId(widgetId); // 'line' | 'bar' | ...
+    const view = this._dashboardViewConfiguration.WidgetViewDefinitions.find(w => w.id === widgetId);
+    if (!view) { this.notify.error(this.l('ThereIsNoViewConfigurationForX', widgetId)); return; }
   
-    this.busy = true;
-    this._dashboardCustomizationServiceProxy.addWidget(new AddWidgetInput({
-      widgetId, pageId: this.selectedPage.id, dashboardName: this.dashboardName,
-      width: def.defaultWidth, height: def.defaultHeight,
-      application: DashboardCustomizationConst.Applications.Angular
-    })).subscribe((saved) => {
-      page.widgets.push({
-        id: widgetId,
-        component: def.component,
-        gridInformation: { id: widgetId, cols: saved.width, rows: saved.height, x: saved.positionX, y: saved.positionY },
-        // 👇 store the chosen chart type so the component can use it
-        chartType
-      });
-      this.initializeUserDashboardFilters();
-      this.busy = false;
-      this.notify.success(this.l('SavedSuccessfully'));
+    const chartType = this.pickTypeFromId(widgetId) || 'line';
+  
+    page.widgets.push({
+      id: widgetId, // keep identical for "one instance per type"
+      component: view.component,
+      gridInformation: { id: widgetId, cols: view.defaultWidth, rows: view.defaultHeight, x: 0, y: 0 },
+      chartType
     });
+  
+    this.refreshAllGrids();
   }
+  
+
   
   private pickTypeFromId(id: string): any {
     const t = id.toLowerCase();
@@ -288,54 +289,6 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
   // customizable-dashboard.component.ts
 
 
-private toCard(def: WidgetOutput): WidgetCard {
-  const name = (def.name || 'Widget').trim();
-  const lower = name.toLowerCase();
-
-  const kind: WidgetCard['kind'] =
-    lower.includes('line') ? 'line' :
-    lower.includes('bar') ? 'bar' :
-    lower.includes('pie') || lower.includes('donut') ? 'pie' :
-    lower.includes('table') || lower.includes('list') ? 'table' :
-    lower.includes('calc') || lower.includes('kpi') || lower.includes('total') ? 'kpi' :
-    lower.includes('polar') ? 'polarArea' :
-    lower.includes('battery') ? 'battery' : 'other';
-
-  const icon =
-    kind === 'line' ? 'fa-line-chart' :
-    kind === 'bar' ? 'fa-bar-chart' :
-    kind === 'pie' ? 'fa-pie-chart' :
-    kind === 'table' ? 'fa-table' :
-    kind === 'kpi' ? 'fa-percent' :
-    kind === 'polarArea' ? 'fa-compass' :
-    kind === 'battery' ? 'fa-bolt' : 'fa-area-chart';
-
-  return {
-    id: def.id,
-    label: name,
-    description: def.description || 'Custom widget',
-    icon,
-    kind
-  };
-}
-
-// openAddWidgetModal(): void {
-//   const page = this.userDashboard.pages.find(p => p.id === this.selectedPage.id);
-//   if (!page) { return; }
-
-//   const defs = this.dashboardDefinition.widgets ?? [];
-//   const availableDefs = defs.filter((def: WidgetOutput) => !page.widgets.some(w => w.id === def.id));
-
-//   let cards: WidgetCard[] = availableDefs.map(def => this.toCard(def));
-
-//   // Fallback: show a default chart gallery if nothing left from server
-//   if (cards.length === 0) {
-//     cards = DEFAULT_CHART_CARDS; // static list (Line, Bar, Pie, …)
-//   }
-
-//   console.log('available defs:', availableDefs.length, 'cards:', cards.length);
-//   this.addWidgetModal.show(cards);
-// }
 openAddWidgetModal(): void {
   // just open the picker with our static cards
   this.addWidgetModal.show(DEFAULT_CHART_CARDS);
@@ -580,4 +533,39 @@ openAddWidgetModal(): void {
   onMenuToggle = () => {
     this.refreshAllGrids();
   }
+
+
+
+  // customizable-dashboard.component.ts (add handlers)
+onShapePicked(widgetTypeId: string) {
+  const chartType = this.pickTypeFromId(widgetTypeId) || 'line';
+  this.configModal.chartType = chartType;
+  this.configModal.show();
+}
+
+onCreateFromConfig(cfg: ChartConfig) {
+  const view = this._dashboardViewConfiguration.WidgetViewDefinitions.find(w => w.id === 'Widgets_Generic_Chart')
+           ?? this._dashboardViewConfiguration.WidgetViewDefinitions[0];
+
+  const page = this.userDashboard.pages.find(p => p.id === this.selectedPage.id);
+  if (!page || !view) return;
+
+  const instanceId = `${cfg.id}-${Date.now()}`;
+
+  page.widgets.push({
+    id: instanceId,
+    component: view.component,      // e.g. ChartWidgetCardComponent or a wrapper
+    gridInformation: {
+      id: instanceId, cols: view.defaultWidth, rows: view.defaultHeight, x: 0, y: 0
+    },
+    chartType: cfg.chartType,
+    config: cfg                     // keep full config for reload/persist
+  });
+
+  this.refreshAllGrids();
+
+  // OPTIONAL: persist to backend (map cfg → AddWidgetInput + your metadata)
+  // this._dashboardCustomizationServiceProxy.addWidget(...)
+}
+
 }

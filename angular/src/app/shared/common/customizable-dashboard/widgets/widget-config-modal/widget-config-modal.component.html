@@ -1,0 +1,78 @@
+<!-- widget-config-modal.component.html -->
+<div appBsModal #dlg="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header align-items-center">
+          <h5 class="modal-title">New {{ chartType | titlecase }} Widget</h5>
+          <button type="button" class="btn-close ms-2" aria-label="Close" (click)="hide()"></button>
+        </div>
+  
+        <div class="modal-body">
+          <!-- Stepper header -->
+          <ul class="nav nav-pills mb-3">
+            <li class="nav-item"><span class="nav-link" [class.active]="step===0">1. Shape</span></li>
+            <li class="nav-item"><span class="nav-link" [class.active]="step===1">2. Filters & Preview</span></li>
+          </ul>
+  
+          <!-- Step 0: entity + fields -->
+          <div *ngIf="step===0" [formGroup]="form" class="row">
+            <div class="col-5">
+              <div>
+                <label class="form-label">Entity</label>
+                <p-dropdown [options]="entities" formControlName="entity" placeholder="Select entity"
+                            (onChange)="onEntityChange()"></p-dropdown>
+              </div>
+  
+              <div>
+                <label class="form-label">Measure</label>
+                <p-dropdown [options]="measures" optionLabel="label" optionValue="name"
+                            formControlName="measure" placeholder="Select measure"></p-dropdown>
+              </div>
+  
+              <div>
+                <label class="form-label">Group by (optional)</label>
+                <p-dropdown [options]="dimensions" optionLabel="label" optionValue="name"
+                            formControlName="dimension" placeholder="Dimension"></p-dropdown>
+              </div>
+  
+              <!-- <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="form-label">From</label>
+                  <p-calendar formControlName="dateFrom" dateFormat="yy-mm-dd"></p-calendar>
+                </div>
+                <div>
+                  <label class="form-label">To</label>
+                  <p-calendar formControlName="dateTo" dateFormat="yy-mm-dd"></p-calendar>
+                </div>
+              </div> -->
+            </div>
+  
+            <div class="col-7">
+              <app-chart-widget-card [chartType]="chartType" [externalData]="previewData"></app-chart-widget-card>
+              <small class="text-muted">Preview updates in next step.</small>
+            </div>
+          </div>
+  
+          <!-- Step 1: filters + live preview -->
+          <div *ngIf="step===1" class="grid md:grid-cols-2 gap-4">
+            <app-filter-builder
+              [fields]="fields"
+              [filterDefs]="filterDefs"
+              (changed)="onFiltersChanged($event)">
+            </app-filter-builder>
+  
+            <div>
+              <app-chart-widget-card [chartType]="chartType" [externalData]="previewData"></app-chart-widget-card>
+            </div>
+          </div>
+        </div>
+  
+        <div class="modal-footer">
+          <button class="btn btn-secondary" *ngIf="step===1" (click)="back()">Back</button>
+          <button class="btn btn-primary"   *ngIf="step===0" [disabled]="!form.get('entity')?.value || !form.get('measure')?.value" (click)="next()">Next</button>
+          <button class="btn btn-success"   *ngIf="step===1" (click)="submit()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

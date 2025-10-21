@@ -1,4 +1,9 @@
 <p-card>
-    <p-chart [type]="chartType" [data]="data" [options]="options"></p-chart>
-  </p-card>
-  
+  <p-chart
+  *ngIf="chartType && data"
+  [type]="chartType"
+  [data]="data"
+  [options]="options">
+</p-chart>
+
+</p-card>

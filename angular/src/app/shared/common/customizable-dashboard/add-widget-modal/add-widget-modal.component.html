@@ -56,11 +56,12 @@
           <!-- GALLERY -->
           <div class="row g-3" *ngIf="cards?.length">
             <div class="col-12 col-md-6 col-lg-4" *ngFor="let c of filtered()">
-              <button type="button" class="chart-card w-100" (click)="pick(c.id)">
-                <div class="thumb"><i class="fa" [ngClass]="c.icon"></i></div>
+              <button type="button" class="chart-card w-100 mb-2" (click)="pick(c.id)">
+                <div class="thumb"             [style.background-image]="'url(' + c?.image + ')'"
+                [style.background-size]="'cover'" ></div>
                 <div class="meta">
                   <div class="title">{{ c.label }}</div>
-                  <div class="desc text-muted">{{ c.description }}</div>
+                  <!-- <div class="desc text-muted">{{ c.description }}</div> -->
                 </div>
               </button>
             </div>

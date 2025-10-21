@@ -123,13 +123,4 @@ show(cards: WidgetCard[]): void {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
-  private iconFor(name?: string): string {
-    const t = (name || '').toLowerCase();
-    if (t.includes('line')) return 'fa-line-chart';
-    if (t.includes('bar')) return 'fa-bar-chart';
-    if (t.includes('pie') || t.includes('donut')) return 'fa-pie-chart';
-    if (t.includes('table') || t.includes('list')) return 'fa-table';
-    if (t.includes('kpi') || t.includes('total') || t.includes('calc')) return 'fa-percent';
-    return 'fa-area-chart';
-  }
 }

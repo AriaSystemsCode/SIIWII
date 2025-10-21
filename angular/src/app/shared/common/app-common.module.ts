@@ -77,6 +77,9 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
 import { ChartWidgetCardComponent } from "./customizable-dashboard/widgets/widgit-card/chart-widget-card.component";
 import { ChartModule } from 'primeng/chart';
 import { CardModule } from 'primeng/card';
+import { WidgetOutletComponent } from "./customizable-dashboard/widgets/widget-outlet/widget-outlet.component";
+import { WidgetConfigModalComponent } from "./customizable-dashboard/widgets/widget-config-modal/widget-config-modal.component";
+import { FilterBuilderComponent } from "./customizable-dashboard/filters/filter-builder/filter-builder.component";
 @NgModule({
     imports: [
         CommonModule,
@@ -149,6 +152,9 @@ import { CardModule } from 'primeng/card';
         SendMessageModalComponent,
         AppAddOnsSideBarComponent,
         ChartWidgetCardComponent,
+        WidgetOutletComponent ,
+        WidgetConfigModalComponent,
+        FilterBuilderComponent
         
 
     ],
@@ -172,7 +178,8 @@ import { CardModule } from 'primeng/card';
         MatrixGridComponent,
         GenericFormModalComponent,
         SelectionModalComponent,AppSideBarComponent,
-        SendMessageModalComponent
+        SendMessageModalComponent,
+        ChartWidgetCardComponent
     ],
     providers: [
         DateTimeService,

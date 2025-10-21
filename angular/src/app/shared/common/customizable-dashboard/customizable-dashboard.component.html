@@ -45,12 +45,17 @@
                             <gridster [options]="options[i]" [ngClass]="{'no-tab': !moreThanOnePage()}"
                                 [perfectScrollbar]="{wheelPropagation: false}">
                                 <gridster-item *ngFor="let widget of page.widgets" [item]="widget.gridInformation">
-                                    <ng-container *ngComponentOutlet="widget.component"></ng-container>
+                                    <app-widget-outlet
+                                      [component]="widget.component"
+                                      [inputs]="{ chartType: widget.chartType }">
+                                    </app-widget-outlet>
+                                  
                                     <button class="btn btn-sm text-white bg-danger deleteWidgetButton"
-                                        *ngIf="editModeEnabled" (click)="removeItem(widget.gridInformation)">
-                                        <i class="fa fa-times"></i>
+                                            *ngIf="editModeEnabled" (click)="removeItem(widget.gridInformation)">
+                                      <i class="fa fa-times"></i>
                                     </button>
-                                </gridster-item>
+                                  </gridster-item>
+                                  
                             </gridster>
                         </tab>
                     </tabset>
@@ -118,7 +123,16 @@
             </div>
         </div>
     </div>
-    <add-widget-modal #addWidgetModal *ngIf="dashboardName" (onClose)="addWidget($event)"> </add-widget-modal>
+    <add-widget-modal
+    #addWidgetModal
+    *ngIf="dashboardName"
+    (onClose)="onShapePicked($event)">
+  </add-widget-modal>
+  
+  <widget-config-modal
+    #configModal
+    (create)="onCreateFromConfig($event)">
+  </widget-config-modal>
 
     <div appBsModal #filterModal="bs-modal" class="modal fade filterModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-md">

@@ -5,8 +5,11 @@ import { Component, Input, OnInit } from '@angular/core';
   templateUrl: './chart-widget-card.component.html'
 })
 export class ChartWidgetCardComponent implements OnInit {
-  /** e.g. 'line' | 'bar' | 'pie' | ... */
   @Input() chartType: any;
+
+  /** Optional: allow parent to inject data/options for preview or live widgets */
+  @Input() externalData?: any;       // Chart.js ChartData
+  @Input() externalOptions?: any;    // Chart.js ChartOptions
 
   data: any;
   options: any;
