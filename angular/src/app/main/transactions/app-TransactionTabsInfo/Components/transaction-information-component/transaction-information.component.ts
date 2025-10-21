@@ -133,6 +133,7 @@ export class TransactionInformationComponent
   totalOrderQTY: number = 0;
   totlaOrderPrices: number = 0;
   priceLevel:any
+  languageSettingName  =AppConsts.languageSettingName;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,

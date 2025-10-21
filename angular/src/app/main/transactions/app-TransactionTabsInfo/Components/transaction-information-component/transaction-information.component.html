@@ -721,7 +721,7 @@
                                                                 <div class="msrp d-flex align-items-baseline">
                                                                     <h5 class="mr-2"
                                                                         style="color: black !important;font-size: 16px;margin-top: 10px;">
-                                                                        MSRP: </h5>
+                                                                        {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
                                                                     <h5>
 
                                                                         {{
@@ -1803,7 +1803,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                             <div class="msrp d-flex ">
                                                                                 <h5 class="mr-2"
                                                                                     style="color: black !important;font-size: 16px;margin-top: 10px;">
-                                                                                    MSRP: </h5>
+                                                                                    {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
                                                                                 <h5>
 
                                                                                     {{
