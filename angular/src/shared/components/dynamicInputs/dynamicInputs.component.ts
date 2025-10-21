@@ -19,8 +19,7 @@ export class dynamicInputs implements OnInit, OnChanges {
   selectedExtraData: any[] = [];
   @Input() appTransactionsForViewDto: any;
   originalValuesMap = new Map<number, any>();
-
-
+  @Input() fromSetting:boolean =false;
 
   openCalendar(calendar: any) {
     calendar.overlayVisible = true;
@@ -120,6 +119,7 @@ export class dynamicInputs implements OnInit, OnChanges {
 
 
   fillSelectedValuesFromDto() {
+    //i49- data should be like this 
     if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
       return;
     }
@@ -210,6 +210,20 @@ export class dynamicInputs implements OnInit, OnChanges {
     setTimeout(() => this.onAnyInputChange(), 0);
   }
 
-
-
+  isArray(val: any): boolean {
+    return Array.isArray(val);
+  }
+  onCheckboxChange(checked: boolean, value: any, extraAttr: any): void {
+    if (!Array.isArray(extraAttr.selectedValues)) {
+      extraAttr.selectedValues = [];
+    }
+    if (checked) {
+      if (!extraAttr.selectedValues.includes(value)) {
+        extraAttr.selectedValues.push(value);
+      }
+    } else {
+      extraAttr.selectedValues = extraAttr.selectedValues.filter(val => val !== value);
+    }
+    this.onAnyInputChange(); // emit changes
+  }
 }
