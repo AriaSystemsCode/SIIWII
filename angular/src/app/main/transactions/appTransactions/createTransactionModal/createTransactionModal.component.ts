@@ -131,6 +131,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     isBuyer: boolean = false;
     isSeller: boolean = false;
 
+    primeDateFormat = 'mm/dd/yy'; // default
     languageSettingName  =AppConsts.languageSettingName;
     constructor(
         injector: Injector,
@@ -1089,7 +1090,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     }
 
     ngOnInit(): void {
-
+        this.primeDateFormat = this.languageSettingName != 'en-GB'
+        ? 'mm/dd/yy'
+        : 'dd/mm/yy';
         this.today = new Date()
         this.updateControlState()
         this.initForm()
