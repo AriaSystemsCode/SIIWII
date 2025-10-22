@@ -298,11 +298,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     this.isCompantIdExist = false;
                     this.handleSellerNameSearch("");
                     // add seller values
-                    this.selectedSellerContact = { name: `${this.appSession?.user?.name}  ${this.appSession?.user?.surname}` }
+                    // this.selectedSellerContact = { name: `${this.appSession?.user?.name}  ${this.appSession?.user?.surname}` }
+                    
 
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
                     this.orderForm.get('sellerContactPhoneNumber').setValue(res.phone)
                     this.orderForm.get('sellerContactEMailAddress').setValue(res.email)
+                    this.preselectSellerContact();
                     // remove buyer values
                     this.orderForm.get("buyerContactName").reset();
                     this.orderForm.get("buyerCompanyName").reset();
@@ -555,6 +557,31 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
 
     }
+    private preselectSellerContact(): void {
+        this._AppTransactionServiceProxy
+          .getAccountRelatedContacts(this.sellerCompanyId, '')
+          .subscribe((res: any[]) => {
+            this.sellerContacts = res || [];
+            this.filteredSellerContacts = this.sellerContacts;
+      
+            const userEmail = (this.appSession?.user?.emailAddress || '').toLowerCase();
+      
+            const pick =
+              this.sellerContacts.find(c => (c.email || '').toLowerCase() === userEmail) ||
+              this.sellerContacts.find(c => c.isDefault) ||
+              this.sellerContacts[0];
+      
+            if (pick) {
+              // set the control value so the UI shows the selected contact
+              this.orderForm.get('sellerContactName')?.setValue(pick);
+              this.selectedSellerContact = pick;
+      
+              // reuse your existing logic to fill ssin/id/phone/email
+              this.handleSellerNameChange(pick);
+            }
+          });
+      }
+      
     handleSellerNameChange(event: any) {
 
         this.sellerContactId = event?.id;
