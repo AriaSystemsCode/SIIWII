@@ -130,6 +130,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     isSellerTempAccount: boolean = false;
     isBuyer: boolean = false;
     isSeller: boolean = false;
+
+    languageSettingName  =AppConsts.languageSettingName;
     constructor(
         injector: Injector,
         private fb: FormBuilder,
