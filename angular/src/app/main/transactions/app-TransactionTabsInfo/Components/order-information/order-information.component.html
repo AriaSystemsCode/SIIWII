@@ -457,8 +457,8 @@
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
                         <div class="">
-                            <p-calendar #calendar1 appendTo="body" [(ngModel)]="enteredDate" [showIcon]="true"
-                                (ngModelChange)="onChangeDate()" [showOtherMonths]="true" name="enteredDate"
+                            <p-calendar #calendar1 appendTo="body" [(ngModel)]="enteredDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
+                                (ngModelChange)="onChangeDate()" [showOtherMonths]="true" name="enteredDate" 
                                 [selectOtherMonths]="true"></p-calendar>
 
                             <img src="../../../../../assets/icons/calendar.png" style="cursor: pointer;"
@@ -469,8 +469,12 @@
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">Entered Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
-                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "MM/dd/yyyy " }}
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
+                                {{ appTransactionsForViewDto?.enteredDate | momentFormat:'L'  }}
+                            </p>
+
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "dd/MM/yyyy" }}
                             </p>
                         </div>
                     </div>
@@ -478,7 +482,7 @@
                 <div class="col-md-6 mt-2 position-relative dates">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
-                        <p-calendar #calendar2 appendTo="body" [(ngModel)]="startDate" name="startDate" [showIcon]="true"
+                        <p-calendar #calendar2 appendTo="body" [(ngModel)]="startDate" name="startDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
                             (ngModelChange)="onChangeDate()" [showOtherMonths]="true"
                             [selectOtherMonths]="true"></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png" style="cursor: pointer;"
@@ -488,8 +492,12 @@
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">Start Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
-                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "MM/dd/yyyy "}}
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
+                                {{ appTransactionsForViewDto?.startDate | momentFormat:'L'}}
+                            </p>
+
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "dd/MM/yyyy"}}
                             </p>
                         </div>
                     </div>
@@ -497,7 +505,7 @@
                 <div class="col-md-6 mt-2 position-relative dates">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Available Date</label>
-                        <p-calendar #calendar3 appendTo="body" [(ngModel)]="availableDate" name="availableDate" [showIcon]="true"
+                        <p-calendar #calendar3 appendTo="body" [(ngModel)]="availableDate" name="availableDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
                             (ngModelChange)="onChangeDate()" [minDate]="startDate" [showOtherMonths]="true"
                             [selectOtherMonths]="true"></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png" style="cursor: pointer;"
@@ -509,8 +517,11 @@
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">
                                 Avaialable Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
-                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "MM/dd/yyyy " }}
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
+                                {{ appTransactionsForViewDto?.availableDate | momentFormat:'L' }}
+                            </p>
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "dd/MM/yyyy"}}
                             </p>
                         </div>
                     </div>
@@ -518,7 +529,7 @@
                 <div class="col-md-6 mt-2 position-relative dates">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
-                        <p-calendar #calendar4 appendTo="body" [(ngModel)]="completeDate" name="completeDate" [showIcon]="true"
+                        <p-calendar #calendar4 appendTo="body" [(ngModel)]="completeDate" name="completeDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
                             (onSelect)="changeCompleteDate(completeDate)"
                             (ngModelChange)="changeCompleteDate(completeDate)" [minDate]="availableDate"
                             [showOtherMonths]="true" [selectOtherMonths]="true"></p-calendar>
@@ -531,8 +542,11 @@
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">
                                 Complete Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-6 my-2">
-                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "MM/dd/yyyy " }}
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
+                                {{ appTransactionsForViewDto?.completeDate | momentFormat:'L' }}
+                            </p>
+                            <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName == 'en-GB'">
+                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "dd/MM/yyyy"}}
                             </p>
                         </div>
                     </div>

@@ -19,6 +19,7 @@ import * as moment from "moment";
 import { TreeSelect } from "primeng/treeselect";
 import { Calendar } from "primeng/calendar";
 import { TransactionCartoccordionTabs } from "../../../enums/TransactionCartoccordionTabs";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
   selector: "app-order-information",
@@ -102,8 +103,8 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
   oldappTransactionsForViewDto;
   isContactsValid = false;
-
-
+  primeDateFormat = 'mm/dd/yy'; // default
+ languageSettingName  =AppConsts.languageSettingName;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -115,6 +116,9 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     super(injector);
   }
   ngOnInit(): void {
+    this.primeDateFormat = this.languageSettingName != 'en-GB'
+    ? 'mm/dd/yy'
+    : 'dd/mm/yy';
     if (this.currentTab === TransactionCartoccordionTabs.orderInfo) {
       this.fullName = `${this.appSession.user.name}${this.appSession.user.surname}`;
       this.initDates();

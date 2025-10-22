@@ -84,7 +84,7 @@
                 [ngClass]="singleItemPerRowMode ? 'col-md-4' : 'col-md-5'"
             >
                 <div class="align-items-center d-flex justify-content-end" >
-                    <p class="m-0 p-0 mr-2 item-text">{{ ("ItemAdded" | localize) + " " + (item?.appItemsList?.creationTime?.toString() | date : 'longDate') }}</p>
+                    <p class="m-0 p-0 mr-2 item-text">{{ ("ItemAdded" | localize) + " " + (item?.appItemsList?.creationTime | momentFormat:"LL") }}</p>
 
                     <div
                         class="btn-group dropdown"
