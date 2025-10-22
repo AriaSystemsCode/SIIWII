@@ -554,7 +554,7 @@ namespace onetouch.AppMarketplaceItems
                         //.Include(x => x.ListingItemFkList)
                         //.Include(x => x.PublishedListingItemFkList)
                         .Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk).ThenInclude(x => x.EntityExtraData)
-                        .AsNoTracking().Where(x => x.ParentId == input.ItemId).ToListAsync();
+                        .AsNoTracking().Where(x => x.ParentId == input.ItemId).OrderBy(z=>z.ManufacturerCode).ToListAsync();
 
                         var output = new GetAppMarketplaceItemDetailForViewDto { AppItem = ObjectMapper.Map<AppMarketplaceItemForViewDto>(appItem) };
                         //
