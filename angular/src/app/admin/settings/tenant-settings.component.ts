@@ -58,6 +58,8 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
         private _tenantSettingsService: TenantSettingsServiceProxy,
           private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
             private _extraAttributeDataService: ExtraAttributeDataService,
+          
+        private _tokenService: TokenService
     ) {
         super(injector);
         //i49- set dto same as  getAppTransactionsForView api 
@@ -623,7 +625,91 @@ this.formTouched = false;
 
     ngOnInit(): void {
    this.getAppItemTypeExtraAttributesById()
+
+   //i49- upload files
+   //this.initUploaders();
     }
+
+    initUploaders(): void {
+      this.logoUploader = this.createUploader(
+          '/TenantCustomization/UploadLogo',
+          result => {
+              this.appSession.tenant.logoFileType = result.fileType;
+              this.appSession.tenant.logoId = result.id;
+          }
+      );
+
+      this.customCssUploader = this.createUploader(
+          '/TenantCustomization/UploadCustomCss',
+          result => {
+              this.appSession.tenant.customCssId = result.id;
+
+              let oldTenantCustomCss = document.getElementById('TenantCustomCss');
+              if (oldTenantCustomCss) {
+                  oldTenantCustomCss.remove();
+              }
+
+              let tenantCustomCss = document.createElement('link');
+              tenantCustomCss.setAttribute('id', 'TenantCustomCss');
+              tenantCustomCss.setAttribute('rel', 'stylesheet');
+              tenantCustomCss.setAttribute('href', AppConsts.remoteServiceBaseUrl + '/TenantCustomization/GetCustomCss?tenantId=' + this.appSession.tenant.id);
+              document.head.appendChild(tenantCustomCss);
+          }
+      );
+  }
+
+
+
+  createUploader(url: string, success?: (result: any) => void): FileUploader {
+    const uploader = new FileUploader({ url: AppConsts.remoteServiceBaseUrl + url });
+
+    uploader.onAfterAddingFile = (file) => {
+        file.withCredentials = false;
+    };
+
+    uploader.onSuccessItem = (item, response, status) => {
+        const ajaxResponse = <IAjaxResponse>JSON.parse(response);
+        if (ajaxResponse?.success) {
+            this.notify.info(this.l('SavedSuccessfully'));
+            if (success) {
+                success(ajaxResponse.result);
+            }
+        } else {
+            this.message.error(ajaxResponse.error.message);
+        }
+    };
+
+    const uploaderOptions: Partial<FileUploaderOptions> = {};
+    uploaderOptions.authToken = 'Bearer ' + this._tokenService.getToken();
+    uploaderOptions.removeAfterUpload = true;
+    uploader.setOptions(uploaderOptions as FileUploaderOptions);
+    return uploader;
+}
+
+clearLogo(): void {
+  this._tenantSettingsService.clearLogo().subscribe(() => {
+      this.appSession.tenant.logoFileType = null;
+      this.appSession.tenant.logoId = null;
+      this.notify.info(this.l('ClearedSuccessfully'));
+  });
+}
+
+clearCustomCss(): void {
+  this._tenantSettingsService.clearCustomCss().subscribe(() => {
+      this.appSession.tenant.customCssId = null;
+
+      let oldTenantCustomCss = document.getElementById('TenantCustomCss');
+      if (oldTenantCustomCss) {
+          oldTenantCustomCss.remove();
+      }
+
+      this.notify.info(this.l('ClearedSuccessfully'));
+  });
+}
+
+
+
+
   groupAttributesByUsage(attrs: any[]): any {
     return attrs.reduce((acc, attr) => {
       const usage = attr.usage || 'UNSPECIFIED';
@@ -736,7 +822,7 @@ defineExtraAttributes() {
 
 getAppItemTypeExtraAttributesById() {
   //i49- send setting id & use usage
-    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(114)
+    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(771)
       .subscribe((res) => {
         if (res?.length > 0) {
           this.allAttributes = res[0]?.extraAttributes.extraAttributes;
@@ -843,6 +929,8 @@ getAppItemTypeExtraAttributesById() {
     }
   }
   
+
+  //i49- save setting data
   onExtraAttributesChanged(dataFromChild: any[]) {
     this.formTouched = true;
     if (!this.appTransactionsForViewDto) {

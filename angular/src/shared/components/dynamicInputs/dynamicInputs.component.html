@@ -94,6 +94,96 @@
                             </div>
                         </div>
 
+                        <div class="flex-grow-1 position-relative d-flex align-items-center gap-2"
+     *ngIf="extraAttr.dataType === 'color'">
+
+    <input type="color"
+           class="form-control form-control-color col-1"
+           [(ngModel)]="extraAttr.selectedValues"
+           (ngModelChange)="onAnyInputChange()" />
+
+    <span>{{ extraAttr.selectedValues }}</span>
+
+    <i class="pi pi-times"
+       style="cursor: pointer;"
+       *ngIf="extraAttr.selectedValues"
+       (click)="clearExtraAttr(extraAttr)"></i>
+</div>
+
+<div class="upload-card" *ngIf="extraAttr.dataType === 'file'">
+    <label class="form-label fw-semibold">{{ extraAttr.name || 'Label' }}</label>
+  
+    <!-- upload box -->
+    <div class="upload-box" 
+         *ngIf="!extraAttr.selectedValues" 
+         (click)="fileInput.click()">
+      <div class="upload-content">
+        <i class="pi pi-upload upload-icon"></i>
+        <span class="upload-text">Upload File</span>
+      </div>
+      <small class="upload-note">
+        *Select a JPG | JPEG | PNG | GIF File
+      </small>
+      <input
+        type="file"
+        #fileInput
+        class="d-none"
+        accept=".jpg,.jpeg,.png,.gif"
+        (change)="onFileSelected($event, extraAttr)" />
+    </div>
+  
+    <!-- preview after file selected -->
+    <div *ngIf="extraAttr.selectedValues" class="uploaded-preview mt-2">
+      <i class="pi pi-check-circle text-success me-2 mr-1" style="color: #4A0D4A !important;"></i>
+      <span class="mr-1">{{ extraAttr.selectedValues.name }}</span>
+      <i class="pi pi-times ms-2 text-danger" 
+         style="cursor: pointer;" 
+         (click)="clearExtraAttr(extraAttr)"></i>
+
+
+    </div>
+  </div>
+  
+
+
+  <div class="theme-tabset" *ngIf="extraAttr.dataType === 'pills'">
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+      <li
+        class="nav-item"
+        *ngFor="let theme of themes; let i = index"
+        role="presentation"
+      >
+        <button
+          class="nav-link"
+          [class.active]="selectedTheme === theme"
+          (click)="selectTheme(theme)"
+          type="button"
+        >
+          <div class="theme-preview">
+            <img
+              [src]="theme.image"
+              alt="{{ theme.name }}"
+              class="theme-thumbnail"
+            />
+            <span class="theme-name">{{ theme.name }}</span>
+          </div>
+        </button>
+      </li>
+    </ul>
+  
+    <div class="tab-content p-3 border rounded bg-light">
+      <div *ngIf="selectedTheme">
+        <h6 class="fw-semibold">{{ selectedTheme.name }}</h6>
+        <p class="mb-0">Preview or apply this theme.</p>
+      </div>
+    </div>
+  </div>
+  
+  
+  
+
+
+
 
                         <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
