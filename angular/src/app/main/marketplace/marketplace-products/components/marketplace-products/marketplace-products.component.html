@@ -96,6 +96,7 @@
                             selectDepartment($event)
                         "
                         [selectedBrands]="brands"
+                        [selectedDepartmentId]="selectedDepartments?.[0]" 
                         (handleStartPrice)="setPriceFrom($event)"
                         (handleEndPrice)="setPriceTo($event)"
                         (handleStockSiwtch)="swtichStock($event)"

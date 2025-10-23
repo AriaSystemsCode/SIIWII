@@ -4,10 +4,12 @@ import { CTAComponent } from "./syclanding-CTA.component";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
     AppMarketplaceItemsServiceProxy,
+    PagedResultDtoOfGetAllMarketplaceItemListsOutputDto,
     SliderEnum,
+    SycEntityObjectCategoriesServiceProxy,
     SydObjectsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
-import { SyclandingADVComponent } from "./syclanding-adv.component";
+import { SyclandingADVComponent } from "./../components/syclanding-Adv.component";
 import { Router } from "@node_modules/@angular/router";
 
 
@@ -30,11 +32,13 @@ export class SycLandingPageSettingsComponent
     advSliderCode: string = "SycLandingPageSettingsAdvSlider";
      advSliderItems: string[] = [];
      brands:any
+     departments:any
      items:any
+     productList:any
      pages: any[][] = [];
      order = {
         adv_sm: 10, slider: 20, cta: 30, adv_md: 40,
-        products: 60, productsPaged: 70,brands:80,
+        products: 60, productsPaged: 70,brands:80,departmants:90,itemList:100
       };
       // update these numbers from API as needed
       
@@ -42,7 +46,8 @@ export class SycLandingPageSettingsComponent
         injector: Injector,
         private _sydObjectsAppService: SydObjectsServiceProxy,
         private _appMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
-        private router: Router
+        private router: Router,
+        private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     ) {
         super(injector);
       
@@ -309,6 +314,8 @@ export class SycLandingPageSettingsComponent
         this.getAllCallToActionSettings();
         this.getAdvSettings();
         this.getAllBrands()
+        this.getParentDepartments()
+        this.getAllProductCAtalogs()
         // this.getAllBrandSettings()
     }
 
@@ -323,6 +330,24 @@ export class SycLandingPageSettingsComponent
           { queryParams: { brand: brand.label } }
         );
       }
+
+      goToDepartment(department: { label: string; value: number | string }) {
+        // Navigate with ONLY the human-readable name in the URL
+        this.router.navigate(
+          ['/app/main/marketplace/products'],
+          { queryParams: { dept: department.label } }
+        );
+      }
+
+      goToProList(department: { name: string; value: number | string }) {
+        // Navigate with ONLY the human-readable name in the URL
+        this.router.navigate(
+          ['/app/main/marketplace/products'],
+          { queryParams: { proList: department.name } }
+        );
+      }
+
+      
     private chunk<T>(arr: T[], size: number): T[][] {
         const out: T[][] = [];
         for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
@@ -353,7 +378,7 @@ export class SycLandingPageSettingsComponent
 
     getAllBrandSettings() {
         const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.Brand, this.CTASliderCode)
+            .getAllSliderSettings(SliderEnum.AdvSlider, this.CTASliderCode)
             .subscribe((result) => {
                 this.cta.sycLangingPageSetting = result;
             });
@@ -398,4 +423,39 @@ export class SycLandingPageSettingsComponent
         this.brands = res.items;
       });
   }
+
+  getParentDepartments(): Promise<void> {
+    return new Promise((resolve) => {
+      let apiMethod = "getAllWithChildsForProductWithPaging";
+      this._sycEntityObjectCategoriesServiceProxy[apiMethod](
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        true,
+        undefined,
+        [],
+        "name",
+        0,
+        10
+      ).subscribe((res: any) => {
+        this.departments = res.items;
+        resolve(); // ✅ Important!
+      });
+    });
+  }
+
+    getAllProductCAtalogs() {
+      this._appMarketplaceItemsServiceProxy
+        .getSharedItemLists(null, "name", 0, 200, undefined)
+        .subscribe(
+          (res: PagedResultDtoOfGetAllMarketplaceItemListsOutputDto) => {
+            this.productList = res.items;
+          }
+        );
+    }
 }

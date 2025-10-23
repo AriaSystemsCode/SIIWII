@@ -1,7 +1,8 @@
 ...<!-- Navbar -->
 <nav
-    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0" [ngClass]="isAuthenticated ? 'navbarMar':''"
-    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"    [ngClass]="isAuthenticated ? 'navbarMar':''"
+    [style.top.px]="_belowBar ? 25 : 0"
+    [style.backgroundColor]="bgCol"
 
   
 >
@@ -36,10 +37,10 @@
         <!-- test nav -->
  
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form  d-none">
-            <div class="position-relative search-bar w-100" *ngIf="showSearch">
+        <form class="input-group pt-3 input-group-form ">
+            <div class="position-relative search-bar w-75" >
                 <div class="input-group mb-3">
-                    <div
+                    <!-- <div
                         class="input-group-prepend"
                         style="
                             background-color: #ededed;
@@ -72,31 +73,23 @@
                                 >
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <input
                         type="text"
                         class="form-control"
                         style="background-color: #f3f6f9; height: 39px"
                         placeholder="What are you looking for…"
+                        name="globalSearch"                               
+                        [(ngModel)]="searchInput"
+                        [ngModelOptions]="{ standalone: true }"         
+                        (keyup.enter)="onSearch($event)"  
+                    
                     />
                 </div>
                 <div
                     class="save-icon"
-                    style="
-                        position: absolute;
-                        width: 40px;
-                        height: 40px;
-                        padding: 5px;
-                        text-align: center;
-                        border-radius: 5px;
-                        background-color: #f3f6f9;
-                        cursor: pointer;
-                        right: 0px;
-                        background-color: #f88011;
-                        top: 0px;
-                    "
                 >
-                    <img
+                    <img (click)="onSearch($event)"
                         style="width: 30px; height: 30px"
                         src="../../../assets/landingPage/Iconionic-md-search.png"
                     />
@@ -647,11 +640,7 @@
                         class="nav-link active d-flex flex-column text-center"
                         routerLinkActive="header-link-active"
                     >
-                        <!--   <img
-            src="../../../assets/landingPage/notification.png"
-            style="width: 20px; height: 20px"
-            class="m-auto"
-        /> -->
+              
                         <div
                             headerNotifications
                             class="kt-header__topbar-item dropdown"

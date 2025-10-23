@@ -1,10 +1,10 @@
 .topbar {
-    background-color: #4a0d4a;
+    // background-color: #4a0d4a;
     height: 70px;
     // margin-right: 13px !important;
 }
 .navbar {
-    background: #4A0D4A;
+    // background: #4A0D4A;
 }
 .navbar-brand {
     font-size: unset;
@@ -382,4 +382,48 @@ right: 30px;
             background-color: #EBEBEB;
             color: #4A0D4A;
             border-radius: 6px;
+        }
+
+        .save-icon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            padding: 5px;
+            text-align: center;
+            border-radius: 5px;
+            background-color: #f3f6f9;
+            cursor: pointer;
+            right: 0px;
+            background-color: #f88011;
+            top: 0px;
+        }
+
+
+
+        ._divider span {
+            width: 1px;
+            height: 15px;
+            background-color: #c8c8c8;
+        }
+        .kt-header__topbar-item {
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        .kt-header__topbar-item.header-link-active,
+        .kt-header__topbar-item:hover {
+            color: #2061eb !important;
+            transition: all 0.3s ease-in-out;
+        }
+        .kt-header__topbar-item i {
+            font-size: 15px !important;
+        }
+        img.header-profile-picture {
+            max-width: 30px;
+            max-height: 30px;
+            border-radius: 50%;
+        }
+        .kt-header__topbar .kt-header__topbar-item .kt-header__topbar-icon {
+            width: 22px;
+            height: 22px;
         }

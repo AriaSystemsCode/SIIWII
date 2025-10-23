@@ -2,9 +2,6 @@ import {
     Injector,
     Component,
     OnInit,
-    ViewEncapsulation,
-    Output,
-    EventEmitter,
     Input,
     ViewChild,
 } from "@angular/core";
@@ -36,17 +33,12 @@ import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
-import { ClientAuthError } from "msal";
 import { MenuItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
-    FormGroupName,
-    Validators,
 } from "@angular/forms";
 import { DatePipe } from "@angular/common";
-import { finalize } from "rxjs";
-import { Dropdown } from "primeng/dropdown";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 
 export enum MarketPlace {
@@ -59,37 +51,6 @@ export enum MarketPlace {
     templateUrl: "./topbar.component.html",
     selector: "topbar",
     styleUrls: ["./topbar.component.scss"],
-    styles: [
-        `
-            ._divider span {
-                width: 1px;
-                height: 15px;
-                background-color: #c8c8c8;
-            }
-            .kt-header__topbar-item {
-                border-bottom: 2px solid transparent;
-                cursor: pointer;
-                transition: all 0.3s ease-in-out;
-            }
-            .kt-header__topbar-item.header-link-active,
-            .kt-header__topbar-item:hover {
-                color: #2061eb !important;
-                transition: all 0.3s ease-in-out;
-            }
-            .kt-header__topbar-item i {
-                font-size: 15px !important;
-            }
-            img.header-profile-picture {
-                max-width: 30px;
-                max-height: 30px;
-                border-radius: 50%;
-            }
-            .kt-header__topbar .kt-header__topbar-item .kt-header__topbar-icon {
-                width: 22px;
-                height: 22px;
-            }
-        `,
-    ],
 })
 export class TopBarComponent
     extends ThemesLayoutBaseComponent
@@ -162,7 +123,8 @@ export class TopBarComponent
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
     isAuthenticated = this.appSession?.user
-
+    searchInput:string
+    bgCol:string = '#ba4827'
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -178,7 +140,6 @@ export class TopBarComponent
         private messageReadService: MessageReadService,
         private _MessageServiceProxy: MessageServiceProxy,
         private updateLogoService: UpdateLogoService,
-        private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   
@@ -532,6 +493,21 @@ export class TopBarComponent
             });
             
     }
+
+    onSearch(ev?: Event): void {
+        ev?.preventDefault(); // ✅ stop native form submit
+        const q = (this.searchInput ?? '').trim();
+      
+        this.router.navigate(
+          ['/app/main/marketplace/products'],
+          {
+            queryParams: { q: q || null },      // null removes it when empty
+            queryParamsHandling: 'merge',
+            replaceUrl: false
+          }
+        );
+      }
+      
 
 }
 

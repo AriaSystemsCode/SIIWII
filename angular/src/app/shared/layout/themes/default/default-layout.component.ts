@@ -43,6 +43,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openAdSub= false
     tenantLogo:any;
     isAuthenticated = this.appSession?.user
+    hideTopbar:boolean = true
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -63,7 +64,13 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
 
         this._router.events
             .pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe(event => this.currentRouteUrl = this._router.url.split(/[?#]/)[0]);
+            .subscribe(event => {this.currentRouteUrl = this._router.url.split(/[?#]/)[0]
+                console.log(this.currentRouteUrl,'urllllllllllllllll')
+                const path = this.__router.url.split('?')[0]; // ignore query params
+                // show topbar for ANY route under /app/main/account/*
+                this.hideTopbar = !path.startsWith('/app/main/account/');
+
+            });
     }
 
     

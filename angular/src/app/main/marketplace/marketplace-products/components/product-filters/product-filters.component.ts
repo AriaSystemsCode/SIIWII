@@ -44,6 +44,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   brands: any[] = [];
   @Input() isSellerIdExists: boolean = false;
   @Input() selectedBrands: (number | string)[] = []; 
+  @Input() selectedDepartmentId?: number;
+
   // emit all values to parent component
   @Output() handleCatalogSelections: EventEmitter<any> = new EventEmitter();
   @Output() handledeDratmentsTreeSelections: EventEmitter<any> =
@@ -63,7 +65,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   isFromSellerRoom: boolean
   ismarketPLace: boolean
   isAuthenticated = this.appSession?.user
-  
+  @Input() preselectDeptId?: number;
   constructor(
     private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
@@ -114,6 +116,15 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     if (changes['selectedBrands']) {
       // Mirror parent-selected brands into the checkbox model
       this.selctedBradns = Array.isArray(this.selectedBrands) ? [...this.selectedBrands] : [];
+    }
+    if (changes['selectedDepartmentId'] && this.selectedDepartmentId) {
+      // after tree roots are loaded, expand to the selected node
+      if (this.files?.length) {
+        this.expandAndSelectFullPath(this.selectedDepartmentId);
+      } else {
+        // if roots not loaded yet, wait for ngOnInit’s getParentDepartments
+        // and then call expandAndSelectFullPath in its .then(...)
+      }
     }
   }
   
@@ -538,7 +549,15 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     }
     return null;
   }
-    
+  selectionKeys: { [key: string]: boolean } = {}; 
+  ngAfterViewInit() {
+    // wait until deptTree is populated (if it's async, call this after you set it)
+    queueMicrotask(() => {
+      if (this.preselectDeptId) {
+        this.selectedFile = { [this.preselectDeptId]: true };
+      }
+    });
+  }
   ngOnDestroy(): void {
     clearTimeout(this.timeOut);
   }

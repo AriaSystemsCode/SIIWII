@@ -29,13 +29,14 @@
         *ngIf="
             sycLangingPageSetting && sycLangingPageSetting.length > numVisible
         "
-        class="ctaSlider d-flex flex-row ng-star-inserted position-absolute ctaParentSection"
+        class=" d-flex flex-row ng-star-inserted position-absolute ctaParentSection"
     >
         <p-carousel
             [value]="sycLangingPageSetting"
             [numVisible]="numVisible"
             [numScroll]="numScroll"
-            [circular]="false"
+            [circular]="false" [showIndicators]="false"
+            [showNavigators]="true"
         >
             <ng-template let-ctaSection pTemplate="item">
                 <div class="ctaChildection pt-2 pl-3 ml-4 mr-4">

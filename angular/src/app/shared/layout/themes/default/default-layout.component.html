@@ -313,11 +313,11 @@
             <!-- END: Left Aside -->
             <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="isAuthenticated ?'kt-wrapper':'' " id="kt_wrapper">
                 <!-- BEGIN: Header -->
-                <div class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
+                <div *ngIf="hideTopbar" class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
 
                 
                   
-                    <topbar [displayMarketPlace]="displayMarketPlace"></topbar>
+                    <topbar  [displayMarketPlace]="displayMarketPlace"></topbar>
 
                 </div>
                 <div class="bg-white p-3 align-items-center justify-content-center market-place-bar mb-5 w-100" *ngIf="false" [ngClass]=" displayMarketPlace ? 'd-flex' : 'd-none' ">
@@ -349,7 +349,7 @@
                 </div>
 
 
-                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor rout-c" >
+                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="!hideTopbar ? '':'rout-c'">
 
                     <router-outlet></router-outlet>
                 </div>
