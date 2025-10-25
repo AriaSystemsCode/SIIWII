@@ -99,6 +99,8 @@ namespace onetouch.Accounts.Dtos
         Seller,
         Buyer,
         Both,
+        Business,
+        Personal,
     }
     //public enum AccountExcelRecordRepeateHandler
     //{

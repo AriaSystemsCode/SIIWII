@@ -4707,7 +4707,8 @@ namespace onetouch.Accounts
             }
             AccountExcelAccountType accountExcelAccountType;
             AccountExcelRecordType accountExcelRecordType;
-            if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
+            if (string.IsNullOrEmpty(accountExcelDto.RecordType) &&
+                Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4716,12 +4717,13 @@ namespace onetouch.Accounts
                     ErrorType = "Stopper"
                 });
             }
-            if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
+            if (string.IsNullOrEmpty(accountExcelDto.RecordType) && 
+                Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
             {
                 returnList.Add(new ImportContactReturnDto
                 {
                     RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Account Type: Should Be Seller|Buyer|Both.",
+                    ErrorMessage = "Account Type: Should Be Seller|Buyer|Both|Personal|Business.",
                     ErrorType = "Stopper"
                 });
             }
