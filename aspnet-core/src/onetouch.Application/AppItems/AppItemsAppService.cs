@@ -3965,6 +3965,8 @@ namespace onetouch.AppItems
                             .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
                     .Include(x => x.EntityClassifications)
                     .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    //Iteration 49
+                    .Include(x => x.EntitiesRelationships)
                     //Mariam
                     .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                     .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
