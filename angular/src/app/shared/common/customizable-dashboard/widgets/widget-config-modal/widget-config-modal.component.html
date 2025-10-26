@@ -10,8 +10,8 @@
         <div class="modal-body">
           <!-- Stepper header -->
           <ul class="nav nav-pills mb-3">
-            <li class="nav-item"><span class="nav-link" [class.active]="step===0">1. Shape</span></li>
-            <li class="nav-item"><span class="nav-link" [class.active]="step===1">2. Filters & Preview</span></li>
+            <li class="nav-item"><span class="nav-link" [class.active]="step===0">1. Shape & filters</span></li>
+            <li class="nav-item"><span class="nav-link" [class.active]="step===1">2. Preview</span></li>
           </ul>
   
           <!-- Step 0: entity + fields -->
@@ -23,18 +23,79 @@
                             (onChange)="onEntityChange()"></p-dropdown>
               </div>
   
-              <div>
+              <div *ngIf="chartType !== 'bar'">
                 <label class="form-label">Measure</label>
                 <p-dropdown [options]="measures" optionLabel="label" optionValue="name"
                             formControlName="measure" placeholder="Select measure"></p-dropdown>
               </div>
   
-              <div>
-                <label class="form-label">Group by (optional)</label>
-                <p-dropdown [options]="dimensions" optionLabel="label" optionValue="name"
-                            formControlName="dimension" placeholder="Dimension"></p-dropdown>
+              <div *ngIf="chartType !== 'bar'">
+                <label class="form-label">Grouping</label>
+                <p-dropdown
+                  [options]="dimensions"
+                  optionLabel="label"
+                  optionValue="name"
+                  formControlName="dimension"
+                  placeholder="Dimension"
+                  (onChange)="onDimensionChange()">
+                </p-dropdown>
+              
+                <!-- show only after a dimension is chosen -->
+                <div *ngIf="form.value.dimension" class="mt-2">
+                  <label class="form-label">by</label>
+                  <p-multiSelect
+                    [options]="dimensionValueOptions"     
+                    formControlName="dimensionValues"
+                    defaultLabel="Select categories"
+                    [display]="'chip'">
+                  </p-multiSelect>
+                </div>
               </div>
+              
   
+
+              <!-- widget-config-modal.component.html (inside step===0 block, under your Measure/Group by) -->
+<div *ngIf="chartType === 'bar'" class="mt-3">
+  <h6 class="mb-2">Bar options</h6>
+
+  <!-- X axis (dimension) -->
+  <label class="form-label">X axis (Category)</label>
+  <p-dropdown
+    [options]="dimensions" optionLabel="label" optionValue="name"
+    formControlName="barX"
+    placeholder="Select X axis">
+  </p-dropdown>
+
+  <!-- Y axis (one or more measures become series) -->
+  <label class="form-label mt-2">Y series (one or more)</label>
+  <p-multiSelect
+    [options]="measures" optionLabel="label" optionValue="name"
+    formControlName="barY"
+    defaultLabel="Select measures">
+  </p-multiSelect>
+
+  <!-- <div class="grid grid-cols-2 gap-3 mt-3">
+    <div class="flex items-center gap-2">
+      <p-inputSwitch formControlName="barStacked"></p-inputSwitch>
+      <span>Stacked</span>
+    </div>
+
+    <div>
+      <label class="form-label">Ticks color</label>
+      <input type="color" class="form-control form-control-color" formControlName="axisTickColor">
+    </div>
+
+    <div>
+      <label class="form-label">Grid color</label>
+      <input type="color" class="form-control form-control-color" formControlName="gridColor">
+    </div>
+  </div> -->
+</div>
+<app-filter-builder
+[fields]="fields"
+[filterDefs]="filterDefs"
+(changed)="onFiltersChanged($event)">
+</app-filter-builder>
               <!-- <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="form-label">From</label>
@@ -55,11 +116,7 @@
   
           <!-- Step 1: filters + live preview -->
           <div *ngIf="step===1" class="grid md:grid-cols-2 gap-4">
-            <app-filter-builder
-              [fields]="fields"
-              [filterDefs]="filterDefs"
-              (changed)="onFiltersChanged($event)">
-            </app-filter-builder>
+    
   
             <div>
               <app-chart-widget-card [chartType]="chartType" [externalData]="previewData"></app-chart-widget-card>

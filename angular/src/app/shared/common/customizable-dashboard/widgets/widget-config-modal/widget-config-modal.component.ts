@@ -27,6 +27,8 @@ export class WidgetConfigModalComponent {
   filterDefs = [];
 
   previewData: any;
+  dimensionValueOptions: string[] = []; // non-bar group-by categories
+barXValueOptions: string[] = [];      // bar X categories
 
   constructor(
     private fb: FormBuilder,
@@ -39,8 +41,21 @@ export class WidgetConfigModalComponent {
       dimension: [null],
       dateFrom: [null],
       dateTo: [null],
-      filters: [[]]
+      filters: [[]],
+    
+      // category selections (non-bar)
+      dimensionValues: [[]],     // ← selected categories for "Group by"
+    
+      // BAR-only config
+      barX: [null],
+      barY: [[]],
+      barXValues: [[]],          // ← selected X categories for Bar
+      barStacked: [true],
+      axisTickColor: ['#9aa0a6'],
+      gridColor: ['#e0e0e0']
     });
+    
+    
   }
 
   show(): void {
@@ -58,17 +73,49 @@ export class WidgetConfigModalComponent {
   onEntityChange(): void {
     const ent = this.form.value.entity as EntityName;
     if (!ent) return;
-
+  
     this.fields = this.meta.getFields(ent);
     this.measures = this.fields.filter(f => f.role === 'measure');
     this.dimensions = this.fields.filter(f => f.role !== 'measure');
     this.filterDefs = this.meta.getFilters(ent);
-
-    // reset related controls
-    this.form.patchValue({ measure: null, dimension: null, filters: [] });
+  
+    // reset dependent controls & options
+    this.form.patchValue({
+      measure: null,
+      dimension: null,
+      dimensionValues: [],
+      filters: [],
+      barX: null,
+      barY: [],
+      barXValues: []
+    }, { emitEvent: false });
+  
+    this.dimensionValueOptions = [];
+    this.barXValueOptions = [];
     this.previewData = null;
     this.cdr.markForCheck();
   }
+  
+  onDimensionChange(): void {
+    const ent = this.form.value.entity as EntityName;
+    const dim = this.form.value.dimension as string;
+    if (!ent || !dim) return;
+  
+    // you implement this in EntityMetaService: returns distinct values (string[])
+    // this.dimensionValueOptions = this.meta.getDistinctValues(ent, dim) || [];
+    // clear any previous selections that don't exist now
+    this.form.patchValue({ dimensionValues: [] }, { emitEvent: false });
+  }
+  
+  onBarXChange(): void {
+    const ent = this.form.value.entity as EntityName;
+    const dim = this.form.value.barX as string;
+    if (!ent || !dim) return;
+  
+    // this.barXValueOptions = this.meta.getDistinctValues(ent, dim) || [];
+    this.form.patchValue({ barXValues: [] }, { emitEvent: false });
+  }
+  
 
   onFiltersChanged(list: any[]): void {
     // keep filters on form; update preview too

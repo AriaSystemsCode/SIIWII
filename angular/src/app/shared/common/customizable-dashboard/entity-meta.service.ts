@@ -12,8 +12,9 @@ export class EntityMetaService {
         return [
           { name: 'amount',   label: 'Amount',   type: 'number', role: 'measure'   },
           { name: 'quantity', label: 'Quantity', type: 'number', role: 'measure'   },
-          { name: 'date',     label: 'Date',     type: 'date',   role: 'datetime'  },
+          // { name: 'date',     label: 'Date',     type: 'date',   role: 'datetime'  },
           { name: 'status',     label: 'Status',     type: 'string', role: 'dimension' },
+          { name: 'seller',     label: 'Seller',     type: 'string', role: 'dimension' },
         ];
       case 'items':
         return [

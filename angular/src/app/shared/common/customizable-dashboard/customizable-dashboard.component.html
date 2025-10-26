@@ -46,9 +46,15 @@
                                 [perfectScrollbar]="{wheelPropagation: false}">
                                 <gridster-item *ngFor="let widget of page.widgets" [item]="widget.gridInformation">
                                     <app-widget-outlet
-                                      [component]="widget.component"
-                                      [inputs]="{ chartType: widget.chartType }">
-                                    </app-widget-outlet>
+                                    [component]="widget.component"
+                                    [inputs]="{
+                                      chartType: widget.chartType,
+                                      externalData: widget.chartData,
+                                      externalOptions: widget.chartOptions,
+                                      rawRows: widget.rawRows,
+                                      xyMapping: widget.xyMapping
+                                    }">
+                                  </app-widget-outlet>
                                   
                                     <button class="btn btn-sm text-white bg-danger deleteWidgetButton"
                                             *ngIf="editModeEnabled" (click)="removeItem(widget.gridInformation)">

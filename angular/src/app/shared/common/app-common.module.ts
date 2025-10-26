@@ -80,6 +80,10 @@ import { CardModule } from 'primeng/card';
 import { WidgetOutletComponent } from "./customizable-dashboard/widgets/widget-outlet/widget-outlet.component";
 import { WidgetConfigModalComponent } from "./customizable-dashboard/widgets/widget-config-modal/widget-config-modal.component";
 import { FilterBuilderComponent } from "./customizable-dashboard/filters/filter-builder/filter-builder.component";
+import { MultiSelectModule } from "primeng/multiselect";
+import { DropdownModule } from "primeng/dropdown";
+import { InputSwitchModule } from "primeng/inputswitch";
+import { NgxEchartsModule } from 'ngx-echarts';
 @NgModule({
     imports: [
         CommonModule,
@@ -106,7 +110,11 @@ import { FilterBuilderComponent } from "./customizable-dashboard/filters/filter-
         CheckboxModule,
         EditorModule,
         CardModule ,
-        ChartModule
+        ChartModule,
+        MultiSelectModule,   // <-- REQUIRED for <p-multiSelect>
+        DropdownModule,      // <-- you also use <p-dropdown>
+        InputSwitchModule,   // <-- you used <p-inputSwitch>
+        NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
 
     ],
     declarations: [
