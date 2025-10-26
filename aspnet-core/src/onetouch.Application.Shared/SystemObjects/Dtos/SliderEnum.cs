@@ -6,8 +6,18 @@ namespace onetouch.SystemObjects.Dtos
 {
     public enum SliderEnum
     {
-        AutoSlider,
-        CallToAction,
-        AdvSlider
+        //I49[Star]
+        //AutoSlider,
+        //CallToAction,
+        //AdvSlider
+        ASSB,
+        ASMB,
+        CSSB,
+        CSMB,
+        SRCTA,
+        MRCTA,
+        PF,
+        SM
+        //I49[End]
     }
 }

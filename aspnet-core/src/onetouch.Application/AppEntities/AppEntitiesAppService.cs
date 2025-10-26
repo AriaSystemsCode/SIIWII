@@ -615,11 +615,16 @@ namespace onetouch.AppEntities
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+                .Include(z=>z.EntityObjectStatusFk)
                 .Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
                 .OrderBy("Name asc")
                 .Select(appEntity => new LookupLabelDto
                 {
                     Value = appEntity.Id,
+                    //I49[Start]
+                    EntityObjectStatusId = appEntity.EntityObjectStatusId,
+                    Status = (appEntity.EntityObjectStatusFk != null ? appEntity.EntityObjectStatusFk.Name : ""),
+                    //I49[End]
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
                     IsHostRecord = appEntity.TenantId == null,
