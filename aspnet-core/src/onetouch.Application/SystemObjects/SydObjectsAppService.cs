@@ -340,76 +340,119 @@ namespace onetouch.SystemObjects
             {
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 List<PageSettingDto> result = new List<PageSettingDto>();
-                var landPageCodeAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageCodeAttributeId();
-                var landPageOrderAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageOrderAttributeId();
-                var landPageTypeAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageTypeAttributeId();
-                var landPageTitleAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageTitleAttributeId();
-                var landPageDescAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageDescriptionAttributeId();
-                var landPageLinkUrlAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageLinkUrlAttributeId();
-                string selectedLandPageTypeCode="";
-                var landPageTypeObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeLandingPageTypeId();
-                
-                if ( sliderType == SliderEnum.AdvSlider ) {
-                    selectedLandPageTypeCode = "ADVSLIDER";
-                } else if (sliderType == SliderEnum.AutoSlider) {
-                    selectedLandPageTypeCode = "AUTOSLIDER";
-                } else if (sliderType == SliderEnum.CallToAction) {
-                    selectedLandPageTypeCode = "CALLTOACTION";
-                }
-                if( selectedLandPageTypeCode == "ADVSLIDER")
+                //I49[Start]
+                //var landPageCodeAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageCodeAttributeId();
+                //var landPageOrderAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageOrderAttributeId();
+                //var landPageTypeAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageTypeAttributeId();
+                //var landPageTitleAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageTitleAttributeId();
+                //var landPageDescAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageDescriptionAttributeId();
+                //var landPageLinkUrlAttrId = await _helper.SystemTables.GetEntityObjectTypeLandingPageLinkUrlAttributeId();
+                //string selectedLandPageTypeCode="";
+                //var landPageTypeObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeLandingPageTypeId();
+
+                //if ( sliderType == SliderEnum.AdvSlider ) {
+                //    selectedLandPageTypeCode = "ADVSLIDER";
+                //} else if (sliderType == SliderEnum.AutoSlider) {
+                //    selectedLandPageTypeCode = "AUTOSLIDER";
+                //} else if (sliderType == SliderEnum.CallToAction) {
+                //    selectedLandPageTypeCode = "CALLTOACTION";
+                //}
+                //if( selectedLandPageTypeCode == "ADVSLIDER")
+                //{
+                //    var ads = await _appAdvertisementsAppService.GetCurrentPeriodAdvertisement(5, false, true);
+                //    foreach (var q in ads)
+                //    {
+                //        var item = new PageSettingDto();
+                //        item.Type = sliderType;
+                //        item.Image = q.AppAdvertisement.MarketPlaceImage;
+                //        item.id = q.AppAdvertisement.AppEntityId;
+                //        item.ExternalUrl = q.AppAdvertisement.Url;
+                //        result.Add(item);
+                //    }
+                //}
+                //else
+                //{
+                //    var selectedLandPageTypeCodeId = _appEntityRepository.GetAll()
+                //        .Where(x => x.EntityObjectTypeId == landPageTypeObjectTypeId && x.Code == selectedLandPageTypeCode)
+                //        .Select(x=>x.Id)
+                //        .FirstOrDefault();
+
+                //     var query1 = await _appEntityExtraDataRepository.GetAll()
+                //        .Where(x => x.AttributeId == landPageTypeAttrId && x.AttributeValueId == selectedLandPageTypeCodeId)
+                //        .Select(x => x.EntityId)
+                //        .ToListAsync();
+
+                //    var query2 = await _appEntityExtraDataRepository.GetAll()
+                //        .Where(x => x.AttributeId == landPageCodeAttrId && x.AttributeValue == sliderCode && query1.Contains(x.EntityId))
+                //        .Select(x => x.EntityId)
+                //        .ToListAsync();
+
+                //    var query3 = await _appEntityRepository.GetAll()
+                //        .Where(x => query2.Contains(x.Id))
+                //        .Include(x => x.EntityExtraData)
+                //        .Include(x => x.EntityAttachments).ThenInclude(y => y.AttachmentFk)
+                //        .ToListAsync();
+                //    foreach (var q in query3)
+                //    {
+                //        var item = new PageSettingDto();
+                //        item.id = q.Id;
+                //        item.Name = q.Name;
+                //        item.Type = sliderType;
+                //        item.Image = q.EntityAttachments.Count() == 0 ? "" : $"{imagesUrl}{(q.TenantId == null ? -1 : q.TenantId)}/{q?.EntityAttachments.FirstOrDefault()?.AttachmentFk?.Attachment}";
+                //        foreach (var j in q.EntityExtraData)
+                //        {
+                //            if (j.AttributeId == landPageOrderAttrId) item.Order = int.Parse(j.AttributeValue);
+                //            else if (j.AttributeId == landPageCodeAttrId) item.Code = j.AttributeValue;
+                //            else if (j.AttributeId == landPageLinkUrlAttrId) item.LinkPageUrl = j.AttributeValue;
+                //            else if (j.AttributeId == landPageTitleAttrId) item.Title = j.AttributeValue;
+                //            else if (j.AttributeId == landPageDescAttrId) item.Description = j.AttributeValue;
+                //        }
+                //        result.Add(item);
+                //    }
+                //    return result = result.OrderBy(x => x.Order).ToList();
+                //}
+                var sectionActiveStatusId = await _helper.SystemTables.GetEntityObjectStatusActiveLookup();
+                var sectionObjectId = await _helper.SystemTables.GetObjectSectionId();
+                var allSections = await _appEntityRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                    .Include(z=>z.EntityExtraData).Where(z => z.EntityObjectTypeId == sectionObjectId && z.EntityObjectStatusId== sectionActiveStatusId).ToListAsync();
+                if (allSections!=null && allSections.Count>0)
                 {
-                    var ads = await _appAdvertisementsAppService.GetCurrentPeriodAdvertisement(5, false, true);
-                    foreach (var q in ads)
+                    foreach (var section in allSections)
                     {
                         var item = new PageSettingDto();
-                        item.Type = sliderType;
-                        item.Image = q.AppAdvertisement.MarketPlaceImage;
-                        item.id = q.AppAdvertisement.AppEntityId;
-                        item.ExternalUrl = q.AppAdvertisement.Url;
-                        result.Add(item);
-                    }
-                }
-                else
-                {
-                    var selectedLandPageTypeCodeId = _appEntityRepository.GetAll()
-                        .Where(x => x.EntityObjectTypeId == landPageTypeObjectTypeId && x.Code == selectedLandPageTypeCode)
-                        .Select(x=>x.Id)
-                        .FirstOrDefault();
+                        var sectionOrderExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1002);
+                        if (sectionOrderExtraDate != null)
+                            item.Order = int.Parse( sectionOrderExtraDate.AttributeValue);
 
-                     var query1 = await _appEntityExtraDataRepository.GetAll()
-                        .Where(x => x.AttributeId == landPageTypeAttrId && x.AttributeValueId == selectedLandPageTypeCodeId)
-                        .Select(x => x.EntityId)
-                        .ToListAsync();
-
-                    var query2 = await _appEntityExtraDataRepository.GetAll()
-                        .Where(x => x.AttributeId == landPageCodeAttrId && x.AttributeValue == sliderCode && query1.Contains(x.EntityId))
-                        .Select(x => x.EntityId)
-                        .ToListAsync();
-
-                    var query3 = await _appEntityRepository.GetAll()
-                        .Where(x => query2.Contains(x.Id))
-                        .Include(x => x.EntityExtraData)
-                        .Include(x => x.EntityAttachments).ThenInclude(y => y.AttachmentFk)
-                        .ToListAsync();
-                    foreach (var q in query3)
-                    {
-                        var item = new PageSettingDto();
-                        item.id = q.Id;
-                        item.Name = q.Name;
-                        item.Type = sliderType;
-                        item.Image = q.EntityAttachments.Count() == 0 ? "" : $"{imagesUrl}{(q.TenantId == null ? -1 : q.TenantId)}/{q?.EntityAttachments.FirstOrDefault()?.AttachmentFk?.Attachment}";
-                        foreach (var j in q.EntityExtraData)
+                        var sectionTypeExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1001);
+                        if (sectionTypeExtraDate != null)
                         {
-                            if (j.AttributeId == landPageOrderAttrId) item.Order = int.Parse(j.AttributeValue);
-                            else if (j.AttributeId == landPageCodeAttrId) item.Code = j.AttributeValue;
-                            else if (j.AttributeId == landPageLinkUrlAttrId) item.LinkPageUrl = j.AttributeValue;
-                            else if (j.AttributeId == landPageTitleAttrId) item.Title = j.AttributeValue;
-                            else if (j.AttributeId == landPageDescAttrId) item.Description = j.AttributeValue;
+                            var sectionEntity = await _appEntityRepository.GetAll().Where(z => z.Id == long.Parse(sectionTypeExtraDate.AttributeValueId.ToString())).FirstOrDefaultAsync();
+                            if (sectionEntity != null)
+                            {
+                                item.Type = (SliderEnum)Enum.Parse(typeof(SliderEnum), sectionEntity.Code);
+                                
+                            }
                         }
+                        item.Name = section.Name;
+                        item.Description = section.Name;
+                        item.Code = section.Code;
+
+                        var sectionTitleExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1003);
+                        if (sectionTitleExtraDate != null)
+                            item.Title  = sectionTitleExtraDate.AttributeValue;
+                        if (section.EntityAttachments.Count >0)
+                        item.Image = (section.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                   (section.EntityAttachments.FirstOrDefault() != null ? "attachments/" + (section.TenantId.HasValue ? section.TenantId : -1) + "/" +
+                                   section.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                   : "attachments/" + (section.TenantId.HasValue ? section.TenantId : -1) + "/" +
+                                   section.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment);
+                                 
+                        item.id = section.Id;
                         result.Add(item);
                     }
-                    return result = result.OrderBy(x => x.Order).ToList();
                 }
+                //I49[End]
                 return result;
             }
         }
