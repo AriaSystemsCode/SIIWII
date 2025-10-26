@@ -104,6 +104,18 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
             return obj.Id;
         }
+
+        //Iteration 49
+        public async Task<long> GetEntityObjectTypeTenantId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "TENANT");
+            return obj.Id;
+        }
+        public async Task<long> GetEntityObjectTypeHostId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "HOST");
+            return obj.Id;
+        }
         public async Task<long> GetObjectStandardFeatureId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
