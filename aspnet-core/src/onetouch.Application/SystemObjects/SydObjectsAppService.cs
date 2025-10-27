@@ -23,6 +23,7 @@ using onetouch.AppEntities;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
 using onetouch.AppAdvertisements;
+using onetouch.AppMarketplaceItems;
 
 namespace onetouch.SystemObjects
 {
@@ -39,7 +40,9 @@ namespace onetouch.SystemObjects
         private readonly Helper _helper;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IAppAdvertisementsAppService _appAdvertisementsAppService;
-
+        //I49[Start]
+        private readonly IAppMarketplaceItemsAppService _appMarketplaceItemsAppService;
+        //I49[End]
         public SydObjectsAppService(
             IRepository<SydObject, long> sydObjectRepository,
             ISydObjectsExcelExporter sydObjectsExcelExporter ,
@@ -50,7 +53,8 @@ namespace onetouch.SystemObjects
             IRepository<AppEntity, long> appEntityRepository, 
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IAppConfigurationAccessor appConfigurationAccessor,
-            IAppAdvertisementsAppService appAdvertisementsAppService
+            IAppAdvertisementsAppService appAdvertisementsAppService,
+            IAppMarketplaceItemsAppService appMarketplaceItemsAppService
             ) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
@@ -64,6 +68,9 @@ namespace onetouch.SystemObjects
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appAdvertisementsAppService = appAdvertisementsAppService;
+            //I49[Start]
+            _appMarketplaceItemsAppService = appMarketplaceItemsAppService;
+            //I49[End]
         }
 
         public async Task<PagedResultDto<TreeNode<GetSydObjectForViewDto>>> GetAll(GetAllSydObjectsInput input)
@@ -488,10 +495,7 @@ namespace onetouch.SystemObjects
                             item.Name = block.EntityFk.Name;
                             //item.Description = block.EntityFk.Name;
                             item.Code = block.EntityFk.Code;
-
-                            var sectionTitleExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
-                            if (sectionTitleExtraDate != null)
-                                item.Description = sectionTitleExtraDate.AttributeValue; // Block value
+                            item.Description = block.EntityFk.Notes;
 
                             if (block.EntityFk.EntityAttachments != null && block.EntityFk.EntityAttachments.Count > 0)
                                 item.Image = (block.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
@@ -501,10 +505,38 @@ namespace onetouch.SystemObjects
                                            block.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment);
 
                             item.id = block.EntityFk.Id;
+
+                            var blockTypeExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2001);
+                            if (blockTypeExtraDate != null)
+                            {
+                                var blockType=  await _appEntityRepository.GetAll().Where(z => z.Id == blockTypeExtraDate.AttributeValueId).FirstOrDefaultAsync();
+                                if (blockType != null) {
+                                    item.BlockType = blockType.Name;
+                                }
+                            }
+                            var blockValueExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
+                            if (blockValueExtraDate != null)
+                            {
+                                if (!string.IsNullOrEmpty(blockValueExtraDate.AttributeValue)) // Block value
+                                {
+                                    
+                                    switch (item.BlockType.ToUpper())
+                                    {
+                                        case "PRODUCT":
+
+                                           // item.GetAppMarketItemForViewDto =await _appMarketplaceItemsAppService.GetMarketplaceAppItemForView(
+                                            //    new AppMarketplaceItems.Dtos.GetAppMarketplaceItemWithPagedAttributesForViewInput { ItemSSIN = blockValueExtraDate.AttributeValue });
+                                            break;
+
+
+                                    }
+                                }
+
+                            }
                             //var blockValueExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
                             //if (sectionTitleExtraDate != null)
                             //    item.Description= 
-
+                            //item.GetAppMarketItemForViewDto = 
                             result.Add(item);
                         }
                     }
