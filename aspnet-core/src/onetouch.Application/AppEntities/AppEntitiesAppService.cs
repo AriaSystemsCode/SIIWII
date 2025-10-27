@@ -1509,6 +1509,76 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<AppEntityAttachmentDto>(0, new List<AppEntityAttachmentDto>());
             }
         }
+        //Iteration49 
+        public async Task<long> GetCurrentTenantEntityId ()
+        {
+            var tenantObjectId = await _helper.SystemTables.GetObjectContactId();
+            var tenantObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeTenantId();
+
+            var entity = _appEntityRepository.GetAll().Where(e => e.TenantId == AbpSession.TenantId && e.EntityObjectTypeId == tenantObjectTypeId && e.ObjectId== tenantObjectId).FirstOrDefault();
+            if(entity != null)
+            {
+                return entity.Id;
+            }
+            else
+            {
+                return await SaveEntity(new AppEntityDto { Id = 0, TenantId = AbpSession.TenantId, Code = "TENANT",Name="TENANT", EntityObjectTypeId = tenantObjectTypeId, ObjectId = tenantObjectId });
+
+            }
+            return 0;
+        }
+
+        public async Task<long> GetCurrentHostEntityId()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var tenantObjectId = await _helper.SystemTables.GetObjectContactId();
+                var tenantObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeHostId();
+
+                var entity = _appEntityRepository.GetAll().Where(e => e.EntityObjectTypeId == tenantObjectTypeId && e.ObjectId == tenantObjectId).FirstOrDefault();
+                if (entity != null)
+                {
+                    return entity.Id;
+                }
+                else
+                {
+                    return await SaveEntity(new AppEntityDto { Id = 0, Code = "HOST", Name = "HOST", EntityObjectTypeId = tenantObjectTypeId, ObjectId = tenantObjectId });
+
+                }
+            }
+            return 0;
+        }
+
+        public async Task<string> GetHostSettingValue(long settingId)
+        {
+            var hostId = await GetCurrentHostEntityId();
+            if(hostId != 0)
+            {
+                var x = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
+                if (x!= null)
+                {
+                    return x.Items[0].AttributeValue;
+                }
+            }
+            return "";
+
+        }
+
+        public async Task<string> GetTenantSettingValue(long settingId)
+        {
+            var hostId = await GetCurrentTenantEntityId();
+            if (hostId != 0)
+            {
+                var x = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
+                if (x != null)
+                {
+                    return x.Items[0].AttributeValue;
+                }
+            }
+            return "";
+
+        }
+
 
         public async Task<PagedResultDto<AppEntityExtraDataDto>> GetAppEntityExtraWithPaging(GetAppEntityAttributesWithAttributeIdsInput input)
         {

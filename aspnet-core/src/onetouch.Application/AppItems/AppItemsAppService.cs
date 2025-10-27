@@ -1066,6 +1066,7 @@ namespace onetouch.AppItems
                     var EntityExtraDataList = output.AppItem.EntityExtraData;
                     output.AppItem.Recommended = new List<ExtraDataAttrDto>();
                     output.AppItem.Additional = new List<ExtraDataAttrDto>();
+                    output.AppItem.Charges = new List<ExtraDataAttrDto>();
 
                     if (input.GetAppItemAttributesInputForExtraData == null)
                         input.GetAppItemAttributesInputForExtraData = new GetAppItemExtraAttributesInput();
@@ -1077,6 +1078,10 @@ namespace onetouch.AppItems
 
                     input.GetAppItemAttributesInputForExtraData.recommandedOrAdditional = RecommandedOrAdditional.ADDITIONAL;
                     output.AppItem.Additional = GetAppItemExtraDataWithPaging(input.GetAppItemAttributesInputForExtraData).Result.Items.ToList();
+
+                    input.GetAppItemAttributesInputForExtraData.recommandedOrAdditional = RecommandedOrAdditional.CHARGES;
+                    output.AppItem.Charges = GetAppItemExtraDataWithPaging(input.GetAppItemAttributesInputForExtraData).Result.Items.ToList();
+
 
                     //read first attribute values and default images, and second attribute values
                     //string variations = "COLOR|SZIE;101|105;RED|WHITE|BLACK;2688e3fa-df0e-0e4f-d2d4-a8d5b8959c08.jpg||2688e3fa-df0e-0e4f-d2d4-a8d5b8959c08.jpg;3X|4X";
@@ -3965,6 +3970,8 @@ namespace onetouch.AppItems
                             .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
                     .Include(x => x.EntityClassifications)
                     .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    //Iteration 49
+                    .Include(x => x.EntitiesRelationships)
                     //Mariam
                     .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                     .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)

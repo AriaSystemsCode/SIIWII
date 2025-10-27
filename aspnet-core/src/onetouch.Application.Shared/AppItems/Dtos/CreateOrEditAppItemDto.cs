@@ -193,6 +193,7 @@ namespace onetouch.AppItems.Dtos
         public List<ExtraDataAttrDto> ExtraDataAttr { get; set; }
         public List<ExtraDataAttrDto> Recommended { get; set; }
         public List<ExtraDataAttrDto> Additional { get; set; }
+        public List<ExtraDataAttrDto> Charges { get; set; }
         public List<ExtraDataAttrDto> variations { get; set; }
         //MMT
         public List<AppItemPriceInfo> AppItemPriceInfos { get; set; }

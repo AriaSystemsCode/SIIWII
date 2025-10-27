@@ -24,7 +24,8 @@ namespace onetouch.AppItems.Dtos
     public enum RecommandedOrAdditional
     {
         RECOMMENDED,
-        ADDITIONAL
+        ADDITIONAL,
+        CHARGES
 
     }
 
