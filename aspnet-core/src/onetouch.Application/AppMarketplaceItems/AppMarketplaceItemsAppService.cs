@@ -34,6 +34,7 @@ using onetouch.Message;
 using Nito.AsyncEx;
 using Microsoft.AspNetCore.Authorization;
 using Abp.Authorization;
+using onetouch.AppItems;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -550,18 +551,41 @@ namespace onetouch.AppMarketplaceItems
 
                     //using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
-                        var appItem = await _appMarketplaceItem.GetAll()
-                       .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
-                       .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
-                       .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
-                       .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                       .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
-                       .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
-                       .Include(x => x.EntityObjectTypeFk)
-                       //.Include(x => x.ListingItemFkList)
-                       // .Include(x => x.PublishedListingItemFkList)
-                       //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
-                       .AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);
+                        //I49[Start]
+                        AppMarketplaceItems appItem = new AppMarketplaceItems();
+                        if (!string.IsNullOrEmpty(input.ItemSSIN))
+                        {
+                            //I49[End]
+                            appItem = await _appMarketplaceItem.GetAll()
+                           .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                           .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                           .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
+                           .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                           .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                           .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                           .Include(x => x.EntityObjectTypeFk)
+                           //.Include(x => x.ListingItemFkList)
+                           // .Include(x => x.PublishedListingItemFkList)
+                           //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
+                           .AsNoTracking().FirstOrDefaultAsync(x => x.SSIN == input.ItemSSIN);
+                            if (appItem != null)
+                                input.ItemId = appItem.Id;
+                        }
+                        else
+                        {
+                          appItem = await _appMarketplaceItem.GetAll()
+                         .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                         .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                         .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
+                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                         .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                         .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                         .Include(x => x.EntityObjectTypeFk)
+                         //.Include(x => x.ListingItemFkList)
+                         // .Include(x => x.PublishedListingItemFkList)
+                         //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
+                         .AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);
+                        }
 
                         var varAppItems = await _appMarketplaceItem.GetAll()
                             .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))

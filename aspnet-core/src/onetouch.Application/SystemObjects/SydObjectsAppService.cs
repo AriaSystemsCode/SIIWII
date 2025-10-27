@@ -456,5 +456,62 @@ namespace onetouch.SystemObjects
                 return result;
             }
         }
+        //I49[Start]
+        public async Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId)
+        {
+            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+            List<PageSettingDto> result = new List<PageSettingDto>();
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var sectionActiveStatusId = await _helper.SystemTables.GetEntityObjectStatusActiveLookup();
+                var sectionBlockId = await _helper.SystemTables.GetObjectBlockId();
+                var extraDataBlocks = await _appEntityExtraDataRepository.GetAll().Include(x => x.EntityFk).ThenInclude(z=>z.EntityExtraData)
+                    .Include(x => x.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                    .Where(z => z.AttributeId == 2005 && z.AttributeValueId == sectionId
+                    && z.EntityFk.EntityObjectStatusId== sectionActiveStatusId && z.EntityFk.EntityObjectTypeId== sectionBlockId).ToListAsync();
+                if (extraDataBlocks != null && extraDataBlocks.Count > 0)
+                {
+                    //if (allSections != null && allSections.Count > 0)
+                    {
+                        foreach (var block in extraDataBlocks)
+                        {
+                            var item = new PageSettingDto();
+                            var sectionOrderExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2002);
+                            if (sectionOrderExtraDate != null)
+                                item.Order = int.Parse(sectionOrderExtraDate.AttributeValue);
+
+                            var linkExtraData = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
+                            if (linkExtraData != null)
+                                item.LinkPageUrl = linkExtraData.AttributeValue;
+                            
+                            item.Type = SliderEnum.SM; 
+                            item.Name = block.EntityFk.Name;
+                            //item.Description = block.EntityFk.Name;
+                            item.Code = block.EntityFk.Code;
+
+                            var sectionTitleExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
+                            if (sectionTitleExtraDate != null)
+                                item.Description = sectionTitleExtraDate.AttributeValue; // Block value
+
+                            if (block.EntityFk.EntityAttachments != null && block.EntityFk.EntityAttachments.Count > 0)
+                                item.Image = (block.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                           (block.EntityFk.EntityAttachments.FirstOrDefault() != null ? "attachments/" + (block.EntityFk.TenantId.HasValue ? block.EntityFk.TenantId : -1) + "/" +
+                                           block.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                           : "attachments/" + (block.EntityFk.TenantId.HasValue ? block.EntityFk.TenantId : -1) + "/" +
+                                           block.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment);
+
+                            item.id = block.EntityFk.Id;
+                            //var blockValueExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
+                            //if (sectionTitleExtraDate != null)
+                            //    item.Description= 
+
+                            result.Add(item);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+                //I49[End]
     }
 }
