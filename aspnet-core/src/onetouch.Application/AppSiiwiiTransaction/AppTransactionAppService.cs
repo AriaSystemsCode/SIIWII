@@ -1784,8 +1784,8 @@ namespace onetouch.AppSiiwiiTransaction
                 //log[End]
                 appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
-                UpdateAppEntityLog(obj.Id);
                 await CurrentUnitOfWork.SaveChangesAsync();
+                UpdateAppEntityLog(obj.Id);
                 return obj.Id;
             }
 
