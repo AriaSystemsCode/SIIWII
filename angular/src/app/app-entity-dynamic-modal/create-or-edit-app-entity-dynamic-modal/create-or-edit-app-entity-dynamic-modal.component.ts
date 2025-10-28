@@ -726,7 +726,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
     }
     displayVisualTypes():boolean{
         //i49- what else ? 
-        //i49-F5 This lable should be "Active" like UI
+        //i49-F5  xxxxx This lable should be "Active" like UI
         if(this.entityObjectType.code.toString().toUpperCase() == "CHARGES")
             this._displayVisualTypes=false;
         else

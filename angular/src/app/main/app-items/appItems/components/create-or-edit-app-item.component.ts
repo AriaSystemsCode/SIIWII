@@ -2123,7 +2123,7 @@ export class CreateOrEditAppItemComponent
         ).subscribe(result => {
            let  indx= result?.findIndex(x=>x.code.toString().toUpperCase() == "CHARGES");  
            if(indx>=0){   
-//i49-F5 need return only tax     
+//i49-F5 xxxxx need return only tax     
             this._appEntitiesServiceProxy.getAll(
                 undefined,
                 undefined,
