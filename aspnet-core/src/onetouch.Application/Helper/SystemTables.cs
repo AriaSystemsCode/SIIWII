@@ -750,6 +750,11 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "MARKETPLACESECTION");
             return obj.Id;
         }
+        public async Task<long> GetObjectBlockId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "MARKETPLACESECTIONBLOCK");
+            return obj.Id;
+        }
         public async Task<long> GetEntityObjectStatusActiveLookup()
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))

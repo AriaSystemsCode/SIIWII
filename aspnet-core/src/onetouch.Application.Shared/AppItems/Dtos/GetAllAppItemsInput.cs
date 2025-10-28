@@ -34,7 +34,10 @@ namespace onetouch.AppItems.Dtos
         public GetAppItemAttributesInput GetAppItemAttributesInputForCategories { get; set; }
         public GetAppItemAttributesInput GetAppItemAttributesInputForClassifications { get; set; }
         public GetAppItemAttributesInput GetAppItemAttributesInputForDepartments { get; set; }
- 
+        //I49[Start]
+        public string ItemSSIN { set; get; }
+        //I49[End]
+
     }
 
     public class GetAppItemWithPagedAttributesForEditInput : GetAppItemWithPagedAttributesInput
