@@ -108,7 +108,7 @@ export class dynamicInputs implements OnInit, OnChanges {
   }
 
 
-  //i49- set thems 
+  //i49-F6 set thems 
   themes = [
     { name: 'Default', image: 'assets/themes/default.png' },
     { name: 'Theme 2', image: 'assets/themes/theme2.png' },
@@ -125,7 +125,7 @@ export class dynamicInputs implements OnInit, OnChanges {
 
 
   fillSelectedValuesFromDto() {
-    //i49- data should be like this 
+    //i49-F6 data should be like this 
     if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
       return;
     }

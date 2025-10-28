@@ -8569,6 +8569,224 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
+     * @return Success
+     */
+    getCurrentTenantEntityId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetCurrentTenantEntityId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCurrentTenantEntityId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCurrentTenantEntityId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetCurrentTenantEntityId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getCurrentHostEntityId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetCurrentHostEntityId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCurrentHostEntityId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCurrentHostEntityId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetCurrentHostEntityId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param settingId (optional) 
+     * @return Success
+     */
+    getHostSettingValue(settingId: number | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetHostSettingValue?";
+        if (settingId === null)
+            throw new Error("The parameter 'settingId' cannot be null.");
+        else if (settingId !== undefined)
+            url_ += "settingId=" + encodeURIComponent("" + settingId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHostSettingValue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHostSettingValue(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetHostSettingValue(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param settingId (optional) 
+     * @return Success
+     */
+    getTenantSettingValue(settingId: number | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetTenantSettingValue?";
+        if (settingId === null)
+            throw new Error("The parameter 'settingId' cannot be null.");
+        else if (settingId !== undefined)
+            url_ += "settingId=" + encodeURIComponent("" + settingId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantSettingValue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantSettingValue(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetTenantSettingValue(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param entityId (optional) 
      * @param attributeIds (optional) 
      * @param sorting (optional) 
@@ -48864,6 +49082,110 @@ export class SystemTablesServiceProxy {
     /**
      * @return Success
      */
+    getEntityObjectTypeTenantId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeTenantId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeTenantId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeTenantId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeTenantId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeHostId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeHostId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeHostId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeHostId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeHostId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getObjectStandardFeatureId(): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectStandardFeatureId";
         url_ = url_.replace(/[?&]$/, "");
@@ -72659,6 +72981,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
     extraDataAttr!: ExtraDataAttrDto[] | undefined;
     recommended!: ExtraDataAttrDto[] | undefined;
     additional!: ExtraDataAttrDto[] | undefined;
+    charges!: ExtraDataAttrDto[] | undefined;
     variations!: ExtraDataAttrDto[] | undefined;
     appItemSizesScaleInfo!: AppItemSizesScaleInfo[] | undefined;
     sycIdentifierId!: number | undefined;
@@ -72779,6 +73102,11 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
                 this.additional = [] as any;
                 for (let item of _data["additional"])
                     this.additional!.push(ExtraDataAttrDto.fromJS(item));
+            }
+            if (Array.isArray(_data["charges"])) {
+                this.charges = [] as any;
+                for (let item of _data["charges"])
+                    this.charges!.push(ExtraDataAttrDto.fromJS(item));
             }
             if (Array.isArray(_data["variations"])) {
                 this.variations = [] as any;
@@ -72907,6 +73235,11 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
             for (let item of this.additional)
                 data["additional"].push(item.toJSON());
         }
+        if (Array.isArray(this.charges)) {
+            data["charges"] = [];
+            for (let item of this.charges)
+                data["charges"].push(item.toJSON());
+        }
         if (Array.isArray(this.variations)) {
             data["variations"] = [];
             for (let item of this.variations)
@@ -72959,6 +73292,7 @@ export interface IAppItemVariationsDto {
     extraDataAttr: ExtraDataAttrDto[] | undefined;
     recommended: ExtraDataAttrDto[] | undefined;
     additional: ExtraDataAttrDto[] | undefined;
+    charges: ExtraDataAttrDto[] | undefined;
     variations: ExtraDataAttrDto[] | undefined;
     appItemSizesScaleInfo: AppItemSizesScaleInfo[] | undefined;
     sycIdentifierId: number | undefined;
@@ -73034,6 +73368,7 @@ export interface IAppItemAttributePriceDto {
 export enum RecommandedOrAdditional {
     RECOMMENDED = 0,
     ADDITIONAL = 1,
+    CHARGES = 2,
 }
 
 export class ExtraAttribute implements IExtraAttribute {
@@ -73195,6 +73530,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
     extraDataAttr!: ExtraDataAttrDto[] | undefined;
     recommended!: ExtraDataAttrDto[] | undefined;
     additional!: ExtraDataAttrDto[] | undefined;
+    charges!: ExtraDataAttrDto[] | undefined;
     variations!: ExtraDataAttrDto[] | undefined;
     appItemPriceInfos!: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo!: AppItemSizesScaleInfo[] | undefined;
@@ -73331,6 +73667,11 @@ export class AppItemForViewDto implements IAppItemForViewDto {
                 this.additional = [] as any;
                 for (let item of _data["additional"])
                     this.additional!.push(ExtraDataAttrDto.fromJS(item));
+            }
+            if (Array.isArray(_data["charges"])) {
+                this.charges = [] as any;
+                for (let item of _data["charges"])
+                    this.charges!.push(ExtraDataAttrDto.fromJS(item));
             }
             if (Array.isArray(_data["variations"])) {
                 this.variations = [] as any;
@@ -73479,6 +73820,11 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             for (let item of this.additional)
                 data["additional"].push(item.toJSON());
         }
+        if (Array.isArray(this.charges)) {
+            data["charges"] = [];
+            for (let item of this.charges)
+                data["charges"].push(item.toJSON());
+        }
         if (Array.isArray(this.variations)) {
             data["variations"] = [];
             for (let item of this.variations)
@@ -73551,6 +73897,7 @@ export interface IAppItemForViewDto {
     extraDataAttr: ExtraDataAttrDto[] | undefined;
     recommended: ExtraDataAttrDto[] | undefined;
     additional: ExtraDataAttrDto[] | undefined;
+    charges: ExtraDataAttrDto[] | undefined;
     variations: ExtraDataAttrDto[] | undefined;
     appItemPriceInfos: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo: AppItemSizesScaleInfo[] | undefined;
@@ -73775,6 +74122,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
     extraDataAttr!: ExtraDataAttrDto[] | undefined;
     recommended!: ExtraDataAttrDto[] | undefined;
     additional!: ExtraDataAttrDto[] | undefined;
+    charges!: ExtraDataAttrDto[] | undefined;
     variations!: ExtraDataAttrDto[] | undefined;
     appItemPriceInfos!: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo!: AppItemSizesScaleInfo[] | undefined;
@@ -73891,6 +74239,11 @@ export class AppItemForEditDto implements IAppItemForEditDto {
                 this.additional = [] as any;
                 for (let item of _data["additional"])
                     this.additional!.push(ExtraDataAttrDto.fromJS(item));
+            }
+            if (Array.isArray(_data["charges"])) {
+                this.charges = [] as any;
+                for (let item of _data["charges"])
+                    this.charges!.push(ExtraDataAttrDto.fromJS(item));
             }
             if (Array.isArray(_data["variations"])) {
                 this.variations = [] as any;
@@ -74019,6 +74372,11 @@ export class AppItemForEditDto implements IAppItemForEditDto {
             for (let item of this.additional)
                 data["additional"].push(item.toJSON());
         }
+        if (Array.isArray(this.charges)) {
+            data["charges"] = [];
+            for (let item of this.charges)
+                data["charges"].push(item.toJSON());
+        }
         if (Array.isArray(this.variations)) {
             data["variations"] = [];
             for (let item of this.variations)
@@ -74075,6 +74433,7 @@ export interface IAppItemForEditDto {
     extraDataAttr: ExtraDataAttrDto[] | undefined;
     recommended: ExtraDataAttrDto[] | undefined;
     additional: ExtraDataAttrDto[] | undefined;
+    charges: ExtraDataAttrDto[] | undefined;
     variations: ExtraDataAttrDto[] | undefined;
     appItemPriceInfos: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo: AppItemSizesScaleInfo[] | undefined;

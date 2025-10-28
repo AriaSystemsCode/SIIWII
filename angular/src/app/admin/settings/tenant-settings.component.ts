@@ -62,7 +62,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
         private _tokenService: TokenService
     ) {
         super(injector);
-        //i49- set dto same as  getAppTransactionsForView api 
+        //i49-F6 set dto same as  getAppTransactionsForView api 
 //    this.appTransactionsForViewDto= {
 //     "lastRecord": false,
 //     "firstRecord": false,
@@ -626,7 +626,7 @@ this.formTouched = false;
     ngOnInit(): void {
    this.getAppItemTypeExtraAttributesById()
 
-   //i49- upload files
+   //i49-F6 upload files
    //this.initUploaders();
     }
 
@@ -821,7 +821,7 @@ defineExtraAttributes() {
 }
 
 getAppItemTypeExtraAttributesById() {
-  //i49- send setting id & use usage
+  //i49-F6 send setting id & use usage
     this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(771)
       .subscribe((res) => {
         if (res?.length > 0) {
@@ -930,7 +930,7 @@ getAppItemTypeExtraAttributesById() {
   }
   
 
-  //i49- save setting data
+  //i49-F6 save setting data
   onExtraAttributesChanged(dataFromChild: any[]) {
     this.formTouched = true;
     if (!this.appTransactionsForViewDto) {

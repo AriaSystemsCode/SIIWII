@@ -131,8 +131,9 @@ export class CreateOrEditAppItemComponent
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
     oldnonLookupValues;
-    //i49 get taxCodes
+    //i49-F5 get taxCodes
      taxCodes;
+     _isTexable:boolean=false;
 
     constructor(
         injector: Injector,
@@ -206,11 +207,14 @@ export class CreateOrEditAppItemComponent
     id: number;
     // interfaces implementations
 
+    
     ngOnInit(): void {
+        this.isTexable();
         this.defineExtraAttributes();
         this.initUploaders();
         this.id = this.detectComponentMode();
         if (this.id) {
+            //i49-F5 get texable data 
             this.getAppItemDataForEdit(this.id)
                 .then((res) => {
                     if (this.listingMode === ListingModeEnum.Create)
@@ -1613,6 +1617,7 @@ export class CreateOrEditAppItemComponent
 
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
+          //i49-F5 set texable data 
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -2098,5 +2103,18 @@ export class CreateOrEditAppItemComponent
 
     onTaxCodeChange(value: number) {
         this.appItem.taxPercent = value;
+    }
+
+    isTexable(){
+        //i49-F5 API return error
+        //i49-F5 texable id 
+        this._isTexable=true;
+       /*  this._appEntitiesServiceProxy
+            .getTenantSettingValue(undefined)
+            .subscribe((res: any) => {
+                this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
+            });
+          */
+      
     }
 }
