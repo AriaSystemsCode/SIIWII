@@ -6388,7 +6388,7 @@ namespace onetouch.AppItems
                 {
                     long AbpSessionUserId = (long)AbpSession.UserId;
                     string message = "Items imported successfully.";
-                    if (!string.IsNullOrEmpty(excelResultsDTO.FilePath)) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+                    if (!string.IsNullOrEmpty(excelResultsDTO.FilePath) && !excelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
                     await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
                         message,
                         Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
@@ -8099,7 +8099,7 @@ namespace onetouch.AppItems
             {
                 long AbpSessionUserId = (long)AbpSession.UserId;
                 string message = "Items imported successfully.";
-                if (!string.IsNullOrEmpty(excelResultsDTO.FilePath)) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+                if (!string.IsNullOrEmpty(excelResultsDTO.FilePath) && !excelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
                 await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
                     message,
                     Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
