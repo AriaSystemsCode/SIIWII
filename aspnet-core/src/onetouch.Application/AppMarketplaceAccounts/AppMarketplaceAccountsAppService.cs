@@ -1373,6 +1373,7 @@ namespace onetouch.AppMarketplaceAccounts
                            .Where(s => s.RecipientContactSSIN == x.SSIN && s.ConsiderAsTeamMember == true &&
                            s.RequesterContactSSIN == input.SSIN //&& s.SharingLevel == 1
                            && s.EntityObjectStatusId == activeRelationshipStatusId).Count() > 0
+                           && (x.EntityFk.TenantOwner == AbpSession.TenantId || x.EntityFk.TenantOwner == 0)
                            //&& x.ParentId == mainAccountID
                            //&& x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId
                            ).ToList();

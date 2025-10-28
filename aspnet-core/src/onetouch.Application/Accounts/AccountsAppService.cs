@@ -5917,23 +5917,37 @@ namespace onetouch.Accounts
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var contact = await _appContactRepository.GetAll()
+              .Include(z=>z.EntityFk)
               .Include(x => x.EntityFk.EntityExtraData)
               .Include(x => x.EntityFk.EntityAttachments).ThenInclude(x => x.AttachmentFk)
               .Where(x => x.Id == input).FirstOrDefaultAsync();
                 if (contact != null)
                 {
                     returnObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contact);
-                    if (returnObject.EntityAttachments!=null && returnObject.EntityAttachments.Count > 0)
+
+                    if (returnObject.EntityAttachments != null && returnObject.EntityAttachments.Count > 0)
                     {
                         foreach (var attach in returnObject.EntityAttachments)
                         {
                             attach.Url = string.IsNullOrEmpty(attach.FileName) ?
                                             ""
-                                            : "attachments/" + (contact.TenantId == null ? "-1" : contact.TenantId.ToString()) 
+                                            : "attachments/" + (contact.TenantId == null ? "-1" : contact.TenantId.ToString())
                                             + "/" + attach.FileName;
                         }
                     }
-                    returnObject.ExtraDataAttributes = new List<ExtraDataAttrDto>();
+                    //I40[Start]
+                    var publishedRecord = await _appMarketplaceContactRepository.GetAll()
+                                 .AsNoTracking()
+                                 .FirstOrDefaultAsync(x => x.TenantId == null
+                                 && x.IsProfileData == true
+                                 && x.SharingLevel == 1
+                                 && x.SSIN == contact.SSIN);
+                    if (publishedRecord != null)
+                    {
+                        returnObject.TenantOwner = publishedRecord.TenantOwner;
+                    }
+                    //I40[End]
+                        returnObject.ExtraDataAttributes = new List<ExtraDataAttrDto>();
                     returnObject.ExtraDataAttributes = _appEntitiesAppService.GetAppEntityExtraDataWithPaging(contact.EntityId, contact.EntityFk.EntityObjectTypeId).Result.Items.ToList();
                     if (returnObject.LanguageId != null)
                     {
@@ -6882,7 +6896,7 @@ namespace onetouch.Accounts
                 //ContactDto contactDtoObj = new ContactDto();
                 ObjectMapper.Map(contact, returnObject);
                 //Publish Contact if the related Account is published
-                if (accountDto.TenantId  == AbpSession.TenantId && account!=null)//input.UserId != null && input.UserId != 0)
+                if (accountDto.TenantId  == AbpSession.TenantId && account!=null && (accountDto.TenantOwner==0 || accountDto.TenantOwner == AbpSession.TenantId))//input.UserId != null && input.UserId != 0)
                 {
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
