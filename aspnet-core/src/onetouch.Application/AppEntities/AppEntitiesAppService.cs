@@ -152,12 +152,13 @@ namespace onetouch.AppEntities
             var filteredAppEntities = _appEntityRepository.GetAll()
                         .Include(e => e.EntityObjectTypeFk)
                         .Include(e => e.EntityObjectStatusFk)
+                        .Include(e => e.EntityExtraData)
                         .Include(e => e.ObjectFk)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Notes.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), e => e.Name == input.NameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Notes == input.DescriptionFilter)
-                        //.WhereIf(!string.IsNullOrWhiteSpace(input.ExtraDataFilter), e => e.ExtraData == input.ExtraDataFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.ExtraDataFilter), e => e.EntityExtraData.Select(s=> (s.AttributeValueId.ToString() == input.ExtraDataFilter || s.AttributeValue == input.ExtraDataFilter)).ToList().Count>0)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SycEntityObjectTypeNameFilter), e => e.EntityObjectTypeFk != null && e.EntityObjectTypeFk.Name == input.SycEntityObjectTypeNameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SycEntityObjectStatusNameFilter), e => e.EntityObjectStatusFk != null && e.EntityObjectStatusFk.Name == input.SycEntityObjectStatusNameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SydObjectNameFilter), e => e.ObjectFk != null && e.ObjectFk.Name == input.SydObjectNameFilter)
@@ -189,6 +190,8 @@ namespace onetouch.AppEntities
                                       IsDefault = o.IsDefault,
                                       EntityObjectTypeId = o.EntityObjectTypeId,
                                       EntityObjectTypeCode = o.EntityObjectTypeCode,
+                                      EntityExtraData = (input.IncludeExtraDataFilter && o.EntityExtraData!=null)
+                                                        ?ObjectMapper.Map<List<AppEntityExtraDataDto>>(o.EntityExtraData): null,
                                       Id = o.Id,
                                       IsHostRecord = o.TenantId == null
                                   },
@@ -1554,10 +1557,10 @@ namespace onetouch.AppEntities
             var hostId = await GetCurrentHostEntityId();
             if(hostId != 0)
             {
-                var x = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
-                if (x!= null)
+                var extraDataList = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
+                if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
-                    return x.Items[0].AttributeValue;
+                    return extraDataList.Items[0].AttributeValue;
                 }
             }
             return "";
@@ -1569,10 +1572,10 @@ namespace onetouch.AppEntities
             var hostId = await GetCurrentTenantEntityId();
             if (hostId != 0)
             {
-                var x = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
-                if (x != null)
+                var extraDataList = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
+                if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
-                    return x.Items[0].AttributeValue;
+                    return extraDataList.Items[0].AttributeValue;
                 }
             }
             return "";
