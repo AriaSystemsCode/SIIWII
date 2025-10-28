@@ -36,6 +36,7 @@ import {
     AppEntitiesServiceProxy,
     VariationListToDeleteDto,
     AppItemLookupDto,
+    SydObjectsServiceProxy,
 
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
@@ -131,8 +132,8 @@ export class CreateOrEditAppItemComponent
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
     oldnonLookupValues;
-    //i49-F5 get taxCodes
      taxCodes;
+     appEntities;
      _isTexable:boolean=false;
 
     constructor(
@@ -146,6 +147,7 @@ export class CreateOrEditAppItemComponent
         private _activatedRoute: ActivatedRoute,
         private _pricingHelperService: PricingHelpersService,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private _sydObjectsServiceProxy:SydObjectsServiceProxy,
         private _router: Router
     ) {
         super(injector, _location);
@@ -214,7 +216,6 @@ export class CreateOrEditAppItemComponent
         this.initUploaders();
         this.id = this.detectComponentMode();
         if (this.id) {
-            //i49-F5 get texable data 
             this.getAppItemDataForEdit(this.id)
                 .then((res) => {
                     if (this.listingMode === ListingModeEnum.Create)
@@ -1617,7 +1618,7 @@ export class CreateOrEditAppItemComponent
 
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
-          //i49-F5 set texable data 
+          //i49-F5 set texable data if fildes or will be extra data like recommended & additional  
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -2106,15 +2107,52 @@ export class CreateOrEditAppItemComponent
     }
 
     isTexable(){
-        //i49-F5 API return error
-        //i49-F5 texable id 
-        this._isTexable=true;
-       /*  this._appEntitiesServiceProxy
-            .getTenantSettingValue(undefined)
+        //i49-F5 texable setting id 
+        this._appEntitiesServiceProxy
+            .getTenantSettingValue(1111)
             .subscribe((res: any) => {
                 this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
+
+                if(this._isTexable)
+                    this.getTaxesData();
             });
-          */
-      
+    }
+
+    getTaxesData() {
+        this._sydObjectsServiceProxy.getAllLookups(
+        ).subscribe(result => {
+           let  indx= result?.findIndex(x=>x.code.toString().toUpperCase() == "CHARGES");  
+           if(indx>=0){   
+//i49-F5 need return only tax     
+            this._appEntitiesServiceProxy.getAll(
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                "Tax",
+                true,
+                undefined,
+                undefined,
+                undefined,
+                result[indx]?.id,
+                undefined,
+                0,
+                this.maxResultCount
+            ).subscribe(result => {
+              this.appEntities = result?.items?.map(item => item.appEntity) || [];
+              this.taxCodes = this.appEntities
+              .filter(entity => !!entity?.code)
+              .map(entity => {
+                const attr = entity?.entityExtraData?.find(a => a.attributeId === 1203);
+                return {
+                  label: entity.code,
+                  value: attr?.attributeValue || null
+                };
+              })
+              .filter(item => !!item.value);
+                        });
+        }
+
+        });
     }
 }

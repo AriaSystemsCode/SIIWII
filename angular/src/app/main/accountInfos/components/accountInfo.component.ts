@@ -1326,15 +1326,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     isTexable(){
-        //i49-F5 API return error
-        //i49-F5 texable id 
-        this._isTexable=true;
-       /*  this._appEntitiesServiceProxy
-            .getTenantSettingValue(undefined)
+        //i49-F5 texable setting id 
+         this._AppEntitiesServiceProxy
+            .getTenantSettingValue(1111)
             .subscribe((res: any) => {
                 this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
             });
-          */
-      
     }
 }

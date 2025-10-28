@@ -1770,7 +1770,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
     //         getAllInputs.search,
     //         undefined,
     //         undefined,
-    //         undefined,
+    //         undefined,true
     //         extraAttr.entityObjectTypeCode,
     //         undefined,
     //         undefined,

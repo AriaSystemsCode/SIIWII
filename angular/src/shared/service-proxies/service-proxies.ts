@@ -5534,6 +5534,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -5543,7 +5544,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEntityForViewDto> {
+    getAll(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEntityForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -5555,6 +5556,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -6729,6 +6734,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -6738,7 +6744,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllEntitiesByTypeCodeWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllEntitiesByTypeCodeWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllEntitiesByTypeCodeWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -6750,6 +6756,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -6938,6 +6948,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -6947,7 +6958,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllBackgroundWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelWithAttachmentDto> {
+    getAllBackgroundWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelWithAttachmentDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllBackgroundWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -6959,6 +6970,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -7031,6 +7046,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -7040,7 +7056,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllCurrencyForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllCurrencyForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllCurrencyForTableDropdownWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -7052,6 +7068,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -7124,6 +7144,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -7133,7 +7154,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllLanguageForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllLanguageForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllLanguageForTableDropdownWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -7145,6 +7166,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -7217,6 +7242,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -7226,7 +7252,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllCountryForTableDropdowWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllCountryForTableDropdowWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllCountryForTableDropdowWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -7238,6 +7264,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -7310,6 +7340,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -7319,7 +7350,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllAccountTypesForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllAccountTypesForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllAccountTypesForTableDropdownWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -7331,6 +7362,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -7461,6 +7496,7 @@ export class AppEntitiesServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -7470,7 +7506,7 @@ export class AppEntitiesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllEntityTypeForTableDropdown(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllEntityTypeForTableDropdown(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllEntityTypeForTableDropdown?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -7482,6 +7518,10 @@ export class AppEntitiesServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -17835,6 +17875,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -17845,7 +17886,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param accountSSIN (optional) 
      * @return Success
      */
-    getAllBrandsWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, accountSSIN: string | null | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllBrandsWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, accountSSIN: string | null | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAllBrandsWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -17857,6 +17898,10 @@ export class AppMarketplaceItemsServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)

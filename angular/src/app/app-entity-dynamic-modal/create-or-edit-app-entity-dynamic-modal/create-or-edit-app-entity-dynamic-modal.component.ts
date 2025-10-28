@@ -72,6 +72,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
         solid: true,
         image: false
     };
+
+    _displayVisualTypes:boolean=true;
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -89,6 +91,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         nonlookup:boolean=false
     ): void {
         this.entityObjectType = entityObjectType;
+        this.displayVisualTypes();
         this.saving=false;
         if (appEntity) this.appEntity = appEntity;
         else appEntity = new AppEntityDto();
@@ -720,6 +723,17 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
     dropdownOptions(validEntries){
         return validEntries.split('|');
+    }
+    displayVisualTypes():boolean{
+        //i49- what else ? 
+        //i49-F5 This lable should be "Active" like UI
+        if(this.entityObjectType.code.toString().toUpperCase() == "CHARGES")
+            this._displayVisualTypes=false;
+        else
+        this._displayVisualTypes=true;
+
+
+        return this._displayVisualTypes ;
     }
 }
 

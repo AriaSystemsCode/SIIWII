@@ -61,14 +61,14 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
             this.searchQuery,
             undefined,
             undefined,
-            undefined,
+            undefined,true,
             this.entityObjectType.code,
             undefined,
             undefined,
             undefined,
             this.sortBy,
             this.skipCount,
-            this.maxResultCount,
+            this.maxResultCount
         )
         .pipe(
             finalize(()=>{

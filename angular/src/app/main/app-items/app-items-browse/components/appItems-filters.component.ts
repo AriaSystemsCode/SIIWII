@@ -117,7 +117,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             undefined,
             undefined,
             undefined,
-            undefined,
+            undefined,true,
             extraAttrFilter.code,
             undefined,
             undefined,

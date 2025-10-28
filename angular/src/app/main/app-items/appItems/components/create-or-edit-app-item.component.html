@@ -620,6 +620,7 @@
         </label>
 
               
+                <!-- //i49-F5 bind right texable fields if fildes or will be extra data like recommended & additional  -->
         <select
           class="form-control form-control-sm"
           [(ngModel)]="appItem.taxCode"
@@ -627,13 +628,13 @@
           [disabled]="!appItem.taxable"
           (ngModelChange)="onTaxCodeChange($event)" 
         >
-        <!-- //i49-F5 bind right fields  -->
            <option *ngFor="let code of taxCodes" [value]="code.value">
             {{ code.label }}
           </option> 
         </select>
       </div>
   
+                <!-- //i49-F5 bind right texable fields if fildes or will be extra data like recommended & additional  -->
       <!-- ✅ Tax % Input -->
       <div class="col-md-3" *ngIf="appItem.taxable">
         <label class="col-form-label-sm font-weight-bold mb-1">
