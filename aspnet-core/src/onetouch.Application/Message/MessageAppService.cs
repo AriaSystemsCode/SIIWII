@@ -1975,7 +1975,7 @@ namespace onetouch.Message
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 string userSSIN = "";
-                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => x.EntityFk.TenantId == null &&
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => //x.EntityFk.TenantId == null &&
                          x.AttributeId == 715 && x.AttributeValue == userId.ToString());
                 if (contactEntityExtraData != null)
                 {

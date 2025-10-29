@@ -128,7 +128,7 @@ namespace onetouch.AppMarketplaceAccounts
 
 
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-
+                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                     var filteredAccounts = _appMarketplaceContactRepository.GetAll()
                             .Include(e => e.ContactAddresses).ThenInclude(e => e.AddressFk).ThenInclude(e => e.CountryFk)
                             .Include(e => e.EntityClassifications)
@@ -154,26 +154,37 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
                                 x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 1) > 0,
-                                x => _appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
-
+                                 //I49[Start]
+                                 //x => _appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
+                                 x => _appContactRelationshipInfoRepository.GetAll().Count(
+                                    z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccountSSIN)
+                                    || (z.RequesterContactSSIN == x.SSIN && z.RecipientContactSSIN == currentTenantAccountSSIN)) &&
+                                    z.EntityObjectStatusId == activeRelationshipStatusId
+                                    ) > 0)
+                            //I49[End]
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 2) > 0,
-                                x => (_appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
-                                )
+                               // x => (//_appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
+                                x => _appContactRelationshipInfoRepository.GetAll().Count(
+                                    z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccountSSIN)
+                                    || (z.RequesterContactSSIN == x.SSIN && z.RecipientContactSSIN == currentTenantAccountSSIN)) &&
+                                    z.EntityObjectStatusId == activeRelationshipStatusId
+                                    )==0 )
                             .WhereIf(input.Classifications != null && input.Classifications.Count(x => x > 0) > 0,
                                 x => _appEntityRepository.GetAll().Include(ec => ec.EntityClassifications).FirstOrDefault(e => e.Id == x.Id).EntityClassifications.Any(a => input.Classifications.Contains(a.EntityObjectClassificationId)))
                             .WhereIf(input.Categories != null && input.Categories.Count(x => x > 0) > 0,
                                 x => _appEntityRepository.GetAll().Include(ec => ec.EntityCategories).FirstOrDefault(e => e.Id == x.Id).EntityCategories.Any(a => input.Categories.Contains(a.EntityObjectCategoryId)))
 
                             .WhereIf(!string.IsNullOrEmpty(input.City),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
+                                //x => _appMarketplaceContactRepository.GetAll().Include(z=>z.ContactAddresses).Where(z=> z.AccountId== x.Id && z.ContactAddresses.Any(x=>x.AddressFk.City.Contains(input.City))).Count()>0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.AccountId == x.Id && c.ContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.Address),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.AccountId == x.Id && c.ContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.State),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.AccountId == x.Id && c.ContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.Postal),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.AccountId == x.Id && c.ContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
                             .WhereIf(input.Countries != null && input.Countries.Count(x => x > 0) > 0,
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.AccountId == x.Id && c.ContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
 
                             .WhereIf(input.Languages != null && input.Languages.Count(x => x > 0) > 0,
                                 x => _appMarketplaceContactRepository.GetAll().Count(c => c.Id == x.Id && c.LanguageId != null && input.Languages.Contains((long)c.LanguageId)) > 0)
@@ -239,7 +250,7 @@ namespace onetouch.AppMarketplaceAccounts
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
                                     };
                     var marketplaceRelationshipSycEntityObjId = await _helper.SystemTables.GetEntityObjectTypeMarketplaceRelationship();
-                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                    
                     var pendingRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipPending();
                     var inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
                     var currentTenantAccountObject = _appContactRepository.GetAll().Include(e => e.EntityFk)
@@ -1373,6 +1384,7 @@ namespace onetouch.AppMarketplaceAccounts
                            .Where(s => s.RecipientContactSSIN == x.SSIN && s.ConsiderAsTeamMember == true &&
                            s.RequesterContactSSIN == input.SSIN //&& s.SharingLevel == 1
                            && s.EntityObjectStatusId == activeRelationshipStatusId).Count() > 0
+                           && (x.EntityFk.TenantOwner == AbpSession.TenantId || x.EntityFk.TenantOwner == 0)
                            //&& x.ParentId == mainAccountID
                            //&& x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId
                            ).ToList();
