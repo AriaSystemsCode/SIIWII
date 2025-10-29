@@ -11,6 +11,7 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { SyclandingADVComponent } from "./../components/syclanding-Adv.component";
 import { Router } from "@node_modules/@angular/router";
+import { ApiRow, SectionConfig, SectionItem, SectionType } from "../models/landingPage-types";
 
 
 @Component({
@@ -36,12 +37,12 @@ export class SycLandingPageSettingsComponent
      items:any
      productList:any
      pages: any[][] = [];
-     order = {
-        adv_sm: 10, slider: 20, cta: 30, adv_md: 40,
-        products: 60, productsPaged: 70,brands:80,departmants:90,itemList:100
-      };
+
       // update these numbers from API as needed
-      
+      sections:any
+      sectionsFlat: SectionItem[] = [];   // what ngFor iterates
+    private fetchedBrands = false;
+
     constructor(
         injector: Injector,
         private _sydObjectsAppService: SydObjectsServiceProxy,
@@ -50,7 +51,23 @@ export class SycLandingPageSettingsComponent
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     ) {
         super(injector);
-      
+      // in SycLandingPageSettingsComponent
+// this.sections = [
+//     { type: '1', order: 10 },
+//     { type: '3', order: 20 },
+//     { type: '5',    order: 30 },
+//     { type: 'adv_md', order: 40 },
+  
+//     // You can repeat brands multiple times with different inputs/titles
+//     { type: 'brands', order: 50, inputs: { title: 'Our Brands', pageSize: 8 } },
+//     { type: 'brands', order: 100, inputs: { title: 'Featured Brands', pageSize: 6, tag: 'featured' } },
+  
+//     { type: 'products',      order: 60, inputs: { title: 'Products',  numVisible: 5 } },
+//     { type: 'productsPaged', order: 70, inputs: { title: 'Products',  pageSize: 9 } },
+//     { type: 'departments',   order: 80, inputs: { title: 'Departments' } },
+//     { type: 'itemList',      order: 90, inputs: { title: 'Departments' } }
+//   ];
+  
 
           this.items = [
             {
@@ -310,19 +327,141 @@ export class SycLandingPageSettingsComponent
 
     ngOnInit(): void {
         this.pages = this.chunk(this.items, 9); // each page has 9 products
-        this.GetAllAtoSliderSettings();
-        this.getAllCallToActionSettings();
-        this.getAdvSettings();
-        this.getAllBrands()
-        this.getParentDepartments()
-        this.getAllProductCAtalogs()
+        this.loadSections()
+        // this.GetAllAtoSliderSettings();
+        // this.loadSectionsFromBackend()
+        // this.getAllCallToActionSettings();
+        // this.getAdvSettings();
+        // this.getAllBrands()
+        // this.getParentDepartments()
+        // this.getAllProductCAtalogs()
         // this.getAllBrandSettings()
     }
+
+
+    private loadSections() {
+      const sub = this._sydObjectsAppService
+        .getAllSliderSettings(SliderEnum.CSSB, undefined)
+        .subscribe((api: any) => {
+          const rows: ApiRow[] = Array.isArray(api?.result) ? api.result : api;
+    
+          const normalized = rows.map((r, idx) => ({
+            ...r,
+            _type: this.TYPE_TO_SECTION[r.type] ?? 'ASSB',
+            _order: r.order ?? 0,
+            _idx: idx, // preserve API order
+          }));
+    
+          const flat: SectionItem[] = normalized.map(r => {
+            switch (r._type) {
+              case 'ASSB':
+                return {
+                  type: 'ASSB',
+                  order: r._order,
+                  sectionId: r.id,
+                  // rowIds: [r.id],
+                  inputs: {
+                    images: r.image ? [r.image] : [], // one row = one slide set (single image)
+                    title: r.title ?? null , name: r.name ?? null
+                  }
+                };
+              case 'ASMB':
+                return {
+                  type: 'ASMB',
+                  order: r._order,
+                  sectionId: r.id,
+                  // rowIds: [r.id],
+                  inputs: { images: r.image ? [r.image] : [] ,    title: r.title ?? null , name: r.name ?? null}
+                };
+              case 'CSMP':
+                return {
+                  type: 'CSMP',
+                  order: r._order,
+                  sectionId: r.id,
+                  // rowIds: [r.id],
+                  inputs: {  title: r.title ?? null, name: r.name ?? null} 
+                };
+              // case 'PF':
+              //   // You can call getAllBrands() once globally if you like
+              //   // or leave it as-is if brands are already cached
+              //   return {
+              //     type: 'PF',
+              //     order: r._order,
+              //     sectionId: r.id,
+              //     // rowIds: [r.id],
+              //     inputs: { title: r.title , name: r.name ?? null }
+              //   };
+              case 'SRCTA':
+                return {
+                  type: 'SRCTA',
+                  order: r._order,
+                  sectionId: r.id,
+                  // rowIds: [r.id],
+                  inputs: { title: r.title , name: r.name ?? null }
+                };
+              // case 'departments':
+              //   return {
+              //     type: 'departments',
+              //     order: r._order,
+              //     sectionId: r.id,
+              //     // rowIds: [r.id],
+              //     inputs: { title: r.title , name: r.name ?? null }
+              //   };
+              case 'MRCTA':
+                return {
+                  type: 'MRCTA',
+                  order: r._order,
+                  sectionId: r.id,
+                  // rowIds: [r.id],
+                  inputs: { title: r.title ?? null , name: r.name ?? null}
+                };
+              default:
+                return {
+                  type: 'ASSB',
+                  order: r._order,
+                  sectionId: r.id,
+                  // rowIds: [r.id],
+                  inputs: { images: r.image ? [r.image] : [] , name: r.name ?? null}
+                };
+            }
+          });
+    
+          // Stable order: by order, then by original index
+          flat.sort((a, b) => (a.order - b.order) || (rows.findIndex(rr => rr.id === a.sectionId) - rows.findIndex(rr => rr.id === b.sectionId)));
+    
+          this.sectionsFlat = flat;
+    
+          // fetch brands once if any PF exists
+          if (flat.some(s => s.type === 'SRCTA') && !this.fetchedBrands) {
+            this.fetchedBrands = true;
+            this.getAllBrands();
+          }
+        });
+    
+ 
+      }    
+    
 
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
     }
-
+ 
+    private TYPE_TO_SECTION: Record<number, SectionType> = {
+   
+        0: 'ASSB',
+        1: 'ASMB',
+        2: 'ASSB',
+        3: 'CSMP',
+        4: 'SRCTA',
+        5: 'MRCTA',      
+    
+      };
+      
+      get sectionsSorted(): SectionConfig[] {
+        // ✅ guard + avoid mutate
+        return [...(this.sections || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      }
+      
     goToBrand(brand: { label: string; value: number | string }) {
         // Navigate with ONLY the human-readable name in the URL
         this.router.navigate(
@@ -353,32 +492,27 @@ export class SycLandingPageSettingsComponent
         for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
         return out;
       }
+      
     GetAllAtoSliderSettings() {
         var sliderItems: string[] = [];
         const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.AutoSlider, this.autoSliderCode)
+            .getAllSliderSettings(SliderEnum.CSSB,  undefined)
             .subscribe((result) => {
                 result.forEach((img) => {
                     sliderItems.push(img.image);
                 });
-
+                console.log(result,'res')
+                this.sections = result
                 this.slider.sliderItems = sliderItems;
             });
         this.subscriptions.push(subs);
     }
 
-    getAllCallToActionSettings() {
-        const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.CallToAction, this.CTASliderCode)
-            .subscribe((result) => {
-                this.cta.sycLangingPageSetting = result;
-            });
-        this.subscriptions.push(subs);
-    }
+
 
     getAllBrandSettings() {
         const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.AdvSlider, this.CTASliderCode)
+            .getAllSliderSettings(SliderEnum.ASMB, this.CTASliderCode)
             .subscribe((result) => {
                 this.cta.sycLangingPageSetting = result;
             });
@@ -388,7 +522,7 @@ export class SycLandingPageSettingsComponent
     getAdvSettings() {
         var _advSliderItems: string[] = [];
         const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.AdvSlider, this.advSliderCode)
+            .getAllSliderSettings(SliderEnum.ASMB, this.advSliderCode)
             .subscribe((result) => {
 
                 result.forEach((img) => {

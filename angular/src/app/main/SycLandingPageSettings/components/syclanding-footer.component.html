@@ -1,81 +1,47 @@
 <footer class="flex-rw p-4 d-none d-md-block footerBG">
-    <div class=" row mx-4" >
-        <div *ngFor="let brand of brands" class="col-4 text-white">
-            <a>{{brand?.name}}</a>
-         
-         </div>
-
-         <div *ngFor="let brand of brands"  class="col-4  text-white">
-            <a>{{brand?.name}}</a>        
-
-         </div>
-         <div *ngFor="let brand of brands"  class="col-4  text-white">
-            <a>{{brand?.name}}</a>
-         </div>
-    </div>   
-
-    <section class="footer-bottom-section flex-rw">
-  <div class="footer-bottom-wrapper"> 
-    <div class="pb-4"><a href='#'
->
-    <img
-        src="../../../assets/landingPage/Logo_Main.png"
-    />
-</a></div>
-
-  <i class="fa fa-copyright" role="copyright">
-   
-  </i> 
-  <span class="footer-bottom-rights"> 2022 SIWII Security Your Privacy Terms</span>
+    <div class="row">
+        <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
+          <ng-container [ngSwitch]="s.type">
+      
+            <div *ngSwitchCase="'PF'" class="col-12 col-md-4 mb-4">
+              <app-page-link-footer
+                [sectionId]="s.sectionId"
+                [data]="brands">
+              </app-page-link-footer>
+            </div>
+      
+          </ng-container>
+        </ng-container>
       </div>
-      <div class="footer-bottom-wrapper pt-5">
-      <a href='https://www.facebook.com/siiwii.network/' target="_blank" class="generic-anchor pr-5">  <img
-        src="../../../assets/landingPage/Footer_FB_Btn.svg"
-    /></a> 
-      <a href='https://www.instagram.com/siiwii.network/' target="_blank" class="generic-anchor pr-5"><img
-        src="../../../assets/landingPage/Footer_Instagram_Btn.svg"
-    /></a>
-    <a href='https://twitter.com/siiwii_net' target="_blank" class="generic-anchor pr-5"><img
-        src="../../../assets/landingPage/Footer_Twitter_Btn.svg"
-    /></a>
-    <a href='https://www.linkedin.com/company/siiwii/' target="_blank" class="generic-anchor pr-5"><img
-        src="../../../assets/landingPage/Footer_Linkedin_Btn.svg"
-    /></a>
-    <a href='https://www.youtube.com/channel/UCv_4Ao0myNHsjfxyg4lbLbg' target="_blank" class="generic-anchor pr-5">
-        <div style="
-background-color: white;
-width: 40px;
-height: 35px;
-border-radius: 5px;" class="d-inline-block pl-1">
-            <img _ngcontent-hls-c464="" src="../../../assets/landingPage/Footer_Youtube_Btn.jpg" style="
-width: 34px;
-height: 34px;
-" >
+      
+    <section class="footer-bottom-section flex-rw">
+        <div class="footer-bottom-wrapper">
+            <div class="pb-4"><a href='#'>
+                    <img src="../../../assets/landingPage/Logo_Main.png" />
+                </a></div>
+
+            <i class="fa fa-copyright" role="copyright">
+
+            </i>
+            <span class="footer-bottom-rights"> 2022 SIWII Security Your Privacy Terms</span>
         </div>
-    </a>
-        </div>
+        <div class="footer-bottom-wrapper pt-5">
+            <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
+                <div class="col-12 mb-4">
+                    <ng-container [ngSwitch]="s.type">
+                        <app-social-media-footer *ngSwitchCase="'SM'"
+                            [sectionId]="s.sectionId"></app-social-media-footer>
+                        </ng-container>
+                    </div>
+                    </ng-container>
+                </div>
     </section>
-  </footer>
+
+</footer>
 
 
-  <footer class="flex-rw p-4 d-block d-md-none mb-5"> 
+<footer class="flex-rw p-4 d-block d-md-none mb-5">
     <div class="footer-bottom-wrapper pt-5 d-flex socialMedia">
-        <a href='https://www.facebook.com/siiwii.network/' target="_blank" class="generic-anchor pr-5">  <img
-          src="../../../assets/landingPage/SocialMedia_FB_icon.svg"
-      /></a> 
-        <a href='https://www.instagram.com/siiwii.network/' target="_blank" class="generic-anchor pr-5"><img
-          src="../../../assets/landingPage/SocialMedia_In_icon.svg"
-      /></a>
-      <a href='https://twitter.com/siiwii_net' target="_blank" class="generic-anchor pr-5"><img
-          src="../../../assets/landingPage/SocialMedia_Tw_icon.svg"
-      /></a>
-      <a href='https://www.linkedin.com/company/siiwii/' target="_blank" class="generic-anchor pr-5"><img
-          src="../../../assets/landingPage/SocialMedia_Ln_icon.svg"
-      /></a>
-      <a href='https://www.youtube.com/channel/UCv_4Ao0myNHsjfxyg4lbLbg' target="_blank" class="generic-anchor pr-5">
-          <div class="d-inline-block pl-1">
-              <img _ngcontent-hls-c464="" src="../../../assets/landingPage/SocialMedia_Yt_icon.svg">
-          </div>
-      </a>
-          </div>
-    </footer>
+        <app-social-media-footer></app-social-media-footer>
+    </div>
+</footer>

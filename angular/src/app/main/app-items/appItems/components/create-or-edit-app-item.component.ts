@@ -334,6 +334,7 @@ export class CreateOrEditAppItemComponent
                 this.maxResultCount,
                 undefined,
                 undefined,
+                undefined, /////
                 undefined
             )
             .toPromise()
@@ -523,7 +524,9 @@ let x=  this.appItem.nonLookupValues;
                             value:extraAttr.selectedValues,
                             isHostRecord:false,
                             hexaCode:undefined,
-                            image:undefined
+                            image:undefined,
+                            status:undefined,
+                            entityObjectStatusId:undefined
                         })
                         result.items.push(tempAtt)
                     }

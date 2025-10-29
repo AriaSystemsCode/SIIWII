@@ -1,110 +1,109 @@
-<div>
-  <div class="contacts  d-flex flex-column">
-    <app-syclanding-adv #adv_sm class="d-md-none d-block" [advSliderItems]="advSliderItems" [style.order]="order.adv_sm"></app-syclanding-adv>
-    <app-slider #slider class="d-md-block d-none" [style.order]="order.slider"></app-slider>
-    <app-cta #cta [style.order]="order.cta"></app-cta>
-    <app-syclanding-adv #adv_md class="d-md-block d-none" [advSliderItems]="advSliderItems"  [style.order]="order.adv_md"></app-syclanding-adv>
+<div class="contacts d-flex flex-column" style="margin-top: 40px;">
+  <ng-container *ngFor="let s of sectionsFlat; ">
+    <ng-container [ngSwitch]="s.type">
+
+      <!-- auto slider with call to action-->
+      <div *ngSwitchCase="'ASSB'">
+        <h4>slider>> {{ s.inputs?.name  }}</h4>
+        <app-slider 
+        class="d-md-block d-none"
+     
+        [sectionId]="s.sectionId"
+    >
+</app-slider>
+      </div>
+ 
+
+         <!-- carusal slider multi blocks-->
+      <app-cta *ngSwitchCase="'CSMP'"   [sectionId]="s.sectionId"
+               [sectionData]="s.inputs">
+      </app-cta>
+
+         <!-- auto slider without call to action-->
+       <div *ngSwitchCase="'ASMB'">
+        <h4>slider without>> {{ s.inputs?.name  }}</h4>
+
+        <app-syclanding-adv 
+        class=" d-block"    [sectionId]="s.sectionId"
+       >
+</app-syclanding-adv>
+       </div>
 
 
-    <div class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin: 30px 50px !important;" [style.order]="order.brands">
-      <h4 class="text-center">Our Brands</h4>
 
-      <p-carousel [value]="brands" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false"
+      <!--single row Call to Action  (can be brands or products)-->
+      <div *ngSwitchCase="'SRCTA'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
+        <h4 class="text-center">{{ s.inputs?.title  }}</h4>
+        <p-carousel [value]="brands" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false"
         [showNavigators]="true" class="p-4 m-2  rounded">
-        <!-- -->
+  
         <ng-template pTemplate="item" let-brand>
           <div class="px-2 my-2 d-flex flex-column">
-            <!-- <h5>{{brand?.name}}</h5> -->
+
             <img [src]="brand?.image ? attachmentBaseUrl + '/' +  brand?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2" style="width: 80px;" alt="" srcset=""
               onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToBrand(brand)">
               <a (click)="goToBrand(brand)">{{brand?.label}}</a>
           </div>
         </ng-template>
       </p-carousel>
-    </div>
+      </div>
 
-
-    <div class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin: 30px 50px !important;" [style.order]="order.products">
-      <h4> products</h4>
-
-      <p-carousel [value]="items" [numVisible]="5" [numScroll]="5" [circular]="false" [showIndicators]="false"
-        [showNavigators]="true" class="p-4 m-2  rounded">
-
-        <ng-template pTemplate="item" let-product>
-          <div class="px-2 my-2">
-            <app-prodcut-card [product]="product.appItem" [productCard]="product"></app-prodcut-card>
-          </div>
-        </ng-template>
-      </p-carousel>
-    </div>
-
-    <div class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin: 30px 50px !important;" [style.order]="order.productsPaged">
-      <h4>products</h4>
-
-      <p-carousel [value]="pages" [numVisible]="1" [numScroll]="1" [circular]="false" [showIndicators]="false"
-        [showNavigators]="true" class="p-4 m-2 rounded">
-        <ng-template pTemplate="item" let-page>
-          <div class="products-grid">
-            <div *ngFor="let product of page" class="px-2 my-2">
-              <app-prodcut-card [product]="product.appItem" [productCard]="product">
-              </app-prodcut-card>
+    <!--single row Call to Action  (can be brands or products)-->
+      <!-- <div *ngSwitchCase="'SRCTA'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
+        <h4>{{ s.inputs?.title }}</h4>
+        <p-carousel [value]="items" [numVisible]="5" [numScroll]="5" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
+          <ng-template pTemplate="item" let-product>
+            <div class="px-2 my-2">
+              <app-prodcut-card [product]="product.appItem" [productCard]="product"></app-prodcut-card>
             </div>
-          </div>
-        </ng-template>
-      </p-carousel>
-    </div>
+          </ng-template>
+        </p-carousel>
+      </div> -->
 
-    <div class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin: 30px 50px !important;" [style.order]="order.productsPaged">
-      <h4>products</h4>
-
-      <p-carousel [value]="pages" [numVisible]="1" [numScroll]="1" [circular]="false" [showIndicators]="false"
-        [showNavigators]="true" class="p-4 m-2 rounded">
-        <ng-template pTemplate="item" let-page>
-          <div class="products-grid">
-            <div *ngFor="let product of page" class="px-2 my-2">
-              <app-prodcut-card [product]="product.appItem" [productCard]="product">
-              </app-prodcut-card>
+      <!--multi row Call to Action  (can be brands or products)-->
+      <div *ngSwitchCase="'productsPaged'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
+        <h4>{{ s.inputs?.title  }}</h4>
+        <p-carousel [value]="pages" [numVisible]="1" [numScroll]="1" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
+          <ng-template pTemplate="item" let-page>
+            <div class="products-grid">
+              <div *ngFor="let product of page" class="px-2 my-2">
+                <app-prodcut-card [product]="product.appItem" [productCard]="product"></app-prodcut-card>
+              </div>
             </div>
-          </div>
-        </ng-template>
-      </p-carousel>
-    </div>
+          </ng-template>
+        </p-carousel>
+      </div>
 
-    <div class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin: 30px 50px !important;" [style.order]="order.departmants">
-      <h4>Departments</h4>
+      <!-- Departments -->
+      <!-- <div *ngSwitchCase="'departments'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
+        <h4>{{ s.inputs?.title}}</h4>
+        <p-carousel [value]="departments" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
+          <ng-template pTemplate="item" let-department>
+            <div class="px-2 my-2 d-flex flex-column">
+              <img [src]="department?.image ? attachmentBaseUrl + '/' + department?.image : 'assets/placeholders/_logo-placeholder.png'"
+                   class="mb-2" style="width:80px;" (click)="goToDepartment(department)">
+              <a (click)="goToDepartment(department)">{{ department?.label }}</a>
+            </div>
+          </ng-template>
+        </p-carousel>
+      </div> -->
 
-      <p-carousel [value]="departments" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false"
-      [showNavigators]="true" class="p-4 m-2  rounded">
-      <!-- -->
-      <ng-template pTemplate="item" let-department>
-        <div class="px-2 my-2 d-flex flex-column">
-          <!-- <h5>{{brand?.name}}</h5> -->
-          <img [src]="department?.image ? attachmentBaseUrl + '/' +  department?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2" style="width: 80px;" alt="" srcset=""
-            onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToDepartment(department)">
-            <a (click)="goToDepartment(department)">{{department?.label}}</a>
-        </div>
-      </ng-template>
-    </p-carousel>
-    </div>
+      <!-- Item list -->
+      <!-- <div *ngSwitchCase="'itemList'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
+        <h4>{{ s.inputs?.title || 'Departments' }}</h4>
+        <p-carousel [value]="productList" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
+          <ng-template pTemplate="item" let-proList>
+            <div class="px-2 my-2 d-flex flex-column">
+              <img [src]="proList?.image ? attachmentBaseUrl + '/' + proList?.image : 'assets/placeholders/_logo-placeholder.png'"
+                   class="mb-2" style="width:80px;" (click)="goToProList(proList)">
+              <a (click)="goToProList(proList)">{{ proList?.name }}</a>
+            </div>
+          </ng-template>
+        </p-carousel>
+      </div> -->
 
-    <div class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin: 30px 50px !important;" [style.order]="order.itemList">
-      <h4>Departments</h4>
-
-      <p-carousel [value]="productList" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false"
-      [showNavigators]="true" class="p-4 m-2  rounded">
-      <!-- -->
-      <ng-template pTemplate="item" let-proList>
-        <div class="px-2 my-2 d-flex flex-column">
-          <!-- <h5>{{brand?.name}}</h5> -->
-          <img [src]="proList?.image ? attachmentBaseUrl + '/' +  proList?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2" style="width: 80px;" alt="" srcset=""
-            onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToProList(proList)">
-            <a (click)="goToProList(proList)">{{proList?.name}}</a>
-        </div>
-      </ng-template>
-    </p-carousel>
-    </div>
-
-
-  </div>
-  <app-syclanding-footer></app-syclanding-footer>
+    </ng-container>
+  </ng-container>
 </div>
+
+<app-syclanding-footer></app-syclanding-footer>

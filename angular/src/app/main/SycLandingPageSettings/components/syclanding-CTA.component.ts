@@ -1,6 +1,6 @@
-import { Component, OnInit, Injector } from "@angular/core";
+import { Component, OnInit, Injector, Input } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
-import { PageSettingDto, SycAttachmentCategoryDto } from "@shared/service-proxies/service-proxies";
+import { PageSettingDto, SycAttachmentCategoryDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { AppConsts } from "@shared/AppConsts";
 @Component({
     selector: "app-cta",
@@ -8,12 +8,14 @@ import { AppConsts } from "@shared/AppConsts";
     styleUrls: ["./syclanding-CTA.component.scss"],
 })
 export class CTAComponent extends AppComponentBase implements OnInit {
+    @Input() sectionData: any;
     sycLangingPageSetting: PageSettingDto[];
+    @Input() sectionId:number;
     numVisible: number = 4;
     numScroll: number = 4;
     appBaseUrl: string=AppConsts.appBaseUrl;
 
-    constructor(injector: Injector) {
+    constructor(injector: Injector,private SydObjectsServiceProxy:SydObjectsServiceProxy) {
         super(injector);
 
     }
@@ -24,6 +26,11 @@ export class CTAComponent extends AppComponentBase implements OnInit {
         .subscribe((res)=>{
             this.sycAttachmentCategoryCTASlider = res[0]
         })
+        if(this.sectionId){
+            this.getBlocksData()
+
+        }
+        console.log(this.sycLangingPageSetting,'sycLangingPageSetting')
     }
 
     ctaSeeMore(){}
@@ -35,4 +42,25 @@ export class CTAComponent extends AppComponentBase implements OnInit {
     localStorage.removeItem('BuyerSSIN');
     }
 
+
+    getBlocksData(){
+        this.SydObjectsServiceProxy
+        .getAllSectionBlocks(
+          this.sectionId,        
+        )
+        .subscribe((res) => {
+            this.sycLangingPageSetting = res
+         console.log(res,'ctaaaaaaaaaaaaaaaaa')
+        });
+    }
+  
+    private compareByOrder = (a: PageSettingDto, b: PageSettingDto) => {
+        const ao = Number.isFinite(a.order as any) ? (a.order as number) : Number.MAX_SAFE_INTEGER;
+        const bo = Number.isFinite(b.order as any) ? (b.order as number) : Number.MAX_SAFE_INTEGER;
+        return (ao - bo) || ((a.id ?? 0) - (b.id ?? 0));
+      };
+    
+      get blocksSorted(): PageSettingDto[] {
+        return (this.sycLangingPageSetting ?? []).slice().sort(this.compareByOrder);
+      }
 }

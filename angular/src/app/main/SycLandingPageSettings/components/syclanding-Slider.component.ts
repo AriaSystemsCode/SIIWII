@@ -1,6 +1,6 @@
-import { Component, Injector, OnInit } from "@angular/core";
+import { Component, Injector, Input, OnInit } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
-import { SycAttachmentCategoryDto, SycAttachmentTypeDto } from "@shared/service-proxies/service-proxies";
+import { PageSettingDto, SycAttachmentCategoryDto, SycAttachmentTypeDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 
 @Component({
     selector: "app-slider",
@@ -8,18 +8,41 @@ import { SycAttachmentCategoryDto, SycAttachmentTypeDto } from "@shared/service-
     styleUrls: ["./syclanding-Slider.component.scss"],
 })
 export class SliderComponent extends AppComponentBase implements OnInit {
-    sliderItems: string[];
+     sliderItems: any;
+    @Input() sectionId: number;
     interval: number = 10000;
     numVisible: number = 1;
     numScroll: number = 1;
-    constructor(injector: Injector) {
+    constructor(injector: Injector ,private SydObjectsServiceProxy:SydObjectsServiceProxy) {
         super(injector);
     }
     sycAttachmentCategoryAutoSlider	: SycAttachmentCategoryDto
     ngOnInit(){
+     
         this.getSycAttachmentCategoriesByCodes(['AUTOSLIDER'])
         .subscribe((res)=>{
             this.sycAttachmentCategoryAutoSlider = res[0]
         })
+        if(this.sectionId){
+            this.getBlocksData()
+
+        }
+    }
+
+ 
+    private compareByOrder = (a: PageSettingDto, b: PageSettingDto) => {
+      const ao = Number.isFinite(a.order as any) ? (a.order as number) : Number.MAX_SAFE_INTEGER;
+      const bo = Number.isFinite(b.order as any) ? (b.order as number) : Number.MAX_SAFE_INTEGER;
+      return (ao - bo) || ((a.id ?? 0) - (b.id ?? 0));
+    };
+    
+    get blocksSorted(): PageSettingDto[] {
+      return (this.sliderItems ?? []).slice().sort(this.compareByOrder);
+    }
+    
+    getBlocksData() {
+      this.SydObjectsServiceProxy.getAllSectionBlocks(this.sectionId).subscribe(res => {
+        this.sliderItems = res ?? [];
+      });
     }
 }

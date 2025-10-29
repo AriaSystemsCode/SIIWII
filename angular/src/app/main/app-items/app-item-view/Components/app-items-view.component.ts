@@ -846,7 +846,9 @@ export class AppItemsViewComponent
                 isHostRecord: undefined,
                 stockAvailability: undefined,
                 hexaCode:undefined,
-                image:undefined
+                image:undefined,
+                status:undefined,
+                entityObjectStatusId:undefined
             });
             if (currency.symbol) currency.label += ` ${currency.symbol}`;
             if (currency && !alreadyAdded) {
@@ -920,6 +922,7 @@ export class AppItemsViewComponent
                 undefined,
                 timeZoneValue,
                 this.productId,
+                undefined,
                 undefined,
                 undefined,
                 undefined,

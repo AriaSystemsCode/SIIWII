@@ -13,9 +13,13 @@ import { CTAComponent } from "./components/syclanding-CTA.component";
 import { RouterModule } from "@angular/router";
 import { CarouselModule } from "primeng/carousel";
 import { SycLandingPageSettingsRoutingModule } from "./SycLandingPageSettingsRoutingModule-routing.module";
-import { SyclandingADVComponent } from "./components/syclanding-adv.component";
+
 import { SyclandingFooterComponent } from "./components/syclanding-footer.component";
 import { MarketplaceProductsModule } from "../marketplace/marketplace-products/marketplace-products.module";
+import { PageLinkFooterComponent } from "./components/page-link-footer/page-link-footer.component";
+import { SyclandingADVComponent } from "./components/syclanding-Adv.component";
+import { SocialMediaFooterComponent } from "./components/social-media-footer/social-media-footer.component";
+import { SinglrRowCallActionLandingPageComponent } from "./components/single-row-callAction-landing-page/single-row-callAction-landing-page.component";
 
 @NgModule({
     declarations: [
@@ -24,6 +28,9 @@ import { MarketplaceProductsModule } from "../marketplace/marketplace-products/m
         CTAComponent,
         SyclandingFooterComponent,
         SyclandingADVComponent,
+        PageLinkFooterComponent,
+        SocialMediaFooterComponent,
+        SinglrRowCallActionLandingPageComponent
     ],
     imports: [
         SycLandingPageSettingsRoutingModule,
@@ -40,6 +47,6 @@ import { MarketplaceProductsModule } from "../marketplace/marketplace-products/m
         InteractionsModule,
         MarketplaceProductsModule
     ],
-    exports: [SycLandingPageSettingsComponent, SliderComponent, CTAComponent],
+    exports: [SycLandingPageSettingsComponent, SliderComponent, CTAComponent,PageLinkFooterComponent,SocialMediaFooterComponent,SinglrRowCallActionLandingPageComponent],
 })
 export class SycLandingPageSettingsModule {}
