@@ -2109,7 +2109,7 @@ export class CreateOrEditAppItemComponent
     isTexable(){
         //i49-F5 texable setting id 
         this._appEntitiesServiceProxy
-            .getTenantSettingValue(1111)
+            .getTenantSettingValue(1121)
             .subscribe((res: any) => {
                 this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
 
@@ -2129,7 +2129,7 @@ export class CreateOrEditAppItemComponent
                 undefined,
                 undefined,
                 undefined,
-                "Tax",
+                "485823",
                 true,
                 undefined,
                 undefined,

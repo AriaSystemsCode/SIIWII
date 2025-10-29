@@ -61,7 +61,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
             this.searchQuery,
             undefined,
             undefined,
-            undefined,true,
+            undefined,false,
             this.entityObjectType.code,
             undefined,
             undefined,

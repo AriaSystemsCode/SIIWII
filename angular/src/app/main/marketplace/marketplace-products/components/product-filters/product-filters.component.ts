@@ -112,7 +112,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         null,
         null,
         null,
-        true,
+        false,
         "BRAND",
         null,
         null,
