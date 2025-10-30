@@ -91,6 +91,7 @@ using Namotion.Reflection;
 using Abp.MultiTenancy;
 using System.Drawing;
 using SixLabors.Fonts;
+using System.Management.Automation;
 
 namespace onetouch.Accounts
 {
@@ -1204,7 +1205,7 @@ namespace onetouch.Accounts
         public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
         {
             await CreateAdminContact();
-
+            
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var account = await _appContactRepository.GetAll()
@@ -2454,7 +2455,7 @@ namespace onetouch.Accounts
                             string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BRANCH", connectTenant);
                             contactDto.Code =   "B" + sequance; //tenantObj.TenancyName.Trim();
                         }
-
+                        
                         BranchDto savedContactDto = await CreateOrEditBranch(contactDto);
 
 
@@ -2566,6 +2567,7 @@ namespace onetouch.Accounts
                             {
                                 accountDto.EntityAttachments.ForEach(x => x.Id = 0);
                             }
+                            accountDto.ContactRecordType = "C";
                             accountDto.ContactAddresses = null;
                             //XXX
                             var contact = CreateOrUpdateContact(accountDto);
@@ -2574,8 +2576,9 @@ namespace onetouch.Accounts
                     }
 
                 }
+                var branchObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                 var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.TenantId == null &&
-                               x.ParentId == branchesAccountId && x.EntityObjectTypeId != presonEntityObjectTypeId && x.EntityObjectStatusId != cancelledStatus && x.SharingLevel == 1).ToList(); // First level of branches
+                               x.ParentId == branchesAccountId && x.EntityObjectTypeId == branchObjectTypeId && x.EntityObjectStatusId != cancelledStatus && x.SharingLevel == 1).ToList(); // First level of branches
 
                 foreach (var branchObj in branchInfo)
                 {
@@ -5924,7 +5927,9 @@ namespace onetouch.Accounts
                 if (contact != null)
                 {
                     returnObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contact);
-
+                    //I40[Start]
+                   // returnObject.AccountId = contact.AccountId == null? contact.Id : contact.AccountId;
+                    //I40[End]
                     if (returnObject.EntityAttachments != null && returnObject.EntityAttachments.Count > 0)
                     {
                         foreach (var attach in returnObject.EntityAttachments)
