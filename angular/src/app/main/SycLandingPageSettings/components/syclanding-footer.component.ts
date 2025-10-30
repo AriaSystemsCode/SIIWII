@@ -75,13 +75,14 @@ export class SyclandingFooterComponent implements OnInit {
                     order: r._order,
                     sectionId: r.id,
                     inputs: {
-                      links: r.items ?? r.links ?? [], // [{name,url,iconSrc}] or BE shape you map inside component
+                      links: r.items ?? r.links ?? [],  title: r.title ?? null,
+                      name: r.name ?? null,// [{name,url,iconSrc}] or BE shape you map inside component
                     },
                   };
                 default:
                   // Ignore or map other types if needed
                   return {
-                    type: 'ASSB',
+                    type: 'ASSBPF',
                     order: r._order,
                     sectionId: r.id,
                     inputs: {},

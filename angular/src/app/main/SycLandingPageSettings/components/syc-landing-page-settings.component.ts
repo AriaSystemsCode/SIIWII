@@ -417,7 +417,7 @@ export class SycLandingPageSettingsComponent
                 };
               default:
                 return {
-                  type: 'ASSB',
+                  type: 'PF',
                   order: r._order,
                   sectionId: r.id,
                   // rowIds: [r.id],
@@ -453,7 +453,9 @@ export class SycLandingPageSettingsComponent
         2: 'ASSB',
         3: 'CSMP',
         4: 'SRCTA',
-        5: 'MRCTA',      
+        5: 'MRCTA',   
+        6:'PF',
+        7:'SM'   
     
       };
       

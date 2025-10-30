@@ -346,7 +346,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     this.appEntity.objectId = 1;
                     this.appEntity.entityObjectTypeId =
                         this.selectedItemTypeData.id;
-                    this.appEntity.entityObjectStatusId = null;
+                    // this.appEntity.entityObjectStatusId = null;
                     if (
                         this.selectedItemTypeData?.extraAttributes
                             ?.extraAttributes

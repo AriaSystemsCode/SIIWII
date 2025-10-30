@@ -1,4 +1,5 @@
 import { Component, Input } from "@angular/core";
+import { PageSettingDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 
 
 
@@ -11,6 +12,9 @@ export class SocialMediaFooterComponent {
     links: any[] = [];
     @Input() sectionId:number;
 
+    @Input() sectionData: any;
+
+
 
     ngOnInit(){
         this.links = [
@@ -20,5 +24,37 @@ export class SocialMediaFooterComponent {
             { name: 'linkedin',  url: 'https://www.linkedin.com/company/siiwii/',   iconSrc: 'assets/landingPage/Footer_Linkedin_Btn.svg' },
             { name: 'youtube',   url: 'https://www.youtube.com/channel/UCv_4Ao0myNHsjfxyg4lbLbg', iconSrc: 'assets/landingPage/Footer_Youtube_Btn.jpg' },
           ];
+
+          if(this.sectionId){
+            this.getBlocksData()
+
+        }
     }
+
+    
+       constructor(private SydObjectsServiceProxy:SydObjectsServiceProxy) {
+       
+    
+        }
+      
+        getBlocksData(){
+                this.SydObjectsServiceProxy
+                .getAllSectionBlocks(
+                  this.sectionId,        
+                )
+                .subscribe((res) => {
+                    // this.links = res
+                 console.log(res,'SOCIALLL')
+                });
+            }
+          
+            private compareByOrder = (a: PageSettingDto, b: PageSettingDto) => {
+                const ao = Number.isFinite(a.order as any) ? (a.order as number) : Number.MAX_SAFE_INTEGER;
+                const bo = Number.isFinite(b.order as any) ? (b.order as number) : Number.MAX_SAFE_INTEGER;
+                return (ao - bo) || ((a.id ?? 0) - (b.id ?? 0));
+              };
+            
+              get blocksSorted(): PageSettingDto[] {
+                return (this.links ?? []).slice().sort(this.compareByOrder);
+              }
   }
