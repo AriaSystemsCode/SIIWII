@@ -7034,7 +7034,7 @@ namespace onetouch.AppItems
                                     appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
 
                                 }
-
+                                appSizeScaleRatioForEditDto.Id = 0;
                                 var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
 
                                 AppItemSizeScalesHeader appItemSizeScalesHeaderRatio = new AppItemSizeScalesHeader();
