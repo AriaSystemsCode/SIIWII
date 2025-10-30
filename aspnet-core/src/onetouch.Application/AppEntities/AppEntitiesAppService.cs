@@ -132,7 +132,7 @@ namespace onetouch.AppEntities
         public async Task<PagedResultDto<GetAppEntityForViewDto>> GetAll(GetAllAppEntitiesInput input)
         {
             //I46{start}
-            if (input.EntityObjectTypeId !=null)
+            if (input.EntityObjectTypeId != null)
             {
                 var defaultObject = await _appEntityRepository.GetAll()
                     .Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId && (z.TenantId == AbpSession.TenantId || z.TenantId == null) && z.IsDefault).FirstOrDefaultAsync();
@@ -142,7 +142,7 @@ namespace onetouch.AppEntities
                     .Where(z => z.EntityObjectTypeId == input.EntityObjectTypeId && (z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
                     if (firstObject != null)
                     {
-                        firstObject.IsDefault =true;
+                        firstObject.IsDefault = true;
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
 
@@ -158,7 +158,11 @@ namespace onetouch.AppEntities
                         .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), e => e.Name == input.NameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Notes == input.DescriptionFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.ExtraDataFilter), e => e.EntityExtraData.Select(s=> (s.AttributeValueId.ToString() == input.ExtraDataFilter || s.AttributeValue == input.ExtraDataFilter)).ToList().Count>0)
+                        .WhereIf(
+                            !string.IsNullOrWhiteSpace(input.ExtraDataFilter),
+                            e => e.EntityExtraData.Any(s => ((s.AttributeValueId != null && s.AttributeValueId.ToString() == input.ExtraDataFilter)
+                            || (!string.IsNullOrEmpty(s.AttributeValue) && s.AttributeValue == input.ExtraDataFilter)
+                        )))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SycEntityObjectTypeNameFilter), e => e.EntityObjectTypeFk != null && e.EntityObjectTypeFk.Name == input.SycEntityObjectTypeNameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SycEntityObjectStatusNameFilter), e => e.EntityObjectStatusFk != null && e.EntityObjectStatusFk.Name == input.SycEntityObjectStatusNameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SydObjectNameFilter), e => e.ObjectFk != null && e.ObjectFk.Name == input.SydObjectNameFilter)
