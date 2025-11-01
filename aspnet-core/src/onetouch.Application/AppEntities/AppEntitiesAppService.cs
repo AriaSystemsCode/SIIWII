@@ -41,6 +41,7 @@ using Abp.Domain.Entities;
 using NPOI.SS.Formula.Functions;
 using NPOI.HPSF;
 using System.IO;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppEntities
 {
@@ -63,6 +64,7 @@ namespace onetouch.AppEntities
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IProfileAppService _iProfileAppService;
         private readonly IRepository<AppEntityState, long> _appEntityStateRepository;
+        private readonly ISycEntityObjectTypesAppService _SycEntityObjectTypesAppService;
         private readonly Helper _helper;
         
         //MMT
@@ -97,9 +99,10 @@ namespace onetouch.AppEntities
             IRepository<AppPost, long> appPostRepository, IProfileAppService iProfileAppService, IAppNotifier appNotifier
             , IRepository<AppEntityState, long> appEntityStateRepository, IRepository<AppMarketplaceTransactionContacts, long> appMarketplaceTransactionContactsRepository
             , IRepository<AppTransactionContacts, long> appTransactionContactsRepository
+            , ISycEntityObjectTypesAppService sycEntityObjectTypesAppService
             )
         {
-             
+            _SycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
             _iProfileAppService = iProfileAppService;
             _appEntityRepository = appEntityRepository;
             _appEntityAddressRepository = appEntityAddressRepository;
@@ -198,7 +201,9 @@ namespace onetouch.AppEntities
                                                         ?ObjectMapper.Map<List<AppEntityExtraDataDto>>(o.EntityExtraData): null,
                                       Id = o.Id,
                                       IsHostRecord = o.TenantId == null
+                                      
                                   },
+                                  
                                   SycEntityObjectTypeName = s1 == null ? "" : s1.Name.ToString(),
                                   SycEntityObjectStatusName = s2 == null ? "" : s2.Name.ToString(),
                                   SydObjectName = s3 == null ? "" : s3.Name.ToString(),
@@ -212,6 +217,58 @@ namespace onetouch.AppEntities
                 await appEntities.ToListAsync()
             );
         }
+
+        public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
+                var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
+                if (entityObjectExtraAttributeReturn != null)
+                {
+                    entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
+                }
+
+
+
+                if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
+                {
+                    var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
+                    // *Abdo End
+                    //get all extra data type, AttributeId
+                    //var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
+                    var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
+                    var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
+
+                    List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
+
+                    foreach (var EntityExtraData in extraAttributedefintion)
+                    {
+                        if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
+                        {
+                            var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
+                            var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+
+                            if (extraDataSelectedValues.ToList().Count > 0)
+                            {
+                                var extraDataAttrDto = new ExtraDataAttrDto();
+                                extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
+                                extraDataAttrDto.extraAttrName = EntityExtraData.Name;
+                                extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
+                                extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
+                                extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
+                                //if (!string.IsNullOrEmpty(EntityExtraData.Usage)) //&& EntityExtraData.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper())
+                                { returnedList.Add(extraDataAttrDto); }
+                            }
+                        }
+
+                    }
+                    return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
+                }
+                return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
+            }
+        }
+         
 
         public bool checkArray(long[] ids, string names)
         {
@@ -320,6 +377,10 @@ namespace onetouch.AppEntities
                 output.SydObjectName = _lookupSydObject.Name.ToString();
             }
 
+             var extra = GetAppEntityExtraDataWithPaging(appEntity.Id, appEntity.EntityObjectTypeId).Result;
+
+             if (extra != null) { output.ExtraDataAttributes = extra.Items.ToList(); }
+
             return output;
         }
 
@@ -359,7 +420,11 @@ namespace onetouch.AppEntities
                     {
                         item.Url = @"attachments/" + (appEntity.TenantId==null? "-1": appEntity.TenantId.ToString())+ @"/" + item.FileName;
                     }
-                
+
+                var extra = GetAppEntityExtraDataWithPaging(appEntity.Id, appEntity.EntityObjectTypeId).Result;
+
+                if (extra != null) { output.ExtraDataAttributes = extra.Items.ToList(); }
+
                 return output;
             }
         }
