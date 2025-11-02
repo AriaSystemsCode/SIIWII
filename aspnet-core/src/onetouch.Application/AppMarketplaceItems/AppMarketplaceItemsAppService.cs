@@ -137,6 +137,11 @@ namespace onetouch.AppMarketplaceItems
                 if (input.departmentFilters == null)
                     input.departmentFilters = new long[] { };
                 var allCategories = input.departmentFilters.ToList();
+                //I49[Start]
+                if (input.CategoryFilters == null)
+                    input.CategoryFilters = new long[] { };
+                var categoriesListFilter = input.CategoryFilters.ToList();
+                //I49[End]
                 if (input.Brands == null)
                     input.Brands = new long[] { };
 
@@ -201,6 +206,7 @@ namespace onetouch.AppMarketplaceItems
                         x.EntityAttachments,
                         x.ItemPricesFkList,
                         x.TenantOwner,
+                        x.SSIN,
                         x.ManufacturerCode,
                         defaultMsrp = x.ItemPricesFkList.FirstOrDefault(a => a.Code == "MSRP" && a.IsDefault == true)
                     })
@@ -231,7 +237,11 @@ namespace onetouch.AppMarketplaceItems
                 //e => (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count > 0 && input.PublishStatus == 1) || ((e.PublishedListingItemFkList == null || (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count == 0)) && input.PublishStatus == 2))
                 // .WhereIf(input.ListingStatus > 0, e => (e.ListingItemFkList != null && e.ListingItemFkList.Count > 0 && input.ListingStatus == 2) || ((e.ListingItemFkList == null || (e.ListingItemFkList != null && e.ListingItemFkList.Count == 0)) && input.ListingStatus == 1))
                 //  .WhereIf(input.EntityObjectTypeId > 0, e => e.EntityFk.EntityObjectTypeId == input.EntityObjectTypeId)
-                .WhereIf(input.departmentFilters != null && input.departmentFilters.Count() > 0, e => e.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
+                .WhereIf(input.departmentFilters != null && input.departmentFilters.Count() > 0, e => e.EntityCategories.Where(r => r.EntityObjectCategoryFk.TenantId == null && allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
+                //I49[Start]
+                .WhereIf(!string.IsNullOrEmpty(input.ItemSSIN) , e => e.SSIN == input.ItemSSIN)
+                .WhereIf(input.CategoryFilters!= null && input.CategoryFilters.Count() >0 , e => e.EntityCategories.Where(r => r.EntityObjectCategoryFk.TenantId != null && categoriesListFilter.Contains(r.EntityObjectCategoryId)).Count()>0)
+                //I49[End]
                 // .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
                 e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.ManufacturerCode.Contains(input.Filter) || e.Description.Contains(input.Filter) ||
@@ -1834,7 +1844,7 @@ namespace onetouch.AppMarketplaceItems
         }
         //T-SII-20240628.0002 ,1 MMT 07/10/2024 Check if the currency has exchange rate[End]
         //I49[Start]
-        public async Task<GetAppMarketItemForViewDto> GetAppMarketplaceViewData(string ssin, string? currencyCode)
+        public async Task<GetAppMarketItemForViewDto> GetAppMarketplaceItemViewData(string ssin, string? currencyCode)
         {
             decimal exchangeRate = 1;
             GetAppMarketItemForViewDto getAppMarketItemForViewDto = new GetAppMarketItemForViewDto();
