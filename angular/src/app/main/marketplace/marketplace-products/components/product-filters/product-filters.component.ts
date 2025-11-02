@@ -136,7 +136,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   getAllBrands() {
     this._appMarketplaceItemsServiceProxy
       .getAllBrandsWithPaging(
-        null, null, null, null, null, 'BRAND', null, null,
+        null, null, null, null, null, false,'BRAND', null, null,
         86, 'name', 0, 200, this.accountSSIN
       )
       .subscribe(res => {
