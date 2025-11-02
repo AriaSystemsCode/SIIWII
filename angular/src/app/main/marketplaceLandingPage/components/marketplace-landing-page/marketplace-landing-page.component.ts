@@ -48,7 +48,7 @@ export class MarketplaceLandingPageComponent
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     ) {
         super(injector);
-      // in SycLandingPageSettingsComponent
+
 
 
           this.items = [
