@@ -540,7 +540,7 @@ namespace onetouch.SystemObjects
                                     switch (item.BlockType.ToUpper())
                                     {
                                         case "PRODUCT":
-                                            item.GetAppMarketItemForViewDto =await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
+                                           // item.GetAppMarketItemForViewDto =await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
                                             break;
 
 
