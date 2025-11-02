@@ -4,11 +4,11 @@ import { PageSettingDto, SydObjectsServiceProxy } from "@shared/service-proxies/
 
 
 @Component({
-    selector: "app-page-link-footer",
-    templateUrl: "./page-link-footer.component.html",
-    styleUrls: ["./page-link-footer.component.scss"],
+    selector: "app-footer-page-link",
+    templateUrl: "./footer-page-link.component.html",
+    styleUrls: ["./footer-page-link.component.scss"],
 })
-export class PageLinkFooterComponent {
+export class FooterPageLinkComponent {
     @Input()  sectionData: any;
     @Input() sectionId:number;
    pageLiksData:any[]

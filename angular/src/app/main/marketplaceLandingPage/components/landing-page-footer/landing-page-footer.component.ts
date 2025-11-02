@@ -1,30 +1,30 @@
 import { Component, OnInit } from "@angular/core";
-import { ApiRow, SectionConfig, SectionItem, SectionType } from "../models/landingPage-types";
 import { SliderEnum, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
+import { SectionItem, SectionType } from "../../models/landingPage-types";
 
 @Component({
-    selector: "app-syclanding-footer",
-    templateUrl: "./syclanding-footer.component.html",
-    styleUrls: ["./syclanding-footer.component.scss"],
+    selector: "app-landing-page-footer",
+    templateUrl: "./landing-page-footer.component.html",
+    styleUrls: ["./landing-page-footer.component.scss"],
 })
-export class SyclandingFooterComponent implements OnInit {
+export class landingPageFooterComponent implements OnInit {
     brands:any
           // update these numbers from API as needed
           sections:any
           sectionsFlat: SectionItem[] = [];   // what ngFor iterates
     constructor(      private _sydObjectsAppService: SydObjectsServiceProxy,) {
-        this.brands = [
-            { name: 'Apple',        img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Samsung',      img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Nike',         img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Adidas',       img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Sony',         img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'LG',           img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Microsoft',    img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Huawei',       img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Xiaomi',       img: 'assets/brands/xiaomi.svg' },
-            { name: 'Lenovo',       img: 'assets/brands/lenovo.svg' },
-          ];
+        // this.brands = [
+        //     { name: 'Apple',        img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Samsung',      img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Nike',         img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Adidas',       img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Sony',         img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'LG',           img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Microsoft',    img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Huawei',       img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Xiaomi',       img: 'assets/brands/xiaomi.svg' },
+        //     { name: 'Lenovo',       img: 'assets/brands/lenovo.svg' },
+        //   ];
     }
 
     ngOnInit(): void {

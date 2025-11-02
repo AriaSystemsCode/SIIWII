@@ -3,11 +3,11 @@ import { AppComponentBase } from "@shared/common/app-component-base";
 import { PageSettingDto, SycAttachmentCategoryDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { AppConsts } from "@shared/AppConsts";
 @Component({
-    selector: "app-cta",
-    templateUrl: "./syclanding-CTA.component.html",
-    styleUrls: ["./syclanding-CTA.component.scss"],
+    selector: "app-carusal-with-callToAction",
+    templateUrl: "./landing-page-carusal-with-callToAction.component.html",
+    styleUrls: ["./landing-page-carusal-with-callToAction.component.scss"],
 })
-export class CTAComponent extends AppComponentBase implements OnInit {
+export class LandingPageCarusalWithCallToActionComponent extends AppComponentBase implements OnInit {
     @Input() sectionData: any;
     sycLangingPageSetting: PageSettingDto[];
     @Input() sectionId:number;

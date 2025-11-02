@@ -5,28 +5,28 @@
       <!-- auto slider with call to action-->
       <div *ngSwitchCase="'ASSB'">
         <h4>slider>> {{ s.inputs?.name  }}</h4>
-        <app-slider 
+        <app-slider-with-callToAction 
         class="d-md-block d-none"
      
         [sectionId]="s.sectionId"
     >
-</app-slider>
+</app-slider-with-callToAction>
       </div>
  
 
          <!-- carusal slider multi blocks-->
-      <app-cta *ngSwitchCase="'CSMP'"   [sectionId]="s.sectionId"
+      <app-carusal-with-callToAction *ngSwitchCase="'CSMP'"   [sectionId]="s.sectionId"
                [sectionData]="s.inputs">
-      </app-cta>
+      </app-carusal-with-callToAction>
 
          <!-- auto slider without call to action-->
        <div *ngSwitchCase="'ASMB'">
         <h4>slider without>> {{ s.inputs?.name  }}</h4>
 
-        <app-syclanding-adv 
+        <app-slider-without-callToAction
         class=" d-block"    [sectionId]="s.sectionId"
        >
-</app-syclanding-adv>
+</app-slider-without-callToAction>
        </div>
 
 
@@ -106,4 +106,4 @@
   </ng-container>
 </div>
 
-<app-syclanding-footer></app-syclanding-footer>
+<app-landing-page-footer></app-landing-page-footer>

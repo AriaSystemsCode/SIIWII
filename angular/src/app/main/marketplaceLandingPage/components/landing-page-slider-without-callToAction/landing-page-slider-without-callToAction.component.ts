@@ -3,11 +3,11 @@ import { AppComponentBase } from "@shared/common/app-component-base";
 import { PageSettingDto, SycAttachmentCategoryDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 
 @Component({
-    selector: "app-syclanding-adv",
-    templateUrl: "./syclanding-adv.component.html",
-    styleUrls: ["./syclanding-adv.component.scss"],
+    selector: "app-slider-without-callToAction",
+    templateUrl: "./landing-page-slider-without-callToAction.component.html",
+    styleUrls: ["./landing-page-slider-without-callToAction.component.scss"],
 })
-export class SyclandingADVComponent extends AppComponentBase implements OnInit {
+export class LandingPageSliderWithoutCallToActionComponent extends AppComponentBase implements OnInit {
      advSliderItems: any;
     interval: number = 10000;
     numVisible: number = 1;

@@ -3,11 +3,11 @@ import { AppComponentBase } from "@shared/common/app-component-base";
 import { PageSettingDto, SycAttachmentCategoryDto, SycAttachmentTypeDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 
 @Component({
-    selector: "app-slider",
-    templateUrl: "./syclanding-Slider.component.html",
-    styleUrls: ["./syclanding-Slider.component.scss"],
+    selector: "app-slider-with-callToAction",
+    templateUrl: "./landing-page-slider-with-callToAction.component.html",
+    styleUrls: ["./landing-page-slider-with-callToAction.component.scss"],
 })
-export class SliderComponent extends AppComponentBase implements OnInit {
+export class LandingPageSliderWithCallToActionComponent extends AppComponentBase implements OnInit {
      sliderItems: any;
     @Input() sectionId: number;
     interval: number = 10000;

@@ -5,10 +5,10 @@
       
             <div *ngSwitchCase="'PF'" class="col-12 col-md-4 mb-4">
               
-              <app-page-link-footer
+              <app-footer-page-link
                 [sectionId]="s.sectionId"
                 [sectionData]="s.inputs" >
-              </app-page-link-footer>
+              </app-footer-page-link>
             </div>
       
           </ng-container>
@@ -30,9 +30,9 @@
             <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
                 <div class="col-12 mb-4">
                     <ng-container [ngSwitch]="s.type">
-                        <app-social-media-footer *ngSwitchCase="'SM'"
+                        <app-footer-social-media *ngSwitchCase="'SM'"
                         [sectionId]="s.sectionId"
-                        [sectionData]="s.inputs"></app-social-media-footer>
+                        [sectionData]="s.inputs"></app-footer-social-media>
                         </ng-container>
                     </div>
                     </ng-container>
@@ -47,9 +47,9 @@
       <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
         <div class="col-12 mb-4">
             <ng-container [ngSwitch]="s.type">
-                <app-social-media-footer *ngSwitchCase="'SM'"
+                <app-footer-page-link *ngSwitchCase="'SM'"
                 [sectionId]="s.sectionId"
-                [sectionData]="s.inputs"></app-social-media-footer>
+                [sectionData]="s.inputs"></app-footer-page-link>
                 </ng-container>
             </div>
             </ng-container>

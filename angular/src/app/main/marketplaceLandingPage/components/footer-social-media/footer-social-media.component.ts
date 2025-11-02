@@ -5,11 +5,11 @@ import { PageSettingDto, SydObjectsServiceProxy } from "@shared/service-proxies/
 
 
 @Component({
-    selector: "app-social-media-footer",
-    templateUrl: "./social-media-footer.component.html",
-    styleUrls: ["./social-media-footer.component.scss"],
+    selector: "app-footer-social-media",
+    templateUrl: "./footer-social-media.component.html",
+    styleUrls: ["./footer-social-media.component.scss"],
 })
-export class SocialMediaFooterComponent extends AppComponentBase   {
+export class FooterSocialMediaComponent extends AppComponentBase   {
     links: any[] = [];
     @Input() sectionId:number;
 

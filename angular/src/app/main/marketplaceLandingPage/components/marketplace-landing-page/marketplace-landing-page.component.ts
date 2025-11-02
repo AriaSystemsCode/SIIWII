@@ -1,6 +1,4 @@
 import { Component, Injector, OnInit, ViewChild } from "@angular/core";
-import { SliderComponent } from "./syclanding-Slider.component";
-import { CTAComponent } from "./syclanding-CTA.component";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
     AppMarketplaceItemsServiceProxy,
@@ -9,24 +7,23 @@ import {
     SycEntityObjectCategoriesServiceProxy,
     SydObjectsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
-import { SyclandingADVComponent } from "./../components/syclanding-Adv.component";
+
 import { Router } from "@node_modules/@angular/router";
-import { ApiRow, SectionConfig, SectionItem, SectionType } from "../models/landingPage-types";
+import { SectionType,ApiRow, SectionConfig, SectionItem } from "../../models/landingPage-types";
+
 
 
 @Component({
-    selector: "app-syc-landing-page-settings",
-    templateUrl: "./syc-landing-page-settings.component.html",
-    styleUrls: ["./syc-landing-page-settings.component.scss"],
+    selector: "app-marketplace-landing-page",
+    templateUrl: "./marketplace-landing-page.component.html",
+    styleUrls: ["./marketplace-landing-page.component.scss"],
 })
-export class SycLandingPageSettingsComponent
+export class MarketplaceLandingPageComponent
     extends AppComponentBase
     implements OnInit
 {
-    @ViewChild("slider", { static: true }) slider: SliderComponent;
-    @ViewChild("cta", { static: true }) cta: CTAComponent;
-    @ViewChild("adv_sm", { static: true }) adv_sm: SyclandingADVComponent;
-    @ViewChild("ad_md", { static: true }) adv_md: SyclandingADVComponent;
+
+
 
     autoSliderCode: string = "SycLandingPageSettingsAutoSlider";
     CTASliderCode: string = "SycLandingPageSettingsCTASlider";
@@ -52,22 +49,7 @@ export class SycLandingPageSettingsComponent
     ) {
         super(injector);
       // in SycLandingPageSettingsComponent
-// this.sections = [
-//     { type: '1', order: 10 },
-//     { type: '3', order: 20 },
-//     { type: '5',    order: 30 },
-//     { type: 'adv_md', order: 40 },
-  
-//     // You can repeat brands multiple times with different inputs/titles
-//     { type: 'brands', order: 50, inputs: { title: 'Our Brands', pageSize: 8 } },
-//     { type: 'brands', order: 100, inputs: { title: 'Featured Brands', pageSize: 6, tag: 'featured' } },
-  
-//     { type: 'products',      order: 60, inputs: { title: 'Products',  numVisible: 5 } },
-//     { type: 'productsPaged', order: 70, inputs: { title: 'Products',  pageSize: 9 } },
-//     { type: 'departments',   order: 80, inputs: { title: 'Departments' } },
-//     { type: 'itemList',      order: 90, inputs: { title: 'Departments' } }
-//   ];
-  
+
 
           this.items = [
             {
@@ -505,7 +487,7 @@ export class SycLandingPageSettingsComponent
                 });
                 console.log(result,'res')
                 this.sections = result
-                this.slider.sliderItems = sliderItems;
+                // this.slider.sliderItems = sliderItems;
             });
         this.subscriptions.push(subs);
     }
@@ -516,7 +498,7 @@ export class SycLandingPageSettingsComponent
         const subs = this._sydObjectsAppService
             .getAllSliderSettings(SliderEnum.ASMB, this.CTASliderCode)
             .subscribe((result) => {
-                this.cta.sycLangingPageSetting = result;
+                // this.cta.sycLangingPageSetting = result;
             });
         this.subscriptions.push(subs);
     }
