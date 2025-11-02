@@ -741,26 +741,34 @@ namespace onetouch.Accounts
                     var totalCount = await filteredAccounts.CountAsync();
                     //var currentTenantAccountTypeCode = _appContactRepository.GetAll().Include(e => e.EntityFk)
                     //    .FirstOrDefault(e => e.TenantId == tenant.TenantId && e.IsProfileData && e.ParentId == null).EntityFk.EntityObjectTypeCode;
-                    
+                    var pendingRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipPending();
+                    var inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
+
                     var currentTenantAccountTypeCode = currentTenantAccount.EntityFk.EntityObjectTypeCode;
                     foreach (var account in accountsList)
                     {
+                        AppContactRelationshipInfo relationship = null;
                         var accountConnection = _appContactRepository.GetAll()
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN );
-
                         if (accountConnection != null && accountConnection.Id > 0)
+                             relationship = await _appContactRelationshipInfoRepository.GetAll()
+                               .Where(z => ((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
+                               || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN))
+                              ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();
+
+                        if (accountConnection != null && accountConnection.Id > 0 && relationship!=null)
                         {
                             //account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccountTypeCode, false);
                             //account.AvaliableConnectionName = "";
                             //I40[Start]
                             account.ConnectionName = "";
                             
-                            var pendingRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipPending();
-                            var inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
-                            var relationship = await _appContactRelationshipInfoRepository.GetAll()
+                            
+                            /*var relationship = await _appContactRelationshipInfoRepository.GetAll()
                                .Where(z => ((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
                                || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN))
-                              ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();
+                              ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();*/
+
                             if (relationship != null)
                             {
                                 account.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
