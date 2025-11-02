@@ -106,8 +106,13 @@
                           <i class="text-danger pointer" (click)="cancelLinking(record)">❌</i>
                         </span>
 
-                        <ul class="fixed-dropdown-menu drop-up"
-                          *ngIf="record.showActions && (!currentActionRecord || currentActionRecord === record)">
+                        <ul class="fixed-dropdown-menu"
+                          *ngIf="record.showActions && (!currentActionRecord || currentActionRecord === record)"
+                          [ngClass]="{'drop-up': record.dropdownPosition?.dropUp}"
+                          [ngStyle]="{
+                            top: record.dropdownPosition?.top + 'px',
+                            left: record.dropdownPosition?.left + 'px'
+                          }">
                           <ng-container *ngIf="record.recordType !== 'Image'">
                             <li (click)="handleAction(record, UploadActionEnum.ValidateDataRecord)">
                               Validate Data Record
