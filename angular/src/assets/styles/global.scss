@@ -786,8 +786,19 @@ html{
 
 
 
-.p-checkbox .p-checkbox-box .p-icon {
+/* .p-checkbox .p-checkbox-box .p-icon {
     position: relative;
     left: 40%;
     right: 40%;
-}
+} */
+.p-checkbox .p-checkbox-box {
+    display: flex;
+    align-items: center;  
+    justify-content: center; 
+  }
+  
+  .p-checkbox .p-checkbox-box .p-icon {
+    position: static; 
+    margin: 0;
+  }
+  

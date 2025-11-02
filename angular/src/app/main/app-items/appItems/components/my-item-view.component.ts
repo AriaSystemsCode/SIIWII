@@ -63,6 +63,9 @@ export class MyItemViewComponent
                 undefined,
                 undefined,
                 this.skipCount,
+                this.maxResultCount,
+                undefined,
+                this.skipCount,
                 this.maxResultCount
             )
             .pipe(

@@ -24,7 +24,8 @@ namespace onetouch.AppItems.Dtos
     public enum RecommandedOrAdditional
     {
         RECOMMENDED,
-        ADDITIONAL
+        ADDITIONAL,
+        CHARGES
 
     }
 
@@ -34,7 +35,9 @@ namespace onetouch.AppItems.Dtos
         public GetAppItemAttributesInput GetAppItemAttributesInputForCategories { get; set; }
         public GetAppItemAttributesInput GetAppItemAttributesInputForClassifications { get; set; }
         public GetAppItemAttributesInput GetAppItemAttributesInputForDepartments { get; set; }
- 
+
+        public GetAppItemAttributesInput GetAppItemAttributesInputForRelatedItems{ get; set; }
+
     }
 
     public class GetAppItemWithPagedAttributesForEditInput : GetAppItemWithPagedAttributesInput

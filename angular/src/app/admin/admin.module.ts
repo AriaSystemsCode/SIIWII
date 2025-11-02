@@ -189,6 +189,8 @@ import { EmailingTemplateServiceProxy } from "@shared/service-proxies/service-pr
 import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
+import { SharedDynamicInputsModule } from '@shared/shared-module';
+import { AccordionModule } from "primeng/accordion";
 
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -232,7 +234,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         DropdownModule,
         ReactiveFormsModule,
         CheckboxModule,
-
+        SharedDynamicInputsModule,
+        AccordionModule
     ],
     declarations: [
 		ValidationRulesComponent,

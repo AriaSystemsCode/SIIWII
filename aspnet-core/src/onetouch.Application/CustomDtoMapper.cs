@@ -306,6 +306,7 @@ namespace onetouch
                 .ForMember(d => d.EntityDepartments, opt => opt.Ignore())
                 .ForMember(d => d.EntityClassifications, opt => opt.Ignore())
                 .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityFk.EntityAttachments))
+                .ForMember(d => d.EntitiesRelationships, s => s.MapFrom(ss => ss.EntityFk.EntitiesRelationships))
                 .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData))
                 .ForMember(d => d.VariationItems, s => s.MapFrom(ss => ss.ParentFkList))
                 .ForMember(d => d.EntityObjectTypeId, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeId))
@@ -314,7 +315,9 @@ namespace onetouch
                 .ForMember(d => d.Listed, s => s.MapFrom(ss => (ss.ListingItemFkList != null && ss.ListingItemFkList.Count() > 0) ? true : false))
                 .ForMember(d => d.Published, s => s.MapFrom(ss => (ss.PublishedListingItemFkList != null && ss.PublishedListingItemFkList.Count() > 0) ? true : false));
 
-            configuration.CreateMap<AppItem, AppItemVariationsDto>().ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData));
+            configuration.CreateMap<AppItem, AppItemVariationsDto>()
+                .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData));
+
             configuration.CreateMap<AppItemForEditDto, AppItem>();
             configuration.CreateMap<AppItem, AppItemForEditDto>()
                     //.ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk.TenantId != null)))
@@ -331,7 +334,9 @@ namespace onetouch
                 .ForMember(d => d.AppItemPriceInfos, s => s.MapFrom(ss => ss.ItemPricesFkList))
                 .ForMember(d => d.Listed, s => s.MapFrom(ss => (ss.ListingItemFkList != null && ss.ListingItemFkList.Count() > 0) ? true : false))
                 .ForMember(d => d.Published, s => s.MapFrom(ss => (ss.PublishedListingItemFkList != null && ss.PublishedListingItemFkList.Count() > 0) ? true : false))
-                .ForMember(d => d.AppItemSizesScaleInfo, s => s.MapFrom(ss => ss.ItemSizeScaleHeadersFkList));
+                .ForMember(d => d.AppItemSizesScaleInfo, s => s.MapFrom(ss => ss.ItemSizeScaleHeadersFkList))
+                .ForMember(d => d.EntitiesRelationships, s => s.MapFrom(ss => ss.EntityFk.EntitiesRelationships))
+                .ForMember(d => d.RelatedEntitiesRelationships, s => s.MapFrom(ss => ss.EntityFk.RelatedEntitiesRelationships));
 
             configuration.CreateMap<AppItem, VariationItemDto>()
                 .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData))

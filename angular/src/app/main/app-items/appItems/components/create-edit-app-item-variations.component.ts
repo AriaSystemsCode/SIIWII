@@ -896,7 +896,7 @@ this.showMainSpinner();
         this.updateVaritaionAttachments();
     }
 
-    removePhoto(i: number) {
+    removeAttach(i: number) {
         if (
             this.activeAttachmentOption.defaultImageIndex === i &&
             this.activeAttachmentOption.entityAttachments.length > 1
@@ -997,11 +997,14 @@ this.showMainSpinner();
 
     fileChange(event) {
         if (event.target.value) {
+                let file = event.target?.files[0];
+                    const fileType = file.type.toLowerCase();
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
           
                 let aspectRatio=this.aspectRatio;
 
+                if (fileType.startsWith('image/')){
             let { onCropDone, data } = this.openImageCropper(
                 event,
                 aspectRatio,
@@ -1016,6 +1019,14 @@ this.showMainSpinner();
               subs.unsubscribe();
             });
         }
+        
+        else {
+            this.tempUploadImage(event,null);
+            event.target.value = null;
+        }
+    }
+    
+
     }
 
     attachmentCategory: GetSycAttachmentCategoryForViewDto =
@@ -1038,6 +1049,10 @@ this.showMainSpinner();
     ) {
         const file = (event.target as HTMLInputElement).files[0];
         // this.attachmentCategory.imgURL = croppedImageContent.croppedImageAsBase64 as string
+        const fileType = file.type;
+        const isImage = fileType.startsWith('image/');
+        const isPDF = fileType === 'application/pdf';
+        const isVideo = fileType.startsWith('video/');
 
         if (
             this.activeAttachmentOption.entityAttachments == null ||
@@ -1051,6 +1066,7 @@ this.showMainSpinner();
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
       //  att.index = index;
         att.fileName = file?.name;
+        att.isPublic=false;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
        let optionValue;
@@ -1063,6 +1079,9 @@ this.showMainSpinner();
         att.attachmentCategoryId =
             this.attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
+
+
+        if (isImage) {
         att.url = croppedImageContent.croppedImageAsBase64 as string;
 
         // save image as a base64
@@ -1078,8 +1097,8 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         this.activeAttachmentOption.entityAttachments[index] = att;
         att.index = index;
 
-        if (this.activeAttachmentOption.entityAttachments.length == 1) {
-            this.setDefaultImage(0);
+        if (this.activeAttachmentOption.entityAttachments.length == 2 ) {
+            this.setDefaultImage(1);
         }
 
         if (
@@ -1090,7 +1109,36 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         this.updateVaritaionAttachments();
 
         this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+
     }
+
+    else if (isPDF || isVideo) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            att.url = reader.result as string;
+            if (!this.activeAttachmentOption.attachmentSrcs) {
+                this.activeAttachmentOption.attachmentSrcs = [];
+            }
+            this.activeAttachmentOption.attachmentSrcs.push(reader.result  as string);
+            let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAttachmentOption.attachmentSrcs?.length-1 : 0;
+            this.uploadBlobAttachment(file, att);
+
+           this.activeAttachmentOption.entityAttachments[index] = att;
+           att.index = index;
+          
+        
+        if (
+            this.activeAttachmentOption.attachmentSrcs.every((elem) => elem) &&
+            this.activeAttachmentOption.attachmentSrcs.length < 10
+        )
+            this.activeAttachmentOption.attachmentSrcs.push("");
+        this.updateVaritaionAttachments();
+
+        this.uploadBlobAttachment(file, att);
+    }
+    reader.readAsDataURL(file);
+    }
+}
 
     triggerActiveOptionAttachments(optionObject: IVaritaionAttachment) {
         this.activeAttachmentOption = optionObject;
@@ -1722,7 +1770,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
     //         getAllInputs.search,
     //         undefined,
     //         undefined,
-    //         undefined,
+    //         undefined,false
     //         extraAttr.entityObjectTypeCode,
     //         undefined,
     //         undefined,
@@ -2401,6 +2449,15 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         });
          }
         
+    }
+    setVisibleinMarketplaceImage(index) {
+        this.formTouched = true;
+        this.activeAttachmentOption?.entityAttachments?.map((item, i) => {
+            if (index == i) {
+                item.isPublic = !item.isPublic;
+                return item;
+            }
+        });
     }
    
 }

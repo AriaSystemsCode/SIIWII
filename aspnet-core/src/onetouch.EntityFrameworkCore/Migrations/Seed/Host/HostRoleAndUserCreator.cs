@@ -647,9 +647,9 @@ namespace onetouch.Migrations.Seed.Host
 
 
             #region Add missing SycAttachmentCategories
-            var extType = "1,1,1,1".ToUpper().Split(',');
-            var extension = "png,jpg,jpeg,webp".ToUpper().Split(',');
-            var extNames = "PNG,JPG,JPEG,WEBP".Split(',');
+            var extType = "1,1,1,1,1,1,1,1".ToUpper().Split(',');
+            var extension = "png,jpg,jpeg,webp,pdf,mp4,mwv,avi".ToUpper().Split(',');
+            var extNames = "PNG,JPG,JPEG,WEBP,PDF,MP4,WMV,AVI".Split(',');
 
             for (int i = 0; i < extNames.Length; i++)
             {

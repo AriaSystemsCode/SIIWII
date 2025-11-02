@@ -90,11 +90,14 @@ namespace onetouch.SystemObjects
                     // load xml ExtraData
                     var serializer = new XmlSerializer(typeof(ItemExtraAttributes));
                     ItemExtraAttributes result;
-                    using (TextReader reader = new StringReader(item.ExtraAttributes))
+                    try
                     {
-                        result = (ItemExtraAttributes)serializer.Deserialize(reader);
-                        type.ExtraAttributes = result;
-                    }
+                        using (TextReader reader = new StringReader(item.ExtraAttributes))
+                        {
+                            result = (ItemExtraAttributes)serializer.Deserialize(reader);
+                            type.ExtraAttributes = result;
+                        }
+                    }catch(Exception ex) { }
                 }
                 newList.Add(type);
 

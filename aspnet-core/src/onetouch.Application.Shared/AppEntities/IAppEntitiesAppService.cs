@@ -40,6 +40,7 @@ namespace onetouch.AppEntities
         Task<List<LookupLabelDto>> GetAllTitlesForTableDropdown();
 		
 		Task<PagedResultDto<GetAppEntityForViewDto>> GetAll(GetAllAppEntitiesInput input);
+		Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId);
 
         Task<GetAppEntityForViewDto> GetAppEntityForView(long id);
 		Task<string> GetAppEntityState(long id);

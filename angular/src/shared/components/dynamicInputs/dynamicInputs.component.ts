@@ -19,8 +19,7 @@ export class dynamicInputs implements OnInit, OnChanges {
   selectedExtraData: any[] = [];
   @Input() appTransactionsForViewDto: any;
   originalValuesMap = new Map<number, any>();
-
-
+  @Input() fromSetting:boolean =false;
 
   openCalendar(calendar: any) {
     calendar.overlayVisible = true;
@@ -71,14 +70,7 @@ export class dynamicInputs implements OnInit, OnChanges {
         }
 
         // ✅ Handle Numeric input
-        if (attr.dataType === 'Numeric') {
-          if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
-            formattedValue = '';
-          }
-        }
-
-        // ✅ Handle Boolean / Bit
-        if (attr.dataType === 'boolean' || attr.dataType === 'bit') {
+        if (attr.dataType === 'Numeric' || attr.dataType === 'boolean' || attr.dataType === 'bit' || attr.dataType === 'color') {
           if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
             formattedValue = '';
           }
@@ -116,10 +108,24 @@ export class dynamicInputs implements OnInit, OnChanges {
   }
 
 
-
+  //i49-F6 set thems 
+  themes = [
+    { name: 'Default', image: 'assets/themes/default.png' },
+    { name: 'Theme 2', image: 'assets/themes/theme2.png' },
+    { name: 'Theme 3', image: 'assets/themes/theme3.png' },
+    { name: 'Theme 4', image: 'assets/themes/theme4.png' },
+    { name: 'Theme 5', image: 'assets/themes/theme5.png' },
+  ];
+  
+  selectedTheme: any = this.themes[0];
+  selectTheme(theme: any) {
+    this.selectedTheme = theme;
+  }
+  
 
 
   fillSelectedValuesFromDto() {
+    //i49-F6 data should be like this 
     if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
       return;
     }
@@ -210,6 +216,41 @@ export class dynamicInputs implements OnInit, OnChanges {
     setTimeout(() => this.onAnyInputChange(), 0);
   }
 
+  isArray(val: any): boolean {
+    return Array.isArray(val);
+  }
+  onCheckboxChange(checked: boolean, value: any, extraAttr: any): void {
+    if (!Array.isArray(extraAttr.selectedValues)) {
+      extraAttr.selectedValues = [];
+    }
+    if (checked) {
+      if (!extraAttr.selectedValues.includes(value)) {
+        extraAttr.selectedValues.push(value);
+      }
+    } else {
+      extraAttr.selectedValues = extraAttr.selectedValues.filter(val => val !== value);
+    }
+    this.onAnyInputChange(); // emit changes
+  }
 
+  onFileSelected(event: any, extraAttr: any) {
+    const file = event.target.files[0];
+    if (file) {
+      /* if (file.size > 30 * 1024) {
+        alert('File must be less than 30 KB.');
+        return;
+      } */
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Only JPG, PNG, or GIF files are allowed.');
+        return;
+      }
+  
+      extraAttr.selectedValues = file;
+      this.onAnyInputChange();
+    }
+  }
+  
 
+  
 }

@@ -23,6 +23,8 @@ namespace onetouch.AppEntities.Dtos
 
         public long? RelatedEntityId { get; set; }
 
+        public IList<long>? RelatedEntitiesIds { get; set; }
+
         public long EntityObjectTypeId { get; set; }
         public string EntityObjectTypeCode { get; set; }
 
