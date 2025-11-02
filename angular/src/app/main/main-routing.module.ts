@@ -89,9 +89,9 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                                 path: "",
                                 loadChildren: () =>
                                     import(
-                                        "./SycLandingPageSettings/SycLandingPageSettings.module"
+                                        "./marketplaceLandingPage/landingPage.module"
                                     ).then(
-                                        (m) => m.SycLandingPageSettingsModule
+                                        (m) => m.LandingPageModule
                                     ),
                                 data: {
                                     preload: true,
