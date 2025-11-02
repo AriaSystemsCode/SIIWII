@@ -539,90 +539,86 @@ export class MainImportComponent
     uploadStartTime = Date.now();
     uploadedFilesCount = 1;
     callImport(iterationNo: number) {
-        if (iterationNo === 0)
+        if (iterationNo === 0) {
             this.uploadStartTime = Date.now();
-
-
+            Swal.fire({
+                    title: "",
+                    text:  "Your import has started. You’ll receive a confirmation once it’s complete.",  
+                    icon: "info",
+                    showCancelButton: false,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Ok",
+                  }).then((result) => {
+                  });
+        }
+    
         const hasImageRecords = this.uploadindResultExcelList.some(r => r.recordType === 'Image');
+    
         if (hasImageRecords) {
             this.importServiceProxy
                 .saveFromExcel(this.uploadingResult)
                 .pipe(finalize(() => {
                     this.spinnerService.hide();
-                    this.ProgressModal.hide();
+                   // this.notify.success("Your import has been completed successfully.");
                 }))
-                .subscribe((result) => {
-                    this.logFileUrl = result.excelLogPath;
-                    this.logFileName = result.excelLogFileName;
-                    this.successfullyImportModal.show(this.importType);
-                }, (error) => {
-                    this.successfullyImportModal.show(this.importType);
-                });
+                .subscribe(
+                    (result) => {
+                        this.logFileUrl = result.excelLogPath;
+                        this.logFileName = result.excelLogFileName;
+                    },
+                    () => {
+                        //this.notify.error("Import completed with some errors. Please check the log file.");
+                    }
+                );
             return;
         }
-
-            if (this.importType !== ImportTypes.Items || this.imData) {   
-            var toValue = this.uploadingResult?.toList[iterationNo];
-            if (toValue > 1) { toValue = toValue - 1; }
-            this.progress = Math.ceil((toValue / this.uploadingResult?.totalRecords) * 100);
-            this.ProgressDetail = `${this.uploadingResult?.codesFromList[iterationNo]}[${this.uploadingResult?.fromList[iterationNo]}-${this.uploadingResult?.toList[iterationNo]}]`;
-
+    
+        if (this.importType !== ImportTypes.Items || this.imData) {
             if (iterationNo < this.uploadingResult?.fromList.length) {
-                this.uploadingResult.from = this.uploadingResult?.fromList[iterationNo]
-                this.uploadingResult.to = this.uploadingResult?.toList[iterationNo]
-
+                this.uploadingResult.from = this.uploadingResult?.fromList[iterationNo];
+                this.uploadingResult.to = this.uploadingResult?.toList[iterationNo];
+    
                 this.uploadingResult.excelRecords = this.uploadindResultExcelList.slice(
-                    this.uploadingResult.from - 2, this.uploadingResult.to - 2 + 1);
+                    this.uploadingResult.from - 2,
+                    this.uploadingResult.to - 2 + 1
+                );
             }
         }
-
+    
         const isLastIteration = iterationNo === this.uploadingResult?.fromList?.length - 1;
         const isItemsImport = this.importType === ImportTypes.Items;
         const hasImData = !!this.imData;
-
+        const shouldFinish = (isLastIteration && (hasImData || !isItemsImport)) || (isItemsImport && !hasImData);
+    
         this.importServiceProxy
             .saveFromExcel(this.uploadingResult)
             .pipe(finalize(() => {
-              
-                
-                if (
-                  (isLastIteration && (hasImData || !isItemsImport)) ||
-                  (isItemsImport && !hasImData)
-                ) {
- 
-                    this.spinnerService.hide()
-                    this.ProgressModal.hide();
+                if (shouldFinish) {
+                    this.spinnerService.hide();
+                   // this.notify.success("Your import has been completed successfully.");
                 }
-
             }))
-            .subscribe((result) => {
-                    if (
-                        (isLastIteration && (hasImData || !isItemsImport)) ||
-                        (isItemsImport && !hasImData)
-                      ){
-                    this.logFileUrl = result.excelLogPath;
-                    this.logFileName = result.excelLogFileName;
-
-                    this.successfullyImportModal.show(this.importType);
-                }
-                else {
-                    this.callImport(iterationNo + 1);
-                }
-            }
-                , (error) => {
-                    if (
-                        (isLastIteration && (hasImData || !isItemsImport)) ||
-                        (isItemsImport && !hasImData)
-                      ){
-                        this.successfullyImportModal.show(this.importType);
+            .subscribe(
+                (result) => {
+                    if (shouldFinish) {
+                        this.logFileUrl = result.excelLogPath;
+                        this.logFileName = result.excelLogFileName;
+                    } else {
+                        this.callImport(iterationNo + 1);
                     }
-                    else {
+                },
+                () => {
+                    if (shouldFinish) {
+                        //this.notify.error("Import completed with some errors. Please check the log file.");
+                    } else {
                         this.callImport(iterationNo + 1);
                     }
                 }
             );
-
     }
+    
+    
 
     createUploader(
         url: string,
@@ -750,7 +746,7 @@ export class MainImportComponent
                         form.append("guid" + i, this.guids[i]);
                     }
                 };
-                this.ProgressModal.show();
+               // this.ProgressModal.show();
                 // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
                 this.progressHeader = "Uploading folder contents";
                 //this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
@@ -823,6 +819,10 @@ export class MainImportComponent
                     }
                     this.uploadindResultExcelList = this.uploadingResult.excelRecords;
 
+                    
+        let attach = AppConsts.attachmentBaseUrl;
+        let fullURL = `${attach}/${this.logFileUrl}`;
+                    this.uploadingResult.filepath = fullURL;
                     this.callImport(0);
 
                 };

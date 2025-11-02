@@ -291,6 +291,21 @@
 }
 
 
+.fixed-dropdown-menu {
+  position: fixed;
+  z-index: 9999;
+  background: #D9D9D9;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  padding: 8px 0;
+  margin: 0;
+}
+
+.fixed-dropdown-menu.drop-up {
+  transform: translateY(-100%);
+  margin-top: -5px;
+}
+
 
 ._bg-danger {
   color: black;
