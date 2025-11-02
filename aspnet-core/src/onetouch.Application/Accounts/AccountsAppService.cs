@@ -1913,8 +1913,13 @@ namespace onetouch.Accounts
                                     parentExtrData.AttributeValue = "";
                             }
                         }
-                        //if (originalContact.EntityObjectTypeId == presonEntityObjectTypeId)
-                            createOrEditAccountInfoDto.ContactRecordType = "C";
+                        if (originalContact.EntityObjectTypeId == presonEntityObjectTypeId)
+                        {
+                            var accountMainObject = await _appContactRepository.GetAll().Where(z => z.TenantId == tenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+                            if(accountMainObject!=null)
+                                createOrEditAccountInfoDto.AccountId = accountMainObject.Id;
+                        }
+                        createOrEditAccountInfoDto.ContactRecordType = "C";
                         savedAccountSrc = await CreateOrEditAccount(createOrEditAccountInfoDto);
                         var accountSaved = savedAccountSrc;
                         if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
@@ -6860,7 +6865,7 @@ namespace onetouch.Accounts
                         contact.EntityFk.ObjectId = contactObjectId;
                         contact.EntityFk.EntityObjectTypeId = presonEntityObjectTypeId;
                         contact.ParentCode = account.Code;
-                        contact.ParentId = accountDto.ParentId != null? accountDto.ParentId : account.Id;
+                        //contact.ParentId = accountDto.ParentId != null? accountDto.ParentId : account.Id;
                         contact.AccountId = account.Id;
                         await _appContactRepository.UpdateAsync(contact);
                         await CurrentUnitOfWork.SaveChangesAsync();
