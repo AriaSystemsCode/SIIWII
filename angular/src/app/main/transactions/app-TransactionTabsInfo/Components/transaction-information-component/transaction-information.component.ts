@@ -224,6 +224,8 @@ export class TransactionInformationComponent
         undefined,
         [], // ids
         'USD',
+        undefined,
+        undefined,
         'name',
         skipCount,
         maxResultCount

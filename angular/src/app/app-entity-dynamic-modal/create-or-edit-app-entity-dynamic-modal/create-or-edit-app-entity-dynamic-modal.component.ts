@@ -29,8 +29,6 @@ import { BsModalRef, ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
 import { Observable, Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AppEntityListDynamicModalComponent } from "../app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
-import { throws } from "assert";
-import { SelectItem } from "primeng/api";
 import { DomSanitizer, SafeResourceUrl } from "@node_modules/@angular/platform-browser";
 
 @Component({
@@ -170,9 +168,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             undefined,
             undefined
         ).subscribe(result => {
-            //this.primengTableHelper.totalRecordsCount = result.totalCount;
-            //this.primengTableHelper.records = result.items;
-            //this.primengTableHelper.hideLoadingIndicator();
+
             this.attCategories = result.items;
             if (this.attCategories.length > 0) {
                 this.aspectRatio = Number(this.attCategories[0].sycAttachmentCategory.aspectRatio);
@@ -220,8 +216,6 @@ export class CreateOrEditAppEntityDynamicModalComponent
     getStatusOptions() {
         this._sycEntityObjectStatusesAppService.getAllSycEntityStatusForTableDropdown("Lookup").subscribe(result => {
             this.statusValues = result
-
-
         });
     }
 
@@ -286,7 +280,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             }
 
             this.appEntity.nonlookup = false;
-      
+
             this._appEntitiesServiceProxy
                 .saveEntity(this.appEntity)
                 .pipe(
@@ -339,14 +333,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this._sycEntityObjectTypesServiceProxy
             .getAllWithExtraAttributesByCode(this.entityObjectType.code)
             .subscribe(async (result) => {
-              
+
                 this.entityObjectType.code === "SIZE";
                 if (result.length > 0) {
                     this.selectedItemTypeData = result[0];
                     this.appEntity.objectId = 1;
-                    this.appEntity.entityObjectTypeId =
-                        this.selectedItemTypeData.id;
-                    // this.appEntity.entityObjectStatusId = null;
+                    this.appEntity.entityObjectTypeId = this.selectedItemTypeData.id;
+
                     if (
                         this.selectedItemTypeData?.extraAttributes
                             ?.extraAttributes
@@ -485,57 +478,57 @@ export class CreateOrEditAppEntityDynamicModalComponent
     }
 
 
-setStringValue(attrId: number, value: string | boolean): void {
-  
-    if (!this.appEntity.entityExtraData) this.appEntity.entityExtraData = [];
-  
-    // find existing row
-    let idx = this.appEntity.entityExtraData.findIndex(x => x.attributeId === attrId);
-  
-    if (idx === -1) {
-      // create new row
-      const newExtra = new AppEntityExtraDataDto({
-        entityId: undefined,
-        attributeId: attrId,
-        attributeValue: String(value),        //
-        attributeValueId: 0,                
-        id: 0,
-        entityObjectTypeCode: this.entityObjectType.code,
-        entityObjectTypeName: undefined,
-        entityObjectTypeId: this.appEntity.entityObjectTypeId,
-        attributeValueFkName: undefined,
-        attributeValueFkCode: undefined,
-        attributeCode: undefined,
-      });
-      this.appEntity.entityExtraData.push(newExtra);
-    } else {
-      // update existing row
-      this.appEntity.entityExtraData[idx].attributeValue = String(value);
-      this.appEntity.entityExtraData[idx].attributeValueId = 0; // ensure non-lookup
+    setStringValue(attrId: number, value: string | boolean): void {
+
+        if (!this.appEntity.entityExtraData) this.appEntity.entityExtraData = [];
+
+        // find existing row
+        let idx = this.appEntity.entityExtraData.findIndex(x => x.attributeId === attrId);
+
+        if (idx === -1) {
+            // create new row
+            const newExtra = new AppEntityExtraDataDto({
+                entityId: undefined,
+                attributeId: attrId,
+                attributeValue: String(value),        //
+                attributeValueId: 0,
+                id: 0,
+                entityObjectTypeCode: this.entityObjectType.code,
+                entityObjectTypeName: undefined,
+                entityObjectTypeId: this.appEntity.entityObjectTypeId,
+                attributeValueFkName: undefined,
+                attributeValueFkCode: undefined,
+                attributeCode: undefined,
+            });
+            this.appEntity.entityExtraData.push(newExtra);
+        } else {
+            // update existing row
+            this.appEntity.entityExtraData[idx].attributeValue = String(value);
+            this.appEntity.entityExtraData[idx].attributeValueId = 0; // ensure non-lookup
+        }
+
+        // reflect in the filtered attributes (keeps UI in sync)
+        const attrMeta = this.extraAttributes?.find(x => x.attributeId === attrId);
+        if (attrMeta) {
+            // for non-lookup/string/boolean attrs we store the raw value
+            (attrMeta as any).selectedValues = String(value);
+        }
     }
-  
-    // reflect in the filtered attributes (keeps UI in sync)
-    const attrMeta = this.extraAttributes?.find(x => x.attributeId === attrId);
-    if (attrMeta) {
-      // for non-lookup/string/boolean attrs we store the raw value
-      (attrMeta as any).selectedValues = String(value);
-    }
-  }
-  
+
     singleValueExtraAttributeOnChange(
         $event: { value: number; originalEvent: MouseEvent },
         extraAttrDefinition: FilteredExtraAttribute<number>
     ) {
         let selectedAttrValue = $event.value;
-        if(this.entityObjectType.code =='MARKETPLACESECTION'){
-        if( (selectedAttrValue == 486055 || selectedAttrValue == 486056)) {
-            this.setStringValue(1005,'true')
+        if (this.entityObjectType.code == 'MARKETPLACESECTION') {
+            if ((selectedAttrValue == 486055 || selectedAttrValue == 486056)) {
+                this.setStringValue(1005, 'true')
 
-        }else {
-            this.setStringValue(1005,'false')
-            
+            } else {
+                this.setStringValue(1005, 'false')
+
+            }
         }
-    }
         if (!this.appEntity.entityExtraData)
             this.appEntity.entityExtraData = [];
 
@@ -575,8 +568,8 @@ setStringValue(attrId: number, value: string | boolean): void {
         value,
         extraAttrDefinition: FilteredExtraAttribute
     ) {
-       
-        console.log(value,extraAttrDefinition,'kkkkkk')
+
+
         if (!this.appEntity.entityExtraData)
             this.appEntity.entityExtraData = [];
 
@@ -607,7 +600,7 @@ setStringValue(attrId: number, value: string | boolean): void {
         this.appEntity.entityExtraData = this.appEntity.entityExtraData.filter(
             (item) => item.attributeId !== extraAttr.attributeId
         );
- 
+
     }
 
     openCreateAppEntityListModal(extraAttr: FilteredExtraAttribute) {

@@ -124,7 +124,7 @@ export class TopBarComponent
     displaneBuy :boolean =false;
     isAuthenticated = this.appSession?.user
     searchInput:string
-    bgCol:string = '#ba4827'
+    bgCol:string = '#4A0D4A'
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,

@@ -1,4 +1,5 @@
-import { Component, Input } from "@angular/core";
+import { Component, Injector, Input } from "@angular/core";
+import { AppComponentBase } from "@shared/common/app-component-base";
 import { PageSettingDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 
 
@@ -8,7 +9,7 @@ import { PageSettingDto, SydObjectsServiceProxy } from "@shared/service-proxies/
     templateUrl: "./social-media-footer.component.html",
     styleUrls: ["./social-media-footer.component.scss"],
 })
-export class SocialMediaFooterComponent {
+export class SocialMediaFooterComponent extends AppComponentBase   {
     links: any[] = [];
     @Input() sectionId:number;
 
@@ -17,13 +18,13 @@ export class SocialMediaFooterComponent {
 
 
     ngOnInit(){
-        this.links = [
-            { name: 'facebook',  url: 'https://www.facebook.com/siiwii.network/',  iconSrc: 'assets/landingPage/Footer_FB_Btn.svg' },
-            { name: 'instagram', url: 'https://www.instagram.com/siiwii.network/', iconSrc: 'assets/landingPage/Footer_Instagram_Btn.svg' },
-            { name: 'twitter',   url: 'https://twitter.com/siiwii_net',            iconSrc: 'assets/landingPage/Footer_Twitter_Btn.svg' },
-            { name: 'linkedin',  url: 'https://www.linkedin.com/company/siiwii/',   iconSrc: 'assets/landingPage/Footer_Linkedin_Btn.svg' },
-            { name: 'youtube',   url: 'https://www.youtube.com/channel/UCv_4Ao0myNHsjfxyg4lbLbg', iconSrc: 'assets/landingPage/Footer_Youtube_Btn.jpg' },
-          ];
+        // this.links = [
+        //     { name: 'facebook',  url: 'https://www.facebook.com/siiwii.network/',  iconSrc: 'assets/landingPage/Footer_FB_Btn.svg' },
+        //     { name: 'instagram', url: 'https://www.instagram.com/siiwii.network/', iconSrc: 'assets/landingPage/Footer_Instagram_Btn.svg' },
+        //     { name: 'twitter',   url: 'https://twitter.com/siiwii_net',            iconSrc: 'assets/landingPage/Footer_Twitter_Btn.svg' },
+        //     { name: 'linkedin',  url: 'https://www.linkedin.com/company/siiwii/',   iconSrc: 'assets/landingPage/Footer_Linkedin_Btn.svg' },
+        //     { name: 'youtube',   url: 'https://www.youtube.com/channel/UCv_4Ao0myNHsjfxyg4lbLbg', iconSrc: 'assets/landingPage/Footer_Youtube_Btn.jpg' },
+        //   ];
 
           if(this.sectionId){
             this.getBlocksData()
@@ -32,8 +33,8 @@ export class SocialMediaFooterComponent {
     }
 
     
-       constructor(private SydObjectsServiceProxy:SydObjectsServiceProxy) {
-       
+       constructor(private SydObjectsServiceProxy:SydObjectsServiceProxy,injector: Injector,) {
+        super(injector);
     
         }
       
@@ -43,7 +44,7 @@ export class SocialMediaFooterComponent {
                   this.sectionId,        
                 )
                 .subscribe((res) => {
-                    // this.links = res
+                    this.links = res
                  console.log(res,'SOCIALLL')
                 });
             }

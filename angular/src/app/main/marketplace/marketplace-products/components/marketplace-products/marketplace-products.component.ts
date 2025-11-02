@@ -391,6 +391,8 @@ export class MarketplaceProductsComponent
                 requestParams.endShipData ||  this.endShipData,
                 requestParams.brands ||  this.brands, // ids
                 requestParams.selectedCurrency ||  this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                undefined,
+                undefined,
                 requestParams.selectedSort || this.selectedSort.value,
                 requestParams.skipCount || this.skipCount,
                 requestParams.maxResultCount ||  this.maxResultCount

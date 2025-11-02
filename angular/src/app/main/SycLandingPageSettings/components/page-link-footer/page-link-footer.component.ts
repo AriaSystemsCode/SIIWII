@@ -22,22 +22,22 @@ export class PageLinkFooterComponent {
     ngOnInit(){
     
         if(this.sectionId){
-            // this.getBlocksData()
+            this.getBlocksData()
 
         }
 
-        this.pageLiksData = [
-            { name: 'Apple',        img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Samsung',      img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Nike',         img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Adidas',       img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Sony',         img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'LG',           img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Microsoft',    img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Huawei',       img: 'assets/placeholders/_logo-placeholder.png' },
-            { name: 'Xiaomi',       img: 'assets/brands/xiaomi.svg' },
-            { name: 'Lenovo',       img: 'assets/brands/lenovo.svg' },
-          ];
+        // this.pageLiksData = [
+        //     { name: 'Apple',        img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Samsung',      img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Nike',         img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Adidas',       img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Sony',         img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'LG',           img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Microsoft',    img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Huawei',       img: 'assets/placeholders/_logo-placeholder.png' },
+        //     { name: 'Xiaomi',       img: 'assets/brands/xiaomi.svg' },
+        //     { name: 'Lenovo',       img: 'assets/brands/lenovo.svg' },
+        //   ];
       
     }
 
@@ -47,7 +47,7 @@ export class PageLinkFooterComponent {
               this.sectionId,        
             )
             .subscribe((res) => {
-                // this.pageLiksData = res
+                this.pageLiksData = res
              console.log(res,'page link')
             });
         }

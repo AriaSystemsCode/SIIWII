@@ -17241,12 +17241,14 @@ export class AppMarketplaceItemsServiceProxy {
      * @param startShipToDate (optional) 
      * @param brands (optional) 
      * @param currencyCode (optional) 
+     * @param itemSSIN (optional) 
+     * @param categoryFilters (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAll?";
         if (contactSSIN !== undefined && contactSSIN !== null)
             url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
@@ -17305,6 +17307,10 @@ export class AppMarketplaceItemsServiceProxy {
             brands && brands.forEach(item => { url_ += "Brands=" + encodeURIComponent("" + item) + "&"; });
         if (currencyCode !== undefined && currencyCode !== null)
             url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        if (itemSSIN !== undefined && itemSSIN !== null)
+            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
+        if (categoryFilters !== undefined && categoryFilters !== null)
+            categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -18094,8 +18100,8 @@ export class AppMarketplaceItemsServiceProxy {
      * @param currencyCode (optional) 
      * @return Success
      */
-    getAppMarketplaceViewData(ssin: string | null | undefined, currencyCode: string | null | undefined): Observable<GetAppMarketItemForViewDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppMarketplaceViewData?";
+    getAppMarketplaceItemViewData(ssin: string | null | undefined, currencyCode: string | null | undefined): Observable<GetAppMarketItemForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppMarketplaceItemViewData?";
         if (ssin !== undefined && ssin !== null)
             url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
         if (currencyCode !== undefined && currencyCode !== null)
@@ -18111,11 +18117,11 @@ export class AppMarketplaceItemsServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAppMarketplaceViewData(response_);
+            return this.processGetAppMarketplaceItemViewData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetAppMarketplaceViewData(response_ as any);
+                    return this.processGetAppMarketplaceItemViewData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<GetAppMarketItemForViewDto>;
                 }
@@ -18124,7 +18130,7 @@ export class AppMarketplaceItemsServiceProxy {
         }));
     }
 
-    protected processGetAppMarketplaceViewData(response: HttpResponseBase): Observable<GetAppMarketItemForViewDto> {
+    protected processGetAppMarketplaceItemViewData(response: HttpResponseBase): Observable<GetAppMarketItemForViewDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
