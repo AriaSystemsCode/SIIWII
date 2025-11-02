@@ -9,7 +9,6 @@ import { eventsModule } from "../AppEvent/events.module";
 import { InteractionsModule } from "../interactions/interactions.module";
 import { RouterModule } from "@angular/router";
 import { CarouselModule } from "primeng/carousel";
-import { LandingPageRoutingModule } from "./landingPage-routing.module";
 import { MarketplaceProductsModule } from "../marketplace/marketplace-products/marketplace-products.module";
 import { FooterPageLinkComponent } from "./components/footer-page-link/footer-page-link.component";
 import { LandingPageSliderWithCallToActionComponent } from "./components/landing-page-slider-with-callToAction/landing-page-slider-with-callToAction.component";
@@ -19,6 +18,7 @@ import { FooterSocialMediaComponent } from "./components/footer-social-media/foo
 import { LandingPageSliderWithoutCallToActionComponent } from "./components/landing-page-slider-without-callToAction/landing-page-slider-without-callToAction.component";
 import { LandingPageCarusalWithCallToActionComponent } from "./components/landing-page-carusal-with-callToAction/landing-page-carusal-with-callToAction.component";
 import { MarketplaceLandingPageComponent } from "./components/marketplace-landing-page/marketplace-landing-page.component";
+import { LandingPageRoutingModule } from "./LandingPage-routing.module";
 
 
 

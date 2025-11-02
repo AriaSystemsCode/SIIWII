@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit, ViewChild } from "@angular/core";
+import { Component, Injector, OnInit } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
     AppMarketplaceItemsServiceProxy,
@@ -25,9 +25,9 @@ export class MarketplaceLandingPageComponent
 
 
 
-    autoSliderCode: string = "SycLandingPageSettingsAutoSlider";
-    CTASliderCode: string = "SycLandingPageSettingsCTASlider";
-    advSliderCode: string = "SycLandingPageSettingsAdvSlider";
+    // autoSliderCode: string = "SycLandingPageSettingsAutoSlider";
+    // CTASliderCode: string = "SycLandingPageSettingsCTASlider";
+    // advSliderCode: string = "SycLandingPageSettingsAdvSlider";
      advSliderItems: string[] = [];
      brands:any
      departments:any
@@ -424,10 +424,6 @@ export class MarketplaceLandingPageComponent
       }    
     
 
-    ngOnDestroy() {
-        this.unsubscribeToAllSubscriptions();
-    }
- 
     private TYPE_TO_SECTION: Record<number, SectionType> = {
    
         0: 'ASSB',
@@ -494,30 +490,23 @@ export class MarketplaceLandingPageComponent
 
 
 
-    getAllBrandSettings() {
-        const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.ASMB, this.CTASliderCode)
-            .subscribe((result) => {
-                // this.cta.sycLangingPageSetting = result;
-            });
-        this.subscriptions.push(subs);
-    }
 
-    getAdvSettings() {
-        var _advSliderItems: string[] = [];
-        const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.ASMB, this.advSliderCode)
-            .subscribe((result) => {
 
-                result.forEach((img) => {
-                    _advSliderItems.push(img.image);
-                });
-                // this.adv_sm.advSliderItems = advSliderItems;
-                // this.adv_md.advSliderItems = advSliderItems;
-                this.advSliderItems=_advSliderItems;
-            });
-        this.subscriptions.push(subs);
-    }
+    // getAdvSettings() {
+    //     var _advSliderItems: string[] = [];
+    //     const subs = this._sydObjectsAppService
+    //         .getAllSliderSettings(SliderEnum.ASMB, this.advSliderCode)
+    //         .subscribe((result) => {
+
+    //             result.forEach((img) => {
+    //                 _advSliderItems.push(img.image);
+    //             });
+    //             // this.adv_sm.advSliderItems = advSliderItems;
+    //             // this.adv_md.advSliderItems = advSliderItems;
+    //             this.advSliderItems=_advSliderItems;
+    //         });
+    //     this.subscriptions.push(subs);
+    // }
 
     
   getAllBrands() {
@@ -576,4 +565,11 @@ export class MarketplaceLandingPageComponent
           }
         );
     }
+
+
+    
+    ngOnDestroy() {
+      this.unsubscribeToAllSubscriptions();
+  }
+
 }
