@@ -29,6 +29,7 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     notifications: IFormattedUserNotification[] = [];
     unreadNotificationCount = 0;
     dropdownMenudisplay: boolean = false;
+    isAuthenticated = this.appSession?.user
 
     constructor(
         injector: Injector,
@@ -45,8 +46,10 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     }
 
     ngOnInit(): void {
-        
+        if(this.isAuthenticated) {
         this.loadNotifications();
+
+        }
         this.registerToEvents();
     }
 

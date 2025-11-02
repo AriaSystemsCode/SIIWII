@@ -557,7 +557,9 @@ export class CreateEditAppItemVariationsComponent
                         isHostRecord:false,
                         hexaCode:undefined,
                         image:undefined,
-                        id:0
+                        id:0,
+                        status:undefined,
+                        entityObjectStatusId:undefined
                     })
                     extraAttr?.lookupData?.push(tempAtt)
                 }
@@ -2241,7 +2243,9 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                     stockAvailability:0,
                     isHostRecord:false,
                     hexaCode:undefined,
-                    image:undefined
+                    image:undefined,
+                    status:undefined,
+                    entityObjectStatusId:undefined
                     
                 })
                 sizeExtraAttr?.lookupData?.push(tempAtt)

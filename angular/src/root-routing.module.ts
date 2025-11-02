@@ -1,15 +1,22 @@
 import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule, Routes } from '@angular/router';
+import { AppRouteGuard } from '@app/shared/common/auth/auth-route-guard';
 import { AppUiCustomizationService } from '@shared/common/ui/app-ui-customization.service';
 
 const routes: Routes = [
     {
+                        canActivate: [AppRouteGuard],
+                        canActivateChild: [AppRouteGuard],
         path: 'account',
         loadChildren: () => import('account/account.module').then(m => m.AccountModule), //Lazy load account module
         data: { preload: true }
     },
-    { path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' },
-    { path: '**', redirectTo: '/app/main/dashboard' }
+
+  // Default '' -> marketplace products
+  { path: '', redirectTo: '/app/main/marketplace', pathMatch: 'full' },
+
+  // Wildcard '**' -> marketplace products
+  { path: '**', redirectTo: '/app/main/marketplace' }
 ];
 
 @NgModule({

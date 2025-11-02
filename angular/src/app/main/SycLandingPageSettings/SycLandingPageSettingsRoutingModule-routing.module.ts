@@ -1,11 +1,12 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
-import { SycLandingPageSettingsComponent } from "./components/syc-landing-page-settings.component";
+import { MarketplaceLandingPageComponent } from "./components/marketplace-landing-page/marketplace-landing-page.component";
+
 
 const routes: Routes = [
     {
         path: "",
-        component: SycLandingPageSettingsComponent,
+        component: MarketplaceLandingPageComponent,
     },
 ];
 

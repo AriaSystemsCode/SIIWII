@@ -42,6 +42,8 @@ using NPOI.SS.Formula.Functions;
 using NPOI.HPSF;
 using System.IO;
 using onetouch.SystemObjects.Dtos;
+using Org.BouncyCastle.Crypto;
+using System.Diagnostics;
 
 namespace onetouch.AppEntities
 {
@@ -286,6 +288,32 @@ namespace onetouch.AppEntities
             //catch (Exception ex) { }
             //return ret;
         }
+        //I49[Start]
+        public async Task<PagedResultDto<GetAppEntityForViewDto>> GetAllSearchedEntities(GetAllAppEntitiesInput input)
+        {
+            var itemObjectId = await _helper.SystemTables.GetObjectListingId();
+            var searchList = _appEntityRepository.GetAll().Where(z => z.ObjectId == itemObjectId && z.TenantId== null && (z.Code.ToLower().Trim() == input.Filter.ToLower().Trim()  
+            || z.Name.ToLower().Trim() == input.Filter.ToLower().Trim()) );
+
+            var filteredList = searchList.OrderBy(input.Sorting ?? "id asc");
+            var resultList = from d in filteredList
+                             select new GetAppEntityForViewDto()
+                             {
+                                 AppEntity = ObjectMapper.Map<AppEntityDto>(d)
+                             };
+            var appEntityPage = filteredList.PageBy(input);
+
+            var appEntityList = await resultList.ToListAsync();
+            var totalCount = await resultList.CountAsync();
+
+
+            return new PagedResultDto<GetAppEntityForViewDto>(
+                totalCount,
+                appEntityList
+            );
+        }
+
+        //I49[end]
 
         [AbpAllowAnonymous]
         public async Task<GetAppEntityForViewDto> GetAppEntityRelations(long id)
@@ -659,11 +687,16 @@ namespace onetouch.AppEntities
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+                .Include(z=>z.EntityObjectStatusFk)
                 .Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
                 .OrderBy("Name asc")
                 .Select(appEntity => new LookupLabelDto
                 {
                     Value = appEntity.Id,
+                    //I49[Start]
+                    EntityObjectStatusId = appEntity.EntityObjectStatusId,
+                    Status = (appEntity.EntityObjectStatusFk != null ? appEntity.EntityObjectStatusFk.Name : ""),
+                    //I49[End]
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
                     IsHostRecord = appEntity.TenantId == null,
@@ -695,6 +728,7 @@ namespace onetouch.AppEntities
         //MMT30
 
         #region get all with paging
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input)
         {
             //var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId(); *Abdo : Not used variable 
@@ -1443,6 +1477,9 @@ namespace onetouch.AppEntities
         }
 
         #region get class/category/depts by page objects/names
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppEntityCategoriesWithPaging(GetAppEntityAttributesInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1460,7 +1497,9 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
-
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<AppEntityClassificationDto>> GetAppEntityClassificationsWithPaging(GetAppEntityAttributesInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1478,7 +1517,9 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<AppEntityClassificationDto>(0, new List<AppEntityClassificationDto>());
             }
         }
-
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppEntityDepartmentsWithPaging(GetAppEntityAttributesInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1496,8 +1537,10 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
-       
 
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<string>> GetAppEntityCategoriesNamesWithPaging(GetAppEntityAttributesInput input)
         {
             var categoriesOrderdPaged = await GetAppEntityCategoriesWithPaging(input);
@@ -1507,7 +1550,9 @@ namespace onetouch.AppEntities
             }
             return new PagedResultDto<string>(0, new List<string>());
         }
-
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<string>> GetAppEntityClassificationsNamesWithPaging(GetAppEntityAttributesInput input)
         {
             var classificationsOrderdPaged = await GetAppEntityClassificationsWithPaging(input);

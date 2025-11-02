@@ -87,7 +87,8 @@ export class MarketplaceViewProductComponent
     languageSettingName  =AppConsts.languageSettingName;
     IsConnected : boolean = false
     overRating: OverAllRatingDto
-    
+    isAuthenticated = this.appSession?.user
+    items:any
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -106,6 +107,260 @@ export class MarketplaceViewProductComponent
         this.priceLevel = localStorage.getItem("tempPriceLevel");
         this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
+        this.items = [
+            {
+                "appItem": {
+                    "code": "00001094-000000000032",
+                    "name": "    Flower Power Top",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/8119619d-52f4-2c36-a673-0d6989b37314.jpg",
+                    "ssin": "00001094-000000000032",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Dresscode",
+                    "manufacturerCode": "6004",
+                    "id": 363498
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 1,
+                "averageRating": 5
+            },
+            {
+                "appItem": {
+                    "code": "00001130-000000000005",
+                    "name": " \"Never Slow Down\" Printed Fashionable T-Shirt",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/cf04d0f0-0985-76cf-c24b-f13c812182a3.webp",
+                    "ssin": "00001130-000000000005",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "RAVIN",
+                    "manufacturerCode": "RAV-7002",
+                    "id": 364075
+                },
+                "selected": false,
+                "sellerSSIN": "Business-000000000071",
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00002244-000000000049",
+                    "name": " Blazer",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/04141886-e609-a4fe-04ac-10a0c1112b04.PNG",
+                    "ssin": "00002244-000000000049",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "TORINO WEAR",
+                    "manufacturerCode": "TOR-0114576205",
+                    "id": 365691
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00002305-000000000012",
+                    "name": " Crew Neck Sweater",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/468330e9-4531-2ba2-cdd9-05348f4a64a9.PNG",
+                    "ssin": "00002305-000000000012",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Nillens",
+                    "manufacturerCode": "NLLS-9520215404",
+                    "id": 367001
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00001081-000000000015",
+                    "name": " Essential Biker Short",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/0ef7ec3f-c781-ce7e-53c5-958487173e0a.webp",
+                    "ssin": "00001081-000000000015",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Sigma Fit",
+                    "manufacturerCode": "23235",
+                    "id": 363240
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 1,
+                "averageRating": 4
+            },
+            {
+                "appItem": {
+                    "code": "00002352-000000000001",
+                    "name": " Flamingo Tee",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/5326acc6-806a-6559-d33c-47400254e12b.PNG",
+                    "ssin": "00002352-000000000001",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Vustra",
+                    "manufacturerCode": "S/V5400001551",
+                    "id": 367315
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00002177-000000000012",
+                    "name": " Front Printing Slip On Hoodie",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/d5e0328d-df49-49d6-76bc-32906ffeaff1.PNG",
+                    "ssin": "00002177-000000000012",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Andora",
+                    "manufacturerCode": "AN-6456582",
+                    "id": 364563
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00001020-000000000006",
+                    "name": " Geometric Trees Embroidery Tunic",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/3969d748-86cc-6e7e-a4e7-3708d38f8ddb.jpg",
+                    "ssin": "00001020-000000000006",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Nina Mclemore",
+                    "manufacturerCode": "7928",
+                    "id": 362693
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00001130-000000000018",
+                    "name": " Girls Polka Dots Buttoned Dress",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/76537a31-798b-2ed3-0c89-c0b747968194.webp",
+                    "ssin": "00001130-000000000018",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "RAVIN",
+                    "manufacturerCode": null,
+                    "id": 364088
+                },
+                "selected": false,
+                "sellerSSIN": "Business-000000000071",
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00001018-000000000001",
+                    "name": "- Ladies Butterfly Floral Printed Mid-Length Basic Rain Coat with Removable Hood",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/1a7bf404-9e27-bdef-98e1-dac57ece6893.webp",
+                    "ssin": "00001018-000000000001",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Capelli New York",
+                    "manufacturerCode": "CNY-ST1",
+                    "id": 362837
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00002200-000000000001",
+                    "name": " Mazzika  T-shirt",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/16f018c8-791c-2438-e185-3b816f0e4c49.webp",
+                    "ssin": "00002200-000000000001",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "NAS Trends",
+                    "manufacturerCode": "NAS-4652101",
+                    "id": 364972
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            },
+            {
+                "appItem": {
+                    "code": "00002215-000000000004",
+                    "name": " MICROFIBER WATERPROOF PUFFER JACKET",
+                    "description": null,
+                    "price": 0,
+                    "published": false,
+                    "listed": false,
+                    "imageUrl": "attachments/-1/fe923c7a-234d-3adb-98d5-c257cc26841a.jpg",
+                    "ssin": "00002215-000000000004",
+                    "sharingLevel": null,
+                    "showItem": true,
+                    "sellerName": "Junior Group Egypt",
+                    "manufacturerCode": "JGE-451157102",
+                    "id": 365144
+                },
+                "selected": false,
+                "sellerSSIN": null,
+                "numberOfReviews": 0,
+                "averageRating": 0
+            }
+        ]
     }
     ngOnInit(): void {
         this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
@@ -168,105 +423,110 @@ export class MarketplaceViewProductComponent
             this.setSizes(this.currentIndex);
             this.scrollIntoView();
           }
-    getProductDetailsForView() {
-        this.showMainSpinner();
-        this.showEditSpecialPrice = true;
-        this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
-            .subscribe((res: ShoppingCartSummary) => {
-                if (res?.orderType == TransactionType.SalesOrder)
-                    this.orderType = 'SO';
-                else if (res?.orderType == TransactionType.PurchaseOrder)
-                    this.orderType = 'PO';
-
-                if (res?.buyerSSIN)
-                    this.productBodyData.buyerSSIN = res?.buyerSSIN;
-                if (res?.sellerSSIN)
-                    this.productBodyData.sellerSSIN = res?.sellerSSIN;
-
-                if (res?.currencyCode)
-                    this.productBodyData.currencyCode = res?.currencyCode;
-              
-                this._AppMarketplaceItemsServiceProxy
-                    .getMarketplaceAppItemForView(
-                        undefined,
-                        0,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        this.productBodyData.currencyCode,
-                        this.productBodyData.buyerSSIN,
-                        this.productBodyData.sellerSSIN,
-                        this.priceLevel,
-                        this.productBodyData.id,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        0,
-                        10
-                    )
-                    .pipe( 
-                        finalize(() => {
-                            this.getOverAllRatings()
-                            this.hideMainSpinner();
-                        })
-                    )
-                    .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
-                        this.productDetails = res?.appItem;
-                        this.productData = res;
-                        this.productDetails.maxSpecialPrice = this.productDetails?.maxSpecialPrice ? this.productDetails?.maxSpecialPrice : 0;
-                        this.updatedSpecialPrice = this.productDetails?.maxSpecialPrice;
-                        this.productDetails?.minMSRP % 1 == 0 ? this.productDetails.minMSRP = Math.round(this.productDetails?.minMSRP * 100 / 100).toFixed(2) : null;
-                        this.productDetails?.maxMSRP % 1 == 0 ? this.productDetails.maxMSRP = Math.round(this.productDetails?.maxMSRP * 100 / 100).toFixed(2) : null;
-                        this.productImages = res?.appItem?.entityAttachments;
-                        this.productVarImages = res?.appItem?.variations;
-                        let colorVariation: any[] = res?.appItem?.variations?.filter(
-                            (variation: any) => variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName
-                        );
-                        let selectedValues = [
-                            ...colorVariation.map(
-                                (selected: any) => selected?.selectedValues
-                            ),
-                        ];
-
-                        this.colorsData = selectedValues[0]?.map((variation: any) => {
-                            let sizesValue = variation?.edRestAttributes?.map(
-                                (attr: any) => {
-                                    if (attr?.extraAttrName === "SIZE") {
-                                        return [...attr.values];
-                                    }
-                                }
-                            );
-                            return {
-                                colorName: variation?.value,
-                                sizes: sizesValue[0],
-                                colorImg: variation?.colorImage,
-                                colorCode: variation?.colorHexaCode,
-                                colorCodeSelectedValues: variation?.code
-                            };
-                        });
-                        this.filteredColors = this.colorsData
-                        this.chk_Order_by_prepack = [];
-                        this.chk_Order_by_prepack = new Array(this.colorsData?.length).fill(true);
-                    });
-
-
-
-                this.GetCurrencyInfo();
+          getProductDetailsForView() {
+            this.showMainSpinner();
+            this.showEditSpecialPrice = true;
+                    
+            const handleItemDetails = (res: GetAppMarketplaceItemDetailForViewDto) => {
+              this.productDetails = res?.appItem;
+              this.productData = res;
+          
+              this.productDetails.maxSpecialPrice = this.productDetails?.maxSpecialPrice ?? 0;
+              this.updatedSpecialPrice = this.productDetails.maxSpecialPrice;
+          
+              // keep your formatting logic
+              this.productDetails?.minMSRP % 1 == 0
+                ? (this.productDetails.minMSRP = Math.round((this.productDetails?.minMSRP * 100) / 100).toFixed(2) as any)
+                : null;
+          
+              this.productDetails?.maxMSRP % 1 == 0
+                ? (this.productDetails.maxMSRP = Math.round((this.productDetails?.maxMSRP * 100) / 100).toFixed(2) as any)
+                : null;
+          
+              this.productImages = res?.appItem?.entityAttachments;
+              this.productVarImages = res?.appItem?.variations;
+          
+              const colorVariation: any[] = res?.appItem?.variations?.filter(
+                (v: any) => v.extraAttrName === this.productDetails?.variations?.[0]?.extraAttrName
+              );
+          
+              const selectedValues = [...(colorVariation?.map((s: any) => s?.selectedValues) ?? [])];
+          
+              this.colorsData = selectedValues?.[0]?.map((variation: any) => {
+                const sizesValue = variation?.edRestAttributes?.map((attr: any) => {
+                  if (attr?.extraAttrName === 'SIZE') return [...attr.values];
+                });
+                return {
+                  colorName: variation?.value,
+                  sizes: sizesValue?.[0],
+                  colorImg: variation?.colorImage,
+                  colorCode: variation?.colorHexaCode,
+                  colorCodeSelectedValues: variation?.code,
+                };
+              });
+          
+              this.filteredColors = this.colorsData;
+              this.chk_Order_by_prepack = new Array(this.colorsData?.length || 0).fill(true);
+            };
+          
+            const fetchDetails = () => {
+              this._AppMarketplaceItemsServiceProxy
+                .getMarketplaceAppItemForView(
+                  undefined,
+                  0,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  this.productBodyData.currencyCode,
+                  this.productBodyData.buyerSSIN,
+                  this.productBodyData.sellerSSIN,
+                  this.priceLevel,
+                  this.productBodyData.id,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  0,
+                  10
+                )
+                .pipe(
+                  finalize(() => {
+                    this.getOverAllRatings();
+                    this.hideMainSpinner();
+                  })
+                )
+                .subscribe(handleItemDetails);
+            };
+          
+            if (this.isAuthenticated) {
+              // Fetch current active transaction first
+              this._AppTransactionServiceProxy.getCurrentUserActiveTransaction().subscribe((res: ShoppingCartSummary) => {
+                if (res?.orderType == TransactionType.SalesOrder) this.orderType = 'SO';
+                else if (res?.orderType == TransactionType.PurchaseOrder) this.orderType = 'PO';
+          
+                if (res?.buyerSSIN) this.productBodyData.buyerSSIN = res.buyerSSIN;
+                if (res?.sellerSSIN) this.productBodyData.sellerSSIN = res.sellerSSIN;
+                if (res?.currencyCode) this.productBodyData.currencyCode = res.currencyCode;
+          
+                fetchDetails();
+                // this.GetCurrencyInfo();
+              });
+            } else {
+              // Not authenticated: skip active-transaction call
+              fetchDetails();
+            //   this.GetCurrencyInfo();
             }
-            );
-    }
+          }
+          
 
     GetCurrencyInfo() {
         this._AppEntitiesServiceProxy.getCurrencyInfo(this.productBodyData?.currencyCode)

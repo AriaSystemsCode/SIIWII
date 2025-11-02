@@ -5687,6 +5687,99 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
+     * @param filter (optional) 
+     * @param nameFilter (optional) 
+     * @param codeFilter (optional) 
+     * @param descriptionFilter (optional) 
+     * @param extraDataFilter (optional) 
+     * @param sycEntityObjectTypeNameFilter (optional) 
+     * @param sycEntityObjectStatusNameFilter (optional) 
+     * @param sydObjectNameFilter (optional) 
+     * @param entityObjectTypeId (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllSearchedEntities(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEntityForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllSearchedEntities?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (nameFilter !== undefined && nameFilter !== null)
+            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
+        if (codeFilter !== undefined && codeFilter !== null)
+            url_ += "CodeFilter=" + encodeURIComponent("" + codeFilter) + "&";
+        if (descriptionFilter !== undefined && descriptionFilter !== null)
+            url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
+        if (extraDataFilter !== undefined && extraDataFilter !== null)
+            url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
+            url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
+        if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
+            url_ += "SycEntityObjectStatusNameFilter=" + encodeURIComponent("" + sycEntityObjectStatusNameFilter) + "&";
+        if (sydObjectNameFilter !== undefined && sydObjectNameFilter !== null)
+            url_ += "SydObjectNameFilter=" + encodeURIComponent("" + sydObjectNameFilter) + "&";
+        if (entityObjectTypeId === null)
+            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
+        else if (entityObjectTypeId !== undefined)
+            url_ += "EntityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSearchedEntities(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSearchedEntities(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppEntityForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppEntityForViewDto>;
+        }));
+    }
+
+    protected processGetAllSearchedEntities(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppEntityForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAppEntityForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -11909,15 +12002,13 @@ export class AppItemsServiceProxy {
      * @param getAppItemAttributesInputForDepartments_Sorting (optional) 
      * @param getAppItemAttributesInputForDepartments_SkipCount (optional) 
      * @param getAppItemAttributesInputForDepartments_MaxResultCount (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_Sorting (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_SkipCount (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_MaxResultCount (optional) 
+     * @param itemSSIN (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, timeZoneValue: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, getAppItemAttributesInputForRelatedItems_Sorting: string | null | undefined, getAppItemAttributesInputForRelatedItems_SkipCount: number | undefined, getAppItemAttributesInputForRelatedItems_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
+    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, timeZoneValue: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, itemSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -11983,16 +12074,8 @@ export class AppItemsServiceProxy {
             throw new Error("The parameter 'getAppItemAttributesInputForDepartments_MaxResultCount' cannot be null.");
         else if (getAppItemAttributesInputForDepartments_MaxResultCount !== undefined)
             url_ += "GetAppItemAttributesInputForDepartments.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForDepartments_MaxResultCount) + "&";
-        if (getAppItemAttributesInputForRelatedItems_Sorting !== undefined && getAppItemAttributesInputForRelatedItems_Sorting !== null)
-            url_ += "GetAppItemAttributesInputForRelatedItems.Sorting=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_Sorting) + "&";
-        if (getAppItemAttributesInputForRelatedItems_SkipCount === null)
-            throw new Error("The parameter 'getAppItemAttributesInputForRelatedItems_SkipCount' cannot be null.");
-        else if (getAppItemAttributesInputForRelatedItems_SkipCount !== undefined)
-            url_ += "GetAppItemAttributesInputForRelatedItems.SkipCount=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_SkipCount) + "&";
-        if (getAppItemAttributesInputForRelatedItems_MaxResultCount === null)
-            throw new Error("The parameter 'getAppItemAttributesInputForRelatedItems_MaxResultCount' cannot be null.");
-        else if (getAppItemAttributesInputForRelatedItems_MaxResultCount !== undefined)
-            url_ += "GetAppItemAttributesInputForRelatedItems.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_MaxResultCount) + "&";
+        if (itemSSIN !== undefined && itemSSIN !== null)
+            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -12958,15 +13041,13 @@ export class AppItemsServiceProxy {
      * @param getAppItemAttributesInputForDepartments_Sorting (optional) 
      * @param getAppItemAttributesInputForDepartments_SkipCount (optional) 
      * @param getAppItemAttributesInputForDepartments_MaxResultCount (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_Sorting (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_SkipCount (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_MaxResultCount (optional) 
+     * @param itemSSIN (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemForEdit(itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, getAppItemAttributesInputForRelatedItems_Sorting: string | null | undefined, getAppItemAttributesInputForRelatedItems_SkipCount: number | undefined, getAppItemAttributesInputForRelatedItems_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemForEditOutput> {
+    getAppItemForEdit(itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, itemSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemForEditOutput> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForEdit?";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
@@ -13002,16 +13083,8 @@ export class AppItemsServiceProxy {
             throw new Error("The parameter 'getAppItemAttributesInputForDepartments_MaxResultCount' cannot be null.");
         else if (getAppItemAttributesInputForDepartments_MaxResultCount !== undefined)
             url_ += "GetAppItemAttributesInputForDepartments.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForDepartments_MaxResultCount) + "&";
-        if (getAppItemAttributesInputForRelatedItems_Sorting !== undefined && getAppItemAttributesInputForRelatedItems_Sorting !== null)
-            url_ += "GetAppItemAttributesInputForRelatedItems.Sorting=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_Sorting) + "&";
-        if (getAppItemAttributesInputForRelatedItems_SkipCount === null)
-            throw new Error("The parameter 'getAppItemAttributesInputForRelatedItems_SkipCount' cannot be null.");
-        else if (getAppItemAttributesInputForRelatedItems_SkipCount !== undefined)
-            url_ += "GetAppItemAttributesInputForRelatedItems.SkipCount=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_SkipCount) + "&";
-        if (getAppItemAttributesInputForRelatedItems_MaxResultCount === null)
-            throw new Error("The parameter 'getAppItemAttributesInputForRelatedItems_MaxResultCount' cannot be null.");
-        else if (getAppItemAttributesInputForRelatedItems_MaxResultCount !== undefined)
-            url_ += "GetAppItemAttributesInputForRelatedItems.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_MaxResultCount) + "&";
+        if (itemSSIN !== undefined && itemSSIN !== null)
+            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -17695,12 +17768,14 @@ export class AppMarketplaceItemsServiceProxy {
      * @param startShipToDate (optional) 
      * @param brands (optional) 
      * @param currencyCode (optional) 
+     * @param itemSSIN (optional) 
+     * @param categoryFilters (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAll?";
         if (contactSSIN !== undefined && contactSSIN !== null)
             url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
@@ -17759,6 +17834,10 @@ export class AppMarketplaceItemsServiceProxy {
             brands && brands.forEach(item => { url_ += "Brands=" + encodeURIComponent("" + item) + "&"; });
         if (currencyCode !== undefined && currencyCode !== null)
             url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        if (itemSSIN !== undefined && itemSSIN !== null)
+            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
+        if (categoryFilters !== undefined && categoryFilters !== null)
+            categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -18061,15 +18140,13 @@ export class AppMarketplaceItemsServiceProxy {
      * @param getAppItemAttributesInputForDepartments_Sorting (optional) 
      * @param getAppItemAttributesInputForDepartments_SkipCount (optional) 
      * @param getAppItemAttributesInputForDepartments_MaxResultCount (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_Sorting (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_SkipCount (optional) 
-     * @param getAppItemAttributesInputForRelatedItems_MaxResultCount (optional) 
+     * @param itemSSIN (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, getAppItemAttributesInputForRelatedItems_Sorting: string | null | undefined, getAppItemAttributesInputForRelatedItems_SkipCount: number | undefined, getAppItemAttributesInputForRelatedItems_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
+    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, itemSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetMarketplaceAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -18139,16 +18216,8 @@ export class AppMarketplaceItemsServiceProxy {
             throw new Error("The parameter 'getAppItemAttributesInputForDepartments_MaxResultCount' cannot be null.");
         else if (getAppItemAttributesInputForDepartments_MaxResultCount !== undefined)
             url_ += "GetAppItemAttributesInputForDepartments.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForDepartments_MaxResultCount) + "&";
-        if (getAppItemAttributesInputForRelatedItems_Sorting !== undefined && getAppItemAttributesInputForRelatedItems_Sorting !== null)
-            url_ += "GetAppItemAttributesInputForRelatedItems.Sorting=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_Sorting) + "&";
-        if (getAppItemAttributesInputForRelatedItems_SkipCount === null)
-            throw new Error("The parameter 'getAppItemAttributesInputForRelatedItems_SkipCount' cannot be null.");
-        else if (getAppItemAttributesInputForRelatedItems_SkipCount !== undefined)
-            url_ += "GetAppItemAttributesInputForRelatedItems.SkipCount=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_SkipCount) + "&";
-        if (getAppItemAttributesInputForRelatedItems_MaxResultCount === null)
-            throw new Error("The parameter 'getAppItemAttributesInputForRelatedItems_MaxResultCount' cannot be null.");
-        else if (getAppItemAttributesInputForRelatedItems_MaxResultCount !== undefined)
-            url_ += "GetAppItemAttributesInputForRelatedItems.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForRelatedItems_MaxResultCount) + "&";
+        if (itemSSIN !== undefined && itemSSIN !== null)
+            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -18548,6 +18617,63 @@ export class AppMarketplaceItemsServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param ssin (optional) 
+     * @param currencyCode (optional) 
+     * @return Success
+     */
+    getAppMarketplaceItemViewData(ssin: string | null | undefined, currencyCode: string | null | undefined): Observable<GetAppMarketItemForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppMarketplaceItemViewData?";
+        if (ssin !== undefined && ssin !== null)
+            url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
+        if (currencyCode !== undefined && currencyCode !== null)
+            url_ += "currencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppMarketplaceItemViewData(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppMarketplaceItemViewData(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAppMarketItemForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAppMarketItemForViewDto>;
+        }));
+    }
+
+    protected processGetAppMarketplaceItemViewData(response: HttpResponseBase): Observable<GetAppMarketItemForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAppMarketItemForViewDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -48222,6 +48348,69 @@ export class SydObjectsServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param sectionId (optional) 
+     * @return Success
+     */
+    getAllSectionBlocks(sectionId: number | undefined): Observable<PageSettingDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/SydObjects/GetAllSectionBlocks?";
+        if (sectionId === null)
+            throw new Error("The parameter 'sectionId' cannot be null.");
+        else if (sectionId !== undefined)
+            url_ += "sectionId=" + encodeURIComponent("" + sectionId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSectionBlocks(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSectionBlocks(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PageSettingDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PageSettingDto[]>;
+        }));
+    }
+
+    protected processGetAllSectionBlocks(response: HttpResponseBase): Observable<PageSettingDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(PageSettingDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -53036,6 +53225,162 @@ export class SystemTablesServiceProxy {
     }
 
     protected processGetEntityObjectStatusReadyToSendEntityLog(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectSectionId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectSectionId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectSectionId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectSectionId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectSectionId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectBlockId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectBlockId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectBlockId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectBlockId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectBlockId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectStatusActiveLookup(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectStatusActiveLookup";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectStatusActiveLookup(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectStatusActiveLookup(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectStatusActiveLookup(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -61078,6 +61423,8 @@ export class LookupLabelDto implements ILookupLabelDto {
     isHostRecord!: boolean | undefined;
     hexaCode!: string | undefined;
     image!: string | undefined;
+    status!: string | undefined;
+    entityObjectStatusId!: number | undefined;
 
     [key: string]: any;
 
@@ -61103,6 +61450,8 @@ export class LookupLabelDto implements ILookupLabelDto {
             this.isHostRecord = _data["isHostRecord"];
             this.hexaCode = _data["hexaCode"];
             this.image = _data["image"];
+            this.status = _data["status"];
+            this.entityObjectStatusId = _data["entityObjectStatusId"];
         }
     }
 
@@ -61126,6 +61475,8 @@ export class LookupLabelDto implements ILookupLabelDto {
         data["isHostRecord"] = this.isHostRecord;
         data["hexaCode"] = this.hexaCode;
         data["image"] = this.image;
+        data["status"] = this.status;
+        data["entityObjectStatusId"] = this.entityObjectStatusId;
         return data;
     }
 }
@@ -61138,6 +61489,8 @@ export interface ILookupLabelDto {
     isHostRecord: boolean | undefined;
     hexaCode: string | undefined;
     image: string | undefined;
+    status: string | undefined;
+    entityObjectStatusId: number | undefined;
 
     [key: string]: any;
 }
@@ -69031,6 +69384,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
     isHostRecord!: boolean | undefined;
     hexaCode!: string | undefined;
     image!: string | undefined;
+    status!: string | undefined;
+    entityObjectStatusId!: number | undefined;
 
     [key: string]: any;
 
@@ -69057,6 +69412,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
             this.isHostRecord = _data["isHostRecord"];
             this.hexaCode = _data["hexaCode"];
             this.image = _data["image"];
+            this.status = _data["status"];
+            this.entityObjectStatusId = _data["entityObjectStatusId"];
         }
     }
 
@@ -69081,6 +69438,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
         data["isHostRecord"] = this.isHostRecord;
         data["hexaCode"] = this.hexaCode;
         data["image"] = this.image;
+        data["status"] = this.status;
+        data["entityObjectStatusId"] = this.entityObjectStatusId;
         return data;
     }
 }
@@ -69094,6 +69453,8 @@ export interface ILookupLabelWithAttachmentDto {
     isHostRecord: boolean | undefined;
     hexaCode: string | undefined;
     image: string | undefined;
+    status: string | undefined;
+    entityObjectStatusId: number | undefined;
 
     [key: string]: any;
 }
@@ -69167,6 +69528,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
     isHostRecord!: boolean | undefined;
     hexaCode!: string | undefined;
     image!: string | undefined;
+    status!: string | undefined;
+    entityObjectStatusId!: number | undefined;
 
     [key: string]: any;
 
@@ -69193,6 +69556,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
             this.isHostRecord = _data["isHostRecord"];
             this.hexaCode = _data["hexaCode"];
             this.image = _data["image"];
+            this.status = _data["status"];
+            this.entityObjectStatusId = _data["entityObjectStatusId"];
         }
     }
 
@@ -69217,6 +69582,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
         data["isHostRecord"] = this.isHostRecord;
         data["hexaCode"] = this.hexaCode;
         data["image"] = this.image;
+        data["status"] = this.status;
+        data["entityObjectStatusId"] = this.entityObjectStatusId;
         return data;
     }
 }
@@ -69230,6 +69597,8 @@ export interface ICurrencyInfoDto {
     isHostRecord: boolean | undefined;
     hexaCode: string | undefined;
     image: string | undefined;
+    status: string | undefined;
+    entityObjectStatusId: number | undefined;
 
     [key: string]: any;
 }
@@ -73014,8 +73383,6 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
     entityCategories!: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    relatedAppItems!: PagedResultDtoOfAppItemLookupDto;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
@@ -73088,12 +73455,6 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
                 for (let item of _data["entitiesRelationships"])
                     this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
             }
-            if (Array.isArray(_data["relatedEntitiesRelationships"])) {
-                this.relatedEntitiesRelationships = [] as any;
-                for (let item of _data["relatedEntitiesRelationships"])
-                    this.relatedEntitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
-            }
-            this.relatedAppItems = _data["relatedAppItems"] ? PagedResultDtoOfAppItemLookupDto.fromJS(_data["relatedAppItems"]) : <any>undefined;
             if (Array.isArray(_data["entityCategoriesRemoved"])) {
                 this.entityCategoriesRemoved = [] as any;
                 for (let item of _data["entityCategoriesRemoved"])
@@ -73220,12 +73581,6 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
             for (let item of this.entitiesRelationships)
                 data["entitiesRelationships"].push(item.toJSON());
         }
-        if (Array.isArray(this.relatedEntitiesRelationships)) {
-            data["relatedEntitiesRelationships"] = [];
-            for (let item of this.relatedEntitiesRelationships)
-                data["relatedEntitiesRelationships"].push(item.toJSON());
-        }
-        data["relatedAppItems"] = this.relatedAppItems ? this.relatedAppItems.toJSON() : <any>undefined;
         if (Array.isArray(this.entityCategoriesRemoved)) {
             data["entityCategoriesRemoved"] = [];
             for (let item of this.entityCategoriesRemoved)
@@ -73325,8 +73680,6 @@ export interface IAppItemVariationsDto {
     entityCategories: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    relatedAppItems: PagedResultDtoOfAppItemLookupDto;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
@@ -73563,8 +73916,6 @@ export class AppItemForViewDto implements IAppItemForViewDto {
     entityCategories!: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    relatedAppItems!: PagedResultDtoOfAppItemLookupDto;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
@@ -73653,12 +74004,6 @@ export class AppItemForViewDto implements IAppItemForViewDto {
                 for (let item of _data["entitiesRelationships"])
                     this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
             }
-            if (Array.isArray(_data["relatedEntitiesRelationships"])) {
-                this.relatedEntitiesRelationships = [] as any;
-                for (let item of _data["relatedEntitiesRelationships"])
-                    this.relatedEntitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
-            }
-            this.relatedAppItems = _data["relatedAppItems"] ? PagedResultDtoOfAppItemLookupDto.fromJS(_data["relatedAppItems"]) : <any>undefined;
             if (Array.isArray(_data["entityCategoriesRemoved"])) {
                 this.entityCategoriesRemoved = [] as any;
                 for (let item of _data["entityCategoriesRemoved"])
@@ -73805,12 +74150,6 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             for (let item of this.entitiesRelationships)
                 data["entitiesRelationships"].push(item.toJSON());
         }
-        if (Array.isArray(this.relatedEntitiesRelationships)) {
-            data["relatedEntitiesRelationships"] = [];
-            for (let item of this.relatedEntitiesRelationships)
-                data["relatedEntitiesRelationships"].push(item.toJSON());
-        }
-        data["relatedAppItems"] = this.relatedAppItems ? this.relatedAppItems.toJSON() : <any>undefined;
         if (Array.isArray(this.entityCategoriesRemoved)) {
             data["entityCategoriesRemoved"] = [];
             for (let item of this.entityCategoriesRemoved)
@@ -73930,8 +74269,6 @@ export interface IAppItemForViewDto {
     entityCategories: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    relatedAppItems: PagedResultDtoOfAppItemLookupDto;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
@@ -74155,8 +74492,6 @@ export class AppItemForEditDto implements IAppItemForEditDto {
     entityCategories!: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded!: AppEntityCategoryDto[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    relatedAppItems!: PagedResultDtoOfAppItemLookupDto;
     entityCategoriesRemoved!: AppEntityCategoryDto[] | undefined;
     entityDepartments!: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded!: AppEntityCategoryDto[] | undefined;
@@ -74225,12 +74560,6 @@ export class AppItemForEditDto implements IAppItemForEditDto {
                 for (let item of _data["entitiesRelationships"])
                     this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
             }
-            if (Array.isArray(_data["relatedEntitiesRelationships"])) {
-                this.relatedEntitiesRelationships = [] as any;
-                for (let item of _data["relatedEntitiesRelationships"])
-                    this.relatedEntitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
-            }
-            this.relatedAppItems = _data["relatedAppItems"] ? PagedResultDtoOfAppItemLookupDto.fromJS(_data["relatedAppItems"]) : <any>undefined;
             if (Array.isArray(_data["entityCategoriesRemoved"])) {
                 this.entityCategoriesRemoved = [] as any;
                 for (let item of _data["entityCategoriesRemoved"])
@@ -74357,12 +74686,6 @@ export class AppItemForEditDto implements IAppItemForEditDto {
             for (let item of this.entitiesRelationships)
                 data["entitiesRelationships"].push(item.toJSON());
         }
-        if (Array.isArray(this.relatedEntitiesRelationships)) {
-            data["relatedEntitiesRelationships"] = [];
-            for (let item of this.relatedEntitiesRelationships)
-                data["relatedEntitiesRelationships"].push(item.toJSON());
-        }
-        data["relatedAppItems"] = this.relatedAppItems ? this.relatedAppItems.toJSON() : <any>undefined;
         if (Array.isArray(this.entityCategoriesRemoved)) {
             data["entityCategoriesRemoved"] = [];
             for (let item of this.entityCategoriesRemoved)
@@ -74466,8 +74789,6 @@ export interface IAppItemForEditDto {
     entityCategories: PagedResultDtoOfAppEntityCategoryDto;
     entityCategoriesAdded: AppEntityCategoryDto[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    relatedAppItems: PagedResultDtoOfAppItemLookupDto;
     entityCategoriesRemoved: AppEntityCategoryDto[] | undefined;
     entityDepartments: PagedResultDtoOfAppEntityCategoryDto;
     entityDepartmentsAdded: AppEntityCategoryDto[] | undefined;
@@ -79254,6 +79575,7 @@ export interface IAppMarketplaceItemForViewDto {
 }
 
 export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplaceItemDetailForViewDto {
+    relatedItems!: GetAppMarketItemForViewDto[] | undefined;
     appItem!: AppMarketplaceItemForViewDto;
     sellerSSIN!: string | undefined;
     sellerCompanyName!: string | undefined;
@@ -79278,6 +79600,11 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            if (Array.isArray(_data["relatedItems"])) {
+                this.relatedItems = [] as any;
+                for (let item of _data["relatedItems"])
+                    this.relatedItems!.push(GetAppMarketItemForViewDto.fromJS(item));
+            }
             this.appItem = _data["appItem"] ? AppMarketplaceItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
             this.sellerSSIN = _data["sellerSSIN"];
             this.sellerCompanyName = _data["sellerCompanyName"];
@@ -79300,6 +79627,11 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        if (Array.isArray(this.relatedItems)) {
+            data["relatedItems"] = [];
+            for (let item of this.relatedItems)
+                data["relatedItems"].push(item.toJSON());
+        }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["sellerSSIN"] = this.sellerSSIN;
         data["sellerCompanyName"] = this.sellerCompanyName;
@@ -79311,6 +79643,7 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
 }
 
 export interface IGetAppMarketplaceItemDetailForViewDto {
+    relatedItems: GetAppMarketItemForViewDto[] | undefined;
     appItem: AppMarketplaceItemForViewDto;
     sellerSSIN: string | undefined;
     sellerCompanyName: string | undefined;
@@ -106471,9 +106804,14 @@ export interface ISydObjectSydObjectLookupTableDto {
 }
 
 export enum SliderEnum {
-    AutoSlider = 0,
-    CallToAction = 1,
-    AdvSlider = 2,
+    ASSB = 0,
+    ASMB = 1,
+    CSSB = 2,
+    CSMB = 3,
+    SRCTA = 4,
+    MRCTA = 5,
+    PF = 6,
+    SM = 7,
 }
 
 export class PageSettingDto implements IPageSettingDto {
@@ -106487,6 +106825,11 @@ export class PageSettingDto implements IPageSettingDto {
     order!: number;
     linkPageUrl!: string | undefined;
     externalUrl!: string | undefined;
+    blockType!: string | undefined;
+    getAppMarketItemForViewDto!: GetAppMarketItemForViewDto;
+    getAppEntityForViewDto!: GetAppEntityForViewDto;
+    getAccountForViewDto!: GetAccountForViewDto;
+    getSycEntityObjectCategoryForViewDto!: GetSycEntityObjectCategoryForViewDto;
 
     [key: string]: any;
 
@@ -106515,6 +106858,11 @@ export class PageSettingDto implements IPageSettingDto {
             this.order = _data["order"];
             this.linkPageUrl = _data["linkPageUrl"];
             this.externalUrl = _data["externalUrl"];
+            this.blockType = _data["blockType"];
+            this.getAppMarketItemForViewDto = _data["getAppMarketItemForViewDto"] ? GetAppMarketItemForViewDto.fromJS(_data["getAppMarketItemForViewDto"]) : <any>undefined;
+            this.getAppEntityForViewDto = _data["getAppEntityForViewDto"] ? GetAppEntityForViewDto.fromJS(_data["getAppEntityForViewDto"]) : <any>undefined;
+            this.getAccountForViewDto = _data["getAccountForViewDto"] ? GetAccountForViewDto.fromJS(_data["getAccountForViewDto"]) : <any>undefined;
+            this.getSycEntityObjectCategoryForViewDto = _data["getSycEntityObjectCategoryForViewDto"] ? GetSycEntityObjectCategoryForViewDto.fromJS(_data["getSycEntityObjectCategoryForViewDto"]) : <any>undefined;
         }
     }
 
@@ -106541,6 +106889,11 @@ export class PageSettingDto implements IPageSettingDto {
         data["order"] = this.order;
         data["linkPageUrl"] = this.linkPageUrl;
         data["externalUrl"] = this.externalUrl;
+        data["blockType"] = this.blockType;
+        data["getAppMarketItemForViewDto"] = this.getAppMarketItemForViewDto ? this.getAppMarketItemForViewDto.toJSON() : <any>undefined;
+        data["getAppEntityForViewDto"] = this.getAppEntityForViewDto ? this.getAppEntityForViewDto.toJSON() : <any>undefined;
+        data["getAccountForViewDto"] = this.getAccountForViewDto ? this.getAccountForViewDto.toJSON() : <any>undefined;
+        data["getSycEntityObjectCategoryForViewDto"] = this.getSycEntityObjectCategoryForViewDto ? this.getSycEntityObjectCategoryForViewDto.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -106556,6 +106909,11 @@ export interface IPageSettingDto {
     order: number;
     linkPageUrl: string | undefined;
     externalUrl: string | undefined;
+    blockType: string | undefined;
+    getAppMarketItemForViewDto: GetAppMarketItemForViewDto;
+    getAppEntityForViewDto: GetAppEntityForViewDto;
+    getAccountForViewDto: GetAccountForViewDto;
+    getSycEntityObjectCategoryForViewDto: GetSycEntityObjectCategoryForViewDto;
 
     [key: string]: any;
 }

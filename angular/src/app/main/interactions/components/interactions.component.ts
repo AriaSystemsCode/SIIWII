@@ -41,6 +41,8 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     showComments:boolean = false
     @ViewChild('commentParentComponent',{ static:true }) commentParentComponent : CommentParentComponent
     isFlipped = false;
+    isAuthenticated = this.appSession?.user
+
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,

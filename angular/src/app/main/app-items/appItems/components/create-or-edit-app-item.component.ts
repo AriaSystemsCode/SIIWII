@@ -348,24 +348,24 @@ export class CreateOrEditAppItemComponent
     async getAppItemDataForEdit(id: number) {
         this.showMainSpinner();
         return await this._appItemsServiceProxy
-            .getAppItemForEdit(
-                id,
-                undefined,
-                0,
-                this.maxResultCount,
-                undefined,
-                0,
-                this.maxResultCount,
-                undefined,
-                0,
-                this.maxResultCount,
-                undefined,
-                0,
-                this.maxResultCount,
-                undefined,
-                undefined,
-                undefined
-            )
+        .getAppItemForEdit(
+            id,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined,
+            undefined,
+            undefined
+        )
             .toPromise()
             .then((res) => {
                 this.appItem = CreateOrEditAppItemDto.fromJS({
@@ -549,17 +549,19 @@ export class CreateOrEditAppItemComponent
                 let isExist = result.items.filter((item) => { return item.value == extraAttr.attributeId });
                 if ((isExist!.length == 0 || isExist == undefined) && extraAttr?.selectedValues?.length > 0) {
 
-                    const tempAtt = new LookupLabelDto({
-                        code: extraAttr.code,
-                        label: extraAttr.selectedValues,
-                        stockAvailability: undefined,
-                        value: extraAttr.selectedValues,
-                        isHostRecord: false,
-                        hexaCode: undefined,
-                        image: undefined
-                    })
-                    result.items.push(tempAtt)
-                }
+                        const tempAtt = new LookupLabelDto({
+                            code:extraAttr.code,
+                            label:extraAttr.selectedValues,
+                            stockAvailability:undefined,
+                            value:extraAttr.selectedValues,
+                            isHostRecord:false,
+                            hexaCode:undefined,
+                            image:undefined,
+                            status:undefined,
+                            entityObjectStatusId:undefined
+                        })
+                        result.items.push(tempAtt)
+                    }
 
                 extraAttr.paginationSetting.list.push(...result.items);
                 if (

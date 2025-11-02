@@ -2,19 +2,19 @@ import {
 
   Component,
   EventEmitter,
+  Injector,
   Input,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
 } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
-  AppEntitiesServiceProxy,
   AppMarketplaceItemsServiceProxy,
   GetAllMarketplaceItemListsOutputDto,
   PagedResultDtoOfGetAllMarketplaceItemListsOutputDto,
   SycEntityObjectCategoriesServiceProxy,
-  SycEntityObjectTypesServiceProxy,
   TreeNodeOfGetSycEntityObjectCategoryForViewDto,
 } from "@shared/service-proxies/service-proxies";
 import { finalize } from "rxjs";
@@ -24,7 +24,7 @@ import { finalize } from "rxjs";
   templateUrl: "./product-filters.component.html",
   styleUrls: ["./product-filters.component.scss"],
 })
-export class ProductFiltersComponent implements OnInit, OnDestroy {
+export class ProductFiltersComponent extends AppComponentBase implements OnInit, OnDestroy {
   isExpanded: boolean = true;
   productList: GetAllMarketplaceItemListsOutputDto[];
   selectedList: boolean = false;
@@ -43,6 +43,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
   max: any;
   brands: any[] = [];
   @Input() isSellerIdExists: boolean = false;
+  @Input() selectedBrands: (number | string)[] = []; 
+  @Input() selectedDepartmentId?: number;
 
   // emit all values to parent component
   @Output() handleCatalogSelections: EventEmitter<any> = new EventEmitter();
@@ -62,12 +64,16 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
   isSelected: boolean = false
   isFromSellerRoom: boolean
   ismarketPLace: boolean
+  isAuthenticated = this.appSession?.user
+  @Input() preselectDeptId?: number;
   constructor(
     private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     private _appMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
+    injector: Injector
 
   ) {
+    super(injector);
     this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom"));
     this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
     this.savedFilters = localStorage.getItem("productFilters");
@@ -102,34 +108,45 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     
     this.getAllProductCAtalogs();
     this.getParentDepartments();
+    if(this.isAuthenticated){
     this.getAllBrands();
 
+    }
+
 
 
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedBrands']) {
+      // Mirror parent-selected brands into the checkbox model
+      this.selctedBradns = Array.isArray(this.selectedBrands) ? [...this.selectedBrands] : [];
+    }
+    if (changes['selectedDepartmentId'] && this.selectedDepartmentId) {
+      // after tree roots are loaded, expand to the selected node
+      if (this.files?.length) {
+        this.expandAndSelectFullPath(this.selectedDepartmentId);
+      } else {
+        // if roots not loaded yet, wait for ngOnInit’s getParentDepartments
+        // and then call expandAndSelectFullPath in its .then(...)
+      }
+    }
+  }
+  
   getAllBrands() {
-
     this._appMarketplaceItemsServiceProxy
       .getAllBrandsWithPaging(
-        null,
-        null,
-        null,
-        null,
-        null,
-        false,
-        "BRAND",
-        null,
-        null,
-        86,
-        "name",
-        0,
-        10, this.accountSSIN
+        null, null, null, null, null, 'BRAND', null, null,
+        86, 'name', 0, 200, this.accountSSIN
       )
-      .subscribe((res) => {
-        this.brands = res.items;
+      .subscribe(res => {
+        this.brands = (res.items || []).map((b: any) => ({
+          label: b.name ?? b.label ?? b.displayName ?? '',
+          value: b.id   ?? b.value
+        }));
       });
   }
+  
 
   handlebrandsSelction() {
     this.handleBrandsSelection.emit(this.selctedBradns);
@@ -537,7 +554,15 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     }
     return null;
   }
-    
+  selectionKeys: { [key: string]: boolean } = {}; 
+  ngAfterViewInit() {
+    // wait until deptTree is populated (if it's async, call this after you set it)
+    queueMicrotask(() => {
+      if (this.preselectDeptId) {
+        this.selectedFile = { [this.preselectDeptId]: true };
+      }
+    });
+  }
   ngOnDestroy(): void {
     clearTimeout(this.timeOut);
   }

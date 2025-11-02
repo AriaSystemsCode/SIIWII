@@ -95,6 +95,8 @@
                         (handledeDratmentsTreeSelections)="
                             selectDepartment($event)
                         "
+                        [selectedBrands]="brands"
+                        [selectedDepartmentId]="selectedDepartments?.[0]" 
                         (handleStartPrice)="setPriceFrom($event)"
                         (handleEndPrice)="setPriceTo($event)"
                         (handleStockSiwtch)="swtichStock($event)"
@@ -179,7 +181,7 @@
                 (click)="openFiltersDialog('Select Currency')"
                 class="filter-btn w-25"
             >
-                {{ selectedCurrrency.code }}
+                {{ selectedCurrrency?.code }}
             </button>
             <button
             class="filter-btn w-50"
@@ -273,11 +275,11 @@
             *ngFor="let currency of currencies"
             class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3"
         >
-            <label [for]="currency.code" class="ml-2">{{
-                currency.code
+            <label [for]="currency?.code" class="ml-2">{{
+                currency?.code
             }}</label>
             <p-radioButton
-                [inputId]="currency.code"
+                [inputId]="currency?.code"
                 name="code"
                 class="px-3"
                 [value]="currency"
