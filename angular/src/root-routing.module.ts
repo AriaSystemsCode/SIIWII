@@ -1,32 +1,17 @@
 import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule, Routes } from '@angular/router';
+import { AppRouteGuard } from '@app/shared/common/auth/auth-route-guard';
 import { AppUiCustomizationService } from '@shared/common/ui/app-ui-customization.service';
 
 const routes: Routes = [
     {
+                        canActivate: [AppRouteGuard],
+                        canActivateChild: [AppRouteGuard],
         path: 'account',
         loadChildren: () => import('account/account.module').then(m => m.AccountModule), //Lazy load account module
         data: { preload: true }
     },
-    // path: "marketplace",
-    // children: [
-      
-  
- 
-    //     {
-    //         path: "products",
-    //         loadChildren: () =>
-    //             import(
-    //                 "app/main/marketplace/marketplace-products/marketplace-products.module"
-    //             ).then((m) => m.MarketplaceProductsModule),
-    //         data: {
-    //             preload: true,
-    //             permission: "Pages.Marketplace.Products",
-    //         },
-    //     },
- 
 
-    // ],
   // Default '' -> marketplace products
   { path: '', redirectTo: '/app/main/marketplace', pathMatch: 'full' },
 
