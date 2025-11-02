@@ -184,7 +184,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     _text = "All " + ImportTypes[this.importType] + " Failed , can not import.";
 
 
-    this.uploadingResult.totalPassedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length;
+    this.uploadingResult.totalPassedRecords =
+    (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length || 0) +
+    (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'warning')?.length || 0);
+  
     this.uploadingResult.totalFailedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
 
     if (this.uploadingResult.totalPassedRecords == 0) {
@@ -432,25 +435,35 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       event.stopPropagation();
       return;
     }
-
+  
     this.records.forEach(r => {
       if (r !== record) r.showActions = false;
     });
-
+  
     record.showActions = !record.showActions;
-
+  
     if (record.showActions) {
-      const rect = (event.target as HTMLElement).getBoundingClientRect();
-
+      const targetEl = (event.target as HTMLElement).closest('.dropdown') as HTMLElement;
+      if (!targetEl) return;
+  
+      const rect = targetEl.getBoundingClientRect();
+  
+      const spaceAbove = rect.top;
+      const spaceBelow = window.innerHeight - rect.bottom;
+  
+      const openUpward = spaceBelow < 220 && spaceAbove > 220;
+  
       record.dropdownPosition = {
-        top: document.querySelector('.browser-table')?.getBoundingClientRect().top ?? 0,
-        left: rect.left
+        top: openUpward
+          ? rect.top + window.scrollY
+          : rect.bottom + window.scrollY,
+       // left: rect.left + window.scrollX,
+       left: 50,
+        openUpward
       };
-
-      record.openUpward = true;
     }
   }
-
+  
 
 
 
@@ -782,9 +795,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       let item = this.imagesList.find(x => x.code.toLowerCase() == imageItem.toLowerCase());
 
 
-      return item?.croppedbase64 === ''
+     let ret=  item?.croppedbase64 === ''
         ? item?.tempBase64
         : item?.croppedbase64;
+
+        return  !ret ? '' : ret;
     }
 
     else
@@ -1338,8 +1353,5 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     const val = this.getRecordValue(record, 'price');
     return !this.isNumberLike(val);
   }
-
-
-
 
 }  

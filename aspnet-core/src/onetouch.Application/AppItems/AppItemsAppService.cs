@@ -81,6 +81,7 @@ using onetouch.Migrations;
 using Newtonsoft.Json;
 using System.Drawing;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using onetouch.MultiTenancy;
 
 namespace onetouch.AppItems
 {
@@ -6262,9 +6263,7 @@ namespace onetouch.AppItems
         {
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
-
-
-
+             
             #region handle 4,2,3 actions
             // select type images
             // action 2 add to item
@@ -6418,10 +6417,24 @@ namespace onetouch.AppItems
             && r.Actions != "8" && r.Actions != "9" && r.Actions != "10"
             && r.RecordType != "Image" && r.RecordType != "Color")).ToList();
 
-            if (result.Count <= 0) { return excelResultsDTO.ExcelLogDTO; }
+            if (result.Count <= 0) {
+                #region send notification to current user
+                if (AbpSession.UserId != null)
+                {
+                    long AbpSessionUserId = (long)AbpSession.UserId;
+                    string message = "Items imported successfully.";
+                    if (!string.IsNullOrEmpty(excelResultsDTO.FilePath) && !excelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
+                        message,
+                        Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                }
+
+                #endregion send notification to current user 
+
+                return excelResultsDTO.ExcelLogDTO; 
+            }
             #endregion
-
-
+             
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
@@ -8120,512 +8133,27 @@ namespace onetouch.AppItems
             if (appItemModifyList.Count > 0 || appItemList.Count > 0)
                 await x.SaveChangesAsync();*/
             //MMT46
+
+            #region send notification to current user
+            if (AbpSession.UserId != null)
+            {
+                long AbpSessionUserId = (long)AbpSession.UserId;
+                string message = "Items imported successfully.";
+                if (!string.IsNullOrEmpty(excelResultsDTO.FilePath) && !excelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+                await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
+                    message,
+                    Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+            }
+
+            #endregion send notification to current user
+
+
+
+
+
             return excelResultsDTO.ExcelLogDTO;
         }   //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
-        //{
-        //    ExcelResultsDTO itemExcelResultsDTO = new ExcelResultsDTO();
-        //    itemExcelResultsDTO.TotalRecords = 0;
-        //    itemExcelResultsDTO.TotalFailedRecords = 0;
-        //    itemExcelResultsDTO.TotalPassedRecords = 0;
-        //    itemExcelResultsDTO.FilePath = "";
-        //    itemExcelResultsDTO.ExcelRecords = new List<ExcelRecordDTO>() { };
-
-        //    try
-        //    {
-
-        //        #region open the excel
-        //        var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
-        //        var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".xlsx";
-        //        //var files = Directory.GetFiles(_appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\", "*.XLSX", SearchOption.AllDirectories);
-        //        //if (files != null && files.Length > 0)
-        //        {
-        //            var ds = _helper.ExcelHelper.GetExcelDataSet(path);
-
-        //            //rename columns
-        //            for (int icounter = 0; icounter < ds.Tables[0].Columns.Count; icounter++)
-        //            {
-        //                string fieldName = ds.Tables[0].Rows[0][icounter].ToString().Trim().Replace(" ", "").Replace(".", "");
-        //                ds.Tables[0].Columns[icounter].ColumnName = fieldName;
-        //            }
-
-        //            // remove first row, as it contains the headers
-        //            ds.Tables[0].Rows.RemoveAt(0);
-        //            #endregion open the excel
-
-        //            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = null;
-        //            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = null;
-        //            List<LookupLabelDto> currencyIds = null;
-        //            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categoriesIds = null;
-        //            List<SycEntityObjectCategorySycEntityObjectCategoryLookupTableDto> productTypes = null;
-        //            List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = null;
-
-
-        //            try
-        //            {
-        //                #region get lists
-        //                // get Currencies
-        //                currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
-        //                // get Product Departments
-        //                departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
-        //                //get classifications for contacts
-        //                classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput());
-        //                // get Product Categories
-        //                categoriesIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name" });
-        //                //get Product Types
-        //                productTypes = await _sycEntityObjectCategoriesAppService.GetAllSycEntityObjectCategoryForTableDropdown();
-        //                // get attachment categories
-        //                attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
-
-        //                #endregion get lists
-        //            }
-        //            catch (Exception ex) { }
-        //            #region create mapper to middle layer AppItemExcelDto list of objects
-        //            //create mapper to middle layer AccountExcelDto list of objects
-        //            MapperConfiguration configuration;
-        //            configuration = new MapperConfiguration(a => { a.AddProfile(new ItemExcelDtoProfile()); });
-        //            IMapper mapper;
-        //            mapper = configuration.CreateMapper();
-        //            List<ExcelDto> result;
-        //            result = mapper.Map<List<DataRow>, List<ExcelDto>>(new List<DataRow>(ds.Tables[0].Rows.OfType<DataRow>()));
-        //            #endregion create mapper to middle layer AccountExcelDto list of objects
-
-        //            #region Excel validateion rules only.
-        //            // 0.Record images array existance in the images array
-        //            // 1.Record duplicated in excel
-        //            // 2.Sheet.Code and Sheet.Name are not empty
-        //            // 3.Sheet.Email Address is not empty, then it has a valid email address
-        //            // 4.Sheet.Website is not empty, then it has a valid website
-        //            // 5.Sheet.RecordType shuold be either 'Account', 'Branch' or 'Contact'
-        //            // 6.Sheet.AccountType shuold be either 'Seller', 'Buyer' and 'Seller & Buyer'
-        //            Int32 rowNumber = 1;
-        //            foreach (var rec in result)
-        //            {
-        //                rowNumber++;
-        //                rec.rowNumber = rowNumber;
-        //            }
-        //            itemExcelResultsDTO.TotalRecords = result.Count();
-        //            itemExcelResultsDTO.TotalFailedRecords = 0;
-        //            itemExcelResultsDTO.TotalPassedRecords = 0;
-        //            itemExcelResultsDTO.FilePath = path;
-        //            itemExcelResultsDTO.ExcelRecords = new List<ExcelRecordDTO>() { };
-
-        //            List<string> RecordsCodes = result.Select(r => r.Code).ToList();
-        //            List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
-        //            foreach (ExcelDto excelDto in result)
-        //            {
-        //                ExcelRecordDTO itemExcelRecordErrorDTO = new ExcelRecordDTO();
-        //                itemExcelRecordErrorDTO.RecordType = excelDto.RecordType;
-        //                itemExcelRecordErrorDTO.ParentCode = excelDto.ParentCode;
-        //                itemExcelRecordErrorDTO.Code = excelDto.Code;
-        //                itemExcelRecordErrorDTO.Name = excelDto.Name;
-        //                itemExcelRecordErrorDTO.Status = ExcelRecordStatus.Passed.ToString();
-        //                itemExcelRecordErrorDTO.ErrorMessage = "";
-        //                itemExcelRecordErrorDTO.FieldsErrors = new List<string>() { };
-        //                itemExcelRecordErrorDTO.ExcelDto = excelDto;
-        //                string recordErrorMEssage = "Wrong data in this " + itemExcelRecordErrorDTO.RecordType + ". check this record in the sheet and update";
-
-        //                #region check images
-        //                bool hasError = false;
-        //                if (imagesList != null)
-        //                {
-        //                    if (!string.IsNullOrEmpty(excelDto.Image1FileName) && !imagesList.Contains(excelDto.Image1FileName.ToUpper()))
-        //                    {
-        //                        accountExcelRecordErrorDTO.FieldsErrors.Add("Image 1 File Name: Not found.");
-        //                        hasError = true;
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image1Type))
-        //                    {
-        //                        var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(accountExcelDto.Image1Type.ToUpper().TrimEnd());
-        //                        if (attCoverId == 0)
-        //                        {
-        //                            accountExcelRecordErrorDTO.FieldsErrors.Add("Image 1 Type: Not found.");
-        //                            hasError = true;
-        //                        }
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image2FileName) && !imagesList.Contains(accountExcelDto.Image2FileName.ToUpper()))
-        //                    {
-        //                        accountExcelRecordErrorDTO.FieldsErrors.Add("Image 2 File Name: Not found.");
-        //                        hasError = true;
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image2Type))
-        //                    {
-        //                        var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(accountExcelDto.Image2Type.ToUpper().TrimEnd());
-        //                        if (attCoverId == 0)
-        //                        {
-        //                            accountExcelRecordErrorDTO.FieldsErrors.Add("Image 2 Type: Not found.");
-        //                            hasError = true;
-        //                        }
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image3FileName) && !imagesList.Contains(accountExcelDto.Image3FileName.ToUpper()))
-        //                    {
-        //                        accountExcelRecordErrorDTO.FieldsErrors.Add("Image 3 File Name: Not found.");
-        //                        hasError = true;
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image3Type))
-        //                    {
-        //                        var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(accountExcelDto.Image3Type.ToUpper().TrimEnd());
-        //                        if (attCoverId == 0)
-        //                        {
-        //                            accountExcelRecordErrorDTO.FieldsErrors.Add("Image 3 Type: Not found.");
-        //                            hasError = true;
-        //                        }
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image4FileName) && !imagesList.Contains(accountExcelDto.Image4FileName.ToUpper()))
-        //                    {
-        //                        accountExcelRecordErrorDTO.FieldsErrors.Add("Image 4 File Name: Not found.");
-        //                        hasError = true;
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image4Type))
-        //                    {
-        //                        var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(accountExcelDto.Image4Type.ToUpper().TrimEnd());
-        //                        if (attCoverId == 0)
-        //                        {
-        //                            accountExcelRecordErrorDTO.FieldsErrors.Add("Image 4 Type: Not found.");
-        //                            hasError = true;
-        //                        }
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image5FileName) && !imagesList.Contains(accountExcelDto.Image5FileName.ToUpper()))
-        //                    {
-
-        //                        accountExcelRecordErrorDTO.FieldsErrors.Add("Image 5 File Name: Not found.");
-        //                        hasError = true;
-        //                    }
-
-        //                    if (!string.IsNullOrEmpty(accountExcelDto.Image5Type))
-        //                    {
-        //                        var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(accountExcelDto.Image5Type.ToUpper().TrimEnd());
-        //                        if (attCoverId == 0)
-        //                        {
-        //                            accountExcelRecordErrorDTO.FieldsErrors.Add("Image 5 Type: Not found.");
-        //                            hasError = true;
-        //                        }
-        //                    }
-        //                }
-        //                #endregion check images
-
-        //                #region code, name, email and website validation    
-        //                if (RecordsCodes.Where(r => r == accountExcelDto.Code).ToList().Count() > 1)
-        //                {
-        //                    accountExcelRecordErrorDTO.FieldsErrors.Add("Code: Should Exists Once."); hasError = true;
-        //                    recordErrorMEssage = "Duplicated " + accountExcelRecordErrorDTO.RecordType;
-        //                }
-
-        //                AccountExcelRecordType accountExcelRecordType;
-        //                AccountExcelAccountType accountExcelAccountType;
-
-        //                if (string.IsNullOrEmpty(accountExcelDto.Code)) { accountExcelRecordErrorDTO.FieldsErrors.Add("Code: Should Have a Value."); hasError = true; }
-        //                if (string.IsNullOrEmpty(accountExcelDto.Name)) { accountExcelRecordErrorDTO.FieldsErrors.Add("Name: Should Have a Value."); hasError = true; }
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Website) && !_helper.ExcelHelper.IsValidWebsite(accountExcelDto.Website))
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Website: Not Valid Website Value."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Email Address: Not Valid Email Value."); hasError = true; }
-
-        //                #endregion code, name, email and website validation
-
-        //                #region check record type
-        //                if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Record Type: Should Be Account|Branch|Contact."); hasError = true; }
-
-        //                if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
-        //                {
-        //                    accountExcelRecordErrorDTO.FieldsErrors.Add("Account Type: Should Be Seller|Buyer|Both."); hasError = true;
-        //                }
-        //                if (accountExcelDto.RecordType == AccountExcelRecordType.Branch.ToString() && result.Where(r => r.Code == accountExcelDto.ParentCode && r.RecordType == AccountExcelRecordType.Account.ToString()).ToList().Count() == 0)
-        //                {
-        //                    accountExcelRecordErrorDTO.FieldsErrors.Add("Parent Code: Branch Parent Should Be Of Account Type."); hasError = true;
-        //                }
-
-        //                if (accountExcelDto.RecordType == AccountExcelRecordType.Contact.ToString() && result.Where(r => r.Code == accountExcelDto.ParentCode && r.RecordType == AccountExcelRecordType.Branch.ToString()).ToList().Count() == 0)
-        //                {
-        //                    accountExcelRecordErrorDTO.FieldsErrors.Add("Parent Code: Contact Parent Should Be Of Branch Type."); hasError = true;
-        //                }
-        //                #endregion check record type
-
-        //                #region phone validation
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
-        //                    !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
-        //                    !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Is Filled With a InValid Phone# and Code."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Type is InValid."); hasError = true; }
-
-
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
-        //                   !string.IsNullOrEmpty(accountExcelDto.Phone2Number) &&
-        //                   !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone2Code + accountExcelDto.Phone2Number))
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Is Filled With a InValid Phone# and Code."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Type is InValid."); hasError = true; }
-
-
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
-        //                    !string.IsNullOrEmpty(accountExcelDto.Phone3Number) &&
-        //                    !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone3Code + accountExcelDto.Phone3Number))
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 3: Phone 3 Is Filled With a InValid Phone# and Code."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Phone3Type) && GetTypeId(accountExcelDto.Phone3Type, phoneTypes) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 3: Phone 3 Type is InValid."); hasError = true; }
-
-
-        //                #endregion phone validation
-
-        //                #region check address 
-        //                bool AddressTypeFound = false;
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address1Type) && GetTypeId(accountExcelDto.Address1Type, addressTypes) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 Type: Address Type is InValid."); hasError = true; }
-        //                else
-        //                { AddressTypeFound = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address2Type) && GetTypeId(accountExcelDto.Address2Type, addressTypes) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 Type: Address Type is InValid."); hasError = true; }
-        //                else
-        //                { AddressTypeFound = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address3Type) && GetTypeId(accountExcelDto.Address3Type, addressTypes) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 Type: Address Type is InValid."); hasError = true; }
-        //                else
-        //                { AddressTypeFound = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address4Type) && GetTypeId(accountExcelDto.Address4Type, addressTypes) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 Type: Address Type is InValid."); hasError = true; }
-        //                else
-        //                { AddressTypeFound = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address1Country) && GetTypeId(accountExcelDto.Address1Country, countries) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 Country: Country Code is InValid."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address2Country) && GetTypeId(accountExcelDto.Address2Country, countries) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 Country: Country Code is InValid."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address3Country) && GetTypeId(accountExcelDto.Address3Country, countries) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 Country: Country Code is InValid."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Address4Country) && GetTypeId(accountExcelDto.Address4Country, countries) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 Country: Country Code is InValid."); hasError = true; }
-
-        //                if (!AddressTypeFound)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address Type: At Least One Address Type Should Be Valid."); hasError = true; }
-
-        //                if ((!string.IsNullOrEmpty(accountExcelDto.Address1City) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1State) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address1Type)) &&
-        //                    (string.IsNullOrEmpty(accountExcelDto.Address1City) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1Code) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1Country) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1Line1) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1Line2) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1Name) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1PostalCode) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1State) ||
-        //                    string.IsNullOrEmpty(accountExcelDto.Address1Type))
-        //                    )
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 1 : Address 1 Field Should be All Filled or Removed."); hasError = true; }
-
-        //                if ((!string.IsNullOrEmpty(accountExcelDto.Address2City) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Type)) &&
-        //                    !(string.IsNullOrEmpty(accountExcelDto.Address2City) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Code) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Country) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Line1) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Line2) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Name) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2PostalCode) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2State) ||
-        //                    !string.IsNullOrEmpty(accountExcelDto.Address2Type))
-        //                    )
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 2 : Address 2 Field Should be All Filled or Removed."); hasError = true; }
-
-        //                if ((!string.IsNullOrEmpty(accountExcelDto.Address3City) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3State) ||
-        //                                    !string.IsNullOrEmpty(accountExcelDto.Address3Type)) &&
-        //                                    (string.IsNullOrEmpty(accountExcelDto.Address3City) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3Code) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3Country) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3Line1) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3Line2) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3Name) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3PostalCode) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3State) ||
-        //                                    string.IsNullOrEmpty(accountExcelDto.Address3Type))
-        //                                    )
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 3 : Address 3 Field Should be All Filled or Removed."); hasError = true; }
-
-        //                if ((!string.IsNullOrEmpty(accountExcelDto.Address4City) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4State) ||
-        //                               !string.IsNullOrEmpty(accountExcelDto.Address4Type)) &&
-        //                               (string.IsNullOrEmpty(accountExcelDto.Address4City) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4Code) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4Country) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4Line1) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4Line2) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4Name) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4PostalCode) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4State) ||
-        //                               string.IsNullOrEmpty(accountExcelDto.Address4Type))
-        //                               )
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Address 4 : Address 4 Field Should be All Filled or Removed."); hasError = true; }
-
-
-        //                #endregion check address 
-
-        //                #region currency && language validation
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Language) && GetTypeId(accountExcelDto.Language, languageIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Language: Should Have a Valid Language Value."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Currency) && GetTypeId(accountExcelDto.Currency, currencyIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Currency: Should Have a Valid Currency Value."); hasError = true; }
-        //                #endregion currency && language validation
-
-        //                #region Class && department validation
-        //                if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification1) && GetClassId(accountExcelDto.BusinessClassification1, classIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 1: Should Have a Valid Business Classification  Value."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification2) && GetClassId(accountExcelDto.BusinessClassification2, classIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 2: Should Have a Valid Business Classification  Value."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.BusinessClassification3) && GetClassId(accountExcelDto.BusinessClassification3, classIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Business Classification 3: Should Have a Valid Business Classification  Value."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Department1) && GetDepartmentId(accountExcelDto.Department1, departmentIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Department 1: Should Have a Valid Product Department  Value."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Department2) && GetDepartmentId(accountExcelDto.Department2, departmentIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Department 2: Should Have a Valid Product Department  Value."); hasError = true; }
-
-        //                if (!string.IsNullOrEmpty(accountExcelDto.Department3) && GetDepartmentId(accountExcelDto.Department3, departmentIds) == 0)
-        //                { accountExcelRecordErrorDTO.FieldsErrors.Add("Department 3: Should Have a Valid Product Department  Value."); hasError = true; }
-        //                #endregion Class && department validation
-
-        //                if (hasError)
-        //                {
-        //                    accountExcelRecordErrorDTO.Status = AccountExcelRecordStatus.Failed.ToString();
-        //                    accountExcelRecordErrorDTO.ErrorMessage = recordErrorMEssage;
-        //                }
-        //                accountExcelRecordErrorDTO.image1 = accountExcelDto.Image1FileName;
-        //                accountExcelRecordErrorDTO.image1Type = accountExcelDto.Image1Type;
-        //                accountExcelRecordErrorDTO.image2 = accountExcelDto.Image2FileName;
-        //                accountExcelRecordErrorDTO.image2Type = accountExcelDto.Image2Type;
-        //                accountExcelRecordErrorDTO.image3 = accountExcelDto.Image3FileName;
-        //                accountExcelRecordErrorDTO.image3Type = accountExcelDto.Image3Type;
-        //                accountExcelRecordErrorDTO.image4 = accountExcelDto.Image4FileName;
-        //                accountExcelRecordErrorDTO.image4Type = accountExcelDto.Image4Type;
-        //                accountExcelRecordErrorDTO.image5 = accountExcelDto.Image5FileName;
-        //                accountExcelRecordErrorDTO.image5Type = accountExcelDto.Image5Type;
-
-        //                accountExcelResultsDTO.AccountExcelRecords.Add(accountExcelRecordErrorDTO);
-
-        //            }
-
-        //            #region if parent failed then children are failed
-        //            List<AccountExcelRecordDTO> resultSorted = accountExcelResultsDTO.AccountExcelRecords.OrderBy(r => r.ParentCode).ThenBy(r => r.Code).ToList();
-        //            foreach (AccountExcelRecordDTO accountExcelRecord in resultSorted)
-        //            {
-        //                if (accountExcelRecord.Status == AccountExcelRecordStatus.Failed.ToString())
-        //                {
-        //                    accountExcelResultsDTO.AccountExcelRecords.Where(r => r.ParentCode == accountExcelRecord.Code).ToList().ForEach(r => r.Status = AccountExcelRecordStatus.Failed.ToString());
-        //                }
-        //            }
-        //            #endregion if parent failed then children are failed
-
-        //            accountExcelResultsDTO.TotalPassedAccounts = accountExcelResultsDTO.AccountExcelRecords.Where(r => r.Status == AccountExcelRecordStatus.Passed.ToString() || r.Status == AccountExcelRecordStatus.Warning.ToString()).Count();
-        //            accountExcelResultsDTO.TotalFailedAccounts = accountExcelResultsDTO.AccountExcelRecords.Where(r => r.Status == AccountExcelRecordStatus.Failed.ToString()).Count(); ;
-        //            #endregion Excel validateion rules only.
-
-        //            #region update the excel sheet with errors
-        //            // Create new Spreadsheet
-        //            accountExcelResultsDTO.CodesFromList = new List<string>();
-        //            accountExcelResultsDTO.FromList = new List<Int32>();
-        //            accountExcelResultsDTO.ToList = new List<Int32>();
-        //            Spreadsheet document = new Spreadsheet();
-        //            document.LoadFromFile(accountExcelResultsDTO.FilePath);
-
-        //            // Get worksheet by name
-        //            Worksheet Sheet = document.Workbook.Worksheets[0];
-        //            // Set current cell
-        //            Sheet.Cell("CA1").Value = "Processing Status";
-        //            Sheet.Cell("CB1").Value = "Processing Error Message";
-        //            Sheet.Cell("CC1").Value = "Processing Error Details";
-        //            rowNumber = 1;
-        //            //accountExcelResultsDTO.FromList.Add(1);
-        //            foreach (AccountExcelRecordDTO logRecord in accountExcelResultsDTO.AccountExcelRecords)
-        //            {
-        //                rowNumber++;
-        //                if (Sheet.Cell("A" + rowNumber.ToString()).Value.ToString() == "Account")
-        //                {
-        //                    if (rowNumber > 2)
-        //                    { accountExcelResultsDTO.ToList.Add(rowNumber - 1); }
-        //                    accountExcelResultsDTO.FromList.Add(rowNumber);
-        //                    accountExcelResultsDTO.CodesFromList.Add(Sheet.Cell("D" + rowNumber.ToString()).Value.ToString());
-        //                }
-        //                Sheet.Cell("CA" + rowNumber.ToString()).Value = logRecord.Status;
-        //                Sheet.Cell("CB" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
-        //                Sheet.Cell("CC" + rowNumber.ToString()).Value = logRecord.FieldsErrors.JoinAsString(",");
-        //            }
-        //            accountExcelResultsDTO.ToList.Add(rowNumber);
-        //            //move to attachment folder and save
-        //            accountExcelResultsDTO.FilePath = accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:PathTemp"], _appConfiguration[$"Attachment:Path"]);
-        //            //accountExcelResultsDTO.FilePath = accountExcelResultsDTO.FilePath.ToString().ToUpper().Replace("XLSX", "XLS");
-
-        //            document.SaveAsXLSX(accountExcelResultsDTO.FilePath);
-
-        //            // Close document
-        //            document.Close();
-
-        //            itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
-
-        //            itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-        //            itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
-        //            itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"Templates:AccountExcelLogFileName"];
-
-        //            #endregion update the excel sheet with errors
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        itemExcelResultsDTO.ErrorMessage = ex.Message.ToString();
-        //    }
-        //    return itemExcelResultsDTO;
-        //}
+         
         //Mariam[End]
         //MMT30[Start]
         public async Task<string> GenerateProductCode(int productId, bool lUpdateSeq, long? tenantId)
@@ -9273,6 +8801,8 @@ namespace onetouch.AppItems
                 }
 
             }
+
+           
             return returnList;
         }
     }
