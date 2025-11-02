@@ -362,9 +362,10 @@ export class CreateOrEditAppItemComponent
             undefined,
             0,
             this.maxResultCount,
+            undefined, ///item SSIN
             undefined,
-            undefined,
-            undefined
+            0,
+            this.maxResultCount
         )
             .toPromise()
             .then((res) => {

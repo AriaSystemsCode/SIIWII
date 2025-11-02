@@ -212,7 +212,7 @@ export class MarketplaceProductsComponent
         // You can optimize this with a dedicated "getByName" if you have one.
         const res = await this._AppMarketplaceItemsServiceProxy
           .getAllBrandsWithPaging(
-            null, null, null, null, null, 'BRAND', null, null,
+            null, null, null, null, null,false, 'BRAND', null, null,
             86, 'name', 0, 200, this.sellerSSIN
           )
           .toPromise();

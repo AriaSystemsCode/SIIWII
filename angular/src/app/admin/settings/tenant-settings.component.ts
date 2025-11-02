@@ -887,7 +887,10 @@ getAppItemTypeExtraAttributesById() {
                           value:extraAttr.selectedValues,
                           isHostRecord:false,
                           hexaCode:undefined,
-                          image:undefined
+                          image:undefined,
+                          status:undefined,
+                          entityObjectStatusId:undefined
+
                       })
                       result.items.push(tempAtt)
                   }

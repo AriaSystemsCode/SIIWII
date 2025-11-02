@@ -1096,7 +1096,7 @@ export class AppItemsViewComponent
                 undefined,
                 undefined,
                 0,
-                10,
+                undefined, //item ssin
                 undefined,
                 0,
                 10
