@@ -7506,6 +7506,7 @@ namespace onetouch.AppItems
                                 }
                                 //T-SII-20250725.0002,1 MMT 09/24/2025 Fix import item issues[Start]
                                 //var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
+                                appSizeScaleRatioForEditDto.Id = 0;
                                 AppSizeScaleForEditDto sizescaleRatio =null;
                                 
                                 try
