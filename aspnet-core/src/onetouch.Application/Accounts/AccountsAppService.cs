@@ -275,23 +275,26 @@ namespace onetouch.Accounts
                         ((z.ObjectId == postObjectId || z.ObjectId == eventObjectId) && z.TenantId == account.OwnerId));*/
 
                     onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
-                    var appEntityAttach = _appEntityAttachmentRepository.GetAll().Include(z=>z.EntityFk).Include(z => z.AttachmentFk)
-                                   //.Where(z => //(z.AttachmentCategoryId == catgImage || z.AttachmentCategoryId == catgVideo) &&
-                                 //  z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId)
-                                 //.Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
-                                 //&& z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId && z.EntityFk.EntityAttachments.Count() > 0) ||
-                        .Where(z=> (((z.EntityFk.ObjectId == postObjectId && 
-                        _appEntityRelationShipRepository.GetAll().Count(x=>x.EntityId== z.EntityFk.Id && x.RelatedEntityTypeCode=="EVENT")==0 
-                        ) || z.EntityFk.ObjectId == eventObjectId) && z.EntityFk.TenantId == account.TenantOwner )
-                        || (z.EntityFk.ObjectId ==contactObjectId && z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.TenantOwner &&
-                        _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.EntityFk.SSIN && x.SharingLevel == 1)>0) ||
+                    var appEntityAttach = _appEntityAttachmentRepository.GetAll().Include(z => z.EntityFk).Include(z => z.AttachmentFk)
+                        //.Where(z => //(z.AttachmentCategoryId == catgImage || z.AttachmentCategoryId == catgVideo) &&
+                        //  z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId)
+                        //.Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
+                        //&& z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId && z.EntityFk.EntityAttachments.Count() > 0) ||
+                        .Where(z => (((z.EntityFk.ObjectId == postObjectId &&
+                        _appEntityRelationShipRepository.GetAll().Count(x => x.EntityId == z.EntityFk.Id && x.RelatedEntityTypeCode == "EVENT") == 0
+                        ) || z.EntityFk.ObjectId == eventObjectId) && z.EntityFk.TenantId == account.TenantOwner)
+                        || (z.EntityFk.ObjectId == contactObjectId && z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.TenantOwner &&
+                        _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.EntityFk.SSIN && x.SharingLevel == 1) > 0) ||
                         (z.EntityFk.ObjectId == itemListObjectId && z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.TenantOwner &&
-                        (dbContext.AppMarketplaceItems.Count(x => x.SSIN == z.EntityFk.SSIN && (x.SharingLevel ==1 ||
-                        x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)) > 0)));
+                        (dbContext.AppMarketplaceItems.Count(x => x.SSIN == z.EntityFk.SSIN && (x.SharingLevel == 1 ||
+                        x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)) > 0)))
+                       .OrderByDescending(z=>z.EntityFk.LastModificationTime != null ? z.EntityFk.LastModificationTime: z.EntityFk.CreationTime);
+                    //    .Where(z => z.Id == _appEntityAttachmentRepository.GetAll().Include(z=>z.AttachmentFk).Where(r => r.AttachmentFk.Name == z.AttachmentFk.Name)
+                    //.Select(a => a.Id).FirstOrDefault());
                     /*var appEntities = _appEntityRepository.GetAll()//.Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                         .Where(z => ((z.ObjectId== itemListObjectId || z.ObjectId== accountObjectId) && z.TenantId == null && z.TenantOwner == account.OwnerId && z.EntityAttachments.Count() > 0) ||
                         ((z.ObjectId == postObjectId || z.ObjectId == eventObjectId) && z.TenantId == account.OwnerId));*/
-
+                    
                     var entities = from t in appEntityAttach
                                    //join e in appEntities
                                    //on t.EntityId equals e.Id into j
@@ -303,22 +306,24 @@ namespace onetouch.Accounts
                                        AttachmentCategoryId = t.AttachmentCategoryId,
                                        Id = t.Id,
                                    };
+                    var  entities1 = entities.Where(z => z.Id == entities.Where(r => r.DisplayName== z.DisplayName)
+                    .Select(a => a.Id).FirstOrDefault());
+                    /*var entities = from t in appEntityAttach
+                                 join e in appEntities on t.EntityId equals e.Id into j
+                                 from j1 in j
+                                 select new AppEntityAttachmentDto()
+                                 {
+                                     Url = "attachments/" + ((j1.ObjectId == postObjectId || j1.ObjectId == eventObjectId) ? j1.TenantId.ToString() : "-1") + "/" + t.AttachmentFk.Attachment,
+                                     DisplayName = t.AttachmentFk.Name,
+                                     AttachmentCategoryId = t.AttachmentCategoryId,
+                                     Id = t.Id,
 
-                      /*var entities = from t in appEntityAttach
-                                   join e in appEntities on t.EntityId equals e.Id into j
-                                   from j1 in j
-                                   select new AppEntityAttachmentDto()
-                                   {
-                                       Url = "attachments/" + ((j1.ObjectId == postObjectId || j1.ObjectId == eventObjectId) ? j1.TenantId.ToString() : "-1") + "/" + t.AttachmentFk.Attachment,
-                                       DisplayName = t.AttachmentFk.Name,
-                                       AttachmentCategoryId = t.AttachmentCategoryId,
-                                       Id = t.Id,
-                                       
-                                   };*/
+                                 };*/
 
-                    var pagedAndFilteredAccounts = entities.OrderBy("Id desc").PageBy(input);
+                    var pagedAndFilteredAccounts = entities1.PageBy(input);//.OrderBy("Id desc")
                     retrunResult = await pagedAndFilteredAccounts.ToListAsync();
-                    totalCount = await entities.CountAsync();
+
+                    totalCount = await entities1.CountAsync();
 
 
 
