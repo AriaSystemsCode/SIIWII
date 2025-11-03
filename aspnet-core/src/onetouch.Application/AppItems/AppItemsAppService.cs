@@ -4134,7 +4134,7 @@ namespace onetouch.AppItems
                                 }else
                                 {
                                     rela.RelatedEntityId = 0;
-                                    marketplaceItem.EntitiesRelationships.Remove(rela);
+                                    //marketplaceItem.EntitiesRelationships.Remove(rela);
                                 }
                             }
                         }
