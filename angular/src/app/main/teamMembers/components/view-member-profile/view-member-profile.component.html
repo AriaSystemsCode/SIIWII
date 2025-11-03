@@ -252,10 +252,10 @@
                                 <div class="row ml-5">
                                     <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
                                     style="color: white !important;"
-                                        [class.hide]="editInfo" (click)="Save_editMember()" [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle && editBranchValue== oldEditBranchValue) ">
+                                        [class.hide]="editInfo" (click)="Save_editMember()" >
                                         {{ "SaveChanges" | localize }}
                                     </button>
-
+                                    <!-- [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle || editBranchValue== oldEditBranchValue) " -->
                                     <button class="btn mb-3 mt-4 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false;cancel()">
                                         {{ "Cancel" | localize }}
                                     </button>
