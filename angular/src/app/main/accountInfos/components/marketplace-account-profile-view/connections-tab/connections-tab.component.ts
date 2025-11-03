@@ -76,7 +76,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
     undefined,
     undefined,
     0,
-    4,
+    5,
     false
 )
 .subscribe(result => {
