@@ -66,6 +66,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   linkNewParentItem_Data;
   linkNewItemColor_Data;
   linkNewColorLookup_Data;
+  @Output() _resetRecordsCompleted = new EventEmitter<void>();
+
 
   public constructor(
     private _importService: MainImportService,
@@ -126,6 +128,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.records.forEach((r, index) => {
         this.resetRecords(r, index);
       });
+
+      this._resetRecordsCompleted.emit();
     }
 
     if (changes['updatedRecordData'] && this.updatedRecordData) {

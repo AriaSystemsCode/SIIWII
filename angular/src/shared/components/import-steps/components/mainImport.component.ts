@@ -510,6 +510,9 @@ export class MainImportComponent
         );
     }
 
+    onResetRecordsCompleted() {
+        this._resetRecords = false;
+      }
     onrepreateHandler($event: number) {
         this.repreateHandler = $event;
     }
