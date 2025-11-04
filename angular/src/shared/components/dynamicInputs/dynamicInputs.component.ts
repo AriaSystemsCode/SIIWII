@@ -41,6 +41,9 @@ export class dynamicInputs implements OnInit, OnChanges {
     if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
       for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
 
+        if (attr.dataType === 'pills') 
+          attr.themes = this.getThemes(attr);
+
         if (attr.isSelectedOnVariation || attr.isVariation) {
           continue;
         }
@@ -111,18 +114,18 @@ export class dynamicInputs implements OnInit, OnChanges {
   themes =[] ; 
     selectedTheme: any ;
 
-      //i49-F6 set thems 
-    getThemes(){
-      this.themes =  
-      [
-       { name: 'Default', image: 'assets/themes/default.png' },
-       { name: 'Theme 2', image: 'assets/themes/theme2.png' },
-       { name: 'Theme 3', image: 'assets/themes/theme3.png' },
-       { name: 'Theme 4', image: 'assets/themes/theme4.png' },
-       { name: 'Theme 5', image: 'assets/themes/theme5.png' },
-     ];
-     
-    }
+      //i49-F6 set thems  ?
+      getThemes(extraAttr: any) {
+       return this.themes =  
+        [
+         { name: 'Default', image: 'assets/themes/default.png' },
+         { name: 'Theme 2', image: 'assets/themes/theme2.png' },
+         { name: 'Theme 3', image: 'assets/themes/theme3.png' },
+         { name: 'Theme 4', image: 'assets/themes/theme4.png' },
+         { name: 'Theme 5', image: 'assets/themes/theme5.png' },
+       ];      
+      }
+
   selectTheme(theme: any) {
     this.selectedTheme = theme;
   }
@@ -142,6 +145,7 @@ export class dynamicInputs implements OnInit, OnChanges {
     ];
 
     for (const attr of allAttributes) {
+
       const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
 
       if (matchedDto && matchedDto.selectedValues?.length) {

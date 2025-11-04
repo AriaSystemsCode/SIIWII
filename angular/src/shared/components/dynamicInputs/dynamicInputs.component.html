@@ -1,4 +1,4 @@
-<div class="row pl-3 mt-4">
+<div class="row pl-3">
     <div class="col-lg-8 col-md-10 col">
         <div class="row  pt-4">
             <!-- //API GetAllWithExtraAttributes -->
@@ -9,7 +9,7 @@
                         <label class="{{fromSetting ? 'fromSettingLabel':''}}">{{extraAttr.name | localize}}</label>
                     </div>
 
-
+<!-- //i49-f6 review settings  types  -->
                     <!-- //API GetAllEntitiesByTypeCodeWithPaging -->
                     <div class="d-flex align-items-center">
 
@@ -68,32 +68,73 @@
                             <!-- (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" -->
                         </div>
 
+                      
+
+
+
+
+
+
                         <div class="flex-grow-1"
-                            *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
-                            <div class="radio-inline mt-2">
-                                <label class="radio radio-accent radio-primary mr-4"
-                                    for="extraAttr{{extraAttr.name}}_1">
-                                    <input (ngModelChange)="onAnyInputChange()" type="radio"
-                                        name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_1"
-                                        [value]="'true'" [(ngModel)]="extraAttr.selectedValues"  />
-                                    <!-- (click)="notLookupExtraAttributeOnChange('true',extraAttr)" -->
-                                    {{ "Yes" | localize }}
-                                </label>
-                                <label class="radio radio-accent radio-primary" for="extraAttr{{extraAttr.name}}_0">
-                                    <input (onChange)="onAnyInputChange()" type="radio"
-                                        name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_0"
-                                        [value]="'false'" [(ngModel)]="extraAttr.selectedValues" >
-                                    <!-- (click)="notLookupExtraAttributeOnChange('true',extraAttr)" -->
-                                    {{ "No" | localize }}
-                                </label>
-                                <a *ngIf="extraAttr.selectedValues" class="ml-5 pointer text-black-50 font-weight-bold"
-                                    (click)="extraAttr.selectedValues = null">
-                                    Reset
-                                </a>
+                        *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit'">
+                     <div class="radio-inline mt-2">
+                       <ng-container *ngIf="extraAttr.validEntries?.trim(); else yesNoBlock">
+                         <label
+                           class="radio radio-accent radio-primary mr-4"
+                           *ngFor="let option of extraAttr.validEntries.split('|')"
+                           [for]="'extraAttr' + extraAttr.name + '_' + option.trim()"
+                         >
+                           <input
+                             (ngModelChange)="onAnyInputChange()"
+                             type="radio"
+                             [name]="'extraAttr_' + extraAttr.name"
+                             [id]="'extraAttr' + extraAttr.name + '_' + option.trim()"
+                             [value]="option.trim()"
+                             [(ngModel)]="extraAttr.selectedValues"
+                           />
+                           {{ option.trim() }}
+                         </label>
+                       </ng-container>
+                   
+                       <ng-template #yesNoBlock>
+                         <label class="radio radio-accent radio-primary mr-4"
+                                [for]="'extraAttr' + extraAttr.name + '_1'">
+                           <input
+                             (ngModelChange)="onAnyInputChange()"
+                             type="radio"
+                             [name]="'extraAttr_' + extraAttr.name"
+                             [id]="'extraAttr' + extraAttr.name + '_1'"
+                             [value]="'true'"
+                             [(ngModel)]="extraAttr.selectedValues"
+                           />
+                           {{ "Yes" | localize }}
+                         </label>
+                         <label class="radio radio-accent radio-primary"
+                                [for]="'extraAttr' + extraAttr.name + '_0'">
+                           <input
+                             (ngModelChange)="onAnyInputChange()"
+                             type="radio"
+                             [name]="'extraAttr_' + extraAttr.name"
+                             [id]="'extraAttr' + extraAttr.name + '_0'"
+                             [value]="'false'"
+                             [(ngModel)]="extraAttr.selectedValues"
+                           />
+                           {{ "No" | localize }}
+                         </label>
+                       </ng-template>
+                   
+                       <a *ngIf="extraAttr.selectedValues"
+                          class="ml-5 pointer text-black-50 font-weight-bold"
+                          (click)="extraAttr.selectedValues = null">
+                          Reset
+                       </a>
+                     </div>
+                   </div>
+                   
 
-                            </div>
-                        </div>
 
+
+                        
                         <div class="flex-grow-1 position-relative d-flex align-items-center gap-2"
      *ngIf="extraAttr.dataType === 'color'">
 
@@ -146,11 +187,11 @@
   
 
 
-  <div class="theme-tabset" *ngIf="extraAttr.dataType === 'pills'">
+    <div class="theme-tabset" *ngIf="extraAttr.dataType === 'pills'">
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
       <li
-        class="nav-item"
-        *ngFor="let theme of themes; let i = index"
+        class="nav-item m-3"
+        *ngFor="let theme of extraAttr.themes; let i = index"
         role="presentation"
       >
         <button
@@ -171,20 +212,14 @@
       </li>
     </ul>
   
-    <div class="tab-content p-3 border rounded bg-light">
+  <div class="tab-content p-3 border rounded bg-light">
       <div *ngIf="selectedTheme">
         <h6 class="fw-semibold">{{ selectedTheme.name }}</h6>
         <p class="mb-0">Preview or apply this theme.</p>
       </div>
-    </div>
+    </div> 
   </div>
   
-  
-  
-
-
-
-
                         <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                                 [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name"

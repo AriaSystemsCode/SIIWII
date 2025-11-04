@@ -274,7 +274,7 @@ getAppItemTypeExtraAttributesById() {
           this.selectedTransTypeData = res[0]; // ensure defineExtraAttributes uses correct data
           this.defineExtraAttributes();
   
-          this.loadRecommendedAndAdditionalExtraDataLookupLists();
+          this.loadTenantSettings();
 
           setTimeout(() => this.scrollToUsage(this.selectedUsage), 200);
         }
@@ -282,8 +282,8 @@ getAppItemTypeExtraAttributesById() {
   }
   
 
-
-  loadRecommendedAndAdditionalExtraDataLookupLists() {
+     //i49-F6 set dto same as  getAppTransactionsForView api 
+  loadTenantSettings() {
     if (!this.extraAttributes || typeof this.extraAttributes !== 'object') {
       return;
     }
@@ -370,7 +370,7 @@ getAppItemTypeExtraAttributesById() {
     }
   }
   
-
+   //i49-F6 save setting data
   onExtraAttributesChanged(dataFromChild: any[]) {
     this.formTouched = true;
     if (!this.appTransactionsForViewDto) {
