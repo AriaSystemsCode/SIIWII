@@ -8653,6 +8653,10 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.Id, act => act.MapFrom(src => 0));
             mappingExpression.ForMember(dest => dest.ProductType, act => act.MapFrom(src => src["ProductType"].ToString()));
             mappingExpression.ForMember(dest => dest.RecordType, act => act.MapFrom(src => src["RecordType"].ToString()));
+
+            mappingExpression.ForMember(dest => dest.ColorCode, act => act.MapFrom(src => src["COLORCode"].ToString()));
+            mappingExpression.ForMember(dest => dest.ColorName, act => act.MapFrom(src => src["COLORName"].ToString()));
+
             mappingExpression.ForMember(dest => dest.ParentCode, act => act.MapFrom(src => src["ParentCode"].ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.ParentId, act => act.MapFrom(src => 0));
             mappingExpression.ForMember(dest => dest.Code, act => act.MapFrom(src => src["Code"].ToString().TrimEnd()));
