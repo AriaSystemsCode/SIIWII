@@ -109,15 +109,20 @@ export class dynamicInputs implements OnInit, OnChanges {
 
 
   //i49-F6 set thems 
-  themes = [
-    { name: 'Default', image: 'assets/themes/default.png' },
-    { name: 'Theme 2', image: 'assets/themes/theme2.png' },
-    { name: 'Theme 3', image: 'assets/themes/theme3.png' },
-    { name: 'Theme 4', image: 'assets/themes/theme4.png' },
-    { name: 'Theme 5', image: 'assets/themes/theme5.png' },
-  ];
-  
-  selectedTheme: any = this.themes[0];
+  themes =[] ; 
+    selectedTheme: any ;
+
+    getThemes(){
+      this.themes =  
+      [
+       { name: 'Default', image: 'assets/themes/default.png' },
+       { name: 'Theme 2', image: 'assets/themes/theme2.png' },
+       { name: 'Theme 3', image: 'assets/themes/theme3.png' },
+       { name: 'Theme 4', image: 'assets/themes/theme4.png' },
+       { name: 'Theme 5', image: 'assets/themes/theme5.png' },
+     ];
+     
+    }
   selectTheme(theme: any) {
     this.selectedTheme = theme;
   }

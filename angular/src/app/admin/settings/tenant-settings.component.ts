@@ -821,7 +821,6 @@ defineExtraAttributes() {
 }
 
 getAppItemTypeExtraAttributesById() {
-  //i49-F6 send setting id & use usage
     this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(771)
       .subscribe((res) => {
         if (res?.length > 0) {
