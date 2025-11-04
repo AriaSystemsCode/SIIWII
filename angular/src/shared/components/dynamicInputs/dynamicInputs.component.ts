@@ -108,10 +108,10 @@ export class dynamicInputs implements OnInit, OnChanges {
   }
 
 
-  //i49-F6 set thems 
   themes =[] ; 
     selectedTheme: any ;
 
+      //i49-F6 set thems 
     getThemes(){
       this.themes =  
       [
@@ -130,7 +130,6 @@ export class dynamicInputs implements OnInit, OnChanges {
 
 
   fillSelectedValuesFromDto() {
-    //i49-F6 data should be like this 
     if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
       return;
     }
