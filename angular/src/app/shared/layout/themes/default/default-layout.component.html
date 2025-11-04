@@ -18,7 +18,7 @@
     <div class="kt-grid kt-grid--hor kt-grid--root">
         <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
             <!-- BEGIN: Left Aside -->
-            <div [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
+            <div *ngIf="!hideChrome" [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
                 <div class="text-center">
                 <img *ngIf="!tenantLogo" [src]="defaultLogo" alt="logo" height="38" class="rounded-circle" />
 
@@ -38,11 +38,12 @@
                       </svg>
                 </button>
                 <ul [ngClass]="isMinimized ? 'ulMargin':''">
+                 
                   <li *ngFor="let item of menu.items ; let i = index" [ngClass]="{
                     'd-none': !showMenuItem(item) || item.name === 'BillingLog',
                     'spLeng': item.name == 'System Objects'  && openSub && isMinimized ,
                   
-                  }"  [queryParams]="item.parameters"   [routerLink]="item.name != 'Administration' && item.name != 'System Objects'  ? item.route : null" [routerLinkActive]="item.name != 'Administration' && item.name != 'System Objects' ? 'active-link' :''" (click)=" item.name != 'Administration' ? isMinimized = true : ''; ">
+                  }"  [queryParams]="item.parameters"   [routerLink]="item.name != 'Administration' && item.name != 'System Objects'  ? item.route : null" [routerLinkActive]="item.name != 'Administration' && item.name != 'System Objects' ? 'active-link' :''" (click)=" item.name != 'Administration' ? isMinimized = true : ''; " > 
                     <svg *ngIf="item.name == 'My Transactions'"  (click)="openSub = false  ; openAdSub = false " xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none"  class="svgIcon">
                         <g clip-path="url(#clip0_272_39693)">
                           <path d="M22.7116 10.3223H2.06641V20.6448H22.7116V10.3223ZM11.3567 19.6126H3.09866V17.5481H11.3567V19.6126ZM11.3567 16.5158H3.09866V14.4513H11.3567V16.5158ZM11.3567 13.419H3.09866V11.3545H11.3567V13.419ZM16.518 19.6126H12.389V17.5481H16.518V19.6126ZM16.518 16.5158H12.389V14.4513H16.518V16.5158ZM16.518 13.419H12.389V11.3545H16.518V13.419ZM21.6793 19.6126H17.5503V17.5481H21.6793V19.6126ZM21.6793 16.5158H17.5503V14.4513H21.6793V16.5158ZM21.6793 13.419H17.5503V11.3545H21.6793V13.419Z" />
@@ -113,7 +114,8 @@
                         
                       </a>
                     <div *ngIf="item.name == 'Administration'  && openAdSub" class="sub-menu" style="min-height: 75vh;">
-                      <li *ngFor="let child of item.items" [ngClass]=" !showMenuItem(child) || child?.name =='BillingLog' || child?.name =='AppSubscriptionPlanDetails' ? 'd-none' : ''" [routerLink]="child.route " [routerLinkActive]="'active-link'" (click)="isMinimized = true;openAdSub = true" >
+                      <li *ngFor="let child of item.items" [ngClass]=" !showMenuItem(child) || child?.name =='BillingLog' || child?.name =='AppSubscriptionPlanDetails' ? 'd-none' : ''" [routerLink]="child?.name == 'AriaSystem' ? '': child.route " [routerLinkActive]=" child?.name == 'AriaSystem' ? '':'active-link'" (click)="isMinimized = true;openAdSub = true;child?.name == 'AriaSystem'  ? openAria() : ''" >
+                
                         <i    *ngIf="child.name != 'AccountProfile' && child.name != 'Lookups' && child.name != 'Organization Units' && child.name != 'Roles'  && child.name != 'Users' && child.name != 'Subscription' && child.name != 'Settings' && child.name != 'OrganizationUnits' " [class]="child.icon" ></i>
                         <svg *ngIf="child.name == 'AccountProfile'" width="32" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg"   class="svgIcon">
                           <path d="M27.1667 28C27.1667 26.1392 27.1667 25.2089 26.937 24.4518C26.4199 22.7473 25.0861 21.4134 23.3815 20.8963C22.6245 20.6667 21.6941 20.6667 19.8333 20.6667H13.1667C11.3059 20.6667 10.3755 20.6667 9.61847 20.8963C7.91393 21.4134 6.58005 22.7473 6.06298 24.4518C5.83333 25.2089 5.83333 26.1392 5.83333 28M22.5 10C22.5 13.3137 19.8137 16 16.5 16C13.1863 16 10.5 13.3137 10.5 10C10.5 6.68629 13.1863 4 16.5 4C19.8137 4 22.5 6.68629 22.5 10Z" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -311,65 +313,12 @@
               </div>
               
             <!-- END: Left Aside -->
-            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor kt-wrapper" id="kt_wrapper">
+            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " id="kt_wrapper" [ngClass]="hideChrome? '':'kt-wrapper'">
                 <!-- BEGIN: Header -->
-                <div class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
+                <div *ngIf="!hideChrome" class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
 
-                      <!-- <div class=" mb-3" style="    display: -webkit-box;
-                      display: -ms-flexbox;
-                      display: flex;
-                      -webkit-box-align: stretch;
-                      -ms-flex-align: stretch;
-                      align-items: stretch;
-                      margin: 0;">
-
-                      </div> -->
                     <div class="kt-header-menu-wrapper" id="kt_header_menu_wrapper"></div>
-                    <!-- <div class="search-bar" style="width: 43%;
-                    z-index: 99999999999999;
-                    z-index: 99999999999999;
-                    position: relative;
-                    left: 4%;
-                    top: 22%;">
-                        <div class="input-group mb-3" style="">
-                            <div class="input-group-prepend" style="background-color: #EDEDED;height: 39px;width: 77px;
-                            border-radius: 5px;">
-
-                                <div class="btn-group">
-                                    <button class="btn btn-secondary btn-sm dropdown-toggle" style="width:77px;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                      All
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#">Action</a>
-                                        <a class="dropdown-item" href="#">Another action</a>
-                                        <a class="dropdown-item" href="#">Something else here</a>
-                                      </div>
-                                  </div>
-                            </div>
-                            <input type="text" class="form-control" style="background-color: #F3F6F9;height: 39px;" placeholder="I am looking for…">
-                            <div class="input-group-append p-2" style="background-color: #3699FF;height: 39px;    width: 8%;
-                            border-radius: 4px">
-                              <img src="assets/profile/tools-and-utensils-white.svg" style="margin: 0 auto;" >
-                            </div>
-
-                          </div>
-                          <div *ngIf="false" class="save-icon" style="    position: absolute;
-                          width: 32px;
-                          height: 32px;
-                          padding: 5px 0;
-                          text-align: center;
-                          margin-left: 10px;
-                          border-radius: 5px;
-                          background-color: #F3F6F9;
-                          cursor: pointer;
-                          left: 100%;
-                          /* background-color: antiquewhite; */
-                          top: 4%;">
-                            <img src="assets/profile/interface.svg">
-
-                        </div>
-                    </div> -->
-
+                
                     <topbar [displayMarketPlace]="displayMarketPlace"></topbar>
 
                 </div>
@@ -402,7 +351,7 @@
                 </div>
 
 
-                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor rout-c" >
+                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="hideChrome?'':'rout-c'">
 
                     <router-outlet></router-outlet>
                 </div>
