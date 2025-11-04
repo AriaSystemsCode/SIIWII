@@ -8,6 +8,7 @@
     .p-accordion-header-text {
         color: #1B101B !important;
         font-weight: 700 !important;
+        padding: 10px;
     }
 }
 .leftSec {
@@ -16,7 +17,9 @@
     border-radius: 1px;
 }
 .saveBtn {
-    background-color: #4A0D4A;
+    border-radius: 5px;
+    background-color: #4A0D4A !important;
+    border: #4A0D4A !important;color: white;
 }
 .list-group-item{
 font-weight: 600;
