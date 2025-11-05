@@ -66,6 +66,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   linkNewParentItem_Data;
   linkNewItemColor_Data;
   linkNewColorLookup_Data;
+  @Output() _resetRecordsCompleted = new EventEmitter<void>();
+
 
   public constructor(
     private _importService: MainImportService,
@@ -126,6 +128,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.records.forEach((r, index) => {
         this.resetRecords(r, index);
       });
+
+      this._resetRecordsCompleted.emit();
     }
 
     if (changes['updatedRecordData'] && this.updatedRecordData) {
@@ -443,26 +447,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record.showActions = !record.showActions;
   
     if (record.showActions) {
-      const targetEl = (event.target as HTMLElement).closest('.dropdown') as HTMLElement;
-      if (!targetEl) return;
-  
-      const rect = targetEl.getBoundingClientRect();
-  
-      const spaceAbove = rect.top;
-      const spaceBelow = window.innerHeight - rect.bottom;
-  
-      const openUpward = spaceBelow < 220 && spaceAbove > 220;
-  
       record.dropdownPosition = {
-        top: openUpward
-          ? rect.top + window.scrollY
-          : rect.bottom + window.scrollY,
-       // left: rect.left + window.scrollX,
-       left: 50,
-        openUpward
+        top: event.clientY,
+        left: event.clientX
       };
     }
   }
+  
   
 
 
