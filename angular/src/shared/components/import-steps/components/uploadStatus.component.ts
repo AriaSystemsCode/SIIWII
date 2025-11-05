@@ -447,26 +447,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record.showActions = !record.showActions;
   
     if (record.showActions) {
-      const targetEl = (event.target as HTMLElement).closest('.dropdown') as HTMLElement;
-      if (!targetEl) return;
-  
-      const rect = targetEl.getBoundingClientRect();
-  
-      const spaceAbove = rect.top;
-      const spaceBelow = window.innerHeight - rect.bottom;
-  
-      const openUpward = spaceBelow < 220 && spaceAbove > 220;
-  
       record.dropdownPosition = {
-        top: openUpward
-          ? rect.top + window.scrollY
-          : rect.bottom + window.scrollY,
-       // left: rect.left + window.scrollX,
-       left: 50,
-        openUpward
+        top: event.clientY,
+        left: event.clientX
       };
     }
   }
+  
   
 
 

@@ -1194,7 +1194,8 @@ export class MainImportComponent
 
                 record.fieldsErrors = hasErrors ? result : [];
                 record.errorMessage = hasErrors ? "" : record.errorMessage;
-                record.status = hasErrors ? "Failed" : "Passed";
+               let allWarnings = result.every(x => x.errorType === "Warning");
+                record.status =hasErrors ? (allWarnings ? "Warning" :  "Failed" ) : "Passed"
                 if (record._isCreateParent || record._isCreateItemColor) {
                     record.recordType = "Image";
                     record.excelDto.recordType = "Image";
