@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -7,6 +7,7 @@ import { SelectItem } from 'primeng/api';
 import { ImageObject } from '../../../accounts/account-shared/models/imageobject';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
+import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 
 
 @Component({
@@ -20,7 +21,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @ViewChild('nav') slider: NgImageSliderComponent;
     @Input('accountData') accountData: AccountDto;
     @Input('contactData') contactData: AccountDto;
-    
+
     @Input('isPublished') isPublished: boolean;
     @Input('isSync') isSync: boolean;
 
@@ -34,7 +35,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Output("editedContactData") editedContactData: EventEmitter<any> = new EventEmitter<any>()
     @Output("delete") delete: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("publish") publish: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output("unPublish") unPublish: EventEmitter<boolean> = new EventEmitter<boolean>()
+
 
     showEditConnected: boolean = false;
     priceLevel: string;
@@ -42,8 +43,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     accountLevelEnum = AccountLevelEnum;
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
-    active = false;
-    saving = false;
+
     coverPhoto: any = ""
     logoPhoto: any = ""
     accountType: any;
@@ -93,12 +93,19 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     showIsSync = false;
     showShare = true;
     hideshowShare = false;
-    editedPersonalData:any
-        allLanguages: LookupLabelDto[];
-        isRecordOwner:boolean
+    editedPersonalData: any
+    allLanguages: LookupLabelDto[];
+    isRecordOwner: boolean
 
-        currentLang:string
-        isArabic:boolean 
+    currentLang: string
+    isArabic: boolean
+    emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+    phonePattern = '^(\\+?[1-9]\\d{0,2}(\\s|-)?(\\(?\\d{1,4}\\)?(\\s|-)?)+|\\d{1,20}|0\\d{9,14})$';
+
+    
+    companyLogo: any;
+  
+
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -125,7 +132,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
-    
+
     }
 
     prevImageClick() {
@@ -158,47 +165,42 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
-  
+
         if (this.personalAccount && !this.editPersonal) {
             this.Editting = true;
             this.editInfo = false;
             this.NoteditInfo = true;
-            this.editFirstNameValue = this.contactData?.firstName;
-            this.editLastNameValue =  this.contactData?.lastName;
-            this.editJobTitleValue = this.contactData?.jobTitle;
-            this.editEMailAddressValue = this.accountData.eMailAddress;
-            // this.editLanguageNameValue = this.contactData.languageName;
-            this.editPhoneNumberValue = this.accountData.phone1Number;
-     
+            this.setPersonalData()
 
 
-        }else if(this.personalAccount && this.editPersonal){
+
+        } else if (this.personalAccount && this.editPersonal) {
             if (!this.editedPersonalData) {
                 this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
-              }
-              this.editedPersonalData.firstName= this.editFirstNameValue
-              this.editedPersonalData.lastName= this.editLastNameValue
-              this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
-              this.editedPersonalData.languageId = this.contactData.languageId;
-              this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;              
-              this.editedPersonalData.phone1Number = this.editPhoneNumberValue;
-              this.editedPersonalData.jobTitle = this.editJobTitleValue;
-              this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
-              this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
-              this.contactData.languageName = this.editedPersonalData.languageName;
-              this.editedContactData.emit(this.contactData)
-              this.editedData.emit(this.editedPersonalData);
-              this.editInfo = true;
-              this.NoteditInfo = false;
-              this.Editting = false;
-              this.editPersonal = false;
-           
+            }
+            this.editedPersonalData.firstName = this.editFirstNameValue
+            this.editedPersonalData.lastName = this.editLastNameValue
+            this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
+            this.editedPersonalData.languageId = this.contactData.languageId;
+            this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;
+            this.editedPersonalData.phone1Number = this.editPhoneNumberValue;
+            this.editedPersonalData.jobTitle = this.editJobTitleValue;
+            this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
+            this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
+            this.contactData.languageName = this.editedPersonalData.languageName;
+            this.editedContactData.emit(this.contactData)
+            this.editedData.emit(this.editedPersonalData);
+            this.editInfo = true;
+            this.NoteditInfo = false;
+            this.Editting = false;
+            this.editPersonal = false;
+
 
         }
 
         else {
-        
-  
+
+
             this.editInfo = true;
             this.NoteditInfo = false;
             this.Editting = false;
@@ -329,13 +331,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         })
 
     }
-    publishProfile() {
-        this.publish.emit(true);
-    }
 
-    unPublishProfile() {
-        this.unPublish.emit(true);
-    }
+
 
 
     editConnnectedAccount() {
@@ -382,7 +379,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                     this.showIsSync = !response;
                     this.isSync = !response;
                     this.isSync = false;
-                    
+
                 });
 
     }
@@ -412,7 +409,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     isNotManualLevel(): boolean {
-     
+
         return this.accountLevel !== AccountLevelEnum.Manual;
     }
 
@@ -422,7 +419,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             return false;
 
 
-        if (this.editFirstNameValue == this.accountData.name &&  this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue == this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue == this.accountData.phoneNumber)
+        if (this.editFirstNameValue == this.accountData.name && this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue == this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue == this.accountData.phoneNumber)
             return false;
 
         return true;
@@ -430,14 +427,99 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     get jobTitleAttr() {
         return this.accountData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
-      }
-      
+    }
+
     getLanguages() {
         this._appEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
             this.allLanguages = result;
         });
     }
 
+        setPersonalData(){
+            this.editFirstNameValue = this.contactData?.firstName;
+    this.editLastNameValue = this.contactData?.lastName;
+    this.editJobTitleValue = this.contactData?.jobTitle;
+    this.editEMailAddressValue = this.accountData.eMailAddress;
+    this.editPhoneNumberValue = this.accountData.phone1Number;
+        }
 
-     
+    cancelPerAcc(){
+    
+    this.editInfo = true;
+    this.NoteditInfo = false;
+    this.Editting=false
+    this.setPersonalData()
+}
+
+    imageBrowseDone($event: ImageUploadComponentOutput, sycAttachmentCategory: SycAttachmentCategoryDto, index?: number) {
+        let exidtedIndex: number = -1;
+        let att: AppEntityAttachmentDto
+        let guid = this.guid();
+        // this.touched = true
+
+        if (sycAttachmentCategory.code == "IMAGE") {
+            exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == sycAttachmentCategory.id && x.index == index);
+        }
+        else {
+            exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == sycAttachmentCategory.id);
+        }
+
+        if (exidtedIndex > -1) {
+            att = this.accountData.entityAttachments[exidtedIndex]
+        } else {
+            att = new AppEntityAttachmentDto();
+        }
+        att.fileName = $event.file.name;
+        att.attachmentCategoryId = sycAttachmentCategory.id;
+        att.guid = guid;
+
+        if (this.sycAttachmentCategoryLogo.id == att.attachmentCategoryId) {
+            this.companyLogo = $event.image
+        }
+        else if (this.sycAttachmentCategoryBanner.id == att.attachmentCategoryId) {
+            this.coverPhoto = $event.image
+        }
+ 
+
+        if (exidtedIndex == -1) {
+            att.index = index
+            this.accountData.entityAttachments.push(att);
+        }
+
+        this.uploader.addToQueue([$event.file]);
+
+        this.uploader.onBuildItemForm = (fileItem: any, form: any) => {
+            form.append('guid', guid);
+        };
+
+        this.uploader.uploadAll()
+
+        if (this.accountData.entityAttachments == null || this.accountData.entityAttachments == undefined) {
+            this.accountData.entityAttachments = [];
+        }
+    }
+
+        removeImage($event, t: SycAttachmentCategoryDto, index: number) {
+            // this.touched = true
+    
+            let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
+            let exidtedIndex: number = -1;
+            if (t.code == "IMAGE") {
+                exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == t.id && x.index == index);
+            }
+            else {
+                exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == t.id);
+            }
+            this.accountData.entityAttachments.splice(exidtedIndex, 1)
+    
+   
+             if (index == -1) {
+
+                this.companyLogo = undefined
+            }
+            else if (index == -2) {
+      
+                this.coverPhoto = undefined
+            }
+        }
 }

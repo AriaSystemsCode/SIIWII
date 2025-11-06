@@ -1,4 +1,4 @@
-﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, AfterViewInit, } from '@angular/core';
+﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, } from '@angular/core';
 import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -34,7 +34,7 @@ import { Paginator } from 'primeng/paginator';
     animations: [appModuleAnimation()],
     providers: [MarketplaceAccountsServiceProxy]
 })
-export class AccountInfoComponent extends AppComponentBase implements OnInit, AfterViewInit {
+export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
     @Input('accountLevel') accountLevel: AccountLevelEnum = AccountLevelEnum.Profile
     @ViewChild('createOrEditMember', { static: true }) createOrEditMember: CreateOrEditMemberComponent
@@ -59,7 +59,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
     public uploader: FileUploader;
 
-    activeTabIndex: number = 0;
     phone1TypeIdName = '';
     phone2TypeIdName = '';
     phone3TypeIdName = '';
@@ -73,8 +72,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     classificationsIds: number[] = [];
 
     allPhoneTypes: LookupLabelDto[];
-    allCurrencies: LookupLabelDto[];
-    allCurrenciesDto: CurrencyInfoDto[];
+    allCurrencies: CurrencyInfoDto[];
     allLanguages: LookupLabelDto[];
     allPriceLevel: SelectItem[] = [];
     accountTypes: SelectItem[] = [];
@@ -100,7 +98,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     accountInfoLoded: any;
     phoneTypesLoaded: any;
-    allAccountTypes: LookupLabelDto[] = [];
 
     canPublish: boolean = false;
     displaySaveAccount: boolean = false;
@@ -110,9 +107,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     recordIdSubBranch: any;
     currentTab: AccountInfoPageTabs
     saving = false;
-    publishing = false;
 
-    dropdownActionmenuhover: string = '';
+
+    sycAttachmentCategoryLogo: SycAttachmentCategoryDto
+    sycAttachmentCategoryBanner: SycAttachmentCategoryDto
+    sycAttachmentCategoryImage: SycAttachmentCategoryDto
+
+    paymentTermsId;
+    shipViaId;
 
     selectedMember: { memberId?: number, userId?: number } = {}
 
@@ -128,10 +130,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     changeCurrency: boolean = false;
 
 
-    initDataLoaded: boolean = false
+
     getForEditResult: GetAccountInfoForEditOutput
     touched: boolean = false
-
     isRecordOwner: boolean
 
 
@@ -182,12 +183,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     get isMyAccountEdit(): boolean { return this.isMyAccount && Boolean(this.accountId) }
 
     get otherAccount(): boolean { return this.viewMode }
-    sycAttachmentCategoryLogo: SycAttachmentCategoryDto
-    sycAttachmentCategoryBanner: SycAttachmentCategoryDto
-    sycAttachmentCategoryImage: SycAttachmentCategoryDto
 
-    paymentTermsId;
-    shipViaId;
     GetContactDefaults() {
         this._AccountsServiceProxy.getContactDefaults()
             .subscribe((res) => {
@@ -239,38 +235,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
         });
     }
-    ngAfterViewInit(): void {
 
-
-    }
-
-
-
-    showDialogSaveAccount() {
-        this.save();
-    }
-    onEmitButtonSaveYes(event) {
-        if (event.value == 'yes' && event.type == 'saveAccount') {
-            this.publishProfile();
-            this.displaySaveAccount = false;
-        }
-        else {
-            this.displaySaveAccount = false;
-            this.displayDeleteClassification = false;
-            this.displayDeleteProductCategories = false;
-            this.displayDeleteSubBranch = false;
-        }
-    }
-
-    clearAddress(address: AppContactAddressDto) {
-        address.code = ''
-        address.name = ''
-        address.addressLine1 = ''
-        address.addressLine2 = ''
-        address.city = ''
-        address.state = ''
-        address.postalCode = ''
-    }
 
     initUploaders(): void {
         this.uploader = this.createUploader(
@@ -320,7 +285,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
             this.allPhoneTypes = result;
             this.phoneTypesLoaded = true;
-            this.setDefaultPhoneTypes();
+            // this.setDefaultPhoneTypes();
 
         });
     }
@@ -337,17 +302,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         });
     }
 
-    getCurrenciesDto() {
-        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
-            this.allCurrenciesDto = result;
-        });
-    }
 
-    getAccountType() {
-        this._AccountsServiceProxy.getMyAccountForEdit().subscribe((result) => {
-            this.accountInfoTemp.accountType = result.accountInfo.accountType;
-        });
-    }
 
     async handleComponentMode() {
 
@@ -359,7 +314,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             else { // create ManualOrExternal Account
                 this.loadInitData()
                 this.setProfileData()
-
             }
         }
 
@@ -371,7 +325,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             } else { // create
                 this.loadInitData()
                 this.setProfileData()
-                this.getAccountType();
             }
         }
 
@@ -380,18 +333,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             return this.getAccountDataForView()
         }
 
-
-
     }
 
     loadInitData() {
         if (this.accountInfoTemp)
             this.accountInfoTemp.currencyId = this.tenantDefaultCurrency.value;
 
-        // this.defineAccountTypes();
         this.getLanguages();
         this.getCurrencies();
-        this.getCurrenciesDto();
         this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
         this.getShipVia();
@@ -433,10 +382,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
 
     getAccountDataForEdit(): void {
-        if (!this.initDataLoaded) {
-            this.initDataLoaded = true
-            this.loadInitData()
-        }
+
+        this.loadInitData()
         this.showMainSpinner()
         this._AccountsServiceProxy.getAccountForEdit(this.accountId)
             .pipe(
@@ -451,19 +398,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     async getMyAccountDataForEdit() {
-        if (!this.initDataLoaded) {
-            this.initDataLoaded = true
-            this.loadInitData()
-        }
-        const result = await this._AccountsServiceProxy.getMyAccountForEdit().toPromise()
 
+        this.loadInitData()
+        const result = await this._AccountsServiceProxy.getMyAccountForEdit().toPromise()
         if (result) {
             this.getForEditResult = result
             this.accountInfoOldCurrencyId = this.getForEditResult?.accountInfo?.currencyId;
             this.setProfileData(result)
             if (!result.accountInfo.id) {
-                this.accountInfoTemp.accountType = result.accountInfo?.accountType;
-                this.accountInfoTemp.accountTypeId = result?.accountInfo?.accountTypeId;
                 this.accountInfoTemp.name = this.appSession?.tenant?.name
                 this.accountInfoTemp.tradeName = this.appSession?.tenant?.name
             }
@@ -490,7 +432,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     async getAccountDataForView() {
 
         this.showMainSpinner();
-
         let result;
         if (!this.fromMarketplace) {
             result = await this._AccountsServiceProxy.getAccountForView(this.accountId, 5)
@@ -610,7 +551,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
-        this.setDefaultPhoneTypes();
+        // this.setDefaultPhoneTypes();
 
         this.categoriesIds = [];
         this.accountInfoTemp.entityCategories.forEach(element => {
@@ -755,7 +696,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
     getCotactData(event) {
         this.editedContactPerData = event
-        // this.accountInfoTemp.entityAttachments =  this.editedContactPerData?.entityAttachments
+   
 
 
     }
@@ -915,26 +856,26 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     saveMyAccount() {
         this.accountInfoTemp.entityExtraData ??= [];
 
-                if (!this.accountInfoTemp.id) {
-                    const mustHave = [701,702,703,706,707,708,709,710,711,712,713,714,715];
-                    mustHave.forEach(id => this.ensureAttribute(id));
+        if (!this.accountInfoTemp.id) {
+            const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
+            mustHave.forEach(id => this.ensureAttribute(id));
 
-                    // now it's safe to set values
-                    this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
-                    this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
-                    this.setStringValue(707, '');     // instead of null
-                    this.setStringValue(706, '');     // instead of null
-                    this.setBooleanValue(713, true);
-                    this.setBooleanValue(708, true);
-                    this.setBooleanValue(710, true);
-                    this.setStringValue(715, '');     // instead of null
-                    this.setBooleanValue(711, true);
-                    this.setBooleanValue(712, true);
-                    this.setBooleanValue(709, true);
-                    this.setStringValue(703, '');     // instead of null
-                    this.setBooleanValue(714, true);
+            // now it's safe to set values
+            this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
+            this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
+            this.setStringValue(707, '');     // instead of null
+            this.setStringValue(706, '');     // instead of null
+            this.setBooleanValue(713, true);
+            this.setBooleanValue(708, true);
+            this.setBooleanValue(710, true);
+            this.setStringValue(715, '');     // instead of null
+            this.setBooleanValue(711, true);
+            this.setBooleanValue(712, true);
+            this.setBooleanValue(709, true);
+            this.setStringValue(703, '');     // instead of null
+            this.setBooleanValue(714, true);
 
-                }
+        }
 
 
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
@@ -956,7 +897,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 if (result) {
                     this.touched = false;
                     this.notify.success(this.l('SavedSuccessfully'));
-                    this.appSession.tenant.currencyInfoDto = this.allCurrenciesDto.find(e => e.value == this.accountInfoTemp.currencyId);
+                    this.appSession.tenant.currencyInfoDto = this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
                     this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
                     this.displaySaveAccount = true;
                     this.canPublish = true;
@@ -1042,32 +983,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
     }
 
-    publishProfile(): void {
-        if (this.uploader.isUploading) {
-            this.notify.info(this.l('WaitUntilUploadingImagesIsCompleted'));
-            return
-        }
-        this.publishing = true;
-        this._AccountsServiceProxy.publishProfile(false)
-            .pipe(finalize(() => { this.publishing = false; }))
-            .subscribe(() => {
-                if (this.getForEditResult)
-                    this.getForEditResult.lastChangesIsPublished = true
-                this.notify.info(this.l('ProfilePublishedSuccessfully'));
-                this.accountLevel == AccountLevelEnum.Profile ? this.getMyAccountDataForView() : this.getAccountDataForView();
-                this.isPublished = true;
-            });
-    }
 
-    unPublishProfile(): void {
-        this._AccountsServiceProxy.unPublishProfile()
-            .pipe(finalize(() => { this.publishing = false; }))
-            .subscribe(() => {
-                this.notify.info(this.l('ProfileUnPublishedSuccessfully'));
-                this.accountLevel == AccountLevelEnum.Profile ? this.getMyAccountDataForView() : this.getAccountDataForView();
-                this.isPublished = false;
-            });
-    }
+
     onWebsiteChange() {
         var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
         var regex = new RegExp(expression);
@@ -1078,32 +995,19 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
     }
 
-    showPublishProfileMsg(): void {
-        var isConfirmed: Observable<boolean>;
-        isConfirmed = this.askToConfirm("DoYouWantToPublishYourProfileNow", "");
 
-        isConfirmed.subscribe((res) => {
-            if (res) {
-                this.publishProfile();
-            }
-        }
-        );
-    }
-    changeStyleActionButton($event) {
-        this.dropdownActionmenuhover = $event.type == 'mouseover' ? 'dropdownActionmenuhover' : '';
-    }
 
-    setDefaultPhoneTypes(): void {
+    // setDefaultPhoneTypes(): void {
 
-        if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
+    //     if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
 
-        //set default phone types tobe displayed
-        if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
-            this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
-            this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
-            this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
-        }
-    }
+    //     //set default phone types tobe displayed
+    //     if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
+    //         this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
+    //         this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
+    //         this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
+    //     }
+    // }
 
 
     openImageCropper(event, aspectRatio?: number, noOptions?: boolean): { onCropDone: Observable<any>, data: ImageCropperComponent } {
@@ -1181,10 +1085,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
     }
 
-    showDialogRemoveSubBranch(branch: BranchDto) {
-        this.displayDeleteSubBranch = true;
-        this.recordIdSubBranch = branch;
-    }
+
 
     // Categories
     openSelectCategoriesModal() {
@@ -1566,22 +1467,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     getFormattedConnectionName(): string | null {
         let raw: string | undefined;
-
-
         raw = this.accData?.disConnectLabel?.trim();
-
-
         if (!raw) return null;
-
-
-
-        // Format only if starts with 'MPAction'
         if (raw.startsWith('MPAction')) {
             const label = raw.replace('MPAction', '');
             return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
         }
-
-        // For anything else, return null (or raw if you prefer)
         return null;
     }
 }

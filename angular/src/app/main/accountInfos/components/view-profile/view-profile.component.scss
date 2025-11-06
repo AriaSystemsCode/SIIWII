@@ -4,6 +4,7 @@
     background: #ffffff;
     border-radius: 6px;
 }
+
 ._btn {
     width: 104px;
     height: 35px;
@@ -12,10 +13,12 @@
     margin-right: 15px;
     white-space: nowrap;
 }
+
 .btn-Edit {
     background: #a2a2a2;
     color: white;
 }
+
 .btn-delete {
     background: #f8c8c8;
     color: #f90000;
@@ -25,6 +28,7 @@
     background: #e1ffe9;
     color: #00a49a;
 }
+
 .btn-createListOrAddToList {
     background: #ffb822;
     color: #725311;
@@ -33,18 +37,21 @@
 .seconedContainer {
     width: 1316px;
 }
+
 .emptyDiv {
     width: 314px;
     height: 561px;
     background: #ffffff;
     border-radius: 6px;
 }
+
 .extraDatacontainer {
     height: auto;
     background: #ffffff;
     border-radius: 6px;
     margin: 0 auto;
 }
+
 .leftContainer {
     width: 100px;
     height: 510px;
@@ -68,6 +75,7 @@
     width: 100%;
     height: 100%;
 }
+
 .center-dev {
     align-items: center;
 }
@@ -96,14 +104,17 @@
     padding-left: 5px;
     white-space: nowrap;
 }
+
 .seeMoreDescription:hover {
     text-decoration: underline !important;
 }
+
 .dropDownVariation {
     height: auto;
     max-height: 300px;
     overflow: hidden scroll;
 }
+
 .attachImage {
     width: 430px;
     height: 115px;
@@ -142,6 +153,7 @@
     border-radius: 6px;
     margin: 0 auto;
 }
+
 .recomendedandAdditionalData {
     overflow-x: hidden;
     overflow-y: scroll;
@@ -156,6 +168,7 @@
     font-size: 16px;
     color: #464e5f;
 }
+
 .seeMoreContainer {
     height: auto;
     border-radius: 6px;
@@ -169,9 +182,11 @@
     padding-left: 5px;
     white-space: nowrap;
 }
+
 .seeMore:hover {
     text-decoration: underline !important;
 }
+
 .seeMoreData {
     background-color: #f4f4f4;
     display: inline-block;
@@ -203,8 +218,10 @@
     border-right: 0.3em solid transparent;
     border-bottom: 0;
     border-left: 0.3em solid transparent;
-    -ms-transform: rotate(-18deg); /* IE 9 */
-    -webkit-transform: rotate(-180deg); /* Chrome, Safari, Opera */
+    -ms-transform: rotate(-18deg);
+    /* IE 9 */
+    -webkit-transform: rotate(-180deg);
+    /* Chrome, Safari, Opera */
     transform: rotate(-180deg);
 }
 
@@ -227,23 +244,24 @@
     color: #F88011 !important;
     border-radius: 6px;
 }
-.editAccount_butn{
+
+.editAccount_butn {
     background-color: #4A0D4A !important;
     border: none;
     border-radius: 6px;
     color: white;
 }
 
-.hide{
-display: none !important;
+.hide {
+    display: none !important;
 }
 
 
-.Save_editPersonal{
+.Save_editPersonal {
     margin: auto;
 }
 
-input{
+input {
     background-color: transparent !important;
     width: 60%;
     display: inline-block;
@@ -254,28 +272,32 @@ input{
     margin-left: 0 !important;
     width: 100% !important;
 }
-.ng-image-slider .ng-image-slider-container .main{
+
+.ng-image-slider .ng-image-slider-container .main {
     position: relative !important;
     width: 100% !important;
 }
+
 .img-div {
     width: 292px !important;
 }
+
 .addHight {
     height: 375px;
-    //  margin-top: 175px;
+
 }
 
-.addMg {
-    // margin-top: 120px;
-}
+
 ::ng-deep {
     .ng-image-slider .ng-image-slider-container .main .main-inner .img-div {
         max-width: 225px !important;
     }
-    .ng-image-slider .ng-image-slider-container .main .main-inner .img-div img, .ng-image-slider .ng-image-slider-container .main .main-inner .img-div video {
+
+    .ng-image-slider .ng-image-slider-container .main .main-inner .img-div img,
+    .ng-image-slider .ng-image-slider-container .main .main-inner .img-div video {
         margin: 0 !important;
     }
+
     .p-button:enabled:hover {
         background-color: transparent !important;
         color: inherit !important;
@@ -288,9 +310,11 @@ input{
     background-color: #4A0D4A;
     color: #fff;
 }
+
 .isPublic {
     color: #1B101B;
     font-weight: 700;
+    white-space: nowrap
 }
 
 .account-name {
@@ -298,21 +322,44 @@ input{
     font-weight: 700;
 }
 
-.addWidth{
+.addWidth {
     width: 135px;
 }
 
 
 .view-profile-action-buttons-en {
     position: absolute;
-right: 20px;
-bottom: -50px;
-z-index: 2;
+    right: 20px;
+    bottom: -50px;
+    z-index: 2;
 }
 
 .view-profile-action-buttons-ar {
     position: absolute;
-left: 20px;
-bottom: -50px;
-z-index: 2;
+    left: 20px;
+    bottom: -50px;
+    z-index: 2;
+}
+
+small {
+    white-space: nowrap;
+}
+
+.caneclBtn {
+    background-color: white !important;
+    color: #4A0D4A !important;
+    border: 1px solid #EEEEEEEE;
+    height: 38px;
+    border-radius: 6px;
+}
+
+
+.txtSty {
+
+    min-height: 80px;
+    border: 0;
+    outline: 0;
+    overflow-y: scroll;
+    font-weight: 400;
+    font-size: 14px;
 }

@@ -32,8 +32,7 @@ export class LanguageSwitchComponent
         );
         this.currentLanguage = abp.localization.currentLanguage;
         this.currentLanguage.displayName == "العربية" ? this.isArabic = true : this.isArabic = false
-        console.log(this.currentLanguage.displayName ,'lan')
-        console.log(this.isArabic ,'is')
+    
    
     }
 
