@@ -11,7 +11,7 @@
         <div class="form-group MB20">
             <label class="sub_titleLog"> {{'UserName'| localize}} <span class="StarInfo">*</span></label>
             <div class="user_p_relative">
-            <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width">
+            <img src="../../assets/img/input_icons/user.png" class=" icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
             <input #userNameOrEmailAddressInput="ngModel"
                 [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress" autoFocus
                 class="form-control m-input MT0" type="text" autocomplete="new-password"
@@ -24,7 +24,7 @@
         <div class="form-group MB20">
             <label class="sub_titleLog"> {{'Password' | localize}} <span class="StarInfo">*</span></label>
             <div class="user_p_relative">
-            <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width">
+            <img src="../../assets/img/input_icons/lock.png" class="icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
             <input #passwordInput="ngModel" [(ngModel)]="loginService.authenticateModel.password"
                 class="form-control m-input MT0" type="password" autocomplete="new-password"
                 placeholder="{{'Enter Your Password' | localize}} *" name="password" required maxlength="32" /></div>

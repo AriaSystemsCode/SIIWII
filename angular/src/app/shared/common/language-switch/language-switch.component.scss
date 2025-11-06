@@ -16,3 +16,39 @@
 .header__topbar-item i{
     display:flex;
 }
+
+.dropdown-menu-en {
+    position: absolute;
+    // top: 100%;
+    left:  auto !important;
+    right: 0 !important;
+    z-index: 95;
+    width: 320px;
+  
+    float: right;
+    font-size: 1rem;
+    color: #212529;
+    text-align: right;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+
+}
+.dropdown-menu-ar {
+    position: absolute;
+    // top: 100%;
+    left:  0 !important;
+    right: auto !important;
+    z-index: 95;
+    width: 320px;
+  
+    float: right;
+    font-size: 1rem;
+    color: #212529;
+    text-align: right;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+
+}
+

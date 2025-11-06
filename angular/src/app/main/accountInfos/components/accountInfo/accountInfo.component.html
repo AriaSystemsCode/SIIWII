@@ -72,21 +72,21 @@
                             </div>
                             <div class="sidebar-item-data">
                                 <div class="row row-item row-item-main-data">
-                                    <div class="col-md-3 row-item-title emailColor">{{l("Email")}}</div>
-                                    <div class="col-md-9 row-item-desc text-right">
+                                    <div class="col-md-4 row-item-title emailColor">{{l("Email")}}</div>
+                                    <div class="col-md-8 row-item-desc text-right">
                                         <span> {{ accountDataForView?.eMailAddress || '-' }} </span>
                                     </div>
                                 </div>
                                 <div class="row row-item row-item-main-data">
-                                    <div class="col-md-3 row-item-title emailColor">{{l("Phone")}}</div>
-                                    <div class="col-md-9 row-item-desc text-right">
+                                    <div class="col-md-4 row-item-title emailColor">{{l("Phone")}}</div>
+                                    <div class="col-md-8 row-item-desc text-right">
                                         <span> {{ accountDataForView?.phone1Number || '-' }}</span>
                                     </div>
                                 </div>
                                 <div class="row row-item row-item-main-data" *ngIf="accountDataForView?.accountTypeId != 21">
-                                    <div class="col-md-3 row-item-title emailColor" >
+                                    <div class="col-md-4 row-item-title emailColor" >
                                         {{l("Website")}}</div>
-                                    <div class="col-md-9 row-item-desc text-right">
+                                    <div class="col-md-8 row-item-desc text-right">
                                         <span> {{ accountDataForView?.website || '-' }} </span>
                                     </div>
                                 </div>

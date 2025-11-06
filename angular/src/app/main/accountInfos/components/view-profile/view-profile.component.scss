@@ -301,3 +301,18 @@ input{
 .addWidth{
     width: 135px;
 }
+
+
+.view-profile-action-buttons-en {
+    position: absolute;
+right: 20px;
+bottom: -50px;
+z-index: 2;
+}
+
+.view-profile-action-buttons-ar {
+    position: absolute;
+left: 20px;
+bottom: -50px;
+z-index: 2;
+}

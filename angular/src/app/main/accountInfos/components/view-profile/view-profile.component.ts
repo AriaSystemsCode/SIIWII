@@ -96,6 +96,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     editedPersonalData:any
         allLanguages: LookupLabelDto[];
         isRecordOwner:boolean
+
+        currentLang:string
+        isArabic:boolean 
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -120,7 +123,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
 
-    
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
     
     }
 

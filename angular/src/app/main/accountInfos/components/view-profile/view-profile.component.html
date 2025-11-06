@@ -29,7 +29,7 @@
                                             [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                             [staticWidth]="viewProfileCover?.offsetWidth">
                                         </app-image-display>
-                                        <div class="mr-3 view-profile-action-buttons"
+                                        <div class="mr-3 " [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
                                             *ngIf="!viewMode&&isNotManualLevel()">
                                             <button class="btn editAccount_butn" (click)="editAccount()"
                                                 [disabled]="Editting">
@@ -78,14 +78,14 @@
 
                                         </div>
 
-                                        <div class="d-flex view-profile-action-buttons"
+                                        <div class="d-flex" [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
                                             *ngIf="((accountData.isConnected && showEditConnected && !isRecordOwner && accountData?.accountTypeId !=21) ||  accountData.isManual) ">
                                             <button class="btn mb-3 mt-4 w-100 btn-save"
                                                 (click)="this.showEditConnected =false;editAccount()">
                                                 {{ "Edit" | localize }}
                                             </button>
                                         </div>
-                                        <div class="d-flex view-profile-action-buttons"
+                                        <div class="d-flex "  [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
                                             *ngIf="accountData.isConnected && !showEditConnected &&isNotManualLevel()">
                                             <button class="btn mb-3 mt-4 w-100 btn-save"
                                                 [disabled]="priceLevel==accountData.priceLevel"
@@ -131,7 +131,7 @@
                                 </div>
                             </div>
                             <hr class="header" *ngIf="!personalAccount">
-                            <div class="row" *ngIf="!personalAccount">
+                            <div class="row mx-1" *ngIf="!personalAccount">
                                 <div class="col-md-12">
                                     <div class="address"
                                         *ngIf="accountData?.addressLine1 || accountData?.city || accountData?.state || accountData?.zipCode || accountData?.countryName">
@@ -213,7 +213,7 @@
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="!personalAccount">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body pl-0 py-0 pr-3">
+                    <div class="kt-portlet__body pl-3 py-0 pr-3">
                         <div class="row p-28">
                             <div class="col-4" *ngIf="accountData && accountData.accountType">
                                 <p class="title-dev-slider text-left">{{"AccountType" | localize}}</p>
