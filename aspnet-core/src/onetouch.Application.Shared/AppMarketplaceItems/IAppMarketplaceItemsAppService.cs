@@ -17,7 +17,7 @@ namespace onetouch.AppMarketplaceItems
         Task<bool> CheckCurrencyExchangeRate(CurrencyInfoDto inpurCurrencyCode);
         //I49[Start]
         Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input);
-       // Task<GetAppMarketItemForViewDto> GetAppMarketplaceViewData(string ssin, string? currencyCode);
+        Task<GetAppMarketItemForViewDto> GetAppMarketplaceViewData(string ssin, string? currencyCode);
         //I49[End]
     }
 }

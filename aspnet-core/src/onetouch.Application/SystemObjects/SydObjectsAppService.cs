@@ -27,6 +27,11 @@ using onetouch.AppMarketplaceItems;
 using onetouch.AppItems.Dtos;
 using onetouch.Message;
 using Z.EntityFramework.Plus;
+using onetouch.AppEntities.Dtos;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using System.Runtime.CompilerServices;
+using onetouch.Accounts.Dtos;
+using onetouch.Accounts;
 
 namespace onetouch.SystemObjects
 {
@@ -48,6 +53,9 @@ namespace onetouch.SystemObjects
         private readonly IAppMarketplaceItemsAppService _appMarketplaceItemsAppService;
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRateRepository;
         private readonly IMessageAppService _messageAppService;
+        private readonly IAppEntitiesAppService _appEntitiesAppService;
+        private readonly ISycEntityObjectCategoriesAppService _sycEntityObjectCategoriesAppService;
+        private readonly IAccountsAppService _accountsAppService;
         //I49[End]
         public SydObjectsAppService(
             IRepository<SydObject, long> sydObjectRepository,
@@ -61,9 +69,10 @@ namespace onetouch.SystemObjects
             IAppConfigurationAccessor appConfigurationAccessor,
             IAppAdvertisementsAppService appAdvertisementsAppService,
             IAppMarketplaceItemsAppService appMarketplaceItemsAppService,
-            //IRepository<AppMarketplaceItem, long> appMarketplaceItemRepository,
+            IAppEntitiesAppService appEntitiesAppService,
             IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
-            IMessageAppService messageAppService) 
+            IMessageAppService messageAppService, ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService,
+            IAccountsAppService accountsAppService) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
 			_sydObjectsExcelExporter = sydObjectsExcelExporter;
@@ -81,6 +90,9 @@ namespace onetouch.SystemObjects
             //_appMarketplaceItemRepository = appMarketplaceItemRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
             _messageAppService= messageAppService;
+            _appEntitiesAppService= appEntitiesAppService;
+            _sycEntityObjectCategoriesAppService = sycEntityObjectCategoriesAppService;
+            _accountsAppService = accountsAppService;
             //I49[End]
         }
 
@@ -534,16 +546,23 @@ namespace onetouch.SystemObjects
                             var blockValueExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
                             if (blockValueExtraDate != null)
                             {
-                                if (!string.IsNullOrEmpty(blockValueExtraDate.AttributeValue)) // Block value
+                                if (!string.IsNullOrEmpty(blockValueExtraDate.AttributeValue)) // Block value 
                                 {
                                     
                                     switch (item.BlockType.ToUpper())
                                     {
                                         case "PRODUCT":
-                                           // item.GetAppMarketItemForViewDto =await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
+                                            item.GetAppMarketItemForViewDto =await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
                                             break;
-
-
+                                        case "BRAND":
+                                            item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(long.Parse(blockValueExtraDate.AttributeValue));
+                                            break;
+                                        case "CATEGORY":
+                                            item.GetSycEntityObjectCategoryForViewDto =await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(blockValueExtraDate.AttributeValue));
+                                            break;
+                                        case "CONTACT":
+                                            item.GetAccountForViewDto = await _accountsAppService.GetAccountForView(int.Parse(blockValueExtraDate.AttributeValue),1);
+                                            break;
                                     }
                                 }
 
