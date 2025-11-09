@@ -42,7 +42,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openSub = false
     openAdSub= false
     tenantLogo:any;
-
+    currentLang:string
+    isArabic:boolean 
     // merge
     hideChrome = false; // <— add
 
@@ -59,7 +60,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     }
 
     ngOnInit() {
-     
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
