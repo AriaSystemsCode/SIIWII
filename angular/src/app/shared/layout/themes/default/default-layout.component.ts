@@ -42,8 +42,9 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openSub = false
     openAdSub= false
     tenantLogo:any;
-    currentLang:string
-    isArabic:boolean 
+    hideChrome = false; // <— add
+
+    private readonly ariaRouteMatchers = ['/app/admin/ariasystem']; // normalize once
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -57,20 +58,34 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     }
 
     ngOnInit() {
-        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+     
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
+
    
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
-
+        this.updateChromeVisibility(this.currentRouteUrl);
+    
         this._router.events
-            .pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe(event => this.currentRouteUrl = this._router.url.split(/[?#]/)[0]);
+          .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+          .subscribe(() => {
+            this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
+            this.updateChromeVisibility(this.currentRouteUrl);
+          });
     }
 
+    private updateChromeVisibility(url: string) {
+        const u = (url || '').toLowerCase();
+        this.hideChrome = this.ariaRouteMatchers.some(p => u.startsWith(p) || u.includes(p));
     
+        // keep your localStorage switch if you like
+        if (this.hideChrome) {
+          localStorage.setItem('openArya', 'true');
+        } else {
+          localStorage.removeItem('openArya');
+        }
+      }
       toggleSidebar() {
         this.isMinimized = !this.isMinimized;
       }
@@ -121,6 +136,9 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     onOpenSideBar($event:boolean){
         this.openSideBar=$event
     }
-
-
+    openAria(){
+        let bt = 'app/admin/AriaSystem'
+        window.open(bt);
+        
+    }
 }

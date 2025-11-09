@@ -37,6 +37,9 @@ export class AriaIframeComponent extends AppComponentBase implements OnInit {
         console.log('ERP site loaded successfully');
       }
       
+      ngOnDestroy() {
+        localStorage.removeItem('openArya')
 
-
+    }
+      
 }
