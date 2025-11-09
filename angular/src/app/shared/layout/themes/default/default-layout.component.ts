@@ -5,7 +5,7 @@ import { UrlHelper } from '@shared/helpers/UrlHelper';
 import { DOCUMENT } from '@angular/common';
 import { OffcanvasOptions } from '@metronic/app/core/_base/layout/directives/offcanvas.directive';
 import { AppConsts } from '@shared/AppConsts';
-import { AccountsServiceProxy, LanguageServiceProxy} from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy} from '@shared/service-proxies/service-proxies';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -42,35 +42,40 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openSub = false
     openAdSub= false
     tenantLogo:any;
-    currentLang:string
-    isArabic:boolean 
+
+    // merge
+    hideChrome = false; // <— add
+
+    private readonly ariaRouteMatchers = ['/app/admin/ariasystem']; // normalize once
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _router:Router,
         private _appNavigationService: AppNavigationService,
-
     ) {
         super(injector);
         this.subscribeToMarketPlace()
     }
 
     ngOnInit() {
-        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+     
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
+
    
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
-
+        this.updateChromeVisibility(this.currentRouteUrl);
+    
         this._router.events
-            .pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe(event => this.currentRouteUrl = this._router.url.split(/[?#]/)[0]);
+          .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+          .subscribe(() => {
+            this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
+            this.updateChromeVisibility(this.currentRouteUrl);
+          });
     }
 
-    
       toggleSidebar() {
         this.isMinimized = !this.isMinimized;
       }
@@ -83,6 +88,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
    
         this._accountsServiceProxy.getAccountSummary().subscribe(result =>{
             this.accountSummary = result;
+            // console.log(this.accountSummary,'accountSummary')
 
             if(result.logoUrl!=undefined)
                 this.tenantLogo=`${this.attachmentBaseUrl}/${this.accountSummary.logoUrl}`
@@ -121,6 +127,21 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     onOpenSideBar($event:boolean){
         this.openSideBar=$event
     }
-
-
+    // merge
+    openAria(){
+        let bt = 'app/admin/AriaSystem'
+        window.open(bt);
+        
+    }
+    private updateChromeVisibility(url: string) {
+        const u = (url || '').toLowerCase();
+        this.hideChrome = this.ariaRouteMatchers.some(p => u.startsWith(p) || u.includes(p));
+    
+        // keep your localStorage switch if you like
+        if (this.hideChrome) {
+          localStorage.setItem('openArya', 'true');
+        } else {
+          localStorage.removeItem('openArya');
+        }
+      }
 }
