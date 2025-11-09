@@ -42,6 +42,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openSub = false
     openAdSub= false
     tenantLogo:any;
+
+    // merge
     hideChrome = false; // <— add
 
     private readonly ariaRouteMatchers = ['/app/admin/ariasystem']; // normalize once
@@ -73,23 +75,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
             this.updateChromeVisibility(this.currentRouteUrl);
           });
     }
-    // merge
-    openAria(){
-        let bt = 'app/admin/AriaSystem'
-        window.open(bt);
-        
-    }
-    private updateChromeVisibility(url: string) {
-        const u = (url || '').toLowerCase();
-        this.hideChrome = this.ariaRouteMatchers.some(p => u.startsWith(p) || u.includes(p));
-    
-        // keep your localStorage switch if you like
-        if (this.hideChrome) {
-          localStorage.setItem('openArya', 'true');
-        } else {
-          localStorage.removeItem('openArya');
-        }
-      }
+
       toggleSidebar() {
         this.isMinimized = !this.isMinimized;
       }
@@ -141,5 +127,21 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     onOpenSideBar($event:boolean){
         this.openSideBar=$event
     }
-
+    // merge
+    openAria(){
+        let bt = 'app/admin/AriaSystem'
+        window.open(bt);
+        
+    }
+    private updateChromeVisibility(url: string) {
+        const u = (url || '').toLowerCase();
+        this.hideChrome = this.ariaRouteMatchers.some(p => u.startsWith(p) || u.includes(p));
+    
+        // keep your localStorage switch if you like
+        if (this.hideChrome) {
+          localStorage.setItem('openArya', 'true');
+        } else {
+          localStorage.removeItem('openArya');
+        }
+      }
 }
