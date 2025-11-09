@@ -543,6 +543,17 @@ namespace onetouch.SystemObjects
                                     item.BlockType = blockType.Name;
                                 }
                             }
+                            var linkExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
+                            if (linkExtraDate != null)
+                            {
+                              item.Link= linkExtraDate.AttributeValue;
+                            }
+                            var buttonTxtExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2006);
+                            if (buttonTxtExtraDate != null)
+                            {
+                                item.ButtonText = buttonTxtExtraDate.AttributeValue;
+                            }
+                            
                             var blockValueExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
                             if (blockValueExtraDate != null)
                             {
