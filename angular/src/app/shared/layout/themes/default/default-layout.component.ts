@@ -73,7 +73,12 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
             this.updateChromeVisibility(this.currentRouteUrl);
           });
     }
-
+    // merge
+    openAria(){
+        let bt = 'app/admin/AriaSystem'
+        window.open(bt);
+        
+    }
     private updateChromeVisibility(url: string) {
         const u = (url || '').toLowerCase();
         this.hideChrome = this.ariaRouteMatchers.some(p => u.startsWith(p) || u.includes(p));
@@ -136,9 +141,5 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     onOpenSideBar($event:boolean){
         this.openSideBar=$event
     }
-    openAria(){
-        let bt = 'app/admin/AriaSystem'
-        window.open(bt);
-        
-    }
+
 }

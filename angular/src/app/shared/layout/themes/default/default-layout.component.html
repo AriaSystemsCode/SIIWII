@@ -113,6 +113,8 @@
                         </svg>
                         
                       </a>
+
+                      <!-- mergee -->
                     <div *ngIf="item.name == 'Administration'  && openAdSub" class="sub-menu" style="min-height: 75vh;">
                       <li *ngFor="let child of item.items" [ngClass]=" !showMenuItem(child) || child?.name =='BillingLog' || child?.name =='AppSubscriptionPlanDetails' ? 'd-none' : ''" [routerLink]="child?.name == 'AriaSystem' ? '': child.route " [routerLinkActive]=" child?.name == 'AriaSystem' ? '':'active-link'" (click)="isMinimized = true;openAdSub = true;child?.name == 'AriaSystem'  ? openAria() : ''" >
                 
