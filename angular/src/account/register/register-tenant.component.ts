@@ -45,7 +45,8 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
 lastName:string="";
 firstName:string=";"
  //  accountTypes:SelectItem[] = [];
-
+ currentLang:string
+ isArabic:boolean 
     constructor(
         injector: Injector,
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
@@ -59,6 +60,8 @@ firstName:string=";"
     }
 
     ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.model.inviterTenantId = this._activatedRoute.snapshot.queryParams['tenantid'];
         if (!this.model.inviterTenantId  || this.model.inviterTenantId.toString().toUpperCase()=="NULL") {
             this.model.inviterTenantId = 0;

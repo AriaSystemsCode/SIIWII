@@ -508,7 +508,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         if (!this.accountInfoTemp.branches) this.accountInfoTemp.branches = []
 
         if (!this.accountInfoTemp.id) {
-            this.changeTab(this.accountInfoPageTabsEnum.ProfileCreateOrEdit)
+          
             if (!this.accountInfoTemp.languageId) {
 
                 this._AccountsServiceProxy.getMyAccountForEdit().subscribe(async result => {
@@ -708,6 +708,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.accountInfoTemp.entityExtraData = [];
         }
         this.accountInfoTemp.entityAttachments = this.editedContactPerData?.entityAttachments
+     
         // Ensure attributes exist
         this.ensureAttribute(701); // first name
         this.ensureAttribute(702); // last name
@@ -879,37 +880,41 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
-            .pipe(finalize(() => {
-                this.saving = false;
-                if (!this.accountId) {
-                    // Redirect to view page with ProfileView tab
-                    this._router.navigate([`/app/main/account`], {
-                        queryParams: { tab: 'ProfileView' }
-                    });
-                } else {
-                    this.getAccountDataForView()
-
-                    this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
-
-                }
-            }))
-            .subscribe(result => {
-                if (result) {
-                    this.touched = false;
-                    this.notify.success(this.l('SavedSuccessfully'));
-                    this.appSession.tenant.currencyInfoDto = this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
-                    this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
-                    this.displaySaveAccount = true;
-                    this.canPublish = true;
-                    this.getForEditResult.lastChangesIsPublished = false;
-                    this.updateLogoService.updateLogo();
-
-                    this.accountId = result?.accountInfo?.id
-
-                }
-            }, err => {
-                this.touched = true;
+        .pipe(finalize(() => {
+          this.saving = false;          // ✅ flags only
+        }))
+        .subscribe(result => {
+          if (!result) return;
+      
+          // ✅ set ids first
+          this.accountId = result?.accountInfo?.id;
+          if (this.appSession?.user) {
+            this.appSession.user.accountId = this.accountId;  // keep session in sync
+          }
+      
+          // ✅ (optional) update tenant currency, flags, etc.
+          this.touched = false;
+          this.notify.success(this.l('SavedSuccessfully'));
+          this.appSession.tenant.currencyInfoDto =
+            this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
+          this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
+          this.displaySaveAccount = true;
+          this.canPublish = true;
+          this.getForEditResult.lastChangesIsPublished = false;
+          this.updateLogoService.updateLogo();
+      
+          // ✅ load the data for view using the fresh id
+          this.getAccountDataForView().then(() => {
+            // ✅ now it’s safe to navigate/switch tab
+            this._router.navigate(['/app/main/account'], {
+              queryParams: { tab: 'ProfileView' }
             });
+            this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
+          });
+        }, _ => {
+          this.touched = true;
+        });
+      
     }
 
 

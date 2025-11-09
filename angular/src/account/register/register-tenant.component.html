@@ -18,7 +18,7 @@
             <div class="col-9 col-lg-12 pl-0 p-0 MB20">
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"Work Space Name"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
-                <img src="../../assets/img/input_icons/workSpaceIcon.png" class="user_icon icon-width">
+                <img src="../../assets/img/input_icons/workSpaceIcon.png" class=" icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
                 <input #tenancyName="ngModel" class="mb-3 form-control" autoFocus type="text"
                     placeholder="{{ 'Enter Your Work Space Name' | localize }} " [(ngModel)]="model.tenancyName" name="tenancyName"
                     required maxlength="64" [pattern]="domainPattern" /></div>
@@ -36,7 +36,7 @@
         <div *ngIf="model.edition" class="form-group col-9 col-lg-12 MB20">
             <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"AccountName"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <div class="user_p_relative">
-            <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width">
+            <img src="../../assets/img/input_icons/user.png" class=" icon-width"  [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
             <input #nameInput="ngModel" class="mb-3 form-control" type="text"
                 placeholder="{{ 'Enter Account Name' | localize }}" [(ngModel)]="model.name" name="Name" required
                 maxlength="128" /></div>
@@ -50,7 +50,7 @@
             <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2">
                 <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{"FirstName" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
-                <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
+                <img src="../../assets/img/input_icons/user.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
                 <input #firstNameInput="ngModel" class="mb-3 form-control" type="text"
              
                     [placeholder]="('Enter Your First Name' | localize )" [(ngModel)]="model.firstName" name="adminFirstName"
@@ -63,7 +63,7 @@
             <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6">
                 <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{ "last Name" | localize }} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
-                <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
+                <img src="../../assets/img/input_icons/user.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
                 <input #lastNameInput="ngModel" class="mb-3 form-control" type="text"
              
                    [placeholder]="('Enter Your Last Name' | localize )" [(ngModel)]="model.lastName" name="adminLastName"
@@ -80,7 +80,7 @@
             <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')"> {{"Admin Email Address" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')"> {{"PersonalEmailAddressL" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <div class="user_p_relative">
-            <img src="../../assets/img/input_icons/letter.png" class="user_icon icon-width">
+            <img src="../../assets/img/input_icons/letter.png" class=" icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
             <input #adminEmailAddressInput="ngModel" class="mb-3 form-control" type="email"
                 [placeholder]="!accountTypeLabel?.includes('PERSONAL') ? ('Enter The Admin EmailAddress' | localize) : ( 'Enter Your Personal EmailAdress '| localize)"
                 [(ngModel)]="model.adminEmailAddress" name="adminEmailAddress" required maxlength="256" email /></div>
@@ -94,7 +94,7 @@
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')">{{"Password" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')">{{"AdminPassword" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
-                <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width SmallUser_icon">
+                <img src="../../assets/img/input_icons/lock.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
                 <input type="password" name="Password" class="mb-3 form-control" [(ngModel)]="model.adminPassword"
                     #Password="ngModel"
                     [placeholder]="'Enter Your Password' | localize "
@@ -151,7 +151,7 @@
             <div class="form-group MB20 col-lg-6">
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"PasswordRepeat" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
-                <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width SmallUser_icon">
+                <img src="../../assets/img/input_icons/lock.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
                 <input type="password" name="PasswordRepeat" class="mb-3 form-control" [ngModel]="model.passwordRepeat"
                     #PasswordRepeat="ngModel" placeholder="{{'Enter Your Confirm Password' | localize}}" validateEqual="Password"
                     reverse="false" [requireDigit]="passwordComplexitySetting.requireDigit" [requireLowercase]="

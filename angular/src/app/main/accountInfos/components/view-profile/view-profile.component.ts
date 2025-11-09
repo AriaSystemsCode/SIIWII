@@ -8,8 +8,8 @@ import { ImageObject } from '../../../accounts/account-shared/models/imageobject
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
-
-
+import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
+import { AbpSessionService, IAjaxResponse, TokenService } from 'abp-ng2-module';
 @Component({
     selector: 'app-view-profile',
     styleUrls: ['./view-profile.component.scss'],
@@ -45,7 +45,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
 
     coverPhoto: any = ""
-    logoPhoto: any = ""
+
     accountType: any;
     imageObject: ImageObject[] = [];
     allAccountTypes: SelectItem[] = []
@@ -102,14 +102,19 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
     phonePattern = '^(\\+?[1-9]\\d{0,2}(\\s|-)?(\\(?\\d{1,4}\\)?(\\s|-)?)+|\\d{1,20}|0\\d{9,14})$';
 
-    
+
     companyLogo: any;
-  
+
+    // NEW: keep originals so Cancel can revert
+    private _originalLogoUrl?: string;
+    private _originalCoverUrl?: string;
+
 
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _AccountsServiceProxy: AccountsServiceProxy,
+        private _tokenService: TokenService,
     ) {
         super(injector)
     }
@@ -132,7 +137,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
-
+        this.initUploaders();
     }
 
     prevImageClick() {
@@ -150,8 +155,14 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.showEditConnected = false;
 
         this.priceLevel = this.accountData.priceLevel;
-        if (this.accountData.coverUrl) this.coverPhoto = `${this?.attachmentBaseUrl}/${this?.accountData?.coverUrl}`;
-        if (this.accountData.logoUrl) this.logoPhoto = `${this?.attachmentBaseUrl}/${this?.accountData?.logoUrl}`;
+        if (this.accountData.coverUrl) {
+            this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountData.coverUrl}`;
+            this._originalCoverUrl = this.coverPhoto;
+        }
+        if (this.accountData.logoUrl) {
+            this.companyLogo = `${this.attachmentBaseUrl}/${this.accountData.logoUrl}`;
+            this._originalLogoUrl = this.companyLogo;
+        }
 
         for (let index = 0; index < this.accountData?.imagesUrls?.length; index++) {
             const element = this.accountData.imagesUrls[index];
@@ -178,6 +189,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             if (!this.editedPersonalData) {
                 this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
             }
+            console.log(this.accountData.entityAttachments, 'data')
+            console.log(this.accountData.logoUrl, 'logo')
+            console.log(this.accountData.coverUrl, 'cooo')
             this.editedPersonalData.firstName = this.editFirstNameValue
             this.editedPersonalData.lastName = this.editLastNameValue
             this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
@@ -187,7 +201,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.editedPersonalData.jobTitle = this.editJobTitleValue;
             this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
             this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
+            this.contactData.entityAttachments = this.accountData.entityAttachments
             this.contactData.languageName = this.editedPersonalData.languageName;
+
             this.editedContactData.emit(this.contactData)
             this.editedData.emit(this.editedPersonalData);
             this.editInfo = true;
@@ -360,7 +376,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                 finalize(() => this.hideMainSpinner()
                 ))
             .subscribe((response) => {
-                this.notify.info(this.l('Profile Published Successfully'));
+                this.notify.info(this.l('Profile Shared Successfully'));
                 this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
                 this.hidUshare = true;
                 this.hideshowShare = true;
@@ -390,12 +406,19 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             finalize(() => this.hideMainSpinner()
             )).subscribe(
                 (response) => {
-                    this.notify.info(this.l('Profile UnPublished Successfully'));
+                    if(this.isPublished&&this.connectionCount==0&&this.isNotManualLevel()){
+                        this.notify.success(this.l('Profile Set To Private Successfully'));
+
+                    } else if (this.isPublished&&this.connectionCount!=0&&this.isNotManualLevel()){
+                        this.notify.success(this.l('Profile Set To Heddin Successfully'));
+                    }
+       
                     this.showShare = false;
                     this.hidUshare = true;
                     this.hideshowShare = true;
                     this.showHide = true;
                     this.showPrivate = true;
+                    this.isPublished = false 
                 });
     }
 
@@ -435,91 +458,148 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         });
     }
 
-        setPersonalData(){
-            this.editFirstNameValue = this.contactData?.firstName;
-    this.editLastNameValue = this.contactData?.lastName;
-    this.editJobTitleValue = this.contactData?.jobTitle;
-    this.editEMailAddressValue = this.accountData.eMailAddress;
-    this.editPhoneNumberValue = this.accountData.phone1Number;
-        }
-
-    cancelPerAcc(){
-    
-    this.editInfo = true;
-    this.NoteditInfo = false;
-    this.Editting=false
-    this.setPersonalData()
-}
-
-    imageBrowseDone($event: ImageUploadComponentOutput, sycAttachmentCategory: SycAttachmentCategoryDto, index?: number) {
-        let exidtedIndex: number = -1;
-        let att: AppEntityAttachmentDto
-        let guid = this.guid();
-        // this.touched = true
-
-        if (sycAttachmentCategory.code == "IMAGE") {
-            exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == sycAttachmentCategory.id && x.index == index);
-        }
-        else {
-            exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == sycAttachmentCategory.id);
-        }
-
-        if (exidtedIndex > -1) {
-            att = this.accountData.entityAttachments[exidtedIndex]
-        } else {
-            att = new AppEntityAttachmentDto();
-        }
-        att.fileName = $event.file.name;
-        att.attachmentCategoryId = sycAttachmentCategory.id;
-        att.guid = guid;
-
-        if (this.sycAttachmentCategoryLogo.id == att.attachmentCategoryId) {
-            this.companyLogo = $event.image
-        }
-        else if (this.sycAttachmentCategoryBanner.id == att.attachmentCategoryId) {
-            this.coverPhoto = $event.image
-        }
- 
-
-        if (exidtedIndex == -1) {
-            att.index = index
-            this.accountData.entityAttachments.push(att);
-        }
-
-        this.uploader.addToQueue([$event.file]);
-
-        this.uploader.onBuildItemForm = (fileItem: any, form: any) => {
-            form.append('guid', guid);
-        };
-
-        this.uploader.uploadAll()
-
-        if (this.accountData.entityAttachments == null || this.accountData.entityAttachments == undefined) {
-            this.accountData.entityAttachments = [];
-        }
+    setPersonalData() {
+        this.editFirstNameValue = this.contactData?.firstName;
+        this.editLastNameValue = this.contactData?.lastName;
+        this.editJobTitleValue = this.contactData?.jobTitle;
+        this.editEMailAddressValue = this.accountData.eMailAddress;
+        this.editPhoneNumberValue = this.accountData.phone1Number;
     }
 
-        removeImage($event, t: SycAttachmentCategoryDto, index: number) {
-            // this.touched = true
-    
-            let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-            let exidtedIndex: number = -1;
-            if (t.code == "IMAGE") {
-                exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == t.id && x.index == index);
-            }
-            else {
-                exidtedIndex = this.accountData.entityAttachments.findIndex(x => x.attachmentCategoryId == t.id);
-            }
-            this.accountData.entityAttachments.splice(exidtedIndex, 1)
-    
-   
-             if (index == -1) {
+    cancelPerAcc() {
 
-                this.companyLogo = undefined
+        this.editInfo = true;
+        this.NoteditInfo = false;
+        this.Editting = false
+
+        this.companyLogo = this._originalLogoUrl ?? this.companyLogo;
+        this.coverPhoto = this._originalCoverUrl ?? this.coverPhoto;
+
+        // optionally also remove any pending logo/cover attachments:
+        this.accountData.entityAttachments =
+            (this.accountData.entityAttachments || []).filter(a => !(a.index === -1 || a.index === -2));
+
+        this.setPersonalData()
+
+    }
+    initUploaders(): void {
+        this.uploader = this.createUploader(
+            '/Attachment/UploadFiles',
+            result => {
             }
-            else if (index == -2) {
-      
-                this.coverPhoto = undefined
+        );
+
+    }
+
+    createUploader(url: string, success?: (result: any) => void): FileUploader {
+        const uploader = new FileUploader({ url: AppConsts.remoteServiceBaseUrl + url });
+
+        uploader.onAfterAddingFile = (file) => { file.withCredentials = false; };
+        uploader.onSuccessItem = (_item, response) => {
+            const ajaxResponse = <IAjaxResponse>JSON.parse(response || '{}');
+            if (ajaxResponse?.success) {
+                this.notify.info(this.l('UploadSuccessfully'));
+                success?.(ajaxResponse.result);
+            } else if (ajaxResponse?.error?.message) {
+                this.message.error(ajaxResponse.error.message);
             }
+        };
+
+        const opts: Partial<FileUploaderOptions> = {
+            authToken: 'Bearer ' + this._tokenService.getToken(),
+            removeAfterUpload: true
+        };
+        uploader.setOptions(opts as FileUploaderOptions);
+        return uploader;
+    }
+    imageBrowseDone($event: ImageUploadComponentOutput, cat: SycAttachmentCategoryDto, index?: number) {
+        this.accountData.entityAttachments ??= []; 
+
+        const guid = this.guid();
+
+        // Decide the stable slot
+        let slotIndex = index;
+        if (cat.id === this.sycAttachmentCategoryLogo?.id) slotIndex = -1; // logo
+        if (cat.id === this.sycAttachmentCategoryBanner?.id) slotIndex = -2; // cover
+
+        // Live preview
+        if (slotIndex === -1) this.companyLogo = $event.image;
+        if (slotIndex === -2) this.coverPhoto = $event.image;
+
+        // Upsert into entityAttachments
+        const att = this.upsertAttachment(this.accountData.entityAttachments, {
+            attachmentCategoryId: cat.id,
+            index: slotIndex!,
+            fileName: $event.file.name,
+            guid
+        });
+
+        // Queue upload (requires this.uploader to be initialized in this component)
+        this.uploader.addToQueue([$event.file]);
+        this.uploader.onBuildItemForm = (_fileItem: any, form: any) => form.append('guid', guid);
+        this.uploader.uploadAll();
+
+        // Optional: when server responds, bind back id/url using the same guid
+        this.uploader.onSuccessItem = (_item, response) => {
+            try {
+                const res = JSON.parse(response || '{}');
+                if (res?.success && res?.result) {
+                    // Map server result -> attachment
+                    // Assuming your API returns: { id, url, guid }
+                    const r = res.result;
+                    const idx = this.accountData.entityAttachments.findIndex(a => a.guid === r.guid);
+                    if (idx > -1) {
+                        this.accountData.entityAttachments[idx].id = r.id;
+                        this.accountData.entityAttachments[idx].url = r.url;
+                    }
+                }
+            } catch { }
+            this.notify.info(this.l('UploadSuccessfully'));
+        };
+    }
+
+
+
+    removeImage(_evt, cat: SycAttachmentCategoryDto, index: number) {
+        this.accountData.entityAttachments ??= [];
+
+        let existedIndex = -1;
+        if (cat.code === 'IMAGE') {
+            existedIndex = this.accountData.entityAttachments.findIndex(
+                x => x.attachmentCategoryId === cat.id && x.index === index
+            );
+        } else {
+            existedIndex = this.accountData.entityAttachments.findIndex(
+                x => x.attachmentCategoryId === cat.id && x.index === index 
+            );
         }
+
+        if (existedIndex > -1) {
+            this.accountData.entityAttachments.splice(existedIndex, 1);
+        }
+
+        if (index === -1) { this.companyLogo = undefined; }
+        else if (index === -2) { this.coverPhoto = undefined; }
+    }
+
+
+    private upsertAttachment(
+        list: AppEntityAttachmentDto[],
+        params: { attachmentCategoryId: number; index: number; fileName: string; guid: string }
+    ): AppEntityAttachmentDto {
+        const { attachmentCategoryId, index, fileName, guid } = params;
+        const i = list.findIndex(a => a.attachmentCategoryId === attachmentCategoryId && a.index === index);
+        let att = i > -1 ? list[i] : new AppEntityAttachmentDto();
+
+        att.attachmentCategoryId = attachmentCategoryId;
+        att.index = index;           // -1 logo, -2 cover
+        att.fileName = fileName;
+        att.guid = guid;
+
+        if (i === -1) list.push(att);
+        else list[i] = att;
+
+        return att;
+    }
+
 }

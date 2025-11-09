@@ -29,7 +29,7 @@
                 <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="mb-4">
                     <div class="kt-portlet kt-portlet--mobile">
                         <div class="kt-portlet__body p-0 bg-white">
-                            <div class="row">
+                            <div class="row" *ngIf="!(personalAccount && Editting)">
                                 <div class="col-md-12">
                                     <div #viewProfileCover
                                         class="view-profile-cover d-flex justify-content-center align-items-center position-relative"
@@ -61,9 +61,18 @@
                                             </button>
 
 
-
+                                            <button class="btn transparent-button " (click)="UnShareAccount()"
+                                            *ngIf="isNotManualLevel()" [ngClass]="{'hide':showPrivate}">
+                                            <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                            {{ "Private" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button " (click)="UnShareAccount()"
+                                            *ngIf="isNotManualLevel()" [class.hide]="showHide">
+                                            <img src="../../assets/img/input_icons/hideAccount.png">
+                                            {{ "Hide" | localize }}
+                                        </button>
                                             <button pButton pRipple label="Share"
-                                                class="share btn transparent-button alaa" icon="pi pi-share-alt"
+                                                class="share btn transparent-button " icon="pi pi-share-alt"
                                                 (click)="openShareAccountsModal()"
                                                 *ngIf="!isPublished&&isNotManualLevel()"
                                                 [class.hide]="hideshowShare"></button>
@@ -102,11 +111,11 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row" *ngIf="!(Editting && personalAccount)">
                                 <div class="col-md-2 ">
                                     <div class="dev-logo">
                                         <app-image-display
-                                            [image]="logoPhoto ? logoPhoto  :'../../../../assets/common/images/default-profile-picture.png'"
+                                            [image]="companyLogo ? companyLogo  :'../../../../assets/common/images/default-profile-picture.png'"
                                             [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                             [classList]="'logo-profile'" [staticHeight]="74">
                                         </app-image-display>
@@ -123,31 +132,31 @@
                                     </div>
                                 </div>
                             </div>
-<!-- 
-                            <div class="form-group row " *ngIf='personalAccount && Editting'>
+
+                            <div class="form-group row mt-2" *ngIf='personalAccount && Editting'>
                                 <label for="colFormLabelSm"
-                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayLogo")}}
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account Logo")}}
                                 </label>
                                 <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                  
                                     [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
-                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryLogo)"
+                                    (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryLogo, -1)"
                                     (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)">
                                 </app-image-upload>
                             </div>
 
                             <div class="form-group row " *ngIf='personalAccount && Editting'>
                                 <label
-                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayImages")}}
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account Cover")}}
                                 </label>
                                 <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                   
                                     [image]="coverPhoto" [staticHeight]="120" [showGuidelines]="true"
-                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryBanner)"
+                                    (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryBanner, -2)"
                                     (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)">
                                 </app-image-upload>
 
-                            </div> -->
+                            </div>
 
                             
                             <hr class="header" *ngIf="!personalAccount">
