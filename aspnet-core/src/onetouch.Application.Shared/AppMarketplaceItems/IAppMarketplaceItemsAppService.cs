@@ -18,6 +18,7 @@ namespace onetouch.AppMarketplaceItems
         //I49[Start]
         Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input);
         Task<GetAppMarketItemForViewDto> GetAppMarketplaceViewData(string ssin, string? currencyCode);
+        Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAppItemRelatedItems(GetAllAppMarketItemsInput input);
         //I49[End]
     }
 }
