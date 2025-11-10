@@ -25,6 +25,9 @@ namespace onetouch.SystemObjects.Dtos
         public GetAppEntityForViewDto? GetAppEntityForViewDto { set; get; }
         public GetAccountForViewDto? GetAccountForViewDto { set; get; }
         public GetSycEntityObjectCategoryForViewDto? GetSycEntityObjectCategoryForViewDto { set; get; }
+        public string Link { set; get; }
+        public string ButtonText { set; get; }
+        public string TitleAlignment { set; get; }
         //I49[End]
     }
 }
