@@ -467,6 +467,9 @@ namespace onetouch.SystemObjects
                         item.Name = section.Name;
                         item.Description = section.Name;
                         item.Code = section.Code;
+                        var sectionTitleAlignExtraData = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1004);
+                        if (sectionTitleAlignExtraData != null)
+                            item.TitleAlignment = sectionTitleAlignExtraData.AttributeValue;
 
                         var sectionTitleExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1003);
                         if (sectionTitleExtraDate != null)
