@@ -16,7 +16,15 @@
           [product]="product?.getAppMarketItemForViewDto?.appItem"
           [productCard]="product?.getAppMarketItemForViewDto">
         </app-prodcut-card>
+
+        <div class="px-2 my-2 d-flex flex-column" *ngIf="product?.blockType=='Brand'">
+
+          <img [src]="product?.image ? attachmentBaseUrl + '/' +  product?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2" style="width: 80px;" alt="" srcset=""
+            onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToBrand(product)">
+            <a (click)="goToBrand(product)">{{product?.name}}</a>
+        </div>
       </div>
+
     </div>
   </ng-template>
 </p-carousel>

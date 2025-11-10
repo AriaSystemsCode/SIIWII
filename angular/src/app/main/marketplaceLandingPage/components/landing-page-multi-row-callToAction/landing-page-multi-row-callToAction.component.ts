@@ -56,4 +56,11 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   goToProduct(ssin?: string) {
     if (ssin) this.router.navigate(['/app/main/app-items/view', ssin]);
   }
+  goToBrand(brand: { name: string; id: number | string }) {
+   
+    this.router.navigate(
+        ['/app/main/marketplace/products'],
+        { queryParams: { brand: brand.name } }
+    );
+}
 }
