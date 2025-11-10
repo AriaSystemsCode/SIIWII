@@ -170,7 +170,8 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     //Esraa [Start]
                     // { path: 'Messages', component: MessagesComponent },
                     //Esraa [End]
-                    { path: "", redirectTo: "marketplace/products", pathMatch: "full" },
+                    // { path: "", redirectTo: "marketplace/products", pathMatch: "full" },
+                    { path: "", redirectTo: "dashboard", pathMatch: "full" },
                     {
                         path: "dev-express-demo",
                         loadChildren: () =>
@@ -195,8 +196,8 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                             // permission: "Pages.AppSiiwiiTransactions",
                         },
                     },
-                    // { path: '**', redirectTo: '/app/main/dashboard'}
-                    { path: "**", redirectTo: "marketplace/products" },
+                    { path: '**', redirectTo: '/app/main/dashboard'}
+                    // { path: "**", redirectTo: "marketplace/products" },
                 ],
             },
         ]),

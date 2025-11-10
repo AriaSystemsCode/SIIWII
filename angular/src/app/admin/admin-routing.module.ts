@@ -61,8 +61,8 @@ import { AppRouteGuard } from '@app/shared/common/auth/auth-route-guard';
         RouterModule.forChild([
             {
                 path: '',
-                     canActivate: [AppRouteGuard],
-                canActivateChild: [AppRouteGuard],
+                //      canActivate: [AppRouteGuard],
+                // canActivateChild: [AppRouteGuard],
                 children: [
                     { path: 'validationRules/validationRules', component: ValidationRulesComponent, data: { permission: 'Pages.Administration.ValidationRules' }  },
                     { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates', component: SycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates' }  },

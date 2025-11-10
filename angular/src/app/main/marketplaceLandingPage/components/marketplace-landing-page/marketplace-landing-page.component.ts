@@ -363,16 +363,7 @@ export class MarketplaceLandingPageComponent
                   // rowIds: [r.id],
                   inputs: {  title: r.title ?? null, name: r.name ?? null} 
                 };
-              // case 'PF':
-              //   // You can call getAllBrands() once globally if you like
-              //   // or leave it as-is if brands are already cached
-              //   return {
-              //     type: 'PF',
-              //     order: r._order,
-              //     sectionId: r.id,
-              //     // rowIds: [r.id],
-              //     inputs: { title: r.title , name: r.name ?? null }
-              //   };
+
               case 'SRCTA':
                 return {
                   type: 'SRCTA',
@@ -381,14 +372,7 @@ export class MarketplaceLandingPageComponent
                   // rowIds: [r.id],
                   inputs: { title: r.title , name: r.name ?? null }
                 };
-              // case 'departments':
-              //   return {
-              //     type: 'departments',
-              //     order: r._order,
-              //     sectionId: r.id,
-              //     // rowIds: [r.id],
-              //     inputs: { title: r.title , name: r.name ?? null }
-              //   };
+
               case 'MRCTA':
                 return {
                   type: 'MRCTA',
@@ -473,40 +457,10 @@ export class MarketplaceLandingPageComponent
         return out;
       }
       
-    GetAllAtoSliderSettings() {
-        var sliderItems: string[] = [];
-        const subs = this._sydObjectsAppService
-            .getAllSliderSettings(SliderEnum.CSSB,  undefined)
-            .subscribe((result) => {
-                result.forEach((img) => {
-                    sliderItems.push(img.image);
-                });
-                console.log(result,'res')
-                this.sections = result
-                // this.slider.sliderItems = sliderItems;
-            });
-        this.subscriptions.push(subs);
-    }
 
 
 
 
-
-    // getAdvSettings() {
-    //     var _advSliderItems: string[] = [];
-    //     const subs = this._sydObjectsAppService
-    //         .getAllSliderSettings(SliderEnum.ASMB, this.advSliderCode)
-    //         .subscribe((result) => {
-
-    //             result.forEach((img) => {
-    //                 _advSliderItems.push(img.image);
-    //             });
-    //             // this.adv_sm.advSliderItems = advSliderItems;
-    //             // this.adv_md.advSliderItems = advSliderItems;
-    //             this.advSliderItems=_advSliderItems;
-    //         });
-    //     this.subscriptions.push(subs);
-    // }
 
     
   getAllBrands() {
