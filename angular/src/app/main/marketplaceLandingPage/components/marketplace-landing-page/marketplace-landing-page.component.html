@@ -4,86 +4,57 @@
 
       <!-- auto slider with call to action-->
       <div *ngSwitchCase="'ASSB'">
-        <h4>slider>> {{ s.inputs?.name  }}</h4>
-        <app-slider-with-callToAction 
-        class="d-md-block d-none"
-     
-        [sectionId]="s.sectionId"
-    >
-</app-slider-with-callToAction>
+        <h4   [style.text-align]="
+        s?.inputs?.titleAlignment === 'Center'
+          ? 'center'
+          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
+      ">slider>> {{ s.inputs?.name }}</h4>
+        <app-slider-with-callToAction class="d-md-block d-none" [sectionId]="s.sectionId">
+        </app-slider-with-callToAction>
       </div>
- 
 
-         <!-- carusal slider multi blocks-->
-      <app-carusal-with-callToAction *ngSwitchCase="'CSMP'"   [sectionId]="s.sectionId"
-               [sectionData]="s.inputs">
+
+      <!-- carusal slider multi blocks-->
+      <app-carusal-with-callToAction *ngSwitchCase="'CSMP'" [sectionId]="s.sectionId" [sectionData]="s.inputs">
       </app-carusal-with-callToAction>
 
-         <!-- auto slider without call to action-->
-       <div *ngSwitchCase="'ASMB'">
-        <h4>slider without>> {{ s.inputs?.name  }}</h4>
+      <!-- auto slider without call to action-->
+      <div *ngSwitchCase="'ASMB'">
+        <h4   [style.text-align]="
+        s?.inputs?.titleAlignment === 'Center'
+          ? 'center'
+          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
+      ">slider without>> {{ s.inputs?.name }}</h4>
 
-        <app-slider-without-callToAction
-        class=" d-block"    [sectionId]="s.sectionId"
-       >
-</app-slider-without-callToAction>
-       </div>
+        <app-slider-without-callToAction class=" d-block" [sectionId]="s.sectionId">
+        </app-slider-without-callToAction>
+      </div>
 
 
 
       <!--single row Call to Action  (can be brands or products)-->
       <div *ngSwitchCase="'SRCTA'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
-        <h4 class="text-center">{{ s.inputs?.title  }}</h4>
-       <app-single-row-callAction [sectionId]="s.sectionId"></app-single-row-callAction>
+        <h4   [style.text-align]="
+        s?.inputs?.titleAlignment === 'Center'
+          ? 'center'
+          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
+      ">{{ s.inputs?.title }}</h4>
+        <app-single-row-callAction [sectionId]="s.sectionId"></app-single-row-callAction>
       </div>
 
-    <!--single row Call to Action  (can be brands or products)-->
-      <!-- <div *ngSwitchCase="'SRCTA'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
-        <h4>{{ s.inputs?.title }}</h4>
-  
-      </div> -->
+
 
       <!--multi row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'productsPaged'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
-        <h4>{{ s.inputs?.title  }}</h4>
-        <p-carousel [value]="pages" [numVisible]="1" [numScroll]="1" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
-          <ng-template pTemplate="item" let-page>
-            <div class="products-grid">
-              <div *ngFor="let product of page" class="px-2 my-2">
-                <app-prodcut-card [product]="product.appItem" [productCard]="product"></app-prodcut-card>
-              </div>
-            </div>
-          </ng-template>
-        </p-carousel>
+      <div *ngSwitchCase="'MRCTA'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
+        <h4   [style.text-align]="
+        s?.inputs?.titleAlignment === 'Center'
+          ? 'center'
+          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
+      ">{{ s.inputs?.title }}</h4>
+        <app-multi-row-callAction [sectionId]="s.sectionId"></app-multi-row-callAction>
       </div>
 
-      <!-- Departments -->
-      <!-- <div *ngSwitchCase="'departments'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
-        <h4>{{ s.inputs?.title}}</h4>
-        <p-carousel [value]="departments" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
-          <ng-template pTemplate="item" let-department>
-            <div class="px-2 my-2 d-flex flex-column">
-              <img [src]="department?.image ? attachmentBaseUrl + '/' + department?.image : 'assets/placeholders/_logo-placeholder.png'"
-                   class="mb-2" style="width:80px;" (click)="goToDepartment(department)">
-              <a (click)="goToDepartment(department)">{{ department?.label }}</a>
-            </div>
-          </ng-template>
-        </p-carousel>
-      </div> -->
 
-      <!-- Item list -->
-      <!-- <div *ngSwitchCase="'itemList'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
-        <h4>{{ s.inputs?.title || 'Departments' }}</h4>
-        <p-carousel [value]="productList" [numVisible]="8" [numScroll]="8" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
-          <ng-template pTemplate="item" let-proList>
-            <div class="px-2 my-2 d-flex flex-column">
-              <img [src]="proList?.image ? attachmentBaseUrl + '/' + proList?.image : 'assets/placeholders/_logo-placeholder.png'"
-                   class="mb-2" style="width:80px;" (click)="goToProList(proList)">
-              <a (click)="goToProList(proList)">{{ proList?.name }}</a>
-            </div>
-          </ng-template>
-        </p-carousel>
-      </div> -->
 
     </ng-container>
   </ng-container>

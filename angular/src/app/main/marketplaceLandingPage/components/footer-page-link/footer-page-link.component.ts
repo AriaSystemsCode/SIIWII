@@ -48,7 +48,7 @@ export class FooterPageLinkComponent {
             )
             .subscribe((res) => {
                 this.pageLiksData = res
-             console.log(res,'page link')
+           
             });
         }
       

@@ -310,8 +310,7 @@ export class MarketplaceLandingPageComponent
     ngOnInit(): void {
         this.pages = this.chunk(this.items, 9); // each page has 9 products
         this.loadSections()
-        // this.GetAllAtoSliderSettings();
-        // this.loadSectionsFromBackend()
+      
         // this.getAllCallToActionSettings();
         // this.getAdvSettings();
         // this.getAllBrands()
@@ -344,7 +343,7 @@ export class MarketplaceLandingPageComponent
                   // rowIds: [r.id],
                   inputs: {
                     images: r.image ? [r.image] : [], // one row = one slide set (single image)
-                    title: r.title ?? null , name: r.name ?? null
+                    title: r.title ?? null , name: r.name ?? null , titleAlignment:r.titleAlignment
                   }
                 };
               case 'ASMB':
@@ -353,7 +352,7 @@ export class MarketplaceLandingPageComponent
                   order: r._order,
                   sectionId: r.id,
                   // rowIds: [r.id],
-                  inputs: { images: r.image ? [r.image] : [] ,    title: r.title ?? null , name: r.name ?? null}
+                  inputs: { images: r.image ? [r.image] : [] ,    title: r.title ?? null , name: r.name ?? null, titleAlignment:r.titleAlignment}
                 };
               case 'CSMP':
                 return {
@@ -361,7 +360,7 @@ export class MarketplaceLandingPageComponent
                   order: r._order,
                   sectionId: r.id,
                   // rowIds: [r.id],
-                  inputs: {  title: r.title ?? null, name: r.name ?? null} 
+                  inputs: {  title: r.title ?? null, name: r.name ?? null, titleAlignment:r.titleAlignment} 
                 };
 
               case 'SRCTA':
@@ -370,7 +369,7 @@ export class MarketplaceLandingPageComponent
                   order: r._order,
                   sectionId: r.id,
                   // rowIds: [r.id],
-                  inputs: { title: r.title , name: r.name ?? null }
+                  inputs: { title: r.title , name: r.name ?? null , titleAlignment:r.titleAlignment}
                 };
 
               case 'MRCTA':
@@ -379,7 +378,7 @@ export class MarketplaceLandingPageComponent
                   order: r._order,
                   sectionId: r.id,
                   // rowIds: [r.id],
-                  inputs: { title: r.title ?? null , name: r.name ?? null}
+                  inputs: { title: r.title ?? null , name: r.name ?? null, titleAlignment:r.titleAlignment}
                 };
               default:
                 return {
@@ -387,7 +386,7 @@ export class MarketplaceLandingPageComponent
                   order: r._order,
                   sectionId: r.id,
                   // rowIds: [r.id],
-                  inputs: { images: r.image ? [r.image] : [] , name: r.name ?? null}
+                  inputs: { images: r.image ? [r.image] : [] , name: r.name ?? null , titleAlignment:r.titleAlignment}
                 };
             }
           });
@@ -400,7 +399,7 @@ export class MarketplaceLandingPageComponent
           // fetch brands once if any PF exists
           if (flat.some(s => s.type === 'SRCTA') && !this.fetchedBrands) {
             this.fetchedBrands = true;
-            this.getAllBrands();
+          
           }
         });
     
@@ -426,13 +425,7 @@ export class MarketplaceLandingPageComponent
         return [...(this.sections || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       }
       
-    goToBrand(brand: { label: string; value: number | string }) {
-        // Navigate with ONLY the human-readable name in the URL
-        this.router.navigate(
-          ['/app/main/marketplace/products'],
-          { queryParams: { brand: brand.label } }
-        );
-      }
+
 
       goToDepartment(department: { label: string; value: number | string }) {
         // Navigate with ONLY the human-readable name in the URL
@@ -462,29 +455,7 @@ export class MarketplaceLandingPageComponent
 
 
 
-    
-  getAllBrands() {
 
-    this._appMarketplaceItemsServiceProxy
-      .getAllBrandsWithPaging(
-        null,
-        null,
-        null,
-        null,
-        null,
-        false,
-        "BRAND",
-        null,
-        null,
-        86,
-        "name",
-        0,
-        10, null
-      )
-      .subscribe((res) => {
-        this.brands = res.items;
-      });
-  }
 
   getParentDepartments(): Promise<void> {
     return new Promise((resolve) => {

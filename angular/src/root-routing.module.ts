@@ -5,18 +5,20 @@ import { AppUiCustomizationService } from '@shared/common/ui/app-ui-customizatio
 
 const routes: Routes = [
     {
-                        canActivate: [AppRouteGuard],
-                        canActivateChild: [AppRouteGuard],
+                        // canActivate: [AppRouteGuard],
+                        // canActivateChild: [AppRouteGuard],
         path: 'account',
         loadChildren: () => import('account/account.module').then(m => m.AccountModule), //Lazy load account module
         data: { preload: true }
     },
 
-  // Default '' -> marketplace products
-  { path: '', redirectTo: '/app/main/marketplace', pathMatch: 'full' },
+//   // Default '' -> marketplace products
+//   { path: '', redirectTo: '/app/main/marketplace', pathMatch: 'full' },
 
-  // Wildcard '**' -> marketplace products
-  { path: '**', redirectTo: '/app/main/marketplace' }
+//   // Wildcard '**' -> marketplace products
+//   { path: '**', redirectTo: '/app/main/marketplace' }
+{ path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' },
+{ path: '**', redirectTo: '/app/main/dashboard' }
 ];
 
 @NgModule({

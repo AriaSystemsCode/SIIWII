@@ -8,3 +8,9 @@
     margin: 30px 50px !important;
 
 }
+
+::ng-deep  {
+    .p-icon{
+        display: none !important;
+    }
+}

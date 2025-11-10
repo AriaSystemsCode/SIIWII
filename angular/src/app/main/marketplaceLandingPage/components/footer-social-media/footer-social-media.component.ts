@@ -45,7 +45,7 @@ export class FooterSocialMediaComponent extends AppComponentBase   {
                 )
                 .subscribe((res) => {
                     this.links = res
-                 console.log(res,'SOCIALLL')
+              
                 });
             }
           

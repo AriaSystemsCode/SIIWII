@@ -18380,6 +18380,152 @@ export class AppMarketplaceItemsServiceProxy {
     }
 
     /**
+     * @param contactSSIN (optional) 
+     * @param accountSSIN (optional) 
+     * @param tenantId (optional) 
+     * @param appItemListId (optional) 
+     * @param selectorOnly (optional) 
+     * @param filter (optional) 
+     * @param lastKey (optional) 
+     * @param selectorKey (optional) 
+     * @param arrtibuteFilters (optional) 
+     * @param departmentFilters (optional) 
+     * @param minimumPrice (optional) 
+     * @param maximumPrice (optional) 
+     * @param onlyAvialbleStock (optional) 
+     * @param soldOutFromDate (optional) 
+     * @param soldOutToDate (optional) 
+     * @param startShipFromDate (optional) 
+     * @param startShipToDate (optional) 
+     * @param brands (optional) 
+     * @param currencyCode (optional) 
+     * @param itemSSIN (optional) 
+     * @param categoryFilters (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAppItemRelatedItems(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppItemRelatedItems?";
+        if (contactSSIN !== undefined && contactSSIN !== null)
+            url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "AccountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (appItemListId !== undefined && appItemListId !== null)
+            url_ += "AppItemListId=" + encodeURIComponent("" + appItemListId) + "&";
+        if (selectorOnly !== undefined && selectorOnly !== null)
+            url_ += "SelectorOnly=" + encodeURIComponent("" + selectorOnly) + "&";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (lastKey !== undefined && lastKey !== null)
+            url_ += "LastKey=" + encodeURIComponent("" + lastKey) + "&";
+        if (selectorKey !== undefined && selectorKey !== null)
+            url_ += "SelectorKey=" + encodeURIComponent("" + selectorKey) + "&";
+        if (arrtibuteFilters !== undefined && arrtibuteFilters !== null)
+            arrtibuteFilters && arrtibuteFilters.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "ArrtibuteFilters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (departmentFilters !== undefined && departmentFilters !== null)
+            departmentFilters && departmentFilters.forEach(item => { url_ += "departmentFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (minimumPrice !== undefined && minimumPrice !== null)
+            url_ += "MinimumPrice=" + encodeURIComponent("" + minimumPrice) + "&";
+        if (maximumPrice !== undefined && maximumPrice !== null)
+            url_ += "MaximumPrice=" + encodeURIComponent("" + maximumPrice) + "&";
+        if (sharingLevel === undefined || sharingLevel === null)
+            throw new Error("The parameter 'sharingLevel' must be defined and cannot be null.");
+        else
+            url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
+        if (onlyAvialbleStock === null)
+            throw new Error("The parameter 'onlyAvialbleStock' cannot be null.");
+        else if (onlyAvialbleStock !== undefined)
+            url_ += "OnlyAvialbleStock=" + encodeURIComponent("" + onlyAvialbleStock) + "&";
+        if (soldOutFromDate === null)
+            throw new Error("The parameter 'soldOutFromDate' cannot be null.");
+        else if (soldOutFromDate !== undefined)
+            url_ += "SoldOutFromDate=" + encodeURIComponent(soldOutFromDate ? "" + soldOutFromDate.toISOString() : "") + "&";
+        if (soldOutToDate === null)
+            throw new Error("The parameter 'soldOutToDate' cannot be null.");
+        else if (soldOutToDate !== undefined)
+            url_ += "SoldOutToDate=" + encodeURIComponent(soldOutToDate ? "" + soldOutToDate.toISOString() : "") + "&";
+        if (startShipFromDate === null)
+            throw new Error("The parameter 'startShipFromDate' cannot be null.");
+        else if (startShipFromDate !== undefined)
+            url_ += "StartShipFromDate=" + encodeURIComponent(startShipFromDate ? "" + startShipFromDate.toISOString() : "") + "&";
+        if (startShipToDate === null)
+            throw new Error("The parameter 'startShipToDate' cannot be null.");
+        else if (startShipToDate !== undefined)
+            url_ += "StartShipToDate=" + encodeURIComponent(startShipToDate ? "" + startShipToDate.toISOString() : "") + "&";
+        if (brands !== undefined && brands !== null)
+            brands && brands.forEach(item => { url_ += "Brands=" + encodeURIComponent("" + item) + "&"; });
+        if (currencyCode !== undefined && currencyCode !== null)
+            url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        if (itemSSIN !== undefined && itemSSIN !== null)
+            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
+        if (categoryFilters !== undefined && categoryFilters !== null)
+            categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppItemRelatedItems(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppItemRelatedItems(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
+        }));
+    }
+
+    protected processGetAppItemRelatedItems(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAppMarketItemForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param itemId (optional) 
      * @param itemEntityId (optional) 
      * @param sorting (optional) 
@@ -18737,8 +18883,8 @@ export class AppMarketplaceItemsServiceProxy {
      * @param currencyCode (optional) 
      * @return Success
      */
-    getAppMarketplaceItemViewData(ssin: string | null | undefined, currencyCode: string | null | undefined): Observable<GetAppMarketItemForViewDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppMarketplaceItemViewData?";
+    getAppMarketplaceViewData(ssin: string | null | undefined, currencyCode: string | null | undefined): Observable<GetAppMarketItemForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppMarketplaceViewData?";
         if (ssin !== undefined && ssin !== null)
             url_ += "ssin=" + encodeURIComponent("" + ssin) + "&";
         if (currencyCode !== undefined && currencyCode !== null)
@@ -18754,11 +18900,11 @@ export class AppMarketplaceItemsServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAppMarketplaceItemViewData(response_);
+            return this.processGetAppMarketplaceViewData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetAppMarketplaceItemViewData(response_ as any);
+                    return this.processGetAppMarketplaceViewData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<GetAppMarketItemForViewDto>;
                 }
@@ -18767,7 +18913,7 @@ export class AppMarketplaceItemsServiceProxy {
         }));
     }
 
-    protected processGetAppMarketplaceItemViewData(response: HttpResponseBase): Observable<GetAppMarketItemForViewDto> {
+    protected processGetAppMarketplaceViewData(response: HttpResponseBase): Observable<GetAppMarketItemForViewDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -107007,6 +107153,9 @@ export class PageSettingDto implements IPageSettingDto {
     getAppEntityForViewDto!: GetAppEntityForViewDto;
     getAccountForViewDto!: GetAccountForViewDto;
     getSycEntityObjectCategoryForViewDto!: GetSycEntityObjectCategoryForViewDto;
+    link!: string | undefined;
+    buttonText!: string | undefined;
+    titleAlignment!: string | undefined;
 
     [key: string]: any;
 
@@ -107040,6 +107189,9 @@ export class PageSettingDto implements IPageSettingDto {
             this.getAppEntityForViewDto = _data["getAppEntityForViewDto"] ? GetAppEntityForViewDto.fromJS(_data["getAppEntityForViewDto"]) : <any>undefined;
             this.getAccountForViewDto = _data["getAccountForViewDto"] ? GetAccountForViewDto.fromJS(_data["getAccountForViewDto"]) : <any>undefined;
             this.getSycEntityObjectCategoryForViewDto = _data["getSycEntityObjectCategoryForViewDto"] ? GetSycEntityObjectCategoryForViewDto.fromJS(_data["getSycEntityObjectCategoryForViewDto"]) : <any>undefined;
+            this.link = _data["link"];
+            this.buttonText = _data["buttonText"];
+            this.titleAlignment = _data["titleAlignment"];
         }
     }
 
@@ -107071,6 +107223,9 @@ export class PageSettingDto implements IPageSettingDto {
         data["getAppEntityForViewDto"] = this.getAppEntityForViewDto ? this.getAppEntityForViewDto.toJSON() : <any>undefined;
         data["getAccountForViewDto"] = this.getAccountForViewDto ? this.getAccountForViewDto.toJSON() : <any>undefined;
         data["getSycEntityObjectCategoryForViewDto"] = this.getSycEntityObjectCategoryForViewDto ? this.getSycEntityObjectCategoryForViewDto.toJSON() : <any>undefined;
+        data["link"] = this.link;
+        data["buttonText"] = this.buttonText;
+        data["titleAlignment"] = this.titleAlignment;
         return data;
     }
 }
@@ -107091,6 +107246,9 @@ export interface IPageSettingDto {
     getAppEntityForViewDto: GetAppEntityForViewDto;
     getAccountForViewDto: GetAccountForViewDto;
     getSycEntityObjectCategoryForViewDto: GetSycEntityObjectCategoryForViewDto;
+    link: string | undefined;
+    buttonText: string | undefined;
+    titleAlignment: string | undefined;
 
     [key: string]: any;
 }

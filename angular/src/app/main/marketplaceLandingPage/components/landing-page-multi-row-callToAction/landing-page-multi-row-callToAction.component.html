@@ -1,0 +1,22 @@
+<p-carousel
+  [value]="pageGroups"
+  [numVisible]="1"
+  [numScroll]="1"
+  [circular]="false"
+  [showIndicators]="false"
+  [showNavigators]="true"
+
+  class="p-4 m-2 rounded"
+>
+  <ng-template pTemplate="item" let-group>
+    <div class="products-grid">
+      <div *ngFor="let product of group" class="px-2 my-2">
+     
+        <app-prodcut-card *ngIf="product?.blockType=='Product'"
+          [product]="product?.getAppMarketItemForViewDto?.appItem"
+          [productCard]="product?.getAppMarketItemForViewDto">
+        </app-prodcut-card>
+      </div>
+    </div>
+  </ng-template>
+</p-carousel>

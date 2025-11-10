@@ -50,7 +50,7 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
         )
         .subscribe((res) => {
             this.sycLangingPageSetting = res
-         console.log(res,'ctaaaaaaaaaaaaaaaaa')
+      
         });
     }
   

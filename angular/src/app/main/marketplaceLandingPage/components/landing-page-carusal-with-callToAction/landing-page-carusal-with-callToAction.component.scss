@@ -9,8 +9,9 @@
     margin: 30px;
 
 }
+
 .ctaParentSection {
-   /*  padding-left: 2%; */
+    /*  padding-left: 2%; */
     top: -80px;
     width: 100%;
     justify-content: center;
@@ -44,20 +45,21 @@ a {
 }
 
 
-.cta-sm{
+.cta-sm {
     background-color: #EFEFEF;
-border-radius: 10px;
+    border-radius: 10px;
 
 }
 
-.flexContainer{
+.flexContainer {
     flex-wrap: wrap;
 }
-.flexContainerSection{
+
+.flexContainerSection {
     flex: 50%;
 }
 
-.btnSeeMore{
+.btnSeeMore {
     color: #700066 !important;
     background-color: #dedada !important;
     border: none !important;
@@ -65,4 +67,3 @@ border-radius: 10px;
     font-weight: bold;
     font-size: 21pt;
 }
-
