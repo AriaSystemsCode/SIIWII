@@ -10,7 +10,7 @@ import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttach
   styleUrls: ['./dynamicInputs.component.scss'],
   animations: [appModuleAnimation()]
 })
-export class dynamicInputs implements OnInit, OnChanges {
+export class dynamicInputs implements OnInit, OnChanges  {
   @Input("extraAttributeObject") extraAttributeObject;
   @Input("entityType") entityType;
   @Input("entityObjectTypeId") entityObjectTypeId;
@@ -25,12 +25,11 @@ export class dynamicInputs implements OnInit, OnChanges {
     calendar.overlayVisible = true;
   }
   ngOnChanges() {
-    this.fillSelectedValuesFromDto();
-    this.onAnyInputChange();
+      this.fillSelectedValuesFromDto();
+      this.onAnyInputChange();
   }
+  
   onAnyInputChange() {
-
-
     const updatedDataMap = new Map<number, any>();
 
     // Preserve existing values
@@ -114,7 +113,7 @@ export class dynamicInputs implements OnInit, OnChanges {
   themes =[] ; 
     selectedTheme: any ;
 
-      //i49-F6 set thems  ?
+      // set thems  ?
       getThemes(extraAttr: any) {
        return this.themes =  
         [

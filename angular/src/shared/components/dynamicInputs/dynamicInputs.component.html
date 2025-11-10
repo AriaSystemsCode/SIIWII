@@ -9,7 +9,6 @@
                         <label class="{{fromSetting ? 'fromSettingLabel':''}}">{{extraAttr.name | localize}}</label>
                     </div>
 
-<!-- //i49-f6 review settings  types  -->
                     <!-- //API GetAllEntitiesByTypeCodeWithPaging -->
                     <div class="d-flex align-items-center">
 
@@ -76,7 +75,7 @@
 
 
                         <div class="flex-grow-1"
-                        *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit'">
+                        *ngIf="extraAttr.dataType === 'boolean'  || extraAttr.dataType === 'Boolean' || extraAttr.dataType === 'bit'">
                      <div class="radio-inline mt-2">
                        <ng-container *ngIf="extraAttr.validEntries?.trim(); else yesNoBlock">
                          <label
@@ -97,31 +96,31 @@
                        </ng-container>
                    
                        <ng-template #yesNoBlock>
-                         <label class="radio radio-accent radio-primary mr-4"
-                                [for]="'extraAttr' + extraAttr.name + '_1'">
-                           <input
-                             (ngModelChange)="onAnyInputChange()"
-                             type="radio"
-                             [name]="'extraAttr_' + extraAttr.name"
-                             [id]="'extraAttr' + extraAttr.name + '_1'"
-                             [value]="'true'"
-                             [(ngModel)]="extraAttr.selectedValues"
-                           />
-                           {{ "Yes" | localize }}
-                         </label>
-                         <label class="radio radio-accent radio-primary"
-                                [for]="'extraAttr' + extraAttr.name + '_0'">
-                           <input
-                             (ngModelChange)="onAnyInputChange()"
-                             type="radio"
-                             [name]="'extraAttr_' + extraAttr.name"
-                             [id]="'extraAttr' + extraAttr.name + '_0'"
-                             [value]="'false'"
-                             [(ngModel)]="extraAttr.selectedValues"
-                           />
-                           {{ "No" | localize }}
-                         </label>
-                       </ng-template>
+                        <label class="radio radio-accent radio-primary mr-4" [for]="'extraAttr' + extraAttr.name + '_yes'">
+                          <input
+                            type="radio"
+                            [name]="'extraAttr_' + extraAttr.name"
+                            [id]="'extraAttr' + extraAttr.name + '_yes'"
+                            [value]="true"
+                            [(ngModel)]="extraAttr.selectedValues"
+                            (ngModelChange)="onAnyInputChange()"
+                          />
+                          {{ "Yes" | localize }}
+                        </label>
+                      
+                        <label class="radio radio-accent radio-primary" [for]="'extraAttr' + extraAttr.name + '_no'">
+                          <input
+                            type="radio"
+                            [name]="'extraAttr_' + extraAttr.name"
+                            [id]="'extraAttr' + extraAttr.name + '_no'"
+                            [value]="false"
+                            [(ngModel)]="extraAttr.selectedValues"
+                            (ngModelChange)="onAnyInputChange()"
+                          />
+                          {{ "No" | localize }}
+                        </label>
+                      </ng-template>
+                      
                    
                        <a *ngIf="extraAttr.selectedValues"
                           class="ml-5 pointer text-black-50 font-weight-bold"

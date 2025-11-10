@@ -3,7 +3,7 @@ import { Component, Injector, OnInit } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { SettingScopes, SendTestEmailInput, TenantSettingsEditDto, TenantSettingsServiceProxy, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
+import { SettingScopes, SendTestEmailInput, TenantSettingsEditDto, TenantSettingsServiceProxy, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, GetAppTransactionsForViewDto, AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
 import { finalize } from 'rxjs/operators';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
@@ -58,6 +58,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
         private _tenantSettingsService: TenantSettingsServiceProxy,
           private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
             private _extraAttributeDataService: ExtraAttributeDataService,
+            private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
           
         private _tokenService: TokenService
     ) {
@@ -67,8 +68,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
 
     ngOnInit(): void {
    this.getAppItemTypeExtraAttributesById()
-   //this.initUploaders();
-    }
+  }
 
     initUploaders(): void {
       this.logoUploader = this.createUploader(
@@ -165,63 +165,48 @@ clearCustomCss(): void {
   
 
   
+   //i49-F6 save setting data - should use UpdateAllSettings
+   saveAll(): void {
+    const extraData = this.appTransactionsForViewDto?.entityExtraData || [];
 
-   //i49-F6 save setting data
-    // saveAll(): void {
-    //     this._tenantSettingsService.updateAllSettings(this.settings).subscribe(() => {
-    //         this.notify.info(this.l('SavedSuccessfully'));
-
-    //         if (abp.clock.provider.supportsMultipleTimezone && this.usingDefaultTimeZone && this.initialTimeZone !== this.settings.general.timezone) {
-    //             this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
-    //                 window.location.reload();
-    //             });
-    //         }
-    //     });
-    // }
-    // saveAll(): void {
-    //   const extraData = this.appTransactionsForViewDto?.entityExtraData || [];
-    
-    //   this._tenantSettingsService.updateAllSettings(this.settings)
-    //     .pipe(finalize(() => {
-    //       // Reset form change tracking
-    //       this.formTouched = false;
-    //     }))
-    //     .subscribe(() => {
-    //       // Update entity extra data after settings saved
-    //       if (extraData.length > 0) {
-    //         // this._extraAttributeDataService.saveEntityExtraData(extraData).subscribe(() => {
-    //         //   this.notify.success(this.l('SavedSuccessfully'));
-    //         // });
-    //       } else {
-    //         this.notify.success(this.l('SavedSuccessfully'));
-    //       }
-    
-    //       if (abp.clock.provider.supportsMultipleTimezone &&
-    //           this.usingDefaultTimeZone &&
-    //           this.initialTimeZone !== this.settings.general.timezone) {
-    //         this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
-    //           window.location.reload();
-    //         });
-    //       }
-    //     });
-    // }
-    saveAll(): void {
-      const extraData = this.appTransactionsForViewDto?.entityExtraData || [];  
-      this.notify.success(this.l('SavedSuccessfully (Test Mode)'));
-    
-      // Simulate reset of unsaved changes tracking
+    this._appEntitiesServiceProxy.saveEntity(extraData)
+    .pipe(finalize(() => {
       this.formTouched = false;
-    
-      if (
-        abp.clock.provider.supportsMultipleTimezone &&
-        this.usingDefaultTimeZone &&
-        this.initialTimeZone !== this.settings.general.timezone
-      ) {
-        this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
-          window.location.reload();
-        });
+      this.notify.success(this.l('SavedSuccessfully'));
+    }))
+    .subscribe({
+      next: (res) => {
+      },
+      error: (err) => {
+        this.notify.error(this.l('SaveFailed'));
       }
-    }
+    });
+
+    
+   /* this._tenantSettingsService.updateAllSettings(this.settings)
+      .pipe(finalize(() => {
+        this.formTouched = false;
+      }))
+      .subscribe(() => {
+        // Update entity extra data after settings saved
+        if (extraData.length > 0) {
+          // this._extraAttributeDataService.saveEntityExtraData(extraData).subscribe(() => {
+          //   this.notify.success(this.l('SavedSuccessfully'));
+          // });
+        } else {
+          this.notify.success(this.l('SavedSuccessfully'));
+        }*/
+
+        if (abp.clock.provider.supportsMultipleTimezone &&
+          this.usingDefaultTimeZone &&
+          this.initialTimeZone !== this.settings.general.timezone) {
+          this.message.info(this.l('TimeZoneSettingChangedRefreshPageNotification')).then(() => {
+            window.location.reload();
+          });
+        }
+     // });
+  }
+   
     
 defineExtraAttributes() {
   this.extraAttributes = {};
@@ -282,7 +267,6 @@ getAppItemTypeExtraAttributesById() {
   }
   
 
-     //i49-F6 set dto same as  getAppTransactionsForView api 
   loadTenantSettings() {
     if (!this.extraAttributes || typeof this.extraAttributes !== 'object') {
       return;
@@ -298,7 +282,7 @@ getAppItemTypeExtraAttributesById() {
     });
   }
   
-
+       //i49-F6 get settings with values  - should use GetAllSettings
   loadExtraDataLookupList(extraAttr: FilteredExtraAttribute) {
       this._extraAttributeDataService
           .getExtraAttributeLookupDataWithPaging(
@@ -370,7 +354,6 @@ getAppItemTypeExtraAttributesById() {
     }
   }
   
-   //i49-F6 save setting data
   onExtraAttributesChanged(dataFromChild: any[]) {
     this.formTouched = true;
     if (!this.appTransactionsForViewDto) {

@@ -69,8 +69,8 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
 
 
 
-     //i49-F6 set dto same as  getAppTransactionsForView api 
-    loadHostSettings(): void {
+       //i49-F6 get settings with values  - should use GetAllSettings
+       loadHostSettings(): void {
         const self = this;
         self._hostSettingService.getAllSettings()
             .subscribe(setting => {
@@ -174,8 +174,8 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         });
     }
 
-        //i49-F6 save setting data
-    saveAll(): void {
+   //i49-F6 save setting data - should use UpdateAllSettings
+   saveAll(): void {
         const self = this;
 
         const extraData = this.appTransactionsForViewDto?.entityExtraData || [];
@@ -370,7 +370,6 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         }
     }
 
-        //i49-F6 save setting data
     onExtraAttributesChanged(dataFromChild: any[]) {
         this.formTouched = true;
         if (!this.appTransactionsForViewDto) {
