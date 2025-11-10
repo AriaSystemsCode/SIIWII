@@ -363,7 +363,7 @@ namespace onetouch.SystemObjects
 
                 return true;
             }
-
+        [AbpAllowAnonymous]
         public async Task<List<PageSettingDto>> GetAllSliderSettings(SliderEnum sliderType, string sliderCode)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -490,6 +490,7 @@ namespace onetouch.SystemObjects
             }
         }
         //I49[Start]
+        [AbpAllowAnonymous]
         public async Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId)
         {
             string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";

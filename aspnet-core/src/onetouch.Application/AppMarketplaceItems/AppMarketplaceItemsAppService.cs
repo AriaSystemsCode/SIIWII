@@ -487,6 +487,10 @@ namespace onetouch.AppMarketplaceItems
         {
             try
             {
+                //I49[Start]
+                string showStockQty = await _appEntitiesAppService.GetHostSettingValue(1215);
+                string showMSRP = await _appEntitiesAppService.GetHostSettingValue(1214);
+                //I49[End]
                 //MMT
                 var stopwatch = new System.Diagnostics.Stopwatch();
                 stopwatch.Start();
@@ -1397,10 +1401,16 @@ namespace onetouch.AppMarketplaceItems
                             }
                         }
                         //I46[End]
-                        //I49[Start]
+                        //I49[Start] 
                         if (!AbpSession.UserId.HasValue)
                         {
                             output.AppItem.AppItemPriceInfos.RemoveAll(x=>x.Code!="MSRP");
+                            if (showMSRP == "No")
+                            {
+                                output.AppItem.AppItemPriceInfos.RemoveAll(x => x.Code == "MSRP");
+                                output.AppItem.MaxMSRP = 0;
+                                output.AppItem.MinMSRP = 0;
+                            }
                             //output.AppItem.MinMSRP = 0;
                             //output.AppItem.MaxMSRP = 0;
                             output.AppItem.MinSpecialPrice = 0;
@@ -1420,7 +1430,8 @@ namespace onetouch.AppMarketplaceItems
                             //    }
                             //}
                         }
-                        output.RelatedItems = new List<GetAppMarketItemForViewDto>();
+                        output.ShowMSRP = showMSRP;
+                        output.ShowStockAvailability = showStockQty;
                         //if (relateditems != null && relateditems.Count > 0)
                         //{
                         
