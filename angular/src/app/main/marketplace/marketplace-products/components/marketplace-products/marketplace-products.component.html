@@ -90,24 +90,24 @@
                 </div>
                 <div *ngIf="!isFilterHidden" class="col-lg-3 col-5 my-3 text-dark pr-0">
                     <app-product-filters
-                        [isSellerIdExists]="isSellerIdExists"
-                        (handleCatalogSelections)="selectCatalog($event)"
-                        (handledeDratmentsTreeSelections)="
-                            selectDepartment($event)
-                        "
-                        [selectedBrands]="brands"
-                        [selectedDepartmentId]="selectedDepartments?.[0]" 
-                        (handleStartPrice)="setPriceFrom($event)"
-                        (handleEndPrice)="setPriceTo($event)"
-                        (handleStockSiwtch)="swtichStock($event)"
-                        (handleStartShipDate)="setStartShipDate($event)"
-                        (handleEndShipDate)="setEndtShipDate($event)"
-                        (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
-                        (handleEndSoldOutDate)="setEndSoldOutDate($event)"
-                        (handleBrandsSelection)="selectBrands($event)"
-                        (clearAll)="clearFiltrs($event)"
-                        #filters
-                    ></app-product-filters>
+                    [isSellerIdExists]="isSellerIdExists"
+                    (handleCatalogSelections)="selectCatalog($event)"
+                    (handledeDratmentsTreeSelections)="selectDepartment($event)"
+                    (handleCategoriesTreeSelections)="selectCategory($event)"      
+                    [selectedBrands]="brands"
+                    [selectedDepartmentId]="selectedDepartments?.[0]"
+                    (handleStartPrice)="setPriceFrom($event)"
+                    (handleEndPrice)="setPriceTo($event)"
+                    (handleStockSiwtch)="swtichStock($event)"
+                    (handleStartShipDate)="setStartShipDate($event)"
+                    (handleEndShipDate)="setEndtShipDate($event)"
+                    (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
+                    (handleEndSoldOutDate)="setEndSoldOutDate($event)"
+                    (handleBrandsSelection)="selectBrands($event)"
+                    (clearAll)="clearFiltrs($event)"
+                    #filters
+                  ></app-product-filters>
+                  
                 </div>
 
                 <div

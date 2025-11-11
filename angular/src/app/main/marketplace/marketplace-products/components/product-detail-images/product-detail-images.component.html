@@ -47,7 +47,7 @@
             </video>
             <!-- PDF thumb -->
             <div *ngIf="kindOf(a) === 'pdf'"
-              class="imageSlides mb-2 d-flex align-items-center justify-content-center bg-light"  
+              class="imageSlides mb-2 d-flex align-items-center justify-content-center bg-light"
               (click)="setMainImage(i)" [ngClass]="i === currentIndex ? 'border border-primary ' : ''"
               style="height:60px;width:60px;cursor:pointer;">
               <i class="fa fa-file-pdf-o"></i>
@@ -86,44 +86,27 @@
       </video>
 
 
-      <!-- <div *ngIf="kindOf(productImages[currentIndex]) === 'pdf'" class="w-100 position-relative">
-        <iframe #pdfViewer class="w-100"
-                [ngStyle]="{ height: !loadingError ? '240px' : '0px' }"
-                frameborder="0"></iframe>
 
-        <div *ngIf="loadingError" class="p-2">
-          Unable to display this PDF.
-          <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">
-            Open in new tab
-          </a>
+
+      <!-- MAIN PDF -->
+      <ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
+        <div class="position-relative w-100">
+          <iframe class="w-100 imageContainer" [src]="pdfSafeMap[currentIndex]" 
+            [ngStyle]="{ height: loadingError ? '0px' : '48vh' }" frameborder="0" (error)="loadingError = true">
+          </iframe>
+
+          <div *ngIf="loadingError" class="p-2">
+            Unable to display this PDF here.
+            <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">Open in new tab</a>
+          </div>
+          <button type="button" class="btn btn-link p-0 m-0" (click)="openNewTab(productImages[currentIndex])"
+            style="position:absolute; top:6px; left:10px">
+            <i class="fa fa-download"></i>
+          </button>
         </div>
-        <button type="button" class="btn btn-link p-0 m-0"
-                (click)="downloadFile(productImages[currentIndex])"
-                style="position:absolute; top:6px; right:10px;">
-          <i class="fa fa-download"></i>
-        </button>
-      </div> -->
- 
-      <!-- <object *ngIf="kindOf(productImages[currentIndex]) === 'pdf'" class="main" style="height: 240px;background:url('assets/Items/pdf-Icon.png');background-position: center;background-size: contain;background-repeat: no-repeat !important;"     
-        type="application/pdf" [data]="toSafeUrl(productImages[currentIndex])">
-        <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">Open PDF</a>
-      </object> -->
+      </ng-container>
 
-      <!-- <button type="button" *ngIf="kindOf(productImages[currentIndex]) === 'pdf'"
-        (click)=" downloadFile(productImages[currentIndex])" class="btn btn-link p-0 m-0"
-        style="position: absolute;top: 1px;  right: 35px;">
-        <i class="fa fa-download"></i>
-      </button> -->
 
-       
-      <div *ngIf="kindOf(productImages[currentIndex]) === 'pdf'" class="main" style="height: 240px;background:url('assets/Items/pdf-Icon.png');background-position: center;background-size: contain;background-repeat: no-repeat !important;"     
-        >
-        <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">   <i class="fa fa-download"></i></a>
-    </div>
-      <!-- OTHER -->
-      <div *ngIf="kindOf(productImages[currentIndex]) === 'other'" class="p-3">
-        <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">Open file</a>
-      </div>
     </div>
   </div>
 </div>

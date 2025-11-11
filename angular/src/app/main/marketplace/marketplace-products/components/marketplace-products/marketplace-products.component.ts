@@ -78,7 +78,8 @@ export class MarketplaceProductsComponent
     acceptedAspectRatio;
     isAuthenticate= this.appSession?.user
 
-    
+    selectedCategories: number[] = []; 
+
     constructor(
         injector: Injector,
         private _router: Router,
@@ -129,12 +130,6 @@ export class MarketplaceProductsComponent
             { label: "Shared With Me", value: 1 },
         ];
         (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
-
-    
-
-   
-
-
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
         
@@ -158,6 +153,7 @@ export class MarketplaceProductsComponent
           this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
           this.searchInput = parsedFilters.searchText || this.searchInput;
           this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
+          this.selectedCategories = parsedFilters.selectedCategory || this.selectedCategories;
           this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
           this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
           this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData;
@@ -202,7 +198,14 @@ export class MarketplaceProductsComponent
             // (optional) make the sidebar visually highlight the selected list
             if (this.filters) this.filters.catalogId = listId ?? null;
           }
-          this.getAllProducts(); // ✅ load once after merging URL/local state
+          const catName = params.get('cat');
+          if (catName) {
+            const id = await this.resolveCategoryNameToId(catName);
+            this.selectedCategories = id ? [id] : [];
+            if (this.filters) this.filters.preselectCategoryId = id ?? undefined; // optional if you add it in child
+          }
+        
+          this.getAllProducts(); // 
         });
       }
       
@@ -352,6 +355,7 @@ export class MarketplaceProductsComponent
             appItemListId: this.appItemListId || null,
             searchText: this.searchInput || '',
             selectedDepartments: this.selectedDepartments || [],
+            selectedCategory: this.selectedCategories || [], 
             minimumPrice: this.minimumPrice || null,
             maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
@@ -392,7 +396,7 @@ export class MarketplaceProductsComponent
                 requestParams.brands ||  this.brands, // ids
                 requestParams.selectedCurrency ||  this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
                 undefined,
-                undefined,
+                requestParams.selectedCategory || this.selectedCategories,  //category
                 requestParams.selectedSort || this.selectedSort.value,
                 requestParams.skipCount || this.skipCount,
                 requestParams.maxResultCount ||  this.maxResultCount
@@ -479,13 +483,14 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
       }
       
-    private updateUrlQueryParams(partial: { dept?: string | null; proList?: string | null; q?: string | null }) {
+    private updateUrlQueryParams(partial: { dept?: string | null; proList?: string | null; q?: string | null ; cat?: string | null}) {
         this._router.navigate([], {
           relativeTo: this.route,
           queryParams: {
             dept: partial.dept ?? undefined,
             proList: partial.proList ?? undefined,
             q: partial.q ?? undefined,
+            cat: partial.cat ?? undefined, 
           },
           queryParamsHandling: 'merge',
           // replaceUrl: true, // optional
@@ -565,7 +570,7 @@ export class MarketplaceProductsComponent
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
          this.appItemListId =''
-
+         this.selectedCategories = [];
         this.brands =[]
         this.skipCount= 0;
         this.maxResultCount= 12;
@@ -575,7 +580,53 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
 
     }
-
+    selectCategory(value: any) {
+      if (!value) {
+        this.selectedCategories = [];
+        this.updateUrlQueryParams({ cat: null });
+      } else {
+        const node = value.node?.data?.sycEntityObjectCategory;
+        const id = node?.id;
+        const name = node?.name ?? node?.displayName ?? value.node?.label;
+        this.selectedCategories = id ? [id] : [];
+        this.updateUrlQueryParams({ cat: name || null });
+      }
+      this.getAllProducts();
+    }
+    private async resolveCategoryNameToId(catName: string): Promise<number | null> {
+      // load category roots
+      const parents = await this._sycEntityObjectCategoriesServiceProxy
+        .getAllWithChildsForProductWithPaging(
+          undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+          undefined, /* departments? */ false,
+          undefined, [], 'name', 0, 50
+        ).toPromise();
+    
+      const norm = (s: string) => (s || '').trim().toLowerCase();
+      const target = norm(catName);
+      const queue: any[] = [...(parents?.items ?? [])];
+    
+      while (queue.length) {
+        const node = queue.shift();
+        const cat = node?.data?.sycEntityObjectCategory;
+        const label = node?.label;
+        const here = norm(cat?.name ?? cat?.displayName ?? label);
+        if (here === target) return cat?.id ?? null;
+    
+        if (!node.children || node.children.length === 0) {
+          const kids = await this._sycEntityObjectCategoriesServiceProxy
+            .getAllChildsWithPaging(
+              undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+              cat?.id, /* departments? */ false,
+              undefined, undefined, 'name', 0, 50
+            ).toPromise();
+          node.children = kids?.items ?? [];
+        }
+        if (node.children?.length) queue.push(...node.children);
+      }
+      return null;
+    }
+        
     ngOnDestroy() {
 
           // Keep SellerSSIN while navigating inside the seller room / product views
@@ -587,10 +638,6 @@ export class MarketplaceProductsComponent
     localStorage.removeItem('BuyerSSIN');
   }
 
-        // if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
-        //     sessionStorage.removeItem("SellerSSIN");
-        //     localStorage.removeItem("BuyerSSIN");
-        // }
         localStorage.setItem("currencyCode", null);
     }
 

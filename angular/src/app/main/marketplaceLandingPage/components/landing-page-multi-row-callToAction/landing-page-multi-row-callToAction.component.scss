@@ -4,4 +4,14 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
   }
-  
+  .sectionGeneral{
+    width: 265px;
+    border: 1px solid #ebedf2;
+    border-radius: 8px;
+}
+
+.iframSty {
+  height: 50vh;
+  width: 250px;
+  border-radius: 8px !important;
+}

@@ -32,6 +32,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   files: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
   loading: boolean;
   selectedFile: any;
+  selectedCatFile: any;
   startShipDate: Date;
   endShipDate: Date;
   startSoldout: string;
@@ -59,6 +60,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   @Output() handleStockSiwtch: EventEmitter<any> = new EventEmitter();
   @Output() handleBrandsSelection: EventEmitter<any> = new EventEmitter();
   @Output() clearAll: EventEmitter<any> = new EventEmitter();
+  @Output() handleCategoriesTreeSelections: EventEmitter<any> = new EventEmitter();
   accountSSIN: string;
   savedFilters: any
   isSelected: boolean = false
@@ -66,6 +68,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   ismarketPLace: boolean
   isAuthenticated = this.appSession?.user
   @Input() preselectDeptId?: number;
+  categories:any
   constructor(
     private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
@@ -82,6 +85,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       const parsedFilters = JSON.parse(this.savedFilters);
 
       this.selectedFile = parsedFilters.selectedDepartments;
+  this.selectedCatFile = parsedFilters.selectedCategory
+
       this.min = parsedFilters.minimumPrice;
       this.max = parsedFilters.maximumPrice;
       this.catalogId = parsedFilters.appItemListId;
@@ -351,6 +356,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     this.catalogId = null;
     this.collapseAll();
     this.selectedFile = []
+    this.selectedCatFile = []
     this.selctedBradns = [];
     this.min = "";
     this.max = "";
@@ -386,36 +392,146 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   }
 
 
-
-  ngOnInit(): void {
-    this.savedFilters = localStorage.getItem("productFilters");
-
-    if (this.savedFilters) {
-      const parsedFilters = JSON.parse(this.savedFilters);
-      const selectedDepartmentId = parsedFilters.selectedDepartments?.[0];
-
-      this.selectedFile = parsedFilters.selectedDepartments;
-      this.min = parsedFilters.minimumPrice;
-      this.max = parsedFilters.maximumPrice;
-      this.catalogId = parsedFilters.appItemListId;
-      this.stockAvailablty = parsedFilters.onlyAvailableStock;
-      this.startSoldout = parsedFilters.startSoldOutData;
-      this.endSoldout = parsedFilters.endSoldOutData;
-      this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
-      this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
-      this.selctedBradns = parsedFilters.brands;
-      this.getParentDepartments().then(async () => {
-        if (selectedDepartmentId) {
-          await this.expandAndSelectFullPath(selectedDepartmentId);
-        }
+  getParentCategories(): Promise<void> {
+    return new Promise((resolve) => {
+      const apiMethod = 'getAllWithChildsForProductWithPaging';
+      this._sycEntityObjectCategoriesServiceProxy[apiMethod](
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+        undefined,
+       false, 
+        undefined,
+        [],
+        'name',
+        0,
+        10
+      ).subscribe((res: any) => {
+        this.categories = res.items;
+        resolve();
       });
-      
-
-
-    } else {
-      this.getParentDepartments();
+    });
+  }
+  
+  nodeCatExpand(evt: any) {
+    if (!evt?.node) return;
+    this.loading = true;
+    this._sycEntityObjectCategoriesServiceProxy
+      .getAllChildsWithPaging(
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+        evt.node.data.sycEntityObjectCategory.id,
+        false,   
+        undefined, undefined, 'name', 0, 10
+      )
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe((res: any) => (evt.node.children = res.items));
+  }
+  
+  nodeCatSelect(evt: any) {
+    this.handleCategoriesTreeSelections.emit(evt);
+  }
+  
+  nodeCatUnselect(_: any) {
+    this.handleCategoriesTreeSelections.emit(null);
+  }
+  async expandAndSelectNodeLazyCat(
+    targetId: number,
+    nodes: any[] = this.categories,
+    parentNode?: any
+  ): Promise<boolean> {
+    for (const node of nodes ?? []) {
+      const currentId = node?.data?.sycEntityObjectCategory?.id;
+  
+      if (currentId === targetId) {
+        if (parentNode) parentNode.expanded = true;
+        node.expanded = true;
+        this.selectedCatFile = node;
+        return true;
+      }
+  
+      if (!node.children || node.children.length === 0) {
+        const res = await this._sycEntityObjectCategoriesServiceProxy
+          .getAllChildsWithPaging(
+            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+            currentId,
+            /* forDepartments? */ false, // ✅ categories
+            undefined, undefined, 'name', 0, 10
+          )
+          .toPromise();
+        node.children = res.items;
+      }
+  
+      const found = await this.expandAndSelectNodeLazyCat(targetId, node.children, node);
+      if (found) {
+        node.expanded = true;
+        if (parentNode) parentNode.expanded = true;
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  async expandAndSelectFullPathCat(targetId: number) {
+    // build path from node to root
+    const pathIds: number[] = [];
+    let currentId = targetId;
+    while (currentId) {
+      pathIds.unshift(currentId);
+      const res = await this._sycEntityObjectCategoriesServiceProxy
+        .getSycEntityObjectCategoryForEdit(currentId)
+        .toPromise();
+      currentId = res?.sycEntityObjectCategory?.parentId;
+    }
+  
+    // walk down the path, expanding as we go
+    let currentNodes = this.categories;
+    for (const id of pathIds) {
+      const ok = await this.expandAndSelectNodeLazyCat(id, currentNodes);
+      if (!ok) break;
+      const n = this.findNodeById(this.categories, id);
+      currentNodes = n?.children ?? [];
+    }
+  
+    // final select
+    const finalNode = this.findNodeById(this.categories, targetId);
+    if (finalNode) {
+      finalNode.expanded = true;
+      this.selectedCatFile = finalNode;
     }
   }
+  
+  ngOnInit(): void {
+    this.savedFilters = localStorage.getItem('productFilters');
+  
+    const init = async () => {
+      if (this.savedFilters) {
+        const parsed = JSON.parse(this.savedFilters);
+        const selectedDeptId = parsed.selectedDepartments?.[0];
+        const selectedCatId  = parsed.selectedCategory?.[0];
+  
+        // mirror saved values into component state
+        this.selectedFile = parsed.selectedDepartments;
+        this.selectedCatFile = parsed.selectedCategory;
+        this.min = parsed.minimumPrice;
+        this.max = parsed.maximumPrice;
+        this.catalogId = parsed.appItemListId;
+        this.stockAvailablty = parsed.onlyAvailableStock;
+        this.startSoldout = parsed.startSoldOutData;
+        this.endSoldout = parsed.endSoldOutData;
+        this.startShipDate = parsed.startShipData ? new Date(parsed.startShipData) : null;
+        this.endShipDate   = parsed.endShipData   ? new Date(parsed.endShipData)   : null;
+        this.selctedBradns = parsed.brands;
+  
+        await Promise.all([this.getParentDepartments(), this.getParentCategories()]);
+  
+        if (selectedDeptId) await this.expandAndSelectFullPath(selectedDeptId);
+        if (selectedCatId)  await this.expandAndSelectFullPathCat(selectedCatId);
+      } else {
+        await Promise.all([this.getParentDepartments(), this.getParentCategories()]);
+      }
+    };
+  
+    init();
+  }
+  
   expandAndSelectNode(targetId: number, nodes: any[] = this.files, parentNode?: any): void {
     if (!nodes) return;
 
@@ -467,6 +583,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     this.handleStartShipDate.emit(undefined);
     this.handleEndSoldOutDate.emit(undefined);
     this.handleSatrtsoldOutDate.emit(undefined);
+    this.handleCategoriesTreeSelections.emit(null);
     this.clearAll.emit(true);
 
   }

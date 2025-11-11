@@ -999,7 +999,7 @@ getRelatedProducts(initial = false) {
   this.loadingMore = true;
   this._AppMarketplaceItemsServiceProxy.getAppItemRelatedItems(
     /* contactSSIN */ undefined,
-    /* accountSSIN */ undefined, // or same seller if you want
+    /* accountSSIN */ undefined, // or same seller 
     /* tenantId */ null,
     /* appItemListId */ null,
     /* selectorOnly */ null,
@@ -1032,14 +1032,13 @@ getRelatedProducts(initial = false) {
   });
 }
 
-/** PrimeNG fires onPage when you click the arrows */
+
 onRelatedPage(e: { first: number; rows: number }) {
-  // e.first = zero-based index of first item in the new page
-  const visibleEndIndex = e.first + e.rows; // end index for the page (e.rows = 4 here)
+
+  const visibleEndIndex = e.first + e.rows; 
   const nearEnd = visibleEndIndex > this.relatedItems.length - 1;
   const hasMore = this.relatedItems.length < this.relatedTotal;
 
-  // If user is paging to items we don't have yet, fetch next 4
   if (nearEnd && hasMore && !this.loadingMore) {
     this.getRelatedProducts(false);
   }

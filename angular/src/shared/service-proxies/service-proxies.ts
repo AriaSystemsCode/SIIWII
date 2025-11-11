@@ -79898,13 +79898,14 @@ export interface IAppMarketplaceItemForViewDto {
 }
 
 export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplaceItemDetailForViewDto {
-    relatedItems!: GetAppMarketItemForViewDto[] | undefined;
     appItem!: AppMarketplaceItemForViewDto;
     sellerSSIN!: string | undefined;
     sellerCompanyName!: string | undefined;
     sellerBranchSSIN!: string | undefined;
     sellerBranchName!: string | undefined;
     sellerMarketPlaceAccountId!: number;
+    showMSRP!: string | undefined;
+    showStockAvailability!: string | undefined;
 
     [key: string]: any;
 
@@ -79923,17 +79924,14 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            if (Array.isArray(_data["relatedItems"])) {
-                this.relatedItems = [] as any;
-                for (let item of _data["relatedItems"])
-                    this.relatedItems!.push(GetAppMarketItemForViewDto.fromJS(item));
-            }
             this.appItem = _data["appItem"] ? AppMarketplaceItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
             this.sellerSSIN = _data["sellerSSIN"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.sellerBranchSSIN = _data["sellerBranchSSIN"];
             this.sellerBranchName = _data["sellerBranchName"];
             this.sellerMarketPlaceAccountId = _data["sellerMarketPlaceAccountId"];
+            this.showMSRP = _data["showMSRP"];
+            this.showStockAvailability = _data["showStockAvailability"];
         }
     }
 
@@ -79950,29 +79948,27 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        if (Array.isArray(this.relatedItems)) {
-            data["relatedItems"] = [];
-            for (let item of this.relatedItems)
-                data["relatedItems"].push(item.toJSON());
-        }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["sellerSSIN"] = this.sellerSSIN;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["sellerBranchSSIN"] = this.sellerBranchSSIN;
         data["sellerBranchName"] = this.sellerBranchName;
         data["sellerMarketPlaceAccountId"] = this.sellerMarketPlaceAccountId;
+        data["showMSRP"] = this.showMSRP;
+        data["showStockAvailability"] = this.showStockAvailability;
         return data;
     }
 }
 
 export interface IGetAppMarketplaceItemDetailForViewDto {
-    relatedItems: GetAppMarketItemForViewDto[] | undefined;
     appItem: AppMarketplaceItemForViewDto;
     sellerSSIN: string | undefined;
     sellerCompanyName: string | undefined;
     sellerBranchSSIN: string | undefined;
     sellerBranchName: string | undefined;
     sellerMarketPlaceAccountId: number;
+    showMSRP: string | undefined;
+    showStockAvailability: string | undefined;
 
     [key: string]: any;
 }
