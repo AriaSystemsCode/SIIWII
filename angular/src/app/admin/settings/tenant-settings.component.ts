@@ -3,7 +3,7 @@ import { Component, Injector, OnInit } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { SettingScopes, SendTestEmailInput, TenantSettingsEditDto, TenantSettingsServiceProxy, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, AppEntitiesServiceProxy, SystemTablesServiceProxy, GetAppEntityForEditOutput } from '@shared/service-proxies/service-proxies';
+import { SettingScopes, SendTestEmailInput, TenantSettingsEditDto, TenantSettingsServiceProxy, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, AppEntitiesServiceProxy, SystemTablesServiceProxy, GetAppEntityForEditOutput, AppEntityDto } from '@shared/service-proxies/service-proxies';
 import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
 import { finalize } from 'rxjs/operators';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
@@ -182,16 +182,14 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
 
 
   saveAll(): void {
-    const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
     let success = false;
     this.showMainSpinner();
 
     //i49-F6 internal error
-    const saveRequests = extraDataList.map(entity =>
-      this._appEntitiesServiceProxy.saveEntity(entity)
-    );
-    
-    forkJoin(saveRequests)
+    let appEntityDto : AppEntityDto =new AppEntityDto();
+    appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
+    appEntityDto.id= this.entityObjectTypeTenantId;
+      this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
         finalize(() => {
           this.formTouched = false;

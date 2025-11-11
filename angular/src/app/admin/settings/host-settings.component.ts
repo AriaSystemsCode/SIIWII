@@ -9,7 +9,7 @@ import { SelectItem } from '@node_modules/primeng/api';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { ComboboxItemDto, CommonLookupServiceProxy, SettingScopes, HostSettingsEditDto, HostSettingsServiceProxy, SendTestEmailInput, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy, AppEntitiesServiceProxy, GetAppEntityForEditOutput, AppEntityAttachmentDto, AttachmentsCategories } from '@shared/service-proxies/service-proxies';
+import { ComboboxItemDto, CommonLookupServiceProxy, SettingScopes, HostSettingsEditDto, HostSettingsServiceProxy, SendTestEmailInput, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy, AppEntitiesServiceProxy, GetAppEntityForEditOutput, AppEntityAttachmentDto, AttachmentsCategories, AppEntityDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 import { forkJoin, Observable } from 'rxjs';
 
@@ -226,32 +226,35 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         });
     }
 
+
+    
+
     saveAll(): void {
         const self = this;
         let success = false;
         this.showMainSpinner();
 
         const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
-        //i49-F6 internal error
-        const saveRequests = extraDataList.map(entity =>
-            this._appEntitiesServiceProxy.saveEntity(entity)
-        );
-
-        forkJoin(saveRequests)
-            .pipe(
+      
+          //i49-F6 internal error
+            let appEntityDto : AppEntityDto=new AppEntityDto();
+            appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
+            appEntityDto.id= this.entityObjectTypeHostId;
+              this._appEntitiesServiceProxy.saveEntity(appEntityDto)
+              .pipe(
                 finalize(() => {
-                    this.formTouched = false;
-                    this.hideMainSpinner();
+                  this.formTouched = false;
+                  this.hideMainSpinner();
                 })
-            )
-            .subscribe({
+              )
+              .subscribe({
                 next: (results) => {
-                    this.notify.success(this.l('SavedSuccessfully'));
+                  this.notify.success(this.l('SavedSuccessfully'));
                 },
                 error: (err) => {
-                    this.notify.error(this.l('SaveFailed'));
+                  this.notify.error(this.l('SaveFailed'));
                 }
-            });
+              });
 
         if (
             abp.clock.provider.supportsMultipleTimezone &&
