@@ -380,11 +380,14 @@ namespace onetouch.AppEntities
             }
         }
 
-
+        [AbpAllowAnonymous]
         public async Task<GetAppEntityForViewDto> GetAppEntityForView(long id)
         {
             var appEntity = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
-
+            if (appEntity == null)
+            {
+                appEntity = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == id);
+            }
             var output = new GetAppEntityForViewDto { AppEntity = ObjectMapper.Map<AppEntityDto>(appEntity) };
 
             if (output.AppEntity.EntityObjectTypeId != null)

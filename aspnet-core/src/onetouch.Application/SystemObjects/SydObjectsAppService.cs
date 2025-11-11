@@ -32,6 +32,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Runtime.CompilerServices;
 using onetouch.Accounts.Dtos;
 using onetouch.Accounts;
+using onetouch.AppContacts;
 
 namespace onetouch.SystemObjects
 {
@@ -56,6 +57,8 @@ namespace onetouch.SystemObjects
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly ISycEntityObjectCategoriesAppService _sycEntityObjectCategoriesAppService;
         private readonly IAccountsAppService _accountsAppService;
+        private readonly IRepository<AppContact, long> _appContactRepository;
+        private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
         //I49[End]
         public SydObjectsAppService(
             IRepository<SydObject, long> sydObjectRepository,
@@ -72,7 +75,8 @@ namespace onetouch.SystemObjects
             IAppEntitiesAppService appEntitiesAppService,
             IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
             IMessageAppService messageAppService, ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService,
-            IAccountsAppService accountsAppService) 
+            IAccountsAppService accountsAppService, IRepository<AppContact, long> appContactRepository,
+            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
 			_sydObjectsExcelExporter = sydObjectsExcelExporter;
@@ -87,12 +91,13 @@ namespace onetouch.SystemObjects
             _appAdvertisementsAppService = appAdvertisementsAppService;
             //I49[Start]
             _appMarketplaceItemsAppService = appMarketplaceItemsAppService;
-            //_appMarketplaceItemRepository = appMarketplaceItemRepository;
+            _sycEntityObjectCategoryRepository = sycEntityObjectCategoryRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
             _messageAppService= messageAppService;
             _appEntitiesAppService= appEntitiesAppService;
             _sycEntityObjectCategoriesAppService = sycEntityObjectCategoriesAppService;
             _accountsAppService = accountsAppService;
+            _appContactRepository = appContactRepository;
             //I49[End]
         }
 
@@ -563,20 +568,39 @@ namespace onetouch.SystemObjects
                             {
                                 if (!string.IsNullOrEmpty(blockValueExtraDate.AttributeValue)) // Block value 
                                 {
-                                    
+
                                     switch (item.BlockType.ToUpper())
                                     {
                                         case "PRODUCT":
-                                            item.GetAppMarketItemForViewDto =await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
+                                            item.GetAppMarketItemForViewDto = await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
                                             break;
                                         case "BRAND":
-                                            item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(long.Parse(blockValueExtraDate.AttributeValue));
+                                            var contactSSINExtraData = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2007);
+                                            if (contactSSINExtraData != null)
+                                            {
+                                                var contactSSIN = contactSSINExtraData.AttributeValue;
+                                                var account = await _appContactRepository.GetAll().AsNoTracking()
+                                                    .Where(a => a.SSIN == contactSSIN.TrimEnd() && a.IsProfileData == true &&
+                                                    a.TenantId != null && a.PartnerId == null && a.ParentId == null).FirstOrDefaultAsync();
+                                                if (account != null)
+                                                {
+                                                    var brandObject = await _appEntityRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId== account.TenantId).FirstOrDefaultAsync();
+                                                    if (brandObject!=null)
+                                                    item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                }
+                                            }
                                             break;
                                         case "CATEGORY":
-                                            item.GetSycEntityObjectCategoryForViewDto =await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(blockValueExtraDate.AttributeValue));
+                                            var category = await _sycEntityObjectCategoryRepository.GetAll().Where(z=>z.Code== blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
+                                            if (category!=null)
+                                                item.GetSycEntityObjectCategoryForViewDto =await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
                                             break;
                                         case "CONTACT":
-                                            item.GetAccountForViewDto = await _accountsAppService.GetAccountForView(int.Parse(blockValueExtraDate.AttributeValue),1);
+                                            var contact = await _appContactRepository.GetAll().Where(z => z.SSIN == blockValueExtraDate.AttributeValue.TrimEnd()).FirstOrDefaultAsync();
+                                            if (contact!=null)
+                                            {
+                                                item.GetAccountForViewDto = await _accountsAppService.GetAccountForView(int.Parse(contact.Id.ToString()), 1);
+                                            }
                                             break;
                                     }
                                 }

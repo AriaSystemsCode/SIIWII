@@ -468,7 +468,7 @@ namespace onetouch.SystemObjects
                 return x;
             }
         }
-
+        [AbpAllowAnonymous]
         public async Task<GetSycEntityObjectCategoryForViewDto> GetSycEntityObjectCategoryForView(int id)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
