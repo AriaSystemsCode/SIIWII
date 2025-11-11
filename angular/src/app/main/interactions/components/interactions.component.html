@@ -1,5 +1,5 @@
  <!-- <hr *ngIf="!parentId" [ngClass]="{'visibility-hidden': !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount}"> -->
- <div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
+ <div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between mt-4" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
     <app-reactions-stats
         [entityId]="entityId"
         [usersReactionsStats]="usersReactionsStats"
@@ -7,7 +7,7 @@
     >
     </app-reactions-stats>
     
-    <div *ngIf="!parentId && showFirstBarOnly" class="d-flex justify-content-between  pr-5 pr-md-0"  [ngClass]="{'visibility-hidden' : !usersReactionsStats?.viewersCount }">
+    <div *ngIf="!parentId && showFirstBarOnly" class="d-flex justify-content-between  pr-5 pr-md-0 mb-2"  [ngClass]="{'visibility-hidden' : !usersReactionsStats?.viewersCount }">
         <app-views-stats
             [viewsCount]="usersReactionsStats.viewersCount"
         >
@@ -25,7 +25,7 @@
 
 <!-- <hr class="mb-4" *ngIf="!parentId">-->
 <div *ngIf="!showFirstBarOnly " class="d-flex" [ngClass]="parentId ? 'flex-column-reverse' : 'flex-column'">
-    <div [ngStyle]="{'margin-left': parentId ? '25px' : ''}" class="d-flex justify-content-between align-items-center pr-4" [ngClass]="{'visibility-hidden':!entityId}">
+    <div [ngStyle]="{'margin-left': parentId ? '25px' : ''}" class="d-flex justify-content-between align-items-center pr-4 pt-4" [ngClass]="{'visibility-hidden':!entityId}">
         <div class="d-flex justify-content-between" [ngStyle]="{'gap': parentId ? '5px':'40px'}" style="white-space: nowrap;" [ngClass]="{'pr-5 w-100': parentId}">
             <div class="d-flex" [ngStyle]="{'gap': parentId ? '5px':'40px'}"  style="white-space: nowrap;">
                 <div *ngIf="fromOverview" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
