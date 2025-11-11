@@ -2,10 +2,14 @@
     width: 265px;
     border: 1px solid #ebedf2;
     border-radius: 8px;
+
+    img {
+        border-radius: 8px;
+    }
 }
 
 .iframSty {
-    height: 40vh;
+    height: 50vh;
     width: 250px;
     border-radius: 8px !important;
 }
