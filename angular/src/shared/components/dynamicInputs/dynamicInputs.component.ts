@@ -17,7 +17,7 @@ export class dynamicInputs implements OnInit, OnChanges  {
   @Output() extraDataChanged = new EventEmitter<any[]>();
   @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
   selectedExtraData: any[] = [];
-  @Input() appTransactionsForViewDto: any;
+  @Input() dynamicInputsForViewDto: any;
   originalValuesMap = new Map<number, any>();
   @Input() fromSetting:boolean =false;
 
@@ -132,11 +132,11 @@ export class dynamicInputs implements OnInit, OnChanges  {
 
 
   fillSelectedValuesFromDto() {
-    if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
+    if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
       return;
     }
 
-    const dtoData = this.appTransactionsForViewDto.extraDataAttributes;
+    const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
     const allAttributes = [
       ...(this.extraAttributeObject.value.extraAttributes || []),

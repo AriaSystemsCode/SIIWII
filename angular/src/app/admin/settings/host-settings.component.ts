@@ -9,14 +9,16 @@ import { SelectItem } from '@node_modules/primeng/api';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { ComboboxItemDto, CommonLookupServiceProxy, SettingScopes, HostSettingsEditDto, HostSettingsServiceProxy, SendTestEmailInput, GetAllEntityObjectTypeOutput, LookupLabelDto, GetAppTransactionsForViewDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { ComboboxItemDto, CommonLookupServiceProxy, SettingScopes, HostSettingsEditDto, HostSettingsServiceProxy, SendTestEmailInput, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy, AppEntitiesServiceProxy, GetAppEntityForEditOutput, AppEntityAttachmentDto, AttachmentsCategories } from '@shared/service-proxies/service-proxies';
+import { finalize } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
-    templateUrl: './host-settings.component.html', 
-    styleUrls: [     './settings.component.scss',
+    templateUrl: './host-settings.component.html',
+    styleUrls: ['./settings.component.scss',
     ],
     animations: [appModuleAnimation()],
-    providers:[SycEntityObjectTypesServiceProxy]
+    providers: [SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy]
 })
 export class HostSettingsComponent extends AppComponentBase implements OnInit {
     loading = false;
@@ -52,9 +54,13 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
     extraAttributes: any;
 
     activeAccordionIndexes: number[] = [0]; // open first tab by default
-    appTransactionsForViewDto: any
+    dynamicInputsForViewDto: any
     hasUnsavedChanges = false;
-
+    entityObjectTypeHostId: number;
+    hostEntityId: number;
+    attachmentsUploader;
+    attachmets=[];
+    AttachmentInfoDto=[];
 
     constructor(
         injector: Injector,
@@ -62,15 +68,14 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         private _commonLookupService: CommonLookupServiceProxy,
         private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
         private _extraAttributeDataService: ExtraAttributeDataService,
+        private _systemTablesServiceProxy: SystemTablesServiceProxy,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _tokenService: TokenService
     ) {
         super(injector);
     }
 
-
-
-       //i49-F6 get settings with values  - should use GetAllSettings
-       loadHostSettings(): void {
+    loadHostSettings(): void {
         const self = this;
         self._hostSettingService.getAllSettings()
             .subscribe(setting => {
@@ -104,48 +109,95 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
     ngOnInit(): void {
         const self = this;
         self.init();
+        this.getSettingData()
         this.getAppItemTypeExtraAttributesById();
-         //i49-F6 upload files
-         //this.initUploaders();
+        // this.initUploaders();
     }
 
-      initUploaders(): void {
-          this.logoUploader = this.createUploader(
-              '/TenantCustomization/UploadLogo',
-              result => {
-                  this.appSession.tenant.logoFileType = result.fileType;
-                  this.appSession.tenant.logoId = result.id;
-              }
-          );
-    
-          this.customCssUploader = this.createUploader(
-              '/TenantCustomization/UploadCustomCss',
-              result => {
-                  this.appSession.tenant.customCssId = result.id;
-    
-                  let oldTenantCustomCss = document.getElementById('TenantCustomCss');
-                  if (oldTenantCustomCss) {
-                      oldTenantCustomCss.remove();
-                  }
-    
-                  let tenantCustomCss = document.createElement('link');
-                  tenantCustomCss.setAttribute('id', 'TenantCustomCss');
-                  tenantCustomCss.setAttribute('rel', 'stylesheet');
-                  tenantCustomCss.setAttribute('href', AppConsts.remoteServiceBaseUrl + '/TenantCustomization/GetCustomCss?tenantId=' + this.appSession.tenant.id);
-                  document.head.appendChild(tenantCustomCss);
-              }
-          );
-      }
-    
-    
-    
-      createUploader(url: string, success?: (result: any) => void): FileUploader {
+    //i49-F6 get settings with values 
+    async getSettingData() {
+        this._appEntitiesServiceProxy.getCurrentHostEntityId().pipe(finalize(() => {
+            this._appEntitiesServiceProxy.getAppEntityForEdit(this.hostEntityId).subscribe(result => {
+                this.dynamicInputsForViewDto = result;
+            });
+
+        })).subscribe(result => {
+            this.hostEntityId = result;
+        });
+    }
+
+    //i49-F6 upload files
+    onUploadAttachmets($event) {
+        var uploadUrl = "/Attachment/UploadFiles";
+        this.attachmentsUploader = this.createUploader(uploadUrl);
+
+        this.attachmentsUploader.addToQueue(this.attachmets);
+        this.attachmentsUploader.onBuildItemForm = (
+            fileItem: any,
+            form: any
+        ) => {
+            this.AttachmentInfoDto = [];
+            for (let i = 0; i < this.attachmets.length; i++) {
+                var guid = this.guid();
+                var _attachmentInfoDto: AppEntityAttachmentDto =
+                    new AppEntityAttachmentDto();
+                _attachmentInfoDto.guid = guid;
+                _attachmentInfoDto.fileName = this.attachmets[i].name;
+                if (this.attachmets[i].type.includes("image"))
+                    _attachmentInfoDto.attachmentCategoryEnum =
+                        AttachmentsCategories.IMAGE;
+                
+
+                this.AttachmentInfoDto.push(_attachmentInfoDto);
+                if (this.attachmets.length > 1) form.append("guid" + i, guid);
+                else form.append("guid", guid);
+            }
+        };
+
+        this.attachmentsUploader.onErrorItem = (item, response, status) => {
+            this.notify.error(this.l("UploadFailed"));
+        };
+        this.attachmentsUploader.onSuccessItem = (item, response, status) => {
+        };
+
+        this.attachmentsUploader.uploadAllFiles();
+    }
+
+    initUploaders(): void {
+        this.logoUploader = this.createUploader(
+            '/TenantCustomization/UploadLogo',
+            result => {
+                this.appSession.tenant.logoFileType = result.fileType;
+                this.appSession.tenant.logoId = result.id;
+            }
+        );
+
+        this.customCssUploader = this.createUploader(
+            '/TenantCustomization/UploadCustomCss',
+            result => {
+                this.appSession.tenant.customCssId = result.id;
+
+                let oldTenantCustomCss = document.getElementById('TenantCustomCss');
+                if (oldTenantCustomCss) {
+                    oldTenantCustomCss.remove();
+                }
+
+                let tenantCustomCss = document.createElement('link');
+                tenantCustomCss.setAttribute('id', 'TenantCustomCss');
+                tenantCustomCss.setAttribute('rel', 'stylesheet');
+                tenantCustomCss.setAttribute('href', AppConsts.remoteServiceBaseUrl + '/TenantCustomization/GetCustomCss?tenantId=' + this.appSession.tenant.id);
+                document.head.appendChild(tenantCustomCss);
+            }
+        );
+    }
+
+    createUploader(url: string, success?: (result: any) => void): FileUploader {
         const uploader = new FileUploader({ url: AppConsts.remoteServiceBaseUrl + url });
-    
+
         uploader.onAfterAddingFile = (file) => {
             file.withCredentials = false;
         };
-    
+
         uploader.onSuccessItem = (item, response, status) => {
             const ajaxResponse = <IAjaxResponse>JSON.parse(response);
             if (ajaxResponse?.success) {
@@ -157,7 +209,7 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
                 this.message.error(ajaxResponse.error.message);
             }
         };
-    
+
         const uploaderOptions: Partial<FileUploaderOptions> = {};
         uploaderOptions.authToken = 'Bearer ' + this._tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
@@ -174,15 +226,32 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         });
     }
 
-   //i49-F6 save setting data - should use UpdateAllSettings
-   saveAll(): void {
+    saveAll(): void {
         const self = this;
+        let success = false;
+        this.showMainSpinner();
 
-        const extraData = this.appTransactionsForViewDto?.entityExtraData || [];
-        this.notify.success(this.l('SavedSuccessfully (Test Mode)'));
+        const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
+        //i49-F6 internal error
+        const saveRequests = extraDataList.map(entity =>
+            this._appEntitiesServiceProxy.saveEntity(entity)
+        );
 
-        // Simulate reset of unsaved changes tracking
-        this.formTouched = false;
+        forkJoin(saveRequests)
+            .pipe(
+                finalize(() => {
+                    this.formTouched = false;
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe({
+                next: (results) => {
+                    this.notify.success(this.l('SavedSuccessfully'));
+                },
+                error: (err) => {
+                    this.notify.error(this.l('SaveFailed'));
+                }
+            });
 
         if (
             abp.clock.provider.supportsMultipleTimezone &&
@@ -260,25 +329,30 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
     }
 
     getAppItemTypeExtraAttributesById() {
-        this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(764)
-            .subscribe((res) => {
-                if (res?.length > 0) {
-                    this.allAttributes = res[0]?.extraAttributes.extraAttributes;
+        this._systemTablesServiceProxy.getEntityObjectTypeHostId().pipe(finalize(() => {
+            this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.entityObjectTypeHostId)
+                .subscribe((res) => {
+                    if (res?.length > 0) {
+                        this.allAttributes = res[0]?.extraAttributes.extraAttributes;
 
-                    // Group attributes by `usage`
-                    this.groupedByUsage = this.groupAttributesByUsage(this.allAttributes);
-                    this.usageList = Object.keys(this.groupedByUsage);
-                    this.selectedUsage = this.usageList[0];
+                        // Group attributes by `usage`
+                        this.groupedByUsage = this.groupAttributesByUsage(this.allAttributes);
+                        this.usageList = Object.keys(this.groupedByUsage);
+                        this.selectedUsage = this.usageList[0];
 
-                    // ✅ Initialize extraAttributes before using it
-                    this.selectedTransTypeData = res[0]; // ensure defineExtraAttributes uses correct data
-                    this.defineExtraAttributes();
+                        // ✅ Initialize extraAttributes before using it
+                        this.selectedTransTypeData = res[0]; // ensure defineExtraAttributes uses correct data
+                        this.defineExtraAttributes();
 
-                    this.loadRecommendedAndAdditionalExtraDataLookupLists();
+                        this.loadRecommendedAndAdditionalExtraDataLookupLists();
 
-                    setTimeout(() => this.scrollToUsage(this.selectedUsage), 200);
-                }
-            });
+                        setTimeout(() => this.scrollToUsage(this.selectedUsage), 200);
+                    }
+                });
+        })).subscribe((res) => {
+            this.entityObjectTypeHostId = res ? res : 764;
+        });
+
     }
 
 
@@ -372,15 +446,15 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
 
     onExtraAttributesChanged(dataFromChild: any[]) {
         this.formTouched = true;
-        if (!this.appTransactionsForViewDto) {
-            this.appTransactionsForViewDto = new GetAppTransactionsForViewDto();
+        if (!this.dynamicInputsForViewDto) {
+            this.dynamicInputsForViewDto = new GetAppEntityForEditOutput();
         }
 
-        if (!this.appTransactionsForViewDto.entityExtraData) {
-            this.appTransactionsForViewDto.entityExtraData = [];
+        if (!this.dynamicInputsForViewDto.entityExtraData) {
+            this.dynamicInputsForViewDto.entityExtraData = [];
         }
 
-        const existingData = this.appTransactionsForViewDto.entityExtraData;
+        const existingData = this.dynamicInputsForViewDto.entityExtraData;
 
         // Step 1: Map incoming data cleanly
         const incomingData: AppEntityExtraDataDto[] = dataFromChild.flatMap(attr => {
@@ -388,12 +462,17 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
                 return (attr.value || []).map(v => {
                     const d = new AppEntityExtraDataDto();
                     d.attributeId = attr.attributeId;
+                    d.tenatId = this.appSession?.tenantId;
+                    d.entityid = this.entityObjectTypeHostId;
                     d.attributeValueId = v;
                     return d;
                 });
             } else {
                 const dto = new AppEntityExtraDataDto();
                 dto.attributeId = attr.attributeId;
+                dto.tenatId = this.appSession?.tenantId;
+                dto.entityid = this.entityObjectTypeHostId;
+
                 if (attr.isLookup) {
                     dto.attributeValueId = attr.value;
                 } else {
@@ -416,12 +495,12 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         const finalData = [...filteredExistingData, ...cleanIncomingData];
         console.log(finalData, 'finalData')
 
-        this.appTransactionsForViewDto.entityExtraData = finalData;
+        this.dynamicInputsForViewDto.entityExtraData = finalData;
 
     }
 
     onExtraAttributeCleared(attributeId: number) {
-        const data = this.appTransactionsForViewDto?.entityExtraData;
+        const data = this.dynamicInputsForViewDto?.entityExtraData;
         if (data && data.length > 0) {
             let index = -1;
             while ((index = data.findIndex(x => x.attributeId === attributeId)) !== -1) {

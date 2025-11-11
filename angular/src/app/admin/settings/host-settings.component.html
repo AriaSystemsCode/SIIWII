@@ -48,9 +48,9 @@
                                   
                                   <app-dynamicInputs
                                   [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
-                                    [entityObjectTypeId]="764"
+                                    [entityObjectTypeId]="entityObjectTypeHostId"
                                     [entityType]="'Settings'"
-                                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                    [dynamicInputsForViewDto]="dynamicInputsForViewDto"
                                     (extraDataCleared)="onExtraAttributeCleared($event)" (extraDataChanged)="onExtraAttributesChanged($event)"
                                     [fromSetting]="true">
                                   </app-dynamicInputs>
