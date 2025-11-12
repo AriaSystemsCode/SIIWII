@@ -9781,7 +9781,7 @@ namespace onetouch.Accounts
                 List<AppContact> contacts = new List<AppContact>();
                 try
                 {
-                   // using (var dbContextTransaction = con.Database.BeginTransaction())
+                    // using (var dbContextTransaction = con.Database.BeginTransaction())
                     {
                         if (accountsList.Count > 0)
                             con.AppContacts.AddRange(accountsList);
@@ -9798,6 +9798,14 @@ namespace onetouch.Accounts
                         {
                             //I40 publiah manula account[start]
                             //I40
+                            if (acc.AppContactAddresses != null)
+                            {
+                                foreach (var z in acc.AppContactAddresses)
+                                {
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
+                                }
+                            }
 
                             {
                                 var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
@@ -9812,36 +9820,37 @@ namespace onetouch.Accounts
                             //I40][end]
                             foreach (var br in acc.ParentFkList)
                             {
-                                br.AccountId = acc.Id;
-
-                                if (br.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
-                                    contacts.Add(br);
-
-                                if (br.ParentFkList != null)
+                                //xx
+                                if (br.AppContactAddresses != null)
                                 {
-                                    foreach (var cont in br.ParentFkList)
+                                    foreach (var z in br.AppContactAddresses)
                                     {
-                                        cont.AccountId = acc.Id;
-                                        contacts.Add(cont);
-                                        if (cont.ParentFkList != null && cont.ParentFkList.Count > 0)
+                                        if (z.AddressFk != null)
+                                            z.AddressFk.AccountId = acc.Id;
+                                    }
+                                }
+                                //xx
+                                br.AccountId = acc.Id;
+                                foreach (var cont in br.ParentFkList)
+                                {
+                                    //xx
+                                    if (cont.AppContactAddresses != null)
+                                    {
+                                        foreach (var z in cont.AppContactAddresses)
                                         {
-                                            contacts.Add(cont);
-                                            foreach (var sub in cont.ParentFkList)
-                                            {
-                                                sub.AccountId = acc.Id;
-                                                // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
-                                                // ac  ol6tttttt5countsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
-
-                                            }
+                                            if (z.AddressFk != null)
+                                                z.AddressFk.AccountId = acc.Id;
                                         }
                                     }
+                                    //xx
+                                    cont.AccountId = acc.Id;
                                 }
                             }
                         }
                         con.AppContacts.UpdateRange(accountsList);
                         await con.SaveChangesAsync();
                         //I40[Start]
-                      //  dbContextTransaction.Commit();
+                        //  dbContextTransaction.Commit();
                     }
                     foreach (var acct in accountsList)
                     {
@@ -9879,6 +9888,7 @@ namespace onetouch.Accounts
                     }
                     //I40[End]
                     // accountContact
+                
 
                 }
                 catch (Exception expt)
@@ -9897,6 +9907,16 @@ namespace onetouch.Accounts
                         await con.SaveChangesAsync();
                         foreach (var acc in accountsList)
                         {
+                            //xx
+                            if (acc.AppContactAddresses != null)
+                            {
+                                foreach (var z in acc.AppContactAddresses)
+                                {
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
+                                }
+                            }
+                            //xx
                             //I40 publiah manula account[start]
                             //I40
 
@@ -9913,20 +9933,40 @@ namespace onetouch.Accounts
                             //I40][end]
                             foreach (var br in acc.ParentFkList)
                             {
+                                //xx
+                                if (br.AppContactAddresses != null)
+                                {
+                                    foreach (var z in br.AppContactAddresses)
+                                    {
+                                        if (z.AddressFk != null)
+                                            z.AddressFk.AccountId = acc.Id;
+                                    }
+                                }
+                                //xx
                                 br.AccountId = acc.Id;
                                 foreach (var cont in br.ParentFkList)
                                 {
+                                    //xx
+                                    if (cont.AppContactAddresses != null)
+                                    {
+                                        foreach (var z in cont.AppContactAddresses)
+                                        {
+                                            if (z.AddressFk != null)
+                                                z.AddressFk.AccountId = acc.Id;
+                                        }
+                                    }
+                                    //xx
                                     cont.AccountId = acc.Id;
                                 }
                             }
-
                         }
                         con.AppContacts.UpdateRange(accountsList);
                         await con.SaveChangesAsync();
                         dbContextTransaction.Commit();
                         //
                         //I40[Start]
-
+                        await con.SaveChangesAsync();
+                       
                         foreach (var acc in accountsList)
                         {
                             var contactList = await _appContactRepository.GetAll().Include(z => z.EntityFk)
