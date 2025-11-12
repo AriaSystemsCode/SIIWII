@@ -100,3 +100,7 @@ input{
     left: 12px;
     top: 15px;
 }
+
+::ng-deep .Login_container {
+    text-align: justify !important;
+}
