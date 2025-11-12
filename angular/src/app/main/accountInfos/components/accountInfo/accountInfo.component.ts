@@ -886,13 +886,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         .subscribe(result => {
           if (!result) return;
       
-          // ✅ set ids first
+      
           this.accountId = result?.accountInfo?.id;
           if (this.appSession?.user) {
             this.appSession.user.accountId = this.accountId;  // keep session in sync
           }
       
-          // ✅ (optional) update tenant currency, flags, etc.
+       
           this.touched = false;
           this.notify.success(this.l('SavedSuccessfully'));
           this.appSession.tenant.currencyInfoDto =
@@ -903,9 +903,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
           this.getForEditResult.lastChangesIsPublished = false;
           this.updateLogoService.updateLogo();
       
-          // ✅ load the data for view using the fresh id
+    
           this.getAccountDataForView().then(() => {
-            // ✅ now it’s safe to navigate/switch tab
+
             this._router.navigate(['/app/main/account'], {
               queryParams: { tab: 'ProfileView' }
             });

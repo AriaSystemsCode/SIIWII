@@ -141,7 +141,15 @@ export class MarketplaceProductsComponent
 
     }
     ngOnInit() {
+        const state = (this._router.getCurrentNavigation()?.extras?.state ?? history.state) as any;
 
+        if (state?.accountDataForView) {
+          this.fromMarketAcoount = !!state.fromMarketAcoount;
+          this.accountDataForView = state.accountDataForView;
+          this.marketplaceAccCurrency = state.marketplaceAccCurrency;
+
+          localStorage.removeItem('productFilters');
+        }
         const savedFilters = localStorage.getItem("productFilters");
 
         if (savedFilters) {
@@ -239,7 +247,10 @@ export class MarketplaceProductsComponent
 
     getAllProducts() {
         this.showMainSpinner();
-
+        const selectedCurrency =
+        (this.fromMarketAcoount || this.fromOverView)
+          ? (this.marketplaceAccCurrency || 'USD')
+          : (this.selectedCurrrency?.code || this.selectedCurrrency || 'USD');
         const requestParams = {
             contactSSIN: this.contactSSIN,
             sellerSSIN: this.sellerSSIN,
@@ -256,7 +267,7 @@ export class MarketplaceProductsComponent
             startShipData: this.startShipData || null,
             endShipData: this.endShipData || null,
             brands: this.brands || [],
-            selectedCurrency: this.fromMarketAcoount || this.fromOverView ? this.marketplaceAccCurrency : this.selectedCurrrency?.code || this.selectedCurrrency || 'USD',
+            selectedCurrency,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
             maxResultCount: this.fromOverView ? 8 : this.maxResultCount
