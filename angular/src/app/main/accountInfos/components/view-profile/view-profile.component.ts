@@ -646,5 +646,15 @@ private mergeAttachmentsForSave(
     return out;
   }
   
+  get hasInvalidEmailOrPhone(): boolean {
+    // Only consider invalid if the user typed something AND it doesn't match the pattern
+    const email = (this.editEMailAddressValue || '').trim();
+    const phone = (this.editPhoneNumberValue || '').trim();
+  
+    const emailBad = !!email && !(new RegExp(this.emailPattern).test(email));
+    const phoneBad = !!phone && !(new RegExp(this.phonePattern).test(phone));
+  
+    return emailBad || phoneBad;
+  }
   
 }

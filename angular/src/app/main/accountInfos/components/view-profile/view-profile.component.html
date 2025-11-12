@@ -19,10 +19,14 @@
                                 [class.hide]="editInfo" (click)="cancelPerAcc()">
                                 {{ "Cancel" | localize }}
                             </button>
-                            <button class="btn mb-3 mt-4 editAccount_butn Save_editPersonal text-white" type="submit"
-                                [class.hide]="editInfo" (click)="editPersonal=true; editAccount()">
-                                {{ "Save" | localize }}
-                            </button>
+                            <button class="btn mb-3 mt-4 editAccount_butn Save_editPersonal text-white"
+                                type="submit"
+                                [class.hide]="editInfo"
+                                [disabled]="hasInvalidEmailOrPhone"
+                                (click)="editPersonal=true; editAccount()">
+                        {{ "Save" | localize }}
+                        </button>
+
                         </div>
                     </div>
                 </div>
@@ -497,7 +501,7 @@
                                     [placeholder]="'Please Enter eMail Address' | localize " required
                                     [class.hide]="editInfo">
 
-                                <div *ngIf="eMailAddressInput.errors &&(eMailAddressInput.touched || eMailAddressInput.dirty) && NoteditInfo"
+                                <div *ngIf="editEMailAddressValue != '' && eMailAddressInput.errors &&(eMailAddressInput.touched || eMailAddressInput.dirty) && NoteditInfo"
                                     class="text-danger">
                                     <small>
                                         Invalid Email
@@ -550,7 +554,7 @@
                                     [placeholder]="'Please Enter phone Number' | localize " required
                                     [class.hide]="editInfo">
 
-                                <div *ngIf="phoneNumberInput.errors &&(phoneNumberInput.touched || phoneNumberInput.dirty)  && NoteditInfo"
+                                <div *ngIf="editPhoneNumberValue && phoneNumberInput.errors &&(phoneNumberInput.touched || phoneNumberInput.dirty)  && NoteditInfo"
                                     class="text-danger">
                                     <small>
                                         Invalid Phone
