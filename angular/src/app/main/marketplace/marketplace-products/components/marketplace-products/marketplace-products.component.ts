@@ -323,36 +323,46 @@ export class MarketplaceProductsComponent
     }
 
 
+    // setCurrency() {
+    //     const currencyCodeRaw = localStorage.getItem("currencyCode");
+    //     if (!currencyCodeRaw || currencyCodeRaw === "undefined" || currencyCodeRaw === "null") {
+    //         this.selectedCurrrency = this.tenantDefaultCurrency;
+    //     } else {
+    //         try {
+    //             const parsed = JSON.parse(currencyCodeRaw);
+    //             this.selectedCurrrency = parsed;
+
+    //         } catch (e) {
+    //             // Fallback to string if it's not a JSON object
+    //             this.selectedCurrrency = currencyCodeRaw;
+
+    //         }
+    //     }
+
+    //     this.currency = this.selectedCurrrency?.code ?? this.selectedCurrrency;
+
+    //     // If it's just a code (e.g., "AFN"), find matching currency object
+    //     if (!this.selectedCurrrency?.code) {
+    //         const match = this.currencies?.find(x => x.code === this.selectedCurrrency);
+
+    //         if (match) {
+    //             this.selectedCurrrency = match;
+    //         }
+    //     }
+    // }
+
+
     setCurrency() {
-        const currencyCodeRaw = localStorage.getItem("currencyCode");
-        if (!currencyCodeRaw || currencyCodeRaw === "undefined" || currencyCodeRaw === "null") {
-            this.selectedCurrrency = this.tenantDefaultCurrency;
-        } else {
-            try {
-                const parsed = JSON.parse(currencyCodeRaw);
-                this.selectedCurrrency = parsed;
+        // read string code from localStorage
+        const saved = localStorage.getItem('currencyCode');
+        const code = saved && saved !== 'null' && saved !== 'undefined' ? saved : (this.tenantDefaultCurrency?.code ?? 'USD');
+      
+        this.selectedCurrrency = code;            // keep it a string
+        this.currency = code;                     // if you still use this elsewhere
+      }
+      
 
-            } catch (e) {
-                // Fallback to string if it's not a JSON object
-                this.selectedCurrrency = currencyCodeRaw;
-
-            }
-        }
-
-        this.currency = this.selectedCurrrency?.code ?? this.selectedCurrrency;
-
-        // If it's just a code (e.g., "AFN"), find matching currency object
-        if (!this.selectedCurrrency?.code) {
-            const match = this.currencies?.find(x => x.code === this.selectedCurrrency);
-
-            if (match) {
-                this.selectedCurrrency = match;
-            }
-        }
-    }
-
-
-
+      
     onPageChange(value: any) {
         this.skipCount = value.first;
         this.maxResultCount = value.rows;
