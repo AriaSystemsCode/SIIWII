@@ -5953,11 +5953,32 @@ namespace onetouch.Accounts
                             await con.SaveChangesAsync();
                             foreach (var acc in accountsList)
                             {
+                                //xx
+                                foreach (var z in acc.AppContactAddresses)
+                                {
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
+                                }
+                                //xx
                                 foreach (var br in acc.ParentFkList)
                                 {
+                                    //xx
+                                    foreach (var z in br.AppContactAddresses)
+                                    {
+                                        if (z.AddressFk != null)
+                                            z.AddressFk.AccountId = acc.Id;
+                                    }
+                                    //xx
                                     br.AccountId = acc.Id;
                                     foreach (var cont in br.ParentFkList)
                                     {
+                                        //xx
+                                        foreach (var z in cont.AppContactAddresses)
+                                        {
+                                            if (z.AddressFk != null)
+                                                z.AddressFk.AccountId = acc.Id;
+                                        }
+                                        //xx
                                         cont.AccountId = acc.Id;
                                     }
                                 }
