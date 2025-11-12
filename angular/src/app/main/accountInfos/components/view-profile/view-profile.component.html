@@ -39,51 +39,55 @@
                                             [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                             [staticWidth]="viewProfileCover?.offsetWidth">
                                         </app-image-display>
-                                        <div class="mr-3 "
-                                            [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
-                                            *ngIf="!viewMode&&isNotManualLevel()">
-                                            <button class="btn editAccount_butn" (click)="editAccount()"
-                                                [disabled]="Editting">
-                                                <img src="../../assets/img/input_icons/edit.png" class="">
-                                                {{ "Edit" | localize }}
-                                            </button>
-                                            <button class="btn transparent-button" (click)="UnShareAccount()"
-                                                *ngIf="isPublished&&connectionCount==0&&isNotManualLevel()"
-                                                [class.hide]="hidUshare">
-                                                <img src="../../assets/img/input_icons/privateAccount.png" class="">
-                                                {{ "Private" | localize }}
-                                            </button>
-                                            <button class="btn transparent-button" (click)="UnShareAccount()"
-                                                *ngIf="isPublished&&connectionCount!=0&&isNotManualLevel()"
-                                                [class.hide]="hidUshare">
-                                                <img src="../../assets/img/input_icons/hideAccount.png" class="">
-                                                {{ "Hide" | localize }}
-                                            </button>
-
-
-                                            <button class="btn transparent-button " (click)="UnShareAccount()"
+                                        <div class="mr-3 "     [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
+                                        *ngIf="!viewMode&&isNotManualLevel()">
+                                        <button class="btn editAccount_butn" (click)="editAccount()"
+                                            [disabled]="Editting">
+                                            <img src="../../assets/img/input_icons/edit.png" class="">
+                                            {{ "Edit" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button" (click)="UnShareAccount()"
+                                            *ngIf="isPublished&&connectionCount==0&&isNotManualLevel()"
+                                            [class.hide]="hidUshare">
+                                            <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                            {{ "Private" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button" (click)="UnShareAccount()"
+                                            *ngIf="isPublished&&connectionCount!=0&&isNotManualLevel()"
+                                            [class.hide]="hidUshare">
+                                            <img src="../../assets/img/input_icons/hideAccount.png" class="">
+                                            {{ "Hide" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button alaa" (click)="UnShareAccount()"
                                             *ngIf="isNotManualLevel()" [ngClass]="{'hide':showPrivate}">
                                             <img src="../../assets/img/input_icons/privateAccount.png" class="">
                                             {{ "Private" | localize }}
                                         </button>
-                                        <button class="btn transparent-button " (click)="UnShareAccount()"
+                                        <button class="btn transparent-button alaa" (click)="UnShareAccount()"
                                             *ngIf="isNotManualLevel()" [class.hide]="showHide">
                                             <img src="../../assets/img/input_icons/hideAccount.png">
                                             {{ "Hide" | localize }}
                                         </button>
-                                            <button pButton pRipple label="Share"
-                                                class="share btn transparent-button " icon="pi pi-share-alt"
-                                                (click)="openShareAccountsModal()"
-                                                *ngIf="!isPublished&&isNotManualLevel()"
-                                                [class.hide]="hideshowShare"></button>
 
 
-                                            <button pButton pRipple label="Sync" *ngIf="isNotManualLevel()"
-                                                class="sync btn" icon="pi pi-sync" (click)="syncAccount()"
-                                                [loading]="btnLoader" [disabled]="isSync == false"></button>
+                                        <button pButton pRipple label="Share"
+                                            class="share btn transparent-button alaa" icon="pi pi-share-alt"
+                                            (click)="openShareAccountsModal()"
+                                            *ngIf="!isPublished&&isNotManualLevel()"
+                                            [class.hide]="hideshowShare"></button>
+
+                                        <button pButton pRipple label="Share"
+                                            class="share btn transparent-button lol" icon="pi pi-share-alt"
+                                            *ngIf="isNotManualLevel()" (click)="openShareAccountsModal()"
+                                            [ngClass]="{'hide':showShare}"></button>
+
+                                        <button pButton pRipple label="Sync" *ngIf="isNotManualLevel()"
+                                            class="sync btn" icon="pi pi-sync" (click)="syncAccount()"
+                                            [loading]="btnLoader" [disabled]="isSync == false"></button>
 
 
-                                        </div>
+                                    </div>
+
 
                                         <div class="d-flex"
                                             [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"

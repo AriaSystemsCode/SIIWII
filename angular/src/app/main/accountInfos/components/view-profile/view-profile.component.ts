@@ -9,7 +9,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
-import { AbpSessionService, IAjaxResponse, TokenService } from 'abp-ng2-module';
+import { IAjaxResponse, TokenService } from 'abp-ng2-module';
 @Component({
     selector: 'app-view-profile',
     styleUrls: ['./view-profile.component.scss'],
@@ -138,6 +138,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.initUploaders();
+
     }
 
     prevImageClick() {
@@ -189,9 +190,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             if (!this.editedPersonalData) {
                 this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
             }
-            console.log(this.accountData.entityAttachments, 'data')
-            console.log(this.accountData.logoUrl, 'logo')
-            console.log(this.accountData.coverUrl, 'cooo')
             this.editedPersonalData.firstName = this.editFirstNameValue
             this.editedPersonalData.lastName = this.editLastNameValue
             this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
@@ -201,7 +199,15 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.editedPersonalData.jobTitle = this.editJobTitleValue;
             this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
             this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
-            this.contactData.entityAttachments = this.accountData.entityAttachments
+            this.contactData.entityAttachments = this.mergeAttachmentsForSave(
+                this.contactData.entityAttachments,  
+                this.accountData.entityAttachments,  
+                this.sycAttachmentCategoryLogo?.id, 
+                this.sycAttachmentCategoryBanner?.id, 
+                this._removed        
+              );
+              
+              
             this.contactData.languageName = this.editedPersonalData.languageName;
 
             this.editedContactData.emit(this.contactData)
@@ -349,8 +355,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
 
-
-
     editConnnectedAccount() {
         this.showMainSpinner();
         this._AccountsServiceProxy.updateConnectedAccountPriceLevel(this.accountData.id, this.priceLevel)
@@ -379,6 +383,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                 this.notify.info(this.l('Profile Shared Successfully'));
                 this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
                 this.hidUshare = true;
+                this.hideshowShare = false;   
                 this.hideshowShare = true;
                 this.showShare = true;
             }
@@ -475,7 +480,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.companyLogo = this._originalLogoUrl ?? this.companyLogo;
         this.coverPhoto = this._originalCoverUrl ?? this.coverPhoto;
 
-        // optionally also remove any pending logo/cover attachments:
+ 
         this.accountData.entityAttachments =
             (this.accountData.entityAttachments || []).filter(a => !(a.index === -1 || a.index === -2));
 
@@ -560,28 +565,18 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
 
 
-    removeImage(_evt, cat: SycAttachmentCategoryDto, index: number) {
+    removeImage(_e: any, cat: SycAttachmentCategoryDto, index: number) {
         this.accountData.entityAttachments ??= [];
+        const i = this.accountData.entityAttachments.findIndex(a => a.attachmentCategoryId === cat.id && a.index === index);
+        if (i > -1) this.accountData.entityAttachments.splice(i, 1);
+      
+        if (cat.id === this.sycAttachmentCategoryLogo?.id)  { this.companyLogo = undefined; this._removed = { ...(this._removed||{}), logo: true }; }
+        if (cat.id === this.sycAttachmentCategoryBanner?.id){ this.coverPhoto  = undefined; this._removed = { ...(this._removed||{}), cover: true }; }
+      }
+      
 
-        let existedIndex = -1;
-        if (cat.code === 'IMAGE') {
-            existedIndex = this.accountData.entityAttachments.findIndex(
-                x => x.attachmentCategoryId === cat.id && x.index === index
-            );
-        } else {
-            existedIndex = this.accountData.entityAttachments.findIndex(
-                x => x.attachmentCategoryId === cat.id && x.index === index 
-            );
-        }
 
-        if (existedIndex > -1) {
-            this.accountData.entityAttachments.splice(existedIndex, 1);
-        }
-
-        if (index === -1) { this.companyLogo = undefined; }
-        else if (index === -2) { this.coverPhoto = undefined; }
-    }
-
+private _removed: { logo?: boolean; cover?: boolean } = {};
 
     private upsertAttachment(
         list: AppEntityAttachmentDto[],
@@ -602,4 +597,54 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         return att;
     }
 
+private mergeAttachmentsForSave(
+    original: AppEntityAttachmentDto[] = [],
+    edited:   AppEntityAttachmentDto[] = [],
+    logoCatId?: number,
+    coverCatId?: number,
+    removed?: { logo?: boolean; cover?: boolean }
+  ): AppEntityAttachmentDto[] {
+  
+    const isLogo  = (a: AppEntityAttachmentDto) => !!logoCatId  && a.attachmentCategoryId === logoCatId;
+    const isCover = (a: AppEntityAttachmentDto) => !!coverCatId && a.attachmentCategoryId === coverCatId;
+  
+
+    edited.forEach(a => {
+      if (isLogo(a))  a.index = 0;  
+      if (isCover(a)) a.index = 0;   
+    });
+  
+   
+    const out: AppEntityAttachmentDto[] = [];
+    const key = (a: AppEntityAttachmentDto) => `${a.attachmentCategoryId}|${a.index}`;
+    const seen = new Set<string>();
+    edited
+      .filter(a => !!a && !isLogo(a) && !isCover(a))
+      .forEach(a => { const k = key(a); if (!seen.has(k)) { seen.add(k); out.push(a); } });
+  
+    // 2) Logo: edited wins. If not present in edited, treat as removed unless you pass removed.logo=false.
+    const editedLogo   = edited.find(isLogo);
+    const originalLogo = original.find(isLogo);
+    if (editedLogo) {
+      out.push(editedLogo);
+    } else if (!removed?.logo && originalLogo) {
+     
+      originalLogo.index = 0;
+      out.push(originalLogo);
+    }
+  
+    // 3) Cover: same logic
+    const editedCover   = edited.find(isCover);
+    const originalCover = original.find(isCover);
+    if (editedCover) {
+      out.push(editedCover);
+    } else if (!removed?.cover && originalCover) {
+      originalCover.index = 0;
+      out.push(originalCover);
+    }
+  
+    return out;
+  }
+  
+  
 }

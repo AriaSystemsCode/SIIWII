@@ -1,4 +1,4 @@
-﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, } from '@angular/core';
+﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, ChangeDetectorRef, } from '@angular/core';
 import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -151,7 +151,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private updateLogoService: UpdateLogoService,
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
-        private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy
+        private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+        private cdr: ChangeDetectorRef
     ) {
         super(injector);
 
@@ -708,7 +709,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.accountInfoTemp.entityExtraData = [];
         }
         this.accountInfoTemp.entityAttachments = this.editedContactPerData?.entityAttachments
-     
         // Ensure attributes exist
         this.ensureAttribute(701); // first name
         this.ensureAttribute(702); // last name
@@ -881,6 +881,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
+            this.updateLogoService.updateLogo();
+            this.getAccountDataForView()
           this.saving = false;          // ✅ flags only
         }))
         .subscribe(result => {
