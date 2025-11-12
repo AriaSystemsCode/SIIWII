@@ -151,38 +151,50 @@
 </div>
 
 <div class="upload-card" *ngIf="extraAttr.dataType === 'file'">
-    <!-- <label class="form-label fw-semibold">{{ extraAttr.name || 'Label' }}</label> -->
-  
-    <!-- upload box -->
-    <div class="upload-box" 
-         *ngIf="!extraAttr.selectedValues" 
-         (click)="fileInput.click()">
-      <div class="upload-content">
-        <i class="pi pi-upload upload-icon"></i>
-        <span class="upload-text">Upload File</span>
-      </div>
-      <small class="upload-note">
-        *Select a JPG | JPEG | PNG | GIF File
-      </small>
-      <input
-        type="file"
-        #fileInput
-        class="d-none"
-        accept=".jpg,.jpeg,.png,.gif"
-        (change)="onFileSelected($event, extraAttr)" />
+
+  <!-- upload box -->
+  <div class="upload-box" 
+       *ngIf="!extraAttr.selectedValues" 
+       (click)="fileInput.click()">
+    <div class="upload-content">
+      <i class="pi pi-upload upload-icon"></i>
+      <span class="upload-text">Upload File</span>
     </div>
-  
-    <!-- preview after file selected -->
-    <div *ngIf="extraAttr.selectedValues" class="uploaded-preview mt-2">
-      <i class="pi pi-check-circle text-success me-2 mr-1" style="color: #4A0D4A !important;"></i>
-      <span class="mr-1">{{ extraAttr.selectedValues.name }}</span>
-      <i class="pi pi-times ms-2 text-danger" 
+    <small class="upload-note">
+      *Select a JPG | JPEG | PNG | GIF File
+    </small>
+    <input
+      type="file"
+      #fileInput
+      class="d-none"
+      accept=".jpg,.jpeg,.png,.gif"
+      (change)="onFileSelected($event, extraAttr)" />
+  </div>
+
+  <!-- preview + upload button -->
+  <div *ngIf="extraAttr.selectedValues">
+    <!-- Preview -->
+    <div class="uploaded-preview mt-2 d-flex align-items-center">
+      <i class="pi pi-check-circle text-success me-2" style="color: #4A0D4A !important;"></i>
+      <span class="mr-2">{{ extraAttr?.selectedValues?.name?.split('|')[0] }}</span>
+      <i class="pi pi-times text-danger" 
          style="cursor: pointer;" 
          (click)="clearExtraAttr(extraAttr)"></i>
-
-
+    </div>
+  
+    <!-- Upload button aligned to right -->
+    <div class="mt-1" style="text-align: right;">
+      <button type="button" class="btn btn-sm uploadBtn me-2" 
+              *ngIf="extraAttr?.showUploadBtn"
+              (click)="onUploadFile(extraAttr.selectedValues)">
+        <i class="pi pi-upload me-1"></i> Upload
+      </button>
     </div>
   </div>
+  
+
+</div>
+
   
 
 

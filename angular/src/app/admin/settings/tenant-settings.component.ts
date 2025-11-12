@@ -53,7 +53,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
   activeAccordionIndexes: number[] = [0]; // open first tab by default
   dynamicInputsForViewDto: any
   hasUnsavedChanges = false;
-  entityObjectTypeTenantId: number;
+  entityObjectTypeTenantId: number=771;
   tenantEntityId: number;
 
 
@@ -185,10 +185,12 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     let success = false;
     this.showMainSpinner();
 
-    //i49-F6 internal error
     let appEntityDto : AppEntityDto =new AppEntityDto();
     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
-    appEntityDto.id= this.entityObjectTypeTenantId;
+    appEntityDto.id= this.tenantEntityId;
+    appEntityDto.entityObjectTypeId=this.entityObjectTypeTenantId;
+    appEntityDto.objectId= 1;
+    //i49-F6 internal error
       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
         finalize(() => {
@@ -198,10 +200,10 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
       )
       .subscribe({
         next: (results) => {
-          this.notify.success(this.l('SavedSuccessfully'));
+          this.notify.success(this.l('Saved Successfully'));
         },
         error: (err) => {
-          this.notify.error(this.l('SaveFailed'));
+          this.notify.error(this.l('Save Failed'));
         }
       });
 
@@ -382,16 +384,16 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
         return (attr.value || []).map(v => {
           const d = new AppEntityExtraDataDto();
           d.attributeId = attr.attributeId;
-          d.tenatId = this.appSession.tenantId;
-          d.entityid = this.entityObjectTypeTenantId;
+          d.entityObjectTypeId = this.entityObjectTypeTenantId;
+          d.entityid = this.tenantEntityId;
           d.attributeValueId = v;
           return d;
         });
       } else {
         const dto = new AppEntityExtraDataDto();
         dto.attributeId = attr.attributeId;
-        dto.tenatId = this.appSession.tenantId;
-        dto.entityid = this.entityObjectTypeTenantId;
+        dto.entityObjectTypeId = this.entityObjectTypeTenantId;
+        dto.entityid = this.tenantEntityId;
         if (attr.isLookup) {
           dto.attributeValueId = attr.value;
         } else {

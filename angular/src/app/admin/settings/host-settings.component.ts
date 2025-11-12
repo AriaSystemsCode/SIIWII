@@ -56,7 +56,7 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
     activeAccordionIndexes: number[] = [0]; // open first tab by default
     dynamicInputsForViewDto: any
     hasUnsavedChanges = false;
-    entityObjectTypeHostId: number;
+    entityObjectTypeHostId: number = 764;
     hostEntityId: number;
     attachmentsUploader;
     attachmets=[];
@@ -102,8 +102,8 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         const self = this;
         self.testEmailAddress = self.appSession.user.emailAddress;
         self.showTimezoneSelection = abp.clock.provider.supportsMultipleTimezone;
-        self.loadHostSettings();
-        self.loadEditions();
+      //  self.loadHostSettings();
+       // self.loadEditions();
     }
 
     ngOnInit(): void {
@@ -124,43 +124,6 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         })).subscribe(result => {
             this.hostEntityId = result;
         });
-    }
-
-    //i49-F6 upload files
-    onUploadAttachmets($event) {
-        var uploadUrl = "/Attachment/UploadFiles";
-        this.attachmentsUploader = this.createUploader(uploadUrl);
-
-        this.attachmentsUploader.addToQueue(this.attachmets);
-        this.attachmentsUploader.onBuildItemForm = (
-            fileItem: any,
-            form: any
-        ) => {
-            this.AttachmentInfoDto = [];
-            for (let i = 0; i < this.attachmets.length; i++) {
-                var guid = this.guid();
-                var _attachmentInfoDto: AppEntityAttachmentDto =
-                    new AppEntityAttachmentDto();
-                _attachmentInfoDto.guid = guid;
-                _attachmentInfoDto.fileName = this.attachmets[i].name;
-                if (this.attachmets[i].type.includes("image"))
-                    _attachmentInfoDto.attachmentCategoryEnum =
-                        AttachmentsCategories.IMAGE;
-                
-
-                this.AttachmentInfoDto.push(_attachmentInfoDto);
-                if (this.attachmets.length > 1) form.append("guid" + i, guid);
-                else form.append("guid", guid);
-            }
-        };
-
-        this.attachmentsUploader.onErrorItem = (item, response, status) => {
-            this.notify.error(this.l("UploadFailed"));
-        };
-        this.attachmentsUploader.onSuccessItem = (item, response, status) => {
-        };
-
-        this.attachmentsUploader.uploadAllFiles();
     }
 
     initUploaders(): void {
@@ -239,7 +202,9 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
           //i49-F6 internal error
             let appEntityDto : AppEntityDto=new AppEntityDto();
             appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
-            appEntityDto.id= this.entityObjectTypeHostId;
+            appEntityDto.id= this.hostEntityId;
+            appEntityDto.entityObjectTypeId=this.entityObjectTypeHostId;
+            appEntityDto.objectId= 1;
               this._appEntitiesServiceProxy.saveEntity(appEntityDto)
               .pipe(
                 finalize(() => {
@@ -249,10 +214,10 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
               )
               .subscribe({
                 next: (results) => {
-                  this.notify.success(this.l('SavedSuccessfully'));
+                  this.notify.success(this.l('Saved Successfully'));
                 },
                 error: (err) => {
-                  this.notify.error(this.l('SaveFailed'));
+                  this.notify.error(this.l('Save Failed'));
                 }
               });
 
@@ -465,16 +430,16 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
                 return (attr.value || []).map(v => {
                     const d = new AppEntityExtraDataDto();
                     d.attributeId = attr.attributeId;
-                    d.tenatId = this.appSession?.tenantId;
-                    d.entityid = this.entityObjectTypeHostId;
+                    d.entityObjectTypeId = this.entityObjectTypeHostId;
+                    d.entityid = this.hostEntityId;
                     d.attributeValueId = v;
                     return d;
                 });
             } else {
                 const dto = new AppEntityExtraDataDto();
                 dto.attributeId = attr.attributeId;
-                dto.tenatId = this.appSession?.tenantId;
-                dto.entityid = this.entityObjectTypeHostId;
+                dto.entityObjectTypeId = this.entityObjectTypeHostId;
+                dto.entityid = this.hostEntityId;
 
                 if (attr.isLookup) {
                     dto.attributeValueId = attr.value;
