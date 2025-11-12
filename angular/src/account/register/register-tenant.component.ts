@@ -37,7 +37,7 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
 
     saving = false;
-    domainPattern = Patterns.domainName
+    domainPattern = Patterns.workspaceName
     accountType;
 
    accountTypeLabel:string="";
