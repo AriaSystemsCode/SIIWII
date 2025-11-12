@@ -1765,6 +1765,7 @@ namespace onetouch.Accounts
                 {
                     if (tenantId != AbpSession.TenantId)
                     {
+                        return;
                         var tenant = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenant != null)
                         {

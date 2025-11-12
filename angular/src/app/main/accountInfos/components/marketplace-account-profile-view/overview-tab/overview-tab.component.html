@@ -128,7 +128,7 @@
 
 
 
-        Department :
+        Departments :
           </div>
           <div class="d-flex py-1 flex-wrap">
             <div *ngFor="let category of accountDataForView?.categories">
@@ -166,7 +166,7 @@
       <div class="d-flex justify-content-between align-items-center">
         <h4 class="mt-1 mb-0">Overall Rating</h4>
         <button class="all-btn d-flex">
-          <p class="m-auto" (click)=" goReviews() ">See More</p>
+          <p class="m-auto" (click)=" goReviews() ">See All</p>
         </button>
 
       </div>
@@ -180,7 +180,7 @@
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(5) : activeTabIndexBtn.emit(4) "
           class="all-btn d-flex">
-          <p class="m-auto">See More</p>
+          <p class="m-auto">See All</p>
         </button>
 
       </div>
@@ -247,7 +247,7 @@
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(4) : activeTabIndexBtn.emit(3) "
           class="all-btn d-flex">
-          <p class="m-auto">See More</p>
+          <p class="m-auto">See All</p>
         </button>
 
       </div>
@@ -268,7 +268,7 @@
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(2) : activeTabIndexBtn.emit(1) "
           class="all-btn d-flex">
-          <p class="m-auto">See More</p>
+          <p class="m-auto">See All</p>
         </button>
 
       </div>
@@ -286,14 +286,14 @@
       <div class="d-flex justify-content-between">
         <h4 class="">Products</h4>
         <button (click)="activeTabIndexBtn.emit(1) " class="all-btn d-flex">
-          <p class="m-auto">See More</p>
+          <p class="m-auto">See All</p>
         </button>
 
       </div>
       <hr class="hr">
       <div class="d-flex justify-content-between">
         <h4 class="" style="font-size: 14px;">For full viewing of {{ "''"+ accountDataForView?.name + "''"}}</h4>
-        <button (click)="activeTabIndexBtn.emit(1) " class="vist-btn d-flex">
+        <button (click)="goSvR() " class="vist-btn d-flex">
           <p class="m-auto">Visit Virtual Showroom</p>
         </button>
 
@@ -311,7 +311,7 @@
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(3) : activeTabIndexBtn.emit(2) "
           class="all-btn d-flex">
-          <p class="m-auto">See More</p>
+          <p class="m-auto">See All</p>
         </button>
 
       </div>
@@ -324,7 +324,7 @@
       <div class="d-flex justify-content-between">
         <h4 class="">Reviews</h4>
         <button class="all-btn d-flex">
-          <p class="m-auto">See More</p>
+          <p class="m-auto">See All</p>
         </button>
 
       </div>

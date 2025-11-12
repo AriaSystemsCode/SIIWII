@@ -93,3 +93,14 @@ input{
     right: 12px;
     top: 15px;
 }
+
+
+.ar-user_icon {
+    position: absolute;
+    left: 12px;
+    top: 15px;
+}
+
+::ng-deep .Login_container {
+    text-align: justify !important;
+}
