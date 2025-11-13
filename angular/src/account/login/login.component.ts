@@ -27,6 +27,9 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
     oldUserName:string;
+    currentLang:string
+    isArabic:boolean 
+    
     constructor(
         injector: Injector,
         public loginService: LoginService,
@@ -61,7 +64,8 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         if (
             this._sessionService.userId > 0 &&
             UrlHelper.getReturnUrl() &&

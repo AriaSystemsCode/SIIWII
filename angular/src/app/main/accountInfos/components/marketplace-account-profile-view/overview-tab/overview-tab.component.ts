@@ -1,7 +1,8 @@
 import { Component, ElementRef, EventEmitter, Injector, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Router } from '@node_modules/@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto, CreateMessageInput, GetAppPostForViewDto, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto, CreateMessageInput, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -22,10 +23,11 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
 
   messages: CreateMessageInput = new CreateMessageInput();
   loginAccoutType: string = "";
-  isModalOpen : boolean = false;
-  selectedIndex : number = 0; 
-  totalImgs : number =0
-  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy
+  isModalOpen: boolean = false;
+  selectedIndex: number = 0;
+  totalImgs: number = 0
+  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy,
+    private _router: Router,
 
   ) {
     super(injector);
@@ -39,9 +41,6 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
 
   }
 
-
-  ngOnChanges() {
-  }
 
   getAllMedia() {
     this.showMainSpinner()
@@ -83,27 +82,18 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     this.reviewsSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
-
-
-
-
   getOverAllRatings() {
     const subs = this.messageServiceProxy
       .getOverAllRatings(
         this.accountDataForView.entityId,
       )
       .pipe(
-        finalize(() => {
-
-        })
+        finalize(() => { })
       )
       .subscribe(
         (result) => {
           this.overRating = result
-
-        },
-
-      );
+        },);
     this.subscriptions.push(subs);
   }
 
@@ -111,19 +101,25 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId, 5).subscribe((res) => {
       this.loginAccoutType = res.account.accountType;
     }
-
     )
   }
 
   handleRefreshRating(event: boolean) {
     if (event) {
-  
-
-    this.getOverAllRatings()
+      this.getOverAllRatings()
     }
   }
-  
 
+  goSvR() {
+    this._router.navigate(['/app/main/marketplace/products'], {
+      state: {
+        fromMarketAcoount: true,
+        accountDataForView: this.accountDataForView,
+        marketplaceAccCurrency: this.accountDataForView?.currencyName
+      }
+    });
+  }
+  
 
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();
