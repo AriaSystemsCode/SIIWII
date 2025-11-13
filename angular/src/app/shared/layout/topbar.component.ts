@@ -467,7 +467,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         let firstName = btoa(this.appSession.user.name);
         let lastName = btoa(this.appSession.user.surname);
         let relatedTenantId = this.appSession.tenantId;
-        const htmlTitle: string = `<div class="font-weight-bold"><p class="text-left alarmInfo_title"> <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"/> A registration mail has been Sent to ` + email + ` </p> </div> `;
+        const htmlTitle: string = `<div class="font-weight-bold"><p class="text-left alarmInfo_title"> <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"/> A registration Email has been Sent to ` + email + ` </p> </div> `;
         const htmlContent: string = `<p class="pleaseClick" style="color: #9E9E9E;">*Please Click on the register link in the email in order to create the new  Business | group account. </p> `;
         var tenantId;
         if (this.appSession?.tenantId)
