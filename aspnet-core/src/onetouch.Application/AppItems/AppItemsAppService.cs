@@ -6396,7 +6396,8 @@ namespace onetouch.AppItems
                     //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
 
                     if (excelDto.ExcelDto.Code == "-") { excelDto.ExcelDto.Code = excelDto.Code; }
-                    if (excelDto.ExcelDto.NoOfDim == null) { excelDto.ExcelDto.NoOfDim = "1"; }
+                    if (excelDto.ExcelDto.Name == "-") { excelDto.ExcelDto.Name = excelDto.Name; }
+                        if (excelDto.ExcelDto.NoOfDim == null) { excelDto.ExcelDto.NoOfDim = "1"; }
                     if(string.IsNullOrEmpty(excelDto.ExcelDto.ImageType)){excelDto.ExcelDto.ImageType = "Image";}
                     
                     var xexcelDto = AddExtraAttrs(excelDto).Result;
