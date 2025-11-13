@@ -6223,6 +6223,65 @@ namespace onetouch.AppItems
             #endregion add classifications
 
         }
+
+        public async Task<AppItemtExcelRecordDTO> AddExtraAttrs(AppItemtExcelRecordDTO input)
+        {
+            var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+            var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z => z.Code).FirstOrDefault();
+            if (defaultProductType == null)
+                throw new UserFriendlyException("No Product type is marked as default.");
+            else
+            {
+                var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
+                var productTypeId = pdtyp.FirstOrDefault();
+
+                input.ExcelDto.ProductType = defaultProductType;
+                var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));
+                var entityextr = entityObjectExtraAttribute.FirstOrDefault();
+                List<ExtraAttribute> entityExtraAttributes = null;
+                if (entityextr != null && entityextr.ExtraAttributes != null)
+                    entityExtraAttributes = entityextr.ExtraAttributes.ExtraAttributes;
+                input.ExcelDto.ExtraAttributes = entityExtraAttributes;
+                input.ExcelDto.ExtraAttributesValues = new List<AppItemImpExtrAttributes>();
+
+                foreach (var extra in entityExtraAttributes)
+                {
+
+                    if (extra != null)
+                    {
+                        var xCode = extra.IsLookup ? extra.Name.Replace(" ", "") + "Code" : extra.Name.Replace(" ", "");
+                        var xName = extra.IsLookup ? extra.Name.Replace(" ", "") + "Name" : extra.Name.Replace(" ", "");
+
+                        var valueCode = input.ExcelDto.GetType()
+                          .GetProperty(xCode,
+                              System.Reflection.BindingFlags.IgnoreCase
+                              | System.Reflection.BindingFlags.Public
+                              | System.Reflection.BindingFlags.Instance)
+                          ?.GetValue(input.ExcelDto, null);
+
+                        var valueName = input.ExcelDto.GetType()
+                          .GetProperty(xName,
+                              System.Reflection.BindingFlags.IgnoreCase
+                              | System.Reflection.BindingFlags.Public
+                              | System.Reflection.BindingFlags.Instance)
+                          ?.GetValue(input.ExcelDto, null);
+
+
+                        input.ExcelDto.ExtraAttributesValues.Add(new AppItemImpExtrAttributes
+                        {
+                            Name = extra.Name.ToString(),
+                            Code = valueCode == null ? "" : valueCode.ToString(),
+                            Value = valueName == null ? "" : valueName.ToString(),
+                        });
+
+                    }
+                }
+
+
+            }
+            return input;
+        }
+
         //Mariama
         //public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
         //{
