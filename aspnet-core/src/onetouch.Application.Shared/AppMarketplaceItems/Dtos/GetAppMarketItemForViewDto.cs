@@ -37,6 +37,8 @@ namespace onetouch.AppMarketplaceItems.Dtos
         //I49[Start]
         public string ShowMSRP { set; get; }
         public string ShowStockAvailability { set; get; }
+        public string ShowInOutStockFlag { set; get; }
+        public string ShowWarningLabelMajorOutStockFlag { set; get; }
         //I49[End]
     }
     public class GetAppMarketplaceItemWithPagedAttributesForViewInput : GetAppItemWithPagedAttributesInput

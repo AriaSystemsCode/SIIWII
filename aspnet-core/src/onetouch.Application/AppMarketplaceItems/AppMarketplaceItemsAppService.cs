@@ -490,6 +490,8 @@ namespace onetouch.AppMarketplaceItems
                 //I49[Start]
                 string showStockQty = await _appEntitiesAppService.GetHostSettingValue(1215);
                 string showMSRP = await _appEntitiesAppService.GetHostSettingValue(1214);
+                string showInOutStockFlag = await _appEntitiesAppService.GetHostSettingValue(1216);
+                string showWarningLabelMajorOutStockFlag = await _appEntitiesAppService.GetHostSettingValue(1217);
                 //I49[End]
                 //MMT
                 var stopwatch = new System.Diagnostics.Stopwatch();
@@ -1432,9 +1434,11 @@ namespace onetouch.AppMarketplaceItems
                         }
                         output.ShowMSRP = showMSRP;
                         output.ShowStockAvailability = showStockQty;
+                        output.ShowInOutStockFlag = showInOutStockFlag;
+                        output.ShowWarningLabelMajorOutStockFlag = showWarningLabelMajorOutStockFlag;
                         //if (relateditems != null && relateditems.Count > 0)
                         //{
-                        
+
                         //MMT
                         stopwatch.Stop();
                         var elapsed_time = stopwatch.ElapsedMilliseconds;
