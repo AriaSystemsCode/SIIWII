@@ -6224,11 +6224,1901 @@ namespace onetouch.AppItems
 
         }
         //Mariama
+        //public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
+        //{
+        //    List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
+        //    ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
+
+        //    #region handle 4,2,3 actions
+        //    // select type images
+        //    // action 2 add to item
+        //    // action 3 add to item code
+        //    // action 4 add to color
+        //    // remove from result
+
+        //    // temp
+        //    //excelResultsDTO.ExcelRecords[0].ExcelDto.Actions = "2";
+        //    //excelResultsDTO.ExcelRecords[0].ExcelDto.Code = "166283";
+        //    //excelResultsDTO.ExcelRecords[0].ExcelDto.ImagePreview = "I-SADE1.png";
+
+
+        //    //excelResultsDTO.ExcelRecords[1].ExcelDto.Actions = "3";
+        //    //excelResultsDTO.ExcelRecords[1].ExcelDto.Code = "621585";
+        //    //excelResultsDTO.ExcelRecords[1].ExcelDto.ImagePreview = "SADE2.png";
+
+        //    // temp end
+        //    List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
+        //        .Where(r => r.Status.ToUpper() == "PASSED" && (r.ExcelDto.Actions == "7" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
+        //        || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6"
+        //        || r.ExcelDto.Actions == "8"
+        //        || r.ExcelDto.Actions == "9"
+        //        || r.ExcelDto.Actions == "10" || r.RecordType == "Color")
+        //        && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
+        //    foreach (var excelDto in result123)
+        //    {
+        //        int number = 0;
+        //        if (excelDto.ExcelDto.Actions != null)
+        //        { number = Int32.Parse(excelDto.ExcelDto.Actions); }
+
+        //        if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType == "Color")
+        //        {
+        //            if (number == 10) { excelDto.ExcelDto.Code = "-"; }
+        //            foreach (var id in excelDto.ExcelDto.Code.Split(","))
+        //            { var ret1 = SaveImageToColor(id, excelDto).Result; }
+        //        }
+        //        if (number == 5)
+        //        {
+        //            if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+        //            //string guid = System.Guid.NewGuid().ToString();
+
+        //            excelDto.ExcelDto.Images.Add(new AppItemImage
+        //            {
+        //                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+        //                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+        //                IsDefault = excelDto.ExcelDto.ImageIsDefault
+
+        //            });
+        //            //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
+        //            excelDto.ExcelDto.Actions = "";
+        //            excelDto.ExcelDto.RecordType = "Item";
+        //            excelDto.RecordType = "Item";
+
+
+        //        }
+
+        //        if (number == 6)
+        //        {
+        //            // search for parent record and get ScaleSizesOrder
+        //            // replace record type as 'Item Variant', and consider as base record
+        //            // for length of ScaleSizesOrder[] repeat the record and update code as code+'-'+ ScaleSizesOrder[i] split for '|' 
+        //            // remove the base record
+        //            int index = excelResultsDTO.ExcelRecords.FindIndex(x => x.Code == excelDto.ParentCode);
+        //            //var parent = excelResultsDTO.ExcelRecords.Select(e => e).Where(e => e.Code == excelDto.ParentCode).FirstOrDefault();
+        //            if (index > -1)
+        //            {
+        //                var parent = excelResultsDTO.ExcelRecords[index];
+        //                int childNo = 0;
+        //                foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
+        //                {
+        //                    var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+
+        //                    thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+        //                    thirdItemCopy.RecordType = "Item Variant";
+
+        //                    thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+        //                    thirdItemCopy.ExcelDto.RecordType = "Item Variant";
+        //                    thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
+        //                    //string guid = System.Guid.NewGuid().ToString();
+        //                    thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+        //                    {
+        //                        ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+        //                        ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+        //                        IsDefault = excelDto.ExcelDto.ImageIsDefault,
+        //                        Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+        //                    });
+        //                    //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
+        //                    thirdItemCopy.ExcelDto.Actions = "";
+        //                    childNo = +1;
+        //                    excelResultsDTO.ExcelRecords.Insert(index + childNo, thirdItemCopy);
+
+        //                }
+        //            }
+
+        //            //if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+        //            //excelDto.ExcelDto.Images.Add(new AppItemImage { ImageFileName = excelDto.image, ImageGuid = excelDto.image });
+
+        //        }
+        //        if (number == 8 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
+        //        {
+        //            var record = excelResultsDTO.ExcelRecords[int.Parse(excelDto.ExcelDto.Code)].ExcelDto;
+        //            //var record = excelResultsDTO.ExcelRecords.Where(e=> e.Code == record.Code).FirstOrDefault();
+        //            var images = record.Images;
+        //            if (images is null || (images != null && images.Count == 1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
+
+        //            string guid = System.Guid.NewGuid().ToString();
+
+        //            images.Add(new AppItemImage
+        //            {
+        //                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+        //                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+        //                IsDefault = excelDto.ExcelDto.ImageIsDefault
+        //                // Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+        //            });
+        //            //RenameFileToGuid(excelDto.image, guid);
+        //            record.Images = images;
+        //            //excelDto.ExcelDto.Actions = "";
+        //            //excelDto.ExcelDto.RecordType = "Item";
+        //            //excelDto.RecordType = "Item";
+
+
+        //        }
+        //        if (number == 9 && !string.IsNullOrEmpty(excelDto.ExcelDto.Code))
+        //        {
+        //            foreach (var id in excelDto.ExcelDto.Code.Split(","))
+        //            {
+        //                var record = excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto;
+        //                var images = record.Images;
+        //                if (images is null || (images != null && images.Count == 1 && images[0].ImageFileName == "noimage_item.jpg")) { images = new List<AppItemImage>(); }
+        //                //string guid = System.Guid.NewGuid().ToString();
+        //                images.Add(new AppItemImage
+        //                {
+        //                    ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+        //                    ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+        //                    IsDefault = excelDto.ExcelDto.ImageIsDefault,
+        //                    Attributes = "101=" + excelResultsDTO.ExcelRecords[int.Parse(id)].ExcelDto.Code.Split('-')[1]
+        //                });
+        //                //RenameFileToGuid(excelDto.image, guid);
+        //                record.Images = images;
+        //                //excelDto.ExcelDto.Actions = "";
+        //                //excelDto.ExcelDto.RecordType = "Item";
+        //                //excelDto.RecordType = "Item";
+        //            }
+
+
+        //        }
+        //    }
+        //    result = result.Select(r => r).Where(r => (r.Actions != "2" && r.Actions != "3" && r.Actions != "4"
+        //    && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
+        //    && r.Actions != "8" && r.Actions != "9" && r.Actions != "10"
+        //    && r.RecordType != "Image" && r.RecordType != "Color")).ToList();
+
+        //    if (result.Count <= 0) {
+        //        #region send notification to current user
+        //        if (AbpSession.UserId != null)
+        //        {
+        //            long AbpSessionUserId = (long)AbpSession.UserId;
+        //            string message = "Items imported successfully.";
+        //            if (!string.IsNullOrEmpty(excelResultsDTO.FilePath) && !excelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+        //            await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
+        //                message,
+        //                Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+        //        }
+
+        //        #endregion send notification to current user 
+
+        //        return excelResultsDTO.ExcelLogDTO; 
+        //    }
+        //    #endregion
+
+
+        //    //MARIAM
+        //    await AddClassifications(result.ToList<AppItemExcelDto>());
+        //    await AddCategories(result);
+        //    //MARIAM
+        //    //XX
+        //    List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+        //    string currencyCode = "";
+        //    long? currencyIDDef = null;
+        //    var tenantCurrencyInfoDto = await TenantManager.GetTenantCurrency();
+
+        //    if (tenantCurrencyInfoDto != null && !string.IsNullOrEmpty(tenantCurrencyInfoDto.Code))
+        //    {
+        //        currencyCode = tenantCurrencyInfoDto.Code;
+        //        currencyIDDef = tenantCurrencyInfoDto.Value;
+        //    }
+        //    if (string.IsNullOrEmpty(currencyCode))
+        //    {
+        //        currencyCode = "USD";
+        //        var defCurrObj = currencyIds.FirstOrDefault(a => a.Code.ToLower() == currencyCode.ToLower());
+        //        if (defCurrObj != null)
+        //        {
+        //            currencyIDDef = defCurrObj.Value;
+        //        }
+        //    }
+        //    //XX
+
+
+        //    PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput());
+
+        //    PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categoriesIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name" });
+        //    // get Product Categories
+        //    List<SycEntityObjectCategorySycEntityObjectCategoryLookupTableDto> productTypes = await _sycEntityObjectCategoriesAppService.GetAllSycEntityObjectCategoryForTableDropdown();
+
+        //    List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
+        //    string productType = result.Select(x => x.ProductType).FirstOrDefault().ToString();
+        //    //  var productTypeId = productTypes.FirstOrDefault(x => x.DisplayName.ToUpper() == productType.ToUpper());
+        //    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
+        //    var productTypeId = pdtyp.FirstOrDefault();
+        //    Dictionary<GetAllEntityObjectTypeOutput, List<LookupLabelDto>> extrattributesLists = new Dictionary<GetAllEntityObjectTypeOutput, List<LookupLabelDto>>();
+        //    //MMT2024
+        //    long? defIdentfier = null;
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+
+        //        var productTypeVar = await _SycEntityObjectTypesAppService.GetSycEntityObjectTypeForView(int.Parse(productTypeId.Id.ToString()));
+        //        if (productTypeVar != null)
+        //        {
+        //            var identifierId = productTypeVar.SycEntityObjectType.SycIdentifierDefinitionId;
+        //            if (identifierId == null)
+        //            {
+        //                var sydobject = _syObjectRepository.FirstOrDefault(x => x.Code == "ITEM");
+        //                if (sydobject != null)
+        //                {
+        //                    defIdentfier = sydobject.SycDefaultIdentifierId;
+        //                }
+        //            }
+        //            else { defIdentfier = identifierId; }
+        //        }
+        //    }
+        //    //MMT2024
+        //    var entityObjectExtraAttribute = _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString())).Result.ToList().FirstOrDefault();
+        //    if (entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null &&
+        //        entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes.Count > 0)
+        //    {
+        //        foreach (var extraAttribute in entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes)
+        //        {
+        //            if (extraAttribute.IsLookup)
+        //            {
+        //                try
+        //                {
+        //                    var retrunValues = await _appEntitiesAppService.GetAllEntitiesByTypeCode(extraAttribute.EntityObjectTypeCode);
+        //                    var retvalues = (await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(extraAttribute.EntityObjectTypeCode));
+
+        //                    if (retvalues != null)
+        //                    {
+        //                        var retValu = retvalues.FirstOrDefault();
+        //                        extrattributesLists.Add(retValu, retrunValues);
+        //                    }
+        //                }
+        //                catch
+        //                { }
+
+        //            }
+        //        }
+        //    }
+        //    DateTime start = DateTime.Now;
+        //    var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+        //    //var itemObj = await _SycEntityObjectTypesAppService.GetAll(new GetAllSycEntityObjectTypesInput { SydObjectIdFilter = itemObjectId });
+        //    // string itemObjCode = itemObj.Items[0].Data.SycEntityObjectType.Code ;
+        //    var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+        //    var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
+        //    string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + tenantId + @"/";
+        //    var itemEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeItemIds();
+        //    var itemStatusId = await _helper.SystemTables.GetEntityObjectStatusItemActive();
+        //    var itemEntityExtraData = new List<AppEntityExtraData>();
+        //    List<AppItem> appItemList = new List<AppItem>();
+        //    List<AppItem> appItemModifyList = new List<AppItem>();
+        //    List<AppEntity> appEntityDeleteList = new List<AppEntity>();
+        //    List<AppEntityAttachment> appEntityAttachmentDeleteList = new List<AppEntityAttachment>();
+        //    List<AppEntityCategory> appEntityCategoryDeleteList = new List<AppEntityCategory>();
+        //    List<AppEntityClassification> appEntityClassificationDeleteList = new List<AppEntityClassification>();
+        //    List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
+        //    var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+        //    List<string> sizeScaleNames = new List<string>();
+        //    foreach (AppItemExcelDto excelDto in result)
+        //    {
+        //        if (!string.IsNullOrEmpty(excelDto.ParentCode))
+        //            continue;
+        //        AppItem itemOrg = new AppItem();
+        //        if (excelDto.Id != 0)
+        //        {
+        //            //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
+        //            bool lNewVariation = false;
+        //            var xx = result.Where(x => x.ParentCode == excelDto.Code && x.Id == 0).Count();
+        //            if (xx > 0)
+        //                lNewVariation = true;
+        //            //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
+        //            switch (excelResultsDTO.RepreateHandler)
+        //            {
+        //                case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+        //                    //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
+        //                    if (lNewVariation == true)
+        //                    {
+        //                        // itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z => z.ItemPricesFkList)
+        //                        //.Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+        //                        //.Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //                        //.Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
+        //                        //.Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //                        //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //                        //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+        //                        //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //                        //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //                        //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
+        //                        //.FirstOrDefault();
+        //                        itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
+        //                        .Include(x => x.EntityFk).AsNoTracking()
+        //                        .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+        //                        .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //                        .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //                        .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //                        .FirstOrDefault();
+        //                        if (itemOrg != null)
+        //                        {
+        //                            itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
+        //                            itemOrg.ParentFkList = _appItemRepository.GetAll()
+        //                           .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //                           .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+        //                           .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //                           .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //                           .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
+        //                        }
+        //                        break;
+        //                    }
+        //                    else
+        //                        //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
+        //                        continue;
+        //                case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
+        //                                                                         //createOrEditAccountInfoDto.Id = account.Id
+
+        //                    itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
+        //                       .Include(x => x.EntityFk).AsNoTracking()
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //                       //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //                       //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+        //                       //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //                       //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //                       //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
+        //                       .FirstOrDefault();
+        //                    if (itemOrg != null)
+        //                    {
+        //                        itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
+        //                        itemOrg.ParentFkList = _appItemRepository.GetAll()
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //                       .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //                       .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
+        //                    }
+        //                    //itemOrg.ParentFkList.Clear();
+        //                    //appItemDeleteList.Add(itemOrg);
+        //                    //if (itemOrg.EntityFk.EntityExtraData != null && itemOrg.EntityFk.EntityExtraData.Count > 0)
+        //                    //{
+        //                    //    appEntityExtraDataDeleteList.AddRange(itemOrg.EntityFk.EntityExtraData);
+        //                    //    itemOrg.EntityFk.EntityExtraData.Clear();
+        //                    //}
+        //                    //if (itemOrg.EntityFk.EntityAttachments !=null && itemOrg.EntityFk.EntityAttachments.Count > 0)
+        //                    //{
+        //                    //    appEntityAttachmentDeleteList.AddRange(itemOrg.EntityFk.EntityAttachments);
+        //                    //    itemOrg.EntityFk.EntityAttachments.Clear();
+        //                    //}
+        //                    //if (itemOrg.EntityFk.EntityCategories !=null && itemOrg.EntityFk.EntityCategories.Count > 0)
+        //                    //{
+        //                    //    appEntityCategoryDeleteList.AddRange(itemOrg.EntityFk.EntityCategories);
+        //                    //    itemOrg.EntityFk.EntityCategories.Clear();
+        //                    //}
+        //                    //if (itemOrg.EntityFk.EntityClassifications!=null &&  itemOrg.EntityFk.EntityClassifications.Count >0)
+        //                    //{
+        //                    //    appEntityClassificationDeleteList.AddRange(itemOrg.EntityFk.EntityClassifications);
+        //                    //    itemOrg.EntityFk.EntityClassifications.Clear();
+        //                    //}
+        //                    //appEntityDeleteList.Add(itemOrg.EntityFk);
+        //                    //itemOrg.EntityFk = null;
+        //                    //itemOrg.ParentFk = null;
+        //                    //itemOrg.ParentEntityFk = null;
+        //                    //itemOrg.ParentEntityId = null;
+        //                    //itemOrg.ParentId = null;
+        //                    //if (itemOrg != null)
+        //                    //{
+        //                    //    itemOrg.Name = excelDto.Name;
+        //                    //    itemOrg.Description = excelDto.ProductDescription;
+        //                    //    itemOrg.EntityFk.Name = excelDto.Name;
+        //                    //    if (itemOrg.Variations != null && excelDto.RecordType =="Item")
+        //                    //    {
+        //                    //        itemOrg.EntityFk.EntityClassifications.Clear();
+        //                    //        if (excelDto.EntityObjectClassificaionID.HasValue)
+        //                    //        {
+        //                    //            itemOrg.EntityFk.EntityClassifications.Add(new AppEntityClassification
+        //                    //            {
+        //                    //                EntityCode = excelDto.Code,
+        //                    //                EntityObjectClassificationCode = excelDto.ProductClassificationCode,
+        //                    //                EntityObjectClassificationId = long.Parse(excelDto.EntityObjectClassificaionID.ToString())
+        //                    //            });
+        //                    //        }
+        //                    //        itemOrg.EntityFk.EntityCategories.Clear();
+        //                    //        itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
+        //                    //        {
+        //                    //            EntityCode = excelDto.Code,
+        //                    //            EntityObjectCategoryId = productTypeId.Id,
+        //                    //            EntityObjectCategoryCode = productTypeId.DisplayName
+
+        //                    //        });
+        //                    //        if (excelDto.EntityObjectCategoryID.HasValue)
+        //                    //        {
+        //                    //            itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
+        //                    //            {
+        //                    //                EntityCode = excelDto.Code,
+        //                    //                EntityObjectCategoryCode = excelDto.ProductClassificationCode,
+        //                    //                EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
+        //                    //            });
+        //                    //        }
+        //                    //        var relatedItems = result.Where(x => x.ParentCode == excelDto.Code).ToList();
+        //                    //        foreach (var chItem in relatedItems)
+        //                    //        {
+        //                    //            var childOrg = itemOrg.ParentFkList.FirstOrDefault(x => x.Code == chItem.Code);
+        //                    //            if (childOrg != null)
+        //                    //            {
+        //                    //                childOrg.Name = chItem.Name;
+        //                    //                childOrg.Description = chItem.ProductDescription;
+        //                    //                childOrg.EntityFk.EntityExtraData.Clear();
+
+        //                    //            }
+        //                    //        }
+
+        //                    //    }
+
+
+        //                    //}
+        //                    break;
+        //                case ExcelRecordRepeateHandler.CreateACopy: // override
+        //                    string oldCode = excelDto.Code;
+        //                    excelDto.Code = GetItemCopyCode(excelDto.Code);
+        //                    excelDto.Id = 0;
+        //                    var childItemsCopy = result.Where(x => x.ParentCode == oldCode);// && x.Id != 0);
+        //                    if (childItemsCopy != null && childItemsCopy.Count<AppItemExcelDto>() > 0)
+        //                    {
+        //                        foreach (var itemCopy in childItemsCopy)
+        //                        {
+        //                            itemCopy.Code = GetItemCopyCode(itemCopy.Code);
+        //                            itemCopy.Id = 0;
+        //                        }
+        //                    }
+
+        //                    result.Where(x => x.ParentCode == oldCode).ToList().ForEach(x => x.ParentCode = excelDto.Code);
+        //                    if (!string.IsNullOrEmpty(excelDto.ParentCode))
+        //                    {
+        //                        result.Where(x => x.ParentCode == oldCode).ToList().ForEach(x => x.Id = 0);
+        //                    }
+        //                    break;
+        //                default:
+        //                    break;
+        //            }
+        //        }
+
+
+
+        //        string isDefault = "1";
+        //        List<string> attributteNames = new List<string>();
+        //        List<string> attributteIDs = new List<string>();
+        //        List<string> firstAttributteValues = new List<string>();
+        //        List<string> firstAttributteImageDefaults = new List<string>();
+        //        List<AppItemExtraDto> secondAttributteValues = new List<AppItemExtraDto>();
+        //        List<List<AppItemExtraDto>> restAttributteValues = new List<List<AppItemExtraDto>>();
+
+        //        AppItem appItem = new AppItem();
+
+        //        if (excelDto.Id != 0)
+        //            appItem = itemOrg;
+        //        else
+        //        {
+        //            appItem = ObjectMapper.Map<AppItem>(excelDto);
+
+        //            appItem.Id = 0;
+        //            appItem.ListingItemId = null;
+        //            appItem.ParentId = null;
+        //            appItem.TenantId = AbpSession.TenantId;
+        //            appItem.CreatorUserId = AbpSession.UserId;
+        //        }
+        //        appItem.Description = excelDto.ProductDescription;
+
+        //        if (string.IsNullOrEmpty(excelDto.Price))
+        //            excelDto.Price = "0";
+
+        //        appItem.Price = decimal.Parse(excelDto.Price);
+        //        //XX
+        //        if (appItem.ItemPricesFkList == null)
+        //            appItem.ItemPricesFkList = new List<AppItemPrices>();
+        //        else
+        //        {
+        //            if (appItem.ItemPricesFkList.Count > 0)
+        //            {
+        //                foreach (var itmPrc in appItem.ItemPricesFkList)
+        //                {
+        //                    itmPrc.IsDeleted = true;
+        //                }
+        //            }
+        //        }
+        //        //if (appItem.Price > 0)
+        //        {
+        //            long? currId = null;
+        //            if (!string.IsNullOrEmpty(excelDto.Currency))
+        //            {
+        //                var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+        //                if (currObj != null)
+        //                    currId = currObj.Value;
+        //            }
+        //            appItem.ItemPricesFkList.Add(new AppItemPrices
+        //            {
+        //                AppItemCode = appItem.Code,
+        //                Code = "MSRP",
+        //                Price = appItem.Price,
+        //                CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+        //                TenantId = AbpSession.TenantId,
+        //                CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+        //                IsDefault = true
+        //            });
+        //        }
+        //        if (string.IsNullOrEmpty(excelDto.PriceA))
+        //            excelDto.PriceA = "0";
+        //        //MMT0311
+        //        if (!string.IsNullOrEmpty(excelDto.PriceA))// && decimal.Parse(excelDto.PriceA) > 0)
+        //        {
+        //            long? currId = null;
+        //            if (!string.IsNullOrEmpty(excelDto.Currency))
+        //            {
+        //                var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+        //                if (currObj != null)
+        //                    currId = currObj.Value;
+        //            }
+        //            appItem.ItemPricesFkList.Add(new AppItemPrices
+        //            {
+        //                AppItemCode = appItem.Code,
+        //                Code = "A",
+        //                Price = decimal.Parse(excelDto.PriceA),
+        //                CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+        //                TenantId = AbpSession.TenantId,
+        //                CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+        //                IsDefault = true
+        //            });
+        //        }
+        //        if (string.IsNullOrEmpty(excelDto.PriceB))
+        //            excelDto.PriceB = "0";
+
+        //        if (!string.IsNullOrEmpty(excelDto.PriceB))// &&  decimal.Parse(excelDto.PriceB) > 0)
+        //        {
+        //            long? currId = null;
+        //            if (!string.IsNullOrEmpty(excelDto.Currency))
+        //            {
+        //                var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+        //                if (currObj != null)
+        //                    currId = currObj.Value;
+        //            }
+        //            appItem.ItemPricesFkList.Add(new AppItemPrices
+        //            {
+        //                AppItemCode = appItem.Code,
+        //                Code = "B",
+        //                Price = decimal.Parse(excelDto.PriceB),
+        //                CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+        //                TenantId = AbpSession.TenantId,
+        //                CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+        //                IsDefault = true
+        //            });
+        //        }
+        //        if (string.IsNullOrEmpty(excelDto.PriceC))
+        //            excelDto.PriceC = "0";
+
+        //        if (!string.IsNullOrEmpty(excelDto.PriceC))// && decimal.Parse(excelDto.PriceC) > 0)
+        //        {
+        //            long? currId = null;
+        //            if (!string.IsNullOrEmpty(excelDto.Currency))
+        //            {
+        //                var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+        //                if (currObj != null)
+        //                    currId = currObj.Value;
+        //            }
+        //            appItem.ItemPricesFkList.Add(new AppItemPrices
+        //            {
+        //                AppItemCode = appItem.Code,
+        //                Code = "C",
+        //                Price = decimal.Parse(excelDto.PriceC),
+        //                CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+        //                TenantId = AbpSession.TenantId,
+        //                CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+        //                IsDefault = true
+        //            });
+        //        }
+        //        if (string.IsNullOrEmpty(excelDto.PriceD))
+        //            excelDto.PriceD = "0";
+
+        //        if (!string.IsNullOrEmpty(excelDto.PriceD))// && decimal.Parse(excelDto.PriceD) > 0)
+        //        {
+        //            long? currId = null;
+        //            if (!string.IsNullOrEmpty(excelDto.Currency))
+        //            {
+        //                var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+        //                if (currObj != null)
+        //                    currId = currObj.Value;
+        //            }
+        //            appItem.ItemPricesFkList.Add(new AppItemPrices
+        //            {
+        //                AppItemCode = appItem.Code,
+        //                Code = "D",
+        //                Price = decimal.Parse(excelDto.PriceD),
+        //                CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+        //                TenantId = AbpSession.TenantId,
+        //                CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef,
+        //                IsDefault = true
+        //            });
+        //        }
+        //        //MMT0311
+        //        //XX
+        //        appItem.Name = excelDto.Name;
+
+        //        if (excelDto.ExtraAttributesValues != null)
+        //        {
+
+        //            for (int et = 0; et < excelDto.ExtraAttributesValues.Count; et++)
+        //            {
+        //                if (excelDto.ExtraAttributes[et].IsVariation) continue;
+
+        //                //long? AttributeValueId = null;
+        //                var AttributeInfoObj = extrattributesLists.FirstOrDefault(x => x.Key.Name.ToUpper() == excelDto.ExtraAttributes[et].Name.ToUpper());
+        //                if (AttributeInfoObj.Key == null) continue;
+        //                //var AttributeInfo = AttributeInfoObj.Value;
+        //                //if (AttributeInfo != null)
+        //                //{
+        //                //    AttributeValueId = AttributeInfo.FirstOrDefault(x => x.Code == excelDto.ExtraAttributesValues[et].Code) == null ? 0 : AttributeInfo.FirstOrDefault(x => x.Code == excelDto.ExtraAttributesValues[et].Code).Value;
+        //                //}
+        //                itemEntityExtraData.Add(new AppEntityExtraData
+        //                {
+        //                    AttributeCode = excelDto.ExtraAttributesValues[et].Code,
+        //                    AttributeValue = excelDto.ExtraAttributesValues[et].Value,
+        //                    AttributeValueId = null,//AttributeValueId,
+        //                    EntityObjectTypeName = excelDto.ExtraAttributes[et].Name,
+        //                    AttributeId = excelDto.ExtraAttributes[et].AttributeId,
+        //                    EntityObjectTypeId = AttributeInfoObj.Key.Id
+
+        //                });
+        //                // attributteNames.Add(excelDto.ExtraAttributes[et].EntityObjectTypeCode + "," + isDefault);
+        //                //  attributteIDs.Add(excelDto.ExtraAttributes[et].AttributeId.ToString() + "," + isDefault);
+        //            }
+        //        }
+        //        if (excelDto.Id == 0)
+        //        {
+        //            appItem.EntityFk = new AppEntity
+        //            {
+        //                Id = 0,
+        //                Code = excelDto.Code,
+        //                ObjectId = itemObjectId,
+        //                TenantId = AbpSession.TenantId,
+        //                EntityObjectStatusId = itemStatusId,
+        //                Notes = _helper.HtmlToPlainText(excelDto.ProductDescription),
+        //                EntityExtraData = itemEntityExtraData,
+        //                Name = excelDto.Name,
+        //                EntityObjectTypeId = productTypeId.Id,
+        //                CreatorUserId = AbpSession.UserId
+
+        //            };
+        //        }
+        //        if (excelDto.EntityObjectClassificaionID.HasValue)
+        //        {
+        //            if (excelDto.Id == 0 || (excelDto.Id != 0 && appItem.EntityFk.EntityClassifications == null))
+        //            {
+        //                appItem.EntityFk.EntityClassifications = new List<AppEntityClassification>();
+        //                appItem.EntityFk.EntityClassifications.Add(new AppEntityClassification
+        //                {
+        //                    EntityCode = excelDto.Code,
+        //                    EntityObjectClassificationCode = excelDto.ProductClassificationCode,
+        //                    EntityObjectClassificationId = long.Parse(excelDto.EntityObjectClassificaionID.ToString())
+        //                });
+        //            }
+        //            else
+        //            {
+        //                if (appItem.EntityFk.EntityClassifications != null &&
+        //                    appItem.EntityFk.EntityClassifications.FirstOrDefault(x => x.EntityObjectClassificationId == long.Parse(excelDto.EntityObjectClassificaionID.ToString())) == null)
+        //                {
+        //                    appItem.EntityFk.EntityClassifications.Add(new AppEntityClassification
+        //                    {
+        //                        EntityCode = excelDto.Code,
+        //                        EntityObjectClassificationCode = excelDto.ProductClassificationCode,
+        //                        EntityObjectClassificationId = long.Parse(excelDto.EntityObjectClassificaionID.ToString())
+        //                    });
+        //                }
+        //            }
+        //        }
+        //        if (excelDto.EntityObjectCategoryID.HasValue)
+        //        {
+        //            if (excelDto.Id == 0 || (excelDto.Id != 0 && appItem.EntityFk.EntityCategories == null))
+        //            {
+        //                appItem.EntityFk.EntityCategories = new List<AppEntityCategory>();
+
+        //                appItem.EntityFk.EntityCategories.Add(new AppEntityCategory
+        //                {
+        //                    EntityCode = excelDto.Code,
+        //                    EntityObjectCategoryCode = excelDto.ProductCategoryCode,
+        //                    EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
+        //                });
+        //            }
+        //            else
+        //            {
+        //                if (appItem.EntityFk.EntityCategories != null &&
+        //                    appItem.EntityFk.EntityCategories.FirstOrDefault(x => x.EntityObjectCategoryId == long.Parse(excelDto.EntityObjectCategoryID.ToString())) == null)
+        //                {
+        //                    appItem.EntityFk.EntityCategories.Add(new AppEntityCategory
+        //                    {
+        //                        EntityCode = excelDto.Code,
+        //                        EntityObjectCategoryCode = excelDto.ProductCategoryCode,
+        //                        EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
+        //                    });
+        //                }
+        //            }
+        //        }
+        //        if (string.IsNullOrEmpty(appItem.SSIN))
+        //        {
+        //            appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
+        //            appItem.EntityFk.SSIN = appItem.SSIN;
+        //        }
+        //        appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+        //        appItem.EntityFk.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+        //        //if (excelDto.Id == 0 || !reserAtt)
+        //        //{
+        //        if (excelDto.Id == 0)
+        //            appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+
+        //        //}
+        //        if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
+        //        {
+        //            var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == excelDto.ImageType.ToUpper()).FirstOrDefault();
+        //            var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") || x.IsDefault).FirstOrDefault();
+        //            foreach (var img in excelDto.Images)
+        //            {
+        //                if (img.ImageFileName == "noimage_item.jpg")
+        //                {
+        //                    img.ImageGuid = Guid.NewGuid().ToString();
+        //                    if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
+        //                    {
+        //                        System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
+        //                    }
+
+        //                    try
+        //                    {
+        //                        System.IO.File.Copy(System.IO.Directory.GetCurrentDirectory() + @"\Assets\noimage_item.jpg", _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + ".jpg", true);
+        //                    }
+        //                    catch { }
+        //                }
+        //                else
+        //                {
+        //                    if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
+        //                    {
+        //                        System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
+        //                    }
+
+        //                    try
+        //                    {
+        //                        System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
+        //                    }
+        //                    catch { }
+        //                }
+        //                AppEntityAttachment appEntityAttachment = new AppEntityAttachment();
+        //                appEntityAttachment.AttachmentFk = new Attachments.AppAttachment { Name = img.ImageFileName, Attachment = img.ImageGuid + "." + img.ImageFileName.Split('.')[1], TenantId = AbpSession.TenantId };
+        //                appEntityAttachment.AttachmentCategoryId = attachCategory.Id;
+        //                appEntityAttachment.Attributes = img.Attributes;
+        //                appEntityAttachment.AttachmentCategoryCode = attachCategory.Code;
+        //                appEntityAttachment.EntityCode = excelDto.Code;
+        //                if (img.ImageFileName.ToLower().Contains("_default") || img.IsDefault)
+        //                {
+        //                    appEntityAttachment.IsDefault = true;
+
+        //                }
+        //                appItem.EntityFk.EntityAttachments.Add(appEntityAttachment);
+        //            }
+        //            if (defaultImage == null)
+        //                appItem.EntityFk.EntityAttachments[0].IsDefault = true;
+        //        }
+        //        if (excelDto.Id == 0)
+        //            appItem.CreatorUserId = AbpSession.UserId;
+
+        //        if (excelDto.Id == 0)
+        //            appItem.ParentFkList = new List<AppItem>();
+        //        //MMT30[Start]
+        //        DateTime timeStamp = DateTime.Now;
+        //        appItem.TimeStamp = timeStamp;
+        //        appItem.EntityFk.TimeStamp = timeStamp;
+        //        appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+        //        if (string.IsNullOrEmpty(appItem.SSIN))
+        //        {
+        //            appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
+        //            appItem.EntityFk.SSIN = appItem.SSIN;
+        //        }
+        //        appItem.EntityFk.TenantOwner = appItem.TenantOwner;
+        //        //MMT30[End]
+        //        //mmt
+        //        if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
+        //        {
+        //            var ratioHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeRatioName & x.ParentId != null).AsNoTracking().FirstOrDefault();
+        //            var scaleHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeScaleName).AsNoTracking().FirstOrDefault();
+        //            if (scaleHeader == null || ratioHeader == null || (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy) ||
+        //               (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords) || (excelDto.Id == 0))
+        //            {
+        //                //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+        //                //var sizesArray = excelDto.ScaleSizesOrder.Split('|');
+        //                var d1sizesArray = excelDto.D1Sizes.Split('|');
+        //                var d2sizesArray = excelDto.D2Sizes.Split('|');
+        //                var d3sizesArray = excelDto.D3Sizes.Split('|');
+        //                //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
+        //                List<AppSizeScalesDetailDto> appSizeScalesDetailDtoList = new List<AppSizeScalesDetailDto>();
+        //                //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+        //                /*for (int pos = 0; pos < sizesArray.Length; pos++)
+        //                {
+        //                    appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                    {
+        //                        SizeCode = sizesArray[pos],
+        //                        D1Position = pos.ToString(),
+        //                        SizeId = null,
+        //                        D3Position = null,
+        //                        D2Position = null,
+        //                        SizeRatio = 0
+        //                    });
+        //                }*/
+        //                for (int pos = 0; pos < d1sizesArray.Length; pos++)
+        //                {
+        //                    appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                    {
+        //                        SizeCode = d1sizesArray[pos].TrimEnd(),
+        //                        D1Position = pos.ToString(),
+        //                        DimensionName = excelDto.D1Name,
+        //                        SizeId = null,
+        //                        D3Position = null,
+        //                        D2Position = null,
+        //                        SizeRatio = 0
+        //                    });
+        //                }
+        //                if (d2sizesArray.Length > 0 && !string.IsNullOrEmpty(d2sizesArray[0]))
+        //                {
+        //                    for (int pos = 0; pos < d2sizesArray.Length; pos++)
+        //                    {
+        //                        appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                        {
+        //                            SizeCode = d2sizesArray[pos].TrimEnd(),
+        //                            D2Position = pos.ToString(),
+        //                            DimensionName = excelDto.D2Name,
+        //                            SizeId = null,
+        //                            D3Position = null,
+        //                            D1Position = null,
+        //                            SizeRatio = 0
+        //                        });
+        //                    }
+        //                }
+        //                if (d3sizesArray.Length > 0 && !string.IsNullOrEmpty(d3sizesArray[0]))
+        //                {
+        //                    for (int pos = 0; pos < d3sizesArray.Length; pos++)
+        //                    {
+        //                        appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                        {
+        //                            SizeCode = d3sizesArray[pos].TrimEnd(),
+        //                            D3Position = pos.ToString(),
+        //                            SizeId = null,
+        //                            D1Position = null,
+        //                            D2Position = null,
+        //                            SizeRatio = 0,
+        //                            DimensionName = excelDto.D3Name,
+        //                        });
+        //                    }
+        //                }
+        //                var sizes = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+        //                if (sizes != null)
+        //                {
+        //                    foreach (var sz in sizes)
+        //                    {
+        //                        var exist = appSizeScalesDetailDtoList.FirstOrDefault(z => z.SizeCode == sz.SizeCode &&
+        //                           z.D1Position == (sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
+        //                           z.D2Position == (sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
+        //                           z.D3Position == (sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
+        //                        if (exist == null)
+        //                            appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                            {
+        //                                SizeCode = sz.SizeCode.TrimEnd(),
+        //                                D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : null,
+        //                                SizeId = null,
+        //                                D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : null,
+        //                                D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : null,
+        //                                SizeRatio = 0
+        //                            });
+        //                    }
+        //                }
+        //                //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
+        //                //var sizeList = sizesArray.Select(array => new AppSizeScalesDetailDto { SizeCode = array[0].ToString (), SizeId = null,D1Position = sizesArray.  }).ToList()
+        //                AppSizeScaleForEditDto appSizeScaleForEditDto = new AppSizeScaleForEditDto();
+        //                appSizeScaleForEditDto.AppSizeScalesDetails = appSizeScalesDetailDtoList;
+        //                //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+        //                //appSizeScaleForEditDto.NoOfDimensions = 1;
+        //                appSizeScaleForEditDto.NoOfDimensions = int.Parse(excelDto.NoOfDim);
+        //                appSizeScaleForEditDto.Dimesion1Name = excelDto.D1Name;
+        //                appSizeScaleForEditDto.Dimesion2Name = excelDto.D2Name;
+        //                appSizeScaleForEditDto.Dimesion3Name = excelDto.D3Name;
+        //                //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
+        //                appSizeScaleForEditDto.ParentId = null;
+
+        //                if (scaleHeader != null)
+        //                {
+        //                    appSizeScaleForEditDto.Code = scaleHeader.Code;
+        //                    appSizeScaleForEditDto.Id = scaleHeader.Id;
+        //                }
+        //                else
+        //                    appSizeScaleForEditDto.Code = "";
+
+        //                appSizeScaleForEditDto.Dimesion1Name = excelDto.SizeScaleName;
+        //                appSizeScaleForEditDto.Name = excelDto.SizeScaleName;
+        //                long? sizeScaleSavedId = 0;
+        //                Task<AppSizeScaleForEditDto> sizescale = null;
+        //                try
+        //                {
+        //                    //var sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+        //                    // var sizeScaleSavedId = sizescale.Result.Id;
+        //                    sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+        //                    sizeScaleSavedId = sizescale.Result.Id;
+        //                    sizeScaleNames.Add(excelDto.SizeScaleName);
+        //                }
+        //                catch
+        //                {
+        //                    if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
+        //                    {
+        //                        sizescale = _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleForEditDto.Id.ToString()));
+        //                        sizeScaleSavedId = sizescale.Result.Id;
+        //                    }
+        //                }
+        //                ////if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
+        //                ////{
+        //                ////    AppSizeScaleForEditDto appSizeScaleRatioForEditDto = new AppSizeScaleForEditDto();
+        //                ////    appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesDetailDtoList;
+        //                ////    appSizeScaleRatioForEditDto.NoOfDimensions = 1;
+        //                ////    appSizeScaleRatioForEditDto.ParentId = sizescale.Result.Id;
+        //                ////    appSizeScaleRatioForEditDto.Code = "";
+        //                ////    appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Result.Dimesion1Name ;
+        //                ////    appSizeScaleRatioForEditDto.Name = excelDto.SizeRatioName ;
+
+        //                ////    var arrayRatio = excelDto.SizeRatioValue.Split('=')[0];
+        //                ////    var arraySizeRatio = arrayRatio.Split('-');
+        //                ////    List<AppSizeScalesDetailDto> appSizeScalesRatioDetailDtoList = new List<AppSizeScalesDetailDto>();
+        //                ////    for (int pos = 0; pos < sizesArray.Length; pos++)
+        //                ////    {
+        //                ////        appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                ////        {
+        //                ////            SizeCode = sizesArray[pos],
+        //                ////            D1Position = pos.ToString(),
+        //                ////            SizeId = null,
+        //                ////            D3Position = "0",
+        //                ////            D2Position = "0",
+        //                ////            SizeRatio = int.Parse(arraySizeRatio[pos])
+        //                ////        });
+        //                ////    }
+        //                ////    var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
+        //                ////}
+        //                long sizeRatioId = 0;
+        //                long sizeScaleId = 0;
+        //                List<AppItemSizeScalesHeader> itemScaleData = new List<AppItemSizeScalesHeader>();
+        //                if (appItem.Id != 0)
+        //                {
+        //                    var sizeScaleList = await x.AppItemSizeScalesHeaders.Where(z => z.AppItemId == appItem.Id).AsNoTracking()
+        //                         .Include(x => x.AppItemSizeScalesDetails).AsNoTracking().ToListAsync();
+        //                    itemScaleData = sizeScaleList;
+
+        //                }
+        //                if (itemScaleData != null && itemScaleData.Count > 0)
+        //                {
+        //                    var scaleObject = itemScaleData.FirstOrDefault(a => a.ParentId == null);
+        //                    if (scaleObject != null) { sizeScaleId = scaleObject.Id; }
+        //                }
+        //                if (itemScaleData != null && itemScaleData.Count > 0)
+        //                {
+        //                    var scaleRatioObject = itemScaleData.FirstOrDefault(a => a.ParentId != null);
+        //                    if (scaleRatioObject != null) { sizeRatioId = scaleRatioObject.Id; }
+        //                }
+        //                appItem.ItemSizeScaleHeadersFkList = new List<AppItemSizeScalesHeader>();
+
+        //                AppItemSizeScalesHeader appItemSizeScalesHeader = new AppItemSizeScalesHeader();
+        //                appItemSizeScalesHeader.SizeScaleId = sizeScaleSavedId;
+        //                appItemSizeScalesHeader.Id = sizeScaleId;
+        //                appItemSizeScalesHeader.TenantId = AbpSession.TenantId;
+        //                appItemSizeScalesHeader.Name = sizescale.Result.Name;
+        //                appItemSizeScalesHeader.SizeScaleCode = sizescale.Result.Code;
+        //                appItemSizeScalesHeader.NoOfDimensions = sizescale.Result.NoOfDimensions;
+        //                appItemSizeScalesHeader.Dimesion1Name = sizescale.Result.Dimesion1Name;
+        //                appItemSizeScalesHeader.ParentId = null;
+        //                //MMT ,1 T-SII-20240628.0001 07/11/2024[Start]
+        //                appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesDetailDtoList.Where(z => z.DimensionName != null));
+        //                //MMT ,1 T-SII-20240628.0001 07/11/2024[End]
+        //                appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+        //                appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
+        //                //appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
+        //                if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
+        //                {
+        //                    var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId == null);
+        //                    if (sizeScaleH != null)
+        //                    {
+        //                        var cnt = itemScaleData.Count(x => x.ParentId == null);
+        //                        if (cnt > 1)
+        //                        {
+        //                            await _appItemSizeScalesHeaderRepository.DeleteAsync(x => x.AppItemId == appItem.Id && x.Id != sizeScaleH.Id && x.ParentId == null);
+        //                        }
+
+        //                        if (sizeScaleH.AppItemSizeScalesDetails != null && sizeScaleH.AppItemSizeScalesDetails.Count > 0)
+        //                        {
+        //                            foreach (var size in sizeScaleH.AppItemSizeScalesDetails)
+        //                            {
+        //                                var existSize = appItemSizeScalesHeader.AppItemSizeScalesDetails.FirstOrDefault(a => a.SizeCode == size.SizeCode && a.DimensionName == size.DimensionName);
+        //                                if (existSize != null)
+        //                                {
+        //                                    existSize.Id = size.Id;
+        //                                }
+        //                                else
+        //                                {
+        //                                    size.IsDeleted = true;
+        //                                    appItemSizeScalesHeader.AppItemSizeScalesDetails.Add(size);
+        //                                }
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            foreach (var size in appItemSizeScalesHeader.AppItemSizeScalesDetails)
+        //                            {
+        //                                size.SizeScaleId = appItemSizeScalesHeader.Id;
+        //                                //await _appItemSizeScalesDetailRepository.InsertAsync(size);
+        //                            }
+        //                        }
+        //                    }
+
+        //                }
+
+
+        //                //appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+        //                // appItem.ItemSizeScaleHeadersFkList = new List<AppItemSizeScalesHeader>();
+
+
+        //                //if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
+        //                {
+        //                    var scaleHeaderRatio = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio") & x.ParentId != null).AsNoTracking().FirstOrDefault();
+        //                    if (scaleHeaderRatio == null || (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy) ||
+        //                        (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords))
+        //                    {
+        //                        AppSizeScaleForEditDto appSizeScaleRatioForEditDto = new AppSizeScaleForEditDto();
+        //                        appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesDetailDtoList;
+        //                        appSizeScaleRatioForEditDto.NoOfDimensions = 1;
+        //                        appSizeScaleRatioForEditDto.ParentId = sizescale.Result.Id;
+
+        //                        if (scaleHeaderRatio != null & (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords))
+        //                        {
+        //                            appSizeScaleRatioForEditDto.Id = scaleHeaderRatio.Id;
+        //                            appSizeScaleRatioForEditDto.Code = scaleHeaderRatio.Code;
+        //                        }
+        //                        else
+        //                            appSizeScaleRatioForEditDto.Code = "";
+
+        //                        appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Result.Dimesion1Name;
+        //                        appSizeScaleRatioForEditDto.Name = (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio");
+        //                        string[] arraySizeRatio = new string[sizes.Count];
+        //                        System.Array.Fill(arraySizeRatio, "0");
+        //                        if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
+        //                        {
+        //                            var arrayRatio = excelDto.SizeRatioValue.Split('=')[0];
+        //                            arraySizeRatio = arrayRatio.Split('-');
+        //                        }
+        //                        List<AppSizeScalesDetailDto> appSizeScalesRatioDetailDtoList = new List<AppSizeScalesDetailDto>();
+        //                        //for (int pos = 0; pos < sizesArray.Length; pos++)
+        //                        //{
+        //                        //    appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                        //    {
+        //                        //        SizeCode = sizesArray[pos],
+        //                        //        D1Position = pos.ToString(),
+        //                        //        SizeId = null,
+        //                        //        D3Position = null,
+        //                        //        D2Position = null,
+        //                        //        SizeRatio = int.Parse(arraySizeRatio[pos])
+        //                        //    });
+        //                        //}
+        //                        if (!string.IsNullOrEmpty(excelDto.SizeRatioName) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[0]) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[1]))
+        //                        {
+        //                            var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
+        //                            var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
+        //                            var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+        //                            if (sizesRatio != null)
+        //                            {
+        //                                foreach (var sz in sizesRatio)
+        //                                {
+        //                                    var posinArr = sizesList.IndexOf(sz.SizeCode);
+        //                                    if (posinArr >= 0)
+        //                                    {
+        //                                        appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                                        {
+        //                                            SizeCode = sz.SizeCode.TrimEnd(),
+        //                                            D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+        //                                            SizeId = null,
+        //                                            D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
+        //                                            D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
+        //                                            SizeRatio = int.Parse(sizesRatios[posinArr])
+        //                                        });
+        //                                    }
+        //                                }
+        //                                appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
+        //                            }
+        //                        }
+        //                        if (string.IsNullOrEmpty(excelDto.SizeRatioName) && (appSizeScaleRatioForEditDto.AppSizeScalesDetails == null || appSizeScaleRatioForEditDto.AppSizeScalesDetails.Count == 0))
+        //                        {
+        //                            foreach (var sz in appSizeScaleForEditDto.AppSizeScalesDetails)
+        //                            {
+        //                                //var posinArr = sizesList.IndexOf(sz.SizeCode);
+        //                                //if (posinArr >= 0)
+        //                                {
+        //                                    appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+        //                                    {
+        //                                        SizeCode = sz.SizeCode.TrimEnd(),
+        //                                        D3Position = sz.D3Position,
+        //                                        SizeId = null,
+        //                                        D1Position = sz.D1Position,
+        //                                        D2Position = sz.D2Position,
+        //                                        SizeRatio = 0
+        //                                    });
+        //                                }
+        //                            }
+        //                            appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
+
+        //                        }
+
+        //                        var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
+
+        //                        AppItemSizeScalesHeader appItemSizeScalesHeaderRatio = new AppItemSizeScalesHeader();
+        //                        appItemSizeScalesHeaderRatio.SizeScaleId = sizescaleRatio.Result.Id;
+        //                        appItemSizeScalesHeaderRatio.Id = sizeRatioId;
+        //                        appItemSizeScalesHeaderRatio.Name = sizescaleRatio.Result.Name;
+        //                        appItemSizeScalesHeaderRatio.SizeScaleCode = sizescaleRatio.Result.Code;
+        //                        appItemSizeScalesHeaderRatio.NoOfDimensions = sizescaleRatio.Result.NoOfDimensions;
+        //                        appItemSizeScalesHeaderRatio.Dimesion1Name = sizescaleRatio.Result.Dimesion1Name;
+        //                        appItemSizeScalesHeaderRatio.ParentId = null;// appItemSizeScalesHeader.Id;
+        //                        appItemSizeScalesHeaderRatio.TenantId = AbpSession.TenantId;
+        //                        appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesRatioDetailDtoList);
+        //                        appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+        //                        appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
+        //                        appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
+        //                        appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeaderRatio.Id);
+        //                        if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
+        //                        {
+
+        //                            var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId != null);
+        //                            if (sizeScaleH != null)
+        //                            {
+        //                                var cnt = itemScaleData.Count(x => x.ParentId != null);
+        //                                if (cnt > 1)
+        //                                {
+        //                                    await _appItemSizeScalesHeaderRepository.DeleteAsync(x => x.AppItemId == appItem.Id && x.Id != sizeScaleH.Id && x.ParentId != null);
+        //                                }
+
+        //                                if (sizeScaleH.AppItemSizeScalesDetails != null && sizeScaleH.AppItemSizeScalesDetails.Count > 0)
+        //                                {
+        //                                    foreach (var size in sizeScaleH.AppItemSizeScalesDetails)
+        //                                    {
+        //                                        var existSize = appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.FirstOrDefault(a => a.SizeCode == size.SizeCode && a.DimensionName == size.DimensionName);
+        //                                        if (existSize != null)
+        //                                        {
+        //                                            existSize.Id = size.Id;
+        //                                        }
+        //                                        else
+        //                                        {
+        //                                            size.IsDeleted = true;
+        //                                            appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.Add(size);
+        //                                        }
+        //                                    }
+        //                                }
+        //                                else
+        //                                {
+        //                                    foreach (var size in appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails)
+        //                                    {
+        //                                        size.SizeScaleId = appItemSizeScalesHeaderRatio.Id;
+        //                                        await _appItemSizeScalesDetailRepository.InsertAsync(size);
+        //                                    }
+        //                                }
+        //                            }
+
+        //                        }
+        //                        if (appItem.ItemSizeScaleHeadersFkList.Count == 0)
+        //                        {
+        //                            appItemSizeScalesHeader.AppItemId = appItem.Id;
+        //                            appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+        //                        }
+        //                        appItemSizeScalesHeaderRatio.AppItemId = appItem.Id;
+        //                        appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
+        //                        appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
+        //                    }
+
+        //                }
+        //                if (appItem.ItemSizeScaleHeadersFkList.Count == 0)
+        //                {
+        //                    appItemSizeScalesHeader.AppItemId = appItem.Id;
+        //                    appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+        //                }
+        //                // string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
+        //                // scaleHeader.SizeScaleCode = (scaleHeader.ParentId == null ? "SizeScale-" : "SizeRatio-") + seq;
+
+
+
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // long sizeRatioId = 0;
+        //            long sizeScaleId = 0;
+        //            string scaleName = appItem.Code + " Scale";
+        //            string scaleCode = null;
+        //            string scaleDim1Name = appItem.Code + " 1st Dimesion";
+
+
+        //            List<AppItemSizeScalesHeader> itemScaleData = new List<AppItemSizeScalesHeader>();
+        //            if (appItem.Id != 0)
+        //            {
+        //                var sizeScaleList = await x.AppItemSizeScalesHeaders.Where(z => z.AppItemId == appItem.Id).AsNoTracking()
+        //                     .Include(x => x.AppItemSizeScalesDetails).AsNoTracking().ToListAsync();
+        //                itemScaleData = sizeScaleList;
+
+        //            }
+        //            if (itemScaleData != null && itemScaleData.Count > 0)
+        //            {
+        //                var scaleObject = itemScaleData.FirstOrDefault(a => a.ParentId == null);
+        //                if (scaleObject != null)
+        //                {
+        //                    sizeScaleId = scaleObject.Id;
+        //                    scaleName = scaleObject.Name;
+        //                    scaleDim1Name = scaleObject.Dimesion1Name;
+        //                    scaleCode = scaleObject.SizeScaleCode;
+        //                }
+        //            }
+        //            appItem.ItemSizeScaleHeadersFkList = new List<AppItemSizeScalesHeader>();
+        //            if (itemScaleData != null && itemScaleData.Count > 0)
+        //            {
+        //                var scaleRatioObject = itemScaleData.FirstOrDefault(a => a.ParentId != null);
+        //                if (scaleRatioObject != null)
+        //                {
+        //                    scaleRatioObject.IsDeleted = true;
+        //                    appItem.ItemSizeScaleHeadersFkList.Add(scaleRatioObject);
+        //                }
+        //            }
+
+
+        //            AppItemSizeScalesHeader appItemSizeScalesHeader = new AppItemSizeScalesHeader();
+        //            appItemSizeScalesHeader.SizeScaleId = null;
+        //            appItemSizeScalesHeader.Id = sizeScaleId;
+        //            appItemSizeScalesHeader.TenantId = AbpSession.TenantId;
+        //            appItemSizeScalesHeader.Name = scaleName;
+        //            appItemSizeScalesHeader.SizeScaleCode = scaleCode;
+        //            //
+        //            if (string.IsNullOrEmpty(appItemSizeScalesHeader.SizeScaleCode))
+        //            {
+        //                string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
+        //                appItemSizeScalesHeader.SizeScaleCode = "SizeScale-" + seq;
+        //            }
+        //            //
+        //            appItemSizeScalesHeader.NoOfDimensions = 1;
+        //            appItemSizeScalesHeader.Dimesion1Name = scaleDim1Name;
+        //            appItemSizeScalesHeader.ParentId = null;
+        //            appItemSizeScalesHeader.AppItemSizeScalesDetails = new List<AppItemSizeScalesDetails>();
+        //            var childItemsExtraData = result.Where(x => x.ParentCode == excelDto.Code).Select(a => new { a.ExtraAttributes, a.ExtraAttributesValues });
+        //            List<string> sizeCodes = new List<string>();
+        //            foreach (var extrAt in childItemsExtraData)
+        //            {
+        //                var sizePos = extrAt.ExtraAttributes.FindIndex(ex => ex.Name.ToUpper() == "SIZE");
+        //                if (sizePos != -1)
+        //                {
+        //                    if (sizeCodes.FirstOrDefault(a => a == extrAt.ExtraAttributesValues[sizePos].Code) == null)
+        //                        sizeCodes.Add(extrAt.ExtraAttributesValues[sizePos].Code);
+        //                }
+        //            }
+        //            List<AppItemSizeScalesDetails> appSizeScaleDet = new List<AppItemSizeScalesDetails>();
+        //            for (int pos = 0; pos < sizeCodes.Count; pos++)
+        //            {
+        //                appSizeScaleDet.Add(new AppItemSizeScalesDetails
+        //                {
+        //                    SizeCode = sizeCodes[pos],
+        //                    D1Position = pos.ToString(),
+        //                    SizeId = null,
+        //                    D3Position = null,
+        //                    D2Position = null,
+        //                    SizeRatio = 0
+        //                });
+        //            }
+        //            appItemSizeScalesHeader.AppItemSizeScalesDetails = appSizeScaleDet;
+        //            appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+        //            appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
+        //            appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = scaleDim1Name);
+        //            if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
+        //            {
+        //                var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId == null);
+        //                if (sizeScaleH != null)
+        //                {
+        //                    if (sizeScaleH.AppItemSizeScalesDetails != null && sizeScaleH.AppItemSizeScalesDetails.Count > 0)
+        //                    {
+        //                        foreach (var size in sizeScaleH.AppItemSizeScalesDetails)
+        //                        {
+        //                            var existSize = appItemSizeScalesHeader.AppItemSizeScalesDetails.FirstOrDefault(a => a.SizeCode == size.SizeCode && a.DimensionName == size.DimensionName);
+        //                            if (existSize != null)
+        //                            {
+        //                                existSize.Id = size.Id;
+        //                            }
+        //                            else
+        //                            {
+        //                                size.IsDeleted = true;
+        //                                appItemSizeScalesHeader.AppItemSizeScalesDetails.Add(size);
+        //                            }
+        //                        }
+        //                    }
+        //                }
+
+        //            }
+        //            //
+
+        //            //
+        //            appItemSizeScalesHeader.AppItemId = appItem.Id;
+        //            appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+        //        }
+        //        //mmt
+
+        //        var childItems = result.Where(x => x.ParentCode == excelDto.Code);
+        //        bool firstItem = false;
+        //        foreach (var item in childItems)
+        //        {
+        //            var appChildItem = new AppItem();
+        //            if (excelDto.Id != 0)
+        //            {
+        //                var itemExist = appItem.ParentFkList.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == item.Code.Replace(" ", string.Empty));
+        //                if (itemExist != null)
+        //                {
+        //                    appChildItem = itemExist;
+        //                    appChildItem.Description = excelDto.ProductDescription;
+        //                    appChildItem.Price = decimal.Parse(excelDto.Price);
+        //                    appChildItem.Name = excelDto.Name;
+        //                    //appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+        //                }
+        //                else
+        //                {
+
+        //                    appChildItem = ObjectMapper.Map<AppItem>(item);
+        //                    appChildItem.ListingItemId = null;
+        //                    appChildItem.Id = 0;
+
+        //                    appChildItem.EntityFk = new AppEntity
+        //                    {
+        //                        Id = 0,
+        //                        Code = item.Code,
+        //                        ObjectId = itemObjectId,
+        //                        TenantId = AbpSession.TenantId,
+        //                        EntityObjectStatusId = itemStatusId,
+        //                        Notes = _helper.HtmlToPlainText(item.ProductDescription),
+
+        //                        Name = item.Name,
+        //                        EntityObjectTypeId = productTypeId.Id,
+        //                        CreatorUserId = AbpSession.UserId,
+        //                        EntityObjectStatusCode = "ACTIVE",
+        //                        EntityObjectTypeCode = "",
+        //                        ObjectCode = "ITEM"
+
+
+        //                    };
+        //                    appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+        //                }
+
+        //            }
+        //            else
+        //            {
+        //                appChildItem = ObjectMapper.Map<AppItem>(item);
+        //                appChildItem.ListingItemId = null;
+        //                appChildItem.Id = 0;
+
+        //                appChildItem.EntityFk = new AppEntity
+        //                {
+        //                    Id = 0,
+        //                    Code = item.Code,
+        //                    ObjectId = itemObjectId,
+        //                    TenantId = AbpSession.TenantId,
+        //                    EntityObjectStatusId = itemStatusId,
+        //                    Notes = _helper.HtmlToPlainText(item.ProductDescription),
+
+        //                    Name = item.Name,
+        //                    EntityObjectTypeId = productTypeId.Id,
+        //                    CreatorUserId = AbpSession.UserId,
+        //                    EntityObjectStatusCode = "ACTIVE",
+        //                    EntityObjectTypeCode = "",
+        //                    ObjectCode = "ITEM"
+
+
+        //                };
+        //                appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+
+        //            }
+        //            //XX
+        //            if (appChildItem.ItemPricesFkList == null)
+        //                appChildItem.ItemPricesFkList = new List<AppItemPrices>();
+        //            else
+        //            {
+        //                if (appChildItem.ItemPricesFkList.Count > 0)
+        //                {
+        //                    foreach (var prc in appChildItem.ItemPricesFkList)
+        //                    {
+        //                        prc.IsDeleted = true;
+        //                    }
+        //                }
+        //            }
+        //            if (string.IsNullOrEmpty(appChildItem.Price.ToString()))
+        //                appChildItem.Price = 0;
+
+        //            //if (appChildItem.Price > 0)
+        //            {
+        //                long? currId = null;
+        //                if (!string.IsNullOrEmpty(item.Currency))
+        //                {
+        //                    var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+        //                    if (currObj != null)
+        //                        currId = currObj.Value;
+        //                }
+        //                appChildItem.ItemPricesFkList.Add(new AppItemPrices
+        //                {
+        //                    AppItemCode = appChildItem.Code,
+        //                    Code = "MSRP",
+        //                    CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+        //                    Price = appChildItem.Price,
+        //                    CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+        //                    TenantId = AbpSession.TenantId,
+        //                    IsDefault = true
+        //                });
+        //            }
+        //            //MMT0311
+        //            if (string.IsNullOrEmpty(item.PriceA))
+        //                item.PriceA = "0";
+
+        //            if (!string.IsNullOrEmpty(item.PriceA))// &&  decimal.Parse(item.PriceA) > 0)
+        //            {
+        //                long? currId = null;
+        //                if (!string.IsNullOrEmpty(item.Currency))
+        //                {
+        //                    var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+        //                    if (currObj != null)
+        //                        currId = currObj.Value;
+        //                }
+        //                appChildItem.ItemPricesFkList.Add(new AppItemPrices
+        //                {
+        //                    AppItemCode = appChildItem.Code,
+        //                    Code = "A",
+        //                    Price = decimal.Parse(item.PriceA),
+        //                    CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+        //                    TenantId = AbpSession.TenantId,
+        //                    CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+        //                    IsDefault = true
+        //                });
+        //            }
+        //            if (string.IsNullOrEmpty(item.PriceB))
+        //                item.PriceB = "0";
+
+        //            if (!string.IsNullOrEmpty(item.PriceB))// && decimal.Parse(item.PriceB) > 0)
+        //            {
+        //                long? currId = null;
+        //                if (!string.IsNullOrEmpty(item.Currency))
+        //                {
+        //                    var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+        //                    if (currObj != null)
+        //                        currId = currObj.Value;
+        //                }
+        //                appChildItem.ItemPricesFkList.Add(new AppItemPrices
+        //                {
+        //                    AppItemCode = appChildItem.Code,
+        //                    Code = "B",
+        //                    Price = decimal.Parse(item.PriceB),
+        //                    CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+        //                    TenantId = AbpSession.TenantId,
+        //                    CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+        //                    IsDefault = true
+        //                });
+        //            }
+        //            if (string.IsNullOrEmpty(item.PriceC))
+        //                item.PriceC = "0";
+
+        //            if (!string.IsNullOrEmpty(item.PriceC))// && decimal.Parse(item.PriceC) > 0)
+        //            {
+        //                long? currId = null;
+        //                if (!string.IsNullOrEmpty(item.Currency))
+        //                {
+        //                    var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+        //                    if (currObj != null)
+        //                        currId = currObj.Value;
+        //                }
+        //                appChildItem.ItemPricesFkList.Add(new AppItemPrices
+        //                {
+        //                    AppItemCode = appChildItem.Code,
+        //                    Code = "C",
+        //                    Price = decimal.Parse(item.PriceC),
+        //                    CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+        //                    TenantId = AbpSession.TenantId,
+        //                    CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+        //                    IsDefault = true
+        //                });
+        //            }
+        //            if (string.IsNullOrEmpty(item.PriceD))
+        //                item.PriceD = "0";
+
+        //            if (!string.IsNullOrEmpty(item.PriceD))// && decimal.Parse(item.PriceD) > 0)
+        //            {
+        //                long? currId = null;
+        //                if (!string.IsNullOrEmpty(item.Currency))
+        //                {
+        //                    var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+        //                    if (currObj != null)
+        //                        currId = currObj.Value;
+        //                }
+        //                appChildItem.ItemPricesFkList.Add(new AppItemPrices
+        //                {
+        //                    AppItemCode = appChildItem.Code,
+        //                    Code = "D",
+        //                    Price = decimal.Parse(item.PriceD),
+        //                    CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+        //                    TenantId = AbpSession.TenantId,
+        //                    CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
+        //                    IsDefault = true
+        //                });
+        //            }
+        //            //MMT0311
+        //            //XX
+        //            //MMT30[End]
+        //            appChildItem.TimeStamp = timeStamp;
+        //            appChildItem.EntityFk.TimeStamp = timeStamp;
+        //            appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+        //            if (string.IsNullOrEmpty(appChildItem.SSIN))
+        //            {
+        //                appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appChildItem.EntityFk));
+        //                appChildItem.EntityFk.SSIN = appItem.SSIN;
+        //            }
+        //            appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
+        //            //MMT30[End]
+        //            if (appChildItem.Id == 0)
+        //                appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+        //            var entityExtraData = new List<AppEntityExtraData>();
+        //            if (item.ExtraAttributesValues != null)
+        //            {
+        //                for (int etx = 0; etx < item.ExtraAttributesValues.Count; etx++)
+        //                {
+        //                    if (!item.ExtraAttributes[etx].IsVariation) continue;
+
+        //                    //long? AttributeValueId = null;
+        //                    var AttributeInfoObj = extrattributesLists.FirstOrDefault(x => x.Key.Name.ToUpper() == item.ExtraAttributes[etx].Name.ToUpper());
+        //                    //if (AttributeInfoObj.Key == null) continue;
+
+        //                    var AttributeInfo = AttributeInfoObj.Key != null ? AttributeInfoObj.Value : null;
+        //                    //if (AttributeInfo != null)
+        //                    //{
+        //                    //    AttributeValueId =  AttributeInfo.FirstOrDefault(x => x.Code == item.ExtraAttributesValues[etx].Code) == null ? 0: AttributeInfo.FirstOrDefault(x => x.Code == item.ExtraAttributesValues[etx].Code).Value ;
+        //                    //}
+        //                    AppEntityExtraData extra = new AppEntityExtraData
+        //                    {
+        //                        AttributeCode = item.ExtraAttributesValues[etx].Code,
+        //                        AttributeValue = item.ExtraAttributesValues[etx].Value,
+        //                        AttributeValueId = null, // AttributeValueId,
+        //                        EntityObjectTypeName = item.ExtraAttributes[etx].Name,
+        //                        AttributeId = item.ExtraAttributes[etx].AttributeId,
+        //                        EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id : null,
+        //                        EntityObjectTypeCode = AttributeInfoObj.Key != null ? item.ExtraAttributes[etx].EntityObjectTypeCode : item.ExtraAttributes[etx].Name,
+        //                        EntityCode = appChildItem.Code
+
+        //                    };
+        //                    //entityExtraData.Add(new AppEntityExtraData
+        //                    //{
+        //                    //    AttributeCode = item.ExtraAttributesValues[etx].Code,
+        //                    //    AttributeValue = item.ExtraAttributesValues[etx].Value,
+        //                    //    AttributeValueId = null, // AttributeValueId,
+        //                    //    EntityObjectTypeName = item.ExtraAttributes[etx].Name,
+        //                    //    AttributeId = item.ExtraAttributes[etx].AttributeId,
+        //                    //    EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id:null,
+        //                    //    EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode,
+        //                    //    EntityCode = appChildItem.Code
+
+        //                    //});
+        //                    try
+        //                    {
+        //                        if (appChildItem.Id == 0)
+        //                            appChildItem.EntityFk.EntityExtraData.Add(extra);
+        //                        else
+        //                        {
+        //                            var ext = appChildItem.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == item.ExtraAttributes[etx].AttributeId);
+        //                            if (ext == null)
+        //                                appChildItem.EntityFk.EntityExtraData.Add(extra);
+        //                            else
+        //                            {
+        //                                ext.AttributeCode = item.ExtraAttributesValues[etx].Code;
+        //                                ext.AttributeValue = item.ExtraAttributesValues[etx].Value;
+        //                                ext.AttributeValueId = null;
+        //                                ext.EntityObjectTypeName = item.ExtraAttributes[etx].Name;
+        //                                //AttributeId = item.ExtraAttributes[etx].AttributeId,
+        //                                ext.EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id : null;
+        //                                ext.EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode;
+        //                                ext.EntityCode = appChildItem.Code;
+        //                            }
+
+        //                        }
+        //                    }
+        //                    catch
+        //                    { }
+        //                    if (etx == 0)
+        //                        firstAttributteValues.Add(item.ExtraAttributesValues[etx].Value);
+
+        //                    if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && item.Images != null && item.Images.Count > 0)
+        //                    {
+        //                        var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == item.ImageType.ToUpper()).FirstOrDefault();
+        //                        var defaultImage = item.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") && x.ImageGuid != null).FirstOrDefault();
+
+        //                        foreach (var img in item.Images)
+        //                        {
+        //                            if (img.ImageGuid == null) continue;
+
+
+        //                            AppEntityAttachment appEntityAttachment = new AppEntityAttachment();
+        //                            appEntityAttachment.AttachmentFk = new Attachments.AppAttachment { Name = img.ImageFileName, Attachment = img.ImageGuid + "." + img.ImageFileName.Split('.')[1], TenantId = AbpSession.TenantId };
+        //                            appEntityAttachment.AttachmentCategoryId = attachCategory.Id;
+        //                            appEntityAttachment.AttachmentCategoryCode = attachCategory.Code;
+        //                            appEntityAttachment.Attributes = item.ExtraAttributes[0].AttributeId.ToString() + "=" + appChildItem.EntityFk.EntityExtraData[0].AttributeCode;
+        //                            appEntityAttachment.EntityCode = excelDto.Code;
+
+        //                            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
+        //                            {
+        //                                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
+        //                            }
+
+        //                            try
+        //                            {
+        //                                System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
+        //                            }
+        //                            catch { }
+
+
+
+        //                            if (img.ImageFileName.ToLower().Contains("_default") || img.IsDefault)
+        //                            {
+        //                                appEntityAttachment.IsDefault = true;
+        //                                firstAttributteImageDefaults.Add(imagesUrl + img.ImageGuid + "." + img.ImageFileName.Split('.')[1]);
+        //                            }
+
+        //                            appChildItem.EntityFk.EntityAttachments.Add(appEntityAttachment);
+        //                        }
+        //                        if (defaultImage == null && appChildItem.EntityFk.EntityAttachments.Count > 0)
+        //                        {
+        //                            appChildItem.EntityFk.EntityAttachments[0].IsDefault = true;
+        //                            firstAttributteImageDefaults.Add(string.IsNullOrEmpty(appChildItem.EntityFk.EntityAttachments[0].AttachmentFk.Attachment) ? "" : imagesUrl + appChildItem.EntityFk.EntityAttachments[0].AttachmentFk.Attachment);
+        //                        }
+
+        //                    }
+        //                    if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && (item.Images == null || item.Images.Count == 0))
+        //                    {
+        //                        firstAttributteImageDefaults.Add("");
+        //                    }
+        //                    if (!firstItem)
+        //                    {
+        //                        attributteNames.Add(excelDto.ExtraAttributes[etx].EntityObjectTypeCode + "," + isDefault);
+        //                        attributteIDs.Add(excelDto.ExtraAttributes[etx].AttributeId.ToString() + "," + isDefault);
+
+        //                    }
+
+        //                    isDefault = "0";
+        //                    //appChildItem.EntityFk.EntityExtraData[0].Id -AttributeValueId
+        //                    try
+        //                    {
+        //                        secondAttributteValues.Add(new AppItemExtraDto()
+        //                        {
+        //                            ParentCode = appChildItem.EntityFk.EntityExtraData[etx].AttributeCode,
+        //                            Id = item.ExtraAttributes[etx].AttributeId,
+        //                            Value = item.ExtraAttributesValues[etx].Value
+        //                        });
+        //                    }
+        //                    catch { }
+        //                }
+        //            }
+        //            if (appChildItem.Id == 0)
+        //            {
+        //                appChildItem.CreatorUserId = AbpSession.UserId;
+        //                appChildItem.TenantId = AbpSession.TenantId;
+        //            }
+        //            appChildItem.Description = item.ProductDescription;
+
+        //            firstItem = true;
+        //            //appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+        //            //if (!string.IsNullOrEmpty(item.ImageType) && item.Images.Count > 0)
+        //            //{
+        //            //    var attachCategory = attachmentsCategories.Where(r => r.Code == item.ImageType).FirstOrDefault();
+        //            //    var defaultImage = item.Images.Where(x => x.ImageFileName.Contains("_default")).FirstOrDefault ();
+
+        //            //    foreach (var img in item.Images)
+        //            //    {
+        //            //        AppEntityAttachment appEntityAttachment = new AppEntityAttachment();
+        //            //        appEntityAttachment.AttachmentFk = new Attachments.AppAttachment { Name = img.ImageFileName, Attachment = img.ImageGuid, TenantId = AbpSession.TenantId };
+        //            //        appEntityAttachment.AttachmentCategoryId = attachCategory.Id;
+        //            //        appEntityAttachment.AttachmentCategoryCode = attachCategory.Code;
+        //            //        appEntityAttachment.Attributes = item.ExtraAttributes[0].AttributeId.ToString() + "=" + item.ExtraAttributesValues[0].Code ;
+        //            //        appEntityAttachment.EntityCode = excelDto.Code;
+        //            //        if (img.ImageFileName.ToUpper().Contains("_default"))
+        //            //        {
+        //            //            appEntityAttachment.IsDefault = true;
+        //            //        }
+
+        //            //        appChildItem.EntityFk.EntityAttachments.Add(appEntityAttachment);
+        //            //    }
+        //            //    if (defaultImage == null)
+        //            //        appChildItem.EntityFk.EntityAttachments[0].IsDefault = true;
+
+        //            //}
+        //            if (appChildItem.Id == 0)
+        //                appChildItem.ParentEntityFk = appItem.EntityFk;
+
+        //            restAttributteValues.Add(secondAttributteValues);
+
+        //            secondAttributteValues = new List<AppItemExtraDto>();
+        //            //Fix Extra
+        //            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //            {
+        //                var childEntity = appChildItem.EntityFk;
+        //                var sizeExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
+        //                if (sizeExtraAtt != null)
+        //                {
+        //                    var sizeExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == sizeExtraAtt.AttributeCode
+        //                    && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+        //                    if (sizeExtra != null)
+        //                    {
+        //                        var sizeNRF = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
+        //                        if (sizeNRF != null && !string.IsNullOrEmpty(sizeNRF.AttributeValue))
+        //                        {
+        //                            var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 206).FirstOrDefault();
+        //                            if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = sizeNRF.AttributeValue;
+        //                        }
+        //                        var sizeMarketplace = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 35).FirstOrDefault();
+        //                        if (sizeMarketplace != null && !string.IsNullOrEmpty(sizeMarketplace.AttributeValue))
+        //                        {
+        //                            var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
+        //                            if (sizeMarketplacev != null && string.IsNullOrEmpty(sizeMarketplacev.AttributeValue)) sizeMarketplacev.AttributeValue = sizeMarketplace.AttributeValue;
+        //                        }
+        //                    }
+        //                }
+        //                var colorExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
+        //                if (colorExtraAtt != null)
+        //                {
+        //                    var colorExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+        //                        .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+        //                        .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+        //                    if (colorExtra != null)
+        //                    {
+        //                        if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
+        //                        {
+        //                            var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+        //                            if (colorImage != null && string.IsNullOrEmpty(colorImage.AttributeValue))
+        //                            {
+        //                                if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
+        //                                    MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
+        //                                colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+        //                            }
+        //                        }
+        //                        var colorHex = colorExtra.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
+        //                        if (colorHex != null && !string.IsNullOrEmpty(colorHex.AttributeValue))
+        //                        {
+        //                            var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+        //                            if (colorHexa != null && string.IsNullOrEmpty(colorHexa.AttributeValue)) colorHexa.AttributeValue = colorHex.AttributeValue;
+        //                        }
+
+        //                        var colorNRF = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
+        //                        if (colorNRF != null && !string.IsNullOrEmpty(colorNRF.AttributeValue))
+        //                        {
+        //                            var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
+        //                            if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = colorNRF.AttributeValue;
+        //                        }
+        //                        var colorSch = colorExtra.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
+        //                        if (colorSch != null && !string.IsNullOrEmpty(colorSch.AttributeValueId.ToString()))
+        //                        {
+        //                            var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
+        //                            if (colorSchv != null && string.IsNullOrEmpty(colorSchv.AttributeValue)) colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
+        //                        }
+        //                    }
+
+        //                }
+        //            }
+        //            //Fix Extra
+        //            if (appChildItem.Id == 0)
+        //                appItem.ParentFkList.Add(appChildItem);
+
+        //        }
+        //        // appItem.Variations = "";
+        //        #region concatenate variation lists
+        //        string variation = "";
+
+
+        //        if (excelDto.ExtraAttributes != null && excelDto.ExtraAttributes.Count > 0)
+        //        {
+        //            variation = string.Join("|", attributteNames.Distinct()) + ";" + string.Join("|", attributteIDs.Distinct()) + ";" +
+        //                string.Join("|", firstAttributteValues.Distinct()) + ";" + string.Join("|", firstAttributteImageDefaults) + ";";
+        //        }
+
+        //        if (restAttributteValues != null && restAttributteValues.Count > 0)
+        //        {
+        //            var restLists = restAttributteValues.Distinct().SelectMany(r => r).ToList();
+        //            string restValues = "";
+        //            int cntAtt = 0;
+        //            foreach (var attributteIDloop in attributteIDs)
+        //            {
+        //                if (cntAtt == 0)
+        //                {
+        //                    cntAtt++;
+        //                    continue;
+        //                }
+        //                string attributteID = attributteIDloop.Split(',')[0];
+        //                var attributeList = restLists.Where(r => r.Id.ToString() == attributteID).Select(r => r.Value + "," + r.ParentCode.ToString()).ToList();
+        //                if (attributeList != null && attributeList.Count > 0)
+        //                { restValues = restValues + string.Join("|", attributeList.Distinct()) + ";"; }
+        //                cntAtt++;
+        //            }
+        //            variation = variation + restValues;
+        //        }
+
+        //        appItem.Variations = variation;
+        //        #endregion concatenate variation lists
+        //        if (appItem.SycIdentifierId == null)
+        //            appItem.SycIdentifierId = defIdentfier;
+
+        //        //MMT46
+        //        /*
+        //        if (excelDto.Id == 0)
+        //            appItemList.Add(appItem);
+        //        else
+        //            appItemModifyList.Add(appItem);*/
+        //        CreateOrEditAppItemDto createOrEditAppItemDto = ObjectMapper.Map<CreateOrEditAppItemDto>(appItem);
+        //        createOrEditAppItemDto.NonLookupValues = new List<LookupLabelDto>();
+        //        await CreateOrEdit(createOrEditAppItemDto);
+        //        //MMT46
+        //    }
+
+        //    //var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+        //    //if (appItemDeleteList.Count > 0)
+        //    //{
+
+        //    //    await x.AppEntityExtraData.BulkDeleteAsync(appEntityExtraDataDeleteList.ToList());
+        //    //    // x.AppEntityExtraData.RemoveRange(appEntityExtraDataDeleteList.ToList());
+        //    //    await x.AppEntityClassifications.BulkDeleteAsync(appEntityClassificationDeleteList.ToList());
+        //    //    // x.AppEntityClassifications.RemoveRange(appEntityClassificationDeleteList.ToList());
+        //    //    await x.AppEntityCategories.BulkDeleteAsync(appEntityCategoryDeleteList.ToList());
+        //    //    // x.AppEntityCategories.RemoveRange(appEntityCategoryDeleteList.ToList());
+        //    //    await  x.AppEntityAttachments.BulkDeleteAsync(appEntityAttachmentDeleteList.ToList());
+        //    //    // x.AppEntityAttachments.RemoveRange(appEntityAttachmentDeleteList.ToList());
+        //    //    await x.AppEntities.BulkDeleteAsync(appEntityDeleteList.ToList());
+        //    //   // x.AppEntities.RemoveRange(appEntityDeleteList.ToList());
+        //    //   await  x.AppItems.BulkDeleteAsync(appItemDeleteList.ToList());
+        //    //   // x.AppItems.RemoveRange(appItemDeleteList.ToList ());
+        //    //    // await x.BulkSaveChangesAsync();
+        //    //}
+        //    // await x.AppItems.BulkInsertAsync(appItemList);
+        //    //MMT46
+        //    /*if (appItemModifyList.Count > 0)
+        //        x.AppItems.UpdateRange(appItemModifyList);
+
+        //    if (appItemList.Count > 0)
+        //        x.AppItems.AddRange(appItemList);
+
+        //    if (appItemModifyList.Count > 0 || appItemList.Count > 0)
+        //        await x.SaveChangesAsync();*/
+        //    //MMT46
+
+        //    #region send notification to current user
+        //    if (AbpSession.UserId != null)
+        //    {
+        //        long AbpSessionUserId = (long)AbpSession.UserId;
+        //        string message = "Items imported successfully.";
+        //        if (!string.IsNullOrEmpty(excelResultsDTO.FilePath) && !excelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + excelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+        //        await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
+        //            message,
+        //            Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+        //    }
+
+        //    #endregion send notification to current user
+
+
+
+
+
+        //    return excelResultsDTO.ExcelLogDTO;
+        //}   //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+
         public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
         {
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
-             
+
             #region handle 4,2,3 actions
             // select type images
             // action 2 add to item
@@ -6261,30 +8151,42 @@ namespace onetouch.AppItems
                 { number = Int32.Parse(excelDto.ExcelDto.Actions); }
 
                 if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType == "Color")
-                {
-                    if (number == 10) { excelDto.ExcelDto.Code = "-"; }
-                    foreach (var id in excelDto.ExcelDto.Code.Split(","))
-                    { var ret1 = SaveImageToColor(id, excelDto).Result; }
-                }
-                if (number == 5)
-                {
-                    if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
-                    //string guid = System.Guid.NewGuid().ToString();
-
-                    excelDto.ExcelDto.Images.Add(new AppItemImage
+                    if (number == 2 || number == 3 || number == 4 || number == 10 || number == 7 || excelDto.RecordType == "Color")
                     {
-                        ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
-                        ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
-                        IsDefault = excelDto.ExcelDto.ImageIsDefault
+                        if (number == 10) { excelDto.ExcelDto.Code = "-"; }
+                        foreach (var id in excelDto.ExcelDto.Code.Split(","))
+                        { var ret1 = SaveImageToColor(id, excelDto).Result; }
+                    }
+                if (number == 5)
+                    if (number == 5)
+                    {
+                        if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
+                        //string guid = System.Guid.NewGuid().ToString();
 
-                    });
-                    //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
-                    excelDto.ExcelDto.Actions = "";
-                    excelDto.ExcelDto.RecordType = "Item";
-                    excelDto.RecordType = "Item";
+                        excelDto.ExcelDto.Images.Add(new AppItemImage
+                        {
+                            ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                            ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                            IsDefault = excelDto.ExcelDto.ImageIsDefault
+
+                        });
+                        //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
+
+                        if (excelDto.ExcelDto.Code == "-") { excelDto.ExcelDto.Code = excelDto.Code; }
+                        if (excelDto.ExcelDto.Name == "-") { excelDto.ExcelDto.Name = excelDto.Name; }
+                        if (excelDto.ExcelDto.NoOfDim == null) { excelDto.ExcelDto.NoOfDim = "1"; }
+                        if (string.IsNullOrEmpty(excelDto.ExcelDto.ImageType)) { excelDto.ExcelDto.ImageType = "Image"; }
+
+                        var xexcelDto = AddExtraAttrs(excelDto).Result;
+                        excelDto.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
+                        excelDto.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
+
+                        excelDto.ExcelDto.Actions = "";
+                        excelDto.ExcelDto.RecordType = "Item";
+                        excelDto.RecordType = "Item";
 
 
-                }
+                    }
 
                 if (number == 6)
                 {
@@ -6300,13 +8202,19 @@ namespace onetouch.AppItems
                         int childNo = 0;
                         foreach (var size in parent.ExcelDto.SizeScaleOrder.Split('|'))
                         {
-                            var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            ////var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO>(excelDto);
+                            //var thirdItemCopy = ObjectMapper.Map<AppItemtExcelRecordDTO, AppItemtExcelRecordDTO>(excelDto);
+                            var json = JsonConvert.SerializeObject(excelDto);
+                            var thirdItemCopy = JsonConvert.DeserializeObject<AppItemtExcelRecordDTO>(json);
 
                             thirdItemCopy.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
                             thirdItemCopy.RecordType = "Item Variant";
 
-                            thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd() + "-" + size.TrimEnd();
+                            thirdItemCopy.ExcelDto.Code = thirdItemCopy.Code.TrimEnd();
                             thirdItemCopy.ExcelDto.RecordType = "Item Variant";
+                            thirdItemCopy.ExcelDto.SizeCode = size.TrimEnd();
+                            thirdItemCopy.ExcelDto.SizeName = size.TrimEnd();
+
                             thirdItemCopy.ExcelDto.Images = new List<AppItemImage>();
                             //string guid = System.Guid.NewGuid().ToString();
                             thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
@@ -6317,11 +8225,29 @@ namespace onetouch.AppItems
                                 Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
                             });
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
+                            //string guid = System.Guid.NewGuid().ToString();
+                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+                            {
+                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                            });
+                            //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
-                            childNo = +1;
+                            childNo += 1;
+                            thirdItemCopy.ExcelDto.D1Pos = childNo.ToString();
+
+                            var xexcelDto = AddExtraAttrs(thirdItemCopy).Result;
+                            thirdItemCopy.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
+                            thirdItemCopy.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
+                            thirdItemCopy.ExcelDto.ParentCode = thirdItemCopy.ParentCode;
                             excelResultsDTO.ExcelRecords.Insert(index + childNo, thirdItemCopy);
 
                         }
+                        // call validate to add extra fields
+                        //var xx = this.ValidateExcel(excelResultsDTO.ExcelRecords);
+
                     }
 
                     //if (excelDto.ExcelDto.Images is null) { excelDto.ExcelDto.Images = new List<AppItemImage>(); }
@@ -6377,12 +8303,16 @@ namespace onetouch.AppItems
 
                 }
             }
+            result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
+            ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
+
             result = result.Select(r => r).Where(r => (r.Actions != "2" && r.Actions != "3" && r.Actions != "4"
             && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
             && r.Actions != "8" && r.Actions != "9" && r.Actions != "10"
             && r.RecordType != "Image" && r.RecordType != "Color")).ToList();
 
-            if (result.Count <= 0) {
+            if (result.Count <= 0)
+            {
                 #region send notification to current user
                 if (AbpSession.UserId != null)
                 {
@@ -6396,10 +8326,10 @@ namespace onetouch.AppItems
 
                 #endregion send notification to current user 
 
-                return excelResultsDTO.ExcelLogDTO; 
+                return excelResultsDTO.ExcelLogDTO;
             }
             #endregion
-             
+
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
@@ -6724,10 +8654,12 @@ namespace onetouch.AppItems
                 {
                     if (appItem.ItemPricesFkList.Count > 0)
                     {
-                        foreach (var itmPrc in appItem.ItemPricesFkList)
-                        {
-                            itmPrc.IsDeleted = true;
-                        }
+                        //foreach (var itmPrc in appItem.ItemPricesFkList)
+                        // {
+                        //  itmPrc.IsDeleted = true;
+                        //}
+                        await _appItemPricesRepository.DeleteAsync(z => z.AppItemId == appItem.Id);
+                        appItem.ItemPricesFkList = new List<AppItemPrices>();
                     }
                 }
                 //if (appItem.Price > 0)
@@ -7034,9 +8966,9 @@ namespace onetouch.AppItems
                     {
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
                         //var sizesArray = excelDto.ScaleSizesOrder.Split('|');
-                        var d1sizesArray = excelDto.D1Sizes.Split('|');
-                        var d2sizesArray = excelDto.D2Sizes.Split('|');
-                        var d3sizesArray = excelDto.D3Sizes.Split('|');
+                        var d1sizesArray = !string.IsNullOrEmpty(excelDto.D1Sizes) ? excelDto.D1Sizes.Split('|') : "".Split('|');
+                        var d2sizesArray = !string.IsNullOrEmpty(excelDto.D2Sizes) ? excelDto.D2Sizes.Split('|') : "".Split('|');
+                        var d3sizesArray = !string.IsNullOrEmpty(excelDto.D3Sizes) ? excelDto.D3Sizes.Split('|') : "".Split('|'); ;
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                         List<AppSizeScalesDetailDto> appSizeScalesDetailDtoList = new List<AppSizeScalesDetailDto>();
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
@@ -7103,9 +9035,9 @@ namespace onetouch.AppItems
                             foreach (var sz in sizes)
                             {
                                 var exist = appSizeScalesDetailDtoList.FirstOrDefault(z => z.SizeCode == sz.SizeCode &&
-                                   z.D1Position == (sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
-                                   z.D2Position == (sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
-                                   z.D3Position == (sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
+                                   z.D1Position == (sz.D1Pos == null || sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
+                                   z.D2Position == (sz.D2Pos == null || sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
+                                   z.D3Position == (sz.D3Pos == null || sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
                                 if (exist == null)
                                     appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
                                     {
@@ -7151,7 +9083,7 @@ namespace onetouch.AppItems
                             sizeScaleSavedId = sizescale.Result.Id;
                             sizeScaleNames.Add(excelDto.SizeScaleName);
                         }
-                        catch
+                        catch (Exception ex)
                         {
                             if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
                             {
@@ -7355,16 +9287,31 @@ namespace onetouch.AppItems
                                     appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
 
                                 }
+                                //T-SII-20250725.0002,1 MMT 09/24/2025 Fix import item issues[Start]
+                                //var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
+                                appSizeScaleRatioForEditDto.Id = 0;
+                                AppSizeScaleForEditDto sizescaleRatio = null;
 
-                                var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
+                                try
+                                {
+                                    sizescaleRatio = await _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
 
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
+                                    {
+                                        sizescaleRatio = await _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleRatioForEditDto.Id.ToString()));
+                                    }
+                                }
+                                //T-SII-20250725.0002,1 MMT 09/24/2025 Fix import item issues[End]
                                 AppItemSizeScalesHeader appItemSizeScalesHeaderRatio = new AppItemSizeScalesHeader();
-                                appItemSizeScalesHeaderRatio.SizeScaleId = sizescaleRatio.Result.Id;
+                                appItemSizeScalesHeaderRatio.SizeScaleId = sizescaleRatio.Id;
                                 appItemSizeScalesHeaderRatio.Id = sizeRatioId;
-                                appItemSizeScalesHeaderRatio.Name = sizescaleRatio.Result.Name;
-                                appItemSizeScalesHeaderRatio.SizeScaleCode = sizescaleRatio.Result.Code;
-                                appItemSizeScalesHeaderRatio.NoOfDimensions = sizescaleRatio.Result.NoOfDimensions;
-                                appItemSizeScalesHeaderRatio.Dimesion1Name = sizescaleRatio.Result.Dimesion1Name;
+                                appItemSizeScalesHeaderRatio.Name = sizescaleRatio.Name;
+                                appItemSizeScalesHeaderRatio.SizeScaleCode = sizescaleRatio.Code;
+                                appItemSizeScalesHeaderRatio.NoOfDimensions = sizescaleRatio.NoOfDimensions;
+                                appItemSizeScalesHeaderRatio.Dimesion1Name = sizescaleRatio.Dimesion1Name;
                                 appItemSizeScalesHeaderRatio.ParentId = null;// appItemSizeScalesHeader.Id;
                                 appItemSizeScalesHeaderRatio.TenantId = AbpSession.TenantId;
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesRatioDetailDtoList);
@@ -7630,10 +9577,12 @@ namespace onetouch.AppItems
                     {
                         if (appChildItem.ItemPricesFkList.Count > 0)
                         {
-                            foreach (var prc in appChildItem.ItemPricesFkList)
-                            {
-                                prc.IsDeleted = true;
-                            }
+                            //foreach (var prc in appChildItem.ItemPricesFkList)
+                            //{
+                            await _appItemPricesRepository.DeleteAsync(z => z.AppItemId == appChildItem.Id);
+                            appChildItem.ItemPricesFkList = new List<AppItemPrices>();
+                            //prc.IsDeleted = true;
+                            //}
                         }
                     }
                     if (string.IsNullOrEmpty(appChildItem.Price.ToString()))
@@ -7834,7 +9783,9 @@ namespace onetouch.AppItems
                             { }
                             if (etx == 0)
                                 firstAttributteValues.Add(item.ExtraAttributesValues[etx].Value);
-
+                            //hia hia
+                            //var attPhotoId = _helper.SystemTables.GetAttachmentCategoryId("Image").Result;
+                            if (string.IsNullOrEmpty(item.ImageType)) { item.ImageType = "Image"; }
                             if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && item.Images != null && item.Images.Count > 0)
                             {
                                 var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == item.ImageType.ToUpper()).FirstOrDefault();
@@ -8113,8 +10064,11 @@ namespace onetouch.AppItems
 
             return excelResultsDTO.ExcelLogDTO;
         }   //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
-         
-        //Mariam[End]
+
+
+
+
+        ////Mariam[End]
         //MMT30[Start]
         public async Task<string> GenerateProductCode(int productId, bool lUpdateSeq, long? tenantId)
         {
