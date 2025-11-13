@@ -1346,7 +1346,26 @@ namespace onetouch.AppItemsLists
 
                     }
                 }
-
+                //Xx22
+                if (!input.SyncProductList)
+                {
+                    publishItemsList.ItemSharingFkList = new List<AppMarketplaceItemSharings>();
+                    foreach (var sharingDto in input.ItemSharing)
+                    {
+                        AppMarketplaceItemSharings sharing;
+                        if (sharingDto.Id == 0)
+                        {
+                            sharing = ObjectMapper.Map<AppMarketplaceItemSharings>(sharingDto);
+                        }
+                        else
+                        {
+                            sharing = await _appMarketplaceItemSharing.FirstOrDefaultAsync((long)sharingDto.Id);
+                            ObjectMapper.Map(sharingDto, sharing);
+                        }
+                        publishItemsList.ItemSharingFkList.Add(sharing);
+                    }
+                }
+                //xx22
                 //var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
 
                 //publishItemsList.EntityId = savedEntity;
@@ -1363,6 +1382,10 @@ namespace onetouch.AppItemsLists
 
 
                     await CurrentUnitOfWork.SaveChangesAsync();
+                }
+                else
+                {
+                    await _appMarketplaceItemListRepository.UpdateAsync(publishItemsList);
                 }
 
                 //Delete removed child items
