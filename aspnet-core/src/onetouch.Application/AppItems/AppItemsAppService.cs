@@ -8862,6 +8862,7 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.D2Pos, act => act.MapFrom(src => src["Dimension2Position"].ToString()));
             mappingExpression.ForMember(dest => dest.D3Pos, act => act.MapFrom(src => src["Dimension3Position"].ToString()));
             mappingExpression.ForMember(dest => dest.SizeCode, act => act.MapFrom(src => src["SIZEcode"].ToString()));
+            mappingExpression.ForMember(dest => dest.SizeName, act => act.MapFrom(src => src["SIZEName"].ToString()));
             //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
             mappingExpression.ForMember(dest => dest.PriceA, act => act.MapFrom(src => src["PriceA"].ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceB, act => act.MapFrom(src => src["PriceB"].ToString().TrimEnd()));
