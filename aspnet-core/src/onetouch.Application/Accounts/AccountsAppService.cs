@@ -4717,12 +4717,12 @@ namespace onetouch.Accounts
                     ErrorType = "Stopper"
                 });
             }
-            if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
+            if (string.IsNullOrEmpty(accountExcelDto.AccountType) || !Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
             {
                 returnList.Add(new ImportContactReturnDto
                 {
                     RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Account Type: Should Be Seller|Buyer|Both.",
+                    ErrorMessage = "Account Type: Should Be Business|Personal.",
                     ErrorType = "Stopper"
                 });
             }
