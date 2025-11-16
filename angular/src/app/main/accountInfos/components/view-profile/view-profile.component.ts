@@ -411,10 +411,10 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             finalize(() => this.hideMainSpinner()
             )).subscribe(
                 (response) => {
-                    if (this.isPublished && this.connectionCount == 0 && this.isNotManualLevel()) {
+                    if ((this.connectionCount == 0 )) {
                         this.notify.success(this.l('Profile Set To Private Successfully'));
 
-                    } else if (this.isPublished && this.connectionCount != 0 && this.isNotManualLevel()) {
+                    } else if ( this.connectionCount != 0 ) {
                         this.notify.success(this.l('Profile Set To Heddin Successfully'));
                     }
 
