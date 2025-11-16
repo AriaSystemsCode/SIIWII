@@ -22,13 +22,19 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
 
     isRecordOwner : boolean
     attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
-    
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector:Injector,
         private router:Router,
         private _accountsServiceProxy: AccountsServiceProxy,
     ){
         super(injector);
+    }
+
+    ngOnInit(){
+      this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+      this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
     }
     ngOnChanges(changes: SimpleChanges): void {
         this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId
