@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
-import { finalize } from "rxjs/operators";
+
 @Component({
     selector: 'app-connections-card',
     templateUrl: './connections-card.component.html',
@@ -43,9 +43,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
     deleteAccount() {
         this.deleteMe.emit()
     }
-    connect(): void {
-        this.connectMe.emit()
-    }
+
 
     disconnect(account): void {
         this.disconnectMe.emit(account)

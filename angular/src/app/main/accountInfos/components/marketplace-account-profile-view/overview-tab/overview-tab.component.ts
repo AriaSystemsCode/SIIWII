@@ -41,7 +41,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
 
     this.getOverAllRatings()
     this.getAllMedia()
-    console.log(this.marketPlaceData,'marketPlaceData')
+
 
   }
 

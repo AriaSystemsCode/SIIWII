@@ -133,11 +133,11 @@ this.accountsTypes=result.items;
   getConnections(event?: LazyLoadEvent) {
     this.loading = true
     // this.showMainSpinner();
-    // if (this.primengTableHelper.shouldResetPaging(event)) {
-    //   this.paginator.totalRecords = 10;
-    //   this.paginator.changePage(0);
-    //   return;
-    // }
+    if (this.primengTableHelper.shouldResetPaging(event)) {
+      this.paginator.totalRecords = 10;
+      this.paginator.changePage(0);
+      return;
+    }
     const filters = this.filterForm?.value;
 
    
