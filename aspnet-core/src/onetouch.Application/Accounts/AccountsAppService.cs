@@ -7638,13 +7638,12 @@ namespace onetouch.Accounts
                     ErrorType = "Stopper"
                 });
             }
-            if (accountExcelDto.RecordType == AccountExcelRecordType.Account.ToString() ?
-                (string.IsNullOrEmpty(accountExcelDto.AccountType) || !Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType)):false)
+            if (string.IsNullOrEmpty(accountExcelDto.AccountType) || !Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType))
             {
                 returnList.Add(new ImportContactReturnDto
                 {
                     RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Account Type: Should Be Seller|Buyer|Both.",
+                    ErrorMessage = "Account Type: Should Be Business|Personal.",
                     ErrorType = "Stopper"
                 });
             }
