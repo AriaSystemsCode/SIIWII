@@ -133,17 +133,17 @@
   <div class="card marketplaceAccountProfile">
     <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex" *ngIf="accountDataForView">
       <p-tabPanel header="Overview">
-        <app-overview-tab [accountDataForView]="accountDataForView"
+        <app-overview-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" 
           (activeTabIndexBtn)="navigateToTab($event)"></app-overview-tab>
       </p-tabPanel>
       <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" header="Products">
-        <app-marketplace-products [fromMarketAcoount]="true"
+        <app-marketplace-products [fromMarketAcoount]="true" 
           [accountDataForView]="accountDataForView" [marketplaceAccCurrency]="accountDataForView.currencyName"></app-marketplace-products>
       </p-tabPanel>
 
       <p-tabPanel header="Connections" *ngIf="accountDataForView">
         <app-connections-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData"
-          [loginAccoutType]="loginAccoutType"></app-connections-tab>
+          ></app-connections-tab>
       </p-tabPanel>
 
 

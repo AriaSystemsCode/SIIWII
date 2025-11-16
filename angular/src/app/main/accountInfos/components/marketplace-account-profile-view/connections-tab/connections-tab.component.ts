@@ -17,7 +17,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
   @Input() accountDataForView :AccountDto;
   @Input() marketPlaceData :AccountDto;
   
-  @Input() loginAccoutType:string;
+  // @Input() loginAccoutType:string;
   @Input() fromOverview:boolean = false;
 
   @ViewChild("paginator", { static: true }) paginator: Paginator;
@@ -131,12 +131,13 @@ this.accountsTypes=result.items;
   }
 
   getConnections(event?: LazyLoadEvent) {
-    this.showMainSpinner();
-    if (this.primengTableHelper.shouldResetPaging(event)) {
-      this.paginator.totalRecords = 10;
-      this.paginator.changePage(0);
-      return;
-    }
+    this.loading = true
+    // this.showMainSpinner();
+    // if (this.primengTableHelper.shouldResetPaging(event)) {
+    //   this.paginator.totalRecords = 10;
+    //   this.paginator.changePage(0);
+    //   return;
+    // }
     const filters = this.filterForm?.value;
 
    
@@ -163,7 +164,7 @@ this.accountsTypes=result.items;
         this.primengTableHelper.getMaxResultCount(this.paginator, event)
       ).pipe(
       finalize(() => {
-        this.primengTableHelper.hideLoadingIndicator();
+        // this.primengTableHelper.hideLoadingIndicator();
         if (!this.active) this.active = true;
         this.loading = false;
         this.hideMainSpinner();

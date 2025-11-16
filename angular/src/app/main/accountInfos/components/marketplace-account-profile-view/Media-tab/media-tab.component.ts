@@ -25,6 +25,7 @@ export class MediaTabComponent extends AppComponentBase implements OnInit {
   isModalOpen : boolean = false;
   selectedIndex :number = 0;
   lastImageIndex: number = 0;
+  isLoading:boolean = false
 
   constructor(
     injector: Injector,
@@ -62,13 +63,13 @@ export class MediaTabComponent extends AppComponentBase implements OnInit {
   }
 
   getAllMedia() {
-    this.showMainSpinner();
+    this.isLoading =true
   
     const skipCount = (this.currentPage - 1) * this.itemsPerPage;
   
     this._AccountsServiceProxy
       .getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, skipCount, this.itemsPerPage)
-      .pipe(finalize(() => this.hideMainSpinner()))
+      .pipe(finalize(() => this.isLoading = false))
       .subscribe((res) => {
         this.mediaItems = res.items
         // ?.map((item) => {

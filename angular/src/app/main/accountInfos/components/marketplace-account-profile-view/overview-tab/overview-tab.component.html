@@ -186,7 +186,16 @@
       </div>
       <hr class="hr">
 
-      <div class="position-relative">
+      <div class="tab-wrapper position-relative">
+
+        <div
+          class="tab-loading-overlay"
+          *ngIf="isLoading"
+        >
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
         <ng-container *ngFor="let item of mediaItems; let i = index">
 <!-- 
           <img [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class="w-100 media-img col-4"
@@ -275,7 +284,7 @@
       <hr class="hr">
       <div *ngIf="accountDataForView"  class="addSecMg">
         <app-connections-tab [fromOverview]="true" [accountDataForView]="accountDataForView"
-          [loginAccoutType]="loginAccoutType"></app-connections-tab>
+        ></app-connections-tab>
       </div>
 
 
@@ -329,7 +338,8 @@
 
       </div>
       <hr class="hr">
-      <app-all-reviews-list [fromOverview]="true" [entityID]="accountDataForView?.entityId" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
+      <!-- {{marketPlaceData?.contact?.tenantId}} -->
+      <app-all-reviews-list [fromOverview]="true" [tenantId]="marketPlaceData?.contact?.id" [entityID]="accountDataForView?.entityId" [alreadyReviewdMsg]="accountReviewMsg" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
      
     </div>
 

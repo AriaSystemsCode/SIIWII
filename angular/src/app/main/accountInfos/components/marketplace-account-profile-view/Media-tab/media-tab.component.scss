@@ -207,3 +207,20 @@ media-grid {
   color: #595959;
 
 }
+
+
+
+.tab-wrapper {
+  position: relative;
+  min-height: 250px;
+}
+
+.tab-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #EEE;
+  z-index: 10;
+}

@@ -44,15 +44,16 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
 
   getData() {
     this.getAccountDataForView();
-    this.getLoginAccoutType();
+    // this.getLoginAccoutType();
   }
-  getLoginAccoutType() {
-    this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId, 5).subscribe((res) => {
-      this.loginAccoutType = res.account.accountType;
-    }
+  // getLoginAccoutType() {
+  //   this.showMainSpinner()
+  //   this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId, 5).subscribe((res) => {
+  //     this.loginAccoutType = res.account.accountType;
+  //   }
 
-    )
-  }
+  //   )
+  // }
 
 
 
