@@ -544,16 +544,6 @@ export class MainImportComponent
     callImport(iterationNo: number) {
         if (iterationNo === 0) {
             this.uploadStartTime = Date.now();
-            Swal.fire({
-                    title: "",
-                    text:  "Your import has started. You’ll receive a confirmation once it’s complete.",  
-                    icon: "info",
-                    showCancelButton: false,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Ok",
-                  }).then((result) => {
-                  });
         }
     
         const hasImageRecords = this.uploadindResultExcelList.some(r => r.recordType === 'Image');
