@@ -1,6 +1,6 @@
 <div bsModal #uploadStatus="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="uploadStatus"
   aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-lg modalCenter">
+  <div class="modal-dialog modal-xl modalCenter">
     <div class="modal-content">
       <div class="modal-header-custom">
         <h5 class="modal-title font-weight-bold">Import {{ImportTypes[importType]}} information</h5>
@@ -492,7 +492,7 @@
                                 'object-fit': 'cover',
                                 'border-radius.px': 4,
                                 'width.px': 60,
-                                'height.px': imgPreview?.clientWidth / acceptedAspectRatio
+                                'height.px': 60 / acceptedAspectRatio
                               }"
                             />
                           </ng-container>
