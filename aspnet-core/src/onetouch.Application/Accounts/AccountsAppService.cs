@@ -6925,7 +6925,7 @@ namespace onetouch.Accounts
                 //ContactDto contactDtoObj = new ContactDto();
                 ObjectMapper.Map(contact, returnObject);
                 //Publish Contact if the related Account is published
-                if (accountDto.TenantId  == AbpSession.TenantId && account!=null && (accountDto.TenantOwner==0 || accountDto.TenantOwner == AbpSession.TenantId))//input.UserId != null && input.UserId != 0)
+                if (accountDto.TenantId  == AbpSession.TenantId && account!=null && (accountDto.TenantOwner == null || accountDto.TenantOwner==0 || accountDto.TenantOwner == AbpSession.TenantId))//input.UserId != null && input.UserId != 0)
                 {
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
