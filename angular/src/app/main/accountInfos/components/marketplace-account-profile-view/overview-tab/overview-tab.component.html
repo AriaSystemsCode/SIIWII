@@ -200,7 +200,7 @@
 <!-- 
           <img [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class="w-100 media-img col-4"
             (click)="openModal(i)" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'" /> -->
-            <ng-container *ngIf="item?.attachmentCategoryId !== 8; ">
+            <ng-container *ngIf="item?.attachmentCategoryId !== 5; ">
               <img onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"     (click)="openModal(i)"
                 [src]="attachmentBaseUrl + '/' + item?.url" alt="Selected Media" class="w-100 media-img col-4"
              loading="lazy" />
@@ -212,9 +212,9 @@
             
             </ng-template> -->
 
-          <div *ngIf="i === 8 " class="more-overlay">
+          <div *ngIf="i === 5 " class="more-overlay">
 
-            <span>+{{ totalImgs - 8 }}</span>
+            <span>+{{ totalImgs - 5 }}</span>
           </div>
         </ng-container>
       </div>
@@ -338,8 +338,7 @@
 
       </div>
       <hr class="hr">
-      <!-- {{marketPlaceData?.contact?.tenantId}} -->
-      <app-all-reviews-list [fromOverview]="true" [tenantId]="marketPlaceData?.contact?.id" [entityID]="accountDataForView?.entityId" [alreadyReviewdMsg]="accountReviewMsg" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
+      <app-all-reviews-list [fromOverview]="true" [isPublished]="marketPlaceData?.isPublished" [entityID]="accountDataForView?.entityId" [alreadyReviewdMsg]="accountReviewMsg" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
      
     </div>
 

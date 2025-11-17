@@ -48,7 +48,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
 
   getAllMedia() {
     this.isLoading = true
-    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, 0, 9).pipe(
+    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, 0, 6).pipe(
       finalize(
         () =>
           this.isLoading = false

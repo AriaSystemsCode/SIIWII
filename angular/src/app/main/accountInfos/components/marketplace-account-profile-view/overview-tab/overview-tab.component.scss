@@ -847,11 +847,11 @@ media-grid {
   height: 87px;
   border-radius: 14px;
   position: absolute;
-  bottom: 4px;
+  bottom: 14px;
   opacity: 8;
   color: #4A0D4A;
   background: rgba(255, 255, 255, 0.3);
-  right: 3px;
+  right: 4px;
   filter: brightness(50%);
 }
 
@@ -885,7 +885,7 @@ media-grid {
 
 .tab-wrapper {
   position: relative;
-  min-height: 250px;
+  min-height: 200px;
 }
 
 .tab-loading-overlay {

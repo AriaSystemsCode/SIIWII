@@ -13,7 +13,7 @@ import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageS
 
 export class AllReviewsListComponent extends AppComponentBase implements OnInit {
   @Input() entityID : number
-  @Input() tenantId : number
+  @Input() isPublished : boolean
   @Input() fromOverview : boolean
   @Input() alreadyReviewdMsg : string = 'You’ve already reviewed this product'
   
