@@ -216,6 +216,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                                     select new GetMarketplaceAccountForViewDto()
                                     {
+                                        IsPublished = (o.TenantOwner == AbpSession.TenantId? true: false),
                                         //AvaliableConnectionName = GetAction(o.EntityObjectTypeCode),
                                         AvaliableConnectionName = "Follow",
                                         //ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? "Follow" : "",
