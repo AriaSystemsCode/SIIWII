@@ -9836,19 +9836,25 @@ namespace onetouch.Accounts
                                 }
                                 //xx
                                 br.AccountId = acc.Id;
-                                foreach (var cont in br.ParentFkList)
+                                if (br.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                                    contacts.Add(br);
+                                if (br.ParentFkList != null)
                                 {
-                                    //xx
-                                    if (cont.AppContactAddresses != null)
+                                    foreach (var cont in br.ParentFkList)
                                     {
-                                        foreach (var z in cont.AppContactAddresses)
+                                        //xx
+                                        if (cont.AppContactAddresses != null)
                                         {
-                                            if (z.AddressFk != null)
-                                                z.AddressFk.AccountId = acc.Id;
+                                            foreach (var z in cont.AppContactAddresses)
+                                            {
+                                                if (z.AddressFk != null)
+                                                    z.AddressFk.AccountId = acc.Id;
+                                            }
                                         }
+                                        //xx
+                                        cont.AccountId = acc.Id;
+                                        contacts.Add(cont);
                                     }
-                                    //xx
-                                    cont.AccountId = acc.Id;
                                 }
                             }
                         }
