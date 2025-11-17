@@ -78,6 +78,7 @@ export class imageCroppingComponent extends AppComponentBase implements OnInit,O
      @Input() failedImagesIndex;
        @ViewChild("AutoCropModal", { static: true })
          AutoCropModal: autoCropComponent;
+         imageExt;
 
     public constructor(
         private _importService:MainImportService,
@@ -152,8 +153,10 @@ export class imageCroppingComponent extends AppComponentBase implements OnInit,O
                 image.file.name.toUpperCase().substring(0, image.file.name.toUpperCase().lastIndexOf("."))
    );
         this.selectedImage=this.finalImages[index];
-        this.imageName=this.selectedImage.file.name;
-
+        let fullName = this.selectedImage.file.name ;
+        this.imageName=fullName.substring(0, fullName.lastIndexOf('.')); 
+        this.imageExt = fullName.substring(fullName.lastIndexOf('.') + 1);
+        
         this.acceptedRatio= Number(this.sycAttachmentCategory[this.selectedImage.imgtype.toUpperCase()].aspectRatio);
 
        this.selectedIndex=index;
