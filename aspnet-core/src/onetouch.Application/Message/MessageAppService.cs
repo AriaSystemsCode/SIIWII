@@ -751,6 +751,8 @@ namespace onetouch.Message
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                if (searchTerm == null)
+                    searchTerm = "";
                 var UserList = from o in UserManager.Users //.Where(x => x.TenantId != null)
                                join o1 in TenantManager.Tenants on o.TenantId equals o1.Id into j1
 
