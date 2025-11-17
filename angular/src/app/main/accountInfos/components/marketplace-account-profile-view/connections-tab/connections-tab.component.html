@@ -1,6 +1,18 @@
 <form [formGroup]="filterForm">
-    <div [@routerTransition] style="margin-top: -90px" class="wrapper">
-        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor mt-md-4 marginMob"
+
+    <div class="tab-wrapper position-relative">
+
+        <div
+          class="tab-loading-overlay"
+          *ngIf="loading"
+        >
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+
+    <div [@routerTransition]  class="wrapper">
+        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor  marginMob"
             [ngClass]="fromOverview ? 'p-0':''">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [ngClass]="fromOverview ? 'p-0':''">
                 <div class="kt-portlet kt-portlet--mobile">
@@ -187,5 +199,7 @@
                 </div>
             </div>
         </div>
+    </div>
+
     </div>
 </form>

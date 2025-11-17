@@ -27,7 +27,7 @@
 }
 
 .kt-portlet {
-    margin-top: 60px !important;
+    margin-top: -15px !important;
 }
 
 .kt-container {
@@ -42,3 +42,19 @@
 .col-md-6 {
     max-width: 98% !important;
 }
+
+.tab-wrapper {
+    position: relative;
+    min-height: 250px;
+  }
+  
+  .tab-loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #EEE;
+    z-index: 10;
+  }
+  

@@ -166,8 +166,10 @@
                                 <button type="button" dropdownToggle style="  border: none !important;
                                 background: white;padding: 0;">
                                     <img class="pb-1" style="width: 15px;"
-                                        src="../../assets/accounts/ph_check-bold.png" /> <span>{{
-                                        getFormattedConnectionName('connectionName') | localize }}</span> <i
+                                        src="../../assets/accounts/ph_check-bold.png" /> <span *ngIf="getFormattedConnectionName('connectionName') as connName"
+                                        [title]="connName">
+                                    {{ connName.length > 10 ? (connName | slice:0:10) + '...' : connName | localize }}
+                                  </span> <i
                                         class="fas fa-lg ml-1 fa-angle-down" style="color: #777777 !important;"></i>
                                 </button>
 
@@ -197,7 +199,9 @@
                                        >
                                         <img class="pb-1" style="width: 15px;" (click)="createRelation(options[0])"
                                             [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
-                                        <span  (click)="createRelation(options[0])" class="ml-1">{{ options[0]?.connectLabel }}</span>
+                                        <span  (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectLabel">{{     options[0]?.connectLabel?.length > 10
+                                            ? (options[0].connectLabel | slice: 0:10) + '...'
+                                            : options[0]?.connectLabel }}</span>
 
                                         <!-- caret only if there are more -->
                                         <i *ngIf="options.length > 1" class="fas fa-lg ml-4 fa-angle-down"

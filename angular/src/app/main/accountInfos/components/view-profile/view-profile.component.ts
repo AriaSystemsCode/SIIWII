@@ -200,14 +200,14 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
             this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
             this.contactData.entityAttachments = this.mergeAttachmentsForSave(
-                this.contactData.entityAttachments,  
-                this.accountData.entityAttachments,  
-                this.sycAttachmentCategoryLogo?.id, 
-                this.sycAttachmentCategoryBanner?.id, 
-                this._removed        
-              );
-              
-              
+                this.contactData.entityAttachments,
+                this.accountData.entityAttachments,
+                this.sycAttachmentCategoryLogo?.id,
+                this.sycAttachmentCategoryBanner?.id,
+                this._removed
+            );
+
+
             this.contactData.languageName = this.editedPersonalData.languageName;
 
             this.editedContactData.emit(this.contactData)
@@ -383,7 +383,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                 this.notify.info(this.l('Profile Shared Successfully'));
                 this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
                 this.hidUshare = true;
-                this.hideshowShare = false;   
+                this.hideshowShare = false;
                 this.hideshowShare = true;
                 this.showShare = true;
             }
@@ -411,19 +411,19 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             finalize(() => this.hideMainSpinner()
             )).subscribe(
                 (response) => {
-                    if(this.isPublished&&this.connectionCount==0&&this.isNotManualLevel()){
+                    if ((this.connectionCount == 0 )) {
                         this.notify.success(this.l('Profile Set To Private Successfully'));
 
-                    } else if (this.isPublished&&this.connectionCount!=0&&this.isNotManualLevel()){
+                    } else if ( this.connectionCount != 0 ) {
                         this.notify.success(this.l('Profile Set To Heddin Successfully'));
                     }
-       
+
                     this.showShare = false;
                     this.hidUshare = true;
                     this.hideshowShare = true;
                     this.showHide = true;
                     this.showPrivate = true;
-                    this.isPublished = false 
+                    this.isPublished = false
                 });
     }
 
@@ -480,7 +480,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.companyLogo = this._originalLogoUrl ?? this.companyLogo;
         this.coverPhoto = this._originalCoverUrl ?? this.coverPhoto;
 
- 
+
         this.accountData.entityAttachments =
             (this.accountData.entityAttachments || []).filter(a => !(a.index === -1 || a.index === -2));
 
@@ -518,7 +518,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         return uploader;
     }
     imageBrowseDone($event: ImageUploadComponentOutput, cat: SycAttachmentCategoryDto, index?: number) {
-        this.accountData.entityAttachments ??= []; 
+        this.accountData.entityAttachments ??= [];
 
         const guid = this.guid();
 
@@ -569,14 +569,14 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountData.entityAttachments ??= [];
         const i = this.accountData.entityAttachments.findIndex(a => a.attachmentCategoryId === cat.id && a.index === index);
         if (i > -1) this.accountData.entityAttachments.splice(i, 1);
-      
-        if (cat.id === this.sycAttachmentCategoryLogo?.id)  { this.companyLogo = undefined; this._removed = { ...(this._removed||{}), logo: true }; }
-        if (cat.id === this.sycAttachmentCategoryBanner?.id){ this.coverPhoto  = undefined; this._removed = { ...(this._removed||{}), cover: true }; }
-      }
-      
+
+        if (cat.id === this.sycAttachmentCategoryLogo?.id) { this.companyLogo = undefined; this._removed = { ...(this._removed || {}), logo: true }; }
+        if (cat.id === this.sycAttachmentCategoryBanner?.id) { this.coverPhoto = undefined; this._removed = { ...(this._removed || {}), cover: true }; }
+    }
 
 
-private _removed: { logo?: boolean; cover?: boolean } = {};
+
+    private _removed: { logo?: boolean; cover?: boolean } = {};
 
     private upsertAttachment(
         list: AppEntityAttachmentDto[],
@@ -597,64 +597,64 @@ private _removed: { logo?: boolean; cover?: boolean } = {};
         return att;
     }
 
-private mergeAttachmentsForSave(
-    original: AppEntityAttachmentDto[] = [],
-    edited:   AppEntityAttachmentDto[] = [],
-    logoCatId?: number,
-    coverCatId?: number,
-    removed?: { logo?: boolean; cover?: boolean }
-  ): AppEntityAttachmentDto[] {
-  
-    const isLogo  = (a: AppEntityAttachmentDto) => !!logoCatId  && a.attachmentCategoryId === logoCatId;
-    const isCover = (a: AppEntityAttachmentDto) => !!coverCatId && a.attachmentCategoryId === coverCatId;
-  
+    private mergeAttachmentsForSave(
+        original: AppEntityAttachmentDto[] = [],
+        edited: AppEntityAttachmentDto[] = [],
+        logoCatId?: number,
+        coverCatId?: number,
+        removed?: { logo?: boolean; cover?: boolean }
+    ): AppEntityAttachmentDto[] {
 
-    edited.forEach(a => {
-      if (isLogo(a))  a.index = 0;  
-      if (isCover(a)) a.index = 0;   
-    });
-  
-   
-    const out: AppEntityAttachmentDto[] = [];
-    const key = (a: AppEntityAttachmentDto) => `${a.attachmentCategoryId}|${a.index}`;
-    const seen = new Set<string>();
-    edited
-      .filter(a => !!a && !isLogo(a) && !isCover(a))
-      .forEach(a => { const k = key(a); if (!seen.has(k)) { seen.add(k); out.push(a); } });
-  
-    // 2) Logo: edited wins. If not present in edited, treat as removed unless you pass removed.logo=false.
-    const editedLogo   = edited.find(isLogo);
-    const originalLogo = original.find(isLogo);
-    if (editedLogo) {
-      out.push(editedLogo);
-    } else if (!removed?.logo && originalLogo) {
-     
-      originalLogo.index = 0;
-      out.push(originalLogo);
+        const isLogo = (a: AppEntityAttachmentDto) => !!logoCatId && a.attachmentCategoryId === logoCatId;
+        const isCover = (a: AppEntityAttachmentDto) => !!coverCatId && a.attachmentCategoryId === coverCatId;
+
+
+        edited.forEach(a => {
+            if (isLogo(a)) a.index = 0;
+            if (isCover(a)) a.index = 0;
+        });
+
+
+        const out: AppEntityAttachmentDto[] = [];
+        const key = (a: AppEntityAttachmentDto) => `${a.attachmentCategoryId}|${a.index}`;
+        const seen = new Set<string>();
+        edited
+            .filter(a => !!a && !isLogo(a) && !isCover(a))
+            .forEach(a => { const k = key(a); if (!seen.has(k)) { seen.add(k); out.push(a); } });
+
+        // 2) Logo: edited wins. If not present in edited, treat as removed unless you pass removed.logo=false.
+        const editedLogo = edited.find(isLogo);
+        const originalLogo = original.find(isLogo);
+        if (editedLogo) {
+            out.push(editedLogo);
+        } else if (!removed?.logo && originalLogo) {
+
+            originalLogo.index = 0;
+            out.push(originalLogo);
+        }
+
+        // 3) Cover: same logic
+        const editedCover = edited.find(isCover);
+        const originalCover = original.find(isCover);
+        if (editedCover) {
+            out.push(editedCover);
+        } else if (!removed?.cover && originalCover) {
+            originalCover.index = 0;
+            out.push(originalCover);
+        }
+
+        return out;
     }
-  
-    // 3) Cover: same logic
-    const editedCover   = edited.find(isCover);
-    const originalCover = original.find(isCover);
-    if (editedCover) {
-      out.push(editedCover);
-    } else if (!removed?.cover && originalCover) {
-      originalCover.index = 0;
-      out.push(originalCover);
+
+    get hasInvalidEmailOrPhone(): boolean {
+        // Only consider invalid if the user typed something AND it doesn't match the pattern
+        const email = (this.editEMailAddressValue || '').trim();
+        const phone = (this.editPhoneNumberValue || '').trim();
+
+        const emailBad = !!email && !(new RegExp(this.emailPattern).test(email));
+        const phoneBad = !!phone && !(new RegExp(this.phonePattern).test(phone));
+
+        return emailBad || phoneBad;
     }
-  
-    return out;
-  }
-  
-  get hasInvalidEmailOrPhone(): boolean {
-    // Only consider invalid if the user typed something AND it doesn't match the pattern
-    const email = (this.editEMailAddressValue || '').trim();
-    const phone = (this.editPhoneNumberValue || '').trim();
-  
-    const emailBad = !!email && !(new RegExp(this.emailPattern).test(email));
-    const phoneBad = !!phone && !(new RegExp(this.phonePattern).test(phone));
-  
-    return emailBad || phoneBad;
-  }
-  
+
 }

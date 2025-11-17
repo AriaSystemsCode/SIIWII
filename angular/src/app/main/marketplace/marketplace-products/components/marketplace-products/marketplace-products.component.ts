@@ -183,14 +183,14 @@ export class MarketplaceProductsComponent
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['accountDataForView'] && this.accountDataForView?.ssin) {
-            if (this.fromMarketAcoount || this.fromOverView) {
-                localStorage.removeItem("productFilters");
-            }
-            this.getAllProducts();
-        } else {
+        // if (changes['accountDataForView'] && this.accountDataForView?.ssin) {
+        //     if (this.fromMarketAcoount || this.fromOverView) {
+        //         localStorage.removeItem("productFilters");
+        //     }
+        //     this.getAllProducts();
+        // } else {
 
-        }
+        // }
         document.getElementById("_searchInput").focus();
     }
     getAspectatio() {
@@ -270,7 +270,7 @@ export class MarketplaceProductsComponent
             selectedCurrency,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
-            maxResultCount: this.fromOverView ? 8 : this.maxResultCount
+            maxResultCount: this.fromOverView ? 4 : this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
 

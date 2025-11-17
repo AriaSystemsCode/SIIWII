@@ -154,7 +154,7 @@
 
                                 </li>
                                 <li class="nav-item"
-                                    *ngIf=" accountDataForView?.accountTypeId != 21 && accountInfoTemp?.accountType != 'People'">
+                                    *ngIf=" accountDataForView?.accountTypeId != 21 && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)"
                                         [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
                                         <img class="sidebar-menu-item-img"
@@ -217,7 +217,7 @@
                                 </li>
 
                                 <li class="nav-item"
-                                    *ngIf=" accountDataForView?.accountTypeId != 21 && accountInfoTemp?.accountType != 'People'">
+                                    *ngIf=" accountDataForView?.accountTypeId != 21 && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.MembersList)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.MembersList?'active':''">
 
@@ -235,7 +235,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item ml-2"
-                                    *ngIf="(accountDataForView?.accountTypeId != 21 && accountLevel == accountLevelEnum.Profile && isRecordOwner) && accountInfoTemp?.accountType != 'People'">
+                                    *ngIf="(accountDataForView?.accountTypeId != 21 && accountLevel == accountLevelEnum.Profile && isRecordOwner) && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.AccountBilling?'active':''">
 
@@ -297,7 +297,7 @@
 
                                         </div>
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People'">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <div
                                                 class="col-sm-10 offset-sm-2 d-flex align-items-center d-flex flex-wrap">
                                                 <!--Other image 1-->
@@ -495,7 +495,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People'">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
 
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -541,7 +541,7 @@
                                         </div>
 
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People'">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -559,7 +559,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People'">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -609,7 +609,7 @@
                                 </div>
 
                                 <div class="kt-portlet m-portlet--full-height"
-                                    *ngIf="accountInfoTemp?.accountType != 'People'">
+                                    *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                     <div class="kt-portlet__head aria-header-block header-no-mr-bt">
                                         <div class="col-md-10">
                                             <div class="kt-portlet__head-label aria-header">
@@ -705,7 +705,7 @@
                                 </div>
 
                                 <div class="kt-portlet m-portlet--full-height"
-                                    *ngIf="accountInfoTemp?.accountType != 'People'">
+                                    *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                     <div class="kt-portlet__head aria-header-block header-no-mr-bt">
                                         <div class="col-md-10">
                                             <div class="kt-portlet__head-label aria-header">

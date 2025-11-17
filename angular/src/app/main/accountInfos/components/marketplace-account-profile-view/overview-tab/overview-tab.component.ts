@@ -14,18 +14,21 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
 
 
   @Input('accountDataForView') accountDataForView: AccountDto;
+  @Input('marketPlaceData') marketPlaceData: AccountDto;
   @Output("activeTabIndexBtn") activeTabIndexBtn: EventEmitter<number> = new EventEmitter<number>()
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;
-
+  
   baseUrl: string = AppConsts.attachmentBaseUrl;
   overRating: OverAllRatingDto
   mediaItems: AppEntityAttachmentDto[]
 
   messages: CreateMessageInput = new CreateMessageInput();
-  loginAccoutType: string = "";
+  @Input() loginAccoutType: string = "";
   isModalOpen: boolean = false;
   selectedIndex: number = 0;
   totalImgs: number = 0
+  accountReviewMsg =  "Your review for this account has already been recorded."
+  isLoading:boolean = false
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy,
     private _router: Router,
 
@@ -35,19 +38,20 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   }
 
   ngOnInit() {
-    this.getLoginAccoutType()
+
     this.getOverAllRatings()
     this.getAllMedia()
+
 
   }
 
 
   getAllMedia() {
-    this.showMainSpinner()
-    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, 0, 9).pipe(
+    this.isLoading = true
+    this._AccountsServiceProxy.getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, 0, 6).pipe(
       finalize(
         () =>
-          this.hideMainSpinner()
+          this.isLoading = false
       )
     ).subscribe((res) => {
 
@@ -97,12 +101,6 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     this.subscriptions.push(subs);
   }
 
-  getLoginAccoutType() {
-    this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId, 5).subscribe((res) => {
-      this.loginAccoutType = res.account.accountType;
-    }
-    )
-  }
 
   handleRefreshRating(event: boolean) {
     if (event) {

@@ -36,23 +36,13 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     this.paramsSubscription = this.route.params.subscribe((params) => {
       this.accountId = params['id'];
 
-      this.getData();
+      this.getAccountDataForView();
     });
 
   }
 
 
-  getData() {
-    this.getAccountDataForView();
-    this.getLoginAccoutType();
-  }
-  getLoginAccoutType() {
-    this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId, 5).subscribe((res) => {
-      this.loginAccoutType = res.account.accountType;
-    }
 
-    )
-  }
 
 
 
@@ -89,12 +79,14 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
 
 
   createRelation(relation, status: boolean = false) {
+    this.showMainSpinner()
     this._AccountsServiceProxy
       .applyRelationOnProfile(this.accountId, undefined, relation.defaultVisibility == 'Public' ? true : false, relation.connectionEntityId)
       .pipe(
         finalize(() => {
         
           this.hideMainSpinner();
+          this.getAccountDataForView();
         })
       )
       .subscribe((result:any) => {
@@ -149,6 +141,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       .pipe(
         finalize(() => {
           this.hideMainSpinner();
+          this.getAccountDataForView();
         })
       )
       .subscribe((res) => {

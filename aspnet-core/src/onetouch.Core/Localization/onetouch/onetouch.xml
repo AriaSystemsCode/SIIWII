@@ -2572,5 +2572,6 @@
 	<text name="Absolute">Absolute</text>
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
-  </texts>  
+    <text name="UpdateAccountInformation">Update Account Information</text>
+	</texts>  
 </localizationDictionary>

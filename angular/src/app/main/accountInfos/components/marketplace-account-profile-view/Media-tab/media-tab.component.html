@@ -1,3 +1,15 @@
+
+<div class="tab-wrapper position-relative">
+
+  <div
+    class="tab-loading-overlay"
+    *ngIf="isLoading"
+  >
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
 <div *ngIf="!fromOverviewTab && mediaItems?.length !=0" class="d-flex flex-wrap justify-content-center">
   <div *ngFor="let item of mediaItems; let i = index" class="media-item m-1">
     <ng-container *ngIf="item?.attachmentCategoryId !== 8; else videoTemplate">
@@ -39,10 +51,10 @@
       (click)="nextMedia()">&#10095;</button>
   </div>
 </p-dialog>
+</div>
+<div class="noDataSec" *ngIf="mediaItems?.length ==0" >
 
-<div class="noDataSec">
-
-  <p *ngIf="mediaItems?.length ==0" class="text-center m-auto">
+  <p class="text-center m-auto">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
     <span class="noDataTxt">There is no data to show ....</span>
   </p>

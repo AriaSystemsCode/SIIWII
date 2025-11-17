@@ -68,3 +68,45 @@ input.editjobTitle ,input.editBranch{
 .Save_editMember{
     margin: auto;
 }
+
+.user-search-slide {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  
+  .user-search-slide.open {
+    max-height: 600px; 
+  }
+  
+  .link-user-container {
+    //min-width: 250px;
+  }
+  
+  .user-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+  }
+  
+  .user-dropdown.show {
+    display: block;
+  }
+  
+  .user-item:hover, .hover-bg {
+    background-color: #f5f5f5;
+    cursor: pointer;
+  }
+  
+  .user-list img {
+    object-fit: cover;
+  }
+  

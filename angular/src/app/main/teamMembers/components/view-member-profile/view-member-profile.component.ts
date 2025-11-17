@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto, GetAllEntityObjectTypeOutput, SycEntityObjectTypesServiceProxy, UserServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto, GetAllEntityObjectTypeOutput, SycEntityObjectTypesServiceProxy, UserServiceProxy, UserListDto, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -12,6 +12,7 @@ import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-
 import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { ActivatedRoute } from '@node_modules/@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-view-member-profile',
@@ -26,8 +27,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   @ViewChild("createOrEditUserModal", { static: true }) createOrEditUserModal: CreateOrEditUserModalComponent;
 
   @Input('accountInfoTemp') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
-  @Input('fromManualAcc') fromManualAcc: boolean 
-  
+  @Input('fromManualAcc') fromManualAcc: boolean
+
   @Output() edit: EventEmitter<number> = new EventEmitter<number>()
   @Output() delete: EventEmitter<number> = new EventEmitter<number>()
 
@@ -74,6 +75,12 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   editInfo = true;
   NoteditInfo = false;
   userAdminId :number
+  userSearchQuery: string = '';
+  filteredUsers: UserListDto[] = [];
+  originalFilteredUsers: UserListDto[] = [];
+  memberIslink: boolean = false;
+  showUserList: boolean = false;
+
   constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy, private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy, private _userService: UserServiceProxy,private route: ActivatedRoute) {
     super(injector);
     this.accountInfoTemp = new CreateOrEditAccountInfoDto();
@@ -149,6 +156,26 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
         this.memberData = result;
         this.memberData.accountId = this.memberData.accountId
+
+        this.showUserList = false;
+        this.userSearchQuery = '';
+
+        this._userService.getUsers('', undefined, undefined, undefined, undefined, undefined, 0)
+          .subscribe(users => {
+            const indx = result.entityExtraData.findIndex(x => x.attributeId === 715);
+
+            if (indx >= 0) {
+              this.memberIslink = true;
+              const linkedUserId = result.entityExtraData[indx].attributeValue;
+              this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId);
+            } else {
+              this.memberIslink = false;
+              this.filteredUsers = users.items;
+            }
+
+            this.originalFilteredUsers = [...this.filteredUsers];
+          });
+
         this.userAdminId != 0 ? this.adminContact = true : this.adminContact = false
         const firstName = this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
         const lastName = this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
@@ -258,7 +285,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     if (!this.memberData?.accountId) return; // silent no-op (no warning)
     this.getAccountBranches();
   }
-  
+
 
   branches: TreeNodeOfBranchForViewDto[] = [];
   selectedBranchid;
@@ -457,6 +484,76 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
   // }
 
-
-
+  toggleUserList() {
+    this.showUserList = !this.showUserList;
+    this.filteredUsers = [...this.originalFilteredUsers];
+    this.userSearchQuery = '';
+    this.loadUsers(this.userSearchQuery);
+  }
+  
+  filterUsers(query: string): void {
+    this.loadUsers(query);
+  }
+  
+  loadUsers(query: string) {
+    this._userService
+      .getUsers(query || '', undefined, undefined, undefined, undefined, undefined, 0)
+      .subscribe(users => {
+        const linkedIndex = this.memberData.entityExtraData.findIndex(x => x.attributeId === 715);
+  
+        if (linkedIndex >= 0) {
+          const linkedUserId = this.memberData.entityExtraData[linkedIndex].attributeValue;
+          this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId);
+        } else {
+          this.filteredUsers = users.items;
+        }
+        });
+  }
+  
+  linkToUser(user: UserListDto, i: number) {
+    this.showMainSpinner();
+  
+    if (user.memberId) {
+      // User already linked
+      this._AccountsServiceProxy.getAppContactForView(user.memberId)
+        .pipe(finalize(() => this.hideMainSpinner()))
+        .subscribe(result => {
+          Swal.fire({
+            title: "",
+            text: `User already linked to team member '${result.name}'`,
+            icon: "info",
+            customClass: {
+              popup: 'popup-class',
+              icon: 'icon-class',
+              content: 'content-class',
+              actions: 'actions-class',
+              confirmButton: 'confirm-button-class',
+            },
+          });
+        });
+      return;
+    }
+  
+    // Link user
+    const linkedIndex = this.memberData.entityExtraData.findIndex(x => x.attributeId === 715);
+  
+    if (linkedIndex >= 0) {
+      this.memberData.entityExtraData[linkedIndex].attributeValue = user.id.toString();
+    } else {
+      const extraData: AppEntityExtraDataDto = new AppEntityExtraDataDto();
+      extraData.attributeId = 715;
+      extraData.attributeValue = user.id.toString();
+      this.memberData.entityExtraData.push(extraData);
+    }
+  
+    this._AccountsServiceProxy.createOrUpdateContact(this.memberData)
+      .pipe(finalize(() => {
+        this.filteredUsers.splice(i, 1);
+        this.showUserList = false;
+        this.memberIslink = true;
+        this.hideMainSpinner();
+      }))
+      .subscribe();
+  }
+  
 }

@@ -134,7 +134,7 @@
                                         class="fas fa-lg ml-4 fa-angle-down" style="color: #777777 !important;"></i>
                                 </button>
 
-                                <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                <ul *dropdownMenu class="dropdown-menu" role="menu"  [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
                                     <li role="menuitem">
                                         <button class="dropdown-item" type="button" (click)="removeRelation(account)">
                                             {{ getFormattedConnectionName('disConnectLabel') }}

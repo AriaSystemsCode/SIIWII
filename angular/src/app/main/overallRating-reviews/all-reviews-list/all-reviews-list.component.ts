@@ -2,8 +2,7 @@ import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, V
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AccountDto, AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
-import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
+import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-all-reviews-list',
@@ -14,7 +13,9 @@ import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/imag
 
 export class AllReviewsListComponent extends AppComponentBase implements OnInit {
   @Input() entityID : number
+  @Input() isPublished : boolean
   @Input() fromOverview : boolean
+  @Input() alreadyReviewdMsg : string = 'You’ve already reviewed this product'
   
   @Output() refreshRating : EventEmitter<boolean> = new EventEmitter<boolean>()
   
@@ -59,7 +60,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   }
   ngOnInit() {
     this.getAllReviws()
-        // ✅ Provide fallback/mock image category
+  
         if (!this.sycAttachmentCategoryImage) {
           this.sycAttachmentCategoryImage = {
             id: 1,
@@ -80,17 +81,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   }
   testImage: string = '';
 
-  // onImageSelected(event: ImageUploadComponentOutput, attr: any) {
-  //   this.testImage = event.image;
-  
-  //   // ✅ Push image to selectedMedia to be uploaded
-  //   this.selectedMedia.push({
-  //     url: event.image,
-  //     type: 'image',
-  //     file: event.file
-  //   });
-  // }
-  
+
   
   onImageRemoved(attr: any) {
     this.testImage = '';
@@ -123,6 +114,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
       )
       .pipe(
         finalize(() => {
+          this.resetForm()
           this.hideMainSpinner()
         })
       )
@@ -166,7 +158,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
         // Handle reviews properly
         const newReviews = result.items.map((review) => ({
           ...review,
-          isExpanded: false, // Add `isExpanded` property for tracking
+          isExpanded: false, 
         }));
 
         if (this.skipCount === 0) {
@@ -339,4 +331,5 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
       });
     }, 1000); // ⏱ 2-second delay (2000 milliseconds)
   }
+  // 489157
 }
