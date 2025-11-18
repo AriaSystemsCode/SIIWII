@@ -44,6 +44,7 @@ using System.IO;
 using onetouch.SystemObjects.Dtos;
 using Org.BouncyCastle.Crypto;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace onetouch.AppEntities
 {
@@ -1669,6 +1670,7 @@ namespace onetouch.AppEntities
             return 0;
         }
 
+        [AllowAnonymous]
         public async Task<string> GetHostSettingValue(long settingId)
         {
             var hostId = await GetCurrentHostEntityId();
