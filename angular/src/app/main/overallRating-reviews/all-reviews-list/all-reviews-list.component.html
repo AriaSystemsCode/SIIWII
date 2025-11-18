@@ -5,8 +5,8 @@
     {{ reviews.length }} over {{ totalCount }} {{ 'Results Of' | localize }} "{{ 'Customers Reviews' | localize }}"
   </h5>
 </div>
-<!-- {{isPublished}}// -->
-<div *ngIf="!isUserReviewdBefore " class="addReview mb-4 pb-2">
+
+<div *ngIf=" ( !isPublished)" class="addReview mb-4 pb-2">
     <div class="topSec w-100 d-flex align-items-start position-relative">
       <img style="height: 30px;" src="assets/common/images/default-profile-picture.png" class="rounded-circle logo" />
      <div class="reviewSection">
@@ -77,7 +77,7 @@
   </div>
   
   
-  <p *ngIf="reviews?.length == 0" class="text-center my-3">
+  <p *ngIf="reviews?.length == 0" class="text-center my-5">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
   
     <span class="noDataTxt">There is no data to show ...</span>

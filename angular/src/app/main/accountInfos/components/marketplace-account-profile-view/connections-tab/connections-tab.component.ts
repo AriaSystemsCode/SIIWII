@@ -16,9 +16,8 @@ import {  finalize, Observable } from 'rxjs';
 export class ConnectionsTabComponent extends AppComponentBase {
   @Input() accountDataForView :AccountDto;
   @Input() marketPlaceData :AccountDto;
-  
-  // @Input() loginAccoutType:string;
   @Input() fromOverview:boolean = false;
+  @Input() isActive: boolean = true;
 
   @ViewChild("paginator", { static: true }) paginator: Paginator;
 
@@ -34,6 +33,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
   isHost: boolean;
   showData:boolean =true;
 
+  private connectionsLoaded = false;
   constructor(
     injector: Injector,
     private _abpSessionService: AbpSessionService,
@@ -54,8 +54,13 @@ export class ConnectionsTabComponent extends AppComponentBase {
   
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['accountDataForView'] &&  (changes['accountDataForView']?.currentValue != changes['accountDataForView']?.previousValue )) {
-    this.GetSettingValue();
+ if (
+      (changes['accountDataForView'] || changes['isActive']) &&
+      this.accountDataForView &&
+      this.isActive &&
+      !this.connectionsLoaded
+    ) {
+      this.GetSettingValue();
     }
   }
 
@@ -101,9 +106,13 @@ this.accountsTypes=result.items;
     
           this.getAllAccountTypesForTableDropdownWithPaging();
         }
-        else
+        else{
           this.accounts = [];
+
+        }
+          this.connectionsLoaded = true;
       });
+
   }
 
   initFilterForm() {

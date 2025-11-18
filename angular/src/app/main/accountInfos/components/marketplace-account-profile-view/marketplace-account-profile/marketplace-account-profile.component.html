@@ -142,7 +142,7 @@
       </p-tabPanel>
 
       <p-tabPanel header="Connections" *ngIf="accountDataForView">
-        <app-connections-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData"
+        <app-connections-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" [isActive]="(activeTabIndex == 2 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 1 && accountDataForView?.accountType != 'BUSINESS')"
           ></app-connections-tab>
       </p-tabPanel>
 
@@ -160,7 +160,7 @@
 
       <p-tabPanel header="Media">
 
-        <app-media-tab [accountDataForView]="accountDataForView"></app-media-tab>
+        <app-media-tab [accountDataForView]="accountDataForView"     [isActive]="(activeTabIndex == 5 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 4 && accountDataForView?.accountType != 'BUSINESS')"></app-media-tab>
       </p-tabPanel>
 
     </p-tabView>

@@ -52,7 +52,7 @@
   </div>
 </p-dialog>
 </div>
-<div class="noDataSec" *ngIf="mediaItems?.length ==0" >
+<div class="noDataSec" *ngIf="!isLoading && mediaItems?.length ==0" >
 
   <p class="text-center m-auto">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">

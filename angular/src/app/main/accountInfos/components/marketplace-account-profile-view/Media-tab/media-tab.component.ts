@@ -1,31 +1,35 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@node_modules/@angular/platform-browser';
+import { Component, Injector, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
 
-
 @Component({
   selector: 'app-media-tab',
   templateUrl: './media-tab.component.html',
   styleUrls: ['./media-tab.component.scss'],
-
 })
-export class MediaTabComponent extends AppComponentBase implements OnInit {
+export class MediaTabComponent extends AppComponentBase implements OnInit, OnChanges {
 
   @Input('accountDataForView') accountDataForView: AccountDto;
-  @Input('fromOverviewTab') fromOverviewTab: boolean = false
+  @Input('fromOverviewTab') fromOverviewTab: boolean = false;
+
+
+  @Input() isActive: boolean = false;
 
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
-  mediaItems: AppEntityAttachmentDto[]
+  mediaItems: AppEntityAttachmentDto[] = [];
   itemsPerPage: number = 10;
   currentPage: number = 1;
   totalItems: number = 0;
-  isModalOpen : boolean = false;
-  selectedIndex :number = 0;
+  isModalOpen: boolean = false;
+  selectedIndex: number = 0;
   lastImageIndex: number = 0;
-  isLoading:boolean = false
+  isLoading: boolean = false;
+
+
+  private mediaLoaded = false;
 
   constructor(
     injector: Injector,
@@ -34,28 +38,25 @@ export class MediaTabComponent extends AppComponentBase implements OnInit {
   ) {
     super(injector);
   }
-  ngOnInit(): void { }
 
+  ngOnInit(): void {
 
-  ngOnChanges(): void {
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
 
-    this.getAllMedia()
+    if ((changes['accountDataForView'] || changes['isActive']) &&
+        this.accountDataForView &&
+        this.isActive &&
+        !this.mediaLoaded) {
+      this.loadMediaFirstPage();
+    }
+  }
 
-    this.mediaItems = this.mediaItems?.map((item) => {
-      if (item.attachmentCategoryId !== 3) {
-        // Explicitly create a new AppEntityAttachmentDto object
-        return {
-          ...item, // Spread existing properties
-          safeUrl: this.sanitizeUrl(item.url), // Add sanitized URL
-          init: item.init,
-          toJSON: item.toJSON
-        } as AppEntityAttachmentDto;
-      }
-      return item;
-    });
-
-    this.lastImageIndex = Math.min(this.mediaItems?.length - 1, 8);
+  private loadMediaFirstPage(): void {
+    this.currentPage = 1;
+    this.getAllMedia();
+    this.mediaLoaded = true;
   }
 
   sanitizeUrl(url: string): SafeResourceUrl {
@@ -63,38 +64,39 @@ export class MediaTabComponent extends AppComponentBase implements OnInit {
   }
 
   getAllMedia() {
-    this.isLoading =true
-  
+    this.isLoading = true;
+
     const skipCount = (this.currentPage - 1) * this.itemsPerPage;
-  
+
     this._AccountsServiceProxy
       .getAllAccountMediaAttachment(this.accountDataForView?.ssin, undefined, skipCount, this.itemsPerPage)
-      .pipe(finalize(() => this.isLoading = false))
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe((res) => {
-        this.mediaItems = res.items
-        // ?.map((item) => {
-        //   if (item.attachmentCategoryId == 8) {
-        //     return {
-        //       ...item,
-        //       safeUrl: this.sanitizeUrl(item.url),
-        //       init: item.init,
-        //       toJSON: item.toJSON
-        //     } as AppEntityAttachmentDto;
-        //   }
-        //   return item;
-        // });
-  
-        this.totalItems = res.totalCount; // ✅ This should come from backend
+        this.mediaItems = res.items;
+        this.totalItems = res.totalCount;
+
+        this.mediaItems = this.mediaItems.map((item) => {
+          if (item.attachmentCategoryId !== 3) {
+            return {
+              ...item,
+              safeUrl: this.sanitizeUrl(item.url),
+              init: item.init,
+              toJSON: item.toJSON,
+            } as AppEntityAttachmentDto;
+          }
+          return item;
+        });
+
+        this.lastImageIndex = Math.min(this.mediaItems.length - 1, 8);
       });
   }
-  
+
   changePage(event: any): void {
-    this.currentPage = (event.first / event.rows) + 1;
+    this.currentPage = event.page + 1; 
     this.itemsPerPage = event.rows;
     this.getAllMedia();
   }
-  
-  
+
   openModal(index: number): void {
     this.selectedIndex = index;
     this.isModalOpen = true;
@@ -115,7 +117,4 @@ export class MediaTabComponent extends AppComponentBase implements OnInit {
       this.selectedIndex++;
     }
   }
-
-
-
 }
