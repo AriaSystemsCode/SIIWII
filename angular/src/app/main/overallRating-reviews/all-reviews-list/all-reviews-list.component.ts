@@ -31,7 +31,6 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   messages: CreateMessageInput = new CreateMessageInput();
   attachmentsUploader: FileUploaderCustom;
   isExpanded: boolean = false;
-  isUserReviewdBefore: boolean = false
   SuccessMsg: boolean = false
   isEmojiPickerOpen: boolean = false; // Toggle emoji picker visibility
   emojis: string[] = [

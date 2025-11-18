@@ -170,7 +170,7 @@ export class AccountsComponent
     defineSortingOptions() {
         this.sortingOptions = [
             { label: this.l("Name"), value: "name" },
-            { label: this.l("AccountType"), value: "accountType" },
+            { label: this.l("AccountType"), value: "accountTypeId" },
         ];
     }
 

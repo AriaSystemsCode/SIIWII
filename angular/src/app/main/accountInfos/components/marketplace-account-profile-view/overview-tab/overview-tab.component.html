@@ -197,9 +197,7 @@
           </div>
         </div>
         <ng-container *ngFor="let item of mediaItems; let i = index">
-<!-- 
-          <img [src]="attachmentBaseUrl + '/' + item?.url" alt="Media Image" class="w-100 media-img col-4"
-            (click)="openModal(i)" onerror="this.src='../../assets/placeholders/appitem-placeholder.png'" /> -->
+
             <ng-container *ngIf="item?.attachmentCategoryId !== 5; ">
               <img onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"     (click)="openModal(i)"
                 [src]="attachmentBaseUrl + '/' + item?.url" alt="Selected Media" class="w-100 media-img col-4"
