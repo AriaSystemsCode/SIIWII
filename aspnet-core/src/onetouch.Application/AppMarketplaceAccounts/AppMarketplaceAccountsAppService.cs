@@ -750,8 +750,11 @@ namespace onetouch.AppMarketplaceAccounts
                     if (publishedRecord != null)
                     {
                         output.IsSync = (publishedRecord.LastModificationTime != entity.LastModificationTime);
-                        output.IsPublished = true;
                     }
+                    //P-SII-20251106.0006,1 MMT 11/17/2025 - I40 - Account profile Rating & reviews issues[Start]
+                    if (account.TenantOwner == AbpSession.TenantId)
+                        output.IsPublished = true;
+                    //P-SII-20251106.0006,1 MMT 11/17/2025 - I40 - Account profile Rating & reviews issues[End]
                     output.AvailableConnections = new List<ConnectionType>();
                     //fill connection attrs
                     //var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk)
