@@ -54,7 +54,7 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
     extraAttributes: any;
 
     activeAccordionIndexes: number[] = [0]; // open first tab by default
-    dynamicInputsForViewDto: any
+    dynamicInputsForViewDto: GetAppEntityForEditOutput;
     hasUnsavedChanges = false;
     entityObjectTypeHostId: number = 764;
     hostEntityId: number;
@@ -205,6 +205,8 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
             appEntityDto.id= this.hostEntityId;
             appEntityDto.entityObjectTypeId=this.entityObjectTypeHostId;
             appEntityDto.objectId= 1;
+            appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
+            appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
               this._appEntitiesServiceProxy.saveEntity(appEntityDto)
               .pipe(
                 finalize(() => {

@@ -51,7 +51,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
   extraAttributes: any;
 
   activeAccordionIndexes: number[] = [0]; // open first tab by default
-  dynamicInputsForViewDto: any
+  dynamicInputsForViewDto: GetAppEntityForEditOutput;
   hasUnsavedChanges = false;
   entityObjectTypeTenantId: number=771;
   tenantEntityId: number;
@@ -190,6 +190,9 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     appEntityDto.id= this.tenantEntityId;
     appEntityDto.entityObjectTypeId=this.entityObjectTypeTenantId;
     appEntityDto.objectId= 1;
+    appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
+    appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
+
     //i49-F6 internal error
       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
