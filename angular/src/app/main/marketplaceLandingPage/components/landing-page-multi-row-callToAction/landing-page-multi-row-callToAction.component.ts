@@ -40,7 +40,7 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
   private getBlocksData(): void {
     this.sydObjectsService.getAllSectionBlocks(this.sectionId).subscribe({
-      next: (res) => this.applyData(res ?? []),
+      next: (res) =>{ this.applyData(res ?? []);console.log(res,'multiii')},
       error: () => this.applyData([])
     });
     
@@ -48,9 +48,9 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
   private applyData(blocks: PageSettingDto[]): void {
     this.sliderItems = blocks.slice().sort(this.compareByOrder);
-    this.sliderItems.filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image)).forEach(b => this.ensurePdfSafeUrl(b));
+    // this.sliderItems.filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image)).forEach(b => this.ensurePdfSafeUrl(b));
 
-    this.pageGroups = this.chunk(this.sliderItems, 9); // 3x3 per slide
+    this.pageGroups = this.chunk(this.sliderItems, 12); // 3x3 per slide
   
     // prepare only the first slide initially
     // this.prepareGroupPdfs(0);
@@ -61,7 +61,7 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     const group = this.pageGroups[i] ?? [];
     group
       .filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image))
-      .forEach(b => this.ensurePdfSafeUrl(b));
+      // .forEach(b => this.ensurePdfSafeUrl(b));
   }
   
   onCarouselPage(e: { page: number }) {
@@ -120,57 +120,57 @@ goToCategory(cat: { name: string; id: number | string }) {
   }
 
   // ---------- PDF handling via Base64 API -> blob -> SafeResourceUrl ----------
-  private async ensurePdfSafeUrl(b: PageSettingDto): Promise<void> {
-    try {
-      if (!b?.id || !this.isPdf(b.image)) return;
+  // private async ensurePdfSafeUrl(b: PageSettingDto): Promise<void> {
+  //   try {
+  //     if (!b?.id || !this.isPdf(b.image)) return;
   
-      // already prepared for this id
-      if (this.attachmentSafeMap[b.id]) return;
+  //     // already prepared for this id
+  //     if (this.attachmentSafeMap[b.id]) return;
   
-      const url = this.fullUrl(b.image);
+  //     const url = this.fullUrl(b.image);
   
-      // ---- Route A: backend returns Base64; convert to Blob -> objectURL ----
-      try {
-        const base64 = await this.appItems.getFile64FromUrl(url).toPromise();
+  //     // ---- Route A: backend returns Base64; convert to Blob -> objectURL ----
+  //     try {
+  //       const base64 = await this.appItems.getFile64FromUrl(url).toPromise();
   
-        // normalize possible "data:...;base64,..." format
-        const raw = (base64 && base64.includes(',')) ? base64.split(',')[1] : base64;
+  //       // normalize possible "data:...;base64,..." format
+  //       const raw = (base64 && base64.includes(',')) ? base64.split(',')[1] : base64;
   
-        const bytes = atob(raw);
-        const arr = new Uint8Array(bytes.length);
-        for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+  //       const bytes = atob(raw);
+  //       const arr = new Uint8Array(bytes.length);
+  //       for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
   
-        const blob = new Blob([arr], { type: 'application/pdf' });
+  //       const blob = new Blob([arr], { type: 'application/pdf' });
   
-        // revoke any previous object URL for this id
-        const old = this.objectUrlById[b.id];
-        if (old) { try { URL.revokeObjectURL(old); } catch {} }
+  //       // revoke any previous object URL for this id
+  //       const old = this.objectUrlById[b.id];
+  //       if (old) { try { URL.revokeObjectURL(old); } catch {} }
   
-        const objUrl = URL.createObjectURL(blob);
-        this.objectUrlById[b.id] = objUrl;
+  //       const objUrl = URL.createObjectURL(blob);
+  //       this.objectUrlById[b.id] = objUrl;
   
-        const safe = this.sanitizer.bypassSecurityTrustResourceUrl(objUrl);
+  //       const safe = this.sanitizer.bypassSecurityTrustResourceUrl(objUrl);
   
-        // ✅ OnPush-friendly: replace the whole map (new reference)
-        this.attachmentSafeMap = { ...this.attachmentSafeMap, [b.id]: safe };
-        this.cdr.markForCheck();
-        return;
-      } catch {
-        // fall through to Route B
-      }
+  //       // ✅ OnPush-friendly: replace the whole map (new reference)
+  //       this.attachmentSafeMap = { ...this.attachmentSafeMap, [b.id]: safe };
+  //       this.cdr.markForCheck();
+  //       return;
+  //     } catch {
+  //       // fall through to Route B
+  //     }
   
-      // ---- Route B: final fallback — direct URL (requires server allows frame-ancestors) ----
-      const safe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      this.attachmentSafeMap = { ...this.attachmentSafeMap, [b.id]: safe };
-      this.cdr.markForCheck();
-    } catch {
-      // if anything above exploded, set null to avoid re-trying in a tight loop
-      if (b?.id) {
-        this.attachmentSafeMap = { ...this.attachmentSafeMap, [b.id]: null };
-        this.cdr.markForCheck();
-      }
-    }
-  }
+  //     // ---- Route B: final fallback — direct URL (requires server allows frame-ancestors) ----
+  //     const safe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  //     this.attachmentSafeMap = { ...this.attachmentSafeMap, [b.id]: safe };
+  //     this.cdr.markForCheck();
+  //   } catch {
+  //     // if anything above exploded, set null to avoid re-trying in a tight loop
+  //     if (b?.id) {
+  //       this.attachmentSafeMap = { ...this.attachmentSafeMap, [b.id]: null };
+  //       this.cdr.markForCheck();
+  //     }
+  //   }
+  // }
   
 
 

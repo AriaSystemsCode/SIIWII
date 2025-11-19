@@ -18,7 +18,7 @@ export class LandingPageSliderWithoutCallToActionComponent extends AppComponentB
     }
     sycAttachmentCategoryBanner:SycAttachmentCategoryDto
     ngOnInit(){
-        this.getSycAttachmentCategoriesByCodes(['BANNER']).subscribe((result)=>{
+        this.getSycAttachmentCategoriesByCodes(['AUTOSLIDER']).subscribe((result)=>{
             result.forEach(item=>{
                 this.sycAttachmentCategoryBanner = item
             })

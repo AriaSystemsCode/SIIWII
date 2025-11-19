@@ -5,20 +5,21 @@ import { AppUiCustomizationService } from '@shared/common/ui/app-ui-customizatio
 
 const routes: Routes = [
     {
-                        // canActivate: [AppRouteGuard],
-                        // canActivateChild: [AppRouteGuard],
         path: 'account',
         loadChildren: () => import('account/account.module').then(m => m.AccountModule), //Lazy load account module
         data: { preload: true }
     },
 
-//   // Default '' -> marketplace products
-//   { path: '', redirectTo: '/app/main/marketplace', pathMatch: 'full' },
+    { path: '', redirectTo: '/app', pathMatch: 'full' },    
+    { path: '**', redirectTo: '/app' }
+  
 
-//   // Wildcard '**' -> marketplace products
+//   { path: '', redirectTo: '/app/main/marketplace', pathMatch: 'full' },
 //   { path: '**', redirectTo: '/app/main/marketplace' }
-{ path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' },
-{ path: '**', redirectTo: '/app/main/dashboard' }
+
+
+// { path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' },
+// { path: '**', redirectTo: '/app/main/dashboard' }
 ];
 
 @NgModule({
@@ -97,4 +98,6 @@ export class RootRoutingModule {
     getSetting(key: string): string {
         return abp.setting.get(key);
     }
+
+    
 }

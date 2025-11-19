@@ -6,17 +6,20 @@
 }
 
 .txtBtn {
-    width: 210px;
- 
-    padding: 16px 26px;
-    border-radius: 50px;
-    border: 1px solid white;
-    background: rgba(0, 0, 0, .2);
-    color: white;
-
-    font-size: .875rem;
     position: absolute;
-    top: 60%;
-    right: 45%;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+
+  width: 210px;
+  padding: 16px 26px;
+  border-radius: 50px;
+  border: 1px solid white;
+  background: rgba(0, 0, 0, .2);
+  color: white;
+  font-size: .875rem;
+  text-align: center;
+  white-space: nowrap; 
+
 }
 

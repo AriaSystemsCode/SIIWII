@@ -1,6 +1,7 @@
 import { Component, Injector, OnInit } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+  AppEntitiesServiceProxy,
     AppMarketplaceItemsServiceProxy,
     PagedResultDtoOfGetAllMarketplaceItemListsOutputDto,
     SliderEnum,
@@ -46,6 +47,7 @@ export class MarketplaceLandingPageComponent
         private _appMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private router: Router,
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     ) {
         super(injector);
 
@@ -310,7 +312,7 @@ export class MarketplaceLandingPageComponent
     ngOnInit(): void {
         this.pages = this.chunk(this.items, 9); // each page has 9 products
         this.loadSections()
-      
+      // this.isFound()
         // this.getAllCallToActionSettings();
         // this.getAdvSettings();
         // this.getAllBrands()
@@ -492,7 +494,13 @@ export class MarketplaceLandingPageComponent
         );
     }
 
-
+isFound(){
+  this._AppEntitiesServiceProxy
+  .getHostSettingValue(1203)
+  .subscribe((res: any) => {
+      console.log(res,'settingsss')
+  });
+}
     
     ngOnDestroy() {
       this.unsubscribeToAllSubscriptions();

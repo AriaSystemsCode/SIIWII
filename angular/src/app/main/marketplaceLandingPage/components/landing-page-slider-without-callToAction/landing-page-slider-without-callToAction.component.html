@@ -1,4 +1,4 @@
-<div class="sliderDiv">
+<div class="sliderDiv addMg">
 <p-carousel
   [value]="blocksSorted"  
   [numVisible]="numVisible"
@@ -13,7 +13,7 @@
         <app-image-display
           [image]="slide?.image ? (attachmentBaseUrl + '/' + slide.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
           [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-          [staticWidth]="ads.offsetWidth"   >
+          [staticWidth]="ads.offsetWidth"    [staticHeight]="350">
         </app-image-display>
       </div>
     </div>

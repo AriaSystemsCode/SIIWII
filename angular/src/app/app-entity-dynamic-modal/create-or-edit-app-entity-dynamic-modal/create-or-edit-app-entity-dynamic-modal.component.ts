@@ -665,6 +665,14 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.attachmentsSrcs[idx] = full;
             }
         });
+
+            // ✅ For MARKETPLACESECTIONBLOCK: always keep one empty slot at the end if all filled
+    if (this.canUploadMultipleAttachments &&
+        this.attachmentsSrcs.length &&
+        this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+        this.attachmentsSrcs.length < 10) {
+        this.attachmentsSrcs.push('');
+    }
     }
 
     fileChange(
@@ -701,6 +709,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
             // Upload the raw PDF file
             this.uploadBlobAttachment(file, att);
+
+            if (this.canUploadMultipleAttachments &&
+                this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+                this.attachmentsSrcs.length < 10) {
+                this.attachmentsSrcs.push('');
+            }
 
             input.value = '';
             return;
@@ -754,6 +768,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
 
+
+        if (this.canUploadMultipleAttachments &&
+            this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+            this.attachmentsSrcs.length < 10) {
+            this.attachmentsSrcs.push('');
+        }
         // // if all is filled with images add new input
         // if (
         //     this.attachmentsSrcs.every((elem) => elem) &&
@@ -762,34 +782,85 @@ export class CreateOrEditAppEntityDynamicModalComponent
         //     this.attachmentsSrcs.push("");
     }
 
+    // removePhoto(i: number) {
+    //     if (this.appEntity.entityAttachments.length > 1)
+    //         return this.notify.info(
+    //             "Please set another image as default first"
+    //         );
+    //     this.appEntity.entityAttachments.splice(i, 1);
+    //     this.attachmentsSrcs.splice(i, 1);
+    //     if (this.attachmentsSrcs.length === 0) this.attachmentsSrcs.push("");
+    //     this.uploader.removeFromQueue(this.uploader.queue[i]);
+    // }
     removePhoto(i: number) {
-        if (this.appEntity.entityAttachments.length > 1)
-            return this.notify.info(
-                "Please set another image as default first"
-            );
-        this.appEntity.entityAttachments.splice(i, 1);
-        this.attachmentsSrcs.splice(i, 1);
-        if (this.attachmentsSrcs.length === 0) this.attachmentsSrcs.push("");
-        this.uploader.removeFromQueue(this.uploader.queue[i]);
+        // Single-image behavior for other entity types
+        if (!this.canUploadMultipleAttachments && this.appEntity.entityAttachments.length > 1) {
+            return this.notify.info("Please set another image as default first");
+        }
+    
+        // Clean PDF URLs if needed
+        if (this.pdfRawUrl[i]) {
+            URL.revokeObjectURL(this.pdfRawUrl[i]);
+            delete this.pdfRawUrl[i];
+        }
+        delete this.pdfSafeMap[i];
+    
+        // Remove attachment metadata
+        if (this.appEntity.entityAttachments?.length) {
+            this.appEntity.entityAttachments.splice(i, 1);
+        }
+    
+        // Remove preview slot
+        if (this.attachmentsSrcs?.length) {
+            this.attachmentsSrcs.splice(i, 1);
+        }
+    
+        // Keep at least one empty slot
+        if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
+            this.attachmentsSrcs = [''];
+        }
+    
+        // Remove from uploader queue if exists
+        if (this.uploader?.queue?.[i]) {
+            this.uploader.removeFromQueue(this.uploader.queue[i]);
+        }
     }
+    
+    // removeAllAttachments() {
+    //     if (this.attachmentsSrcs.length) {
+    //         var isConfirmed: Observable<boolean>;
+    //         isConfirmed = this.askToConfirm(
+    //             "AreYouSureYouWantToDeleteAllTheAttachments?",
+    //             "Confirm"
+    //         );
 
+    //         isConfirmed.subscribe((res) => {
+    //             if (res) {
+    //                 this.attachmentsSrcs = [""];
+    //                 this.appEntity.entityAttachments = [];
+    //                 this.uploader.clearQueue();
+    //             }
+    //         });
+    //     }
+    // }
     removeAllAttachments() {
         if (this.attachmentsSrcs.length) {
-            var isConfirmed: Observable<boolean>;
-            isConfirmed = this.askToConfirm(
-                "AreYouSureYouWantToDeleteAllTheAttachments?",
-                "Confirm"
-            );
-
+            const isConfirmed: Observable<boolean> =
+                this.askToConfirm("AreYouSureYouWantToDeleteAllTheAttachments?", "Confirm");
+    
             isConfirmed.subscribe((res) => {
                 if (res) {
                     this.attachmentsSrcs = [""];
                     this.appEntity.entityAttachments = [];
+                    this.pdfSafeMap = {};
+                    Object.values(this.pdfRawUrl).forEach(url => URL.revokeObjectURL(url));
+                    this.pdfRawUrl = {};
                     this.uploader.clearQueue();
                 }
             });
         }
     }
+    
     getCodeValue(code: string) {
         this.appEntity.code = code;
     }
@@ -811,5 +882,10 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         return this._displayVisualTypes ;
     }
+
+    get canUploadMultipleAttachments(): boolean {
+        return this.entityObjectType?.code === 'MARKETPLACESECTIONBLOCK';
+    }
+    
 }
 

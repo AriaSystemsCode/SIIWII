@@ -20,7 +20,7 @@
         (click)="userClick('Home')"
     >
         <img
-            src="../../../assets/landingPage/Logo_Main.png"
+            [src]=" tenantLogo ? attachmentBaseUrl + '/' + tenantLogo : '../../../assets/landingPage/Logo_Main.png'"
             class="navbar-brand"
         />
     </a>
@@ -37,7 +37,7 @@
         <!-- test nav -->
  
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form ">
+        <form class="input-group pt-3 input-group-form d-lg-block d-none">
             <div class="position-relative search-bar w-75" >
                 <div class="input-group mb-3">
                     <!-- <div

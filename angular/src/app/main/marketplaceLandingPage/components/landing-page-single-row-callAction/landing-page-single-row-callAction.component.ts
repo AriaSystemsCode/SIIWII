@@ -56,7 +56,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
       // Pre-prepare PDFs so iframes have src ready
       this.items
         .filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image))
-        .forEach(b => this.ensurePdfSafeUrl(b));
+        // .forEach(b => this.ensurePdfSafeUrl(b));
     });
   }
 
@@ -84,39 +84,39 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   }
 
   // ---------- PDF handling via Base64 API -> blob -> SafeResourceUrl ----------
-  private async ensurePdfSafeUrl(b: PageSettingDto) {
-    if (!b?.id || !this.isPdf(b.image)) return;
+  // private async ensurePdfSafeUrl(b: PageSettingDto) {
+  //   if (!b?.id || !this.isPdf(b.image)) return;
 
-    // already prepared
-    if (this.attachmentSafeMap[b.id]) return;
+  //   // already prepared
+  //   if (this.attachmentSafeMap[b.id]) return;
 
-    const url = this.fullUrl(b.image);
+  //   const url = this.fullUrl(b.image);
 
-    try {
-      // Ask your backend to fetch and return base64 string from URL (same API you already use)
-      const base64 = await this.appItems.getFile64FromUrl(url).toPromise();
+  //   try {
+  //     // Ask your backend to fetch and return base64 string from URL (same API you already use)
+  //     const base64 = await this.appItems.getFile64FromUrl(url).toPromise();
 
-      // normalize possible "data:...;base64,..." format
-      const raw = (base64 && base64.includes(',')) ? base64.split(',')[1] : base64;
-      const bytes = atob(raw);
-      const arr = new Uint8Array(bytes.length);
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+  //     // normalize possible "data:...;base64,..." format
+  //     const raw = (base64 && base64.includes(',')) ? base64.split(',')[1] : base64;
+  //     const bytes = atob(raw);
+  //     const arr = new Uint8Array(bytes.length);
+  //     for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
 
-      const blob = new Blob([arr], { type: 'application/pdf' });
+  //     const blob = new Blob([arr], { type: 'application/pdf' });
 
-      // revoke old URL if any
-      const old = this.objectUrlById[b.id];
-      if (old) { try { URL.revokeObjectURL(old); } catch {} }
+  //     // revoke old URL if any
+  //     const old = this.objectUrlById[b.id];
+  //     if (old) { try { URL.revokeObjectURL(old); } catch {} }
 
-      const objUrl = URL.createObjectURL(blob);
-      this.objectUrlById[b.id] = objUrl;
+  //     const objUrl = URL.createObjectURL(blob);
+  //     this.objectUrlById[b.id] = objUrl;
 
-      this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(objUrl);
-    } catch {
-      // Final fallback: direct URL (requires server to allow frame-ancestors)
-      this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    }
-  }
+  //     this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(objUrl);
+  //   } catch {
+  //     // Final fallback: direct URL (requires server to allow frame-ancestors)
+  //     this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  //   }
+  // }
 
   // ---------- navigation ----------
   goToBrand(brand: { name: string; id: number | string }) {

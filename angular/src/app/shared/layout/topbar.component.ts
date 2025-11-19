@@ -124,7 +124,8 @@ export class TopBarComponent
     displaneBuy :boolean =false;
     isAuthenticated = this.appSession?.user
     searchInput:string
-    bgCol:string = '#4A0D4A'
+    bgCol:string 
+    tenantLogo:string
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -142,7 +143,8 @@ export class TopBarComponent
         private updateLogoService: UpdateLogoService,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
+        
     ) {
         super(injector);
 
@@ -200,7 +202,7 @@ export class TopBarComponent
 
     ngOnInit() {
         console.log(this.isAuthenticated,'this.isAuthenticated');
-
+        this.getTenantData()
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
@@ -508,6 +510,19 @@ export class TopBarComponent
         );
       }
       
+      getTenantData() {
+       
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208)
+        .subscribe((result) => {
+            // result = '#456'
+            result ? this.bgCol = result : this.bgCol = '#4A0D4A'
+    
+        });
+        this._AppEntitiesServiceProxy.getHostSettingValue(1206)
+        .subscribe((result) => {
+           this.tenantLogo = result
+        });
+    }
 
 }
 

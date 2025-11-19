@@ -1,9 +1,30 @@
-
 .products-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); 
+  gap: 0.75rem;
+}
+
+@media (max-width: 992px) {
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+@media (max-width: 576px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+:host ::ng-deep .p-carousel .p-carousel-item {
+  height: auto !important;
+}
+
+:host ::ng-deep .p-carousel-items-content {
+  height: auto !important;
+}
+
   .sectionGeneral{
     width: 265px;
     border: 1px solid #ebedf2;

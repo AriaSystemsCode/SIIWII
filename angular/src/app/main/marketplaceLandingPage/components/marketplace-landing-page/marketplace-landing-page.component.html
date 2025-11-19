@@ -4,12 +4,12 @@
 
       <!-- auto slider with call to action-->
       <div *ngSwitchCase="'ASSB'">
-        <h4   [style.text-align]="
+        <!-- <h4   [style.text-align]="
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">slider>> {{ s.inputs?.name }}</h4>
-        <app-slider-with-callToAction class="d-md-block d-none" [sectionId]="s.sectionId">
+      ">slider>> {{ s.inputs?.name }}</h4> -->
+        <app-slider-with-callToAction class="" [sectionId]="s.sectionId">
         </app-slider-with-callToAction>
       </div>
 
@@ -20,11 +20,11 @@
 
       <!-- auto slider without call to action-->
       <div *ngSwitchCase="'ASMB'">
-        <h4   [style.text-align]="
+        <!-- <h4   [style.text-align]="
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">slider without>> {{ s.inputs?.name }}</h4>
+      ">slider without>> {{ s.inputs?.name }}</h4> -->
 
         <app-slider-without-callToAction class=" d-block" [sectionId]="s.sectionId">
         </app-slider-without-callToAction>
@@ -33,7 +33,7 @@
 
 
       <!--single row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'SRCTA'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
+      <div *ngSwitchCase="'SRCTA'" class="bg-white rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg">
         <h4   [style.text-align]="
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
@@ -45,12 +45,12 @@
 
 
       <!--multi row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'MRCTA'" class="bg-white rounded p-4 m-2 mb-4 ml-4 mr-4" style="margin:30px 50px !important;">
-        <h4   [style.text-align]="
+      <div *ngSwitchCase="'MRCTA'" class="bg-white rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg" >
+        <h4   [style.text-align]=" 
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">{{ s.inputs?.title }}</h4>
+      " class="mx-2 mt-4 mb-2 ">{{ s.inputs?.title }}</h4>
         <app-multi-row-callAction [sectionId]="s.sectionId"></app-multi-row-callAction>
       </div>
 

@@ -10,7 +10,7 @@
 >
   <ng-template pTemplate="item" let-group>
     <div class="products-grid">
-      <div *ngFor="let block of group" class="px-2 my-2">
+      <div *ngFor="let block of group" class="px-lg-2 my-lg-2 product-col">
      
         <app-prodcut-card *ngIf="block?.blockType?.toUpperCase() =='PRODUCT'"
           [product]="block?.getAppMarketItemForViewDto?.appItem"
@@ -47,6 +47,9 @@
     
             <!-- pdf -->
             <div *ngSwitchCase="'pdf'" class="position-relative">
+              <!-- <img [src]="block?.image ? attachmentBaseUrl + '/' +  block?.image : 'assets/placeholders/_logo-placeholder.png'" class="mb-2"  alt="" srcset=""
+              onerror="'assets/placeholders/_logo-placeholder.png'"    (click)="openNewTab(block?.image)"> -->
+         
               <iframe class=" iframSty"
           
                       [src]="attachmentSafeMap[block.id]"
@@ -54,12 +57,11 @@
                       (error)="block._pdfLoadErr=true">
               </iframe>
     
-              <!-- Fallback if viewer can’t embed -->
+           
               <div *ngIf="block._pdfLoadErr" class="p-2 small text-muted">
                 Can't display PDF here. <a [href]="fullUrl(block?.image)" target="_blank" rel="noopener">Open in new tab</a>
               </div>
     
-              <!-- Optional: your own download button -->
               <button type="button"
                       class="btn btn-sm  position-absolute "
                       style="top: .5rem; left: .5rem"

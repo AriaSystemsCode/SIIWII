@@ -196,8 +196,8 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                             // permission: "Pages.AppSiiwiiTransactions",
                         },
                     },
-                    { path: '**', redirectTo: '/app/main/dashboard'}
-                    // { path: "**", redirectTo: "marketplace/products" },
+                    // { path: '**', redirectTo: '/app/main/dashboard'}
+                    { path: "**", redirectTo: "marketplace/products" },
                 ],
             },
         ]),

@@ -992,57 +992,77 @@ loadingMore = false;
 
 
 getRelatedProducts(initial = false) {
-  const skipCount = initial ? 0 : this.relatedItems.length;
-  const maxResultCount = this.pageSize;
-
-  // ...build your params (same as your current code)...
-  this.loadingMore = true;
-  this._AppMarketplaceItemsServiceProxy.getAppItemRelatedItems(
-    /* contactSSIN */ undefined,
-    /* accountSSIN */ undefined, // or same seller 
-    /* tenantId */ null,
-    /* appItemListId */ null,
-    /* selectorOnly */ null,
-    /* filter */ null,
-    /* lastKey */ null,
-    /* selectorKey */ null,
-    /* arrtibuteFilters */ null,
-    /* departmentFilters */ null,
-    /* minimumPrice */ null,
-    /* maximumPrice */ null,
-    /* sharingLevel */ SharingLevels.Public,
-    /* onlyAvailableStock */ undefined,
-    /* soldOutFromDate */ undefined,
-    /* soldOutToDate */ undefined,
-    /* startShipFromDate */ undefined,
-    /* startShipToDate */ undefined,
-    /* brands */ null,
-    /* currencyCode */ this.productBodyData?.currencyCode ?? null,
-    /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
-    /* categoryFilters */ null,
-    /* sorting */ null,
-    /* skipCount */ skipCount,
-    /* maxResultCount */ maxResultCount
-  )
-  .pipe(finalize(() => (this.loadingMore = false)))
-  .subscribe(res => {
-    this.relatedTotal = res?.totalCount ?? this.relatedTotal;
-    const next = res?.items ?? [];
-    this.relatedItems = initial ? next : [...this.relatedItems, ...next];
-  });
-}
-
-
-onRelatedPage(e: { first: number; rows: number }) {
-
-  const visibleEndIndex = e.first + e.rows; 
-  const nearEnd = visibleEndIndex > this.relatedItems.length - 1;
-  const hasMore = this.relatedItems.length < this.relatedTotal;
-
-  if (nearEnd && hasMore && !this.loadingMore) {
-    this.getRelatedProducts(false);
+    const skipCount = initial ? 0 : this.relatedItems.length;
+    const maxResultCount = this.pageSize;
+  
+    this.loadingMore = true;
+  
+    this._AppMarketplaceItemsServiceProxy
+      .getAppItemRelatedItems(
+        /* contactSSIN */ undefined,
+        /* accountSSIN */ undefined,
+        /* tenantId */ null,
+        /* appItemListId */ null,
+        /* selectorOnly */ null,
+        /* filter */ null,
+        /* lastKey */ null,
+        /* selectorKey */ null,
+        /* arrtibuteFilters */ null,
+        /* departmentFilters */ null,
+        /* minimumPrice */ null,
+        /* maximumPrice */ null,
+        /* sharingLevel */ SharingLevels.Public,
+        /* onlyAvailableStock */ undefined,
+        /* soldOutFromDate */ undefined,
+        /* soldOutToDate */ undefined,
+        /* startShipFromDate */ undefined,
+        /* startShipToDate */ undefined,
+        /* brands */ null,
+        /* currencyCode */ this.productBodyData?.currencyCode ?? null,
+        /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
+        /* categoryFilters */ null,
+        /* sorting */ null,
+        /* skipCount */ skipCount,
+        /* maxResultCount */ maxResultCount
+      )
+      .pipe(finalize(() => (this.loadingMore = false)))
+      .subscribe(res => {
+        this.relatedTotal = res?.totalCount ?? this.relatedTotal;
+        const next = res?.items ?? [];
+  
+        // accumulate pages in order
+        this.relatedItems = initial ? next : [...this.relatedItems, ...next];
+      });
   }
-}
+  
+get relatedItemsUi(): any[] {
+    const loaded = this.relatedItems || [];
+    const hasMore = loaded.length < (this.relatedTotal || 0);
+  
+    if (!hasMore) {
+      // all items loaded; no ghost needed
+      return loaded;
+    }
+  
+    // add one full ghost page
+    const ghostPage = Array.from({ length: this.pageSize }, () => ({ __ghost: true }));
+    return [...loaded, ...ghostPage];
+  }
+  
+
+  onRelatedPage(e: { first: number; rows: number }) {
+    const startIndex = e.first;
+    const pageSize   = e.rows;          // == this.pageSize
+    const ui         = this.relatedItemsUi;
+    const current    = ui[startIndex];
+    const hasMore    = this.relatedItems.length < this.relatedTotal;
+  
+    // If current page starts with a ghost, load the next page
+    if (current?.__ghost && hasMore && !this.loadingMore) {
+      this.getRelatedProducts(false);
+    }
+  }
+  
 
 
     

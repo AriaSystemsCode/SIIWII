@@ -1,7 +1,7 @@
-<div class="position-relative ctaContainer d-md-block d-none">
+<div class="position-relative ctaContainer ">
     <h1>{{sectionData?.name}}</h1>
     <div *ngIf="blocksSorted.length && blocksSorted.length <= numVisible" class="d-flex flex-row ctaParentSection">
-        <div *ngFor="let ctaSection of blocksSorted; " class="ctaChildection pt-2 pl-3 ml-4 mr-4" style="width:20%">
+        <div *ngFor="let ctaSection of blocksSorted; " class="ctaChildection pt-2 pl-3 ml-4 mr-4" >
             <a [routerLink]="['/app/main/' + ctaSection.linkPageUrl]">
                 <h3>{{ ctaSection.name }}</h3>
                 <img [src]="attachmentBaseUrl + '/' + ctaSection.image" class="d-block ctaImage mr-4" />
@@ -34,7 +34,7 @@
 
 </div>
 
-<div class="d-md-none d-flex row flexContainer w-100" *ngIf="blocksSorted.length">
+<!-- <div class="d-md-none d-flex row flexContainer w-100" *ngIf="blocksSorted.length">
     <div *ngFor="let ctaSection of blocksSorted; " class="col-6 mt-4">
         <div class="ctaChildection p-4 ml-4 mr-4 h-100">
             <a [routerLink]="['/app/main/' + ctaSection.linkPageUrl]">
@@ -52,4 +52,4 @@
             <span>{{ l('SeeMore') }}</span>
         </button>
     </div>
-</div>
+</div> -->

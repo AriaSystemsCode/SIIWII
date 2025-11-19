@@ -967,31 +967,44 @@ top: 4px;">
               
                 <!-- > 4 → carousel, lazy-load next 4 on arrow -->
                 <ng-template #relatedCarousel>
-                  <p-carousel
-                    [value]="relatedItems"
-                    [numVisible]="4"
-                    [numScroll]="4"
-                    [circular]="false"
-                    [showIndicators]="false"
-                    [showNavigators]="true"
-                    [responsiveOptions]="[
-                      { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
-                      { breakpoint: '991px',  numVisible: 2, numScroll: 2 },
-                      { breakpoint: '575px',  numVisible: 1, numScroll: 1 }
-                    ]"
-                    (onPage)="onRelatedPage($event)"
-                    class="p-4 m-2 rounded"
-                  >
-                    <ng-template pTemplate="item" let-product>
-                      <div class="px-2 my-2">
-                        <app-prodcut-card
-                          [product]="product.appItem"
-                          [productCard]="product"
-                        ></app-prodcut-card>
-                      </div>
-                    </ng-template>
-                  </p-carousel>
-                </ng-template>
+                    <p-carousel
+                      [value]="relatedItemsUi"
+                      [numVisible]="4"
+                      [numScroll]="4"
+                      [circular]="false"
+                      [showIndicators]="false"
+                      [showNavigators]="true"
+                      [responsiveOptions]="[
+                        { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
+                        { breakpoint: '991px',  numVisible: 2, numScroll: 2 },
+                        { breakpoint: '575px',  numVisible: 1, numScroll: 1 }
+                      ]"
+                      (onPage)="onRelatedPage($event)"
+                      class="p-4 m-2 rounded"
+                    >
+                      <ng-template pTemplate="item" let-product>
+                        <!-- Ghost page (loading placeholder) -->
+                        <div *ngIf="product?.__ghost" class="px-2 my-2">
+                          <div class="card p-4 text-center">
+                            <p class="mb-2">Loading more related products…</p>
+                            <div
+                              class="w-100"
+                              style="height: 150px; border-radius: 8px; background: #f5f5f5;"
+                            ></div>
+                          </div>
+                        </div>
+                  
+                        <!-- Real product -->
+                        <div *ngIf="!product?.__ghost" class="px-2 my-2">
+                          <app-prodcut-card
+                            [product]="product.appItem"
+                            [productCard]="product"
+                          ></app-prodcut-card>
+                        </div>
+                      </ng-template>
+                    </p-carousel>
+                  </ng-template>
+                  
               </div>
               
             <div class="mb-2 p-2 m-2 bg-white rounded row">

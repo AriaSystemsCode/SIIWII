@@ -49,7 +49,7 @@ export class AppAuthService {
             }
           } else {
  
-            const defaultLogin = '/app/main/marketplace'; 
+            const defaultLogin = '/app/account/login'; 
             if (!here.startsWith(defaultLogin)) {
               location.replace(defaultLogin);
             }

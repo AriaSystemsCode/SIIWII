@@ -18,13 +18,13 @@
     <section class="footer-bottom-section flex-rw">
         <div class="footer-bottom-wrapper pt-5">
             <div class="pb-4"><a href='#'>
-                    <img src="../../../assets/landingPage/Logo_Main.png" />
+                    <img [src]="tenantLogo ? attachmentBaseUrl + '/' +tenantLogo : '../../../assets/landingPage/Logo_Main.png'" />
                 </a></div>
 
             <i class="fa fa-copyright" role="copyright">
 
             </i>
-            <span class="footer-bottom-rights"> 2022 SIWII Security Your Privacy Terms</span>
+            <span class="footer-bottom-rights"> 2025 SIWII Security Your Privacy Terms</span>
         </div>
         <div class="footer-bottom-wrapper pt-5">
             <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">

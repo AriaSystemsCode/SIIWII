@@ -11,8 +11,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
             {
                 path: 'app',
                 component: AppComponent,
-                canActivate: [AppRouteGuard],
-                canActivateChild: [AppRouteGuard],
+                // canActivate: [AppRouteGuard],
+                // canActivateChild: [AppRouteGuard],
                 children: [
                     {
                         path: '',
