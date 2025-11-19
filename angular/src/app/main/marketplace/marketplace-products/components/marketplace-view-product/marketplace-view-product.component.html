@@ -959,6 +959,7 @@ top: 4px;">
                         <app-prodcut-card
                           [product]="product.appItem"
                           [productCard]="product"
+                          (prodcutId)="openRelatedProduct($event)"
                         ></app-prodcut-card>
                       </div>
                     </div>

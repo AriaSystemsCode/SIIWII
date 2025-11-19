@@ -1,5 +1,5 @@
 import { HttpParams } from "@angular/common/http";
-import { Component, Injector, Input,OnInit } from "@angular/core";
+import { Component, EventEmitter, Injector, Input,OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
@@ -22,6 +22,7 @@ export class ProdcutCardComponent   extends AppComponentBase  {
     isAuthenticated = this.appSession?.user
     @Input() acceptedAspectRatio;
 
+      @Output() prodcutId = new EventEmitter<number>();
     constructor(private router: Router ,  injector: Injector) {
         super(injector);
     }
@@ -37,7 +38,7 @@ export class ProdcutCardComponent   extends AppComponentBase  {
         };
         localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
         this.router.navigate(["/app/main/marketplace/products/view", id]);
-
+        this.prodcutId.emit(id)
         // this.router.navigateByUrl(`/view/${id}`)
     }
 }

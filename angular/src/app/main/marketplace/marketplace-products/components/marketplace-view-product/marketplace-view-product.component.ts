@@ -1,5 +1,5 @@
 import { Component, Injector, OnDestroy, OnInit} from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 import { animate, style, transition, trigger } from "@node_modules/@angular/animations";
 import { AppConsts } from "@shared/AppConsts";
@@ -99,6 +99,7 @@ export class MarketplaceViewProductComponent
         private AccountsServiceProxy: AccountsServiceProxy,
         private appItemsAppservice: AppItemsServiceProxy,
          private messageServiceProxy: MessageServiceProxy,
+         private route: ActivatedRoute,  
         injector: Injector
     ) {
         super(injector);
@@ -106,24 +107,41 @@ export class MarketplaceViewProductComponent
         this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.priceLevel = localStorage.getItem("tempPriceLevel");
-        this.getProductDetailsForView();
+        // this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
       
     }
     ngOnInit(): void {
-        this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
+        // 🔁 Re-run when /view/:id changes
+        this.route.paramMap.subscribe(params => {
+          const idParam = params.get('id');          // adjust if your route param name is different
+          const id = idParam ? +idParam : null;
+      
+          // Reset local state for new product
+          this.resetProductViewState();
+      
+          // Ensure productBodyData exists
+          if (!this.productBodyData) {
+            this.productBodyData = {};
+          }
+          this.productBodyData.id = id;              // use route id as main source
+      
+          // Load details + related products
+          this.getProductDetailsForView();
+        });
+      
+        // Your existing screen-size logic can stay:
         const screenWidth = window.innerWidth;
-        if (screenWidth >= 992) { // lg screen
-            this.handleSCreenSelect = 5
-        } else if (screenWidth >= 768) { // md screen
-            this.handleSCreenSelect = 3
-
+        if (screenWidth >= 992) {
+          this.handleSCreenSelect = 5;
+        } else if (screenWidth >= 768) {
+          this.handleSCreenSelect = 3;
         }
-
+      
         this.filteredColors = this.colorsData;
-
         // this.IsVariationOrdered()
-    }
+      }
+      
     onFilterTextChanged() {
         this.showIconClose = this.filterText.trim() !== '';
     
@@ -1063,8 +1081,26 @@ get relatedItemsUi(): any[] {
     }
   }
   
-
-
+  private resetProductViewState(): void {
+    this.productDetails = null;
+    this.productImages = [];
+    this.productVarImages = [];
+    this.colorsData = [];
+    this.filteredColors = [];
+    this.orderSummary = [];
+    this.totalOrderQTY = 0;
+    this.totlaOrderPrices = 0;
+    this.currentIndex = 0;
+    this.isColorView = false;
+  
+    // related products reset
+    this.relatedItems = [];
+    this.relatedTotal = 0;
+  }
+  
+  openRelatedProduct(id: number) {
+    this.router.navigate(['/app/main/marketplace/products/view', id]);
+  }
     
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
