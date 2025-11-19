@@ -54,8 +54,15 @@ export class ConnectionsTabComponent extends AppComponentBase {
   
 
   ngOnChanges(changes: SimpleChanges) {
- if (
-      (changes['accountDataForView'] || changes['isActive']) &&
+    const accountChange = changes['accountDataForView'];
+  
+    if (accountChange &&
+        accountChange.currentValue?.ssin !== accountChange.previousValue?.ssin) {
+      this.connectionsLoaded = false;
+    }
+  
+    if (
+      (accountChange || changes['isActive']) &&
       this.accountDataForView &&
       this.isActive &&
       !this.connectionsLoaded
@@ -63,6 +70,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
       this.GetSettingValue();
     }
   }
+  
 
   get sortingCtrl(): AbstractControl {
     return this.filterForm?.get("sorting");
