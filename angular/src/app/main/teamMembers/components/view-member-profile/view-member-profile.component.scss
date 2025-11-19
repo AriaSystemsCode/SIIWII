@@ -6,9 +6,7 @@
 }
 
 .view-profile-wrapper {
-    .kt-portlet {
-        // height: 300px;
-    }
+
 
     .profileInfo_container {
         height: fit-content;
@@ -32,9 +30,7 @@
         }
     }
 
-    .view-profile-action-buttons {
-        // bottom: -26%;
-    }
+
 
     .account-name {
         color: #1B101B;
@@ -62,7 +58,7 @@ input.editjobTitle ,input.editBranch{
     color: #4A0D4A !important;
     border: 1px solid #EEEEEEEE;
     height: 38px;
-    width: 118px;
+    // width: 118px;
     border-radius: 6px;
 }
 .Save_editMember{
@@ -79,9 +75,7 @@ input.editjobTitle ,input.editBranch{
     max-height: 600px; 
   }
   
-  .link-user-container {
-    //min-width: 250px;
-  }
+
   
   .user-dropdown {
     position: absolute;

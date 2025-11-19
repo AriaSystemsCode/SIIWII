@@ -5,7 +5,7 @@
                     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
 
 
-                        <div class="kt-subheader kt-grid__item">
+                        <div class="kt-subheader kt-grid__item d-flex justify-content-between">
                             <div [class]="containerClass">
                                 <div class="kt-subheader__main">
                                     <h6 class="kt-subheader__title">
@@ -15,7 +15,22 @@
                                     <p class="mb-0">{{ contactDisplayName }}</p>
                                 </div>
 
+                            
                             </div>
+
+                            <div class=" ml-2 d-flex align-items-center">
+                             
+                                <!-- [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle || editBranchValue== oldEditBranchValue) " -->
+                                <button class="btn mb-3 mt-4 mr-3 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false;cancel()">
+                                    {{ "Cancel" | localize }}
+                                </button>
+                                <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
+                                style="color: white !important;"
+                                    [class.hide]="editInfo" (click)="Save_editMember()" >
+                                    {{ "Save" | localize }}
+                                </button>
+                            </div>
+
                         </div>
 
 
@@ -335,17 +350,7 @@
                                     <p class="text-left " style="color: #595959;">{{memberData?.phone3Number}} <span class="phoneExt">{{memberData?.phone3Ex}}</span>
                                     </p>
                                 </div>
-                                <div class="row ml-5">
-                                    <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
-                                    style="color: white !important;"
-                                        [class.hide]="editInfo" (click)="Save_editMember()" >
-                                        {{ "SaveChanges" | localize }}
-                                    </button>
-                                    <!-- [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle || editBranchValue== oldEditBranchValue) " -->
-                                    <button class="btn mb-3 mt-4 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false;cancel()">
-                                        {{ "Cancel" | localize }}
-                                    </button>
-                                </div>
+                           
                             </div>
 
                         </div>
