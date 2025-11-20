@@ -8997,9 +8997,17 @@ namespace onetouch.AppItems
                 //{
                 if (excelDto.Id == 0)
                     appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
-
-                //}
-                if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
+                if (appItem.EntityFk.EntityAttachments.Count > 0)
+                {
+                    var defaultExists = excelDto.Images.Select(w => w.IsDefault).ToList();
+                    if(defaultExists != null && defaultExists.Count>0)
+                    {
+                        foreach( var img in appItem.EntityFk.EntityAttachments)
+                        { img.IsDefault = false; }
+                    }
+                }
+                    //}
+                    if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
                 {
                     var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == excelDto.ImageType.ToUpper()).FirstOrDefault();
                     var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") || x.IsDefault ).FirstOrDefault();
