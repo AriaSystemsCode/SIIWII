@@ -523,7 +523,9 @@ namespace onetouch.Accounts
                                             Status = input.FilterType != 1 ? (_appMarketplaceContactRepository.GetAll().Count(z=>z.SSIN == o.SSIN && z.SharingLevel == 1) > 0 || (o.TenantId != null && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) == 0)) :
                                             (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) > 0) > 0 || (o.TenantId != null && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) == 0)),
                                             Id = o.Id,
-                                            IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) == 0,
+                                            IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null
+                                             && (o.EntityFk.TenantOwner == AbpSession.TenantId || o.EntityFk.TenantOwner == 0),
+                                            //&& _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) == 0,
                                             LogoUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                              ""
                                              : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
