@@ -8953,6 +8953,16 @@ namespace onetouch.AppItems
                 {
                     var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == excelDto.ImageType.ToUpper()).FirstOrDefault();
                     var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") || x.IsDefault).FirstOrDefault();
+
+                    if (appItem.EntityFk.EntityAttachments.Count > 0)
+                    {
+                        var defaultExists = excelDto.Images.Select(w => w.IsDefault).ToList();
+                        if (defaultExists != null && defaultExists.Count > 0)
+                        {
+                            foreach (var img in appItem.EntityFk.EntityAttachments)
+                            { img.IsDefault = false; }
+                        }
+                    }
                     foreach (var img in excelDto.Images)
                     {
                         if (img.ImageFileName == "noimage_item.jpg")
