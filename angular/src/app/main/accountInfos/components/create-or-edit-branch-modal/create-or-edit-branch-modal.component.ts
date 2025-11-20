@@ -54,6 +54,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     };
     branchCode: string = "";
 
+    phonePattern = '^[0-9+()\\-\\s]*$'; 
+
     constructor(
         injector: Injector,
         private _AccountsServiceProxy: AccountsServiceProxy,
