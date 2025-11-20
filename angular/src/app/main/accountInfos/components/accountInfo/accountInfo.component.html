@@ -24,7 +24,7 @@
                         <div class="kt-subheader__wrapper"
                             *ngIf="!viewMode && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit) ">
 
-                            <a *ngIf="touched" class="btn btnCancel w-auto mr-4 " (click)="resetFormData()">
+                            <a class="btn btnCancel w-auto mr-4 " (click)="resetFormData()">
                                 <span>{{l("Cancel")}}</span>
                             </a>
                             <button type="submit" class="btn bgPurple btn-1bc5bd w-auto " [buttonBusy]="saving"

@@ -290,45 +290,41 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   
 
   postReview() {
-    
     this.showMainSpinner();
+  
     if (this.selectedMedia?.length > 0)
-      this.onUploadAttachments()
+      this.onUploadAttachments();
+  
     this.messages.to = null;
     this.messages.bodyFormat = this.reviewText;
     this.messages.body = this.reviewText;
-    this.messages.mesasgeObjectType = MesasgeObjectType.Review
-    this.messages.relatedEntityId = this.entityID
-    this.messages.subject = ''
+    this.messages.mesasgeObjectType = MesasgeObjectType.Review;
+    this.messages.relatedEntityId = this.entityID;
+    this.messages.subject = '';
+  
+    const ratingValue = this.selectedRating; 
+  
     setTimeout(() => {
-
-    this.messageServiceProxy
-      .createMessage(this.messages)
-      .pipe(finalize(() => {
-        this.hideMainSpinner();
-        this.notify.info(this.l("SendSuccessfully"));
-        this.getAllReviws()
-        this.messages.entityAttachments = [];
-
-        this.messages = new CreateMessageInput();
-        this.resetForm()
-        this.refreshRating.emit(true)
-        this.onlyMsg = false
-        
-      }))
-      .subscribe(() => {
-        this.messageServiceProxy
-          .createUserEntityRating(this.selectedRating, this.entityID)
-          .pipe(finalize(() => {
-            this.refreshRating.emit(true)
-            
-          }))
-
-          .subscribe(() => {
-          });
-
-      });
-    }, 1000); // ⏱ 2-second delay (2000 milliseconds)
+      this.messageServiceProxy
+        .createMessage(this.messages)
+        .pipe(finalize(() => {
+          this.hideMainSpinner();
+          this.notify.info(this.l("SendSuccessfully"));
+          this.getAllReviws();
+          this.messages.entityAttachments = [];
+          this.messages = new CreateMessageInput();
+          this.resetForm();            
+          this.onlyMsg = false;
+        }))
+        .subscribe(() => {
+  
+          this.messageServiceProxy
+            .createUserEntityRating(ratingValue, this.entityID)
+            .pipe(finalize(() => this.refreshRating.emit(true)))
+            .subscribe(() => {});
+        });
+  
+    }, 1000);
   }
-  // 489157
+  
 }
