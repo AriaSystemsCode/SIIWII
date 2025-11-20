@@ -1299,6 +1299,12 @@ namespace onetouch.Accounts
                 accountDto.PriceLevel = account.PriceLevel;
                 accountDto.AccountTypeId = entity.EntityObjectTypeId;
                 accountDto.AccountType = entity.EntityObjectTypeCode;
+                //accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData
+                //    && account.ParentId == null
+                //    && account.EntityFk.TenantOwner == AbpSession.TenantId);
+                //    //&& (_appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.SharingLevel == 1) == 0));//account.PartnerId == null);
+                //accountDto.IsConnected = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.TenantOwner != AbpSession.TenantId && z.SharingLevel == 1) > 0;//(account.TenantId == null && !account.IsProfileData && account.ParentId == null);
+
                 accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData
                     && account.ParentId == null
                     && account.EntityFk.TenantOwner == AbpSession.TenantId);

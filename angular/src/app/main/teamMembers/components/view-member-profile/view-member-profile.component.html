@@ -5,7 +5,7 @@
                     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
 
 
-                        <div class="kt-subheader kt-grid__item">
+                        <div class="kt-subheader kt-grid__item d-flex justify-content-between">
                             <div [class]="containerClass">
                                 <div class="kt-subheader__main">
                                     <h6 class="kt-subheader__title">
@@ -15,7 +15,22 @@
                                     <p class="mb-0">{{ contactDisplayName }}</p>
                                 </div>
 
+                            
                             </div>
+
+                            <div class=" ml-2 d-flex align-items-center">
+                             
+                                <!-- [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle || editBranchValue== oldEditBranchValue) " -->
+                                <button class="btn mb-3 mt-4 mr-3 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false;cancel()">
+                                    {{ "Cancel" | localize }}
+                                </button>
+                                <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
+                                style="color: white !important;"
+                                    [class.hide]="editInfo" (click)="Save_editMember()" >
+                                    {{ "Save" | localize }}
+                                </button>
+                            </div>
+
                         </div>
 
 
@@ -32,90 +47,6 @@
                                                     [classList]="'img-cover'">
                                                 </app-image-display>
                                                 <div class="view-profile-action-buttons d-flex">
-                                                     
-                                                    <div class="link-user-container d-inline-block">
-
-                                                        <!-- Link Button -->
-                                                        <button class="btn mb-3 mt-4 transparent-button shadow mr-3"
-                                                                (click)="toggleUserList()"
-                                                                [attr.aria-expanded]="showUserList"
-                                                                style="display: flex; align-items: center; gap: 8px;">
-                                                          
-                                                          <ng-container *ngIf="!memberIslink; else linkedIcon">
-                                                            <svg
-                                                                                                                          width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                                                                                          xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                                                                                                          focusable="false"> <!-- chain / link -->
-                                                                                                                          <path
-                                                                                                                              d="M10.5 13.5L8.5 15.5C6.5 17.5 4 17.5 2.5 16C1 14.5 1 12 3 10L5 8"
-                                                                                                                              stroke="#4A0D4A" stroke-width="2"
-                                                                                                                              stroke-linecap="round" stroke-linejoin="round" />
-                                                                                                                          <path
-                                                                                                                              d="M13.5 10.5L15.5 8.5C17.5 6.5 20 6.5 21.5 8C23 9.5 23 12 21 14L19 16"
-                                                                                                                              stroke="#4A0D4A" stroke-width="2"
-                                                                                                                              stroke-linecap="round" stroke-linejoin="round" />
-                                                                                                                          <!-- plus -->
-                                                                                                                          <path d="M17 7v6M14 10h6" stroke="#4A0D4A"
-                                                                                                                              stroke-width="2" stroke-linecap="round"
-                                                                                                                              stroke-linejoin="round" />
-                                                                                                                      </svg>
-                                                            <span>Link to User</span>
-                                                          </ng-container>
-                                                      
-                                                          <ng-template #linkedIcon>
-                                                            <svg
-                                                                                                                          width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                                                                                          xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                                                                                                          focusable="false"> <!-- chain / link -->
-                                                                                                                          <path
-                                                                                                                              d="M10.5 13.5L8.5 15.5C6.5 17.5 4 17.5 2.5 16C1 14.5 1 12 3 10L5 8"
-                                                                                                                              stroke="#4A0D4A" stroke-width="2"
-                                                                                                                              stroke-linecap="round" stroke-linejoin="round" />
-                                                                                                                          <path
-                                                                                                                              d="M13.5 10.5L15.5 8.5C17.5 6.5 20 6.5 21.5 8C23 9.5 23 12 21 14L19 16"
-                                                                                                                              stroke="#4A0D4A" stroke-width="2"
-                                                                                                                              stroke-linecap="round" stroke-linejoin="round" />
-                                                                                                                          <!-- plus -->
-                                                                                                                          <path d="M17 7v6M14 10h6" stroke="#4A0D4A"
-                                                                                                                              stroke-width="2" stroke-linecap="round"
-                                                                                                                              stroke-linejoin="round" />
-                                                                                                                      </svg>
-                                                            <span>User Linked</span>
-                                                          </ng-template>
-                                                        </button>
-                                                      
-                                                        <!-- User List Dropdown -->
-                                                        <div class="user-dropdown shadow rounded"
-                                                             [class.show]="showUserList">
-                                                      
-                                                          <!-- Search Input -->
-                                                          <div class="p-2 border-bottom">
-                                                            <input type="text"
-                                                                   class="form-control form-control-sm"
-                                                                   placeholder="Search users..."
-                                                                   [(ngModel)]="userSearchQuery"
-                                                                   (input)="filterUsers(userSearchQuery)">
-                                                          </div>
-                                                      
-                                                          <!-- User List -->
-                                                          <div class="user-list p-2" *ngIf="filteredUsers?.length > 0; else noUsers">
-                                                            <div class="user-item d-flex align-items-center p-1 mb-1 rounded hover-bg"
-                                                                 *ngFor="let user of filteredUsers;index as i"
-                                                                 (click)="linkToUser(user,i)">
-                                                              <div>
-                                                                <h5 class="mb-1">{{user?.userName}}</h5> 
-                                                              </div>
-                                                            </div>
-                                                          </div>
-                                                      
-                                                          <ng-template #noUsers>
-                                                            <div class="p-2 text-center text-muted">No users found</div>
-                                                          </ng-template>
-                                                        </div>
-                                                      </div>
-                                                      
-
-                                                    
 
                                             
                                                    <!-- Create User Button (if User Id is not present) -->
@@ -140,7 +71,7 @@
                                                         <path d="M14.4749 5.13428C15.0704 7.25859 16.7325 8.92072 18.8657 9.52512" stroke="#4A0D4A" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                                         </svg>
                                                         
-                                                    {{ "Edit User" | localize }}
+                                                    {{ "Edit User Info" | localize }}
                                                     </button>
                                             
                                                     <button *ngIf="canEdit" class="btn mb-3 mt-4 editAccount_butn"
@@ -335,17 +266,7 @@
                                     <p class="text-left " style="color: #595959;">{{memberData?.phone3Number}} <span class="phoneExt">{{memberData?.phone3Ex}}</span>
                                     </p>
                                 </div>
-                                <div class="row ml-5">
-                                    <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
-                                    style="color: white !important;"
-                                        [class.hide]="editInfo" (click)="Save_editMember()" >
-                                        {{ "SaveChanges" | localize }}
-                                    </button>
-                                    <!-- [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle || editBranchValue== oldEditBranchValue) " -->
-                                    <button class="btn mb-3 mt-4 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false;cancel()">
-                                        {{ "Cancel" | localize }}
-                                    </button>
-                                </div>
+                           
                             </div>
 
                         </div>
@@ -366,7 +287,7 @@
                 </div>
             </div>
 
-            <createOrEditUserModal #createOrEditUserModal (refreshData)="refresh($event)"></createOrEditUserModal>
+            <createOrEditUserModal #createOrEditUserModal [filteredUsers]="filteredUsers" (_filterUsers)="filterUsers($event)" (_linkToUser)="linkToUser($event.user, $event.index)" (refreshData)="refresh($event)"></createOrEditUserModal>
 
     </div>
 </div>

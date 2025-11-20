@@ -103,8 +103,15 @@
                         (ng2TelOutput)="getNumberphone1Number($event)"
                         class="form-control form-control-sm aria-input-text phone-input phnoeNum"
                         (intlTelInputObject)="telInputObjectphone1Number($event)"
-                        (countryChange)="onCountryChangephone1Number($event)" />
-                    </div>
+                        (countryChange)="onCountryChangephone1Number($event)"   
+                        #phone1Number="ngModel"  [pattern]="phonePattern" />
+                        <small
+                          class="text-danger"
+                          *ngIf="phone1Number.invalid && phone1Number.errors?.pattern && (phone1Number.dirty || phone1Number.touched)"
+                        >
+                          {{ 'Invalid Phone Number' | localize }}
+                        </small>
+                                            </div>
                     <input type="text" id="branch_Phone1Ex"
                       class="form-control form-control-sm aria-input-text phone-input phone-extenstion"
                       [(ngModel)]="branch.phone1Ext" name="Phone1Ex" minlength="1"
@@ -145,7 +152,14 @@
                         ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                   (ng2TelOutput)="getNumberphone2Number($event)"
                         [(ngModel)]="branch.phone2Number" (intlTelInputObject)="telInputObjectphone2Number($event)"
-                        (countryChange)="onCountryChangephone2Number($event)" />
+                        (countryChange)="onCountryChangephone2Number($event)"   #phone2Number="ngModel"
+                        [pattern]="phonePattern" />
+                        <small
+                        class="text-danger"
+                        *ngIf="phone2Number.invalid && phone2Number.errors?.pattern && (phone2Number.dirty || phone2Number.touched)"
+                      >
+                        {{ 'Invalid Phone Number' | localize }}
+                      </small>
                     </div>
                     <input type="text" id="branch_Phone2Ex"
                       class="form-control form-control-sm aria-input-text phone-input phone-extenstion"
@@ -185,7 +199,14 @@
                         [ng2TelInputOptions]="{initialCountry: 'us'}" name="Phone3Number"
                         (ng2TelOutput)="getNumberphone3Number($event)"
                         [(ngModel)]="branch.phone3Number" (intlTelInputObject)="telInputObjectphone3Number($event)"
-                        (countryChange)="onCountryChangephone3Number($event)" />
+                        (countryChange)="onCountryChangephone3Number($event)"    #phone3Number="ngModel"
+                        [pattern]="phonePattern"/>
+                        <small
+                        class="text-danger"
+                        *ngIf="phone3Number.invalid && phone3Number.errors?.pattern && (phone3Number.dirty || phone3Number.touched)"
+                      >
+                        {{ 'Invalid Phone Number' | localize }}
+                      </small>
                     </div>
                     <input type="text" id="branch_Phone3Ex"
                       class="form-control form-control-sm aria-input-text phone-input phone-extenstion"
