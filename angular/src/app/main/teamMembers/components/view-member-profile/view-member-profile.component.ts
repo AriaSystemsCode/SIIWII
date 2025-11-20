@@ -167,10 +167,10 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             if (indx >= 0) {
               this.memberIslink = true;
               const linkedUserId = result.entityExtraData[indx].attributeValue;
-              this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId);
+              this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId && !user.memberId);
             } else {
               this.memberIslink = false;
-              this.filteredUsers = users.items;
+              this.filteredUsers = users.items.filter(user => !user.memberId);
             }
 
             this.originalFilteredUsers = [...this.filteredUsers];
@@ -503,12 +503,12 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   
         if (linkedIndex >= 0) {
           const linkedUserId = this.memberData.entityExtraData[linkedIndex].attributeValue;
-          this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId);
+          this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId && !user.memberId);
         } else {
-          this.filteredUsers = users.items;
+          this.filteredUsers = users.items.filter(user => !user.memberId);
         }
         });
-  }
+      }
   
   linkToUser(user: UserListDto, i: number) {
     this.showMainSpinner();
