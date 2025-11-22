@@ -308,9 +308,7 @@ export class TransactionInformationComponent
       .pipe(
         finalize(() => {
 
-          this.displayedVariations = []
-          this.filteredColors = []
-          this.allVariations = [];
+
 
         })
       )
@@ -327,6 +325,7 @@ export class TransactionInformationComponent
         this.allVariations = [];
         this.getSellerVariations(0, 10, '')
         this.hideMainSpinner();
+        this.getLinesData();
         this.getShoppingCartData();
         this.filterForm.controls['selectedVariation'].reset()
 
@@ -348,7 +347,6 @@ export class TransactionInformationComponent
     this.showAddLine = false;
     this.filterForm.reset()
     this.displayedVariations = []
-    this.allVariations = []
     this.filteredColors = []
     this.getSellerVariations(0, 10, '')
     this.hideMainSpinner();
@@ -1381,7 +1379,7 @@ export class TransactionInformationComponent
         undefined,
         undefined,
         undefined,
-        this.appTransactionsForViewDto?.currencyCode,
+        'USD',
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
        this.priceLevel,

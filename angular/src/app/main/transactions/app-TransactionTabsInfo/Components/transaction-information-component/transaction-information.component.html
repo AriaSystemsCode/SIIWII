@@ -23,8 +23,7 @@
             <div class="row topheader">
                 <div class="">
                     <div class="row bg-white  m-3 p-2  pl-4" style="border-radius: 4px;min-width: 270px;">
-                        Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{appTransactionsForViewDto?.transactionType == 0 ?
-                        'Sales Order':'Purchase Order'}} &nbsp; &nbsp; >
+                        Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{transactionType}} &nbsp; &nbsp; >
                         &nbsp; &nbsp;
                         {{transactionCode}}
                     </div>
@@ -59,7 +58,7 @@
                     <div class="px-4 py-2" style="line-height: 10px;">
                         <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
                         <div class="purpleColor" style="white-space: nowrap;">
-                            {{appTransactionsForViewDto?.creationDate | momentFormat:"LL h:mm A"}}
+                            {{appTransactionsForViewDto?.creationDate?.toString() | date: 'MMM d y, h:mm a'}}
                         </div>
                     </div>
                 </div>
@@ -205,7 +204,7 @@
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path
-                                                d="M9.99967 3.33301V0.833008L6.66634 4.16634L9.99967 7.49967V4.99967C12.758 4.99967 14.9997 7.24134 14.9997 9.99967C14.9997 10.8413 14.7913 11.6413 14.4163 12.333L15.633 13.5497C16.3082 12.4888 16.6667 11.2572 16.6663 9.99967C16.6663 6.31634 13.683 3.33301 9.99967 3.33301ZM9.99967 14.9997C7.24134 14.9997 4.99967 12.758 4.99967 9.99967C4.99967 9.15801 5.20801 8.35801 5.58301 7.66634L4.36634 6.44967C3.69114 7.51058 3.33266 8.74214 3.33301 9.99967C3.33301 13.683 6.31634 16.6663 9.99967 16.6663V19.1663L13.333 15.833L9.99967 12.4997V14.9997Z"
+                                                d="M9.99967 3.33301V0.833008L6.66634 4.16634L9.99967 7.49967V4.99967C12.758 4.99967 14.9997 7.24134 14.9997 9.99967C14.9997 10.8413 14.7913 11.6413 14.4163 12.333L15.633 13.5497C16.3082 12.4888 16.6667 11.2572 16.6663 9.99967C16.6663 6.31634 13.683 3.33301 9.99967 3.33301ZM9.99967 14.9997C7.24134 14.9997 4.99967 12.758 4.99967 9.99967C4.99967 9.15801 5.20801 8.35801 5.58301 7.66634L4.36634 6.44967C3.69114 7.51058 3.33266 8.74213 3.33301 9.99967C3.33301 13.683 6.31634 16.6663 9.99967 16.6663V19.1663L13.333 15.833L9.99967 12.4997V14.9997Z"
                                                 fill="#777777" />
                                         </svg>
 
@@ -218,7 +217,7 @@
                     </div>
                     <p *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'"
                         style="color: #1B101B;" class="ml-2">Last Edit :
-                        {{appTransactionsForViewDto?.lastModifiedDate | momentFormat:"LL h:mm A"}}</p>
+                        {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'MMM d y, h:mm a'}}</p>
 
                 </div>
                 <div *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'">
@@ -237,7 +236,7 @@
                         </button>
                     </div>
                     <p style="color: #1B101B;" class="ml-2">Last Edit :
-                        {{appTransactionsForViewDto?.lastModifiedDate | momentFormat:"LL h:mm A"}}</p>
+                        {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'MMM d y, h:mm a'}}</p>
 
                 </div>
 
@@ -383,36 +382,44 @@
                                 </app-create-or-edit-billing-info>
                             </div>
                         </p-accordionTab>
+                   
+<p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="currentTab = 6">
+                         
 
-                        <p-accordionTab *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index"
-                            [ngClass]="!showTabs ? 'd-none':''" (click)="currentTab = 6">
-
-
-                            <ng-template pTemplate="header">
-                                <div class="d-inline-block custom-header ">
-                                    <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header |
-                                        localize}}</h6>
-                                    <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
-                                </div>
-                            </ng-template>
-
-
-                            <div *ngIf="currentTab==6 ">
-                                <create-or-edit-extra-data [extraAttributeObject]="extraAttributeObject" [activeTab]="6"
-                                    [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
-                                    [createOrEditExtraData]="createOrEditExtraData" (ontabChange)="ontabChange($event)"
-                                    [showSaveBtn]="showSaveBtn" (refreshShoppingCart)="refreshShoppingCart($event)"
-                                    [canChange]="canChange"></create-or-edit-extra-data>
-                            </div>
-                            <div>
-
-                            </div>
-
-
-
-
-                        </p-accordionTab>
-
+    <ng-template pTemplate="header">
+      <div class="d-inline-block custom-header ">
+        <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header | localize}}</h6>
+        <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
+      </div>
+    </ng-template>
+    
+    
+    <div *ngIf="currentTab==6 ">
+    <create-or-edit-extra-data 
+    
+    [extraAttributeObject]="extraAttributeObject"
+    [activeTab]="6"
+    [currentTab]="currentTab"
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    
+    [createOrEditExtraData]="createOrEditExtraData"
+    
+    (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
+    
+    (refreshShoppingCart)="refreshShoppingCart($event)"
+    
+    [canChange]="canChange"
+    ></create-or-edit-extra-data>
+    </div>
+    <div>
+    
+    </div>
+    
+    
+    
+    
+    </p-accordionTab>
+    
 
 
 
@@ -482,9 +489,7 @@
                                                         [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                         {{ col.header }}
                                                     </th>
-                                                    <!--  <th> <img
-                                                src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
-                                        </th> -->
+
                                                     <th class="purpleColor" *ngIf="canChange" style="width: 5rem;">
                                                         {{l("Action")}}
                                                     </th>
@@ -502,18 +507,17 @@
                                                         <label
                                                             *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
                                                             {{ rowData[col.field] }}</label>
-                                                        <label
-                                                            *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice) || (col.field=='amount')">
+                                                        <label *ngIf="(col.field=='price')||(col.field=='amount')">
                                                             {{ rowData[col.field] | currency:' ' }}</label>
                                                         <label
                                                             *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
                                                             {{ rowData[col.field] }}</label>
 
                                                         <label *ngIf="col.field=='image'">
-                                                            <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                            <img *ngIf="!rowNode.node.data.added"
+                                                                [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
                                                                 onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                 class="imgIcon" />
-
 
                                                         </label>
 
@@ -541,35 +545,15 @@
                                                             </div>
 
                                                         </label>
-
-                                                        <label
-                                                            *ngIf="col.field=='price' && rowNode?.node?.data?.showEditPrice">
-                                                            <div class="editQtyContainer">
-                                                                <div class="fieldset">
-                                                                    <input type="number" min="0"
-                                                                        class="form-control inputs form-text"
-                                                                        id="editPrice"
-                                                                        [(ngModel)]="rowNode.node.data.updatedPrice">
-                                                                    <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
-                                                                        (click)="rowNode.node.data.showEditPrice=false"></a>
-                                                                    <button
-                                                                        class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                                        (click)="onEditPrice(rowNode);"
-                                                                        [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
-                                                                        [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
-                                                                </div>
-                                                            </div>
-                                                        </label>
-
                                                     </td>
 
                                                     <td class="p-treeTable text-center" style="width: 5rem;"
                                                         *ngIf="canChange">
                                                         <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
-                                                class="imgIcon" (click)="onDelete(rowNode)" />
-                                            <img *ngIf="rowNode?.node?.data?.editQty" src=""
-                                                class="editIcon fa fa-edit ml-3 fa-1x"
-                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty" /> -->
+                                                  class="imgIcon" (click)="onDelete(rowNode)" />
+                                              <img *ngIf="rowNode?.node?.data?.editQty" src=""
+                                                  class="editIcon fa fa-edit ml-3 fa-1x"
+                                                  (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty" /> -->
 
                                                         <div class="dropdown" dropdown>
                                                             <button class="btn btn-secondary dropdown-toggle p-0"
@@ -582,7 +566,7 @@
                                                                 aria-labelledby="dropdownMenuButton" *dropdownMenu>
                                                                 <div *ngIf="rowNode?.node?.data?.editQty"
                                                                     class="pointer"
-                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty ; rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
+                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
                                                                     <a class="link purpleColor p-3">
                                                                         <svg class="ml-3"
                                                                             xmlns="http://www.w3.org/2000/svg"
@@ -706,28 +690,28 @@
                                                                 <p
                                                                     style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important; margin-bottom: 0px;">
                                                                     {{productDetails?.name}}</p>
-                                                                <div class="type ml-3 pt-2 text-center">
-                                                                    <p class="mb-0" style="white-space: nowrap;"> {{
-                                                                        productDetails?.orderByPrePack === false
-                                                                        ? "By Size"
-                                                                        : "By Prepack"
-                                                                        }}</p>
-
-                                                                </div>
+                                                                    <div class="type ml-3 pt-2 text-center">
+                                                                        <p class="mb-0" style="white-space: nowrap;"> {{
+                                                                            productDetails?.orderByPrePack === false
+                                                                            ? "By Size"
+                                                                            : "By Prepack"
+                                                                            }}</p>
+                        
+                                                                    </div>
 
                                                             </div>
                                                             <div class="price mb-4">
 
-                                                                <div class="msrp d-flex align-items-baseline">
+                                                                <div class="msrp d-flex ">
                                                                     <h5 class="mr-2"
                                                                         style="color: black !important;font-size: 16px;margin-top: 10px;">
-                                                                        {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
+                                                                        MSRP: </h5>
                                                                     <h5>
 
                                                                         {{
                                                                         currencySymbol
                                                                         }}
-                                                                        {{ productDetails?.minMSRP | number:'1.2-2' }}
+                                                                        {{ productDetails?.minMSRP }}
                                                                     </h5>
                                                                     <span *ngIf="
                                                                   productDetails?.minMSRP !==
@@ -743,7 +727,7 @@
                                                                         {{
                                                                         currencySymbol
                                                                         }}
-                                                                        {{ productDetails?.maxMSRP | number:'1.2-2' }}
+                                                                        {{ productDetails?.maxMSRP }}
                                                                     </h5>
                                                                     <h5> /EAC </h5>
                                                                 </div>
@@ -758,7 +742,10 @@
 
 
                                                                             <h5 *ngIf="showEditSpecialPrice">
-                                                                                {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice ?? 0) | number:'1.2-2' }}
+
+                                                                                {{ productDetails?.maxSpecialPrice ?
+                                                                                productDetails?.maxSpecialPrice : "0" |
+                                                                                currency:' ' }}
                                                                             </h5>
 
                                                                             <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
@@ -786,8 +773,8 @@
                                                         border-radius: 8px;
                                                         border: 2px solid #4A0D4A;" formControlName="updatedSpecialPrice">
 
-                                                                                    <div   style="right: 15px;top: 18px;  z-index: 99;" class="input-group-append position-absolute "
-                                                                                      >
+                                                                                    <div class="input-group-append position-absolute "
+                                                                                        style="right: -8px;  z-index: 99;">
                                                                                         <button
                                                                                             class="btn ml-0 pl-2 pt-3 pb-3"
                                                                                             (click)="showEditSpecialPrice= true">
@@ -796,7 +783,10 @@
                                                                                         </button>
                                                                                     </div>
                                                                                     <div class="input-group-append position-absolute"
-                                                                                        style="z-index: 99;     height: 43px;right: 40px;top: 4px;">
+                                                                                        style="
+                                                         z-index: 99;     height: 43px;
+                          right: 40px;
+                          top: 4px;">
 
                                                                                         <button
                                                                                             class="btn btn-save  mr-0 pr-0"
@@ -1051,18 +1041,17 @@
                                                 <!-- end order by prepack -->
                                             </div>
 
-                                            <div *ngIf="showAddLine" class="d-flex justify-content-end mt-3">
+                                            <div *ngIf="showAddLine" class="d-flex justify-content-between mt-3">
                                                 <button (click)="cancelVariationLine()"
                                                     class="cancelbtn text-center btn float-right">Cancel</button>
-                                                <button
-                                                    [disabled]="filterForm.controls['selectedVariation'].value == ''"
+                                                <button [disabled]="filterForm.controls['selectedVariation'].value == ''"
                                                     (click)="saveVariations()"
                                                     class="previewbtn text-center btn ml-2">Save</button>
                                             </div>
                                         </form>
 
 
-
+                               
 
                                     </div>
 
@@ -1309,7 +1298,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path
-                                                d="M9.99967 3.33301V0.833008L6.66634 4.16634L9.99967 7.49967V4.99967C12.758 4.99967 14.9997 7.24134 14.9997 9.99967C14.9997 10.8413 14.7913 11.6413 14.4163 12.333L15.633 13.5497C16.3082 12.4888 16.6667 11.2572 16.6663 9.99967C16.6663 6.31634 13.683 3.33301 9.99967 3.33301ZM9.99967 14.9997C7.24134 14.9997 4.99967 12.758 4.99967 9.99967C4.99967 9.15801 5.20801 8.35801 5.58301 7.66634L4.36634 6.44967C3.69114 7.51058 3.33266 8.74214 3.33301 9.99967C3.33301 13.683 6.31634 16.6663 9.99967 16.6663V19.1663L13.333 15.833L9.99967 12.4997V14.9997Z"
+                                                d="M9.99967 3.33301V0.833008L6.66634 4.16634L9.99967 7.49967V4.99967C12.758 4.99967 14.9997 7.24134 14.9997 9.99967C14.9997 10.8413 14.7913 11.6413 14.4163 12.333L15.633 13.5497C16.3082 12.4888 16.6667 11.2572 16.6663 9.99967C16.6663 6.31634 13.683 3.33301 9.99967 3.33301ZM9.99967 14.9997C7.24134 14.9997 4.99967 12.758 4.99967 9.99967C4.99967 9.15801 5.20801 8.35801 5.58301 7.66634L4.36634 6.44967C3.69114 7.51058 3.33266 8.74213 3.33301 9.99967C3.33301 13.683 6.31634 16.6663 9.99967 16.6663V19.1663L13.333 15.833L9.99967 12.4997V14.9997Z"
                                                 fill="#777777" />
                                         </svg>
 
@@ -1562,7 +1551,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                             </div>
 
 
-                                            <div class="row handleMob">
+                                            <div class="row handleMob" >
                                                 <div class="ml-4 mr-4">
                                                     <p-treeTable [value]="shoppingCartTreeNodes" [scrollable]="true"
                                                         [tableStyle]="{'min-width':'375px'}">
@@ -1602,7 +1591,8 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                         {{ rowData[col.field] }}</label>
 
                                                                     <label *ngIf="col.field=='image'">
-                                                                        <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                                        <img *ngIf="!rowNode.node.data.added"
+                                                                            [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
                                                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                             class="imgIcon"
                                                                             style="height: 35px; width: 35px;border-radius: 8px;" />
@@ -1716,7 +1706,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                     </button>
 
 
-                                                    <form [formGroup]="filterForm" *ngIf="!addLine">
+                                                    <form [formGroup]="filterForm" *ngIf="!addLine" >
                                                         <div class="mb-3 w-100 row ">
                                                             <div class="d-md-flex  w-100">
                                                                 <div class="col-md-4 col-12">
@@ -1786,16 +1776,14 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                             <p
                                                                                 style="color: #4A0D4A; font-size: 16px;font-weight: 700;margin-top: 4px;white-space: break-space !important;margin-bottom: 0px;">
                                                                                 {{productDetails?.name}}</p>
-                                                                            <div class="type ml-3 pt-2 text-center">
-                                                                                <p class="mb-0"
-                                                                                    style="white-space: nowrap;"> {{
-                                                                                    productDetails?.orderByPrePack ===
-                                                                                    false
-                                                                                    ? "By Size"
-                                                                                    : "By Prepack"
-                                                                                    }}</p>
-
-                                                                            </div>
+                                                                                <div class="type ml-3 pt-2 text-center">
+                                                                                    <p class="mb-0" style="white-space: nowrap;"> {{
+                                                                                        productDetails?.orderByPrePack === false
+                                                                                        ? "By Size"
+                                                                                        : "By Prepack"
+                                                                                        }}</p>
+                                    
+                                                                                </div>
 
                                                                         </div>
                                                                         <div class="price mb-4">
@@ -1803,13 +1791,13 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                             <div class="msrp d-flex ">
                                                                                 <h5 class="mr-2"
                                                                                     style="color: black !important;font-size: 16px;margin-top: 10px;">
-                                                                                    {{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
+                                                                                    MSRP: </h5>
                                                                                 <h5>
 
                                                                                     {{
                                                                                     currencySymbol
                                                                                     }}
-                                                                                    {{ productDetails?.minMSRP | number:'1.2-2'}}
+                                                                                    {{ productDetails?.minMSRP }}
                                                                                 </h5>
                                                                                 <span *ngIf="
                                                                 productDetails?.minMSRP !==
@@ -1825,7 +1813,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                     {{
                                                                                     currencySymbol
                                                                                     }}
-                                                                                    {{ productDetails?.maxMSRP | number:'1.2-2' }}
+                                                                                    {{ productDetails?.maxMSRP }}
                                                                                 </h5>
                                                                                 <h5> /EAC </h5>
                                                                             </div>
@@ -1847,7 +1835,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                                                             productDetails?.maxSpecialPrice
                                                                                             ?
                                                                                             productDetails?.maxSpecialPrice
-                                                                                            : "0" | number:'1.2-2' | currency:' ' }}
+                                                                                            : "0" | currency:' ' }}
                                                                                         </h5>
 
                                                                                         <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
@@ -1876,8 +1864,8 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                       border-radius: 8px;
                                                       border: 2px solid #4A0D4A;" formControlName="updatedSpecialPrice">
 
-                                                                                                <div  style="    right: 15px;top: 18px;  z-index: 99;" class="input-group-append position-absolute "
-                                                                                                   >
+                                                                                                <div class="input-group-append position-absolute "
+                                                                                                    style="right: -8px;  z-index: 99;">
                                                                                                     <button
                                                                                                         class="btn ml-0 pl-2 pt-3 pb-3"
                                                                                                         (click)="showEditSpecialPrice= true">
@@ -2161,62 +2149,24 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                                             <!-- end order by prepack -->
                                                         </div>
 
-                                                        <div *ngIf="showAddLine"
-                                                            class="d-flex justify-content-between mt-3">
-                                                            <button (click)="cancelVariationLine()"
-                                                                class="cancelbtn text-center btn float-right">Cancel</button>
-                                                            <button
-                                                                [disabled]="filterForm.controls['selectedVariation'].value == ''"
-                                                                (click)="saveVariations();"
-                                                                class="previewbtn text-center btn ml-2">Save</button>
-                                                        </div>
+                                                                 <div *ngIf="showAddLine"
+                                                        class="d-flex justify-content-between mt-3">
+                                                        <button (click)="cancelVariationLine()"
+                                                            class="cancelbtn text-center btn float-right">Cancel</button>
+                                                        <button
+                                                            [disabled]="filterForm.controls['selectedVariation'].value == ''"
+                                                            (click)="saveVariations();"
+                                                            class="previewbtn text-center btn ml-2">Save</button>
+                                                    </div>
                                                     </form>
 
 
 
-
+                                           
                                                 </div>
                                             </div>
                                         </div>
                                     </p-accordionTab>
-
-
-                                    <p-accordionTab  *ngFor="let extraAttributeObject of extraAttributes | keyvalue; let i = index" [ngClass]="!showTabs ? 'd-none':''"   (click)="currentTab = 6">
-                         
-
-                                        <ng-template pTemplate="header">
-                                          <div class="d-inline-block custom-header ">
-                                            <h6 class="mb-1 " style="color: #1B101B;">{{extraAttributeObject.value.header | localize}}</h6>
-                                            <!-- <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p> -->
-                                          </div>
-                                        </ng-template>
-                                        
-                                        
-                                        <div *ngIf="currentTab==6 ">
-                                        <create-or-edit-extra-data 
-                                        
-                                        [extraAttributeObject]="extraAttributeObject"
-                                        [activeTab]="6"
-                                        [currentTab]="currentTab"
-                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
-                                        
-                                        [createOrEditExtraData]="createOrEditExtraData"
-                                        
-                                        (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
-                                        
-                                        (refreshShoppingCart)="refreshShoppingCart($event)"
-                                        
-                                        [canChange]="canChange"
-                                        ></create-or-edit-extra-data>
-                                        </div>
-                                        <div>
-                                        
-                                        </div>
-                                        
-                                        
-                                        
-                                        
-                                        </p-accordionTab>
                                     <!-- order Preview tab -->
                                     <p-accordionTab class="shoppingCartAccordionTabBG"
                                         *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'"
@@ -2410,7 +2360,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
 
         <p class="mb-3 text-center">
 
-            <span class="msg-text ml-2 ">Order # {{transactionCode}} placed successfully</span>
+            <span class="msg-text ml-2 ">Order # {{transactionCode}} placed successfuly</span>
         </p>
 
     </div>
@@ -2435,7 +2385,7 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
 
         <p class="mb-3 text-center">
 
-            <span class="msg-text ml-2 ">Transaction synced successfully</span>
+            <span class="msg-text ml-2 ">Transaction synced successfuly</span>
         </p>
 
     </div>

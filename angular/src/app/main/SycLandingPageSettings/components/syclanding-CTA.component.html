@@ -41,7 +41,7 @@
             <ng-template let-ctaSection pTemplate="item">
                 <div class="ctaChildection pt-2 pl-3 ml-4 mr-4">
                  
-                    <a (click)="ctaSection.title=='Products' ? handleStorageData():''"
+                    <a (click)="ctaSection.title=='Products' ? addLocal():''"
                     [routerLink]="['/app/main/' +ctaSection.linkPageUrl ]" >
                         <h3>{{ ctaSection.title }}</h3>
                         <app-image-display

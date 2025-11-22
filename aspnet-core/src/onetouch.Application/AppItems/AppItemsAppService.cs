@@ -82,6 +82,9 @@ using Newtonsoft.Json;
 using System.Drawing;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
+using NPOI.HSSF.Util;
+using DocumentFormat.OpenXml.Presentation;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace onetouch.AppItems
 {
@@ -208,6 +211,7 @@ namespace onetouch.AppItems
             _appItemSelectorRepository = appItemSelectorRepository;
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _validationRuleRepo = validationRuleRepo;
+
 
         }
         //mmt
@@ -356,8 +360,8 @@ namespace onetouch.AppItems
                 )
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                 .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyItems || input.FilterType == ItemsFilterTypesEnum.MyListing, a => a.TenantId == AbpSession.TenantId)
-                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyOwnedItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner == AbpSession.TenantId)
-                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyPatrnersItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner != AbpSession.TenantId)
+                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyOwnedItems, a => a.TenantId == AbpSession.TenantId && (a.TenantOwner == AbpSession.TenantId || a.TenantOwner == 0))
+                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyPatrnersItems, a => a.TenantId == AbpSession.TenantId && (a.TenantOwner != AbpSession.TenantId && a.TenantOwner != 0))
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
                 //xx
                 .WhereIf(input.ScalesFilters != null && input.ScalesFilters.Count() > 0, a => a.ItemSizeScaleHeadersFkList.Where(r => allScales.Contains(r.Name.TrimEnd())).Count() > 0)
@@ -877,7 +881,7 @@ namespace onetouch.AppItems
                //MMTCAT
                .Include(x => x.EntityFk).ThenInclude(z => z.EntityCategories).ThenInclude(z => z.EntityObjectCategoryFk)
                .Include(x => x.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
-               .AsNoTracking().Where(x => x.Id == input.ItemId || x.ParentId == input.ItemId).OrderBy(z=>z.Code).ToListAsync();
+               .AsNoTracking().Where(x => x.Id == input.ItemId || x.ParentId == input.ItemId).OrderBy(z => z.Code).ToListAsync();
                 //XX
                 var appItem = allItems.Where(z => z.Id == input.ItemId).FirstOrDefault();
                 var varAppItems = allItems.Where(z => z.ParentId == input.ItemId).ToList();
@@ -1071,9 +1075,9 @@ namespace onetouch.AppItems
                             firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
                         var firstItem = varAppItems.FirstOrDefault();
-                        List<string> attributeValues = firstItem.EntityFk.EntityExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
-                        List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
-                        var firstAttributeID = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
+                        List<string> attributeValues = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.EntityObjectTypeCode).Distinct().ToList();
+                        List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.AttributeId.ToString()).Distinct().ToList();
+                        var firstAttributeID = firstItem.EntityFk.EntityExtraData.OrderBy(z => z.AttributeId).WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
                             .FirstOrDefault().ToString();
                         var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
                         var firstAttributeValue = firstItem.EntityFk.EntityExtraData
@@ -2307,7 +2311,7 @@ namespace onetouch.AppItems
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
-            if (input.Id==0 && entity.TenantOwner!=null && entity.TenantOwner != 0)
+            if (input.Id == 0 && entity.TenantOwner != null && entity.TenantOwner != 0)
             {
                 entity.AttachmentSourceTenantId = -1;
             }
@@ -2401,7 +2405,7 @@ namespace onetouch.AppItems
                 List<AppEntity> colorsList = new List<AppEntity>();
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
-                   
+
                     foreach (var child in input.VariationItems)
                     {
                         var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
@@ -2596,7 +2600,7 @@ namespace onetouch.AppItems
                                     {
                                         var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
 
-                                      //  if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
+                                        //  if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
                                             {
@@ -2621,6 +2625,17 @@ namespace onetouch.AppItems
                                     }
 
                                 }
+                                //T-SII-20250618.0003,1 MMT 06/24/2025 clear the color hexa attribute if the color has no hexa color[Start]
+                                else
+                                {
+                                    colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                    if (colorHexa != null)
+                                    {
+                                        colorHexa.AttributeValue = "";
+                                    }
+
+                                }
+                                //T-SII-20250618.0003,1 MMT 06/24/2025 clear the color hexa attribute if the color has no hexa color[Start]
 
                                 var colorNRFlook = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
                                 if (colorNRFlook != null && !string.IsNullOrEmpty(colorNRFlook.AttributeValue))
@@ -5144,7 +5159,7 @@ namespace onetouch.AppItems
                     List<AppItemExcelDto> result;
                     try
                     {
-                         
+
                         {
                             foreach (DataRow itemExcelDto in ds.Tables["Products"].Rows)
                             {
@@ -5167,12 +5182,12 @@ namespace onetouch.AppItems
                             index++;
                             if (itemExcelDto["RecordType"].ToString() == "Color")
                             {
-                                
+
                                 result[index].ColorCode = itemExcelDto["COLORCode"].ToString();
                                 result[index].ColorName = itemExcelDto["COLORName"].ToString();
                             }
                         }
-                        }
+                    }
                     catch (Exception exObj)
                     {
                         throw new UserFriendlyException("This Excel file format is invalid");
@@ -5371,7 +5386,7 @@ namespace onetouch.AppItems
                                 var colorImage = imagesList.Where(x => x.ToUpper().StartsWith(("C-") + itemExcelDto.ColorCode.ToUpper())).ToList();
                                 if (colorImage.Count == 0)
                                 {
-                                  
+
                                     {
                                         hasWarning = true;
                                         itemExcelRecordErrorDTO.FieldsErrors.Add("Color Code :" + itemExcelDto.ColorCode + " does not have an image in images folder.!");
@@ -5382,7 +5397,8 @@ namespace onetouch.AppItems
                                 else
                                 {
                                     foreach (var img in colorImage)
-                                    {    itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
+                                    {
+                                        itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
                                     }
                                     itemExcelDto.ImageFolderName = colorImage[0];
 
@@ -5563,7 +5579,7 @@ namespace onetouch.AppItems
                     itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
                     itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44308/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
+                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44303/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
                     itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
                     itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
                     #endregion
@@ -5579,6 +5595,7 @@ namespace onetouch.AppItems
                 {
                     throw new UserFriendlyException(ex.Message);
                 }
+
 
                 // ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
             }
@@ -5753,40 +5770,44 @@ namespace onetouch.AppItems
             }
             return returnCategory;
         }
-        
+
         public async Task<List<ImportItemReturnDto>> ImportItem(List<ImportItemInputDto> itemExcelDtoList, string repeatHandler)
         {
-            AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
-            saveExcelinput.CodesFromList = new List<string>();
-            saveExcelinput.ToList = new List<int>();
-            saveExcelinput.FromList = new List<int>();
-            saveExcelinput.ErrorMessage = "";
-            saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
-            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString()); 
-            saveExcelinput.To = 0;
-            saveExcelinput.From = 0;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
-            foreach (var excelDto in itemExcelDtoList)
+            var hasErrors = false;
+            try
             {
-                if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                    continue;
-                long id = 0;
-                bool canBeSaved = true;
-               var list = await ValidateImportItemData(excelDto);
-                if (list != null && list.Count>0)
+                AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
+                saveExcelinput.CodesFromList = new List<string>();
+                saveExcelinput.ToList = new List<int>();
+                saveExcelinput.FromList = new List<int>();
+                saveExcelinput.ErrorMessage = "";
+                saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
+                saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
+                saveExcelinput.To = 0;
+                saveExcelinput.From = 0;
+
+                foreach (var excelDto in itemExcelDtoList)
                 {
-                    foreach (var err in list)
+                    if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                        continue;
+                    long id = 0;
+                    bool canBeSaved = true;
+                    var list = await ValidateImportItemData(excelDto);
+                    if (list != null && list.Count > 0)
                     {
-                        returnList.Add(err);
-                        canBeSaved = err.ErrorType != "Stopper"? canBeSaved :false;
-                        if (err.ErrorType == "Duplication")
-                            id =long.Parse(err.Id.ToString());
+                        foreach (var err in list)
+                        {
+                            returnList.Add(err);
+                            canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
+                            if (err.ErrorType == "Duplication")
+                                id = long.Parse(err.Id.ToString());
+                        }
                     }
-                }
-                if (canBeSaved == true)
-                {
-                    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
-                    var prdObj = pdtyp.FirstOrDefault();
+                    if (canBeSaved == true)
+                    {
+                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
+                        var prdObj = pdtyp.FirstOrDefault();
 
                         var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(prdObj.Id.ToString()));
                         var entityextr = entityObjectExtraAttribute.FirstOrDefault();
@@ -5887,7 +5908,7 @@ namespace onetouch.AppItems
                     string jsonData = JsonConvert.SerializeObject(returnList);
                     string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
                     _helper.ExcelHelper.ExportJsonToExcel(fileToExport, jsonData);
-                    if( !hasErrors)
+                    if (!hasErrors)
                     {
                         var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                         string tenancyName = myTenantObject.TenancyName;
@@ -5920,6 +5941,10 @@ namespace onetouch.AppItems
         }
         public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto)
         {
+            if (itemExcelDto.RecordType == "Image") { itemExcelDto.RecordType = "Item"; }
+            //HIA HIA as per Sam
+            if (itemExcelDto.NoOfDimensions == null) { itemExcelDto.NoOfDimensions = "1"; }
+
             List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             //foreach (var itemExcelDto in input) 
@@ -5938,7 +5963,7 @@ namespace onetouch.AppItems
                         returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage, ErrorType = "Stopper" });
                     }
                 }
-                
+
                 if (itemExcelDto.RecordType == "Item")
                 {
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
@@ -8526,7 +8551,7 @@ namespace onetouch.AppItems
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
             List<string> sizeScaleNames = new List<string>();
-            foreach (var excelDto in result)
+            foreach (AppItemExcelDto excelDto in result)
             {
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
                     continue;
@@ -8979,7 +9004,15 @@ namespace onetouch.AppItems
                 //{
                 if (excelDto.Id == 0)
                     appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
-
+                if (appItem.EntityFk.EntityAttachments.Count > 0)
+                {
+                    var defaultExists = excelDto.Images.Select(w => w.IsDefault).ToList();
+                    if (defaultExists != null && defaultExists.Count > 0)
+                    {
+                        foreach (var img in appItem.EntityFk.EntityAttachments)
+                        { img.IsDefault = false; }
+                    }
+                }
                 //}
                 if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
                 {
@@ -9060,7 +9093,6 @@ namespace onetouch.AppItems
                 //mmt
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
-
                     var ratioHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeRatioName & x.ParentId != null).AsNoTracking().FirstOrDefault();
                     var scaleHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeScaleName).AsNoTracking().FirstOrDefault();
                     if (scaleHeader == null || ratioHeader == null || (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy) ||
@@ -9175,14 +9207,15 @@ namespace onetouch.AppItems
 
                         appSizeScaleForEditDto.Dimesion1Name = excelDto.SizeScaleName;
                         appSizeScaleForEditDto.Name = excelDto.SizeScaleName;
-                        Task<AppSizeScaleForEditDto> sizescale = null;
                         long? sizeScaleSavedId = 0;
+                        Task<AppSizeScaleForEditDto> sizescale = null;
                         try
                         {
+                            //var sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+                            // var sizeScaleSavedId = sizescale.Result.Id;
                             sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
                             sizeScaleSavedId = sizescale.Result.Id;
                             sizeScaleNames.Add(excelDto.SizeScaleName);
-
                         }
                         catch (Exception ex)
                         {
@@ -9466,11 +9499,6 @@ namespace onetouch.AppItems
                                 }
                                 appItemSizeScalesHeaderRatio.AppItemId = appItem.Id;
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
-                                if (appItem.ItemSizeScaleHeadersFkList.Count == 0)
-                                {
-                                    appItemSizeScalesHeader.AppItemId = appItem.Id;
-                                    appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
-                                }
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
 
@@ -9735,7 +9763,7 @@ namespace onetouch.AppItems
                             CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
                             TenantId = AbpSession.TenantId,
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef,
-                            IsDefault =true
+                            IsDefault = true
                         });
                     }
                     if (string.IsNullOrEmpty(item.PriceB))
@@ -10753,6 +10781,7 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.D2Pos, act => act.MapFrom(src => src["Dimension2Position"].ToString()));
             mappingExpression.ForMember(dest => dest.D3Pos, act => act.MapFrom(src => src["Dimension3Position"].ToString()));
             mappingExpression.ForMember(dest => dest.SizeCode, act => act.MapFrom(src => src["SIZEcode"].ToString()));
+            mappingExpression.ForMember(dest => dest.SizeName, act => act.MapFrom(src => src["SIZEName"].ToString()));
             //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
             mappingExpression.ForMember(dest => dest.PriceA, act => act.MapFrom(src => src["PriceA"].ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceB, act => act.MapFrom(src => src["PriceB"].ToString().TrimEnd()));
@@ -10826,7 +10855,7 @@ namespace onetouch.AppItems
 
             }
 
-           
+
             return returnList;
         }
     }

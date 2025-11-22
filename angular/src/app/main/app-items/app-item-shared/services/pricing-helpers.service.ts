@@ -13,9 +13,7 @@ export class PricingHelpersService extends AppComponentBase {
   levels: string[] = ['A', 'B', 'C', 'D']
   defaultLevel:string="MSRP" ;
   constructor(private injector: Injector) {
-
-    super(injector)
-   this.languageSettingName!='en-GB' ?  this.defaultLevel = "MSRP"  : this.defaultLevel= "RRP" 
+    super(injector);
   }
   getDefaultCols(): MatrixGridColumns {
     const cols: MatrixGridColumns = new MatrixGridColumns({
