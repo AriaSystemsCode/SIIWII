@@ -3008,7 +3008,7 @@ namespace onetouch.Accounts
             entity.EntityObjectTypeCode = partnerEntityObjectTypeCode;
             entity.Name = input.Name;
             entity.Notes = input.Notes;
-            if (input.TenantOwner!=null)
+            if (input.TenantOwner!=null && input.Id==0)
             entity.TenantOwner = long.Parse(input.TenantOwner.ToString());
             if (input.UseDTOTenant)
             {
@@ -3185,6 +3185,12 @@ namespace onetouch.Accounts
             contact.PriceLevel = input.PriceLevel;
             contact.SSIN = input.SSIN;
             entity.SSIN = input.SSIN;
+            if (input.Id != 0)
+            {
+                var currentEntity = _appEntityRepository.GetAll().Where(e => e.Id == input.EntityId).FirstOrDefault();
+                entity.TenantOwner = currentEntity.TenantOwner;
+            }
+
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
 
             contact.EntityId = savedEntity;
