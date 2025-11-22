@@ -3185,7 +3185,7 @@ namespace onetouch.Accounts
             contact.PriceLevel = input.PriceLevel;
             contact.SSIN = input.SSIN;
             entity.SSIN = input.SSIN;
-            if (input.Id != 0)
+            if (input.Id != null && input.Id != 0)
             {
                 var currentEntity = _appEntityRepository.GetAll().Where(e => e.Id == input.EntityId).FirstOrDefault();
                 entity.TenantOwner = currentEntity.TenantOwner;
