@@ -66,6 +66,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   linkNewParentItem_Data;
   linkNewItemColor_Data;
   linkNewColorLookup_Data;
+  @Output() _resetRecordsCompleted = new EventEmitter<void>();
+
 
   public constructor(
     private _importService: MainImportService,
@@ -126,6 +128,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.records.forEach((r, index) => {
         this.resetRecords(r, index);
       });
+
+      this._resetRecordsCompleted.emit();
     }
 
     if (changes['updatedRecordData'] && this.updatedRecordData) {
@@ -184,7 +188,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     _text = "All " + ImportTypes[this.importType] + " Failed , can not import.";
 
 
-    this.uploadingResult.totalPassedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length;
+    this.uploadingResult.totalPassedRecords =
+      (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length || 0) +
+      (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'warning')?.length || 0);
+
     this.uploadingResult.totalFailedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
 
     if (this.uploadingResult.totalPassedRecords == 0) {
@@ -440,16 +447,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record.showActions = !record.showActions;
 
     if (record.showActions) {
-      const rect = (event.target as HTMLElement).getBoundingClientRect();
-
       record.dropdownPosition = {
-        top: document.querySelector('.browser-table')?.getBoundingClientRect().top ?? 0,
-        left: rect.left
+        top: event.clientY,
+        left: event.clientX
       };
-
-      record.openUpward = true;
     }
   }
+
 
 
 
@@ -782,9 +786,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       let item = this.imagesList.find(x => x.code.toLowerCase() == imageItem.toLowerCase());
 
 
-      return item?.croppedbase64 === ''
+      let ret = item?.croppedbase64 === ''
         ? item?.tempBase64
         : item?.croppedbase64;
+
+      return !ret ? '' : ret;
     }
 
     else
@@ -1115,7 +1121,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price D',
     'Color Code',
     'Color Name',
-    'SIZE Code','SIZE Name','Size Scale Name',	'Scale Sizes Order',
+    'SIZE Code', 'SIZE Name', 'Size Scale Name', 'Scale Sizes Order',
     'Size Ratio Value',
     'Start Ship Date',
     'Dimension 1 sizes',
@@ -1153,7 +1159,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Dimension1Position',
     'Dimension2Position',
     'Dimension3Position',
-    'Dimension4Position',    
+    'Dimension4Position',
 
   ];
 
@@ -1167,16 +1173,20 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   exampleTextsForCreateNewParent: { [key: string]: string } = {
     'Code': 'Example: SAM001',
     'Price Currency Code': 'Example: USD , GBP',
-    'Color Code': 'Example: BLK',
-    'Color Name': 'Example: Black',
+    'Color Code': 'Example: BLK|BLU|',
+    'Color Name': 'Example: Black|Blue|',
+    'Size Scale Name'  :'Example: S-XL',
+    'Scale Sizes Order'  :'Example: S|M|L|XL',
+    'Size Ratio Name': 'Example: 1-2-2-1',
+    'Size Ratio Value':'Example: S~M~L~XL|1-2-2-1'
   };
 
   exampleTextsForCreateNewItemColor: { [key: string]: string } = {
     'Parent Code': 'Example: SAM001',
     'Code': 'Example: SAM001 - BLK',
     'Price Currency Code': 'Example: USD , GBP',
-    'Color Code': 'Example: BLK',
-    'Color Name': 'Example: Black',
+    'Color Code': 'Example: BLK|BLU|',
+    'Color Name': 'Example: Black|Blue|',
     'Size Scale Name': 'Example: S-XL',
     'Scale Sizes Order': 'Example: S|M|L|XL',
     'Size Ratio Name': 'Example: 1-2-2-1',
@@ -1184,8 +1194,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   };
 
   exampleTextsForCreateNewColorLookup: { [key: string]: string } = {
-    'Color Code': 'Example: BLK',
-    'Color Name': 'Example: Black',
+    'Color Code': 'Example: BLK|BLU|',
+    'Color Name': 'Example: Black|Blue|',
   };
 
   exampleTextsForLinkToNewParentFromAssociatedData: { [key: string]: string } = {
@@ -1209,6 +1219,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Price Currency Code',
     'Color Code',
     'Color Name',
+    'Size Scale Name',
+    'Scale Sizes Order',
+    'Size Ratio Value',
+    'Dimension 1 sizes',
+    'Dimension 1 Name'
   ];
 
 
@@ -1225,6 +1240,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Scale Sizes Order',
     'Color Code',
     'Color Name',
+    'Size Scale Name',
+    'Scale Sizes Order',
+    'Size Ratio Value',
+    'Dimension 1 sizes',
+    'Dimension 1 Name'
   ];
 
   requiredColumnsForCreateNewColorLookup: string[] = [
@@ -1338,8 +1358,5 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     const val = this.getRecordValue(record, 'price');
     return !this.isNumberLike(val);
   }
-
-
-
 
 }  

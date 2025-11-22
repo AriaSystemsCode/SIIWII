@@ -12,6 +12,7 @@ import { SelectItem } from "primeng/api";
 import { ImageFile } from "../models/imageFile.model";
 import { MainImportService } from "../services/mainImport.service";
 import {ImportTypes} from "../models/ImportTypes"
+import Swal from "sweetalert2";
 @Component({
     selector: "importConfirmationModal",
     templateUrl: './importConfirmation.component.html',
@@ -82,6 +83,16 @@ export class importConfirmationComponent extends AppComponentBase implements OnI
     }
 
     import() {
+        Swal.fire({
+            title: "",
+            text:  "Your import has started; you will receive a confirmation notification once it's complete",  
+            icon: "info",
+            showCancelButton: false,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ok",
+          }).then((result) => {
+          });
         this.repreateHandler.emit(this.selectedDuplicatedOption);
         this._updateLookups.emit(this.updateLookups);
         this.goNext.emit();
