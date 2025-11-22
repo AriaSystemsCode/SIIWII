@@ -88,7 +88,10 @@
     }
 
     .transM {
-   
+        .p-dialog .p-dialog-header {
+            background-color: #fff !important;
+            color: #f6851d !important;
+        }
         border-radius: 3px !important;
     .p-dialog .p-dialog-header {
         background-color: #fff !important;
@@ -391,4 +394,10 @@ label {
     border: 1px solid #C83532ed !important;
 
 }
+
+:host ::ng-deep .addDanger .p-dropdown {
+    border: 1px solid #C83532ed !important;
+   
 }
+}
+

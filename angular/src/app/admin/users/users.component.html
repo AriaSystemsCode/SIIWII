@@ -204,7 +204,7 @@
                                                             *ngIf="'Pages.Administration.Users.Delete' | permission"
                                                             (click)="deleteUser(record)">{{'Delete' | localize}}</a>
                                                     </li>
-                                                    <li *ngIf="appSession.tenantId">
+                                                    <li *ngIf="record.memberId != 0">
                                                         <a href="javascript:;"
                                                             (click)="ViewProfile(record)">{{'ViewProfile' | localize}}</a>
                                                     </li>

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
+	<text name="InvitePartnerByType">Invite partner By Type</text>
     <text name="ValidationRules">Validation rules</text>
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
@@ -711,7 +712,7 @@
 		<text name="TenantNameCanNotBeEmpty">Tenant name can not be empty</text>
 		<text name="ExportToExcel">Export to excel</text>
 		<text name="ChangeProfilePicture">Change profile picture</text>
-		<text name="TenantName_Regex_Description">Domain name must be at least 2 characters, starts with a letter and continue with letter, number, dash or underscore.</text>
+		<text name="TenantName_Regex_Description">  Workspace name must be at least 2 characters, can include letters, numbers, and special characters, and cannot contain spaces.</text>
 		<text name="ProfilePicture_Change_Info">You can select a JPG/JPEG/PNG file with a maximum {0}MB size.</text>
 		<text name="ProfilePicture_Change_Error">Your profile picture could not be changed.</text>
 		<text name="ProfilePicture_Warn_SizeLimit">Picture size must be smaller than {0}MB. Please select another file.</text>
@@ -2570,5 +2571,6 @@
 	<text name="Absolute">Absolute</text>
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
-  </texts>  
+    <text name="UpdateAccountInformation">Update Account Information</text>
+	</texts>  
 </localizationDictionary>

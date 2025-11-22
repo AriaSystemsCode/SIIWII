@@ -89,7 +89,7 @@
                                     <button
                                         class="_btn btn mt-4 startBtn"
                                         [routerLink]="['/account/register-tenant']"
-                                        [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Free,tenantid:tenantid}"
+                                        [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Free,tenantid:tenantid,relatedTenantId:relatedTenantId}"
                                         href="#" *ngIf="!isUserLoggedIn && isFree(editionWithFeatures.edition)">
                                         {{"Start" | localize}}
                                     </button>

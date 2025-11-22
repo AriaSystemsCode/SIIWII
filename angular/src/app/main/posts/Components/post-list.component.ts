@@ -1,5 +1,5 @@
 import { formatDate } from "@angular/common";
-import { Injector, OnDestroy } from "@angular/core";
+import { Injector, Input, OnChanges, OnDestroy, SimpleChanges } from "@angular/core";
 import { ViewChild } from "@angular/core";
 import { Component, OnInit, AfterViewInit } from "@angular/core";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
@@ -9,6 +9,7 @@ import { ProgressComponent } from "@app/shared/common/progress/progress.componen
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+    AccountDto,
     AppEntitiesServiceProxy,
     AppEntityAttachmentDto,
     AppEventDto,
@@ -37,7 +38,7 @@ import { ViewPostComponent } from "./view-post.component";
 })
 export class PostListComponent
     extends AppComponentBase
-    implements OnInit, AfterViewInit, OnDestroy
+    implements OnInit, AfterViewInit, OnChanges,OnDestroy
 {
     @ViewChild("createOrEditModal", { static: true })
     createOrEditModal: CreateorEditPostComponent;
@@ -82,6 +83,10 @@ export class PostListComponent
     @ViewChild("ProgressModal", { static: true })
     ProgressModal: ProgressComponent;
 
+    @Input() fromMarketplaceProfile: boolean = false;
+    @Input() fromOverviewTab: boolean = false;
+    @Input() accountDataForView :AccountDto;
+
     public constructor(
         private _profileService: ProfileServiceProxy,
         private _postService: AppPostsServiceProxy,
@@ -96,7 +101,10 @@ export class PostListComponent
         this.getProfilePicture();
         this.userName =
             this.appSession.user.name + " " + this.appSession.user.surname;
-        this.refreshData();
+            if(!this.fromMarketplaceProfile && !this.fromOverviewTab){
+                this.refreshData();
+
+            }
 
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "Home") {
@@ -117,6 +125,11 @@ export class PostListComponent
             this.bodyElement[0].scrollTop = 0;
             this.bodyElement[0].classList.add("thin-scroll");
         }
+    }
+    ngOnChanges(changes: SimpleChanges) {
+    if (changes['accountDataForView']) {
+        this.refreshData();
+      }
     }
 
     ngOnDestroy() {
@@ -315,7 +328,7 @@ export class PostListComponent
                 undefined,
                 this.contactNameFilter,
                 this.entityNameFilter,
-                0,
+                0,this.accountDataForView?.tenantId ? this.accountDataForView?.tenantId : undefined,undefined,
                 "",
                 this.skipCount,
                 this.maxResultCount
@@ -333,12 +346,12 @@ export class PostListComponent
 
                 this.postsToShow = this.posts.slice(
                     0,
-                    this.noOfItemsToShowInitially
+                   this.fromOverviewTab ? 3 :  this.noOfItemsToShowInitially
                 );
 
                 if (
                     this.bodyElement &&
-                    this.noOfItemsToShowInitially == 5 &&
+                    (this.fromOverviewTab ? 3 :  this.noOfItemsToShowInitially == 5) &&
                     this.skipCount == 0
                 ) {
                     this.bodyElement[0].scrollTop = 0;
@@ -363,7 +376,9 @@ export class PostListComponent
             this.maxResultCount = this.itemsToLoad;
             this.skipCount = this.noOfItemsToShowInitially;
             this.noOfItemsToShowInitially += this.itemsToLoad;
+            if(!this.fromOverviewTab){           
             this.getAllPosts();
+            }
         } else {
             this.isFullListDisplayed = true;
         }
@@ -483,7 +498,7 @@ export class PostListComponent
                 undefined,
                 "",
                 "",
-                postid,
+                postid,undefined,undefined,
                 "",
                 0,
                 1

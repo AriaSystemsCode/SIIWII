@@ -41,5 +41,9 @@ namespace onetouch.AppEvents.Dtos
         public string StateFilter { get; set; }
 
         public string PostalFilter { get; set; }
+        //I40-X527[Start]
+        public long? TenantId { get; set; }
+        public int? NoOfEventsToReturn { get; set; }
+        //I40-X527[End]
     }
 }

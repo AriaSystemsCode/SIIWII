@@ -133,7 +133,6 @@ export class TransactionInformationComponent
   totalOrderQTY: number = 0;
   totlaOrderPrices: number = 0;
   priceLevel:any
-  languageSettingName  =AppConsts.languageSettingName;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -326,6 +325,7 @@ export class TransactionInformationComponent
         this.displayedVariations = []
         this.filteredColors = []
         this.allVariations = [];
+        this.getSellerVariations(0, 10, '')
         this.hideMainSpinner();
         this.getShoppingCartData();
         this.filterForm.controls['selectedVariation'].reset()
@@ -350,6 +350,7 @@ export class TransactionInformationComponent
     this.displayedVariations = []
     this.allVariations = []
     this.filteredColors = []
+    this.getSellerVariations(0, 10, '')
     this.hideMainSpinner();
     this.filterForm.controls['selectedVariation'].reset()
 
@@ -1383,7 +1384,7 @@ export class TransactionInformationComponent
         this.appTransactionsForViewDto?.currencyCode,
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
-       this.appTransactionsForViewDto?.priceLevel,
+       this.priceLevel,
         id,
         undefined,
         undefined,

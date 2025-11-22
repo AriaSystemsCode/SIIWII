@@ -16,6 +16,7 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     @Output() reply : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() toName : EventEmitter<string> = new EventEmitter<string>()
     @Output() mycom : EventEmitter<any> = new EventEmitter<any>()
+
     @Input() entityId: number
     @Input() relatedEntityId: number
     @Input() postCreatorUserId: number
@@ -25,9 +26,10 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
     @Input() commentType:any;
+    @Input() fromOverview:false;
     @Input() comment:any;
     @Input() fromTrans:boolean = false;
-    @Input() fromOverview:boolean;
+
     showReactionsPopup: boolean = false
     defaultReactionType: Reactions = this._reactionService.defaultReactionType
     currentUserReaction: AppEntityUserReactionDto = new AppEntityUserReactionDto()

@@ -18,6 +18,7 @@ using NUglify.Helpers;
 using onetouch.AppContacts;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
+using onetouch.AppMarketplaceContacts;
 using onetouch.AppMarketplaceMessages;
 using onetouch.AppMarketplaceTransactions;
 using onetouch.AppPosts;
@@ -32,6 +33,7 @@ using onetouch.Message.Dto;
 using onetouch.Migrations;
 using onetouch.MultiTenancy;
 using onetouch.SystemObjects;
+using PayPalCheckoutSdk.Orders;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -71,15 +73,19 @@ namespace onetouch.Message
             IRepository<AppEntity, long> appEntityRepository,
             IAppConfigurationAccessor appConfigurationAccessor,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            IRepository<AppEntityClassification, long> appEntityClassificationRepository,
+            IRepository<AppEntityClassification, long> appEntityClassificationRepository, IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IRepository<AppEntityRating, long> appEntityRatingRepository, RoleManager roleManager,
-            IRepository<AppContact, long> appContactRepository,
-            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders
+            IRepository<AppContact, long> appContactRepository
+            
             )
         {
+            _roleManager = roleManager;
+            _appEntityExtraDataRepository = appEntityExtraDataRepository;
+            _appEntityRatingRepository = appEntityRatingRepository;
+            _appConfiguration = appConfigurationAccessor.Configuration;
             _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
             _appContactRepository = appContactRepository;
             _roleManager = roleManager;
@@ -96,7 +102,8 @@ namespace onetouch.Message
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _AppMarketplaceMessagesRepository = appMarketplaceMessagesRepository;
             _appPostRepo = appPostRepo;
-        }
+            
+    }
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
         {
@@ -744,6 +751,8 @@ namespace onetouch.Message
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                if (searchTerm == null)
+                    searchTerm = "";
                 var UserList = from o in UserManager.Users //.Where(x => x.TenantId != null)
                                join o1 in TenantManager.Tenants on o.TenantId equals o1.Id into j1
 
@@ -1968,7 +1977,7 @@ namespace onetouch.Message
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 string userSSIN = "";
-                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => x.EntityFk.TenantId == null &&
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => //x.EntityFk.TenantId == null &&
                          x.AttributeId == 715 && x.AttributeValue == userId.ToString());
                 if (contactEntityExtraData != null)
                 {

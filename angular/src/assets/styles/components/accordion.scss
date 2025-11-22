@@ -11,7 +11,8 @@ body .p-accordion {
             font-size: 14px !important;
             font-weight: 400 !important;
             &[role=tab] {
-                padding: 0;
+                background: #f1f2f3 !important;
+                padding: 15px !important;
             }
             &:focus {
                 outline: 0 none;

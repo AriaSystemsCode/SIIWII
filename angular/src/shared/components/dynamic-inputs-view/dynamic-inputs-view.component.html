@@ -1,0 +1,62 @@
+<div class="container-fluid InfoForm thin-scroll bg-white pt-2">
+    <div class="header my-2 d-flex align-items-center justify-content-between p-1">
+        <h6 class="m-0"><span class="headertxt"> {{formatUsage(extraAttributeObject.value.header)}} : </span></h6>
+     
+    </div>
+    <hr class="" />
+    <div class="pr-3">
+        <div class="row p-3">
+            <!-- Boolean View (not editable) -->
+
+  
+            <ng-container *ngFor="let attrMeta of entityData?.extraDataAttributes">
+                
+              <ng-container *ngIf="attrMeta.extraAttrDataType === 'boolean'; else normalView">
+                <div class="col-md-6 mb-3">
+                  <div>
+                    <label class="font-weight-bold">{{ attrMeta.extraAttrName | localize }}</label>
+                  </div>
+                  <div class="mt-2 d-flex align-items-center">
+                    <p-inputSwitch
+                      [ngModel]="attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value === 'true'"
+                      [disabled]="true"
+                      styleClass="disabled-toggle"
+                    ></p-inputSwitch>
+                    <span class="ml-2 text-muted ">
+                      {{
+                        attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value === 'true'
+                          ? ('Yes' | localize)
+                          : ('No' | localize)
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </ng-container>
+              
+                  
+                  <ng-template #normalView>
+                    <div class="col-md-6 mb-3">
+                      <div>
+                        <label class="font-weight-bold">{{ attrMeta.extraAttrName | localize }}</label>
+                      </div>
+                      <div class="mt-1">
+                        <ng-container *ngIf="attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value">
+                          <span *ngIf="attrMeta.extraAttrDataType === 'Datetime'">
+                            {{ attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value | date: 'dd MMMM yyyy' }}
+                          </span>
+                          <span *ngIf="attrMeta.extraAttrDataType !== 'Datetime'">
+                            {{ attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value }}
+                          </span>
+                        </ng-container>
+                        <div *ngIf="!attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value || attrMeta.selectedValues[attrMeta.selectedValues.length - 1]?.value === ''">
+                          -
+                        </div>
+                      </div>
+                    </div>
+                  </ng-template>
+                  
+            </ng-container>
+        </div>
+    </div>
+    <hr class="my-2" />
+</div>

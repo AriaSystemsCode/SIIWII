@@ -14,6 +14,7 @@ export class CommentComponent implements OnChanges {
     isLongContent: boolean = false;
     displayedContent: string = '';
     charLimit: number = 30; // Adjust the limit as needed
+
     constructor(private _postService:AppPostsServiceProxy) { }
     ngOnChanges(changes: SimpleChanges,): void {
         this.getProfilePictureById(this.comment.messages.profilePictureId);
@@ -38,10 +39,13 @@ export class CommentComponent implements OnChanges {
                 }
             });
     }
+   
 
+    // toggleExpand() {
+    //   this.isExpanded = !this.isExpanded;
+    // }
     setupContent() {
-      // merge
-        const bodyFormat = this.comment?.messages?.body || '';
+        const bodyFormat = this.comment?.messages?.bodyFormat || '';
         if (bodyFormat.length > this.charLimit) {
           this.isLongContent = true;
           this.displayedContent = this.getTruncatedContent(bodyFormat);
@@ -52,7 +56,7 @@ export class CommentComponent implements OnChanges {
       }
       
       toggleExpand() {
-        const bodyFormat = this.comment?.messages?.body || '';
+        const bodyFormat = this.comment?.messages?.bodyFormat || '';
         this.isExpanded = !this.isExpanded;
         this.displayedContent = this.isExpanded
           ? bodyFormat

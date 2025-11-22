@@ -1,12 +1,12 @@
-<h4>Reviews</h4>
-<hr>
+<h4 *ngIf="!fromOverview">Reviews</h4>
+<hr *ngIf="!fromOverview">
 <div *ngIf="totalCount > 0" class="review-summary mb-3">
   <h5 class="font-weight-bold">
     {{ reviews.length }} over {{ totalCount }} {{ 'Results Of' | localize }} "{{ 'Customers Reviews' | localize }}"
   </h5>
 </div>
 
-<div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
+<div *ngIf=" ( !isPublished)" class="addReview mb-4 pb-2">
     <div class="topSec w-100 d-flex align-items-start position-relative">
       <img style="height: 30px;" src="assets/common/images/default-profile-picture.png" class="rounded-circle logo" />
      <div class="reviewSection">
@@ -34,13 +34,7 @@
         <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput   (click)="selectedMedia?.length >= 1 ? stop(): ''"/>
         <img src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
           (click)="selectedMedia?.length >= 1 ? stop(): imageInput.click()" />
-          <!-- <app-image-upload
-          [sycAttachmentCategory]="sycAttachmentCategoryImage"
-          [image]="testImage"
-          [fromReview]="true" 
-          (imageBrowseDone)="onImageSelected($event, null)"
-          (removeImage)="onImageRemoved(null)">
-        </app-image-upload> -->
+
 
   
         <!-- Video Input -->
@@ -83,7 +77,7 @@
   </div>
   
   
-  <p *ngIf="reviews?.length == 0" class="text-center">
+  <p *ngIf="reviews?.length == 0" class="text-center my-5">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
   
     <span class="noDataTxt">There is no data to show ...</span>
@@ -230,7 +224,7 @@
     </div>
     <div class=" con-body">
       <p class="mb-3 text-center">
-        <span class="msg-text ml-2 ">You’ve already reviewed this product</span>
+        <span class="msg-text ml-2 ">{{alreadyReviewdMsg}}</span>
       </p>
     </div>
     <div class="d-flex justify-content-center btns mb-3">

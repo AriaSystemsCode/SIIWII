@@ -42,6 +42,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openSub = false
     openAdSub= false
     tenantLogo:any;
+
+  
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -59,13 +61,15 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.menu = this._appNavigationService.getMenu();
    
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
+   
 
         this._router.events
             .pipe(filter(event => event instanceof NavigationEnd))
             .subscribe(event => this.currentRouteUrl = this._router.url.split(/[?#]/)[0]);
+    
     }
 
-    
+ 
       toggleSidebar() {
         this.isMinimized = !this.isMinimized;
       }
@@ -116,4 +120,6 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     onOpenSideBar($event:boolean){
         this.openSideBar=$event
     }
+
+ 
 }

@@ -1,13 +1,9 @@
-<div class="container bg-white p-4 mb-4">
+<div class="container bg-white p-4 mb-4" style="border: solid 1px #EEEEEEEE;
+border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
+">
     <div *ngIf="post">
         <div
             class="row pb-4"
-            [ngStyle]="{
-                'border-bottom':
-                    post.appPost.description != ''
-                        ? '0.699999988079071px solid #EDEDED'
-                        : 'none'
-            }"
         >
             <div class="col-1 mr-4 mr-lg-0 mr-md-0 ">
                 <img
@@ -20,8 +16,9 @@
                 />
             </div>
 
-            <div class="col-9">
-                <a class="pt-2 addFont"
+            <div class="col-9" [ngClass]="fromMarketplaceProfile ? 'ml-lg-1  ml-5':''">
+                <a class="pt-2 h6"
+                style="color: #1B101B !important; font-weight: bold;"
                 *ngIf="post?.appPost?.accountId"
                     [routerLink]="[
                         '/app/main/account/view/',
@@ -34,9 +31,12 @@
                       >
                     {{ post.appPost.accountName }}
                 </a>
-                <h6 class="userName">
+                <h6 class="userName"  *ngIf="!fromMarketplaceProfile">
                     {{'PostBy' | localize}},<b>{{ post.appPost.userName }} </b> ,
                     {{ post.appPost.creationDatetime?.toString() | date: "mediumDate" }}
+                </h6>
+                <h6 class="userName" *ngIf="fromMarketplaceProfile">
+                    {{'posted in :' | localize}}  {{ post.appPost.creationDatetime?.toString() | date: 'h:mm a, dd-MM-yyyy' }}
                 </h6>
             </div>
 
@@ -297,7 +297,7 @@
     </div>
     <div
         *ngIf="getAppEntityForViewDto"
-        class="row  p-4 pointer viewContainer"
+        class="row  p-4 pointer viewContainer mb-5"
     >
         <div class="col-8 col-sm-9">
             <h5>

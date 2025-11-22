@@ -81,7 +81,7 @@
                                             imageSelectedIndex = i;
                                             showImageAtCenter(img)
                                         "
-                                        [ngStyle]="{'height.px' :  (leftImage.clientWidth / acceptedAspectRatio )}"
+                                        [ngStyle]="{'height.px':  (leftImage.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
@@ -123,12 +123,12 @@
                                             imageSelectedIndex = i;
                                             showImageAtCenter(img)
                                         "
-                                        [ngStyle]="{'height.px' :  (leftImage.clientWidth / acceptedAspectRatio )}"
+                                        [ngStyle]="{'height.px':  (leftImage.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
 
-                            <div class="p-2 ml-2 center-dev" #centerdiv>
+                            <div class="p-2 ml-2 center-dev">
                                 <div class="centerContatiner"  #centerContatiner>
                                     <img
                                         *ngIf="centerImage"
@@ -140,7 +140,7 @@
                                         alt="defaultImage"
                                         (error)="handleFailedImage($event)"
                                         class="imageContainer"
-                                        [ngStyle]="{'height.px' :  (centerContatiner.clientWidth / acceptedAspectRatio )}"
+                                        [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
@@ -416,7 +416,7 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{  languageSettingName!='en-GB' ? "MSRP"   :  "RRP"  | localize }} :
+                                {{  languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  | localize }}:
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{ appItemForViewDto?.minPrice }} -
                                 {{ tenantDefaultCurrency.symbol
@@ -429,7 +429,7 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{ languageSettingName!='en-GB' ? "MSRP"   :  "RRP"  | localize }} :
+                                {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  | localize }}:
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{appItemForViewDto?.minPrice | currency :' '}}
                              

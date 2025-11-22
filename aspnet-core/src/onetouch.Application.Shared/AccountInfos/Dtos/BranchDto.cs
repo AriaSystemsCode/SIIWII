@@ -69,5 +69,9 @@ namespace onetouch.AccountInfos.Dtos
 		//I45
 		public int? TenantId { get; set; }
 		public bool UseDTOTenant { get; set; }
-	}
+        //I40
+		public string ParentCode { set; get; }
+        public virtual long? TenantOwner { set; get; }
+        //I40
+    }
 }

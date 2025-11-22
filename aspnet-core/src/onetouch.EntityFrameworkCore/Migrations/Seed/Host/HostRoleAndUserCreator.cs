@@ -285,6 +285,36 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Transaction);
                 _context.SaveChanges();
             }
+            //MMT40[Start]
+            var sydObjects_MarketplaceRelationship = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+        r => r.Code == "MARKETPLACECONTACTRELATIONSHIP");
+            if (sydObjects_MarketplaceRelationship == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_MarketplaceRelationship = new SystemObjects.SydObject
+                {
+                    Code = "MARKETPLACECONTACTRELATIONSHIP",
+                    Name = "Marketplace Contact Relationship",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_MarketplaceRelationship);
+                _context.SaveChanges();
+            }
+       //     var sydObjects_Address = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+       //r => r.Code == "ADDRESS");
+       //     if (sydObjects_Address == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+       //     {
+       //         sydObjects_Address = new SystemObjects.SydObject
+       //         {
+       //             Code = "ADDRESS",
+       //             Name = "Address",
+       //             ObjectTypeCode = ObjectTypeCodeEntity.Code,
+       //             ObjectTypeId = ObjectTypeCodeEntity.Id
+       //         };
+       //         _context.SydObjects.Add(sydObjects_Address);
+       //         _context.SaveChanges();
+       //     }
+            //MMT40[End]
             //STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG
             var sydObjects_StandardFeature = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
        r => r.Code == "STANDARDFEATURE");
@@ -332,9 +362,9 @@ namespace onetouch.Migrations.Seed.Host
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question".Split(',');
+            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP".ToUpper().Split(',');
+            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
+            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -528,7 +558,37 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             //MMT-EntityLog[End]
+            //MMT40[Start]
+            ObjectCode = "MARKETPLACECONTACTRELATIONSHIP";
+            codes = "ACTIVE,INACTIVE,PENDING".ToUpper().Split(',');
+            names = "Active,InActive,Pending".Split(',');
+            for (int i = 0; i < codes.Length; i++)
+            {
+                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                    r => r.Code == ObjectCode);
+                if (sydObjects != null && sydObjects.Id > 0)
+                {
+                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
+                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
 
+                    if (sydObjects != null && sydObjects.Id > 0 &&
+                        SycEntityObjectStatuses == null)
+                    {
+                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
+                        {
+                            Code = codes[i],
+                            Name = names[i],
+                            ObjectId = sydObjects.Id,
+                            ObjectCode = sydObjects.Code,
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
+
+                        };
+                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            //MMT40[End]
         }
 
         private void CreateHostCodeStructures()
@@ -560,7 +620,7 @@ namespace onetouch.Migrations.Seed.Host
                     //_context.SycEntityObjectTypes.Update(sycEntityObjectType);
                     _context.SaveChanges();
                     bool isAutoGenerated = false;
-                    if ("CATEGORY|DEPARTMENT|CLASSIFICATION|POST|TENANTCONTACT|MANUALACCOUNT|MANUALACCOUNTCONTACT|MANUALACCOUNTBRANCH|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))
+                    if ("CATEGORY|DEPARTMENT|CLASSIFICATION|POST|PERSONAL|BRANCH|BUSINESS|MARKETPLACECONTACTRELATIONSHIP|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))
                     { isAutoGenerated = true; }
                     bool isVisible = true;
                     if ("CATEGORY|DEPARTMENT|CLASSIFICATION|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))

@@ -352,7 +352,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             // remove buyer values
             this.isSeller = false;
             this.isBuyer = false;
-            this.isBuyerTempAccount = false;
             this.isCompantIdExist = false;
             this.isSellerCompanyIdExist = false;
             this.orderForm.get("buyerContactName").reset();
@@ -1018,7 +1017,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
                         localStorage.setItem(
                             "currencyCode",
-                            JSON.stringify(this.currencyCode)
+                            JSON.stringify(this.sellerCurrencyCode)
                         );
                     }
 
@@ -1160,6 +1159,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
 
-    }
 
+}
 }
