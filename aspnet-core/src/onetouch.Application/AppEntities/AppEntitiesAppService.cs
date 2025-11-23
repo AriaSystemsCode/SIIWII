@@ -1043,18 +1043,18 @@ namespace onetouch.AppEntities
                 else
                 {
                     //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[Start]   
-                    if (AbpSession.TenantId!=null && input.EntityObjectTypeId==16)
+                    if (AbpSession.TenantId != null && input.EntityObjectTypeId == 16)
                     {
-                        var codeExist = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Code == input.Code && x.EntityObjectTypeId== 16
+                        var codeExist = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Code == input.Code && x.EntityObjectTypeId == 16
                         && (x.TenantId == null || x.TenantId == AbpSession.TenantId));
-                        if (codeExist!=null)
+                        if (codeExist != null)
                             throw new UserFriendlyException("Code '" + input.Code + "' Already Exists.");
                     }
                     //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[End]   
                     entity = new AppEntity();
                 }
-               
-                
+
+
                 //temp solution to test 
                 if (string.IsNullOrEmpty(input.Code))
                     input.Code = System.Guid.NewGuid().ToString();
@@ -1063,8 +1063,9 @@ namespace onetouch.AppEntities
                 //------------------------------------------
                 //var contactObjectId = await _helper.SystemTables.GetObjectContactId();
                 //var partnerEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
-
+                if (entity.ObjectId == null || entity.ObjectId==0)
                 entity.ObjectId = input.ObjectId;
+
                 entity.EntityObjectStatusId = input.EntityObjectStatusId;
                 
                 if (entity.EntityObjectStatusId == null)
@@ -1088,6 +1089,7 @@ namespace onetouch.AppEntities
                 // I3-13 [End]
 
                 //input.TenantID==-1 means not set and the backend must set it by the current seesion.TenantId
+                if(entity.TenantId==null || entity.TenantId==0)
                 entity.TenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
                 //entity.TenantId = GetCurrentTenant().Id;
                 //I46[Start]
@@ -1360,6 +1362,8 @@ namespace onetouch.AppEntities
                 //    await _appEntityAttachmentRepository.DeleteAsync(x => x.EntityId == entity.Id && !arr.Contains(x.Id));
                 //}
 
+                
+
                 if (entity.Id == 0)
                 {
                     entity = await _appEntityRepository.InsertAsync(entity);
@@ -1416,6 +1420,7 @@ namespace onetouch.AppEntities
                     }
                 }
                 #endregion Iteration49 update the related items
+                input = null;
                 return entity.Id;
             }
         }
