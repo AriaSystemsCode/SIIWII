@@ -1,4 +1,5 @@
-﻿import { Component, Injector, OnInit } from '@angular/core';
+﻿import { Component, ViewChild, Injector, Output, EventEmitter, OnInit} from '@angular/core';
+import { BsModalRef, BsModalService, ModalDirective, ModalOptions } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
 import { AppEntityAttachmentDto, AppTenantInvoicesServiceProxy, AppTenantSubscriptionPlansServiceProxy, CreateOrEditAppTenantInvoiceDto, GetSycAttachmentCategoryForViewDto, SycAttachmentCategoryDto, TenantInformation } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -6,6 +7,16 @@ import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ImageCropperComponent } from "@app/shared/common/image-cropper/image-cropper.component";
+import {Observable, config} from "@node_modules/rxjs";
+import { SelectAppItemTypeComponent } from '@app/app-item-type/select-app-item-type/select-app-item-type.component';
+import { AppEntityListDynamicModalComponent } from '@app/app-entity-dynamic-modal/app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component';
+
+//import { ImageCropperComponent } from 'ngx-image-cropper';
+//import { SelectAppItemTypeComponent } from '@app/app-item-type/select-app-item-type/select-app-item-type.component';
+
+
+
+
 
 @Component({
     templateUrl: './create-or-edit-appTenantInvoice.component.html',
@@ -31,10 +42,17 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
     attachmentsSrcs: string[] = Array(1).fill("");
     appTenantInvoice: CreateOrEditAppTenantInvoiceDto = new CreateOrEditAppTenantInvoiceDto();
     TenantList: TenantInformation[];
+    
+    //private _appTenantSubscriptionPlansServiceProxy: any;
+
+
+
+
 
     constructor(
         injector: Injector,
-        private _activatedRoute: ActivatedRoute,
+        private _activatedRoute: ActivatedRoute,     
+        private _BsModalService: BsModalService,   
         private _appTenantInvoicesServiceProxy: AppTenantInvoicesServiceProxy,
         private _appTenantSubscriptionPlansServiceProxy: AppTenantSubscriptionPlansServiceProxy,
         private _router: Router
@@ -148,6 +166,10 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
             sycAttachmentCategoryName: "",
         });
 
+
+
+
+//I43
 
     tempUploadImage(
         event: Event,
