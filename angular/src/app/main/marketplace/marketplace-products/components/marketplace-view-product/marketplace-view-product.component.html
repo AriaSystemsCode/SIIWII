@@ -371,6 +371,9 @@ top: 4px;">
                                         </button>
                                     </div>
                                 </div>
+
+                                <p *ngIf="productBodyData?.appItem?.stockAvailability ==0 && productBodyData?.showWarningLabelMajorOutStockFlag">call the office for more information</p>
+                                <p *ngIf="productBodyData?.appItem?.stockAvailability >0 && productBodyData?.showWarningLabelMajorOutStockFlag" class="text-success">In stock</p>
                             </div>
                         </div>
                     </div>
@@ -519,7 +522,11 @@ top: 4px;">
                                         let i = index
                                     ">
                                     <td>{{ size.label }}</td>
-                                    <td >{{ productBodyData?.showStockAvailability ? size.stockAvailability :'' }}</td>
+                                    <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability ==0 ">Out of stock</td>
+
+                                    <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability >=0 ">In Stock</td>
+
+                                    <td *ngIf="!productBodyData?.showInOutStockFlag">{{  size.stockAvailability  }}</td>
                                     <td>
                                         <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true"
                                             inputId="minmax-buttons" [min]="0" (ngModelChange)="
@@ -639,9 +646,11 @@ top: 4px;">
                                                 let i = index
                                             ">
                                             <td>{{ size.label }}</td>
-                                            <td>
-                                                {{ productBodyData?.showStockAvailability ? size.stockAvailability :'' }}
-                                            </td>
+                                            <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability ==0 ">Out of stock</td>
+
+                                            <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability >=0 ">In Stock</td>
+
+                                            <td *ngIf="!productBodyData?.showInOutStockFlag ">{{  size.stockAvailability  }}</td>
                                             <td
                                                 *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 
@@ -931,15 +940,20 @@ top: 4px;">
                         <div class="col-md-8">
                             <p>{{ productDetails?.entityObjectTypeName }}</p>
                             <p>{{ productDetails?.code }}</p>
-                            <p>
+                            <p *ngIf="productDetails
+                            ?.entityDepartmentsNames.items.length >0">
                                 <span class="mr-2 p-2 border" *ngFor="
                                         let item of productDetails
                                             ?.entityDepartmentsNames.items
                                     ">{{ item }}</span>
                             </p>
-                            <p>{{ productDetails?.brand }}</p>
-                            <p>{{ productDetails?.soldOutDate }}</p>
-                            <p>{{ productDetails?.startShipDate }}</p>
+                            <p *ngIf="productDetails
+                            ?.entityDepartmentsNames.items.length  ==0">
+                              -
+                            </p>
+                            <p>{{ productDetails?.brand ? productDetails?.brand : '-' }}</p>
+                            <p>{{ productDetails?.soldOutDate ? productDetails?.soldOutDate : '-' }}</p>
+                            <p>{{ productDetails?.startShipDate ? productDetails?.startShipDate : '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -963,6 +977,7 @@ top: 4px;">
                         ></app-prodcut-card>
                       </div>
                     </div>
+                    <h6 *ngIf="relatedItems.length ==0" class="mx-auto">No items ...</h6>
                   </div>
                 </ng-container>
               
@@ -1188,7 +1203,8 @@ top: 4px;">
                                             </div>
                                         </div>
 
-
+                                        <p *ngIf="productBodyData?.appItem?.stockAvailability ==0 && productBodyData?.showWarningLabelMajorOutStockFlag">call the office for more information</p>
+                                        <p *ngIf="productBodyData?.appItem?.stockAvailability >0 && productBodyData?.showWarningLabelMajorOutStockFlag" class="text-success">In stock</p>
                                     </div>
                                 </div>
                             </div>
@@ -1337,7 +1353,11 @@ top: 4px;">
                                                     let i = index
                                                 ">
                                             <td>{{ size.label }}</td>
-                                            <td>{{ productBodyData?.showStockAvailability ? size.stockAvailability : '' }}</td>
+                                            <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability ==0 " class="text-danger">Out of stock</td>
+
+                                            <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability >=0 " class="text-success">In Stock</td>
+
+                                            <td *ngIf="!productBodyData?.showInOutStockFlag ">{{  size.stockAvailability  }}</td>
                                             <td>
                                                 <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal"
                                                     [showButtons]="true" inputId="minmax-buttons" [min]="0"
@@ -1458,9 +1478,11 @@ top: 4px;">
                                                             let i = index
                                                         ">
                                                     <td>{{ size.label }}</td>
-                                                    <td>
-                                                        {{ productBodyData?.showStockAvailability ? size.stockAvailability :'' }}
-                                                    </td>
+                                                    <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability ==0 " class="text-danger">Out of stock</td>
+
+                                                    <td *ngIf="productBodyData?.showInOutStockFlag && size.stockAvailability >=0 " class="text-success">In Stock</td>
+        
+                                                    <td *ngIf="!productBodyData?.showInOutStockFlag ">{{  size.stockAvailability  }}</td>
                                                     <td
                                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 

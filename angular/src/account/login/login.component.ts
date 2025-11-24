@@ -179,7 +179,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     chooseDefaultPage(callback: (url: string) => void): void {
         // this._appEntitiesServiceProxy.getHostSettingValue(1203).subscribe({
         //     next: res2 => {
-                let defaultUrl = '/app/main/marketplace';
+                let defaultUrl = '/app/main/dashboard';
 
                 // if (res2) {
                 //     const userNavigation = res2;

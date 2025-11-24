@@ -1004,7 +1004,7 @@ handleRefreshRating(event: boolean) {
 
 
 relatedTotal = 0;                 // from API totalCount
-pageSize = 5;
+pageSize = 11;
 loadingMore = false;
 
 

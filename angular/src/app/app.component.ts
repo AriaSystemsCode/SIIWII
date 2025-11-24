@@ -103,8 +103,8 @@ export class AppComponent extends AppComponentBase implements OnInit {
 
     this._appEntitiesServiceProxy.getHostSettingValue(1213).subscribe({
       next: res => {
-        const allowAnonymous = this.toBool(res);
-        // const allowAnonymous = false
+        // const allowAnonymous = this.toBool(res);
+        const allowAnonymous = true
 
         if (allowAnonymous) {
           //  if anonymous is allowed:
