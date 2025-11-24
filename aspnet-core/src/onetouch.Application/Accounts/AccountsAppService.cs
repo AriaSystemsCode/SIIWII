@@ -3008,7 +3008,7 @@ namespace onetouch.Accounts
             entity.EntityObjectTypeCode = partnerEntityObjectTypeCode;
             entity.Name = input.Name;
             entity.Notes = input.Notes;
-            if (input.TenantOwner!=null && input.Id==0)
+            if (input.TenantOwner!=null && input.Id !=null && input.Id == 0)
             entity.TenantOwner = long.Parse(input.TenantOwner.ToString());
             if (input.UseDTOTenant)
             {
