@@ -64,6 +64,7 @@ export class SycLandingPageSettingsComponent
             .getAllSliderSettings(SliderEnum.CallToAction, this.CTASliderCode)
             .subscribe((result) => {
                 this.cta.sycLangingPageSetting = result;
+         
             });
         this.subscriptions.push(subs);
     }
