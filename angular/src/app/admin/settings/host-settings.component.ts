@@ -115,6 +115,7 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
     }
 
     //i49-F6 get settings with values 
+    //i49-F6 If click on any place , don't show changes lose message
     async getSettingData() {
         this._appEntitiesServiceProxy.getCurrentHostEntityId().pipe(finalize(() => {
             this._appEntitiesServiceProxy.getAppEntityForEdit(this.hostEntityId).subscribe(result => {
