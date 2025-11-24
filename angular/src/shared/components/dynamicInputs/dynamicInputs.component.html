@@ -101,7 +101,7 @@
                             type="radio"
                             [name]="'extraAttr_' + extraAttr.name"
                             [id]="'extraAttr' + extraAttr.name + '_yes'"
-                            [value]="true"
+                            value="true"
                             [(ngModel)]="extraAttr.selectedValues"
                             (ngModelChange)="onAnyInputChange()"
                           />
@@ -113,7 +113,7 @@
                             type="radio"
                             [name]="'extraAttr_' + extraAttr.name"
                             [id]="'extraAttr' + extraAttr.name + '_no'"
-                            [value]="false"
+                            value="false"
                             [(ngModel)]="extraAttr.selectedValues"
                             (ngModelChange)="onAnyInputChange()"
                           />

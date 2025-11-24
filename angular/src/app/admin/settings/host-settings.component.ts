@@ -199,12 +199,12 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
 
         const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
       
-          //i49-F6 internal error
+         
             let appEntityDto : AppEntityDto=new AppEntityDto();
             appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
             appEntityDto.id= this.hostEntityId;
             appEntityDto.entityObjectTypeId=this.entityObjectTypeHostId;
-            appEntityDto.objectId= 1;
+            appEntityDto.objectId= 2;
             appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
             appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
               this._appEntitiesServiceProxy.saveEntity(appEntityDto)

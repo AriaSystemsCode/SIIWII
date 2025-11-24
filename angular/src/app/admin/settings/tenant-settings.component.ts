@@ -74,7 +74,6 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     this.getAppItemTypeExtraAttributesById()
   }
 
-  //i49-F6 get settings with values 
   getSettingData() {
     this._appEntitiesServiceProxy.getCurrentTenantEntityId().pipe(finalize(() => {
       this._appEntitiesServiceProxy.getAppEntityForEdit(this.tenantEntityId).subscribe(result => {
@@ -189,11 +188,12 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
     appEntityDto.id= this.tenantEntityId;
     appEntityDto.entityObjectTypeId=this.entityObjectTypeTenantId;
-    appEntityDto.objectId= 1;
+    appEntityDto.objectId= 2;
+    appEntityDto.tenantId=this.appSession.tenantId;
     appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
 
-    //i49-F6 internal error
+   
       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
         finalize(() => {
