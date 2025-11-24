@@ -170,7 +170,7 @@
                             (change)="setRecordValue(record, mapColumnNameToKey(column.name), $event.target.checked)" />
                         </div>
 
-                        <img *ngSwitchCase="'Image Preview'" [src]="record.previewUrl" width="50"  class="ml-3"/>
+                        <img *ngSwitchCase="'Image Preview'" [src]="record.previewUrl" width="50"  class="ml-4"/>
 
                         <!-- Text only -->
                         <span *ngSwitchCase="'Record Type'">{{ record.recordType || '—' }}</span>
@@ -498,7 +498,7 @@
                           </ng-container>
                           
                           <ng-template #fallback>
-                            <span #fallbackText class="ml-3">-</span>
+                            <span #fallbackText class="ml-4">-</span>
                           </ng-template>
                         </a>
                       </ng-container>
