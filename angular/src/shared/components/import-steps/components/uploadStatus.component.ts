@@ -1181,7 +1181,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   };
 
   exampleTextsForCreateNewItemColor: { [key: string]: string } = {
-    'Parent Code': 'Example: SAM001',
+    'Parent Code': 'Example: SAM001', 
     'Code': 'Example: SAM001 - BLK',
     'Price Currency Code': 'Example: USD , GBP',
     'Color Code': 'Example: BLK|BLU|',
@@ -1237,11 +1237,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Size Scale Name',
     'Scale Sizes Order',
     'Color Code',
-    'Color Name',
-    'Size Scale Name',
-    'Scale Sizes Order',
-    'Dimension 1 sizes',
-    'Dimension 1 Name'
+    'Color Name'
   ];
 
   requiredColumnsForCreateNewColorLookup: string[] = [
