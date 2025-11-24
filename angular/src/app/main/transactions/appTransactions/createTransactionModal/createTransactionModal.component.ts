@@ -746,10 +746,15 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         buyerBranchName: this.isBuyerTempAccount ? this.orderForm.controls['buyerBranchName']?.setValue('Main') : this.orderForm.controls['buyerCompanyBranch']?.value?.name,
                         sellerBranchSSIN: this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
-                        completeDate: moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
-                        enteredDate: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
-                        startDate: moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
-                        availableDate: moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
+                        // completeDate: moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
+                        // enteredDate: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
+                        // startDate: moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
+                        // availableDate: moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
+                        completeDate:  this.formatDateEn(this.orderForm.controls['completeDate']?.value),
+                        enteredDate:   this.formatDateEn(this.orderForm.controls['enteredDate']?.value),
+                        startDate:     this.formatDateEn(this.orderForm.controls['startDate']?.value),
+                        availableDate: this.formatDateEn(this.orderForm.controls['availableDate']?.value),
+
                         reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
                         priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "MSRP",
                         currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : this.appSession.tenant.currencyInfoDto.value
@@ -1163,4 +1168,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     }
 
 
+    private formatDateEn(value: any): string | null {
+        if (!value) { return null; }
+        return moment(value).locale('en').format('YYYY-MM-DD')
+      }
+      
 }
