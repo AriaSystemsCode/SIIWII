@@ -27,6 +27,7 @@ import {
     CurrencyInfoDto,
     AppEntitiesServiceProxy,
     CreateOrEditAccountInfoDto,
+
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
@@ -133,6 +134,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     primeDateFormat = 'mm/dd/yy'; // default
     languageSettingName  =AppConsts.languageSettingName;
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -141,6 +144,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         private userClickService: UserClickService,
         private router: Router,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+
     ) {
         super(injector);
         this.initForm()
@@ -1130,7 +1134,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.minDate = new Date();
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
 
     }
 

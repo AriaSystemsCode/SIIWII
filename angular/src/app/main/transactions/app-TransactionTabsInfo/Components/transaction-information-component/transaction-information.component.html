@@ -242,10 +242,10 @@
 
             </div>
             <div class="row h-100 m-3 web" *ngIf="!onshare">
-                <div class="col-8 p-0">
+                <div class="col-8 p-0 ">
 
                     <h1 class="mb-4 purpleColor"> {{appTransactionsForViewDto?.name}} </h1>
-                    <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex">
+                    <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex" [ngClass]="isArabic ? 'rtl-arr-acc':'ltr-arr-acc'">
                         <!-- order information tab -->
 
                         <!-- [ngClass]="{'shoppingCartAccordionNotValidTab':!orderInfoValid}" -->

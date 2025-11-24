@@ -21,19 +21,18 @@
 
 @media (min-width: 1024px) {
 
-    .rightList {
-        position: absolute;
-        right: 0%;
-        top: 0;
+.rightList {
+    position: absolute;
+    right: 0%;
+    top: 0;
 
-    }
+}
+.leftList {
+    position: absolute;
+    left: 0%;
+    top: 0;
 
-    .leftList {
-        position: absolute;
-        left: 0%;
-        top: 0;
-
-    }
+}
 
 }
 
@@ -104,6 +103,7 @@
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
 
+   
     }
 }
 
@@ -139,6 +139,11 @@
         left: 30px;
     }
 
+    .leftList {
+        position: absolute;
+left: 30px;
+    }
+
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
         right: -35% !important;
@@ -168,6 +173,11 @@
     .leftList {
         position: absolute;
         left: 30px;
+    }
+
+    .leftList {
+        position: absolute;
+left: 30px;
     }
 
     .navbar-nav {
@@ -366,6 +376,18 @@
 
     }
 }
+    @media (min-width: 567px) {
+
+        .ltr-navbar {
+            margin-left: 75px !important;
+          
+        }
+
+        .rtl-navbar {
+            margin-right: 75px !important;
+          
+        }
+        }
 
 
 

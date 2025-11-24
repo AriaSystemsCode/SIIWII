@@ -5,7 +5,7 @@ import { UrlHelper } from '@shared/helpers/UrlHelper';
 import { DOCUMENT } from '@angular/common';
 import { OffcanvasOptions } from '@metronic/app/core/_base/layout/directives/offcanvas.directive';
 import { AppConsts } from '@shared/AppConsts';
-import { AccountsServiceProxy} from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, LanguageServiceProxy} from '@shared/service-proxies/service-proxies';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -44,18 +44,23 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     tenantLogo:any;
 
   
+    currentLang:string
+    isArabic:boolean 
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _router:Router,
         private _appNavigationService: AppNavigationService,
+
     ) {
         super(injector);
         this.subscribeToMarketPlace()
     }
 
     ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
@@ -122,4 +127,5 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     }
 
  
+
 }

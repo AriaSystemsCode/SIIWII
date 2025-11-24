@@ -1,6 +1,9 @@
 ...<!-- Navbar -->
-<nav class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
-    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }" [ngClass]="isArabic?'rtl-navbar':'ltr-navbar'">
+<nav
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
+    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }" [ngClass]="isArabic?'rtl-navbar':'ltr-navbar'"
+  
+>
     <!-- Container wrapper -->
     <div class="container ml-0  position-lg-static " [ngClass]="isArabic ? '':'position-md-absolute'">
         <!-- Navbar brand -->
@@ -90,8 +93,7 @@
         </a>
 
         <!-- Collapsible wrapper -->
-        <div class="ml-4 d-sm-flex d-none " style="justify-content: center;margin-left: 35px;"
-            [ngClass]="isArabic ? 'rt-sec-section':'sec-section'">
+        <div class="ml-4 d-sm-flex d-none " style="justify-content: center;margin-left: 35px;" [ngClass]="isArabic ? 'rt-sec-section':'sec-section'">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">

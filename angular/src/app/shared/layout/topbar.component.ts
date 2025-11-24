@@ -24,6 +24,7 @@ import {
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
     AccountsServiceProxy,
+    LanguageServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -90,11 +91,11 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     transactionType: string = "";
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     currencySymbol: string = "";
-    visible: boolean = false;
-    displaneSel: boolean = false;
-    displaneBuy: boolean = false;
-    currentLang: string
-    isArabic: boolean
+    visible:boolean =false;
+    displaneSel :boolean =false;
+    displaneBuy :boolean =false;
+    currentLang:string
+    isArabic:boolean 
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -217,6 +218,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         });
         this.getBelowBar();
     }
+
+
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
