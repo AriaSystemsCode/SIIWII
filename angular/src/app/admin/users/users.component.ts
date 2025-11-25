@@ -270,4 +270,16 @@ export class UsersComponent extends AppComponentBase implements OnInit,AfterView
                 );
             });
     }
+    disconnectUserFromTeamMember(user: UserListDto){
+
+        this._userServiceProxy
+        .disconnectUserFromTeamMember(user.id)
+        .subscribe((result) => {
+            if(result){
+                user.memberId=0;
+                this.notify.success("Disconnect The User "+ user.userName )
+            }
+        });
+
+    }
 }
