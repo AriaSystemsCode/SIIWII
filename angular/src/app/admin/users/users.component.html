@@ -208,6 +208,10 @@
                                                         <a href="javascript:;"
                                                             (click)="ViewProfile(record)">{{'ViewProfile' | localize}}</a>
                                                     </li>
+                                                    <li *ngIf="record.memberId != 0">
+                                                        <a href="javascript:;"
+                                                            (click)="disconnectUserFromTeamMember(record)">{{'Disconnect' | localize}}</a>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>

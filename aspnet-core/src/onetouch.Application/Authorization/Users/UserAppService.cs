@@ -183,7 +183,26 @@ namespace onetouch.Authorization.Users
 
             }
         }
-
+        //P-SII-20251124.0004 - Contact - Disconnect user from Team member within Users screen MMT 11/25/2025[Start]
+        public async Task<bool> DisconnectUserFromTeamMember(long input)
+        {
+            bool returnValue = false;
+            if (input != 0)
+            {
+              var relatedContactExtraData = await _appEntityExtraDataRepository.GetAll()
+                 .Where(z=> z.EntityFk.TenantId== AbpSession.TenantId &&
+                                z.AttributeId == 715 && z.AttributeValue== input.ToString()).FirstOrDefaultAsync();
+                if (relatedContactExtraData != null)
+                {
+                    relatedContactExtraData.AttributeValue = "";
+                    await _appEntityExtraDataRepository.UpdateAsync(relatedContactExtraData);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    returnValue = true;
+                }
+            }
+            return returnValue;
+        }
+        //P-SII-20251124.0004 - Contact - Disconnect user from Team member within Users screen MMT 11/25/2025[End]
         public async Task<FileDto> GetUsersToExcel(GetUsersToExcelInput input)
         {
             var query = GetUsersFilteredQuery(input);
