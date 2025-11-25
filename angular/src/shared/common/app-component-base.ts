@@ -257,9 +257,12 @@ export abstract class AppComponentBase {
         uploader.onAfterAddingFile = (file) => {
             file.withCredentials = false;
         };
+
         uploader.onCompleteAll = () => {
             this.notify.info(this.l("UploadSuccessfully"));
         };
+        
+
         const uploaderOptions: Partial<FileUploaderOptions> = {};
         uploaderOptions.authToken = "Bearer " + this.tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
