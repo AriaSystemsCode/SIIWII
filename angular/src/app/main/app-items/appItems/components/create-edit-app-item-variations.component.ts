@@ -2260,7 +2260,7 @@ export class CreateEditAppItemVariationsComponent
             this.createOreEditAppEntityModal.show(entityObjectType, appEntity, false)
     }
 
-    onAddNonLookupValues($event: AppEntityDto) {
+    
     onAddNonLookupValues($event: AppEntityDto) {
         this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
           .subscribe((nonLookupValues: LookupLabelDto) => {
