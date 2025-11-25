@@ -1204,8 +1204,7 @@ export class MainImportComponent
     }
 
     private mapRecordToImportItemInputDto(record: any): ImportItemInputDto {
-        if(record?.excelDto?.name)
-         record.excelDto.name= record?.name;
+         record.excelDto.name= record?.name; 
 
         const dto = record?.excelDto;
         const ret = new ImportItemInputDto();
