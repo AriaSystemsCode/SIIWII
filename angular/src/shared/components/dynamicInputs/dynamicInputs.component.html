@@ -77,23 +77,24 @@
                         <div class="flex-grow-1"
                         *ngIf="extraAttr.dataType === 'boolean'  || extraAttr.dataType === 'Boolean' || extraAttr.dataType === 'bit'">
                      <div class="radio-inline mt-2">
-                       <ng-container *ngIf="extraAttr.validEntries?.trim(); else yesNoBlock">
-                         <label
-                           class="radio radio-accent radio-primary mr-4"
-                           *ngFor="let option of extraAttr.validEntries.split('|')"
-                           [for]="'extraAttr' + extraAttr.name + '_' + option.trim()"
-                         >
-                           <input
-                             (ngModelChange)="onAnyInputChange()"
-                             type="radio"
-                             [name]="'extraAttr_' + extraAttr.name"
-                             [id]="'extraAttr' + extraAttr.name + '_' + option.trim()"
-                             [value]="option.trim()"
-                             [(ngModel)]="extraAttr.selectedValues"
-                           />
-                           {{ option.trim() }}
-                         </label>
-                       </ng-container>
+                      <ng-container *ngIf="extraAttr.validEntries?.trim(); else yesNoBlock">
+                        <label
+                          class="radio radio-accent radio-primary mr-4"
+                          *ngFor="let option of extraAttr.validEntries.split('|')"
+                          [for]="'extraAttr_' + getSafeString(extraAttr.name) + '_' + getSafeString(option)"
+                        >
+                          <input
+                            type="radio"
+                            [name]="'extraAttr_' + getSafeString(extraAttr.name)"
+                            [id]="'extraAttr_' + getSafeString(extraAttr.name) + '_' + getSafeString(option)"
+                            [value]="option"
+                            [(ngModel)]="extraAttr.selectedValues"
+                            (ngModelChange)="onAnyInputChange()"
+                          />
+                          {{ option }}
+                        </label>
+                      </ng-container>
+                      
                    
                        <ng-template #yesNoBlock>
                         <label class="radio radio-accent radio-primary mr-4" [for]="'extraAttr' + extraAttr.name + '_yes'">
@@ -176,7 +177,7 @@
     <!-- Preview -->
     <div class="uploaded-preview mt-2 d-flex align-items-center">
       <i class="pi pi-check-circle text-success me-2" style="color: #4A0D4A !important;"></i>
-      <span class="mr-2">{{ extraAttr?.selectedValues?.name?.split('|')[0] }}</span>
+      <span class="mr-2">{{ extraAttr?.selectedValues?.name?.split('|')[0]  ? extraAttr?.selectedValues?.name?.split('|')[0]  :extraAttr?.selectedValues?.split('|')[0]  }}</span>
       <i class="pi pi-times text-danger" 
          style="cursor: pointer;" 
          (click)="clearExtraAttr(extraAttr)"></i>

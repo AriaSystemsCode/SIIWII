@@ -447,7 +447,10 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
                 if (attr.isLookup) {
                     dto.attributeValueId = attr.value;
                 } else {
-                    dto.attributeValue = attr.value;
+                    if (attr.value && attr.value.type?.startsWith('image/'))
+                        dto.attributeValue = attr.value.name;
+                      else 
+                        dto.attributeValue = attr.value;
                 }
                 return dto;
             }
