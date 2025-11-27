@@ -33,7 +33,7 @@ export class FooterComponent extends AppComponentBase implements OnInit {
 
     this._AppEntitiesServiceProxy.getHostSettingValue(1209)
       .subscribe((result) => {
-        this.tenantFooterText = 'fooooter'
+        this.tenantFooterText = result
       });
   }
 }

@@ -280,6 +280,7 @@ export class MarketplaceViewProductComponent
             if (this.isAuthenticated) {
               // Fetch current active transaction first
               this._AppTransactionServiceProxy.getCurrentUserActiveTransaction().subscribe((res: ShoppingCartSummary) => {
+                
                 if (res?.orderType == TransactionType.SalesOrder) this.orderType = 'SO';
                 else if (res?.orderType == TransactionType.PurchaseOrder) this.orderType = 'PO';
           
@@ -1002,9 +1003,20 @@ handleRefreshRating(event: boolean) {
 }
 
 
+hasColorStock(color: any): boolean {
+    if (!color || !color.sizes || !color.sizes.length) {
+      return false;
+    }
+  
+ 
+    return color.sizes.some((s: any) =>
+      (s.stockAvailability ?? 0) > 0 || (s.noOfAvailablePrepacks ?? 0) > 0
+    );
+  }
+  
 
 relatedTotal = 0;                 // from API totalCount
-pageSize = 5;
+pageSize = 11;
 loadingMore = false;
 
 

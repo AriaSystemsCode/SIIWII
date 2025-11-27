@@ -5,6 +5,14 @@
         <a>{{s?.name}}</a>
      
      </div>
+     <button class="btn btn-sm btn-light mt-3"
+     (click)="contactUsModal.show()">
+Contact us
+</button>
+
     </div>
+
+
+    <app-contact-us-modal #contactUsModal></app-contact-us-modal>
 
 <!-- </div>    -->

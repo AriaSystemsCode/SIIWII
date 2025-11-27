@@ -85,7 +85,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         }
 
         // ✅ Handle Numeric input
-        if (attr.dataType === 'Numeric' || attr.dataType === 'boolean' || attr.dataType === 'bit' || attr.dataType === 'color') {
+        if (attr.dataType === 'Numeric' || attr.dataType === 'boolean' || attr.dataType === 'Boolean'|| attr.dataType === 'bit' || attr.dataType === 'color') {
           if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
             formattedValue = '';
           }
@@ -122,6 +122,17 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     this.extraDataChanged.emit(this.selectedExtraData);
   }
 
+  reset(extraAttr: any) {
+    if (extraAttr.acceptMultipleValues) {
+      extraAttr.selectedValues = [];
+    } else {
+      extraAttr.selectedValues = '';
+    }
+  
+    this.onAnyInputChange();
+  }
+  
+  
 
   themes =[] ; 
     selectedTheme: any ;
@@ -270,7 +281,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       const extension = file.name.substring(dotIndex);   
       const guid = this.guid();
   
-      const newFileName = `${baseName}${extension}|${guid}${extension}`;
+      const newFileName = `${baseName}${extension}|${guid}`;
        const newFile = new File([file], newFileName , { type: file.type });
        extraAttr.selectedValues = newFile;    
        extraAttr.showUploadBtn =true;   
@@ -328,4 +339,6 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
           uploader.setOptions(uploaderOptions as FileUploaderOptions);
           return uploader;
       }
+      getSafeString = (str: string) => str.replace(/\s+/g, '_');
+
 }

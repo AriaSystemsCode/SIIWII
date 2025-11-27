@@ -114,7 +114,6 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         // this.initUploaders();
     }
 
-    //i49-F6 get settings with values 
     async getSettingData() {
         this._appEntitiesServiceProxy.getCurrentHostEntityId().pipe(finalize(() => {
             this._appEntitiesServiceProxy.getAppEntityForEdit(this.hostEntityId).subscribe(result => {
@@ -199,12 +198,12 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
 
         const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
       
-          //i49-F6 internal error
+         
             let appEntityDto : AppEntityDto=new AppEntityDto();
             appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
             appEntityDto.id= this.hostEntityId;
             appEntityDto.entityObjectTypeId=this.entityObjectTypeHostId;
-            appEntityDto.objectId= 1;
+            appEntityDto.objectId= 2;
             appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
             appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
               this._appEntitiesServiceProxy.saveEntity(appEntityDto)
@@ -446,7 +445,10 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
                 if (attr.isLookup) {
                     dto.attributeValueId = attr.value;
                 } else {
-                    dto.attributeValue = attr.value;
+                    if (attr.value && attr.value.type?.startsWith('image/'))
+                        dto.attributeValue = attr.value.name;
+                      else 
+                        dto.attributeValue = attr.value;
                 }
                 return dto;
             }

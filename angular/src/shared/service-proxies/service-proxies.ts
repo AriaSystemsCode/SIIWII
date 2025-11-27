@@ -79906,6 +79906,8 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
     sellerMarketPlaceAccountId!: number;
     showMSRP!: string | undefined;
     showStockAvailability!: string | undefined;
+    showInOutStockFlag!: string | undefined;
+    showWarningLabelMajorOutStockFlag!: string | undefined;
 
     [key: string]: any;
 
@@ -79932,6 +79934,8 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
             this.sellerMarketPlaceAccountId = _data["sellerMarketPlaceAccountId"];
             this.showMSRP = _data["showMSRP"];
             this.showStockAvailability = _data["showStockAvailability"];
+            this.showInOutStockFlag = _data["showInOutStockFlag"];
+            this.showWarningLabelMajorOutStockFlag = _data["showWarningLabelMajorOutStockFlag"];
         }
     }
 
@@ -79956,6 +79960,8 @@ export class GetAppMarketplaceItemDetailForViewDto implements IGetAppMarketplace
         data["sellerMarketPlaceAccountId"] = this.sellerMarketPlaceAccountId;
         data["showMSRP"] = this.showMSRP;
         data["showStockAvailability"] = this.showStockAvailability;
+        data["showInOutStockFlag"] = this.showInOutStockFlag;
+        data["showWarningLabelMajorOutStockFlag"] = this.showWarningLabelMajorOutStockFlag;
         return data;
     }
 }
@@ -79969,6 +79975,8 @@ export interface IGetAppMarketplaceItemDetailForViewDto {
     sellerMarketPlaceAccountId: number;
     showMSRP: string | undefined;
     showStockAvailability: string | undefined;
+    showInOutStockFlag: string | undefined;
+    showWarningLabelMajorOutStockFlag: string | undefined;
 
     [key: string]: any;
 }

@@ -20,6 +20,7 @@ import { LandingPageCarusalWithCallToActionComponent } from "./components/landin
 import { MarketplaceLandingPageComponent } from "./components/marketplace-landing-page/marketplace-landing-page.component";
 import { LandingPageRoutingModule } from "./landingPage-routing.module";
 import { LandingPageMultiRowCallToActionComponent } from "./components/landing-page-multi-row-callToAction/landing-page-multi-row-callToAction.component";
+import { ContactUsModalComponent } from "./components/contact-us-modal/contact-us-modal.component";
 
 
 
@@ -33,7 +34,8 @@ import { LandingPageMultiRowCallToActionComponent } from "./components/landing-p
         LandingPageSinglrRowCallActionComponent,
         LandingPageSliderWithoutCallToActionComponent,
         LandingPageCarusalWithCallToActionComponent,
-        LandingPageMultiRowCallToActionComponent
+        LandingPageMultiRowCallToActionComponent,
+        ContactUsModalComponent
 
     ],
     imports: [
@@ -51,6 +53,6 @@ import { LandingPageMultiRowCallToActionComponent } from "./components/landing-p
         InteractionsModule,
         MarketplaceProductsModule
     ],
-    exports: [MarketplaceLandingPageComponent, LandingPageSliderWithCallToActionComponent,FooterPageLinkComponent,FooterSocialMediaComponent,LandingPageSinglrRowCallActionComponent,LandingPageSliderWithoutCallToActionComponent,LandingPageCarusalWithCallToActionComponent,LandingPageMultiRowCallToActionComponent],
+    exports: [MarketplaceLandingPageComponent, LandingPageSliderWithCallToActionComponent,FooterPageLinkComponent,FooterSocialMediaComponent,LandingPageSinglrRowCallActionComponent,LandingPageSliderWithoutCallToActionComponent,LandingPageCarusalWithCallToActionComponent,LandingPageMultiRowCallToActionComponent,ContactUsModalComponent],
 })
 export class LandingPageModule {}

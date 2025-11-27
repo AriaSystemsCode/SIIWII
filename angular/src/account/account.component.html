@@ -9,7 +9,8 @@
                                 <img class="main-logo-image" *ngIf="!appSession.tenant || !appSession.tenant.logoId" [src]="appRootUrl() + 'assets/common/images/app-logo-on-dark.svg'" alt="logo" height="38" />
                                 <img class="main-logo-image" *ngIf="appSession.tenant && appSession.tenant.logoId" [src]="remoteServiceBaseUrl + '/TenantCustomization/GetTenantLogo?skin=light&tenantId=' + appSession.tenant.id + '&id=' + appSession.tenant.logoId" alt="logo" height="38" />
                             </a>
-                            <img class="main-logo-image-text" [src]="tenantWordLogo ? tenantWordLogo : appRootUrl() + 'assets/common/images/app-logo-text-on-light.svg'" alt="logo" height="38" />
+
+                            <img class="main-logo-image-text" [src]="tenantWordLogo ? attachmentBaseUrl + '/' +  tenantWordLogo : appRootUrl() + 'assets/common/images/app-logo-text-on-light.svg'" alt="logo" height="38" />
                         </div>
                         <h4 class="kt-login__subtitle">{{ tenantText }}</h4>
                     </div>
