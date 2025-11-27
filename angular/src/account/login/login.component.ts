@@ -177,24 +177,24 @@ export class LoginComponent extends AppComponentBase implements OnInit {
      * then return it via callback so login() can pass it to authenticate().
      */
     chooseDefaultPage(callback: (url: string) => void): void {
-        // this._appEntitiesServiceProxy.getHostSettingValue(1203).subscribe({
-        //     next: res2 => {
-                let defaultUrl = '/app/main/dashboard';
+        this._appEntitiesServiceProxy.getHostSettingValue(1203).subscribe({
+            next: res2 => {
+                let defaultUrl = '/app/main/Home';
 
-                // if (res2) {
-                //     const userNavigation = res2;
-                //     defaultUrl = userNavigation
-                //         ? '/app/main/marketplace'
-                //         : '/app/main/dashboard';
-                // }
+                if (res2) {
+                    // const userNavigation = res2;
+                    defaultUrl = res2 == 'Marketplace Landing page'
+                        ? '/app/main/marketplace'
+                        : '/app/main/Home';
+                }
 
                 callback(defaultUrl);
-        //     },
-        //     error: err2 => {
-        //         console.error('Failed to load host setting 1203', err2);
+            },
+            error: err2 => {
+                console.error('Failed to load host setting 1203', err2);
 
-        //         callback('/app/main/dashboard');
-        //     }
-        // });
+                callback('/app/main/dashboard');
+            }
+        });
     }
 }
