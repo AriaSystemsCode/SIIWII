@@ -8873,14 +8873,17 @@ export class AppEntitiesServiceProxy {
 
     /**
      * @param settingId (optional) 
+     * @param type (optional) 
      * @return Success
      */
-    getHostSettingValue(settingId: number | undefined): Observable<string> {
+    getHostSettingValue(settingId: number | undefined, type: string | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetHostSettingValue?";
         if (settingId === null)
             throw new Error("The parameter 'settingId' cannot be null.");
         else if (settingId !== undefined)
             url_ += "settingId=" + encodeURIComponent("" + settingId) + "&";
+        if (type !== undefined && type !== null)
+            url_ += "type=" + encodeURIComponent("" + type) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -8930,14 +8933,17 @@ export class AppEntitiesServiceProxy {
 
     /**
      * @param settingId (optional) 
+     * @param type (optional) 
      * @return Success
      */
-    getTenantSettingValue(settingId: number | undefined): Observable<string> {
+    getTenantSettingValue(settingId: number | undefined, type: string | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetTenantSettingValue?";
         if (settingId === null)
             throw new Error("The parameter 'settingId' cannot be null.");
         else if (settingId !== undefined)
             url_ += "settingId=" + encodeURIComponent("" + settingId) + "&";
+        if (type !== undefined && type !== null)
+            url_ += "type=" + encodeURIComponent("" + type) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

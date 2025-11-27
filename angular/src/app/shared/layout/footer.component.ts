@@ -31,7 +31,7 @@ export class FooterComponent extends AppComponentBase implements OnInit {
   getTenantData() {
 
 
-    this._AppEntitiesServiceProxy.getHostSettingValue(1209)
+    this._AppEntitiesServiceProxy.getHostSettingValue(1209,null)
       .subscribe((result) => {
         this.tenantFooterText = result
       });

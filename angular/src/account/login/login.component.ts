@@ -177,7 +177,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
      * then return it via callback so login() can pass it to authenticate().
      */
     chooseDefaultPage(callback: (url: string) => void): void {
-        this._appEntitiesServiceProxy.getHostSettingValue(1203).subscribe({
+        this._appEntitiesServiceProxy.getHostSettingValue(1203,null).subscribe({
             next: res2 => {
                 let defaultUrl = '/app/main/Home';
 

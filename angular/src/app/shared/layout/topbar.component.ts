@@ -512,17 +512,17 @@ export class TopBarComponent
       
       getTenantData() {
        
-        this._AppEntitiesServiceProxy.getHostSettingValue(1208)
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208,null)
         .subscribe((result) => {
             // result = '#456'
             result ? this.bgCol = result : this.bgCol = '#4A0D4A'
     
         });
-        this._AppEntitiesServiceProxy.getHostSettingValue(1206)
+        this._AppEntitiesServiceProxy.getHostSettingValue(1206,"file")
         .subscribe((result) => {
-            const str = result
-            const after = str.split("|")[1];
-           this.tenantLogo = after
+            // const str = result
+            // const after = str.split("|")[1];
+           this.tenantLogo = result
            console.log(this.tenantLogo,'logo')
         });
     }
