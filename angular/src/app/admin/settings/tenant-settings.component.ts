@@ -193,6 +193,10 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
 
+    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+    .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
+    .filter(index => index !== -1);
+    
    
       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
