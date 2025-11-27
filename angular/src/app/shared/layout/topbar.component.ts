@@ -520,7 +520,9 @@ export class TopBarComponent
         });
         this._AppEntitiesServiceProxy.getHostSettingValue(1206)
         .subscribe((result) => {
-           this.tenantLogo = result
+            const str = result
+            const after = str.split("|")[1];
+           this.tenantLogo = after
         });
     }
 

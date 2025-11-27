@@ -89,8 +89,14 @@ export class AccountComponent extends AppComponentBase implements OnInit {
     getTenantData() {
         this._appEntitiesServiceProxy.getHostSettingValue(1204)
         .subscribe((result) => {
-           this.tenantWordLogo = result
-           console.log(this.tenantWordLogo,'logo')
+            const str = result
+            const after = str.split("|")[1];
+            const before = str.split("|")[0];
+
+
+           this.tenantWordLogo = after
+           console.log(after,'logo')
+      
         });
         this._appEntitiesServiceProxy.getHostSettingValue(1205)
         .subscribe((result) => {
@@ -98,7 +104,9 @@ export class AccountComponent extends AppComponentBase implements OnInit {
         });
         this._appEntitiesServiceProxy.getHostSettingValue(1206)
         .subscribe((result) => {
-           this.tenantLogo = result
+            const str = result
+            const after = str.split("|")[1];
+           this.tenantLogo = after
         });
     }
 }
