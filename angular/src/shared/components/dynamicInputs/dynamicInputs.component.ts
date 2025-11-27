@@ -122,6 +122,17 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     this.extraDataChanged.emit(this.selectedExtraData);
   }
 
+  reset(extraAttr: any) {
+    if (extraAttr.acceptMultipleValues) {
+      extraAttr.selectedValues = [];
+    } else {
+      extraAttr.selectedValues = '';
+    }
+  
+    this.onAnyInputChange();
+  }
+  
+  
 
   themes =[] ; 
     selectedTheme: any ;
