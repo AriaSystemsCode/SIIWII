@@ -40,6 +40,7 @@ namespace onetouch.AppEntities.Dtos
         public virtual IList<AppEntityAttachmentDto> EntityAttachments { get; set; }
 
         public IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
+        public IList<int> ExtraDataFileTypeIndex { get; set; }
 
         public virtual IList<AppEntitiesRelationshipDto> EntitiesRelationships { get; set; }
 

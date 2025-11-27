@@ -1246,6 +1246,17 @@ namespace onetouch.AppEntities
                         }
                     }
                 }
+                //Iteration49 save extra data images to attachments
+                #region Iteration49 save extra data images to attachments
+                if (input.ExtraDataFileTypeIndex != null && input.ExtraDataFileTypeIndex.Count() > 0)
+                {
+                    foreach (var e in input.ExtraDataFileTypeIndex)
+                    {
+                        if (!string.IsNullOrEmpty(input.EntityExtraData[e].AttributeValue) && input.EntityExtraData[e].AttributeValue.Contains('|'))
+                        { MoveFile(input.EntityExtraData[e].AttributeValue.Split('|')[1], AbpSession.TenantId, AbpSession.TenantId); }
+                    }
+                }
+                #endregion Iteration49 save extra data images to attachments
 
                 //delete removed attachments not in the input attachments
                 if (entity.Id != 0 && input.EntityAttachments != null)
