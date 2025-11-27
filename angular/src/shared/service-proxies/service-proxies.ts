@@ -8873,14 +8873,17 @@ export class AppEntitiesServiceProxy {
 
     /**
      * @param settingId (optional) 
+     * @param type (optional) 
      * @return Success
      */
-    getHostSettingValue(settingId: number | undefined): Observable<string> {
+    getHostSettingValue(settingId: number | undefined, type: string | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetHostSettingValue?";
         if (settingId === null)
             throw new Error("The parameter 'settingId' cannot be null.");
         else if (settingId !== undefined)
             url_ += "settingId=" + encodeURIComponent("" + settingId) + "&";
+        if (type !== undefined && type !== null)
+            url_ += "type=" + encodeURIComponent("" + type) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -8930,14 +8933,17 @@ export class AppEntitiesServiceProxy {
 
     /**
      * @param settingId (optional) 
+     * @param type (optional) 
      * @return Success
      */
-    getTenantSettingValue(settingId: number | undefined): Observable<string> {
+    getTenantSettingValue(settingId: number | undefined, type: string | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetTenantSettingValue?";
         if (settingId === null)
             throw new Error("The parameter 'settingId' cannot be null.");
         else if (settingId !== undefined)
             url_ += "settingId=" + encodeURIComponent("" + settingId) + "&";
+        if (type !== undefined && type !== null)
+            url_ += "type=" + encodeURIComponent("" + type) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -68869,6 +68875,7 @@ export class AppEntityDto implements IAppEntityDto {
     entityClassifications!: AppEntityClassificationDto[] | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex!: number[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes!: AppEntityTypes;
@@ -68936,6 +68943,11 @@ export class AppEntityDto implements IAppEntityDto {
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
                     this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
+            if (Array.isArray(_data["extraDataFileTypeIndex"])) {
+                this.extraDataFileTypeIndex = [] as any;
+                for (let item of _data["extraDataFileTypeIndex"])
+                    this.extraDataFileTypeIndex!.push(item);
             }
             if (Array.isArray(_data["entitiesRelationships"])) {
                 this.entitiesRelationships = [] as any;
@@ -69011,6 +69023,11 @@ export class AppEntityDto implements IAppEntityDto {
             for (let item of this.entityExtraData)
                 data["entityExtraData"].push(item.toJSON());
         }
+        if (Array.isArray(this.extraDataFileTypeIndex)) {
+            data["extraDataFileTypeIndex"] = [];
+            for (let item of this.extraDataFileTypeIndex)
+                data["extraDataFileTypeIndex"].push(item);
+        }
         if (Array.isArray(this.entitiesRelationships)) {
             data["entitiesRelationships"] = [];
             for (let item of this.entitiesRelationships)
@@ -69050,6 +69067,7 @@ export interface IAppEntityDto {
     entityClassifications: AppEntityClassificationDto[] | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex: number[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes: AppEntityTypes;
@@ -84914,6 +84932,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     entityClassifications!: AppEntityClassificationDto[] | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex!: number[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes!: AppEntityTypes;
@@ -85062,6 +85081,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
                     this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
+            if (Array.isArray(_data["extraDataFileTypeIndex"])) {
+                this.extraDataFileTypeIndex = [] as any;
+                for (let item of _data["extraDataFileTypeIndex"])
+                    this.extraDataFileTypeIndex!.push(item);
             }
             if (Array.isArray(_data["entitiesRelationships"])) {
                 this.entitiesRelationships = [] as any;
@@ -85218,6 +85242,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             for (let item of this.entityExtraData)
                 data["entityExtraData"].push(item.toJSON());
         }
+        if (Array.isArray(this.extraDataFileTypeIndex)) {
+            data["extraDataFileTypeIndex"] = [];
+            for (let item of this.extraDataFileTypeIndex)
+                data["extraDataFileTypeIndex"].push(item);
+        }
         if (Array.isArray(this.entitiesRelationships)) {
             data["entitiesRelationships"] = [];
             for (let item of this.entitiesRelationships)
@@ -85322,6 +85351,7 @@ export interface IGetAppTransactionsForViewDto {
     entityClassifications: AppEntityClassificationDto[] | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex: number[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes: AppEntityTypes;
@@ -85397,6 +85427,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     entityClassifications!: AppEntityClassificationDto[] | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex!: number[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes!: AppEntityTypes;
@@ -85516,6 +85547,11 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
                     this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
+            if (Array.isArray(_data["extraDataFileTypeIndex"])) {
+                this.extraDataFileTypeIndex = [] as any;
+                for (let item of _data["extraDataFileTypeIndex"])
+                    this.extraDataFileTypeIndex!.push(item);
             }
             if (Array.isArray(_data["entitiesRelationships"])) {
                 this.entitiesRelationships = [] as any;
@@ -85643,6 +85679,11 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             for (let item of this.entityExtraData)
                 data["entityExtraData"].push(item.toJSON());
         }
+        if (Array.isArray(this.extraDataFileTypeIndex)) {
+            data["extraDataFileTypeIndex"] = [];
+            for (let item of this.extraDataFileTypeIndex)
+                data["extraDataFileTypeIndex"].push(item);
+        }
         if (Array.isArray(this.entitiesRelationships)) {
             data["entitiesRelationships"] = [];
             for (let item of this.entitiesRelationships)
@@ -85726,6 +85767,7 @@ export interface ICreateOrEditAppTransactionsDto {
     entityClassifications: AppEntityClassificationDto[] | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex: number[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes: AppEntityTypes;
@@ -86027,6 +86069,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     entityClassifications!: AppEntityClassificationDto[] | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex!: number[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes!: AppEntityTypes;
@@ -86184,6 +86227,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
                     this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
+            if (Array.isArray(_data["extraDataFileTypeIndex"])) {
+                this.extraDataFileTypeIndex = [] as any;
+                for (let item of _data["extraDataFileTypeIndex"])
+                    this.extraDataFileTypeIndex!.push(item);
             }
             if (Array.isArray(_data["entitiesRelationships"])) {
                 this.entitiesRelationships = [] as any;
@@ -86349,6 +86397,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             for (let item of this.entityExtraData)
                 data["entityExtraData"].push(item.toJSON());
         }
+        if (Array.isArray(this.extraDataFileTypeIndex)) {
+            data["extraDataFileTypeIndex"] = [];
+            for (let item of this.extraDataFileTypeIndex)
+                data["extraDataFileTypeIndex"].push(item);
+        }
         if (Array.isArray(this.entitiesRelationships)) {
             data["entitiesRelationships"] = [];
             for (let item of this.entitiesRelationships)
@@ -86462,6 +86515,7 @@ export interface IGetAllAppTransactionsForViewDto {
     entityClassifications: AppEntityClassificationDto[] | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex: number[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes: AppEntityTypes;
@@ -86880,6 +86934,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     entityClassifications!: AppEntityClassificationDto[] | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     entityExtraData!: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex!: number[] | undefined;
     entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes!: AppEntityTypes;
@@ -87018,6 +87073,11 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
                 this.entityExtraData = [] as any;
                 for (let item of _data["entityExtraData"])
                     this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
+            if (Array.isArray(_data["extraDataFileTypeIndex"])) {
+                this.extraDataFileTypeIndex = [] as any;
+                for (let item of _data["extraDataFileTypeIndex"])
+                    this.extraDataFileTypeIndex!.push(item);
             }
             if (Array.isArray(_data["entitiesRelationships"])) {
                 this.entitiesRelationships = [] as any;
@@ -87164,6 +87224,11 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             for (let item of this.entityExtraData)
                 data["entityExtraData"].push(item.toJSON());
         }
+        if (Array.isArray(this.extraDataFileTypeIndex)) {
+            data["extraDataFileTypeIndex"] = [];
+            for (let item of this.extraDataFileTypeIndex)
+                data["extraDataFileTypeIndex"].push(item);
+        }
         if (Array.isArray(this.entitiesRelationships)) {
             data["entitiesRelationships"] = [];
             for (let item of this.entitiesRelationships)
@@ -87254,6 +87319,7 @@ export interface IGetOrderDetailsForViewDto {
     entityClassifications: AppEntityClassificationDto[] | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     entityExtraData: AppEntityExtraDataDto[] | undefined;
+    extraDataFileTypeIndex: number[] | undefined;
     entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
     appEntityTypes: AppEntityTypes;

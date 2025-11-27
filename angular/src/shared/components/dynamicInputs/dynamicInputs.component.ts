@@ -281,7 +281,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       const extension = file.name.substring(dotIndex);   
       const guid = this.guid();
   
-      const newFileName = `${baseName}${extension}|${guid}`;
+      const newFileName = `${baseName}${extension}|${guid}${extension}`;
        const newFile = new File([file], newFileName , { type: file.type });
        extraAttr.selectedValues = newFile;    
        extraAttr.showUploadBtn =true;   
