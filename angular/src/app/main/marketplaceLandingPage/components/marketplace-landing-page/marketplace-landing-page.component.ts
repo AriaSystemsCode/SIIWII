@@ -494,13 +494,7 @@ export class MarketplaceLandingPageComponent
         );
     }
 
-isFound(){
-  this._AppEntitiesServiceProxy
-  .getHostSettingValue(1203)
-  .subscribe((res: any) => {
-      console.log(res,'settingsss')
-  });
-}
+
     
     ngOnDestroy() {
       this.unsubscribeToAllSubscriptions();

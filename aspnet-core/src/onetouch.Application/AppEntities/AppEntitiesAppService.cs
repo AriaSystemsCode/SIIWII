@@ -1246,6 +1246,17 @@ namespace onetouch.AppEntities
                         }
                     }
                 }
+                //Iteration49 save extra data images to attachments
+                #region Iteration49 save extra data images to attachments
+                if (input.ExtraDataFileTypeIndex != null && input.ExtraDataFileTypeIndex.Count() > 0)
+                {
+                    foreach (var e in input.ExtraDataFileTypeIndex)
+                    {
+                        if (!string.IsNullOrEmpty(input.EntityExtraData[e].AttributeValue) && input.EntityExtraData[e].AttributeValue.Contains('|'))
+                        { MoveFile(input.EntityExtraData[e].AttributeValue.Split('|')[1], AbpSession.TenantId, AbpSession.TenantId); }
+                    }
+                }
+                #endregion Iteration49 save extra data images to attachments
 
                 //delete removed attachments not in the input attachments
                 if (entity.Id != 0 && input.EntityAttachments != null)
@@ -1676,7 +1687,7 @@ namespace onetouch.AppEntities
         }
 
         [AllowAnonymous]
-        public async Task<string> GetHostSettingValue(long settingId)
+        public async Task<string> GetHostSettingValue(long settingId, string type = "")
         {
             var hostId = await GetCurrentHostEntityId();
             if(hostId != 0)
@@ -1684,14 +1695,21 @@ namespace onetouch.AppEntities
                 var extraDataList = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
-                    return extraDataList.Items[0].AttributeValue;
+                    var attributeValue = extraDataList.Items[0].AttributeValue;
+                    if (type.ToUpper() =="FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|') )
+                    {
+                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                        attributeValue = imagesUrl +  "-1" + @"/" + attributeValue.Split('|')[1];
+
+                    }
+                    return attributeValue;
                 }
             }
             return "";
 
         }
 
-        public async Task<string> GetTenantSettingValue(long settingId)
+        public async Task<string> GetTenantSettingValue(long settingId, string type = "")
         {
             var hostId = await GetCurrentTenantEntityId();
             if (hostId != 0)
@@ -1699,7 +1717,14 @@ namespace onetouch.AppEntities
                 var extraDataList = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
-                    return extraDataList.Items[0].AttributeValue;
+                    var attributeValue = extraDataList.Items[0].AttributeValue;
+                    if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
+                    {
+                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue.Split('|')[1];
+
+                    }
+                    return attributeValue;
                 }
             }
             return "";

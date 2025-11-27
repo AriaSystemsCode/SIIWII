@@ -99,7 +99,7 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
   getTenantData() {
 
 
-    this._appEntitiesServiceProxy.getHostSettingValue(1206)
+    this._appEntitiesServiceProxy.getHostSettingValue(1206,"file" )
       .subscribe((result) => {
         this.tenantLogo = result
       });

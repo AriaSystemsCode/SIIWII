@@ -94,8 +94,8 @@ namespace onetouch.AppEntities
 		//Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown();
 		//MMT-43
 		//I49[Start]
-		Task<string> GetHostSettingValue(long settingId);
-		Task<string> GetTenantSettingValue(long settingId);
+		Task<string> GetHostSettingValue(long settingId, string type="");
+		Task<string> GetTenantSettingValue(long settingId, string type="");
 		//I49[End]
     }
 }

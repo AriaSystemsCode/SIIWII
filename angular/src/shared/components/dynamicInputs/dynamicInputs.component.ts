@@ -281,7 +281,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       const extension = file.name.substring(dotIndex);   
       const guid = this.guid();
   
-      const newFileName = `${baseName}${extension}|${guid}`;
+      const newFileName = `${baseName}${extension}|${guid}${extension}`;
        const newFile = new File([file], newFileName , { type: file.type });
        extraAttr.selectedValues = newFile;    
        extraAttr.showUploadBtn =true;   
@@ -299,7 +299,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
     const blob = new Blob([file], { type: file.type });
      const originalName = file.name.split('|')[0];
-     const guid = file.name.split('|')[1];
+     const  guid = file.name.split('|')[1].split('.')[0]
       const newFile = new File([blob], originalName, { type: file.type });
         
       this.attachmentsUploader.addToQueue([newFile]);
