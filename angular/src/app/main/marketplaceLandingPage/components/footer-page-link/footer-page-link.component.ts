@@ -1,4 +1,5 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, ViewChild } from "@angular/core";
+import { ModalDirective } from "ngx-bootstrap/modal";
 import { PageSettingDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 
 
@@ -12,7 +13,8 @@ export class FooterPageLinkComponent {
     @Input()  sectionData: any;
     @Input() sectionId:number;
    pageLiksData:any[]
-
+   @ViewChild('contactUsModal', { static: false })
+   contactUsModal: ModalDirective;
 
    constructor(private SydObjectsServiceProxy:SydObjectsServiceProxy) {
    
@@ -61,4 +63,13 @@ export class FooterPageLinkComponent {
           get blocksSorted(): PageSettingDto[] {
             return (this.pageLiksData ?? []).slice().sort(this.compareByOrder);
           }
+
+
+          onMenuClick(event: MouseEvent, s: any): void {
+            if (s?.name === 'Contact Us') {
+              event.preventDefault();   // don't follow link
+              this.contactUsModal.show();
+            }
+          }
+          
   }

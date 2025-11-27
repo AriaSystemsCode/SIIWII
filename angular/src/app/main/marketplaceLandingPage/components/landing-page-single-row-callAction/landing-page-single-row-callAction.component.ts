@@ -136,4 +136,8 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   openNewTab(path?: string){
     window.open(this.fullUrl(path))
   }
+  openTab(path?: string){
+    window.open(path)
+  }
+
 }

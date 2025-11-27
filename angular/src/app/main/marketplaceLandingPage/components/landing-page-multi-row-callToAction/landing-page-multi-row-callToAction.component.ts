@@ -187,6 +187,11 @@ goToCategory(cat: { name: string; id: number | string }) {
     window.open(this.fullUrl(path))
   }
 
+
+  openTab(path?: string){
+    window.open(path)
+  }
+
   
 ngOnDestroy() {
   Object.values(this.objectUrlById).forEach(u => { try { URL.revokeObjectURL(u); } catch {} });

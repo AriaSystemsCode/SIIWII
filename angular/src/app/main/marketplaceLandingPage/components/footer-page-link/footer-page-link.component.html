@@ -2,13 +2,21 @@
     <div class="col-4">
       <h5 class="text-white">{{sectionData?.name}}</h5>
     <div *ngFor="let s of pageLiksData" class=" text-white">
-        <a>{{s?.name}}</a>
+      <a
+      [href]="s?.link || '/app/main/Home'"
+      [attr.target]="s?.name === 'Contact Us' ? null : '/app/main/Home'"
+      (click)="onMenuClick($event, s)"
+      class="text-white"
+    >
+      {{ s?.name }}
+    </a>
+    
      
      </div>
-     <button class="btn btn-sm btn-light mt-3"
+     <!-- <button *ngIf="s.name == 'contactus'" class="btn btn-sm btn-light mt-3"
      (click)="contactUsModal.show()">
 Contact us
-</button>
+</button> -->
 
     </div>
 

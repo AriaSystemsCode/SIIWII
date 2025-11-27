@@ -523,6 +523,7 @@ export class TopBarComponent
             const str = result
             const after = str.split("|")[1];
            this.tenantLogo = after
+           console.log(this.tenantLogo,'logo')
         });
     }
 
