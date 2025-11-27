@@ -1685,10 +1685,10 @@ namespace onetouch.AppEntities
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
                     var attributeValue = extraDataList.Items[0].AttributeValue;
-                    if (type.ToUpper() =="FILE")
+                    if (type.ToUpper() =="FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|') )
                     {
                         string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue;
+                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue.Split('|')[1];
 
                     }
                     return attributeValue;
@@ -1707,10 +1707,10 @@ namespace onetouch.AppEntities
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
                     var attributeValue = extraDataList.Items[0].AttributeValue;
-                    if (type.ToUpper() == "FILE")
+                    if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
                     {
                         string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue;
+                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue.Split('|')[1];
 
                     }
                     return attributeValue;
