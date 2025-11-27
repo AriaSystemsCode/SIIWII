@@ -87,26 +87,26 @@ export class AccountComponent extends AppComponentBase implements OnInit {
     }
 
     getTenantData() {
-        this._appEntitiesServiceProxy.getHostSettingValue(1204)
+        this._appEntitiesServiceProxy.getHostSettingValue(1204,"file")
         .subscribe((result) => {
-            const str = result
-            const after = str.split("|")[1];
-            const before = str.split("|")[0];
+            // const str = result
+            // const after = str.split("|")[1];
+            // const before = str.split("|")[0];
 
 
-           this.tenantWordLogo = after
-           console.log(after,'logo')
+           this.tenantWordLogo = result
+       
       
         });
-        this._appEntitiesServiceProxy.getHostSettingValue(1205)
+        this._appEntitiesServiceProxy.getHostSettingValue(1205,null)
         .subscribe((result) => {
            this.tenantText = result
         });
-        this._appEntitiesServiceProxy.getHostSettingValue(1206)
+        this._appEntitiesServiceProxy.getHostSettingValue(1206,"file")
         .subscribe((result) => {
-            const str = result
-            const after = str.split("|")[1];
-           this.tenantLogo = after
+            // const str = result
+            // const after = str.split("|")[1];
+           this.tenantLogo = result
         });
     }
 }

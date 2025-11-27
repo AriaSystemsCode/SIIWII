@@ -61,7 +61,7 @@ export class DashboardComponent extends AppComponentBase {
     }
     chooseDefaultPage(){
 
-        this._appEntitiesServiceProxy.getHostSettingValue(1213).subscribe({
+        this._appEntitiesServiceProxy.getHostSettingValue(1213,null).subscribe({
             next: res => {
                 this.defaultUrl = '/app/main/Home';
 

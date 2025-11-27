@@ -1328,7 +1328,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     isTexable(){
         //i49-F5 texable setting id 
          this._AppEntitiesServiceProxy
-            .getTenantSettingValue(1111)
+            .getTenantSettingValue(1111,null)
             .subscribe((res: any) => {
                 this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
             });

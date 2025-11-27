@@ -2112,7 +2112,7 @@ export class CreateOrEditAppItemComponent
     isTexable(){
         //i49-F5 texable setting id 
         this._appEntitiesServiceProxy
-            .getTenantSettingValue(1121)
+            .getTenantSettingValue(1121,null)
             .subscribe((res: any) => {
                 this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
 
