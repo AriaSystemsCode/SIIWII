@@ -1676,7 +1676,7 @@ namespace onetouch.AppEntities
         }
 
         [AllowAnonymous]
-        public async Task<string> GetHostSettingValue(long settingId)
+        public async Task<string> GetHostSettingValue(long settingId, string type = "")
         {
             var hostId = await GetCurrentHostEntityId();
             if(hostId != 0)
@@ -1684,14 +1684,21 @@ namespace onetouch.AppEntities
                 var extraDataList = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
-                    return extraDataList.Items[0].AttributeValue;
+                    var attributeValue = extraDataList.Items[0].AttributeValue;
+                    if (type.ToUpper() =="FILE")
+                    {
+                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue;
+
+                    }
+                    return attributeValue;
                 }
             }
             return "";
 
         }
 
-        public async Task<string> GetTenantSettingValue(long settingId)
+        public async Task<string> GetTenantSettingValue(long settingId, string type = "")
         {
             var hostId = await GetCurrentTenantEntityId();
             if (hostId != 0)
@@ -1699,7 +1706,14 @@ namespace onetouch.AppEntities
                 var extraDataList = await GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput() { EntityId = hostId, AttributeIds = new List<long>() { settingId } });
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
-                    return extraDataList.Items[0].AttributeValue;
+                    var attributeValue = extraDataList.Items[0].AttributeValue;
+                    if (type.ToUpper() == "FILE")
+                    {
+                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue;
+
+                    }
+                    return attributeValue;
                 }
             }
             return "";
