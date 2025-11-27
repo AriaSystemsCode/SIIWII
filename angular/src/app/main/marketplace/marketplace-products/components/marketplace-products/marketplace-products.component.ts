@@ -173,13 +173,20 @@ export class MarketplaceProductsComponent
             if (q !== null) {
               this.searchInput = q; // URL wins over local storage
             }
-          const brandName = params.get('brand');
-      
-          if (brandName) {
-            // resolve human-readable name -> id
-            const id = await this.resolveBrandNameToId(brandName);
-            this.brands = id ? [id] : [];   // apply real filter value
-          }
+            const brandNames = params.getAll('brand');   // 👈 may be [], one, or many
+
+            if (brandNames && brandNames.length) {
+              const ids: (number | string)[] = [];
+            
+              for (const name of brandNames) {
+                const id = await this.resolveBrandNameToId(name);
+                if (id != null) {
+                  ids.push(id);
+                }
+              }
+            
+              this.brands = ids;   // applies all selected brands
+            }
 
           const DepartmentName = params.get('dept');
       
@@ -228,6 +235,32 @@ export class MarketplaceProductsComponent
         return match ? (match.id ?? match.value) : null;
       }
 
+      private async resolveBrandIdToName(brandId: number | string): Promise<string | null> {
+        const res = await this._AppMarketplaceItemsServiceProxy
+          .getAllBrandsWithPaging(
+            null, null, null, null, null,
+            false,
+            'BRAND',
+            null,
+            null,
+            86,             // tenant or language as you already use
+            'name',
+            0,
+            200,
+            this.sellerSSIN
+          )
+          .toPromise();
+      
+        const items = res?.items ?? [];
+        const match = items.find((b: any) => {
+          const id = b.id ?? b.value;
+          return id === brandId;
+        });
+      
+        if (!match) return null;
+        return match.name ?? match.label ?? match.displayName ?? null;
+      }
+      
       private async resolveDeptNameToId(deptName: string): Promise<number | null> {
         // 1) Load top-level categories once
         const parents = await this._sycEntityObjectCategoriesServiceProxy
@@ -483,7 +516,7 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
       }
       
-    private updateUrlQueryParams(partial: { dept?: string | null; proList?: string | null; q?: string | null ; cat?: string | null}) {
+    private updateUrlQueryParams(partial: { dept?: string | null; proList?: string | null; q?: string | null ; cat?: string | null; brand?: string | string[] | null;   }) {
         this._router.navigate([], {
           relativeTo: this.route,
           queryParams: {
@@ -491,6 +524,7 @@ export class MarketplaceProductsComponent
             proList: partial.proList ?? undefined,
             q: partial.q ?? undefined,
             cat: partial.cat ?? undefined, 
+            brand: partial.brand ?? undefined,
           },
           queryParamsHandling: 'merge',
           // replaceUrl: true, // optional
@@ -549,10 +583,48 @@ export class MarketplaceProductsComponent
     }
 
     brands: any[] = [];
-    selectBrands(value) {
-        this.brands = value;
-            this.getAllProducts();
+
+    async selectBrands(value: any[]) {
+      this.brands = value || [];
+    
+      // 🔹 No brands selected → remove from URL
+      if (!this.brands.length) {
+        this.updateUrlQueryParams({ brand: null });
+        this.getAllProducts();
+        return;
+      }
+    
+      // 🔹 Load all brands once
+      const res = await this._AppMarketplaceItemsServiceProxy
+        .getAllBrandsWithPaging(
+          null, null, null, null, null,
+          false,
+          'BRAND',
+          null,
+          null,
+          86, 'name', 0, 200, this.sellerSSIN
+        )
+        .toPromise();
+    
+      const items = res?.items ?? [];
+      const selectedIdSet = new Set(this.brands.map(x => String(x)));
+    
+      const brandNames: string[] = [];
+    
+      for (const b of items) {
+        const id = (b.id ?? b.value)?.toString();
+        if (id && selectedIdSet.has(id)) {
+          const name = b.name ?? b.label ?? b.displayName;
+          if (name) brandNames.push(name);
+        }
+      }
+    
+      // 👇 this becomes ?brand=Nike&brand=Adidas
+      this.updateUrlQueryParams({ brand: brandNames });
+    
+      this.getAllProducts();
     }
+    
 
     resetProducts($event) {
         this.filters.resetFilters();

@@ -45,4 +45,8 @@ export class LandingPageSliderWithCallToActionComponent extends AppComponentBase
         this.sliderItems = res ?? [];
       });
     }
+
+    onMenuClick( s: any): void {
+      window.open(s)
+    }
 }

@@ -69,6 +69,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   isAuthenticated = this.appSession?.user
   @Input() preselectDeptId?: number;
   categories:any
+  @Input() preselectCategoryId?: number;
+
   constructor(
     private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
@@ -99,7 +101,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
       this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
 
-      this.selctedBradns = parsedFilters.brands;
+      // this.selctedBradns = parsedFilters.brands;
 
 
     }
@@ -124,24 +126,29 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedBrands']) {
-      // Mirror parent-selected brands into the checkbox model
-      this.selctedBradns = Array.isArray(this.selectedBrands) ? [...this.selectedBrands] : [];
+      const curr = changes['selectedBrands'].currentValue;
+      this.selctedBradns = Array.isArray(curr) ? [...curr] : [];
     }
+  
     if (changes['selectedDepartmentId'] && this.selectedDepartmentId) {
-      // after tree roots are loaded, expand to the selected node
       if (this.files?.length) {
         this.expandAndSelectFullPath(this.selectedDepartmentId);
-      } else {
-        // if roots not loaded yet, wait for ngOnInit’s getParentDepartments
-        // and then call expandAndSelectFullPath in its .then(...)
+      }
+    }
+  
+    if (changes['preselectCategoryId'] && this.preselectCategoryId) {
+      if (this.categories?.length) {
+        this.expandAndSelectFullPathCat(this.preselectCategoryId);
       }
     }
   }
   
+  
   getAllBrands() {
     this._appMarketplaceItemsServiceProxy
       .getAllBrandsWithPaging(
-        null, null, null, null, null, false,'BRAND', null, null,
+        null, null, null, null, null,
+        false, 'BRAND', null, null,
         86, 'name', 0, 200, this.accountSSIN
       )
       .subscribe(res => {
@@ -151,6 +158,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         }));
       });
   }
+  
   
 
   handlebrandsSelction() {
@@ -398,7 +406,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       this._sycEntityObjectCategoriesServiceProxy[apiMethod](
         undefined, undefined, undefined, undefined, undefined, undefined, undefined,
         undefined,
-       false, 
+        false,
         undefined,
         [],
         'name',
@@ -406,10 +414,17 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         10
       ).subscribe((res: any) => {
         this.categories = res.items;
+  
+        // 🔹 If we already know which category to preselect, expand to it
+        if (this.preselectCategoryId) {
+          this.expandAndSelectFullPathCat(this.preselectCategoryId);
+        }
+  
         resolve();
       });
     });
   }
+  
   
   nodeCatExpand(evt: any) {
     if (!evt?.node) return;
@@ -518,7 +533,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         this.endSoldout = parsed.endSoldOutData;
         this.startShipDate = parsed.startShipData ? new Date(parsed.startShipData) : null;
         this.endShipDate   = parsed.endShipData   ? new Date(parsed.endShipData)   : null;
-        this.selctedBradns = parsed.brands;
+        // this.selctedBradns = parsed.brands;
   
         await Promise.all([this.getParentDepartments(), this.getParentCategories()]);
   

@@ -103,7 +103,7 @@ export class AppComponent extends AppComponentBase implements OnInit {
 
     this._appEntitiesServiceProxy.getHostSettingValue(1213).subscribe({
       next: res => {
-        const allowAnonymous = res == 'Disable' ? false :true
+        const allowAnonymous = res == 'Enable' ? true :false
         // const allowAnonymous = true
 
         if (allowAnonymous) {
@@ -133,22 +133,6 @@ export class AppComponent extends AppComponentBase implements OnInit {
     });
   }
 
-  /** helper to normalize true/false from backend */
-  private toBool(val: any): boolean {
-    if (val === true) return true;
-    if (val === false) return false;
-
-    if (typeof val === 'string') {
-      const v = val.trim().toLowerCase();
-      return v === 'true' || v === '1' || v === 'yes';
-    }
-
-    if (typeof val === 'number') {
-      return val === 1;
-    }
-
-    return false;
-  }
 
   subscriptionStatusBarVisible(): boolean {
     return this.appSession.tenantId > 0 &&

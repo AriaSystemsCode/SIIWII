@@ -10,7 +10,7 @@
 >
   <ng-template pTemplate="item" let-group>
     <div class="products-grid">
-      <div *ngFor="let block of group" class="px-lg-2 my-lg-2 product-col">
+      <div *ngFor="let block of group" class="  product-col">
      
         <app-prodcut-card *ngIf="block?.blockType?.toUpperCase() =='PRODUCT'"
           [product]="block?.getAppMarketItemForViewDto?.appItem"
@@ -19,22 +19,23 @@
 
         <div class="px-2  d-flex flex-column sectionGeneral" *ngIf="block?.blockType?.toUpperCase()=='BRAND'">
 
-          <img [src]="block?.image ? attachmentBaseUrl + '/' +  block?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2"alt="" srcset=""
+          <img [src]="block?.image ? attachmentBaseUrl + '/' +  block?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="img-fluid"alt="" srcset=""
             onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToBrand(block)">
-            <a (click)="goToBrand(block)">{{block?.name}}</a>
+            <!-- <a (click)="goToBrand(block)">{{block?.name}}</a> -->
         </div>
-        <div class="px-2  d-flex flex-column sectionGeneral" *ngIf="block?.blockType?.toUpperCase()=='CATEGORY'">
+        <!-- <div class="px-2  d-flex flex-column sectionGeneral" *ngIf="block?.blockType?.toUpperCase()=='CATEGORY'">
 
           <img [src]="block?.image ? attachmentBaseUrl + '/' +  block?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2"  alt="" srcset=""
             onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToCategory(block)">
             <a (click)="goToCategory(block)">{{block  ?.name}}</a>
-        </div>
+        </div> -->
 
-        <div *ngIf="block?.blockType?.toUpperCase()=='ATTACHMENT'" class="col">
+        <div *ngIf="block?.blockType?.toUpperCase()=='ATTACHMENT'" class="col sectionGeneral p-0  text-center">
           <ng-container [ngSwitch]="kindOfPath(block?.image)">
             <!-- image -->
             <img *ngSwitchCase="'image'"
                  [src]="fullUrl(block?.image)"
+                 (click)="openTab(block?.link)"
                  class="img-fluid rounded border"
                  alt="{{ block?.name || 'attachment' }}"
                  (error)="onImgErr($event)">
@@ -49,8 +50,8 @@
             <div *ngSwitchCase="'pdf'" class="position-relative">
               <!-- <img [src]="block?.image ? attachmentBaseUrl + '/' +  block?.image : 'assets/placeholders/_logo-placeholder.png'" class="mb-2"  alt="" srcset=""
               onerror="'assets/placeholders/_logo-placeholder.png'"    (click)="openNewTab(block?.image)"> -->
-         
-              <iframe class=" iframSty"
+              <img src="assets/Items/pdf-Icon.png" class=" iframSty" alt="" srcset=""    (click)="openNewTab(block?.image)">
+              <!-- <iframe class=" iframSty"
           
                       [src]="attachmentSafeMap[block.id]"
                       (load)="block._pdfLoadErr=false"
@@ -67,7 +68,7 @@
                       style="top: .5rem; left: .5rem"
                       (click)="openNewTab(block?.image)">
                       <i class="fa fa-download"></i>
-              </button>
+              </button> -->
             </div>
     
             <!-- other file -->

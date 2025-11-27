@@ -35,18 +35,27 @@
             <!-- Subject -->
             <div class="col-md-4 mb-3">
               <label class="font-weight-bold">Subject: *</label>
-              <select class="form-control form-control-sm"
+              <input type="text"
+              class="form-control form-control-sm"
+              name="subject"
+              value="Registration request"
+              disabled
+              [(ngModel)]="model.subject"
+              required
+              minlength="2"
+              maxlength="100" />
+              <!-- <select class="form-control form-control-sm"
                       name="subject"
                       [(ngModel)]="model.subject"
                       required>
                 <option value="Registration request">Registration request</option>
                 <option value="General inquiry">option1</option>
                 <option value="Support">option2</option>
-              </select>
-              <small class="text-danger"
+              </select> -->
+              <!-- <small class="text-danger"
                      *ngIf="contactForm.submitted && !contactForm.controls.subject?.valid">
                 Subject is required
-              </small>
+              </small> -->
             </div>
 
             <!-- First Name -->
