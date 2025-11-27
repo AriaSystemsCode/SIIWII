@@ -40,6 +40,7 @@ namespace onetouch.AppEntities
         Task<List<LookupLabelDto>> GetAllTitlesForTableDropdown();
 		
 		Task<PagedResultDto<GetAppEntityForViewDto>> GetAll(GetAllAppEntitiesInput input);
+		Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId);
 
         Task<GetAppEntityForViewDto> GetAppEntityForView(long id);
 		Task<string> GetAppEntityState(long id);
@@ -92,5 +93,9 @@ namespace onetouch.AppEntities
 		Task<List<LookupLabelDto>> GetAllUOMForTableDropdown();
 		//Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown();
 		//MMT-43
+		//I49[Start]
+		Task<string> GetHostSettingValue(long settingId);
+		Task<string> GetTenantSettingValue(long settingId);
+		//I49[End]
     }
 }

@@ -44,6 +44,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   ];
   onlyMsg = false
   sycAttachmentCategoryImage: SycAttachmentCategoryDto;
+  isAuthenticated = this.appSession?.user
 
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
 

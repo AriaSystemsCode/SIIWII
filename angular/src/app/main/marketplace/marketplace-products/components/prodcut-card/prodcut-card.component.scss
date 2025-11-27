@@ -108,3 +108,12 @@ font-weight: 700;
     color: #1B101B;
   
   }
+
+
+
+  .blur-text {
+    filter: blur(3px);
+    transition: filter 0.3s;
+    user-select: none;      /* prevent copy/paste */
+    pointer-events: none;   /* disable text selection/clicks */
+  }

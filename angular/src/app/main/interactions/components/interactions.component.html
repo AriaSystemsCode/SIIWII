@@ -67,7 +67,7 @@
                     >
                     </app-reactions-stats>
                 </div>
-                <a *ngIf="!fromOverview" (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
+                <a *ngIf="!fromOverview && isAuthenticated" (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
                     <span>
                         <!-- <i class="far fa-comments"></i> -->
                          <img src="../../../../assets/reactions/commentIcon.png"/>

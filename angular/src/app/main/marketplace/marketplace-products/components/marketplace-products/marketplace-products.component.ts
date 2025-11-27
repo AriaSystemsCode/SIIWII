@@ -8,13 +8,14 @@ import {
     ViewChild,
    SimpleChanges, OnChanges, ViewChildren, ElementRef
 } from "@angular/core";
-import {  Router } from "@angular/router";
+import {  ActivatedRoute, Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
 import { AppItemBrowseEvents } from "@app/main/app-items/app-items-browse/models/appItems-browse-events";
 import { ActionsMenuEventEmitter } from "@app/main/app-items/app-items-browse/models/ActionsMenuEventEmitter";
 import {
     AppEntitiesServiceProxy,
     AppMarketplaceItemsServiceProxy,
+    SycEntityObjectCategoriesServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { PricingHelpersService } from "@app/main/app-items/app-item-shared/services/pricing-helpers.service";
@@ -75,6 +76,10 @@ export class MarketplaceProductsComponent
     selectedDepartments: any;
  
     acceptedAspectRatio;
+    isAuthenticate= this.appSession?.user
+
+    selectedCategories: number[] = []; 
+
     constructor(
         injector: Injector,
         private _router: Router,
@@ -83,6 +88,8 @@ export class MarketplaceProductsComponent
         private _pricingHelperService: PricingHelpersService,
         public datepipe: DatePipe,
         public breakpointObserver: BreakpointObserver,
+        private route: ActivatedRoute,   
+         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     ) {
         super(injector);
         this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom") );
@@ -123,45 +130,192 @@ export class MarketplaceProductsComponent
             { label: "Shared With Me", value: 1 },
         ];
         (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
-            this.getAllCurrencies();
-
-
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
         
 
 
         this.checkMediaQuery();
-        this.getAspectatio();
+        if(this.isAuthenticate){
+            this.getAllCurrencies();
+            this.getAspectatio();
+        }
         
     }
     ngOnInit() {
-        
         const savedFilters = localStorage.getItem("productFilters");
-        
         if (savedFilters) {
-            const parsedFilters = JSON.parse(savedFilters);
-            this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? null;
-            this.selectedCurrrency = parsedFilters.selectedCurrency ?? 'USD';
-            this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
-            
-            this.appItemListId = parsedFilters.appItemListId ||   this.appItemListId;
-            this.searchInput = parsedFilters.searchText||    this.searchInput;
-            this.selectedDepartments = parsedFilters.selectedDepartments ||  this.selectedDepartments;
-            this.minimumPrice = parsedFilters.minimumPrice ||  this.minimumPrice;
-            this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
-            this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
-            this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
-            this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) :   this.startShipData;
-            this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) :  this.endShipData;
-            this.brands = parsedFilters.brands || this.brands ;
-            this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
-            this.skipCount = parsedFilters.skipCount ||     this.skipCount;
-            this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
+          const parsedFilters = JSON.parse(savedFilters);
+          this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? null;
+          this.selectedCurrrency = parsedFilters.selectedCurrency ?? 'USD';
+          this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
+      
+          this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
+          this.searchInput = parsedFilters.searchText || this.searchInput;
+          this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
+          this.selectedCategories = parsedFilters.selectedCategory || this.selectedCategories;
+          this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
+          this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
+          this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData;
+          this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
+          this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : this.startShipData;
+          this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : this.endShipData;
+          this.brands = parsedFilters.brands || this.brands;
+          this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
+          this.skipCount = parsedFilters.skipCount || this.skipCount;
+          this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
+      
+        // 🔗 URL takes priority if present
+        this.route.queryParamMap.subscribe(async (params) => {
+            const q = params.get('q'); // <-- new
+
+            if (q !== null) {
+              this.searchInput = q; // URL wins over local storage
+            }
+            const brandNames = params.getAll('brand');   // 👈 may be [], one, or many
+
+            if (brandNames && brandNames.length) {
+              const ids: (number | string)[] = [];
+            
+              for (const name of brandNames) {
+                const id = await this.resolveBrandNameToId(name);
+                if (id != null) {
+                  ids.push(id);
+                }
+              }
+            
+              this.brands = ids;   // applies all selected brands
+            }
+
+          const DepartmentName = params.get('dept');
+      
+          if (DepartmentName) {
+            // resolve human-readable name -> id
+            const id = await this.resolveDeptNameToId(DepartmentName);
+            this.selectedDepartments = id ? [id] : [];
+            this.filters.preselectDeptId = id ?? undefined;  // tell the child to highlight
+          }
+          // If no brand param, we keep the restored localStorage brands as-is.
+          const listName = params.get('proList');
+          if (listName) {
+            const listId = await this.resolveListNameToId(listName);
+            this.appItemListId = listId || null;
+          
+            // (optional) make the sidebar visually highlight the selected list
+            if (this.filters) this.filters.catalogId = listId ?? null;
+          }
+          const catName = params.get('cat');
+          if (catName) {
+            const id = await this.resolveCategoryNameToId(catName);
+            this.selectedCategories = id ? [id] : [];
+            if (this.filters) this.filters.preselectCategoryId = id ?? undefined; // optional if you add it in child
+          }
+        
+          this.getAllProducts(); // 
+        });
+      }
+      
     
-        this.getAllProducts(); // Fetch products using restored filters
-    }
+    private async resolveBrandNameToId(brandName: string): Promise<number | string | null> {
+        // Call your brands endpoint and find the matching brand by name.
+        // You can optimize this with a dedicated "getByName" if you have one.
+        const res = await this._AppMarketplaceItemsServiceProxy
+          .getAllBrandsWithPaging(
+            null, null, null, null, null,false, 'BRAND', null, null,
+            86, 'name', 0, 200, this.sellerSSIN
+          )
+          .toPromise();
+      
+        const items = res?.items ?? [];
+        const match = items.find((b: any) =>
+          (b.name ?? b.label ?? '').toLowerCase() === brandName.toLowerCase()
+        );
+      
+        return match ? (match.id ?? match.value) : null;
+      }
+
+      private async resolveBrandIdToName(brandId: number | string): Promise<string | null> {
+        const res = await this._AppMarketplaceItemsServiceProxy
+          .getAllBrandsWithPaging(
+            null, null, null, null, null,
+            false,
+            'BRAND',
+            null,
+            null,
+            86,             // tenant or language as you already use
+            'name',
+            0,
+            200,
+            this.sellerSSIN
+          )
+          .toPromise();
+      
+        const items = res?.items ?? [];
+        const match = items.find((b: any) => {
+          const id = b.id ?? b.value;
+          return id === brandId;
+        });
+      
+        if (!match) return null;
+        return match.name ?? match.label ?? match.displayName ?? null;
+      }
+      
+      private async resolveDeptNameToId(deptName: string): Promise<number | null> {
+        // 1) Load top-level categories once
+        const parents = await this._sycEntityObjectCategoriesServiceProxy
+          .getAllWithChildsForProductWithPaging(
+            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+            undefined, /* includeParents */ true,
+            undefined,
+            [],               // selected parents
+            "name", 0, 50     // sort, paging (tweak page size if you have many parents)
+          )
+          .toPromise();
+      
+        const parentsNodes = (parents?.items ?? []) as any[];
+      
+        // 2) BFS over the tree, loading children lazily until we find a name match
+        const norm = (s: string) => (s || '').trim().toLowerCase();
+        const target = norm(deptName);
+      
+        const queue: any[] = [...parentsNodes];
+      
+        while (queue.length) {
+          const node = queue.shift();
+          const cat = node?.data?.sycEntityObjectCategory;
+          const label = node?.label;
+      
+          const nameHere = norm(cat?.name ?? cat?.displayName ?? label);
+          if (nameHere === target) return cat?.id ?? null;
+      
+          // load children if absent
+          if (!node.children || node.children.length === 0) {
+            const kids = await this._sycEntityObjectCategoriesServiceProxy
+              .getAllChildsWithPaging(
+                undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+                cat?.id, true, undefined, undefined, "name", 0, 50
+              )
+              .toPromise();
+            node.children = kids?.items ?? [];
+          }
+      
+          if (node.children?.length) queue.push(...node.children);
+        }
+      
+        return null;
+      }
+      private async resolveListNameToId(listName: string): Promise<number | null> {
+        const res = await this._AppMarketplaceItemsServiceProxy
+          .getSharedItemLists(null, 'name', 0, 200, this.sellerSSIN)
+          .toPromise();
+      
+        const items = res?.items ?? [];
+        const norm = (s: string) => (s || '').trim().toLowerCase();
+        const match = items.find((x: any) => norm(x.name) === norm(listName));
+        return match ? match.id : null;
+      }
+      
     
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
@@ -234,6 +388,7 @@ export class MarketplaceProductsComponent
             appItemListId: this.appItemListId || null,
             searchText: this.searchInput || '',
             selectedDepartments: this.selectedDepartments || [],
+            selectedCategory: this.selectedCategories || [], 
             minimumPrice: this.minimumPrice || null,
             maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
@@ -273,6 +428,8 @@ export class MarketplaceProductsComponent
                 requestParams.endShipData ||  this.endShipData,
                 requestParams.brands ||  this.brands, // ids
                 requestParams.selectedCurrency ||  this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                undefined,
+                requestParams.selectedCategory || this.selectedCategories,  //category
                 requestParams.selectedSort || this.selectedSort.value,
                 requestParams.skipCount || this.skipCount,
                 requestParams.maxResultCount ||  this.maxResultCount
@@ -348,22 +505,50 @@ export class MarketplaceProductsComponent
     }
 
     // start filter criteria
-    selectCatalog(value) {
-        this.appItemListId = value.id;
-            this.getAllProducts();
-    }
+    selectCatalog(value: any) {
+        if (!value || !value.id) {
+          this.appItemListId = null;
+          this.updateUrlQueryParams({ proList: null });
+        } else {
+          this.appItemListId = value.id;
+          this.updateUrlQueryParams({ proList: value.name || null });
+        }
+        this.getAllProducts();
+      }
+      
+    private updateUrlQueryParams(partial: { dept?: string | null; proList?: string | null; q?: string | null ; cat?: string | null; brand?: string | string[] | null;   }) {
+        this._router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {
+            dept: partial.dept ?? undefined,
+            proList: partial.proList ?? undefined,
+            q: partial.q ?? undefined,
+            cat: partial.cat ?? undefined, 
+            brand: partial.brand ?? undefined,
+          },
+          queryParamsHandling: 'merge',
+          // replaceUrl: true, // optional
+        });
+      }
+      
+      
 
     selectDepartment(value) {
-
-        if (value == null) {
-            this.selectedDepartments = [];
+        if (!value) {
+          this.selectedDepartments = [];
+          this.updateUrlQueryParams({ dept: null });
         } else {
-            this.selectedDepartments = [
-                value.node.data.sycEntityObjectCategory.id,
-            ];
+          const id = value.node.data.sycEntityObjectCategory.id;
+          const name = value.node.data.sycEntityObjectCategory.name
+                    ?? value.node.data.sycEntityObjectCategory.displayName
+                    ?? value.node.label;
+      
+          this.selectedDepartments = [id];
+          this.updateUrlQueryParams({ dept: name });
         }
-            this.getAllProducts();
-    }
+        this.getAllProducts();
+      }
+      
 
 
     setPriceFrom(value) {
@@ -397,11 +582,49 @@ export class MarketplaceProductsComponent
             this.getAllProducts();
     }
 
-    brands: [] = [];
-    selectBrands(value) {
-        this.brands = value;
-            this.getAllProducts();
+    brands: any[] = [];
+
+    async selectBrands(value: any[]) {
+      this.brands = value || [];
+    
+      // 🔹 No brands selected → remove from URL
+      if (!this.brands.length) {
+        this.updateUrlQueryParams({ brand: null });
+        this.getAllProducts();
+        return;
+      }
+    
+      // 🔹 Load all brands once
+      const res = await this._AppMarketplaceItemsServiceProxy
+        .getAllBrandsWithPaging(
+          null, null, null, null, null,
+          false,
+          'BRAND',
+          null,
+          null,
+          86, 'name', 0, 200, this.sellerSSIN
+        )
+        .toPromise();
+    
+      const items = res?.items ?? [];
+      const selectedIdSet = new Set(this.brands.map(x => String(x)));
+    
+      const brandNames: string[] = [];
+    
+      for (const b of items) {
+        const id = (b.id ?? b.value)?.toString();
+        if (id && selectedIdSet.has(id)) {
+          const name = b.name ?? b.label ?? b.displayName;
+          if (name) brandNames.push(name);
+        }
+      }
+    
+      // 👇 this becomes ?brand=Nike&brand=Adidas
+      this.updateUrlQueryParams({ brand: brandNames });
+    
+      this.getAllProducts();
     }
+    
 
     resetProducts($event) {
         this.filters.resetFilters();
@@ -419,7 +642,7 @@ export class MarketplaceProductsComponent
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
          this.appItemListId =''
-
+         this.selectedCategories = [];
         this.brands =[]
         this.skipCount= 0;
         this.maxResultCount= 12;
@@ -429,7 +652,53 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
 
     }
-
+    selectCategory(value: any) {
+      if (!value) {
+        this.selectedCategories = [];
+        this.updateUrlQueryParams({ cat: null });
+      } else {
+        const node = value.node?.data?.sycEntityObjectCategory;
+        const id = node?.id;
+        const name = node?.name ?? node?.displayName ?? value.node?.label;
+        this.selectedCategories = id ? [id] : [];
+        this.updateUrlQueryParams({ cat: name || null });
+      }
+      this.getAllProducts();
+    }
+    private async resolveCategoryNameToId(catName: string): Promise<number | null> {
+      // load category roots
+      const parents = await this._sycEntityObjectCategoriesServiceProxy
+        .getAllWithChildsForProductWithPaging(
+          undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+          undefined, /* departments? */ false,
+          undefined, [], 'name', 0, 50
+        ).toPromise();
+    
+      const norm = (s: string) => (s || '').trim().toLowerCase();
+      const target = norm(catName);
+      const queue: any[] = [...(parents?.items ?? [])];
+    
+      while (queue.length) {
+        const node = queue.shift();
+        const cat = node?.data?.sycEntityObjectCategory;
+        const label = node?.label;
+        const here = norm(cat?.name ?? cat?.displayName ?? label);
+        if (here === target) return cat?.id ?? null;
+    
+        if (!node.children || node.children.length === 0) {
+          const kids = await this._sycEntityObjectCategoriesServiceProxy
+            .getAllChildsWithPaging(
+              undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+              cat?.id, /* departments? */ false,
+              undefined, undefined, 'name', 0, 50
+            ).toPromise();
+          node.children = kids?.items ?? [];
+        }
+        if (node.children?.length) queue.push(...node.children);
+      }
+      return null;
+    }
+        
     ngOnDestroy() {
 
           // Keep SellerSSIN while navigating inside the seller room / product views
@@ -441,10 +710,6 @@ export class MarketplaceProductsComponent
     localStorage.removeItem('BuyerSSIN');
   }
 
-        // if (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") {
-        //     sessionStorage.removeItem("SellerSSIN");
-        //     localStorage.removeItem("BuyerSSIN");
-        // }
         localStorage.setItem("currencyCode", null);
     }
 

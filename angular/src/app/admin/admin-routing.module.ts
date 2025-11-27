@@ -52,6 +52,7 @@ import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTe
 import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
 import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
 import { AppTransactionsBrowseComponent } from '@app/main/transactions/appTransactions/appTransBrowse/appTransBrowse.component';
+import { AppRouteGuard } from '@app/shared/common/auth/auth-route-guard';
 
 
 
@@ -60,6 +61,8 @@ import { AppTransactionsBrowseComponent } from '@app/main/transactions/appTransa
         RouterModule.forChild([
             {
                 path: '',
+                //      canActivate: [AppRouteGuard],
+                // canActivateChild: [AppRouteGuard],
                 children: [
                     { path: 'validationRules/validationRules', component: ValidationRulesComponent, data: { permission: 'Pages.Administration.ValidationRules' }  },
                     { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates', component: SycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates' }  },

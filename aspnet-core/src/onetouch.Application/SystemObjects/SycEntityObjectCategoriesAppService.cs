@@ -468,26 +468,29 @@ namespace onetouch.SystemObjects
                 return x;
             }
         }
-
+        [AbpAllowAnonymous]
         public async Task<GetSycEntityObjectCategoryForViewDto> GetSycEntityObjectCategoryForView(int id)
         {
-            var sycEntityObjectCategory = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Id == id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
-
-            var output = new GetSycEntityObjectCategoryForViewDto { SycEntityObjectCategory = ObjectMapper.Map<SycEntityObjectCategoryDto>(sycEntityObjectCategory) };
-
-            if (output.SycEntityObjectCategory.ObjectId != null)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var _lookupSydObject = await _lookup_sydObjectRepository.FirstOrDefaultAsync((int)output.SycEntityObjectCategory.ObjectId);
-                output.SydObjectName = _lookupSydObject.Name.ToString();
-            }
+                var sycEntityObjectCategory = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Id == id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
 
-            if (output.SycEntityObjectCategory.ParentId != null)
-            {
-                var _lookupSycEntityObjectCategory = await _lookup_sycEntityObjectCategoryRepository.FirstOrDefaultAsync((int)output.SycEntityObjectCategory.ParentId);
-                output.SycEntityObjectCategoryName = _lookupSycEntityObjectCategory.Name.ToString();
-            }
+                var output = new GetSycEntityObjectCategoryForViewDto { SycEntityObjectCategory = ObjectMapper.Map<SycEntityObjectCategoryDto>(sycEntityObjectCategory) };
 
-            return output;
+                if (output.SycEntityObjectCategory.ObjectId != null)
+                {
+                    var _lookupSydObject = await _lookup_sydObjectRepository.FirstOrDefaultAsync((int)output.SycEntityObjectCategory.ObjectId);
+                    output.SydObjectName = _lookupSydObject.Name.ToString();
+                }
+
+                if (output.SycEntityObjectCategory.ParentId != null)
+                {
+                    var _lookupSycEntityObjectCategory = await _lookup_sycEntityObjectCategoryRepository.FirstOrDefaultAsync((int)output.SycEntityObjectCategory.ParentId);
+                    output.SycEntityObjectCategoryName = _lookupSycEntityObjectCategory.Name.ToString();
+                }
+
+                return output;
+            }
         }
 
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectCategories_Edit)]

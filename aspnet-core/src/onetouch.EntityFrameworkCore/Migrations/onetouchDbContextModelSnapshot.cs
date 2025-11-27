@@ -2448,6 +2448,9 @@ namespace onetouch.Migrations
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AttachmentCategoryId");
@@ -8440,6 +8443,8 @@ namespace onetouch.Migrations
                     b.Navigation("EntityObjectStatusFk");
 
                     b.Navigation("EntityObjectTypeFk");
+
+                    b.Navigation("ObjectFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityRating", b =>

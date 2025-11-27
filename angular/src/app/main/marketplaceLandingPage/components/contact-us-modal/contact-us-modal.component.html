@@ -1,0 +1,167 @@
+<div bsModal
+     #contactUsModal="bs-modal"
+     class="modal fade"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="contactUsModal"
+     aria-hidden="true"
+     [config]="{backdrop: 'static'}">
+
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <form *ngIf="active"
+            #contactForm="ngForm"
+            novalidate
+            (ngSubmit)="save()"
+            autocomplete="off">
+
+        <div class="modal-header border-0 pb-0">
+          <h4 class="modal-title font-weight-bold">
+            Contact Us
+          </h4>
+          <button type="button"
+                  class="close"
+                  aria-label="Close"
+                  (click)="close()"
+                  [disabled]="saving">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="row">
+            <!-- Subject -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">Subject: *</label>
+              <input type="text"
+              class="form-control form-control-sm"
+              name="subject"
+              value="Registration request"
+              disabled
+              [(ngModel)]="model.subject"
+              required
+              minlength="2"
+              maxlength="100" />
+              <!-- <select class="form-control form-control-sm"
+                      name="subject"
+                      [(ngModel)]="model.subject"
+                      required>
+                <option value="Registration request">Registration request</option>
+                <option value="General inquiry">option1</option>
+                <option value="Support">option2</option>
+              </select> -->
+              <!-- <small class="text-danger"
+                     *ngIf="contactForm.submitted && !contactForm.controls.subject?.valid">
+                Subject is required
+              </small> -->
+            </div>
+
+            <!-- First Name -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">First Name: *</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     name="firstName"
+                     [(ngModel)]="model.firstName"
+                     required
+                     minlength="2"
+                     maxlength="100" />
+              <small class="text-danger"
+                     *ngIf="contactForm.submitted && !contactForm.controls.firstName?.valid">
+                First name is required
+              </small>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">Last Name: *</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     name="lastName"
+                     [(ngModel)]="model.lastName"
+                     required
+                     minlength="2"
+                     maxlength="100" />
+              <small class="text-danger"
+                     *ngIf="contactForm.submitted && !contactForm.controls.lastName?.valid">
+                Last name is required
+              </small>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- Email -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Email Address: *</label>
+              <input type="email"
+                     class="form-control form-control-sm"
+                     name="email"
+                     [(ngModel)]="model.email"
+                     required  [pattern]="emailPattern"
+                     #emailInput="ngModel"
+                     maxlength="150" />
+              <small class="text-danger"
+                     *ngIf="emailInput.touched && emailInput.valid">
+                Enter a valid email
+              </small>
+            </div>
+
+            <!-- Telephone -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Telephone:</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     name="telephone"
+                     [(ngModel)]="model.telephone"
+                     pattern="^[0-9+()\- ]*$"
+                     #phoneInput="ngModel"
+                     maxlength="20" />
+              <small class="text-danger"
+                     *ngIf="phoneInput.invalid && phoneInput?.touched">
+                Inter valid phone
+              </small>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="form-group">
+            <label class="font-weight-bold">Message: *</label>
+            <textarea class="form-control"
+                      rows="4"
+                      name="message"
+                      [(ngModel)]="model.message"
+                      required
+                      minlength="5"
+                      maxlength="2000"></textarea>
+            <small class="text-danger"
+                   *ngIf="contactForm.submitted && !contactForm.controls.message?.valid">
+              Message is required
+            </small>
+          </div>
+
+        </div>
+
+        <div class="modal-footer border-0">
+          <button type="button"
+                  class="btn btn-light"
+                  (click)="close()"
+                  [disabled]="saving">
+            Cancel
+          </button>
+
+          <button type="submit"
+                  class="btn text-white"
+                  [ngClass]="'bgPurple'"
+                  [disabled]="saving || !contactForm.form.valid"
+                  [buttonBusy]="saving"
+                  [busyText]="l('SavingWithThreeDot')">
+            Submit
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

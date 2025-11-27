@@ -2,9 +2,6 @@ import {
     Injector,
     Component,
     OnInit,
-    ViewEncapsulation,
-    Output,
-    EventEmitter,
     Input,
     ViewChild,
 } from "@angular/core";
@@ -36,17 +33,12 @@ import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
-import { ClientAuthError } from "msal";
 import { MenuItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
-    FormGroupName,
-    Validators,
 } from "@angular/forms";
 import { DatePipe } from "@angular/common";
-import { finalize } from "rxjs";
-import { Dropdown } from "primeng/dropdown";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 
 export enum MarketPlace {
@@ -59,37 +51,6 @@ export enum MarketPlace {
     templateUrl: "./topbar.component.html",
     selector: "topbar",
     styleUrls: ["./topbar.component.scss"],
-    styles: [
-        `
-            ._divider span {
-                width: 1px;
-                height: 15px;
-                background-color: #c8c8c8;
-            }
-            .kt-header__topbar-item {
-                border-bottom: 2px solid transparent;
-                cursor: pointer;
-                transition: all 0.3s ease-in-out;
-            }
-            .kt-header__topbar-item.header-link-active,
-            .kt-header__topbar-item:hover {
-                color: #2061eb !important;
-                transition: all 0.3s ease-in-out;
-            }
-            .kt-header__topbar-item i {
-                font-size: 15px !important;
-            }
-            img.header-profile-picture {
-                max-width: 30px;
-                max-height: 30px;
-                border-radius: 50%;
-            }
-            .kt-header__topbar .kt-header__topbar-item .kt-header__topbar-icon {
-                width: 22px;
-                height: 22px;
-            }
-        `,
-    ],
 })
 export class TopBarComponent
     extends ThemesLayoutBaseComponent
@@ -161,6 +122,10 @@ export class TopBarComponent
     visible:boolean =false;
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
+    isAuthenticated = this.appSession?.user
+    searchInput:string
+    bgCol:string 
+    tenantLogo:string
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -176,10 +141,10 @@ export class TopBarComponent
         private messageReadService: MessageReadService,
         private _MessageServiceProxy: MessageServiceProxy,
         private updateLogoService: UpdateLogoService,
-        private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
+        
     ) {
         super(injector);
 
@@ -236,13 +201,11 @@ export class TopBarComponent
     }
 
     ngOnInit() {
+        console.log(this.isAuthenticated,'this.isAuthenticated');
+        this.getTenantData()
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
-        // this._AppTransactionServiceProxy
-        // .getRelatedAccounts()
-        // .subscribe((res: any) => {
-        //     console.log(res);
-        // });
+
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "refreshShoppingInfoInTopbar") {
                 this.getShoppingCartInfo();
@@ -269,27 +232,30 @@ export class TopBarComponent
         this.isMultiTenancyEnabled = this._abpMultiTenancyService.isEnabled;
         this.isImpersonatedLogin =
             this._abpSessionService.impersonatorUserId > 0;
-        this.setCurrentLoginInformations();
-        this.getProfilePicture();
-        this.getRecentlyLinkedUsers();
-        this.appSession.user.memberId;
-        this.appSession.user.id;
-        this.registerToEvents();
-        this.getUnreadMessageCount();
-        if(!this.isHost)
-          this.getShoppingCartInfo();
-
-        this.messageReadService.readMessageSubject$.subscribe((res) => {
-            if (res) {
+            if(this.isAuthenticated != undefined) {
+                this.setCurrentLoginInformations();
+                // this.getProfilePicture();
+                this.getRecentlyLinkedUsers();
+                this.appSession.user.memberId;
+                this.appSession.user.id;
+                this.registerToEvents();
                 this.getUnreadMessageCount();
+                if(!this.isHost)
+                  this.getShoppingCartInfo();
+        
+                this.messageReadService.readMessageSubject$.subscribe((res) => {
+                    if (res) {
+                        this.getUnreadMessageCount();
+                    }
+                });
+                this.getBelowBar();
             }
-        });
-        this.getBelowBar();
+       
     }
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
-            this.getProfilePicture();
+            // this.getProfilePicture();
         });
 
         abp.event.on("app.chat.unreadMessageCountChanged", (messageCount) => {
@@ -528,6 +494,37 @@ export class TopBarComponent
 
             });
             
+    }
+
+    onSearch(ev?: Event): void {
+        ev?.preventDefault(); // ✅ stop native form submit
+        const q = (this.searchInput ?? '').trim();
+      
+        this.router.navigate(
+          ['/app/main/marketplace/products'],
+          {
+            queryParams: { q: q || null },      // null removes it when empty
+            queryParamsHandling: 'merge',
+            replaceUrl: false
+          }
+        );
+      }
+      
+      getTenantData() {
+       
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208)
+        .subscribe((result) => {
+            // result = '#456'
+            result ? this.bgCol = result : this.bgCol = '#4A0D4A'
+    
+        });
+        this._AppEntitiesServiceProxy.getHostSettingValue(1206)
+        .subscribe((result) => {
+            const str = result
+            const after = str.split("|")[1];
+           this.tenantLogo = after
+           console.log(this.tenantLogo,'logo')
+        });
     }
 
 }

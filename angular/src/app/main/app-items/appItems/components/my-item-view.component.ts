@@ -62,6 +62,10 @@ export class MyItemViewComponent
                 undefined,
                 undefined,
                 undefined,
+                undefined,
+                this.maxResultCount,
+                undefined, //item ssin
+                undefined,
                 this.skipCount,
                 this.maxResultCount
             )

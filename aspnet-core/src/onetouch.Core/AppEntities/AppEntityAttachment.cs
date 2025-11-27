@@ -20,8 +20,9 @@ namespace onetouch.AppEntities
 
 		[StringLength(SycEntityObjectClassificationConsts.MaxCodeLength, MinimumLength = SycEntityObjectClassificationConsts.MinCodeLength)]
 		public virtual string EntityCode { get; set; }
+        public virtual bool IsPublic { get; set; }
 
-		public virtual long AttachmentId { get; set; }
+        public virtual long AttachmentId { get; set; }
 
 		[StringLength(SycEntityObjectClassificationConsts.MaxCodeLength, MinimumLength = SycEntityObjectClassificationConsts.MinCodeLength)]
 		public virtual string AttachmentCode { get; set; }

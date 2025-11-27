@@ -332,9 +332,9 @@ namespace onetouch.Migrations.Seed.Host
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question".Split(',');
+            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,LOOKUP,LOOKUP,LOOKUP,LOOKUP".ToUpper().Split(',');
+            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,MARKETPLACESECTIONTYPE,MARKETPLACESECTION,MARKETPLACEBLOCKTYPE,MARKETPLACESECTIONBLOCK".ToUpper().Split(',');
+            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Marketplace Section Type,Marketplace Section,Marketplace Block Type,Marketplace Section Block".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -528,7 +528,37 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             //MMT-EntityLog[End]
+            //I49-[Start]
+            ObjectCode = "LOOKUP";
+            codes = "ACTIVE,INACTIVE".ToUpper().Split(',');
+            names = "Active,Inactive".Split(',');
+            for (int i = 0; i < codes.Length; i++)
+            {
+                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                    r => r.Code == ObjectCode);
+                if (sydObjects != null && sydObjects.Id > 0)
+                {
+                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
+                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
 
+                    if (sydObjects != null && sydObjects.Id > 0 &&
+                        SycEntityObjectStatuses == null)
+                    {
+                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
+                        {
+                            Code = codes[i],
+                            Name = names[i],
+                            ObjectId = sydObjects.Id,
+                            ObjectCode = sydObjects.Code,
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
+
+                        };
+                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            //I49-[End]
         }
 
         private void CreateHostCodeStructures()
@@ -647,9 +677,9 @@ namespace onetouch.Migrations.Seed.Host
 
 
             #region Add missing SycAttachmentCategories
-            var extType = "1,1,1,1".ToUpper().Split(',');
-            var extension = "png,jpg,jpeg,webp".ToUpper().Split(',');
-            var extNames = "PNG,JPG,JPEG,WEBP".Split(',');
+            var extType = "1,1,1,1,1,1,1,1".ToUpper().Split(',');
+            var extension = "png,jpg,jpeg,webp,pdf,mp4,mwv,avi".ToUpper().Split(',');
+            var extNames = "PNG,JPG,JPEG,WEBP,PDF,MP4,WMV,AVI".Split(',');
 
             for (int i = 0; i < extNames.Length; i++)
             {

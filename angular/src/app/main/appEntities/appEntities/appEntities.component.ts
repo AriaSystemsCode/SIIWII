@@ -151,19 +151,20 @@ export class AppEntitiesComponent extends AppComponentBase {
         this.paginator.rows=event.rows;
         this.maxResultCount  = this.primengTableHelper.getMaxResultCount(this.paginator, event)
         this.skipCount  = ( event?.page || 0 ) * this.maxResultCount
-        this._appEntitiesServiceProxy.getAll(
-            this.filterText,
-            this.nameFilter,
-            this.codeFilter,
-            this.descriptionFilter,
-            this.extraDataFilter,
-            this.sycEntityObjectTypeNameFilter,
-            this.sycEntityObjectStatusNameFilter,
-            this.sydObjectNameFilter,
-            +this.currTab.id,
-            this.primengTableHelper.getSorting(this.dataTable),
-            this.skipCount,
-            this.maxResultCount
+            this._appEntitiesServiceProxy.getAll(
+                this.filterText,
+                this.nameFilter,
+                this.codeFilter,
+                this.descriptionFilter,
+                this.extraDataFilter,
+                true,
+                this.sycEntityObjectTypeNameFilter,
+                this.sycEntityObjectStatusNameFilter,
+                this.sydObjectNameFilter,
+                +this.currTab.id,
+                this.primengTableHelper.getSorting(this.dataTable),
+                this.skipCount,
+                this.maxResultCount
         ).subscribe(result => {
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>    <text name="ValidationRules">Validation rules</text>
+	<texts>
+    <text name="ValidationRules">Validation rules</text>
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
     <text name="FieldName">Field name</text>
@@ -2569,5 +2570,7 @@
 	<text name="Absolute">Absolute</text>
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
+	<text name="Relatedproducts">Related products</text>
+	<text name="noproductsarelinked">no products are linked</text>
   </texts>  
 </localizationDictionary>

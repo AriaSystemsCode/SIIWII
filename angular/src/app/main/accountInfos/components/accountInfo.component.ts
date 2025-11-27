@@ -127,6 +127,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
+    _isTexable:boolean=false;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -150,6 +151,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     async ngOnInit() {
+        this.isTexable();
          this.handleComponentMode()
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange()
@@ -444,6 +446,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         const result = await this._AccountsServiceProxy.getMyAccountForEdit().toPromise()
         
         if(result){
+              //i49-F5 get texable value 
             this.getForEditResult = result
             this.accountInfoOldCurrencyId= this.getForEditResult.accountInfo.currencyId;
             this.setProfileData(result)
@@ -747,6 +750,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
 
     saveMyAccount(){
+                  //i49-F5 set texable value 
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => { this.saving = false;
         }))
@@ -1319,5 +1323,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
     getCodeValue(code: string) {
         this.accountInfoTemp.code = code;
+    }
+
+    isTexable(){
+        //i49-F5 texable setting id 
+         this._AppEntitiesServiceProxy
+            .getTenantSettingValue(1111)
+            .subscribe((res: any) => {
+                this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
+            });
     }
 }

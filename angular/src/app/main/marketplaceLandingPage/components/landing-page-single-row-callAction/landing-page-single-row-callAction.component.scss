@@ -1,0 +1,21 @@
+.sectionGeneral{
+    width: 240px;
+    border: 1px solid #ebedf2;
+    border-radius: 8px;
+
+    img {
+        border-radius: 8px;
+        cursor: pointer;
+    }
+}
+
+.iframSty {
+    height: 50vh;
+    width: 250px;
+    border-radius: 8px !important;
+    cursor: pointer;
+}
+
+img {
+    cursor: pointer;
+}
