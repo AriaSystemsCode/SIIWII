@@ -1,4 +1,4 @@
-<p-carousel
+<!-- <p-carousel
   [value]="pageGroups"
   [numVisible]="1"
   [numScroll]="1"
@@ -8,9 +8,9 @@
   (onPage)="onCarouselPage($event)"
   class="p-4 m-2 rounded"
 >
-  <ng-template pTemplate="item" let-group>
+  <ng-template pTemplate="item" let-group> -->
     <div class="products-grid">
-      <div *ngFor="let block of group" class="  product-col">
+      <div *ngFor="let block of sliderItems" class="  product-col">
      
         <app-prodcut-card *ngIf="block?.blockType?.toUpperCase() =='PRODUCT'"
           [product]="block?.getAppMarketItemForViewDto?.appItem"
@@ -80,5 +80,5 @@
       </div>
 
     </div>
-  </ng-template>
-</p-carousel>
+  <!-- </ng-template> -->
+<!-- </p-carousel> -->

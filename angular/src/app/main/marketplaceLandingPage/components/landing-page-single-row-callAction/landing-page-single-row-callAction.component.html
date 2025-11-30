@@ -1,6 +1,6 @@
 <p-carousel [value]="blocksSorted" [numVisible]="5" [numScroll]="5" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
     <ng-template pTemplate="item" let-item>
-      <div class="px-2  " *ngIf="item?.blockType?.toUpperCase() =='PRODUCT'">
+      <div class="px-2  sectionGeneral" *ngIf="item?.blockType?.toUpperCase() =='PRODUCT'">
       
         <app-prodcut-card [product]="item?.getAppMarketItemForViewDto?.appItem" [productCard]="item?.getAppMarketItemForViewDto" class=""></app-prodcut-card>
       </div>
@@ -18,7 +18,7 @@
           <a (click)="goToCategory(item)">{{item?.name}}</a>
       </div> -->
 
-      <div *ngIf="item?.blockType?.toUpperCase()=='ATTACHMENT'" class="col p-0  text-center">
+      <div *ngIf="item?.blockType?.toUpperCase()=='ATTACHMENT'" class="col p-0  text-center sectionGeneral" >
         <ng-container [ngSwitch]="kindOfPath(item?.image)">
           <!-- image -->
           <img *ngSwitchCase="'image'"
@@ -35,7 +35,7 @@
           </video>
   
           <!-- pdf -->
-          <div *ngSwitchCase="'pdf'" class="position-relative sectionGeneral">
+          <div *ngSwitchCase="'pdf'" class="position-relative ">
             <!-- <iframe class=" iframSty"
         
                     [src]="attachmentSafeMap[item.id]"

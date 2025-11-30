@@ -23,6 +23,7 @@ import {
     SycEntityObjectStatusesServiceProxy,
     SycEntityObjectStatusLookupTableDto,
     SycEntityObjectTypesServiceProxy,
+    SycIdentifierDefinitionsServiceProxy,
 
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
@@ -30,6 +31,8 @@ import { Observable, Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AppEntityListDynamicModalComponent } from "../app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
 import { DomSanitizer, SafeResourceUrl } from "@node_modules/@angular/platform-browser";
+import { Router } from "@angular/router";
+import { ImageUploadComponentOutput } from "@app/shared/common/image-upload/image-upload.component";
 
 @Component({
     selector: "app-create-or-edit-app-entity-dynamic-modal",
@@ -77,6 +80,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
     pdfSafeMap: { [index: number]: SafeResourceUrl } = {};
     private pdfRawUrl: { [index: number]: string } = {};
     statusValues: SycEntityObjectStatusLookupTableDto[]
+    hideAddToLookupOption = false;
 
     constructor(
         injector: Injector,
@@ -85,6 +89,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
         private _extraAttributeDataService: ExtraAttributeDataService,
         private sanitizer: DomSanitizer,
         private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy,
+        private router: Router,   
+         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy
     ) {
         super(injector);
         this.initUploaders();
@@ -92,7 +98,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
     }
 
     ngOnInit(): void {
-        this.getStatusOptions()
+
+     this.hideAddToLookupOption = this.router.url.includes('/app/main/lookups');
     }
 
 
@@ -103,6 +110,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
     ): void {
         this.entityObjectType = entityObjectType;
         this.displayVisualTypes();
+        this.getStatusOptions();
+        this.getLookupCode()
         this.saving=false;
         if (appEntity) this.appEntity = appEntity;
         else appEntity = new AppEntityDto();
@@ -191,6 +200,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         });
         this.getExtrAttributes();
+        this.initAttachmentSlots();
         this.active = true;
         this.modal.show();
     }
@@ -207,18 +217,25 @@ export class CreateOrEditAppEntityDynamicModalComponent
     }
     resetState() {
         this.appEntity = new AppEntityDto();
-        this._extraAttributeDataService.resetExtraAttrSelectedValues(
-            this.extraAttributes
-        );
+        this._extraAttributeDataService.resetExtraAttrSelectedValues(this.extraAttributes);
         this.displaySaveSideBar = false;
-        this.attachmentsSrcs = [""];
+        this.attachmentsSrcs = [];
         this.uploader.clearQueue();
         this.aspectRatio = undefined;
+    
+        this.initAttachmentSlots();
     }
+    
 
     getStatusOptions() {
         this._sycEntityObjectStatusesAppService.getAllSycEntityStatusForTableDropdown("Lookup").subscribe(result => {
             this.statusValues = result
+            if (!this.appEntity?.id && !this.appEntity.entityObjectStatusId) {
+                const active = this.statusValues.find(s => s.displayName === 'Active');
+                this.appEntity.entityObjectStatusId = active
+                    ? active.id
+                    : this.statusValues[0]?.id;
+            }
         });
     }
 
@@ -649,31 +666,29 @@ export class CreateOrEditAppEntityDynamicModalComponent
             } as any),
             sycAttachmentCategoryName: "",
         });
-    attachmentsSrcs: string[] = Array(1).fill("");
-    adjustImageSrcsUrls() {
-        const atts = this.appEntity?.entityAttachments ?? [];
-        this.attachmentsSrcs = [''];                 // reset
-        this.pdfSafeMap = {};                        // reset
-        this.pdfRawUrl = {};                         // reset (server urls won't be revoked)
+        // attachmentsSrcs: string[] = Array(1).fill("");
+        attachmentsSrcs: string[] = [''];
 
-        atts.forEach((att, idx) => {
-            const full = `${this.attachmentBaseUrl}/${att.url}`;
-            if (/\.pdf$/i.test(att.url)) {
-                this.pdfSafeMap[idx] = this.sanitizer.bypassSecurityTrustResourceUrl(full);
-                this.attachmentsSrcs[idx] = ''; // no image at this index
-            } else {
-                this.attachmentsSrcs[idx] = full;
-            }
-        });
 
-            // ✅ For MARKETPLACESECTIONBLOCK: always keep one empty slot at the end if all filled
-    if (this.canUploadMultipleAttachments &&
-        this.attachmentsSrcs.length &&
-        this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-        this.attachmentsSrcs.length < 10) {
-        this.attachmentsSrcs.push('');
-    }
-    }
+        adjustImageSrcsUrls() {
+            const atts = this.appEntity?.entityAttachments ?? [];
+            this.attachmentsSrcs = [];
+            this.pdfSafeMap = {};
+            this.pdfRawUrl = {};
+        
+            atts.forEach((att, idx) => {
+                const full = `${this.attachmentBaseUrl}/${att.url}`;
+                if (/\.pdf$/i.test(att.url)) {
+                    this.pdfSafeMap[idx] = this.sanitizer.bypassSecurityTrustResourceUrl(full);
+                    this.attachmentsSrcs[idx] = '';
+                } else {
+                    this.attachmentsSrcs[idx] = full;
+                }
+            });
+        
+            this.initAttachmentSlots(); // make sure we respect maxAllowedAttachments
+        }
+        
 
     fileChange(
         event: Event,
@@ -712,7 +727,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
             if (this.canUploadMultipleAttachments &&
                 this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-                this.attachmentsSrcs.length < 10) {
+                this.attachmentsSrcs.length < this.maxAllowedAttachments
+            ) {
                 this.attachmentsSrcs.push('');
             }
 
@@ -721,7 +737,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         }
 
         // Image branch (as you already do)
-        const { onCropDone, data } = this.openImageCropper(event, Number(aspectRatio), cropWithoutOptions);
+        const { onCropDone, data } = this.openImageCropper(event, Number(aspectRatio), cropWithoutOptions,  this.getStaticWidthForEntity());
         const sub = onCropDone.subscribe(() => {
             if (data.isCropDone) {
                 this.tempUploadImage(event, attachmentCategory, data, index);
@@ -743,8 +759,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
         index?: number
     ) {
         const file = (event.target as HTMLInputElement).files[0];
-        attachmentCategory.imgURL =
-            croppedImageContent.croppedImageAsBase64 as string;
+        // attachmentCategory.imgURL =
+        //     croppedImageContent.croppedImageAsBase64 as string;
 
         if (
             this.appEntity.entityAttachments == null ||
@@ -769,17 +785,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
 
 
-        if (this.canUploadMultipleAttachments &&
-            this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-            this.attachmentsSrcs.length < 10) {
-            this.attachmentsSrcs.push('');
-        }
-        // // if all is filled with images add new input
-        // if (
-        //     this.attachmentsSrcs.every((elem) => elem) &&
-        //     this.attachmentsSrcs.length < 10
-        // )
-        //     this.attachmentsSrcs.push("");
+//         if (this.canUploadMultipleAttachments &&
+//             this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+//             this.attachmentsSrcs.length < this.maxAllowedAttachments
+// ) {
+//             this.attachmentsSrcs.push('');
+//         }
+  
     }
 
     // removePhoto(i: number) {
@@ -792,13 +804,17 @@ export class CreateOrEditAppEntityDynamicModalComponent
     //     if (this.attachmentsSrcs.length === 0) this.attachmentsSrcs.push("");
     //     this.uploader.removeFromQueue(this.uploader.queue[i]);
     // }
-    removePhoto(i: number) {
-        // Single-image behavior for other entity types
-        if (!this.canUploadMultipleAttachments && this.appEntity.entityAttachments.length > 1) {
+    onRemovePhoto(i: number, event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+    
+       
+        if (!this.canUploadMultipleAttachments &&
+            this.appEntity.entityAttachments.length > 1) {
             return this.notify.info("Please set another image as default first");
         }
-    
-        // Clean PDF URLs if needed
+        
+
         if (this.pdfRawUrl[i]) {
             URL.revokeObjectURL(this.pdfRawUrl[i]);
             delete this.pdfRawUrl[i];
@@ -825,6 +841,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             this.uploader.removeFromQueue(this.uploader.queue[i]);
         }
     }
+    
     
     // removeAllAttachments() {
     //     if (this.attachmentsSrcs.length) {
@@ -886,6 +903,209 @@ export class CreateOrEditAppEntityDynamicModalComponent
     get canUploadMultipleAttachments(): boolean {
         return this.entityObjectType?.code === 'MARKETPLACESECTIONBLOCK';
     }
+
+     async getLookupCode(){
+        if(!this.appEntity.code){
+         let  sequance="";
+   
+ 
+         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType.code,this.appSession.tenantId).toPromise()
+         if(getNextEntityCodeRes)
+             sequance=getNextEntityCodeRes;
+ 
+         this.appEntity.code= sequance;
+     }
+    }
+
+    getStaticWidthForEntity(): number {
+        switch (this.entityObjectType?.code) {
+            case 'MARKETPLACESECTIONBLOCK':
+            case 'MARKETPLACESECTION':
+                return 318;  // same as your crop/resize logic
+            default:
+                return 200;
+        }
+    }
     
+    onImageBrowseDone(
+        event: ImageUploadComponentOutput,
+        cat: SycAttachmentCategoryDto,
+        index: number
+    ): void {
+    
+        if (!event?.file || !cat) {
+            return;
+        }
+    
+        const file = event.file;
+        const isPdf =
+            file.type === 'application/pdf' ||
+            /\.pdf$/i.test(file.name);
+    
+        this.appEntity.entityAttachments ??= [];
+        this.attachmentsSrcs ??= [];
+    
+        const guid = this.guid();
+    
+      
+        let attIndex = this.appEntity.entityAttachments.findIndex(
+            a => a.attachmentCategoryId === cat.id && a.index === index
+        );
+    
+        let att: AppEntityAttachmentDto;
+        if (attIndex === -1) {
+            att = new AppEntityAttachmentDto();
+            att.attachmentCategoryId = cat.id;
+            att.index = index;
+            this.appEntity.entityAttachments.push(att);
+            attIndex = this.appEntity.entityAttachments.length - 1;
+        } else {
+            att = this.appEntity.entityAttachments[attIndex];
+        }
+    
+        att.fileName = file.name;
+        att.guid = guid;
+
+        if (index >= this.attachmentsSrcs.length) {
+            this.attachmentsSrcs.length = index + 1;
+        }
+
+        if (this.pdfRawUrl?.[index]) {
+            URL.revokeObjectURL(this.pdfRawUrl[index]);
+            delete this.pdfRawUrl[index];
+        }
+        delete this.pdfSafeMap[index];
+
+        if (isPdf) {
+            const url = URL.createObjectURL(file);
+            this.pdfRawUrl[index] = url;
+            this.pdfSafeMap[index] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+            this.attachmentsSrcs[index] = '';
+        } else {
+
+            this.attachmentsSrcs[index] = event.image || '';
+        }
+    
+        this.uploader.addToQueue([file]);
+    
+        this.uploader.onBuildItemForm = (_fileItem, form: any) => {
+            form.append('guid', guid);
+            form.append('attachmentCategoryId', String(cat.id));
+        };
+    
+        this.uploader.uploadAll();
+    
+        this.uploader.onSuccessItem = (_item, response) => {
+            try {
+                const ajaxResponse = JSON.parse(response || '{}');
+                if (ajaxResponse?.success && ajaxResponse?.result) {
+                    const r = ajaxResponse.result;
+                    const idx = this.appEntity.entityAttachments.findIndex(a => a.guid === r.guid);
+                    if (idx > -1) {
+                        this.appEntity.entityAttachments[idx].id = r.id;
+                        this.appEntity.entityAttachments[idx].url = r.url;
+                    }
+                }
+            } catch {
+                // ignore parse error
+            }
+            this.notify.info(this.l('UploadSuccessfully'));
+            this.uploader.onSuccessItem = (_item, response) => {
+                try {
+                    const ajaxResponse = JSON.parse(response || '{}');
+                    if (ajaxResponse?.success && ajaxResponse?.result) {
+                        const r = ajaxResponse.result;
+                        const idx = this.appEntity.entityAttachments.findIndex(a => a.guid === r.guid);
+                        if (idx > -1) {
+                            this.appEntity.entityAttachments[idx].id = r.id;
+                            this.appEntity.entityAttachments[idx].url = r.url;
+                        }
+                    }
+                } catch { }
+            
+                this.notify.info(this.l('UploadSuccessfully'));
+            
+                // ⭐ بعد الرفع: لو نقدر نضيف attach تاني و مافيش slot فاضي في الآخر → نزود ''
+                if (this.canUploadMultipleAttachments) {
+                    const max = this.maxAllowedAttachments;
+            
+                    const filledCount = this.attachmentsSrcs.filter(
+                        (s, i) => s || this.pdfSafeMap[i]
+                    ).length;
+            
+                    const lastIndex = this.attachmentsSrcs.length - 1;
+                    const lastIsEmpty =
+                        lastIndex >= 0 &&
+                        !this.attachmentsSrcs[lastIndex] &&
+                        !this.pdfSafeMap[lastIndex];
+            
+                    if (!lastIsEmpty && filledCount < max) {
+                        this.attachmentsSrcs.push('');
+                    }
+                }
+            };
+            
+        };
+    }
+    
+    onRemoveImageFromUpload(
+        _event: any,
+        cat: SycAttachmentCategoryDto,
+        index: number
+    ): void {
+    
+        this.appEntity.entityAttachments ??= [];
+        this.attachmentsSrcs ??= [''];
+    
+        const i = this.appEntity.entityAttachments.findIndex(
+            a => a.attachmentCategoryId === cat.id && a.index === index
+        );
+        if (i > -1) {
+            this.appEntity.entityAttachments.splice(i, 1);
+        }
+
+        this.attachmentsSrcs.splice(index, 1);
+
+        if (this.pdfRawUrl?.[index]) {
+            URL.revokeObjectURL(this.pdfRawUrl[index]);
+            delete this.pdfRawUrl[index];
+        }
+        delete this.pdfSafeMap[index];
+    
+        if (!this.attachmentsSrcs.length) {
+            this.attachmentsSrcs = [''];
+        }
+    }
+    getStaticHeightForEntity(): number {
+        switch (this.entityObjectType?.code) {
+            case 'MARKETPLACESECTIONBLOCK':
+            case 'MARKETPLACESECTION':
+                return 200;   // matches 16:9 with width 355 ≈ 355x200
+            default:
+                return 120;
+        }
+    }
+
+    get maxAllowedAttachments(): number {
+        return this.entityObjectType?.code === 'MARKETPLACESECTIONBLOCK'
+            ? 2
+            : 1;
+    }
+    private initAttachmentSlots(): void {
+        if (!this.attachmentsSrcs) {
+          this.attachmentsSrcs = [];
+        }
+      }
+      
+    
+      get currentAttachmentsCount(): number {
+        return this.appEntity?.entityAttachments?.length || 0;
+      }
+      
+      get nextUploadIndex(): number {
+
+        return this.currentAttachmentsCount;
+      }
+      
 }
 
