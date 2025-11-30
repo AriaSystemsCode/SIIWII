@@ -1,0 +1,198 @@
+<div class="single-item mr-2 row   memberCard_container shadowContainer"
+    [ngClass]="singleItemPerRowMode?'p-0 no-padding-bottom' :'p-4 extra-padding-bottom'">
+    <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around  single-item-photo" [ngStyle]="{
+        'background-image':
+        account.account.logoUrl ?
+        'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
+        '' , 
+    'height': singleItemPerRowMode ? 'auto' : '100px', 
+    'width':  singleItemPerRowMode  ? '200px' : '100px'
+}" (click)="clickCardHandler()">
+        <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
+    </div>
+    <div class="single-item-body col pr-0" style="width: 176px;" [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}">
+        <div>
+            <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" class="p-0">
+                <h3 (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                    {{account?.account?.name}}</h3>
+                <p class="text-primary m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
+                    {{ account?.account.description | textSubstring : 60 }}
+                </p>
+                <div class="info-container d-flex flex-column">
+                    <!-- Categories Section -->
+                    <div *ngIf="singleItemPerRowMode && account.account.categories"
+                        class="d-flex align-items-center mb-1">
+                        <p class="text-dark m-0 product-name"
+                            style="font-weight: 600; font-size: 14px; min-width: 150px;">
+                            <b>{{"Categories" | localize}}</b> :
+                        </p>
+                        <span class="d-flex flex-wrap align-items-center">
+                            <span *ngFor="let category of account.account.categories" class="mt-2" style="background-color: #F8F8F8F8 !important;
+                                padding: 5px;
+                                border: 1px solid #E6E6E6;
+                                border-radius: 4px;
+                                margin-right: 5px;">
+                                {{ category }}
+                            </span>
+                            <span *ngIf="account.account.categories.length === 0" class="mt-2">
+                                {{ "NotSpecified" | localize }}
+                            </span>
+                        </span>
+                    </div>
+
+                    <!-- Classifications Section -->
+                    <div *ngIf="singleItemPerRowMode && account.account.classfications"
+                        class="d-flex align-items-start">
+                        <p class="text-dark m-0 product-name"
+                            style="font-weight: 600; font-size: 14px; min-width: 150px;">
+                            <b>{{ "Classifications" | localize }}</b> :
+                        </p>
+                        <span class="d-flex flex-wrap align-items-center">
+                            <span *ngFor="let class of account.account.classfications" class="mt-2" style="background-color: #F8F8F8F8 !important;
+                                padding: 5px;
+                                border: 1px solid #E6E6E6;
+                                border-radius: 4px;
+                                margin-right: 5px;">
+                                {{ class }}
+                            </span>
+                            <span *ngIf="account.account.classfications.length === 0" class="mt-2">
+                                {{ "NotSpecified" | localize }}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+
+
+                <div [ngClass]="singleItemPerRowMode?'pt-0 d-flex align-items-center mb-1' : ''">
+                    <!-- Account Type -->
+                    <b class="accountType_label" [ngStyle]="{
+                      'color': singleItemPerRowMode ? 'black' : '#595959'
+                    }" style="min-width: 115px;">
+                        {{ "AccountType" | localize }}:
+                    </b>
+                    <span class="accountType_value  mt-2">
+                        {{ account.account.accountType || ('NotSpecified' | localize) }}
+                    </span>
+                </div>
+                <div *ngIf="singleItemPerRowMode" class="d-flex align-items-center mb-1">
+                    <!-- Zipcode -->
+                    <b style="font-weight: 600; font-size: 14px; color: black; min-width: 115px;">
+                        {{ "Zipcode" | localize }}:
+                    </b>
+                    <span class="pl-2">
+                        {{ account.account.zipCode ? account.account.zipCode : ("NotSpecified" | localize) }}
+                    </span>
+                </div>
+
+
+            </div>
+
+            <div>
+                <div class="btn-group dropdown" dropdown *ngIf="false">
+                    <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
+                    </button>
+                    <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                        <li>
+                            <a href="javascript:;"
+                                *ngIf="isManual === false                                                                                                                                                                                                      "
+                                (click)="viewProfile()">{{l('ViewProfile')}}</a>
+                        </li>
+
+                        <li>
+                            <a *ngIf="isManual===true" (click)="edit()">{{'Edit' | localize}}</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" *ngIf="isManual === true" (click)="deleteAccount()">{{ 'Delete' |
+                                localize }}</a>
+                        </li>
+
+                    </ul>
+                </div>
+                <div>
+                    <div>
+
+                        <div style="width: 100%; " class="mt-4 d-flex justify-content-between align-items-center" *ngIf="(account?.availableConnections?.length == 0 && account?.connectionName && fromMarketplace) || (!fromMarketplace && account?.connectionName)">
+                            <img *ngIf="account?.visibility == 'Public' && !fromMarketplace" class="" style="width: 30px;  " src="../../assets/accounts/views.png"
+                                (click)="makeRelationPrivatePublic(account,false)" />
+                            <img *ngIf="account?.visibility != 'Public' && !fromMarketplace" class="" style="width: 30px;   " src="../../assets/accounts/hidden.png"
+                                (click)="makeRelationPrivatePublic(account,true)" />
+                             <div *ngIf="fromMarketplace"></div>
+                            <div class="btn relation_Status_button " [ngStyle]="{
+                                'bottom':  singleItemPerRowMode  ? '5px' : '1px'
+                            }" style="    white-space: nowrap;
+                              cursor: auto;  " dropdown>
+
+                                <button type="button" dropdownToggle style="  border: none !important;
+                                background: white;padding: 0;">
+                                    <img class="pb-1 mr-1" style="width: 17px;"
+                                        src="../../assets/accounts/ph_check-bold.png" /><span *ngIf="getFormattedConnectionName('connectionName') as connName"
+                                        [title]="connName">
+                                    {{ connName.length > 10 ? (connName | slice:0:10) + '...' : connName | localize }}
+                                  </span>
+                                  <i
+                                        class="fas fa-lg ml-4 fa-angle-down" style="color: #777777 !important;"></i>
+                                </button>
+
+                                <ul *dropdownMenu class="dropdown-menu" role="menu"  [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
+                                    <li role="menuitem">
+                                        <button class="dropdown-item" type="button" (click)="removeRelation(account)">
+                                            {{ getFormattedConnectionName('disConnectLabel') }}
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+
+                        </div>
+
+                        <span style="width: 100%; " class="mt-3"
+                            *ngIf="(account?.availableConnections?.length > 0 && fromMarketplace && account?.avaliableConnectionName) || (!fromMarketplace
+                             && !account.connectionName && account.avaliableConnectionName)">
+
+                            <!-- Guard + alias once -->
+                            <ng-container *ngIf="account?.availableConnections as options">
+                                <div
+                                    [ngStyle]="{ bottom: singleItemPerRowMode ? '5px' : '1px' }"
+                                    style="white-space: nowrap; position: absolute; right: 5px;" dropdown>
+                                    <!-- Main button = first option -->
+                                    <button type="button" class="relation_button" dropdownToggle
+                                       >
+                                        <img class="pb-1" style="width: 20px;" (click)="createRelation(options[0])"
+                                            [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
+                                        <span  (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectLabel">{{  
+                                            options[0]?.connectLabel?.length > 10
+                                              ? (options[0].connectLabel | slice: 0:10) + '...'
+                                              : options[0]?.connectLabel
+                                      
+                                        }}</span>
+
+                                        <!-- caret only if there are more -->
+                                        <i *ngIf="options.length > 1" class="fas fa-lg ml-4 fa-angle-down"
+                                            style="color: #fff !important;"></i>
+                                    </button>
+
+                                    <!-- Dropdown only if > 1 -->
+                                    <ng-container *ngIf="options.length > 1">
+                                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                          <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                                            <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                                              <img class="pb-1 mr-2" style="width: 18px;" [src]="getConnectionIcon(option?.connectLabel)" alt="" />
+                                              {{ option?.connectLabel }}
+                                            </button>
+                                          </li>
+                                        </ul>
+                                      </ng-container>
+                                      
+                                </div>
+                            </ng-container>
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

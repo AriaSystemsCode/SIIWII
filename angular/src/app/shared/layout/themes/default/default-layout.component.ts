@@ -44,6 +44,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     tenantLogo:any;
     isAuthenticated = this.appSession?.user
     hideTopbar:boolean = true
+
+  
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -61,6 +63,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.menu = this._appNavigationService.getMenu();
    
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
+   
 
         this._router.events
             .pipe(filter(event => event instanceof NavigationEnd))
@@ -73,7 +76,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
             });
     }
 
-    
+ 
       toggleSidebar() {
         this.isMinimized = !this.isMinimized;
       }
@@ -124,4 +127,6 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     onOpenSideBar($event:boolean){
         this.openSideBar=$event
     }
+
+ 
 }

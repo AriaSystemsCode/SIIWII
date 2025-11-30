@@ -19,11 +19,11 @@ import {
     GetMaintainanceForViewDto,
     MaintainancesServiceProxy,
     AppTransactionServiceProxy,
-    ICreateOrEditAppTransactionsDto,
     ShoppingCartSummary,
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
+    AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -40,21 +40,15 @@ import {
 } from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
+import Swal from "sweetalert2";
 
-export enum MarketPlace {
-    Accounts,
-    Products,
-    Persons,
-}
 
 @Component({
     templateUrl: "./topbar.component.html",
     selector: "topbar",
     styleUrls: ["./topbar.component.scss"],
 })
-export class TopBarComponent
-    extends ThemesLayoutBaseComponent
-    implements OnInit {
+export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit {
     attachmentBaseUrl = AppConsts.attachmentBaseUrl;
     hubConnection: signalR.HubConnection;
     _belowBar = false;
@@ -68,50 +62,27 @@ export class TopBarComponent
     tenancyName = "";
     userName = "";
     name = "";
-    defaultProfilePicture =
-        AppConsts.appBaseUrl +
-        "/assets/common/images/default-profile-picture.png";
-    profilePicture = this.defaultProfilePicture;
-    defaultLogo =
-        AppConsts.appBaseUrl +
-        "/assets/common/images/app-logo-on-" +
-        this.currentTheme?.baseSettings?.menu?.asideSkin +
-        ".svg";
+
+       
+    profilePicture = AppConsts.appBaseUrl + "/assets/common/images/default-profile-picture.png";
+    defaultLogo = AppConsts.appBaseUrl + "/assets/common/images/app-logo-on-" + this.currentTheme?.baseSettings?.menu?.asideSkin + ".svg";
     recentlyLinkedUsers: LinkedUserDto[];
     unreadChatMessageCount = 0;
     unreadMessageCount = 0;
-    remoteServiceBaseUrl: string = AppConsts.remoteServiceBaseUrl;
     chatConnected = false;
-    isQuickThemeSelectEnabled: boolean = this.setting.getBoolean(
-        "App.UserManagement.IsQuickThemeSelectEnabled"
-    );
     installationMode = true;
     topbardropDown: TopbardropDown[] = [];
     display: boolean = false;
     items: MenuItem[];
     dt: string;
     roles: any[];
-    public orderForm: FormGroup;
-    submitted: boolean = false;
-    salesOrderControls: ICreateOrEditAppTransactionsDto;
-    selectedCar: number;
-    buyerCompanies: any[];
-    sellerCompanies: any[];
-    buyerContacts: any[];
-    sellerContacts: any[];
-    searchTimeout: any;
-    buyerComapnyId: number = 0;
-    sellerCompanyId: number = 0;
-    sellerContactId: number;
-    buyerContactId: number;
-    isCompantIdExist: boolean = false;
-    isSellerCompanyIdExist: boolean = false;
+    orderNo: any;
     role: string;
     formType: string;
-    isRoleExist: boolean = false;
-    btnLoader: boolean = false;
+
+  
     modalheaderName: string;
-    showSearch:boolean =false;
+    showSearch: boolean = false;
     shoppingCartSummary: ShoppingCartSummary;
     defaultSellerLogo: string = "";
     defaultBuyerLogo: string = "";
@@ -126,6 +97,8 @@ export class TopBarComponent
     searchInput:string
     bgCol:string 
     tenantLogo:string
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -144,7 +117,7 @@ export class TopBarComponent
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
-        
+        private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
 
@@ -182,7 +155,6 @@ export class TopBarComponent
         ];
     }
 
-    orderNo: any;
     getOderNumber(tranType: string, tranName: string) {
         this._AppTransactionServiceProxy
             .getNextOrderNumber(tranType)
@@ -203,6 +175,8 @@ export class TopBarComponent
     ngOnInit() {
         console.log(this.isAuthenticated,'this.isAuthenticated');
         this.getTenantData()
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
@@ -224,7 +198,7 @@ export class TopBarComponent
 
         this.hubConnection.on("SendBuildMessage", (data) => {
             this.belowBar(data);
-            console.log(data);
+
         });
 
         this.installationMode = UrlHelper.isInstallUrl(location.href);
@@ -282,7 +256,7 @@ export class TopBarComponent
         this.userName = this.appSession.user.userName;
         this.name = this.appSession.user.name;
         this.fullName =
-            this.appSession.user.name +' '+ this.appSession.user.surname;
+            this.appSession.user.name + ' ' + this.appSession.user.surname;
         console.log(">>", this.appSession.user);
     }
     closeModal(value: boolean) {
@@ -305,12 +279,7 @@ export class TopBarComponent
         this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
             this.profilePicture = res;
         });
-        // this._profileServiceProxy.getProfilePicture().subscribe((result) => {
-        //     if (result && result.profilePicture) {
-        //         this.profilePicture =
-        //             "data:image/jpeg;base64," + result.profilePicture;
-        //     }
-        // });
+
     }
 
     getRecentlyLinkedUsers(): void {
@@ -458,18 +427,18 @@ export class TopBarComponent
     }
     getUnreadMessageCount() {
         this._MessageServiceProxy.getUnreadCounts(null).subscribe((result) => {
-            if(result){
+            if (result) {
                 this.unreadMessageCount = result;
 
             }
         });
     }
 
-    
+
     onImageError(event: any, type: 'seller' | 'buyer') {
-      event.target.src = type === 'seller' ? this.defaultSellerLogo : this.defaultBuyerLogo;
+        event.target.src = type === 'seller' ? this.defaultSellerLogo : this.defaultBuyerLogo;
     }
-    
+
     getShoppingCartInfo(openShoppingCart: boolean = false) {
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
@@ -480,20 +449,65 @@ export class TopBarComponent
                     this.transactionType = "PO";
 
 
-                  if(this.shoppingCartSummary?.amount)
-                  this.shoppingCartSummary?.amount % 1 ==0?this.shoppingCartSummary.amount=parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)):null; 
+                if (this.shoppingCartSummary?.amount)
+                    this.shoppingCartSummary?.amount % 1 == 0 ? this.shoppingCartSummary.amount = parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)) : null;
 
                 if (openShoppingCart)
                     this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
 
-                     //Currency
-            this._AppEntitiesServiceProxy.getCurrencyInfo(res?.currencyCode)
-            .subscribe((res: CurrencyInfoDto) => {
-                this.currencySymbol = res?.symbol ? res?.symbol : res?.code  ;
-            });
+                //Currency
+                this._AppEntitiesServiceProxy.getCurrencyInfo(res?.currencyCode)
+                    .subscribe((res: CurrencyInfoDto) => {
+                        this.currencySymbol = res?.symbol ? res?.symbol : res?.code;
+                    });
 
             });
-            
+
+    }
+
+    CreateBusiness_GroupAccount(accout_type: string, account_name: string): void {
+
+        let type = accout_type;
+        let accountname = account_name;
+        let email = this.appSession.user.emailAddress;
+        let url = this.appUrlService.appRootUrl;
+        let tenantName = this.appSession.tenant.name;
+        //let tenantName =this.appSession.tenancyName;
+        let firstName = btoa(this.appSession.user.name);
+        let lastName = btoa(this.appSession.user.surname);
+        let relatedTenantId = this.appSession.tenantId;
+        const htmlTitle: string = `<div class="font-weight-bold"><p class="text-left alarmInfo_title"> <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"/> A registration Email has been Sent to ` + email + ` </p> </div> `;
+        const htmlContent: string = `<p class="pleaseClick" style="color: #9E9E9E;">*Please Click on the register link in the email in order to create the new  Business | group account. </p> `;
+        var tenantId;
+        if (this.appSession?.tenantId)
+            tenantId = this.appSession?.tenantId?.toString();
+        else tenantId = null;
+        let link = url + "/account/select-edition?editionId=1&subscriptionStartType=1&accountTypeLabel=" + type + "&accountType=" + type + "&firstName=" + firstName + "&lastName=" + lastName + "&relatedTenantId=" + relatedTenantId;
+        Swal.fire({
+            title: htmlTitle,
+            html: htmlContent,
+            showCancelButton: false,
+            //cancelButtonText: this.l("No"),
+            confirmButtonText: "okay",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+            customClass: {
+                popup: 'popup_container popup_container_CreateBusiness_GroupAccount',
+                content: 'popup_content',
+                actions: 'popup_actions',
+                confirmButton: 'popp_confirm-button',
+
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                this._accountsServiceProxy.sendRegistrationEmail(email, tenantId, type, link, tenantName).subscribe(
+                    response => {
+                        console.log('Email sent successfully', response);
+                    })
+            }
+        })
     }
 
     onSearch(ev?: Event): void {
@@ -528,6 +542,7 @@ export class TopBarComponent
     }
 
 }
+
 
 export interface TopbardropDown {
     title: string;

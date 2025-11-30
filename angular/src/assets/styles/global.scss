@@ -181,11 +181,12 @@ body {
 
 
 .bgPurple{
-    background-color: #700066 !important;
+    background-color: #4A0D4A !important;
+    color: #fff !important;
 }
 
 .colorPurple{
-    color: #700066 !important;
+    color: #4A0D4A !important;
 }
 
 .w-80{
@@ -807,4 +808,36 @@ html{
     color: #1B101B !important;
     font-weight: 700 !important;
     padding: 10px;
+  }
+.kt-scrolltop--on .kt-scrolltop:hover {
+    background-color: #4A0D4A !important;
+}
+
+
+.p-icon-wrapper{
+    right: auto !important;
+}
+
+.marketplaceAccountProfile .tabview-custom .p-tabview-nav {
+    border-bottom: 4px solid #EEEEEE;
+    margin: 5px;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav li{
+    padding-bottom: 5px;
+}
+
+html{
+    overflow: auto !important;
+    overflow-y: auto !important;
+.p-checkbox .p-checkbox-box .p-icon {
+    position: relative;
+    left: 40%;
+    right: 40%;
+}
 }

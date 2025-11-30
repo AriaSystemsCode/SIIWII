@@ -18,6 +18,7 @@ export class ReactionsActionComponent extends AppComponentBase {
     Reactions = Reactions
     isAuthenticated = this.appSession?.user
 
+
     constructor(
         private injector:Injector,
         ) {

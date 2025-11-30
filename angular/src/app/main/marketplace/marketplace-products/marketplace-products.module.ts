@@ -66,6 +66,6 @@ import { OverALLRatingReviewsModule } from "@app/main/overallRating-reviews/over
         OverALLRatingReviewsModule
     ],
     providers:[AppMarketplaceItemsServiceProxy],
-    exports:[ProdcutCardComponent]
+    exports:[ProdcutCardComponent,ProdcutCardComponent]
 })
 export class MarketplaceProductsModule {}

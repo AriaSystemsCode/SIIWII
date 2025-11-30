@@ -17,7 +17,7 @@ namespace onetouch.AppEntities
 		Task<PagedResultDto<LookupLabelDto>> GetAllCurrencyForTableDropdownWithPaging(GetAllAppEntitiesInput input);
 		Task<PagedResultDto<LookupLabelDto>> GetAllLanguageForTableDropdownWithPaging(GetAllAppEntitiesInput input);
 		Task<PagedResultDto<LookupLabelDto>> GetAllCountryForTableDropdowWithPaging(GetAllAppEntitiesInput input);
-		Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input);
+		Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input, bool hasManual = true);
 		Task<PagedResultDto<LookupLabelDto>> GetAllEntityTypeForTableDropdown(GetAllAppEntitiesInput input);
 		Task<List<LookupLabelDto>> GetAllAccountTypeForTableDropdown();
 		Task<PagedResultDto<LookupLabelWithAttachmentDto>> GetAllBackgroundWithPaging(GetAllAppEntitiesInput input);
@@ -93,6 +93,9 @@ namespace onetouch.AppEntities
 		Task<List<LookupLabelDto>> GetAllUOMForTableDropdown();
 		//Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown();
 		//MMT-43
+		//I40[Start]
+		Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId);
+		//I40[End]
 		//I49[Start]
 		Task<string> GetHostSettingValue(long settingId, string type="");
 		Task<string> GetTenantSettingValue(long settingId, string type="");

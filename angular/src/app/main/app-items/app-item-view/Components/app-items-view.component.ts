@@ -185,6 +185,7 @@ export class AppItemsViewComponent
     acceptedAspectRatio;
     languageSettingName  =AppConsts.languageSettingName;
     pdfCache: { [key: string]: string } = {};
+
     public constructor(
         private _router: Router,
         private _appItemsServiceProxy: AppItemsServiceProxy,

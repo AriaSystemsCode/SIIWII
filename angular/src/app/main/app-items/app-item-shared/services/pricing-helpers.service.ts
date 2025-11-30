@@ -14,6 +14,7 @@ export class PricingHelpersService extends AppComponentBase {
   defaultLevel:string ;
   languageSettingName  =AppConsts.languageSettingName;
 
+  
   constructor(private injector: Injector) {
 
     super(injector)

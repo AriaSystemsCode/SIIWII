@@ -1,5 +1,6 @@
 
 import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
@@ -201,6 +202,11 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         }
         this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
       }
+  //     else {
+  //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
+  //   attr.selectedValues = this.defaultBooleanValue;
+  // }
+  //     }
     }
 
   }
@@ -241,10 +247,19 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     this.extraDataChanged.emit(this.selectedExtraData);
   }
 
+  onImageSelected(event: ImageUploadComponentOutput, attr: any) {
+    attr.selectedValues = event.image;
+    this.onAnyInputChange(); // emit change
+  }
+  
+  onImageRemoved(attr: any) {
+    attr.selectedValues = '';
+    this.onAnyInputChange(); // emit change
+  }
+  
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
-    setTimeout(() => this.onAnyInputChange(), 0);
   }
 
   isArray(val: any): boolean {

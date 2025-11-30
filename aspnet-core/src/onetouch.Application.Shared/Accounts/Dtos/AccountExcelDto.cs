@@ -100,6 +100,12 @@ namespace onetouch.Accounts.Dtos
         public string Image5Type { get; set; }
         public string Image5FileName { get; set; }
         public string Image5Guid { get; set; }
+        //I40[Start]
+        public AccountExcelDto ShallowCopy()
+        {
+            return (AccountExcelDto)MemberwiseClone();
+        }
+        //I40[End]
     }
     //I46[Start]
     public class ImportContactReturnDto
@@ -110,4 +116,5 @@ namespace onetouch.Accounts.Dtos
         public string ErrorType { set; get; }
     }
     //I46[End]
-}
+    
+    }

@@ -2,8 +2,7 @@ import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, V
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AccountDto, AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
-import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
+import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-all-reviews-list',
@@ -14,7 +13,10 @@ import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/imag
 
 export class AllReviewsListComponent extends AppComponentBase implements OnInit {
   @Input() entityID : number
-
+  @Input() isPublished : boolean
+  @Input() fromOverview : boolean
+  @Input() alreadyReviewdMsg : string = 'You’ve already reviewed this product'
+  
   @Output() refreshRating : EventEmitter<boolean> = new EventEmitter<boolean>()
   
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;
@@ -29,7 +31,6 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   messages: CreateMessageInput = new CreateMessageInput();
   attachmentsUploader: FileUploaderCustom;
   isExpanded: boolean = false;
-  isUserReviewdBefore: boolean = false
   SuccessMsg: boolean = false
   isEmojiPickerOpen: boolean = false; // Toggle emoji picker visibility
   emojis: string[] = [
@@ -59,7 +60,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   }
   ngOnInit() {
     this.getAllReviws()
-        // ✅ Provide fallback/mock image category
+  
         if (!this.sycAttachmentCategoryImage) {
           this.sycAttachmentCategoryImage = {
             id: 1,
@@ -80,17 +81,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   }
   testImage: string = '';
 
-  // onImageSelected(event: ImageUploadComponentOutput, attr: any) {
-  //   this.testImage = event.image;
-  
-  //   // ✅ Push image to selectedMedia to be uploaded
-  //   this.selectedMedia.push({
-  //     url: event.image,
-  //     type: 'image',
-  //     file: event.file
-  //   });
-  // }
-  
+
   
   onImageRemoved(attr: any) {
     this.testImage = '';
@@ -123,6 +114,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
       )
       .pipe(
         finalize(() => {
+          this.resetForm()
           this.hideMainSpinner()
         })
       )
@@ -166,7 +158,7 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
         // Handle reviews properly
         const newReviews = result.items.map((review) => ({
           ...review,
-          isExpanded: false, // Add `isExpanded` property for tracking
+          isExpanded: false, 
         }));
 
         if (this.skipCount === 0) {
@@ -299,41 +291,41 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   
 
   postReview() {
-    
     this.showMainSpinner();
+  
     if (this.selectedMedia?.length > 0)
-      this.onUploadAttachments()
+      this.onUploadAttachments();
+  
     this.messages.to = null;
     this.messages.bodyFormat = this.reviewText;
     this.messages.body = this.reviewText;
-    this.messages.mesasgeObjectType = MesasgeObjectType.Review
-    this.messages.relatedEntityId = this.entityID
-    this.messages.subject = ''
+    this.messages.mesasgeObjectType = MesasgeObjectType.Review;
+    this.messages.relatedEntityId = this.entityID;
+    this.messages.subject = '';
+  
+    const ratingValue = this.selectedRating; 
+  
     setTimeout(() => {
-
-    this.messageServiceProxy
-      .createMessage(this.messages)
-      .pipe(finalize(() => {
-        this.hideMainSpinner();
-        this.notify.info(this.l("SendSuccessfully"));
-        this.getAllReviws()
-        this.messages.entityAttachments = [];
-
-        this.messages = new CreateMessageInput();
-        this.resetForm()
-        this.refreshRating.emit(true)
-        this.onlyMsg = false
-        
-      }))
-      .subscribe(() => {
-        this.messageServiceProxy
-          .createUserEntityRating(this.selectedRating, this.entityID)
-
-          .subscribe(() => {
-
-          });
-
-      });
-    }, 1000); // ⏱ 2-second delay (2000 milliseconds)
+      this.messageServiceProxy
+        .createMessage(this.messages)
+        .pipe(finalize(() => {
+          this.hideMainSpinner();
+          this.notify.info(this.l("SendSuccessfully"));
+          this.getAllReviws();
+          this.messages.entityAttachments = [];
+          this.messages = new CreateMessageInput();
+          this.resetForm();            
+          this.onlyMsg = false;
+        }))
+        .subscribe(() => {
+  
+          this.messageServiceProxy
+            .createUserEntityRating(ratingValue, this.entityID)
+            .pipe(finalize(() => this.refreshRating.emit(true)))
+            .subscribe(() => {});
+        });
+  
+    }, 1000);
   }
+  
 }

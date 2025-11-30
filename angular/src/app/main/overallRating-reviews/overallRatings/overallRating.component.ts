@@ -12,6 +12,7 @@ import {   MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies
 export class OverallRatingComponent extends AppComponentBase implements OnInit, OnDestroy {
 
   @Input() overRating: OverAllRatingDto
+  @Input() fromOverview: boolean 
 
   baseUrl: string = AppConsts.attachmentBaseUrl;
 

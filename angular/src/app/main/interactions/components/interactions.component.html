@@ -1,5 +1,5 @@
  <!-- <hr *ngIf="!parentId" [ngClass]="{'visibility-hidden': !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount}"> -->
- <div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between mt-4" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
+<div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
     <app-reactions-stats
         [entityId]="entityId"
         [usersReactionsStats]="usersReactionsStats"
@@ -13,7 +13,7 @@
         >
         </app-views-stats>
     </div>
-    <div (click)="fromTrans ? openReplyScreen(comment) :triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0" class="pr-5 pr-md-0">
+    <div (click)="fromTrans ? openReplyScreen(comment) :triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0 && !fromOverview" class="pr-5 pr-md-0">
         <app-comments-stats
             [commentsCount]="usersReactionsStats.commentsCount"
             [parentId]="parentId"
@@ -75,7 +75,7 @@
                     {{ parentId ? 'Reply' : 'Comment' | localize}}
                 </a>
             </div>
-            <div *ngIf="parentId && usersReactionsStats?.commentsCount > 0 && !fromOverview" (click)="triggerCommentsList()"  class="pr-5 pr-md-0">
+            <div *ngIf="parentId && usersReactionsStats?.commentsCount > 0 && !fromOverview" (click)="fromTrans ? openReplyScreen(comment) :triggerCommentsList()"  class="pr-5 pr-md-0">
                 <app-comments-stats
                     [commentsCount]="usersReactionsStats.commentsCount"
                     [parentId]="parentId"
@@ -101,6 +101,9 @@
     (newCommentAdded)="changeCommentCountLocally(1)"
     [addNewThread]="addNewThread"
     [commentType]="commentType"
+    [fromOverview]="true"
+
+    [toName]="comment?.messages?.toName"
  
 
 >

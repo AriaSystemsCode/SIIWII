@@ -25,7 +25,15 @@ import { BsDatepickerModule } from '@node_modules/ngx-bootstrap/datepicker';
 import { CalendarModule } from 'primeng/calendar';
 import { dynamicInputsView } from '@shared/components/dynamic-inputs-view/dynamic-inputs-view.component';
 import { relatedItemModule } from '@app/relatedItems/relatedItem.module';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
+@NgModule({
+  imports: [
+    // other modules
+    InputSwitchModule
+  ]
+})
+export class YourModuleName {}
 
 @NgModule({
   declarations: [
@@ -61,7 +69,7 @@ import { relatedItemModule } from '@app/relatedItems/relatedItem.module';
     AppEntityDynamicModalModule,
     CalendarModule,
     InputNumberModule,
- 
+    InputSwitchModule
     
   ],
 
