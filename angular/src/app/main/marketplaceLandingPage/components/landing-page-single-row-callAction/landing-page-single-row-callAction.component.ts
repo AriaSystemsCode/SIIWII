@@ -21,13 +21,12 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
 
   private objectUrlById: Record<number, string> = {};
+  acceptedAspectRatio;
 
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
-    private appItems: AppItemsServiceProxy,
     private router: Router,
-    private sanitizer: DomSanitizer
   ) { super(injector); }
 
   ngOnInit() {
@@ -139,5 +138,20 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   openTab(path?: string){
     window.open(path)
   }
+
+  
+getAspectatio() {
+  let sycAttachmentCategoryImage;
+  this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+      result.forEach(item => {
+          if (item.code == "IMAGE") {
+              sycAttachmentCategoryImage = item
+              let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+              this.acceptedAspectRatio = Number(width) / Number(height);
+              return;
+          }
+      });
+  });
+}
 
 }

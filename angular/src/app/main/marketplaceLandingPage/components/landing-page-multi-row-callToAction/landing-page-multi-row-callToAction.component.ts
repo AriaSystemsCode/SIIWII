@@ -18,13 +18,11 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
 
   private objectUrlById: Record<number, string> = {};
-  
+  acceptedAspectRatio;
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
     private router: Router,
-       private sanitizer: DomSanitizer,
-        private appItems: AppItemsServiceProxy,
     private cdr: ChangeDetectorRef
   ) { super(injector); }
 
@@ -51,9 +49,6 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     // this.sliderItems.filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image)).forEach(b => this.ensurePdfSafeUrl(b));
 
     this.pageGroups = this.chunk(this.sliderItems, 12); // 3x3 per slide
-  
-    // prepare only the first slide initially
-    // this.prepareGroupPdfs(0);
   
     this.cdr.markForCheck();
   }
@@ -94,7 +89,19 @@ goToCategory(cat: { name: string; id: number | string }) {
   );
 }
 
-
+getAspectatio() {
+  let sycAttachmentCategoryImage;
+  this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
+      result.forEach(item => {
+          if (item.code == "IMAGE") {
+              sycAttachmentCategoryImage = item
+              let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+              this.acceptedAspectRatio = Number(width) / Number(height);
+              return;
+          }
+      });
+  });
+}
 
   fullUrl(path?: string): string {
     const p = (path ?? '').trim();

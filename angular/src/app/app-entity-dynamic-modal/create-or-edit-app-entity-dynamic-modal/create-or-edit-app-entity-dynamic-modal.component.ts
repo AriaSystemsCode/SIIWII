@@ -926,156 +926,99 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 return 200;
         }
     }
-    
     onImageBrowseDone(
-        event: ImageUploadComponentOutput,
-        cat: SycAttachmentCategoryDto,
+        output: ImageUploadComponentOutput,
+        sycAttachmentCategory: SycAttachmentCategoryDto,
         index: number
-    ): void {
-    
-        if (!event?.file || !cat) {
-            return;
+      ): void {
+        if (!output) {
+          return;
         }
-    
-        const file = event.file;
-        const isPdf =
-            file.type === 'application/pdf' ||
-            /\.pdf$/i.test(file.name);
-    
-        this.appEntity.entityAttachments ??= [];
-        this.attachmentsSrcs ??= [];
-    
-        const guid = this.guid();
-    
       
-        let attIndex = this.appEntity.entityAttachments.findIndex(
-            a => a.attachmentCategoryId === cat.id && a.index === index
+        const isPdf =
+          output.file.type === 'application/pdf' ||
+          output.file.name.toLowerCase().endsWith('.pdf');
+      
+        if (!this.appEntity.entityAttachments) {
+          this.appEntity.entityAttachments = [];
+        }
+        if (!this.attachmentsSrcs) {
+          this.attachmentsSrcs = [];
+        }
+      
+        let existingIndex = this.appEntity.entityAttachments.findIndex(
+          (x) =>
+            x.attachmentCategoryId === sycAttachmentCategory.id &&
+            x.index === index
         );
-    
+      
         let att: AppEntityAttachmentDto;
-        if (attIndex === -1) {
-            att = new AppEntityAttachmentDto();
-            att.attachmentCategoryId = cat.id;
-            att.index = index;
-            this.appEntity.entityAttachments.push(att);
-            attIndex = this.appEntity.entityAttachments.length - 1;
+        if (existingIndex > -1) {
+          att = this.appEntity.entityAttachments[existingIndex];
         } else {
-            att = this.appEntity.entityAttachments[attIndex];
+          att = new AppEntityAttachmentDto();
         }
-    
-        att.fileName = file.name;
+      
+        const guid = this.guid();
+        att.fileName = output.file.name;
+        att.attachmentCategoryId = sycAttachmentCategory.id;
         att.guid = guid;
-
-        if (index >= this.attachmentsSrcs.length) {
-            this.attachmentsSrcs.length = index + 1;
-        }
-
-        if (this.pdfRawUrl?.[index]) {
-            URL.revokeObjectURL(this.pdfRawUrl[index]);
-            delete this.pdfRawUrl[index];
-        }
-        delete this.pdfSafeMap[index];
-
+        att.index = index;
+      
         if (isPdf) {
-            const url = URL.createObjectURL(file);
-            this.pdfRawUrl[index] = url;
-            this.pdfSafeMap[index] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-            this.attachmentsSrcs[index] = '';
+          // 🧹 نظف أي PDF قديم على نفس الـ index
+          if (this.pdfRawUrl[index]) {
+            URL.revokeObjectURL(this.pdfRawUrl[index]);
+          }
+      
+          this.attachmentsSrcs[index] = ''; // عشان *ngIf(src || pdfSafeMap[i]) يشتغل
+      
+          const rawUrl = URL.createObjectURL(output.file);
+          this.pdfRawUrl[index] = rawUrl;
+          this.pdfSafeMap[index] =
+            this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
+      
         } else {
-
-            this.attachmentsSrcs[index] = event.image || '';
-        }
-    
-        this.uploader.addToQueue([file]);
-    
-        this.uploader.onBuildItemForm = (_fileItem, form: any) => {
-            form.append('guid', guid);
-            form.append('attachmentCategoryId', String(cat.id));
-        };
-    
-        this.uploader.uploadAll();
-    
-        this.uploader.onSuccessItem = (_item, response) => {
-            try {
-                const ajaxResponse = JSON.parse(response || '{}');
-                if (ajaxResponse?.success && ajaxResponse?.result) {
-                    const r = ajaxResponse.result;
-                    const idx = this.appEntity.entityAttachments.findIndex(a => a.guid === r.guid);
-                    if (idx > -1) {
-                        this.appEntity.entityAttachments[idx].id = r.id;
-                        this.appEntity.entityAttachments[idx].url = r.url;
-                    }
-                }
-            } catch {
-                // ignore parse error
-            }
-            this.notify.info(this.l('UploadSuccessfully'));
-            this.uploader.onSuccessItem = (_item, response) => {
-                try {
-                    const ajaxResponse = JSON.parse(response || '{}');
-                    if (ajaxResponse?.success && ajaxResponse?.result) {
-                        const r = ajaxResponse.result;
-                        const idx = this.appEntity.entityAttachments.findIndex(a => a.guid === r.guid);
-                        if (idx > -1) {
-                            this.appEntity.entityAttachments[idx].id = r.id;
-                            this.appEntity.entityAttachments[idx].url = r.url;
-                        }
-                    }
-                } catch { }
-            
-                this.notify.info(this.l('UploadSuccessfully'));
-            
-                // ⭐ بعد الرفع: لو نقدر نضيف attach تاني و مافيش slot فاضي في الآخر → نزود ''
-                if (this.canUploadMultipleAttachments) {
-                    const max = this.maxAllowedAttachments;
-            
-                    const filledCount = this.attachmentsSrcs.filter(
-                        (s, i) => s || this.pdfSafeMap[i]
-                    ).length;
-            
-                    const lastIndex = this.attachmentsSrcs.length - 1;
-                    const lastIsEmpty =
-                        lastIndex >= 0 &&
-                        !this.attachmentsSrcs[lastIndex] &&
-                        !this.pdfSafeMap[lastIndex];
-            
-                    if (!lastIsEmpty && filledCount < max) {
-                        this.attachmentsSrcs.push('');
-                    }
-                }
-            };
-            
-        };
-    }
-    
-    onRemoveImageFromUpload(
-        _event: any,
-        cat: SycAttachmentCategoryDto,
-        index: number
-    ): void {
-    
-        this.appEntity.entityAttachments ??= [];
-        this.attachmentsSrcs ??= [''];
-    
-        const i = this.appEntity.entityAttachments.findIndex(
-            a => a.attachmentCategoryId === cat.id && a.index === index
-        );
-        if (i > -1) {
-            this.appEntity.entityAttachments.splice(i, 1);
-        }
-
-        this.attachmentsSrcs.splice(index, 1);
-
-        if (this.pdfRawUrl?.[index]) {
+          // 🖼 صورة عادية
+          this.attachmentsSrcs[index] = output.image;
+      
+          // لو كان فيه PDF قبل كده على نفس الـ index امسحيه
+          if (this.pdfRawUrl[index]) {
             URL.revokeObjectURL(this.pdfRawUrl[index]);
             delete this.pdfRawUrl[index];
+          }
+          delete this.pdfSafeMap[index];
         }
-        delete this.pdfSafeMap[index];
+      
+        if (existingIndex === -1) {
+          this.appEntity.entityAttachments.push(att);
+        } else {
+          this.appEntity.entityAttachments[existingIndex] = att;
+        }
+      
+        // 👇 نفس لوجيك الرفع بتاعك
+        this.uploader.addToQueue([output.file]);
+        this.uploader.onBuildItemForm = (fileItem: any, form: any) => {
+          form.append('guid', guid);
+        };
+        this.uploader.uploadAll();
+      
+        // إضافة slot فاضية لو multi و لسه أقل من max
+        if (
+          this.canUploadMultipleAttachments &&
+          this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+          this.attachmentsSrcs.length < this.maxAllowedAttachments
+        ) {
+          this.attachmentsSrcs.push('');
+        }
+      }
+      
     
-        if (!this.attachmentsSrcs.length) {
-            this.attachmentsSrcs = [''];
-        }
-    }
+      onRemoveImageFromUpload(_event: any, index: number): void {
+        const fakeClick = new MouseEvent('click');
+        this.onRemovePhoto(index, fakeClick);
+      }
+      
     getStaticHeightForEntity(): number {
         switch (this.entityObjectType?.code) {
             case 'MARKETPLACESECTIONBLOCK':
@@ -1092,10 +1035,11 @@ export class CreateOrEditAppEntityDynamicModalComponent
             : 1;
     }
     private initAttachmentSlots(): void {
-        if (!this.attachmentsSrcs) {
-          this.attachmentsSrcs = [];
+        if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
+          this.attachmentsSrcs = [''];  
         }
       }
+      
       
     
       get currentAttachmentsCount(): number {

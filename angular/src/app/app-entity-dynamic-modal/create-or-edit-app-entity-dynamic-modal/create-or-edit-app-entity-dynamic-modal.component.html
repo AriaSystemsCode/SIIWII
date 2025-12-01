@@ -351,7 +351,8 @@
                                         [staticHeight]="getStaticHeightForEntity()"
                                         [showGuidelines]="true"
                                         (imageBrowseDone)="onImageBrowseDone($event, productImageCategory?.sycAttachmentCategory, i)"
-                                        (removeImage)="onRemoveImageFromUpload($event, productImageCategory?.sycAttachmentCategory, i)">
+                                        (removeImage)="onRemoveImageFromUpload($event, i)"
+                                        >
                                       </app-image-upload>
                                     </ng-template>
                               
@@ -370,7 +371,8 @@
                                         [staticHeight]="getStaticHeightForEntity()"
                                         [showGuidelines]="true"
                                         (imageBrowseDone)="onImageBrowseDone($event, productImageCategory?.sycAttachmentCategory, i)"
-                                        (removeImage)="onRemoveImageFromUpload($event, productImageCategory?.sycAttachmentCategory, i)">
+                                        (removeImage)="onRemoveImageFromUpload($event, i)"
+                                        >
                                       </app-image-upload>
                               
                                     </div>

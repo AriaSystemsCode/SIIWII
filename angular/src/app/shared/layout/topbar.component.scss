@@ -427,3 +427,41 @@ right: 30px;
             width: 22px;
             height: 22px;
         }
+
+        .addMl {
+            margin-left: 100px;
+        }
+
+        .login-btn {
+            background: #ffffff;
+            color: #4a0d4a;               // matches your brand purple
+            border-radius: 99px;         // pill shape
+            border: none;
+            padding: 6px 22px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease-in-out;
+          }
+          
+          .login-btn i {
+            font-size: 1rem;
+          }
+          
+          .login-btn:hover {
+            background: #f6851d;          // your orange color
+            color: #ffffff;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+            transform: translateY(-1px);
+          }
+          
+          .login-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+          }
+          
+          .login-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(246, 133, 29, 0.7);
+          }
+          

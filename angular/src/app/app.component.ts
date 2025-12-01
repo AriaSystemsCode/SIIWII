@@ -18,6 +18,7 @@ import { ChangeProfilePictureModalComponent } from '@app/shared/layout/profile/c
 import { MySettingsModalComponent } from '@app/shared/layout/profile/my-settings-modal.component';
 import { NotificationSettingsModalComponent } from '@app/shared/layout/notifications/notification-settings-modal.component';
 import { UserNotificationHelper } from '@app/shared/layout/notifications/UserNotificationHelper';
+import { FaviconService } from 'favicon.service';
 
 @Component({
   templateUrl: './app.component.html',
@@ -29,7 +30,7 @@ export class AppComponent extends AppComponentBase implements OnInit {
   theme: string;
   installationMode = true;
   isAuthenticated = false;
-  private landingDecided = false; // 👈 ensure only once
+  private landingDecided = false;
 
   @ViewChild('loginAttemptsModal', { static: true }) loginAttemptsModal: LoginAttemptsModalComponent;
   @ViewChild('linkedAccountsModal') linkedAccountsModal: LinkedAccountsModalComponent;
@@ -51,12 +52,14 @@ export class AppComponent extends AppComponentBase implements OnInit {
     private _chatSignalrService: ChatSignalrService,
     private _userNotificationHelper: UserNotificationHelper,
     private _router: Router,
-    private _appEntitiesServiceProxy: AppEntitiesServiceProxy
+    private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+    public faviconService:FaviconService
   ) {
     super(injector);
   }
 
   ngOnInit(): void {
+    this.loadFavicon()
     this._userNotificationHelper.settingsModal = this.notificationSettingsModal;
     this.theme = abp.setting.get('App.UiManagement.Theme').toLocaleLowerCase();
     this.installationMode = UrlHelper.isInstallUrl(location.href);
@@ -183,4 +186,17 @@ export class AppComponent extends AppComponentBase implements OnInit {
   onMySettingsModalSaved(): void {
     abp.event.trigger('app.onMySettingsModalSaved');
   }
+  private loadFavicon(): void {
+    this._appEntitiesServiceProxy.getHostSettingValue(1206, 'file')
+      .subscribe({
+        next: (url: string) => {
+          if (!url) return;
+          const fullUrl = this.attachmentBaseUrl + '/' + url;
+  
+          this.faviconService.setFaviconFromUrl(fullUrl);
+        },
+
+      });
+  }
+  
 }

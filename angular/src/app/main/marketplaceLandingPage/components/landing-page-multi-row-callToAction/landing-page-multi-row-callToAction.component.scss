@@ -1,9 +1,54 @@
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)); 
+  /* auto-fit lets it adapt to any number, minmax gives a nice responsive width */
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 0.75rem;
 }
 
+/* Each grid cell */
+.product-col {
+  height: 100%;
+}
+
+/* Common card styling for all block types */
+.block-card {
+  border: 1px solid #ebedf2;
+  border-radius: 12px;
+  background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Media inside card: image / video / pdf icon */
+.card-media {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+  object-fit: cover; // or 'contain' if you don't want cropping
+}
+
+/* Optional: special tweaks for pdf icon */
+.pdf-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pdf-icon {
+  max-width: 80%;
+}
+
+/* Remove fixed widths/heights that break the grid */
+.sectionGeneral {
+
+  border: 1px solid #ebedf2;
+  border-radius: 8px;
+}
+
+/* If you still want specific breakpoints instead of auto-fit, you can keep these: */
 @media (max-width: 992px) {
   .products-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -16,29 +61,8 @@
   }
 }
 
-
-:host ::ng-deep .p-carousel .p-carousel-item {
-  height: auto !important;
-}
-
-:host ::ng-deep .p-carousel-items-content {
-  height: auto !important;
-}
-
-  .sectionGeneral{
-    width: 355px;
-    border: 1px solid #ebedf2;
-    border-radius: 8px;
-}
-
-.iframSty {
-  height: 50vh;
-  width: 250px;
-  border-radius: 8px !important;
-  cursor: pointer;
-}
-
+/* Remove this fixed height (or make it more flexible) */
 .img-fluid {
   cursor: pointer;
-  height: 345px;
+
 }

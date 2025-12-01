@@ -126,6 +126,7 @@ export class TopBarComponent
     searchInput:string
     bgCol:string 
     tenantLogo:string
+    defaultHomeUrl = '/app/main/Home'; // fallback
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -201,7 +202,7 @@ export class TopBarComponent
     }
 
     ngOnInit() {
-        console.log(this.isAuthenticated,'this.isAuthenticated');
+       this.loadDefaultPage()
         this.getTenantData()
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
@@ -520,13 +521,28 @@ export class TopBarComponent
         });
         this._AppEntitiesServiceProxy.getHostSettingValue(1206,"file")
         .subscribe((result) => {
-            // const str = result
-            // const after = str.split("|")[1];
+          
            this.tenantLogo = result
-           console.log(this.tenantLogo,'logo')
+  
         });
     }
 
+    loadDefaultPage(): void {
+        this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
+          .subscribe({
+            next: (res2: string) => {
+              if (res2 === 'Marketplace Landing page') {
+                this.defaultHomeUrl = '/app/main/marketplace';
+              } else {
+                this.defaultHomeUrl = '/app/main/Home';
+              }
+            },
+            error: err2 => {
+              console.error('Failed to load host setting 1203', err2);
+              this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
+            }
+          });
+      }
 }
 
 export interface TopbardropDown {

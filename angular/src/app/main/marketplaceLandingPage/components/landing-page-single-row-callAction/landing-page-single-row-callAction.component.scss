@@ -1,21 +1,47 @@
-.sectionGeneral{
-    width: 300px;
+/* Make each carousel slide center its card */
+:host ::ng-deep .p-carousel .p-carousel-item {
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* The outer card per slide */
+  .carousel-card {
+    // width: 100%;
+    // width: 240px;          // adjust as you like
+    height: auto;             // 👈 FIXED HEIGHT for all items
     border: 1px solid #ebedf2;
-    border-radius: 8px;
+    border-radius: 12px;
+    background: #fff;
+    // padding: 0.75rem;
+    box-sizing: border-box;
+    display: flex;
+    margin-right: 15px;
+  }
+  
 
-    img {
-        border-radius: 8px;
-        cursor: pointer;
-    }
-}
-
-.iframSty {
-    // height: 48vh;
-    // width: 250px;
-    border-radius: 8px !important;
+  .carousel-card-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Common style for image/video/product-card media */
+  .carousel-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;       // or 'cover' if you want it to fill & crop
+    border-radius: 12px;
     cursor: pointer;
-}
+  }
+  
+  :host ::ng-deep app-prodcut-card.carousel-media {
+    display: block;
+    height: 100%;
+  }
+  
 
-img {
-    cursor: pointer;
-}
+  .pdf-icon {
+    object-fit: contain;
+  }
+  

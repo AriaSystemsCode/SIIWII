@@ -1,10 +1,6 @@
 <div
   class="d-flex justify-content-center image-upload-container"
-  [ngStyle]="{
-    'width.px': staticWidth,
-    'height.px': staticHeight,
-
-  }"
+  [ngStyle]="{ 'width.px': staticWidth, 'height.px': staticHeight }"
 >
   <label
     class="p-0 mb-0 w-100 h-100"
@@ -23,44 +19,38 @@
       [ngStyle]="{ cursor: isDisabled ? 'not-allowed' : 'pointer' }"
     />
 
-    <!-- IMAGE PREVIEW -->
-    <ng-container *ngIf="!isPdf; else pdfPreview">
-      <app-image-display  *ngIf="image"    
-        [staticWidth]="staticWidth"
-        [staticHeight]="staticHeight"
-        [image]="image"
-        [sycAttachmentCategory]="sycAttachmentCategory"
+    <!-- 🖼 IMAGE PREVIEW -->
+    <app-image-display
+      *ngIf="image && !isPdf"
+      [staticWidth]="staticWidth"
+      [staticHeight]="staticHeight"
+      [image]="image"
+      [sycAttachmentCategory]="sycAttachmentCategory"
+    >
+    </app-image-display>
+
+    <ng-container *ngIf="isPdf && pdfObjectUrl">
+      <div
+        class="align-items-center d-flex flex-column h-100 justify-content-center w-100"
       >
-      </app-image-display>
+        <img
+          src="assets/placeholders/pdf-placeholder.png"
+          class="pdf-thumb mb-2"
+          alt="PDF"
+          (click)="onPdfThumbClick($event)"
+        />
+        <span class="text-primary">
+          {{ 'Open PDF' | localize }}
+        </span>
+      </div>
     </ng-container>
 
-    <!-- PDF PREVIEW -->
-    <ng-template #pdfPreview>
-      <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
-        <object
-          *ngIf="pdfSafeUrl"
-          [data]="pdfSafeUrl"
-          type="application/pdf"
-          width="100%"
-          height="100%"
-        >
-          <a [href]="pdfSafeUrl" target="_blank" rel="noopener">
-            {{ 'Open PDF' | localize }}
-          </a>
-        </object>
-      </div>
-    </ng-template>
-
-    <!-- PLACEHOLDER / GUIDELINES -->
     <div
       *ngIf="!image && !isPdf"
       class="align-items-center d-flex flex-column h-100 justify-content-center w-100 pl-1 pr-1"
     >
       <div *ngIf="!fromReview">
-        <div class="upload-content">
-          <i class="pi pi-upload upload-icon mx-2"></i>
-          <span class="upload-text">{{l("ClickOrDrop")}}</span>
-        </div>
+        {{ l('ClickOrDrop') }}
       </div>
       <div *ngIf="sycAttachmentCategory?.aspectRatio && showGuidelines">
         {{ l('AspectRatio?', sycAttachmentCategory?.aspectRatio) }}
@@ -72,12 +62,10 @@
         {{ l(sycAttachmentCategory?.message) }}
       </div>
       <div *ngIf="acceptedExtensions && showGuidelines">
-        {{ l('SupportedExtensions') }}
-        {{ acceptedExtensions }}
+        {{ l('SupportedExtensions') }} {{ acceptedExtensions }}
       </div>
     </div>
 
-    <!-- ICONS -->
     <img
       *ngIf="!fromReview"
       src="assets/profile/Edit_Image.svg"
