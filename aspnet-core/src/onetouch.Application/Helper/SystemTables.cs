@@ -915,5 +915,25 @@ namespace onetouch.Helpers
             return obj;
         }
         //MMT40[End]
+        //I49[Start]
+        public async Task<long> GetObjectSectionId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "MARKETPLACESECTION");
+            return obj.Id;
+        }
+        public async Task<long> GetObjectBlockId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "MARKETPLACESECTIONBLOCK");
+            return obj.Id;
+        }
+        public async Task<long> GetEntityObjectStatusActiveLookup()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "ACTIVE" && x.ObjectCode == "LOOKUP");
+                return obj.Id;
+            }
+        }
+        //I49[End]
     }
 }
