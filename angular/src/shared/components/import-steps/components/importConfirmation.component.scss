@@ -37,17 +37,40 @@ width: 258px;
 }
 ._Btn
 {
-    width: 177px;
-    height: 45px;
+    width: 103px;
+    height: 46px;
     border-radius: 6px;
     opacity: 1;
     cursor: pointer;
-    border: 1px solid #707070;
+    border: 1px solid #EBEBEB;
+    color: #4A0D4A !important;
 
+}
+
+.importBtn{
+    width: 103px;
+    height: 46px;
+    border-radius: 6px;
+    opacity: 1;
+    cursor: pointer;
+    border:1px solid #4A0D4A !important;
+    background-color: #4A0D4A !important;
+    color: white !important;
 }
 
 ._Btn:hover
 {
-    background: #509AF7;
+    background: transparent;
     color: white;
 }
+
+
+label {
+    color:  unset !important;
+    font-size: unset;
+    font-style: unset;
+    font-weight: unset;
+    line-height: unset;
+}
+
+
