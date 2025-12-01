@@ -191,6 +191,8 @@ import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { SharedDynamicInputsModule } from '@shared/shared-module';
 import { AccordionModule } from "primeng/accordion";
+import { PortalTenantSettingsComponent } from './settings/Portal-tenant-settings.component';
+import { PortalHostSettingsComponent } from './settings/Portal-host-settings.component';
 
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -326,6 +328,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         AuditLogsComponent,
         AuditLogDetailModalComponent,
         HostSettingsComponent,
+        PortalHostSettingsComponent,
         InstallComponent,
         MaintenanceComponent,
         EditionsComponent,
@@ -347,6 +350,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         OrganizationUnitRolesComponent,
         CreateOrEditUnitModalComponent,
         TenantSettingsComponent,
+        PortalTenantSettingsComponent,
         HostDashboardComponent,
         EditionComboComponent,
         InvoiceComponent,

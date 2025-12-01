@@ -13,13 +13,13 @@ import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-sh
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { forkJoin, Observable } from 'rxjs';
 @Component({
-  templateUrl: './tenant-settings.component.html',
+  templateUrl: './portal-tenant-settings.component.html',
   styleUrls: ['./settings.component.scss',
   ],
   animations: [appModuleAnimation()],
   providers: [SystemTablesServiceProxy]
 })
-export class TenantSettingsComponent extends AppComponentBase implements OnInit {
+export class PortalTenantSettingsComponent extends AppComponentBase implements OnInit {
 
   usingDefaultTimeZone = false;
   initialTimeZone: string = null;
@@ -201,7 +201,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
         finalize(() => {
-          this.formTouched = false;
+          //this.formTouched = false;
           this.hideMainSpinner();
         })
       )
@@ -374,7 +374,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
   }
 
   onExtraAttributesChanged(dataFromChild: any[]) {
-    this.formTouched = true;
+   // this.formTouched = true;
     if (!this.dynamicInputsForViewDto) {
       this.dynamicInputsForViewDto = new GetAppEntityForEditOutput();
     }

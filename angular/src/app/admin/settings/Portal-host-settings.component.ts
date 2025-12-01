@@ -14,13 +14,13 @@ import { finalize } from 'rxjs/operators';
 import { forkJoin, Observable } from 'rxjs';
 
 @Component({
-    templateUrl: './host-settings.component.html',
+    templateUrl: './portal-host-settings.component.html',
     styleUrls: ['./settings.component.scss',
     ],
     animations: [appModuleAnimation()],
     providers: [SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy]
 })
-export class HostSettingsComponent extends AppComponentBase implements OnInit {
+export class PortalHostSettingsComponent extends AppComponentBase implements OnInit {
     loading = false;
     hostSettings: HostSettingsEditDto;
     editions: ComboboxItemDto[] = undefined;
@@ -215,7 +215,7 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
               this._appEntitiesServiceProxy.saveEntity(appEntityDto)
               .pipe(
                 finalize(() => {
-                  this.formTouched = false;
+                 // this.formTouched = false;
                   this.hideMainSpinner();
                 })
               )
@@ -420,7 +420,7 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
     }
 
     onExtraAttributesChanged(dataFromChild: any[]) {
-        this.formTouched = true;
+      //  this.formTouched = true;
         if (!this.dynamicInputsForViewDto) {
             this.dynamicInputsForViewDto = new GetAppEntityForEditOutput();
         }
