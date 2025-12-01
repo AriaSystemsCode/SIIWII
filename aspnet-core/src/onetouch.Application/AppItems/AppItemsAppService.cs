@@ -5811,40 +5811,44 @@ namespace onetouch.AppItems
             }
             return returnCategory;
         }
-        
+
         public async Task<List<ImportItemReturnDto>> ImportItem(List<ImportItemInputDto> itemExcelDtoList, string repeatHandler)
         {
-            AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
-            saveExcelinput.CodesFromList = new List<string>();
-            saveExcelinput.ToList = new List<int>();
-            saveExcelinput.FromList = new List<int>();
-            saveExcelinput.ErrorMessage = "";
-            saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
-            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString()); 
-            saveExcelinput.To = 0;
-            saveExcelinput.From = 0;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
-            foreach (var excelDto in itemExcelDtoList)
+            var hasErrors = false;
+            try
             {
-                if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                    continue;
-                long id = 0;
-                bool canBeSaved = true;
-               var list = await ValidateImportItemData(excelDto);
-                if (list != null && list.Count>0)
+                AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
+                saveExcelinput.CodesFromList = new List<string>();
+                saveExcelinput.ToList = new List<int>();
+                saveExcelinput.FromList = new List<int>();
+                saveExcelinput.ErrorMessage = "";
+                saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
+                saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
+                saveExcelinput.To = 0;
+                saveExcelinput.From = 0;
+
+                foreach (var excelDto in itemExcelDtoList)
                 {
-                    foreach (var err in list)
+                    if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                        continue;
+                    long id = 0;
+                    bool canBeSaved = true;
+                    var list = await ValidateImportItemData(excelDto);
+                    if (list != null && list.Count > 0)
                     {
-                        returnList.Add(err);
-                        canBeSaved = err.ErrorType != "Stopper"? canBeSaved :false;
-                        if (err.ErrorType == "Duplication")
-                            id =long.Parse(err.Id.ToString());
+                        foreach (var err in list)
+                        {
+                            returnList.Add(err);
+                            canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
+                            if (err.ErrorType == "Duplication")
+                                id = long.Parse(err.Id.ToString());
+                        }
                     }
-                }
-                if (canBeSaved == true)
-                {
-                    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
-                    var prdObj = pdtyp.FirstOrDefault();
+                    if (canBeSaved == true)
+                    {
+                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
+                        var prdObj = pdtyp.FirstOrDefault();
 
                         var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(prdObj.Id.ToString()));
                         var entityextr = entityObjectExtraAttribute.FirstOrDefault();
@@ -5945,7 +5949,7 @@ namespace onetouch.AppItems
                     string jsonData = JsonConvert.SerializeObject(returnList);
                     string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
                     _helper.ExcelHelper.ExportJsonToExcel(fileToExport, jsonData);
-                    if( !hasErrors)
+                    if (!hasErrors)
                     {
                         var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                         string tenancyName = myTenantObject.TenancyName;

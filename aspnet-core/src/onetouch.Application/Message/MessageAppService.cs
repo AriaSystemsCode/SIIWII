@@ -84,13 +84,14 @@ namespace onetouch.Message
             IRepository<AppEntity, long> appEntityRepository,
             IAppConfigurationAccessor appConfigurationAccessor,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            IRepository<AppEntityClassification, long> appEntityClassificationRepository, IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
+            IRepository<AppEntityClassification, long> appEntityClassificationRepository,
+            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IRepository<AppEntityRating, long> appEntityRatingRepository, RoleManager roleManager,
             IRepository<AppContact, long> appContactRepository,
-            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders, IEmailSender emailSender
+            IEmailSender emailSender
             )
         {
             _roleManager = roleManager;
