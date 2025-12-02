@@ -1,47 +1,192 @@
-/* Make each carousel slide center its card */
+/* PrimeNG item wrapper */
 :host ::ng-deep .p-carousel .p-carousel-item {
-    display: flex;
-    justify-content: center;
-  }
-  
-  /* The outer card per slide */
-  .carousel-card {
-    // width: 100%;
-    // width: 240px;          // adjust as you like
-    height: auto;             // 👈 FIXED HEIGHT for all items
-    border: 1px solid #ebedf2;
-    border-radius: 12px;
-    background: #fff;
-    // padding: 0.75rem;
-    box-sizing: border-box;
-    display: flex;
-    margin-right: 15px;
-  }
-  
+  display: flex;
+  justify-content: center;
+}
 
-  .carousel-card-body {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  /* Common style for image/video/product-card media */
-  .carousel-media {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;       // or 'cover' if you want it to fill & crop
-    border-radius: 12px;
-    cursor: pointer;
-  }
-  
-  :host ::ng-deep app-prodcut-card.carousel-media {
-    display: block;
-    height: 100%;
-  }
-  
+/* نفس المقاس لكل الكروت */
+.carousel-card {
+  width: 100%;
+  max-width: 340px;    
+  height: 240px;      
+  border: 1px solid #ebedf2;
+  border-radius: 12px;
+  background: #ffffff;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+margin-right: 15px;
+  // &:hover {
+  //   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  //   transform: translateY(-2px);
+  // }
+}
 
-  .pdf-icon {
-    object-fit: contain;
+.carousel-card-body {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+/* ===============================
+   PRODUCT HORIZONTAL CARD
+   =============================== */
+
+.product-card-horizontal {
+  display: flex;
+  width: 100%;
+  height: 100%;         
+  gap: 12px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.product-image-wrapper {
+  flex: 0 0 40%;
+  // max-width: 150px;
+  // height: 100%;         
+  margin: auto 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* header row */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+
+  .code {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
   }
-  
+
+  .price {
+    font-size: 12px;
+    color: #999;
+  }
+}
+
+/* اسم المنتج */
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  display: -webkit-box;   
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* البائع */
+.seller {
+  font-size: 13px;
+  color: #ababab;
+  margin-bottom: 6px;
+
+  .seller-name {
+    color: #333;
+    text-decoration: underline;
+  }
+}
+
+/* rating + reviews */
+.bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  // margin-top: auto;
+  white-space:nowrap;
+}
+
+.star-rating {
+  display: flex;
+  align-items: center;
+}
+
+.stars-outer {
+  position: relative;
+  display: inline-block;
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1;
+}
+
+.stars-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  color: #f6851d;
+  overflow: hidden;
+}
+
+.rateNum {
+  font-size: 12px;
+  color: #1b101b;
+}
+
+/* ===============================
+   BRAND / ATTACHMENT
+   =============================== */
+
+.card-media {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: cover;  
+  cursor: pointer;
+}
+
+.pdf-icon {
+  object-fit: contain;
+  padding: 18px;
+}
+
+.other-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: underline;
+  color: #4a0d4a;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  :host ::ng-deep .p-carousel .p-carousel-item {
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 575px) {
+  .product-card-horizontal {
+    flex-direction: column;
+  }
+
+  .product-image-wrapper {
+    max-width: 100%;
+    height: 55%;
+  }
+}

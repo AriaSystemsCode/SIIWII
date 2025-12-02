@@ -13,6 +13,7 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
   tenantLogo: string
   sections: any
   sectionsFlat: SectionItem[] = [];   // what ngFor iterates
+  bgCol:string
   constructor(private _sydObjectsAppService: SydObjectsServiceProxy, private _appEntitiesServiceProxy: AppEntitiesServiceProxy,injector: Injector,) {
     super(injector);
   }
@@ -102,6 +103,13 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
     this._appEntitiesServiceProxy.getHostSettingValue(1206,"file" )
       .subscribe((result) => {
         this.tenantLogo = result
+      });
+
+      this._appEntitiesServiceProxy.getHostSettingValue(1208,null)
+      .subscribe((result) => {
+          // result = '#456'
+          result ? this.bgCol = result : this.bgCol = '#4A0D4A'
+  
       });
   }
 

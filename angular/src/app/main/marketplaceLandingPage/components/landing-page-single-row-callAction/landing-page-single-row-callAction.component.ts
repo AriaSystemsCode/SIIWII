@@ -22,7 +22,34 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
 
   private objectUrlById: Record<number, string> = {};
   acceptedAspectRatio;
-
+  responsiveOptions = [
+    {
+      breakpoint: '1400px',
+      numVisible: 4,
+      numScroll: 4
+    },
+    {
+      breakpoint: '1199px',
+      numVisible: 4,
+      numScroll: 4
+    },
+    {
+      breakpoint: '991px',
+      numVisible: 3,
+      numScroll: 3
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 2,
+      numScroll: 2
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
+  
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
@@ -140,18 +167,35 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   }
 
   
-getAspectatio() {
-  let sycAttachmentCategoryImage;
-  this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
-      result.forEach(item => {
-          if (item.code == "IMAGE") {
-              sycAttachmentCategoryImage = item
-              let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
-              this.acceptedAspectRatio = Number(width) / Number(height);
-              return;
+
+  getAspectatio(): void {
+    this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
+      .subscribe(result => {
+  
+        const imgCat = result.find(x => x.code === 'IMAGE');
+  
+        if (imgCat?.aspectRatio) {
+        
+          const [w, h] = imgCat.aspectRatio.split(':').map(Number);
+  
+          if (w && h) {
+            this.acceptedAspectRatio = h / w; 
           }
+        }
       });
-  });
+  }
+
+viewProduct(prod: any) {
+  const productBodyRequestForView = {
+      id: prod?.appItem?.id,
+      // currencyCode: this.currency,
+      sellerSSIN: prod?.sellerSSIN,
+      // buyerSSIN : this.buyerSSIN
+  };
+  localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
+  this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
+
+  // this.router.navigateByUrl(`/view/${id}`)
 }
 
 }

@@ -19,6 +19,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
   private objectUrlById: Record<number, string> = {};
   acceptedAspectRatio;
+
+
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
@@ -89,18 +91,21 @@ goToCategory(cat: { name: string; id: number | string }) {
   );
 }
 
-getAspectatio() {
-  let sycAttachmentCategoryImage;
-  this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
-      result.forEach(item => {
-          if (item.code == "IMAGE") {
-              sycAttachmentCategoryImage = item
-              let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
-              this.acceptedAspectRatio = Number(width) / Number(height);
-              return;
-          }
-      });
-  });
+getAspectatio(): void {
+  this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
+    .subscribe(result => {
+
+      const imgCat = result.find(x => x.code === 'IMAGE');
+
+      if (imgCat?.aspectRatio) {
+      
+        const [w, h] = imgCat.aspectRatio.split(':').map(Number);
+
+        if (w && h) {
+          this.acceptedAspectRatio = h / w; 
+        }
+      }
+    });
 }
 
   fullUrl(path?: string): string {
@@ -199,6 +204,18 @@ getAspectatio() {
     window.open(path)
   }
 
+  viewProduct(prod: any) {
+    const productBodyRequestForView = {
+        id: prod?.appItem?.id,
+        // currencyCode: this.currency,
+        sellerSSIN: prod?.sellerSSIN,
+        // buyerSSIN : this.buyerSSIN
+    };
+    localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
+    this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
+ 
+    // this.router.navigateByUrl(`/view/${id}`)
+}
   
 ngOnDestroy() {
   Object.values(this.objectUrlById).forEach(u => { try { URL.revokeObjectURL(u); } catch {} });

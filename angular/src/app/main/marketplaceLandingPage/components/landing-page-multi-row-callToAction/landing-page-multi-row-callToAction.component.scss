@@ -1,68 +1,199 @@
 .products-grid {
   display: grid;
-  /* auto-fit lets it adapt to any number, minmax gives a nice responsive width */
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 0.75rem;
 }
 
-/* Each grid cell */
 .product-col {
   height: 100%;
 }
 
-/* Common card styling for all block types */
+
 .block-card {
-  border: 1px solid #ebedf2;
+  background: #ffffff;
   border-radius: 12px;
-  background: #fff;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  border: 1px solid #ebedf2;
+  height: 255px;
+  box-sizing: border-box;
+
+  padding: 0;         
+  overflow: hidden;
 }
 
-/* Media inside card: image / video / pdf icon */
+.product-card-horizontal {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 14px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  // &:hover {
+  //   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  //   transform: translateY(-2px);
+  // }
+}
+
+.product-image-wrapper {
+  flex: 0 0 45%;      
+  max-width: 170px;
+  height: 180px;
+  margin: auto;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f5f5f5;
+}
+
+.product-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 13px;
+
+  .code {
+    color: #444;
+  }
+
+  .price {
+    color: #999;
+  }
+}
+
+.name {
+  margin: 6px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.seller {
+  font-size: 13px;
+  color: #ababab;
+
+  .seller-name {
+    text-decoration: underline;
+    color: #333;
+  }
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .stars {
+    color: #f9a825;
+    font-size: 14px;
+  }
+
+  .reviews {
+    font-size: 12px;
+    color: #666;
+  }
+}
+
+
+
 .card-media {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
-  cursor: pointer;
-  object-fit: cover; // or 'contain' if you don't want cropping
+  border-radius: 12px;
+  object-fit: cover;
 }
 
-/* Optional: special tweaks for pdf icon */
-.pdf-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.only-media {
+  display: block;
 }
+
 
 .pdf-icon {
-  max-width: 80%;
+  object-fit: contain;
+  padding: 18px;
+  // background: #f5f5f5;
 }
 
-/* Remove fixed widths/heights that break the grid */
-.sectionGeneral {
-
-  border: 1px solid #ebedf2;
-  border-radius: 8px;
+.other-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: underline;
+  color: #4a0d4a;
+  font-size: 14px;
 }
 
-/* If you still want specific breakpoints instead of auto-fit, you can keep these: */
+/* ===========================
+   Responsive
+   =========================== */
+
 @media (max-width: 992px) {
   .products-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 575px) {
   .products-grid {
     grid-template-columns: 1fr;
   }
+
+  .product-card-horizontal {
+    flex-direction: column;
+  }
+
+  .product-image-wrapper {
+    max-width: 100%;
+    flex: 0 0 auto;
+    height: 55%;     
+  }
 }
 
-/* Remove this fixed height (or make it more flexible) */
-.img-fluid {
-  cursor: pointer;
+
+
+
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stars-outer {
+  position: relative;
+  display: inline-block;
+  font-size: 16px;
+  color: #ccc;
+  line-height: 1;
+}
+
+.stars-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  color: #F6851D;
+  overflow: hidden;
+}
+
+
+.rateNum {
+
+
+
+
+  color: #1B101B;
 
 }
+

@@ -63,6 +63,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       }
     }
   }
+  
 
   async fileChange($event: { target: { files: FileList; value: any } }) {
     const imgFile = $event.target.files[0];
@@ -94,7 +95,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       return;
     }
 
-    // 📄 لو PDF
+
     if (isPdfFile) {
       // نظف blob URL قديم
       if (this.rawPdfUrl) {

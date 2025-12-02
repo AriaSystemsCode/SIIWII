@@ -197,6 +197,13 @@ export class AppComponent extends AppComponentBase implements OnInit {
         },
 
       });
+
+        this._appEntitiesServiceProxy.getHostSettingValue(1205, null).subscribe(title => {
+    const t = title;
+    this.faviconService.setSeoText(t, 'The Global Apparel B2B Network');
+  });
   }
+
+  
   
 }

@@ -359,24 +359,36 @@
                                   </ng-container>
                              
                                   <ng-template #uploadSlot>
-                                    <div class="image-wrapper upload"
-                                         *ngIf="canUploadMultipleAttachments
-                                                  ? i === attachmentsSrcs.length - 1 && attachmentsSrcs.length < maxAllowedAttachments
-                                                  : i === 0 && !src && !pdfSafeMap[i]">
-                              
+                                    <div
+                                      class="image-wrapper upload"
+                                      *ngIf="
+                                        canUploadMultipleAttachments
+                                          ? i === attachmentsSrcs.length - 1 && !src && !pdfSafeMap[i]
+                                          : i === 0 && !src && !pdfSafeMap[i]
+                                      "
+                                    >
                                       <app-image-upload
+                                      *ngIf="productImageCategory?.sycAttachmentCategory"
                                         [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
                                         [image]="null"
-                                        [staticWidth]="getStaticWidthForEntity()"
-                                        [staticHeight]="getStaticHeightForEntity()"
+                                        [staticWidth]="170"
+                                        
+                                
                                         [showGuidelines]="true"
-                                        (imageBrowseDone)="onImageBrowseDone($event, productImageCategory?.sycAttachmentCategory, i)"
+                                        (imageBrowseDone)="
+                                          onImageBrowseDone(
+                                            $event,
+                                            productImageCategory?.sycAttachmentCategory,
+                                            i
+                                          )
+                                        "
                                         (removeImage)="onRemoveImageFromUpload($event, i)"
-                                        >
+                                      >
                                       </app-image-upload>
-                              
                                     </div>
                                   </ng-template>
+                                  
+                                  
                               
                                 </div>
                               

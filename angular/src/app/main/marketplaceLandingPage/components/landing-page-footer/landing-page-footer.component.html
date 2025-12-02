@@ -1,4 +1,4 @@
-<footer class="flex-rw p-4 d-none d-md-block footerBG">
+<footer class="flex-rw p-4 d-none d-md-block "     [style.backgroundColor]="bgCol">
     <div class="row">
         <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
           <ng-container [ngSwitch]="s.type">

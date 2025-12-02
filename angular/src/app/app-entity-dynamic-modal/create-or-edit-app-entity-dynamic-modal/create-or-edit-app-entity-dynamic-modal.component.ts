@@ -222,9 +222,14 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.attachmentsSrcs = [];
         this.uploader.clearQueue();
         this.aspectRatio = undefined;
-    
-        this.initAttachmentSlots();
-    }
+      
+        this.pdfSafeMap = {};
+        Object.values(this.pdfRawUrl).forEach(url => URL.revokeObjectURL(url));
+        this.pdfRawUrl = {};
+      
+        this.initAttachmentSlots();  // هي اللي هتظبط 2 slots لو block
+      }
+      
     
 
     getStatusOptions() {
@@ -690,109 +695,109 @@ export class CreateOrEditAppEntityDynamicModalComponent
         }
         
 
-    fileChange(
-        event: Event,
-        attachmentCategory: GetSycAttachmentCategoryForViewDto,
-        index?: number,
-        aspectRatio?: number | string,
-        cropWithoutOptions?: boolean
-    ) {
-        const input = event.target as HTMLInputElement;
-        const file = input.files?.[0];
-        if (!file) return;
+    // fileChange(
+    //     event: Event,
+    //     attachmentCategory: GetSycAttachmentCategoryForViewDto,
+    //     index?: number,
+    //     aspectRatio?: number | string,
+    //     cropWithoutOptions?: boolean
+    // ) {
+    //     const input = event.target as HTMLInputElement;
+    //     const file = input.files?.[0];
+    //     if (!file) return;
 
-        const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    //     const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
 
-        if (isPdf) {
-            // Create & sanitize blob URL for <object>
-            const url = URL.createObjectURL(file);
-            this.pdfRawUrl[index] = url;
-            this.pdfSafeMap[index] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    //     if (isPdf) {
+    //         // Create & sanitize blob URL for <object>
+    //         const url = URL.createObjectURL(file);
+    //         this.pdfRawUrl[index] = url;
+    //         this.pdfSafeMap[index] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
 
-            // Ensure image preview slot is cleared for this index
-            this.attachmentsSrcs[index] = '';
+    //         // Ensure image preview slot is cleared for this index
+    //         this.attachmentsSrcs[index] = '';
 
-            // Prepare attachment dto (no crop)
-            const att = new AppEntityAttachmentDto();
-            att.index = index;
-            att.fileName = file.name;
-            att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
-            att.guid = this.guid();
+    //         // Prepare attachment dto (no crop)
+    //         const att = new AppEntityAttachmentDto();
+    //         att.index = index;
+    //         att.fileName = file.name;
+    //         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
+    //         att.guid = this.guid();
 
-            if (!this.appEntity.entityAttachments) this.appEntity.entityAttachments = [];
-            this.appEntity.entityAttachments[index] = att;
+    //         if (!this.appEntity.entityAttachments) this.appEntity.entityAttachments = [];
+    //         this.appEntity.entityAttachments[index] = att;
 
-            // Upload the raw PDF file
-            this.uploadBlobAttachment(file, att);
+    //         // Upload the raw PDF file
+    //         this.uploadBlobAttachment(file, att);
 
-            if (this.canUploadMultipleAttachments &&
-                this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-                this.attachmentsSrcs.length < this.maxAllowedAttachments
-            ) {
-                this.attachmentsSrcs.push('');
-            }
+    //         if (this.canUploadMultipleAttachments &&
+    //             this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+    //             this.attachmentsSrcs.length < this.maxAllowedAttachments
+    //         ) {
+    //             this.attachmentsSrcs.push('');
+    //         }
 
-            input.value = '';
-            return;
-        }
+    //         input.value = '';
+    //         return;
+    //     }
 
-        // Image branch (as you already do)
-        const { onCropDone, data } = this.openImageCropper(event, Number(aspectRatio), cropWithoutOptions,  this.getStaticWidthForEntity());
-        const sub = onCropDone.subscribe(() => {
-            if (data.isCropDone) {
-                this.tempUploadImage(event, attachmentCategory, data, index);
-                // clear any previous pdf in same slot
-                if (this.pdfRawUrl[index]) { URL.revokeObjectURL(this.pdfRawUrl[index]); delete this.pdfRawUrl[index]; }
-                delete this.pdfSafeMap[index];
-            }
-            input.value = '';
-            // sub.unsubscribe(); // if needed
-        });
-    }
-
-
-
-    tempUploadImage(
-        event: Event,
-        attachmentCategory: GetSycAttachmentCategoryForViewDto,
-        croppedImageContent: ImageCropperComponent,
-        index?: number
-    ) {
-        const file = (event.target as HTMLInputElement).files[0];
-        // attachmentCategory.imgURL =
-        //     croppedImageContent.croppedImageAsBase64 as string;
-
-        if (
-            this.appEntity.entityAttachments == null ||
-            this.appEntity.entityAttachments == undefined
-        ) {
-            this.appEntity.entityAttachments = [];
-        }
-        // create GuId
-        let guid = this.guid();
-        // create app attachment entity
-        let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-        att.index = index;
-        att.fileName = file?.name;
-        att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
-        att.guid = guid;
-
-        // save image as a base64
-        this.attachmentsSrcs[index] =
-            croppedImageContent.croppedImageAsBase64 as string;
-        this.appEntity.entityAttachments[index] = att;
-
-        this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+    //     // Image branch (as you already do)
+    //     const { onCropDone, data } = this.openImageCropper(event, Number(aspectRatio), cropWithoutOptions,  this.getStaticWidthForEntity());
+    //     const sub = onCropDone.subscribe(() => {
+    //         if (data.isCropDone) {
+    //             this.tempUploadImage(event, attachmentCategory, data, index);
+    //             // clear any previous pdf in same slot
+    //             if (this.pdfRawUrl[index]) { URL.revokeObjectURL(this.pdfRawUrl[index]); delete this.pdfRawUrl[index]; }
+    //             delete this.pdfSafeMap[index];
+    //         }
+    //         input.value = '';
+    //         // sub.unsubscribe(); // if needed
+    //     });
+    // }
 
 
-//         if (this.canUploadMultipleAttachments &&
-//             this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-//             this.attachmentsSrcs.length < this.maxAllowedAttachments
-// ) {
-//             this.attachmentsSrcs.push('');
+
+//     tempUploadImage(
+//         event: Event,
+//         attachmentCategory: GetSycAttachmentCategoryForViewDto,
+//         croppedImageContent: ImageCropperComponent,
+//         index?: number
+//     ) {
+//         const file = (event.target as HTMLInputElement).files[0];
+//         // attachmentCategory.imgURL =
+//         //     croppedImageContent.croppedImageAsBase64 as string;
+
+//         if (
+//             this.appEntity.entityAttachments == null ||
+//             this.appEntity.entityAttachments == undefined
+//         ) {
+//             this.appEntity.entityAttachments = [];
 //         }
+//         // create GuId
+//         let guid = this.guid();
+//         // create app attachment entity
+//         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
+//         att.index = index;
+//         att.fileName = file?.name;
+//         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
+//         att.guid = guid;
+
+//         // save image as a base64
+//         this.attachmentsSrcs[index] =
+//             croppedImageContent.croppedImageAsBase64 as string;
+//         this.appEntity.entityAttachments[index] = att;
+
+//         this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+
+
+// //         if (this.canUploadMultipleAttachments &&
+// //             this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+// //             this.attachmentsSrcs.length < this.maxAllowedAttachments
+// // ) {
+// //             this.attachmentsSrcs.push('');
+// //         }
   
-    }
+//     }
 
     // removePhoto(i: number) {
     //     if (this.appEntity.entityAttachments.length > 1)
@@ -833,9 +838,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
     
         // Keep at least one empty slot
         if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
-            this.attachmentsSrcs = [''];
+            this.initAttachmentSlots();
         }
-    
+        
         // Remove from uploader queue if exists
         if (this.uploader?.queue?.[i]) {
             this.uploader.removeFromQueue(this.uploader.queue[i]);
@@ -867,12 +872,14 @@ export class CreateOrEditAppEntityDynamicModalComponent
     
             isConfirmed.subscribe((res) => {
                 if (res) {
-                    this.attachmentsSrcs = [""];
+                    this.attachmentsSrcs = [];
                     this.appEntity.entityAttachments = [];
                     this.pdfSafeMap = {};
                     Object.values(this.pdfRawUrl).forEach(url => URL.revokeObjectURL(url));
                     this.pdfRawUrl = {};
                     this.uploader.clearQueue();
+                
+                    this.initAttachmentSlots(); // 2 slots لو block ، 1 لو غير كده
                 }
             });
         }
@@ -921,7 +928,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         switch (this.entityObjectType?.code) {
             case 'MARKETPLACESECTIONBLOCK':
             case 'MARKETPLACESECTION':
-                return 318;  // same as your crop/resize logic
+                return 800;  // same as your crop/resize logic
             default:
                 return 200;
         }
@@ -1034,11 +1041,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
             ? 2
             : 1;
     }
-    private initAttachmentSlots(): void {
-        if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
-          this.attachmentsSrcs = [''];  
-        }
-      }
+private initAttachmentSlots(): void {
+  if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
+    this.attachmentsSrcs = [''];
+  }
+}
+
       
       
     

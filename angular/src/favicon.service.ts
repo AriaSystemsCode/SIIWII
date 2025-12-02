@@ -1,10 +1,12 @@
 import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 
 @Injectable({ providedIn: 'root' })
 export class FaviconService {
   private renderer: Renderer2;
 
-  constructor(rendererFactory: RendererFactory2) {
+  constructor(rendererFactory: RendererFactory2 ,private title: Title,
+    private meta: Meta) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
@@ -25,5 +27,17 @@ export class FaviconService {
 
     linkEl.type = type;
     linkEl.href = url;
+  }
+
+  setSeoText(titleText: string, description: string): void {
+    // <title>
+    this.title.setTitle(titleText);
+
+    // normal description
+    this.meta.updateTag({ name: 'description', content: description });
+
+    // Open Graph
+    this.meta.updateTag({ property: 'og:title', content: titleText });
+    this.meta.updateTag({ property: 'og:description', content: description });
   }
 }

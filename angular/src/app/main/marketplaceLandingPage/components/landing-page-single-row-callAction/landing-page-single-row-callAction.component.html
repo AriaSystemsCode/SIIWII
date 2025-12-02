@@ -5,74 +5,115 @@
   [circular]="false"
   [showIndicators]="false"
   [showNavigators]="true"
-  class="p-4 m-2 rounded">
-
+  [responsiveOptions]="responsiveOptions"
+  class="p-4 m-2 rounded"
+>
   <ng-template pTemplate="item" let-item>
+
     <div class="carousel-card">
-      <div class="carousel-card-body " [ngSwitch]="item?.blockType?.toUpperCase()" #itemCard>
+      <div class="carousel-card-body" [ngSwitch]="item?.blockType?.toUpperCase()">
 
         <!-- PRODUCT -->
-        <app-prodcut-card
-          *ngSwitchCase="'PRODUCT'"
-          class="carousel-media"
-          [acceptedAspectRatio]="acceptedAspectRatio"
-          [product]="item?.getAppMarketItemForViewDto?.appItem"
-          [productCard]="item?.getAppMarketItemForViewDto">
-        </app-prodcut-card>
+        <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
+          <div class="product-image-wrapper">
+            <img
+              class="product-image"
+              (error)="onImgErr($event)"
+              [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
+                      ? attachmentBaseUrl + '/' + item?.getAppMarketItemForViewDto?.appItem.imageUrl
+                      : 'assets/placeholders/appitem-placeholder.png'"
+              alt="Product Image"
+              (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)"
+            />
+          </div>
+
+          <div class="product-info">
+            <div class="top-row">
+              <span class="code">
+                {{ item?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
+              </span>
+              <span class="price">
+                RRP: {{ item?.getAppMarketItemForViewDto?.appItem?.price | currency }}
+              </span>
+            </div>
+
+            <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)">
+              {{ item?.getAppMarketItemForViewDto?.appItem?.name }}
+            </div>
+
+            <div class="seller">
+              Sold By
+              <span class="seller-name">
+                {{ item?.getAppMarketItemForViewDto?.appItem?.sellerName }}
+              </span>
+            </div>
+
+            <div class="bottom-row">
+              <div class="star-rating">
+                <div class="stars-outer">
+                  ★★★★★
+                  <div
+                    class="stars-inner"
+                    [style.width]="
+                      (item?.getAppMarketItemForViewDto?.averageRating / 5) * 100 + '%'
+                    "
+                  >
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <span class="rateNum">
+                ({{ item?.getAppMarketItemForViewDto?.numberOfReviews }}) reviews
+              </span>
+            </div>
+          </div>
+        </div>
 
         <!-- BRAND -->
         <img
           *ngSwitchCase="'BRAND'"
-          class="carousel-media"
-          [src]="item?.image ? attachmentBaseUrl + '/' + item?.image : '../../../../assets/placeholders/_logo-placeholder.png'"
-          alt=""
+          class="card-media"
+          [src]="item?.image
+                  ? attachmentBaseUrl + '/' + item?.image
+                  : '../../../../assets/placeholders/_logo-placeholder.png'"
+          alt="Brand"
           (click)="goToBrand(item)"
-          [ngStyle]="{ 'height.px': itemCard.clientWidth / acceptedAspectRatio }"
-          (error)="onImgErr($event)" />
-
-
-                  <!-- CATEGORY -->
-
-          <!-- <div class="px-2  d-flex flex-column sectionGeneral" *ngIf="item?.blockType?.toUpperCase()=='CATEGORY'">
-
-        <img [src]="item?.image ? attachmentBaseUrl + '/' +  item?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2"  alt="" srcset=""
-          onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToCategory(item)">
-          <a (click)="goToCategory(item)">{{item?.name}}</a>
-      </div> -->
+          (error)="onImgErr($event)"
+        />
 
         <!-- ATTACHMENT -->
         <ng-container *ngSwitchCase="'ATTACHMENT'">
           <ng-container [ngSwitch]="kindOfPath(item?.image)">
-
-            <!-- image -->
             <img
               *ngSwitchCase="'image'"
-              class="carousel-media"
+              class="card-media"
               [src]="fullUrl(item?.image)"
-              alt="{{ item?.name || 'attachment' }}"
+              alt="{{ item?.name || 'Attachment' }}"
               (click)="openTab(item?.link)"
-              (error)="onImgErr($event)" />
-
-            <!-- video -->
+              (error)="onImgErr($event)"
+            />
             <video
               *ngSwitchCase="'video'"
-              class="carousel-media"
+              class="card-media"
               controls
-              playsinline>
+              playsinline
+            >
               <source [src]="fullUrl(item?.image)" />
-              Your browser does not support the video tag.
             </video>
-
-            <!-- pdf -->
             <img
               *ngSwitchCase="'pdf'"
-              class="carousel-media pdf-icon"
+              class="card-media pdf-icon"
               src="assets/Items/pdf-Icon.png"
               alt="PDF"
-              (click)="openNewTab(item?.image)" />
-
-            <!-- other file -->
-            <a *ngSwitchDefault [href]="fullUrl(item?.image)" target="_blank" rel="noopener">
+              (click)="openNewTab(item?.image)"
+            />
+            <a
+              *ngSwitchDefault
+              class="card-media other-file"
+              [href]="fullUrl(item?.image)"
+              target="_blank"
+              rel="noopener"
+            >
               Open file
             </a>
           </ng-container>
