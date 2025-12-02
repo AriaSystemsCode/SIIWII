@@ -134,6 +134,7 @@ export class TransactionInformationComponent
   totlaOrderPrices: number = 0;
   priceLevel:any
   languageSettingName  =AppConsts.languageSettingName;
+  transactionSharing:string="";
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -155,6 +156,7 @@ export class TransactionInformationComponent
 
     this.initFilterForm()
     this.calcHight()
+    this.getNeeddedSettingValues();
 
     let CompanyCheck = localStorage.getItem("comNew");
 
@@ -1094,6 +1096,7 @@ export class TransactionInformationComponent
   PlaceOrder() {
 
     this.showMainSpinner();
+
     this.saveDates()
     this.appTransactionsForViewDto.lFromPlaceOrder = true;
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -1104,6 +1107,7 @@ export class TransactionInformationComponent
         this.removeLocalStorage()
         this.show(this.orderId, this.showCarousel, this.validateOrder, this._transactionCartMode.view);
         this.getShoppingCartData()
+
 
 
       }
@@ -1122,6 +1126,45 @@ export class TransactionInformationComponent
       });
   }
 
+
+  askForShareTransactions(){
+    //i49-New set right cases values
+  switch (this.transactionSharing.toString().toUpperCase()){
+    case 'MANUAL':
+      break;
+
+      case 'AUTOMATIC':
+                      //i49-New handle case
+        break;
+
+        case 'INQUIRE':
+          Swal.fire({
+            title: "",
+            text: "Would you like to share the transaction with the other partner or not?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Share Now",
+            cancelButtonText: "Cancel",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+            customClass: {
+              popup: 'popup-class',
+              icon: 'icon-class',
+              content: 'content-class',
+              actions: 'actions-class',
+              confirmButton: 'confirm-button-class2',
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.onShareTransaction();
+            }})
+          break;
+  
+    default:
+      break;
+  }
+  }
   sync() {
     this.showMainSpinner();
     this._AppTransactionServiceProxy.syncTransaction(this.orderId)
@@ -1755,5 +1798,14 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
     this.appTransactionsForViewDto.startDate = moment.utc(moment(startDate).format('YYYY-MM-DD'));
     this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
+  }
+
+  getNeeddedSettingValues(){
+    //i49-New-Send the right id of setting "Transaction Sharing"
+    this._AppEntitiesServiceProxy
+    .getTenantSettingValue(1111,null)
+    .subscribe((res: any) => {
+        this.transactionSharing= res?.toString().toLowerCase();
+    });
   }
 }

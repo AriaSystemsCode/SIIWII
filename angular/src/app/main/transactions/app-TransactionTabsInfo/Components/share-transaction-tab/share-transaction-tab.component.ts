@@ -106,6 +106,7 @@ export class ShareTransactionTabComponent extends AppComponentBase {
         contactUser.id = contact.id;
         newsharingArray.push(contactUser);
       })
+      //i49-New what values should i set !
       shareTranOptionsDto['transactionId'] = this.orderId;
       shareTranOptionsDto['message'] = this.messageBody;
       shareTranOptionsDto['transactionSharing'] = newsharingArray;
