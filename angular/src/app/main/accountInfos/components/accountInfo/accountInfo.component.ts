@@ -878,7 +878,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
         }
 
-
+        this.accountInfoTemp.accountLevel = 0
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
             this.updateLogoService.updateLogo();
