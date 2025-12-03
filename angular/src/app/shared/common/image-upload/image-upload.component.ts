@@ -11,7 +11,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
 export interface ImageUploadComponentOutput {
-  image: string | null; // صورة فقط، PDF = null
+  image: string | null;
   file: File;
 }
 
@@ -28,7 +28,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   @Input() staticWidth: number;
   @Input() staticHeight: number;
   @Input() showGuidelines = false;
-  @Input() image: string; // base64 أو url للصورة
+  @Input() image: string;
   @Input() fromReview: string;
   @Input() isDisabled = false;
 
@@ -51,18 +51,31 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.sycAttachmentCategory) {
-      const [width, height] = this.sycAttachmentCategory.aspectRatio.split(':');
-      this.acceptedAspectRatio = Number(width) / Number(height);
-      this.detectSupportedExtensions();
+  
+    if (
+      !this.sycAttachmentCategory ||
+      !this.sycAttachmentCategory.aspectRatio
+    ) {
+      return;
+    }
+  
+    const aspect = String(this.sycAttachmentCategory.aspectRatio);
+    const [width, height] = aspect.split(':');
 
-      if (this.staticWidth) {
-        this.staticHeight = this.staticWidth / this.acceptedAspectRatio;
-      } else if (this.staticHeight) {
-        this.staticWidth = this.staticHeight * this.acceptedAspectRatio;
-      }
+    if (!width || !height || isNaN(+width) || isNaN(+height)) {
+      return;
+    }
+  
+    this.acceptedAspectRatio = Number(width) / Number(height);
+    this.detectSupportedExtensions();
+  
+    if (this.staticWidth) {
+      this.staticHeight = this.staticWidth / this.acceptedAspectRatio;
+    } else if (this.staticHeight) {
+      this.staticWidth = this.staticHeight * this.acceptedAspectRatio;
     }
   }
+  
   
 
   async fileChange($event: { target: { files: FileList; value: any } }) {
@@ -97,7 +110,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
 
 
     if (isPdfFile) {
-      // نظف blob URL قديم
+
       if (this.rawPdfUrl) {
         URL.revokeObjectURL(this.rawPdfUrl);
       }
@@ -109,14 +122,14 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       this.rawPdfUrl = URL.createObjectURL(imgFile);
       this.pdfObjectUrl = this.rawPdfUrl;
 
-      // parent يعرف إن ده PDF عن طريق image = null
+
       this.imageBrowseDone.emit({ file: this.imgFile, image: null });
 
       resetInput();
       return;
     }
 
-    // 🖼 لو صورة
+ 
     this.isPdf = false;
     this.pdfObjectUrl = null;
 
@@ -128,12 +141,12 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       this.acceptedAspectRatio - buffer < currentAspectRatio &&
       this.acceptedAspectRatio + buffer > currentAspectRatio
     ) {
-      // مقبولة بدون crop
+  
       this.image = (renderedImage as any).src;
       this.imgFile = imgFile;
       this.imageBrowseDone.emit({ file: this.imgFile, image: this.image });
     } else {
-      // محتاجة crop
+   
       const { onCropDone, data } = this.openImageCropper(
         $event as any,
         this.acceptedAspectRatio
@@ -155,7 +168,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   }
 
   onPdfThumbClick(event: MouseEvent): void {
-    // مهم عشان ما يفتحش الـ file picker تاني
+   
     event.preventDefault();
     event.stopPropagation();
 
@@ -165,11 +178,11 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   }
 
   emitRemoveImage($event: MouseEvent) {
-    // برضو امنعي فتح الـ file picker
+ 
     $event.preventDefault();
     $event.stopPropagation();
 
-    // نظف الـ blob لو PDF
+
     if (this.rawPdfUrl) {
       URL.revokeObjectURL(this.rawPdfUrl);
       this.rawPdfUrl = null;

@@ -248,7 +248,7 @@
                         </div>
 
 
-                        <div class="row align-items-baseline mb-5 item-photos m-1 p-3" *ngIf="visual.image" [ngStyle]="{
+                        <div class="row align-items-baseline mb-5 item-photos m-1 py-3 px-1" *ngIf="visual.image" [ngStyle]="{
                         'border': attachmentsSrcs  && attachmentsSrcs?.length >0  && attachmentsSrcs[0]!='' ? 'none': '2px solid #EEEEEEEE' 
                     }" style=" border-radius: 12px;">
                             <div class="col-12 item-photos-header pt-4 pb-2"
@@ -347,13 +347,16 @@
                                       <app-image-upload
                                         [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
                                         [image]="src"
-                                        [staticWidth]="getStaticWidthForEntity()"
-                                        [staticHeight]="getStaticHeightForEntity()"
+                                        [staticWidth]="330"
+                                        [staticHeight]="170"  
+                                     
+                                      
                                         [showGuidelines]="true"
                                         (imageBrowseDone)="onImageBrowseDone($event, productImageCategory?.sycAttachmentCategory, i)"
                                         (removeImage)="onRemoveImageFromUpload($event, i)"
                                         >
                                       </app-image-upload>
+                                      
                                     </ng-template>
                               
                                   </ng-container>
@@ -371,7 +374,8 @@
                                       *ngIf="productImageCategory?.sycAttachmentCategory"
                                         [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
                                         [image]="null"
-                                        [staticWidth]="170"
+                                        [staticWidth]="330"
+                                        [staticHeight]="170"  
                                         
                                 
                                         [showGuidelines]="true"

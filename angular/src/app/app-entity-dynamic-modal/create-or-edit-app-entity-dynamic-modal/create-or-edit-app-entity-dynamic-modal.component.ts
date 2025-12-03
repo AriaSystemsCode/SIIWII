@@ -1018,6 +1018,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         ) {
           this.attachmentsSrcs.push('');
         }
+        console.log(this.attachmentsSrcs,'srcs')
       }
       
     
