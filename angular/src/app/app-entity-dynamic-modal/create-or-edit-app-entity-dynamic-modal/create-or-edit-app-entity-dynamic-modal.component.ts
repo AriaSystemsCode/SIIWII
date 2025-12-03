@@ -76,11 +76,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
         image: false
     };
 
-    _displayVisualTypes:boolean=true;
+    _displayVisualTypes: boolean = true;
     pdfSafeMap: { [index: number]: SafeResourceUrl } = {};
     private pdfRawUrl: { [index: number]: string } = {};
     statusValues: SycEntityObjectStatusLookupTableDto[]
     hideAddToLookupOption = false;
+    // default: normal image
+    imageAttachmentType: 'IMAGE' | 'BANNER' | 'LOGO' = 'IMAGE';
 
     constructor(
         injector: Injector,
@@ -89,8 +91,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
         private _extraAttributeDataService: ExtraAttributeDataService,
         private sanitizer: DomSanitizer,
         private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy,
-        private router: Router,   
-         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy
+        private router: Router,
+        private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy
     ) {
         super(injector);
         this.initUploaders();
@@ -99,7 +101,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
     ngOnInit(): void {
 
-     this.hideAddToLookupOption = this.router.url.includes('/app/main/lookups');
+        this.hideAddToLookupOption = this.router.url.includes('/app/main/lookups');
     }
 
 
@@ -112,7 +114,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.displayVisualTypes();
         this.getStatusOptions();
         this.getLookupCode()
-        this.saving=false;
+        this.saving = false;
         if (appEntity) this.appEntity = appEntity;
         else appEntity = new AppEntityDto();
         this.appEntity.tenantId = -1;
@@ -222,15 +224,15 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.attachmentsSrcs = [];
         this.uploader.clearQueue();
         this.aspectRatio = undefined;
-      
+
         this.pdfSafeMap = {};
         Object.values(this.pdfRawUrl).forEach(url => URL.revokeObjectURL(url));
         this.pdfRawUrl = {};
-      
-        this.initAttachmentSlots();  // هي اللي هتظبط 2 slots لو block
-      }
-      
-    
+
+        this.initAttachmentSlots();
+    }
+
+
 
     getStatusOptions() {
         this._sycEntityObjectStatusesAppService.getAllSycEntityStatusForTableDropdown("Lookup").subscribe(result => {
@@ -671,220 +673,73 @@ export class CreateOrEditAppEntityDynamicModalComponent
             } as any),
             sycAttachmentCategoryName: "",
         });
-        // attachmentsSrcs: string[] = Array(1).fill("");
-        attachmentsSrcs: string[] = [''];
+    // attachmentsSrcs: string[] = Array(1).fill("");
+    attachmentsSrcs: string[] = [];
 
 
-        adjustImageSrcsUrls() {
-            const atts = this.appEntity?.entityAttachments ?? [];
-            this.attachmentsSrcs = [];
-            this.pdfSafeMap = {};
-            this.pdfRawUrl = {};
-        
-            atts.forEach((att, idx) => {
-                const full = `${this.attachmentBaseUrl}/${att.url}`;
-                if (/\.pdf$/i.test(att.url)) {
-                    this.pdfSafeMap[idx] = this.sanitizer.bypassSecurityTrustResourceUrl(full);
-                    this.attachmentsSrcs[idx] = '';
-                } else {
-                    this.attachmentsSrcs[idx] = full;
-                }
-            });
-        
-            this.initAttachmentSlots(); // make sure we respect maxAllowedAttachments
-        }
-        
+    adjustImageSrcsUrls() {
+        debugger
+        const atts = this.appEntity?.entityAttachments ?? [];
+        this.attachmentsSrcs = [];
+        this.pdfSafeMap = {};
+        this.pdfRawUrl = {};
 
-    // fileChange(
-    //     event: Event,
-    //     attachmentCategory: GetSycAttachmentCategoryForViewDto,
-    //     index?: number,
-    //     aspectRatio?: number | string,
-    //     cropWithoutOptions?: boolean
-    // ) {
-    //     const input = event.target as HTMLInputElement;
-    //     const file = input.files?.[0];
-    //     if (!file) return;
+        atts.forEach((att, idx) => {
+            const full = `${this.attachmentBaseUrl}/${att.url}`;
+            if (/\.pdf$/i.test(att.url)) {
+                this.pdfSafeMap[idx] = this.sanitizer.bypassSecurityTrustResourceUrl(full);
+                this.attachmentsSrcs[idx] = '';
+            } else {
+                this.attachmentsSrcs[idx] = full;
+            }
+        });
 
-    //     const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
-
-    //     if (isPdf) {
-    //         // Create & sanitize blob URL for <object>
-    //         const url = URL.createObjectURL(file);
-    //         this.pdfRawUrl[index] = url;
-    //         this.pdfSafeMap[index] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
-    //         // Ensure image preview slot is cleared for this index
-    //         this.attachmentsSrcs[index] = '';
-
-    //         // Prepare attachment dto (no crop)
-    //         const att = new AppEntityAttachmentDto();
-    //         att.index = index;
-    //         att.fileName = file.name;
-    //         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
-    //         att.guid = this.guid();
-
-    //         if (!this.appEntity.entityAttachments) this.appEntity.entityAttachments = [];
-    //         this.appEntity.entityAttachments[index] = att;
-
-    //         // Upload the raw PDF file
-    //         this.uploadBlobAttachment(file, att);
-
-    //         if (this.canUploadMultipleAttachments &&
-    //             this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-    //             this.attachmentsSrcs.length < this.maxAllowedAttachments
-    //         ) {
-    //             this.attachmentsSrcs.push('');
-    //         }
-
-    //         input.value = '';
-    //         return;
-    //     }
-
-    //     // Image branch (as you already do)
-    //     const { onCropDone, data } = this.openImageCropper(event, Number(aspectRatio), cropWithoutOptions,  this.getStaticWidthForEntity());
-    //     const sub = onCropDone.subscribe(() => {
-    //         if (data.isCropDone) {
-    //             this.tempUploadImage(event, attachmentCategory, data, index);
-    //             // clear any previous pdf in same slot
-    //             if (this.pdfRawUrl[index]) { URL.revokeObjectURL(this.pdfRawUrl[index]); delete this.pdfRawUrl[index]; }
-    //             delete this.pdfSafeMap[index];
-    //         }
-    //         input.value = '';
-    //         // sub.unsubscribe(); // if needed
-    //     });
-    // }
+        this.initAttachmentSlots(); // make sure we respect maxAllowedAttachments
+    }
 
 
-
-//     tempUploadImage(
-//         event: Event,
-//         attachmentCategory: GetSycAttachmentCategoryForViewDto,
-//         croppedImageContent: ImageCropperComponent,
-//         index?: number
-//     ) {
-//         const file = (event.target as HTMLInputElement).files[0];
-//         // attachmentCategory.imgURL =
-//         //     croppedImageContent.croppedImageAsBase64 as string;
-
-//         if (
-//             this.appEntity.entityAttachments == null ||
-//             this.appEntity.entityAttachments == undefined
-//         ) {
-//             this.appEntity.entityAttachments = [];
-//         }
-//         // create GuId
-//         let guid = this.guid();
-//         // create app attachment entity
-//         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-//         att.index = index;
-//         att.fileName = file?.name;
-//         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
-//         att.guid = guid;
-
-//         // save image as a base64
-//         this.attachmentsSrcs[index] =
-//             croppedImageContent.croppedImageAsBase64 as string;
-//         this.appEntity.entityAttachments[index] = att;
-
-//         this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
-
-
-// //         if (this.canUploadMultipleAttachments &&
-// //             this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-// //             this.attachmentsSrcs.length < this.maxAllowedAttachments
-// // ) {
-// //             this.attachmentsSrcs.push('');
-// //         }
-  
-//     }
-
-    // removePhoto(i: number) {
-    //     if (this.appEntity.entityAttachments.length > 1)
-    //         return this.notify.info(
-    //             "Please set another image as default first"
-    //         );
-    //     this.appEntity.entityAttachments.splice(i, 1);
-    //     this.attachmentsSrcs.splice(i, 1);
-    //     if (this.attachmentsSrcs.length === 0) this.attachmentsSrcs.push("");
-    //     this.uploader.removeFromQueue(this.uploader.queue[i]);
-    // }
     onRemovePhoto(i: number, event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
-    
-       
+
+
         if (!this.canUploadMultipleAttachments &&
             this.appEntity.entityAttachments.length > 1) {
             return this.notify.info("Please set another image as default first");
         }
-        
+
 
         if (this.pdfRawUrl[i]) {
             URL.revokeObjectURL(this.pdfRawUrl[i]);
             delete this.pdfRawUrl[i];
         }
         delete this.pdfSafeMap[i];
-    
+
         // Remove attachment metadata
         if (this.appEntity.entityAttachments?.length) {
             this.appEntity.entityAttachments.splice(i, 1);
         }
-    
+
         // Remove preview slot
         if (this.attachmentsSrcs?.length) {
             this.attachmentsSrcs.splice(i, 1);
         }
-    
+
         // Keep at least one empty slot
         if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
             this.initAttachmentSlots();
         }
-        
+
         // Remove from uploader queue if exists
         if (this.uploader?.queue?.[i]) {
             this.uploader.removeFromQueue(this.uploader.queue[i]);
         }
     }
-    
-    
-    // removeAllAttachments() {
-    //     if (this.attachmentsSrcs.length) {
-    //         var isConfirmed: Observable<boolean>;
-    //         isConfirmed = this.askToConfirm(
-    //             "AreYouSureYouWantToDeleteAllTheAttachments?",
-    //             "Confirm"
-    //         );
 
-    //         isConfirmed.subscribe((res) => {
-    //             if (res) {
-    //                 this.attachmentsSrcs = [""];
-    //                 this.appEntity.entityAttachments = [];
-    //                 this.uploader.clearQueue();
-    //             }
-    //         });
-    //     }
-    // }
-    removeAllAttachments() {
-        if (this.attachmentsSrcs.length) {
-            const isConfirmed: Observable<boolean> =
-                this.askToConfirm("AreYouSureYouWantToDeleteAllTheAttachments?", "Confirm");
-    
-            isConfirmed.subscribe((res) => {
-                if (res) {
-                    this.attachmentsSrcs = [];
-                    this.appEntity.entityAttachments = [];
-                    this.pdfSafeMap = {};
-                    Object.values(this.pdfRawUrl).forEach(url => URL.revokeObjectURL(url));
-                    this.pdfRawUrl = {};
-                    this.uploader.clearQueue();
-                
-                    this.initAttachmentSlots(); // 2 slots لو block ، 1 لو غير كده
-                }
-            });
-        }
-    }
-    
+
+
+
+
     getCodeValue(code: string) {
         this.appEntity.code = code;
     }
@@ -896,32 +751,32 @@ export class CreateOrEditAppEntityDynamicModalComponent
     dropdownOptions(validEntries) {
         return validEntries.split('|');
     }
-    displayVisualTypes():boolean{
+    displayVisualTypes(): boolean {
         //i49- what else ? 
-        if(this.entityObjectType.code.toString().toUpperCase() == "CHARGES")
-            this._displayVisualTypes=false;
+        if (this.entityObjectType.code.toString().toUpperCase() == "CHARGES")
+            this._displayVisualTypes = false;
         else
-        this._displayVisualTypes=true;
+            this._displayVisualTypes = true;
 
 
-        return this._displayVisualTypes ;
+        return this._displayVisualTypes;
     }
 
     get canUploadMultipleAttachments(): boolean {
         return this.entityObjectType?.code === 'MARKETPLACESECTIONBLOCK';
     }
 
-     async getLookupCode(){
-        if(!this.appEntity.code){
-         let  sequance="";
-   
- 
-         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType.code,this.appSession.tenantId).toPromise()
-         if(getNextEntityCodeRes)
-             sequance=getNextEntityCodeRes;
- 
-         this.appEntity.code= sequance;
-     }
+    async getLookupCode() {
+        if (!this.appEntity.code) {
+            let sequance = "";
+
+
+            const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType.code, this.appSession.tenantId).toPromise()
+            if (getNextEntityCodeRes)
+                sequance = getNextEntityCodeRes;
+
+            this.appEntity.code = sequance;
+        }
     }
 
     getStaticWidthForEntity(): number {
@@ -937,96 +792,94 @@ export class CreateOrEditAppEntityDynamicModalComponent
         output: ImageUploadComponentOutput,
         sycAttachmentCategory: SycAttachmentCategoryDto,
         index: number
-      ): void {
+    ): void {
+        debugger;
         if (!output) {
-          return;
+            return;
         }
-      
+
         const isPdf =
-          output.file.type === 'application/pdf' ||
-          output.file.name.toLowerCase().endsWith('.pdf');
-      
+            output.file.type === 'application/pdf' ||
+            output.file.name.toLowerCase().endsWith('.pdf');
+
         if (!this.appEntity.entityAttachments) {
-          this.appEntity.entityAttachments = [];
+            this.appEntity.entityAttachments = [];
         }
         if (!this.attachmentsSrcs) {
-          this.attachmentsSrcs = [];
+            this.attachmentsSrcs = [];
         }
-      
+
+        // make sure array has this index
+        while (this.attachmentsSrcs.length <= index) {
+            this.attachmentsSrcs.push(undefined);
+        }
+
         let existingIndex = this.appEntity.entityAttachments.findIndex(
-          (x) =>
-            x.attachmentCategoryId === sycAttachmentCategory.id &&
-            x.index === index
+            (x) => x.attachmentCategoryId === sycAttachmentCategory.id && x.index === index
         );
-      
+
         let att: AppEntityAttachmentDto;
         if (existingIndex > -1) {
-          att = this.appEntity.entityAttachments[existingIndex];
+            att = this.appEntity.entityAttachments[existingIndex];
         } else {
-          att = new AppEntityAttachmentDto();
+            att = new AppEntityAttachmentDto();
         }
-      
+
         const guid = this.guid();
         att.fileName = output.file.name;
         att.attachmentCategoryId = sycAttachmentCategory.id;
         att.guid = guid;
         att.index = index;
-      
+
         if (isPdf) {
-          // 🧹 نظف أي PDF قديم على نفس الـ index
-          if (this.pdfRawUrl[index]) {
-            URL.revokeObjectURL(this.pdfRawUrl[index]);
-          }
-      
-          this.attachmentsSrcs[index] = ''; // عشان *ngIf(src || pdfSafeMap[i]) يشتغل
-      
-          const rawUrl = URL.createObjectURL(output.file);
-          this.pdfRawUrl[index] = rawUrl;
-          this.pdfSafeMap[index] =
-            this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
-      
+            // clear image preview for this slot
+            this.attachmentsSrcs[index] = undefined;
+
+            // free previous PDF URL if exists
+            if (this.pdfRawUrl[index]) {
+                URL.revokeObjectURL(this.pdfRawUrl[index]);
+            }
+
+            const rawUrl = URL.createObjectURL(output.file);
+            this.pdfRawUrl[index] = rawUrl;
+            this.pdfSafeMap[index] =
+                this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
         } else {
-          // 🖼 صورة عادية
-          this.attachmentsSrcs[index] = output.image;
-      
-          // لو كان فيه PDF قبل كده على نفس الـ index امسحيه
-          if (this.pdfRawUrl[index]) {
-            URL.revokeObjectURL(this.pdfRawUrl[index]);
-            delete this.pdfRawUrl[index];
-          }
-          delete this.pdfSafeMap[index];
+            // set image preview for this slot
+            this.attachmentsSrcs[index] = output.image;
+
+            // clean any PDF data for this index
+            if (this.pdfRawUrl[index]) {
+                URL.revokeObjectURL(this.pdfRawUrl[index]);
+                delete this.pdfRawUrl[index];
+            }
+            delete this.pdfSafeMap[index];
         }
-      
+
         if (existingIndex === -1) {
-          this.appEntity.entityAttachments.push(att);
+            this.appEntity.entityAttachments.push(att);
         } else {
-          this.appEntity.entityAttachments[existingIndex] = att;
+            this.appEntity.entityAttachments[existingIndex] = att;
         }
-      
-        // 👇 نفس لوجيك الرفع بتاعك
+
+        // upload file with guid
         this.uploader.addToQueue([output.file]);
         this.uploader.onBuildItemForm = (fileItem: any, form: any) => {
-          form.append('guid', guid);
+            form.append('guid', guid);
         };
         this.uploader.uploadAll();
-      
-        // إضافة slot فاضية لو multi و لسه أقل من max
-        if (
-          this.canUploadMultipleAttachments &&
-          this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
-          this.attachmentsSrcs.length < this.maxAllowedAttachments
-        ) {
-          this.attachmentsSrcs.push('');
-        }
-        console.log(this.attachmentsSrcs,'srcs')
-      }
-      
-    
-      onRemoveImageFromUpload(_event: any, index: number): void {
+
+        console.log(this.attachmentsSrcs, 'srcs');
+    }
+
+
+
+
+    onRemoveImageFromUpload(_event: any, index: number): void {
         const fakeClick = new MouseEvent('click');
         this.onRemovePhoto(index, fakeClick);
-      }
-      
+    }
+
     getStaticHeightForEntity(): number {
         switch (this.entityObjectType?.code) {
             case 'MARKETPLACESECTIONBLOCK':
@@ -1042,23 +895,44 @@ export class CreateOrEditAppEntityDynamicModalComponent
             ? 2
             : 1;
     }
-private initAttachmentSlots(): void {
-  if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
-    this.attachmentsSrcs = [''];
-  }
-}
 
-      
-      
-    
-      get currentAttachmentsCount(): number {
-        return this.appEntity?.entityAttachments?.length || 0;
-      }
-      
-      get nextUploadIndex(): number {
+    private initAttachmentSlots(): void {
+        debugger
+        if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
+            this.attachmentsSrcs = [''];
+        }
+    }
 
-        return this.currentAttachmentsCount;
-      }
-      
+
+    showUploadSlot(i: number): boolean {
+        const hasImageOrPdf = (idx: number) =>
+            !!this.attachmentsSrcs?.[idx] || !!this.pdfSafeMap?.[idx];
+
+        if (!this.canUploadMultipleAttachments || this.maxAllowedAttachments === 1) {
+
+            return i === 0 && !hasImageOrPdf(0);
+        }
+
+        if (i >= this.maxAllowedAttachments) {
+            return false;
+        }
+
+        const allPreviousFilled = Array.from({ length: i }).every((_, idx) =>
+            hasImageOrPdf(idx)
+        );
+
+        const currentEmpty = !hasImageOrPdf(i);
+
+        return allPreviousFilled && currentEmpty;
+    }
+
+
+
+    get displaySlots(): number[] {
+        const max = this.maxAllowedAttachments;
+        return Array.from({ length: max }, (_, i) => i);
+    }
+
+
 }
 

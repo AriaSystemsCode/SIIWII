@@ -37,7 +37,7 @@ export class AccountComponent extends AppComponentBase implements OnInit {
     ];
 
     tenantLogo:string
-    tenantText:string
+    tenantName:string
     tenantWordLogo:string
     bgCol:string
     public constructor(
@@ -90,18 +90,11 @@ export class AccountComponent extends AppComponentBase implements OnInit {
     getTenantData() {
         this._appEntitiesServiceProxy.getHostSettingValue(1204,"file")
         .subscribe((result) => {
-            // const str = result
-            // const after = str.split("|")[1];
-            // const before = str.split("|")[0];
-
-
            this.tenantWordLogo = result
-       
-      
         });
         this._appEntitiesServiceProxy.getHostSettingValue(1205,null)
         .subscribe((result) => {
-           this.tenantText = result
+           this.tenantName = result
         });
         this._appEntitiesServiceProxy.getHostSettingValue(1206,"file")
         .subscribe((result) => {

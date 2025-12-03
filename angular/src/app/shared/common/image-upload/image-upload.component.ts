@@ -44,6 +44,10 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   isPdf = false;
   pdfObjectUrl: string | null = null;  // blob: url
   private rawPdfUrl: string | null = null;
+  sycAttachmentCategoryLogo :SycAttachmentCategoryDto
+  sycAttachmentCategoryBanner :SycAttachmentCategoryDto
+  sycAttachmentCategoryImage :SycAttachmentCategoryDto
+  @Input() attachmentTypeCode: 'LOGO' | 'BANNER' | 'IMAGE' = 'IMAGE';
 
   constructor(injector: Injector) {
     super(injector);
@@ -51,121 +55,119 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-  
+    // when the sycAttachmentCategory is passed directly from parent
     if (
-      !this.sycAttachmentCategory ||
-      !this.sycAttachmentCategory.aspectRatio
+      changes['sycAttachmentCategory'] &&
+      this.sycAttachmentCategory &&
+      this.sycAttachmentCategory.aspectRatio
     ) {
-      return;
+      this.applyAspectFromCategory(this.sycAttachmentCategory);
     }
   
-    const aspect = String(this.sycAttachmentCategory.aspectRatio);
-    const [width, height] = aspect.split(':');
-
-    if (!width || !height || isNaN(+width) || isNaN(+height)) {
-      return;
-    }
-  
-    this.acceptedAspectRatio = Number(width) / Number(height);
-    this.detectSupportedExtensions();
-  
-    if (this.staticWidth) {
-      this.staticHeight = this.staticWidth / this.acceptedAspectRatio;
-    } else if (this.staticHeight) {
-      this.staticWidth = this.staticHeight * this.acceptedAspectRatio;
+    // when user changes Logo/Banner/Image in parent
+    if (changes['attachmentTypeCode'] && this.attachmentTypeCode) {
+      this.getAttachRatio();   // will set sycAttachmentCategory & ratio accordingly
     }
   }
   
   
+  
 
   async fileChange($event: { target: { files: FileList; value: any } }) {
-    const imgFile = $event.target.files[0];
-    const resetInput = () => ($event.target.value = null);
-
+    const inputEl = $event.target as HTMLInputElement;
+    const imgFile = inputEl.files && inputEl.files[0];
+    const resetInput = () => (inputEl.value = null);
+  
     if (!imgFile) {
       return;
     }
-
+  
+    // 👇 Detect PDF
     const isPdfFile =
       imgFile.type === 'application/pdf' ||
       imgFile.name.toLowerCase().endsWith('.pdf');
-
-    // ✅ validate extension
-    const isValidExtension = this.hasValidExtension(
-      imgFile.name,
-      this.acceptedExtensionsArr
-    );
-    if (!isValidExtension) {
-      this.message.warn(this.l('UnsupportedExtension'));
-      resetInput();
-      return;
+  
+    // 🔒 Validate extension ONLY for non-PDF files
+    if (!isPdfFile && this.acceptedExtensionsArr?.length) {
+      const isValidExtension = this.hasValidExtension(
+        imgFile.name,
+        this.acceptedExtensionsArr
+      );
+      if (!isValidExtension) {
+        this.message.warn(this.l('UnsupportedExtension'));
+        resetInput();
+        return;
+      }
     }
-
-    // ✅ validate size
+  
+    // 🔒 Max file size (applies to both images & PDFs)
     if (this.checkImageSize(imgFile.size)) {
       this.message.error(this.l('MaxFileSizeExceeded'));
       resetInput();
       return;
     }
-
-
+  
+    // 📄 PDF branch
     if (isPdfFile) {
-
+      // cleanup previous PDF url if any
       if (this.rawPdfUrl) {
         URL.revokeObjectURL(this.rawPdfUrl);
       }
-
+  
       this.isPdf = true;
       this.image = undefined;
       this.imgFile = imgFile;
-
+  
+      // create object URL for opening in new tab
       this.rawPdfUrl = URL.createObjectURL(imgFile);
       this.pdfObjectUrl = this.rawPdfUrl;
-
-
+  
+      // emit with file, image = null
       this.imageBrowseDone.emit({ file: this.imgFile, image: null });
-
+  
       resetInput();
       return;
     }
-
- 
+  
+    // 🖼 IMAGE branch
     this.isPdf = false;
     this.pdfObjectUrl = null;
-
+  
     const renderedImage = await this.renderImageAndGetDimensions(imgFile);
     const currentAspectRatio = renderedImage.width / renderedImage.height;
     const buffer = 0.2;
-
+  
     if (
       this.acceptedAspectRatio - buffer < currentAspectRatio &&
       this.acceptedAspectRatio + buffer > currentAspectRatio
     ) {
-  
+      // ✅ Aspect ratio is within tolerance
       this.image = (renderedImage as any).src;
       this.imgFile = imgFile;
       this.imageBrowseDone.emit({ file: this.imgFile, image: this.image });
     } else {
-   
+      // ❌ Aspect ratio off → open cropper
       const { onCropDone, data } = this.openImageCropper(
         $event as any,
         this.acceptedAspectRatio
       );
+  
       const subs = onCropDone.subscribe(() => {
         if (data.isCropDone) {
           this.image = data.croppedImageAsBase64 as string;
           this.imgFile = new File([data.croppedImage], imgFile.name, {
             type: imgFile.type || 'image/png',
           });
-
+  
           this.imageBrowseDone.emit({ file: this.imgFile, image: this.image });
         }
         subs.unsubscribe();
       });
     }
-
+  
     resetInput();
   }
+  
 
   onPdfThumbClick(event: MouseEvent): void {
    
@@ -219,20 +221,87 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   detectSupportedExtensions() {
     this.acceptedExtensionsArr = [];
     this.acceptedExtensions = '';
+  
     this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
       const notFirst = index > 0;
       const itemsCount = this.sycAttachmentCategory.sycAttachmentTypeDto.length;
+  
       if (notFirst && itemsCount > 1) {
         this.acceptedExtensions += ',';
       }
+  
       this.acceptedExtensions += `.${item.extension}`;
       this.acceptedExtensionsArr.push(`.${item.extension}`);
     });
+  
+   
+    if (!this.acceptedExtensionsArr.includes('.pdf')) {
+      this.acceptedExtensionsArr.push('.pdf');
+      this.acceptedExtensions += (this.acceptedExtensions ? ',' : '') + '.pdf';
+    }
   }
+  
 
   hasValidExtension(fileName: string, exts: string[]) {
     return new RegExp('(' + exts.join('|').replace(/\./g, '\\.') + ')$').test(
       fileName
     );
   }
+  private applyAspectFromCategory(cat: SycAttachmentCategoryDto): void {
+    if (!cat || !cat.aspectRatio) {
+      return;
+    }
+  
+    const aspect = String(cat.aspectRatio);
+    const [width, height] = aspect.split(':');
+  
+    if (!width || !height || isNaN(+width) || isNaN(+height)) {
+      return;
+    }
+  
+    this.acceptedAspectRatio = Number(width) / Number(height);
+    this.detectSupportedExtensions();
+  
+    if (this.staticWidth) {
+      this.staticHeight = this.staticWidth / this.acceptedAspectRatio;
+    } else if (this.staticHeight) {
+      this.staticWidth = this.staticHeight * this.acceptedAspectRatio;
+    }
+  }
+  
+  getAttachRatio() {
+    this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
+      .subscribe((result) => {
+        result.forEach((item) => {
+          if (item.code === 'LOGO') {
+            this.sycAttachmentCategoryLogo = item;
+          } else if (item.code === 'BANNER') {
+            this.sycAttachmentCategoryBanner = item;
+          } else if (item.code === 'IMAGE') {
+            this.sycAttachmentCategoryImage = item;
+          }
+        });
+  
+        // choose based on selected radio
+        let selectedCat: SycAttachmentCategoryDto;
+  
+        switch (this.attachmentTypeCode) {
+          case 'LOGO':
+            selectedCat = this.sycAttachmentCategoryLogo;
+            break;
+          case 'BANNER':
+            selectedCat = this.sycAttachmentCategoryBanner;
+            break;
+          default:
+            selectedCat = this.sycAttachmentCategoryImage;
+            break;
+        }
+  
+        if (selectedCat) {
+          this.sycAttachmentCategory = selectedCat;
+          this.applyAspectFromCategory(selectedCat);
+        }
+      });
+  }
+  
 }

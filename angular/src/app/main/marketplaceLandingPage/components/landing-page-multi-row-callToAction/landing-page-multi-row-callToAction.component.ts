@@ -80,14 +80,14 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
    
     this.router.navigate(
         ['/app/main/marketplace/products'],
-        { queryParams: { brand: brand.name } }
+        { queryParams: { brand: brand.id } } 
     );
 }
 goToCategory(cat: { name: string; id: number | string }) {
    
   this.router.navigate(
       ['/app/main/marketplace/products'],
-      { queryParams: { cat: cat.name } }
+      { queryParams: { cat: cat.id } }  
   );
 }
 

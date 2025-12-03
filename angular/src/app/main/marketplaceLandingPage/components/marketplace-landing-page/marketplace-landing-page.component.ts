@@ -36,6 +36,7 @@ export class MarketplaceLandingPageComponent
   }
 
   ngOnInit(): void {
+    localStorage.removeItem("productFilters");
     this.pages = this.chunk(this.items, 9); // each page has 9 products
     this.loadSections()
   }

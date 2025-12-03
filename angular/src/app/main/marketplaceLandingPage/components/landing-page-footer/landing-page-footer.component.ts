@@ -14,6 +14,7 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
   sections: any
   sectionsFlat: SectionItem[] = [];   // what ngFor iterates
   bgCol:string
+  tenantName:string
   constructor(private _sydObjectsAppService: SydObjectsServiceProxy, private _appEntitiesServiceProxy: AppEntitiesServiceProxy,injector: Injector,) {
     super(injector);
   }
@@ -110,6 +111,10 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
           // result = '#456'
           result ? this.bgCol = result : this.bgCol = '#4A0D4A'
   
+      });
+      this._appEntitiesServiceProxy.getHostSettingValue(1205,null)
+      .subscribe((result) => {
+         this.tenantName = result
       });
   }
 
