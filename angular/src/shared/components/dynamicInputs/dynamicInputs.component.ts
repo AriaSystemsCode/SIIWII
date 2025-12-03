@@ -2,7 +2,7 @@
 import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AppAdvertisementsServiceProxy, ExtraAttribute, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { FileUploaderCustom } from '../import-steps/models/FileUploaderCustom.model';
 import { FileUploader, FileUploaderOptions } from '@node_modules/ng2-file-upload';
 import { AppConsts } from '@shared/AppConsts';
@@ -340,5 +340,11 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
           return uploader;
       }
       getSafeString = (str: string) => str.replace(/\s+/g, '_');
+
+
+      getDropdownOptions(extraAttr:ExtraAttribute){
+        //i49-New get dropdown options
+        //if(extraAttr.id == )
+      }
 
 }
