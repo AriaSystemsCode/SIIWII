@@ -2089,7 +2089,7 @@ namespace onetouch.Message
                         }
                     }
                     AppEntityRating rating = new AppEntityRating();
-                    var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId &&
+                    var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => //x.EntityFk.TenantId == AbpSession.TenantId &&
                              x.AttributeId == 715 && x.AttributeValue == AbpSession.UserId.ToString());
                     if (contactEntityExtraData != null)
                     {
