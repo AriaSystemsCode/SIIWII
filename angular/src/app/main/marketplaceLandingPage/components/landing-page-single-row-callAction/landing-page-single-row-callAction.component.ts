@@ -21,13 +21,39 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
 
   private objectUrlById: Record<number, string> = {};
-
+  acceptedAspectRatio;
+  responsiveOptions = [
+    {
+      breakpoint: '1400px',
+      numVisible: 4,
+      numScroll: 4
+    },
+    {
+      breakpoint: '1199px',
+      numVisible: 4,
+      numScroll: 4
+    },
+    {
+      breakpoint: '991px',
+      numVisible: 3,
+      numScroll: 3
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 2,
+      numScroll: 2
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
+  
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
-    private appItems: AppItemsServiceProxy,
     private router: Router,
-    private sanitizer: DomSanitizer
   ) { super(injector); }
 
   ngOnInit() {
@@ -120,11 +146,19 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
 
   // ---------- navigation ----------
   goToBrand(brand: { name: string; id: number | string }) {
-    this.router.navigate(['/app/main/marketplace/products'], { queryParams: { brand: brand.name } });
-  }
-  goToCategory(cat: { name: string; id: number | string }) {
-    this.router.navigate(['/app/main/marketplace/products'], { queryParams: { cat: cat.name } });
-  }
+   
+    this.router.navigate(
+        ['/app/main/marketplace/products'],
+        { queryParams: { brand: brand.id } } 
+    );
+}
+goToCategory(cat: { name: string; id: number | string }) {
+   
+  this.router.navigate(
+      ['/app/main/marketplace/products'],
+      { queryParams: { cat: cat.id } }  
+  );
+}
 
   // ---------- optional download helper ----------
   downloadRaw(path?: string) {
@@ -139,5 +173,37 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   openTab(path?: string){
     window.open(path)
   }
+
+  
+
+  getAspectatio(): void {
+    this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
+      .subscribe(result => {
+  
+        const imgCat = result.find(x => x.code === 'IMAGE');
+  
+        if (imgCat?.aspectRatio) {
+        
+          const [w, h] = imgCat.aspectRatio.split(':').map(Number);
+  
+          if (w && h) {
+            this.acceptedAspectRatio = h / w; 
+          }
+        }
+      });
+  }
+
+viewProduct(prod: any) {
+  const productBodyRequestForView = {
+      id: prod?.appItem?.id,
+      // currencyCode: this.currency,
+      sellerSSIN: prod?.sellerSSIN,
+      // buyerSSIN : this.buyerSSIN
+  };
+  localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
+  this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
+
+  // this.router.navigateByUrl(`/view/${id}`)
+}
 
 }

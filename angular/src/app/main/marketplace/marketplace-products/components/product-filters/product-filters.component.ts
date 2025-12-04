@@ -394,7 +394,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         10
       ).subscribe((res: any) => {
         this.files = res.items;
-        resolve(); // ✅ Important!
+        resolve(); 
       });
     });
   }
@@ -467,7 +467,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           .getAllChildsWithPaging(
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             currentId,
-            /* forDepartments? */ false, // ✅ categories
+            /* forDepartments? */ false,
             undefined, undefined, 'name', 0, 10
           )
           .toPromise();
@@ -553,7 +553,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     for (let node of nodes) {
       if (node.data.sycEntityObjectCategory.id === targetId) {
         if (parentNode) {
-          parentNode.expanded = true; // ✅ expand parent
+          parentNode.expanded = true; 
         }
         node.expanded = true;
         this.selectedFile = node;

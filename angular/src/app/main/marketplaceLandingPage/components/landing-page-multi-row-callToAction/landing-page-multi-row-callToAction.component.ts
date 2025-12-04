@@ -18,13 +18,13 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
 
   private objectUrlById: Record<number, string> = {};
-  
+  acceptedAspectRatio;
+
+
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
     private router: Router,
-       private sanitizer: DomSanitizer,
-        private appItems: AppItemsServiceProxy,
     private cdr: ChangeDetectorRef
   ) { super(injector); }
 
@@ -51,9 +51,6 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     // this.sliderItems.filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image)).forEach(b => this.ensurePdfSafeUrl(b));
 
     this.pageGroups = this.chunk(this.sliderItems, 12); // 3x3 per slide
-  
-    // prepare only the first slide initially
-    // this.prepareGroupPdfs(0);
   
     this.cdr.markForCheck();
   }
@@ -83,18 +80,33 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
    
     this.router.navigate(
         ['/app/main/marketplace/products'],
-        { queryParams: { brand: brand.name } }
+        { queryParams: { brand: brand.id } } 
     );
 }
 goToCategory(cat: { name: string; id: number | string }) {
    
   this.router.navigate(
       ['/app/main/marketplace/products'],
-      { queryParams: { cat: cat.name } }
+      { queryParams: { cat: cat.id } }  
   );
 }
 
+getAspectatio(): void {
+  this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
+    .subscribe(result => {
 
+      const imgCat = result.find(x => x.code === 'IMAGE');
+
+      if (imgCat?.aspectRatio) {
+      
+        const [w, h] = imgCat.aspectRatio.split(':').map(Number);
+
+        if (w && h) {
+          this.acceptedAspectRatio = h / w; 
+        }
+      }
+    });
+}
 
   fullUrl(path?: string): string {
     const p = (path ?? '').trim();
@@ -192,6 +204,18 @@ goToCategory(cat: { name: string; id: number | string }) {
     window.open(path)
   }
 
+  viewProduct(prod: any) {
+    const productBodyRequestForView = {
+        id: prod?.appItem?.id,
+        // currencyCode: this.currency,
+        sellerSSIN: prod?.sellerSSIN,
+        // buyerSSIN : this.buyerSSIN
+    };
+    localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
+    this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
+ 
+    // this.router.navigateByUrl(`/view/${id}`)
+}
   
 ngOnDestroy() {
   Object.values(this.objectUrlById).forEach(u => { try { URL.revokeObjectURL(u); } catch {} });

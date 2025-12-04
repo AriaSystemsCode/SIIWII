@@ -4,11 +4,7 @@
 
       <!-- auto slider with call to action-->
       <div *ngSwitchCase="'ASSB'">
-        <!-- <h4   [style.text-align]="
-        s?.inputs?.titleAlignment === 'Center'
-          ? 'center'
-          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">slider>> {{ s.inputs?.name }}</h4> -->
+
         <app-slider-with-callToAction class="" [sectionId]="s.sectionId">
         </app-slider-with-callToAction>
       </div>
@@ -20,11 +16,7 @@
 
       <!-- auto slider without call to action-->
       <div *ngSwitchCase="'ASMB'">
-        <!-- <h4   [style.text-align]="
-        s?.inputs?.titleAlignment === 'Center'
-          ? 'center'
-          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">slider without>> {{ s.inputs?.name }}</h4> -->
+
 
         <app-slider-without-callToAction class=" d-block" [sectionId]="s.sectionId">
         </app-slider-without-callToAction>
@@ -33,7 +25,7 @@
 
 
       <!--single row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'SRCTA'" class="bg-white rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg">
+      <div *ngSwitchCase="'SRCTA'" class="rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg">
         <h4   [style.text-align]="
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
@@ -45,7 +37,7 @@
 
 
       <!--multi row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'MRCTA'" class="bg-white rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg" >
+      <div *ngSwitchCase="'MRCTA'" class=" rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg" >
         <h4   [style.text-align]=" 
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'

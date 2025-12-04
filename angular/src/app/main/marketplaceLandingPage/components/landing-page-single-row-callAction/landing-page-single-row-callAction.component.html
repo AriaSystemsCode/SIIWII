@@ -1,77 +1,135 @@
-<p-carousel [value]="blocksSorted" [numVisible]="5" [numScroll]="5" [circular]="false" [showIndicators]="false" [showNavigators]="true" class="p-4 m-2 rounded">
-    <ng-template pTemplate="item" let-item>
-      <div class="px-2  " *ngIf="item?.blockType?.toUpperCase() =='PRODUCT'">
-      
-        <app-prodcut-card [product]="item?.getAppMarketItemForViewDto?.appItem" [productCard]="item?.getAppMarketItemForViewDto" class=""></app-prodcut-card>
-      </div>
-      <div class="mx-2 d-flex flex-column sectionGeneral" *ngIf="item?.blockType?.toUpperCase()=='BRAND'">
+<p-carousel
+  [value]="blocksSorted"
+  [numVisible]="5"
+  [numScroll]="5"
+  [circular]="false"
+  [showIndicators]="false"
+  [showNavigators]="true"
+  [responsiveOptions]="responsiveOptions"
+  class="p-4 m-2 rounded"
+>
+  <ng-template pTemplate="item" let-item>
 
-        <img [src]="item?.image ? attachmentBaseUrl + '/' +  item?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class=""  alt="" srcset=""
-          onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToBrand(item)">
-          <!-- <a (click)="goToBrand(item)">{{item?.name}}</a> -->
-      </div>
+    <div class="carousel-card">
+      <div class="carousel-card-body" [ngSwitch]="item?.blockType?.toUpperCase()">
 
-      <!-- <div class="px-2  d-flex flex-column sectionGeneral" *ngIf="item?.blockType?.toUpperCase()=='CATEGORY'">
-
-        <img [src]="item?.image ? attachmentBaseUrl + '/' +  item?.image : '../../../../assets/placeholders/_logo-placeholder.png'" class="mb-2"  alt="" srcset=""
-          onerror="'../../../../assets/placeholders/_logo-placeholder.png'" (click)="goToCategory(item)">
-          <a (click)="goToCategory(item)">{{item?.name}}</a>
-      </div> -->
-
-      <div *ngIf="item?.blockType?.toUpperCase()=='ATTACHMENT'" class="col p-0  text-center">
-        <ng-container [ngSwitch]="kindOfPath(item?.image)">
-          <!-- image -->
-          <img *ngSwitchCase="'image'"
-               [src]="fullUrl(item?.image)"
-               class="img-fluid rounded border"
-               (click)="openTab(item?.link)"
-               alt="{{ item?.name || 'attachment' }}"
-               (error)="onImgErr($event)">
-  
-          <!-- video -->
-          <video *ngSwitchCase="'video'" class="w-100 rounded border" controls playsinline>
-            <source [src]="fullUrl(item?.image)" />
-            Your browser does not support the video tag.
-          </video>
-  
-          <!-- pdf -->
-          <div *ngSwitchCase="'pdf'" class="position-relative sectionGeneral">
-            <!-- <iframe class=" iframSty"
-        
-                    [src]="attachmentSafeMap[item.id]"
-                    (load)="item._pdfLoadErr=false"
-                    (error)="item._pdfLoadErr=true">
-            </iframe> -->
-  <img src="assets/Items/pdf-Icon.png" class=" iframSty" alt="" srcset=""    (click)="openNewTab(item?.image)">
-            <!-- Fallback if viewer can’t embed -->
-            <!-- <div *ngIf="item._pdfLoadErr" class="p-2 small text-muted">
-              Can't display PDF here. <a [href]="fullUrl(item?.image)" target="_blank" rel="noopener">Open in new tab</a>
-            </div> -->
-  
-            <!-- Optional: your own download button -->
-            <!-- <button type="button"
-                    class="btn btn-sm  position-absolute"
-                    style="top: .5rem; left: .5rem"
-                    (click)="openNewTab(item?.image)">
-                    <i class="fa fa-download"></i>
-            </button> -->
+        <!-- PRODUCT -->
+        <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
+          <div class="product-image-wrapper">
+            <img
+              class="product-image"
+              (error)="onImgErr($event)"
+              [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
+                      ? attachmentBaseUrl + '/' + item?.getAppMarketItemForViewDto?.appItem.imageUrl
+                      : 'assets/placeholders/appitem-placeholder.png'"
+              alt="Product Image"
+              (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)"
+            />
           </div>
-  
-          <!-- other file -->
-          <a *ngSwitchDefault [href]="fullUrl(item?.image)" target="_blank" rel="noopener">
-            Open file
-          </a>
+
+          <div class="product-info">
+            <div class="top-row">
+              <span class="code">
+                {{ item?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
+              </span>
+              <span class="price">
+                RRP: {{ item?.getAppMarketItemForViewDto?.appItem?.price | currency }}
+              </span>
+            </div>
+
+            <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)">
+              {{ item?.getAppMarketItemForViewDto?.appItem?.name }}
+            </div>
+
+            <div class="seller">
+              Sold By
+              <span class="seller-name">
+                {{ item?.getAppMarketItemForViewDto?.appItem?.sellerName }}
+              </span>
+            </div>
+
+            <div class="bottom-row">
+              <div class="star-rating">
+                <div class="stars-outer">
+                  ★★★★★
+                  <div
+                    class="stars-inner"
+                    [style.width]="
+                      (item?.getAppMarketItemForViewDto?.averageRating / 5) * 100 + '%'
+                    "
+                  >
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <span class="rateNum">
+                ({{ item?.getAppMarketItemForViewDto?.numberOfReviews }}) reviews
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BRAND -->
+        <img
+          *ngSwitchCase="'BRAND'"
+          class="card-media"
+          [src]="item?.image
+                  ? attachmentBaseUrl + '/' + item?.image
+                  : '../../../../assets/placeholders/_logo-placeholder.png'"
+          alt="Brand"
+          (click)="goToBrand(item)"
+          (error)="onImgErr($event)"
+        />
+    <!-- CATEGORY -->
+    <img
+    *ngSwitchCase="'CATEGORY'"
+    class="card-media"
+    [src]="item?.image
+            ? attachmentBaseUrl + '/' + item?.image
+            : '../../../../assets/placeholders/_logo-placeholder.png'"
+    alt="category"
+    (click)="goToCategory(item)"
+    (error)="onImgErr($event)"
+  />
+        <!-- ATTACHMENT -->
+        <ng-container *ngSwitchCase="'ATTACHMENT'">
+          <ng-container [ngSwitch]="kindOfPath(item?.image)">
+            <img
+              *ngSwitchCase="'image'"
+              class="card-media"
+              [src]="fullUrl(item?.image)"
+              alt="{{ item?.name || 'Attachment' }}"
+              (click)="openTab(item?.link)"
+              (error)="onImgErr($event)"
+            />
+            <video
+              *ngSwitchCase="'video'"
+              class="card-media"
+              controls
+              playsinline
+            >
+              <source [src]="fullUrl(item?.image)" />
+            </video>
+            <img
+              *ngSwitchCase="'pdf'"
+              class="card-media pdf-icon"
+              src="assets/Items/pdf-Icon.png"
+              alt="PDF"
+              (click)="openNewTab(item?.image)"
+            />
+            <a
+              *ngSwitchDefault
+              class="card-media other-file"
+              [href]="fullUrl(item?.image)"
+              target="_blank"
+              rel="noopener"
+            >
+              Open file
+            </a>
+          </ng-container>
         </ng-container>
+
       </div>
-  
-
-      <!-- <div class="px-2 my-2 row" *ngIf="item?.blockType?.toUpperCase() =='CONTACT'">
-     
-        <app-account-card
-
-     
-    ></app-account-card>
-      </div> -->
-    </ng-template>
-  </p-carousel>
-
+    </div>
+  </ng-template>
+</p-carousel>

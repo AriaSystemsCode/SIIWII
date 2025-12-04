@@ -22,7 +22,9 @@
 	<text name="NotifyUsersByEmail">Notify Users by Email</text>
 	<text name="TransactionSharingIs">Transaction Sharing is</text>
 	<text name="InvitePartnerByType">Invite partner By Type</text>
-    <text name="ValidationRules">Validation rules</text>
+    <text name="Warningmessage">Warning message</text>
+    <text name="ShowNewsfeed">Show News feed</text>
+	<text name="ValidationRules">Validation rules</text>
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
     <text name="FieldName">Field name</text>

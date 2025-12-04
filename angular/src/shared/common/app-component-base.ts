@@ -342,31 +342,47 @@ export abstract class AppComponentBase {
         this.bsModalService.show(ImageViewerComponent, config);
     }
     openImageCropper(
-        event,
+        event: any,
         aspectRatio?: number,
-        noOptions?: boolean
+        noOptions?: boolean,
+        resizeToWidth?: number      
     ): { onCropDone: Observable<any>; data: ImageCropperComponent } {
-        if (event.target.files.length === 0) return; // there are no files selected
+    
+        if (event.target.files.length === 0) return; 
+    
         let config: ModalOptions = new ModalOptions();
-        // data to be shared to the modal
+
         config.initialState = {
             title: "Edit image:",
             originalFileChangeEvent: event,
         };
-        if (noOptions != undefined)
-            config.initialState["noOptions"] = noOptions; // open modal with crop only without any other functionalities
-        if (!isNaN(aspectRatio))
+    
+        if (noOptions != undefined) {
+            config.initialState["noOptions"] = noOptions; 
+        }
+    
+        if (!isNaN(aspectRatio)) {
             config.initialState["aspectRatio"] = aspectRatio;
+        }
+    
+    
+        if (resizeToWidth && resizeToWidth > 0) {
+            config.initialState["resizeToWidth"] = resizeToWidth;
+        }
+    
         config.class = "right-modal";
+    
         let mgCropperModalRef = this.bsModalService.show(
             ImageCropperComponent,
             config
         );
+    
         return {
             onCropDone: this.bsModalService.onHide,
             data: mgCropperModalRef.content,
         };
     }
+    
     guid(): string {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)

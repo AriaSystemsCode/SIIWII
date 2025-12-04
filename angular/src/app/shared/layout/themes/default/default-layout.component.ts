@@ -19,7 +19,7 @@ import { AppMenu } from '../../nav/app-menu';
     animations: [appModuleAnimation()],
 })
 export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements OnInit {
-    defaultLogo = AppConsts.appBaseUrl + '/assets/common/images/Ellipse 5.svg';
+    defaultLogo = AppConsts.appBaseUrl + '/assets/common/images/default-profile-picture.png';
     displayMarketPlace : boolean
     menuCanvasOptions: OffcanvasOptions = {
         baseClass: 'kt-aside',
@@ -43,9 +43,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openAdSub= false
     tenantLogo:any;
     isAuthenticated = this.appSession?.user
-    hideTopbar:boolean = true
+    hideTopbar: boolean = false;
 
-  
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -61,22 +60,21 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
-   
+
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
-   
-
+        this.updateTopbarVisibility(this.currentRouteUrl);
+      
+    
         this._router.events
-            .pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe(event => {this.currentRouteUrl = this._router.url.split(/[?#]/)[0]
-             
-                const path = this.__router.url.split('?')[0]; // ignore query params
-                // show topbar for ANY route under /app/main/account/*
-                this.hideTopbar = !path.startsWith('/app/account/');
-
-            });
-    }
-
- 
+          .pipe(filter(event => event instanceof NavigationEnd))
+          .subscribe(() => {
+            this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
+            this.updateTopbarVisibility(this.currentRouteUrl);
+         
+          });
+      }
+      
+    
       toggleSidebar() {
         this.isMinimized = !this.isMinimized;
       }
@@ -128,5 +126,36 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.openSideBar=$event
     }
 
- 
+    private readonly ACCOUNT_ROUTES = [
+        'login',
+        'register',
+        'register-tenant',
+        'register-tenant-result',
+        'forgot-password',
+        'reset-password',
+        'email-activation',
+        'confirm-email',
+        'send-code',
+        'verify-code',
+        'buy',
+        'extend',
+        'upgrade',
+        'select-edition',
+        'paypal-purchase',
+        'stripe-purchase',
+        'stripe-payment-result',
+        'stripe-cancel-payment',
+        'payment-completed',
+        'session-locked',
+      ];
+      
+      private updateTopbarVisibility(path: string): void {
+        const cleanPath = path.split(/[?#]/)[0]; // remove query + hash
+      
+        this.hideTopbar = this.ACCOUNT_ROUTES.some(route =>
+          cleanPath === `/app/account/${route}` ||
+          cleanPath === `/app/main/account/${route}`
+        );
+      }
+      
 }

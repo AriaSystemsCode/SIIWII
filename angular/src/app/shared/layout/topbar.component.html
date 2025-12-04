@@ -10,18 +10,18 @@
 
         <p-menu #menu [model]="items" [popup]="true"></p-menu>
       
-        <a *ngIf="isAuthenticated"
+        <a
         class="navbar-brand pt-0"
-       
-        [routerLink]="['/app/main/Home']"
+        [routerLink]="defaultHomeUrl"
         routerLinkActive="header-link-active"
         (click)="userClick('Home')"
-    >
+      >
         <img
-            [src]=" tenantLogo ? attachmentBaseUrl +'/'+ tenantLogo : '../../../assets/landingPage/Logo_Main.png'"
-            class="navbar-brand"
+          [src]=" attachmentBaseUrl + '/' + tenantLogo"
+          class="navbar-brand"
         />
-    </a>
+      </a>
+      
         <button
             type="button"
             (click)="menu.toggle($event)"
@@ -36,7 +36,9 @@
 
         <!-- Search form -->
         <form class="input-group pt-3 input-group-form d-lg-block d-none">
-            <div class="position-relative search-bar w-75" >
+            <div class="position-relative search-bar w-75" [ngClass]="!isHost && !isAuthenticated ? 'addMl' : ''"
+
+            >
                 <div class="input-group mb-3">
                     <!-- <div
                         class="input-group-prepend"
@@ -97,7 +99,7 @@
             [ngClass]="isArabic ? 'rt-sec-section':'sec-section'">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item">
+                <li class="nav-item" *ngIf="isAuthenticated">
                     <a
                         *ngIf="('Pages.Marketplace' | permission) || !isAuthenticated"
                         class="nav-link active d-flex flex-column text-center"
@@ -407,7 +409,16 @@
         </div>
 
         <div class="rightList ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" *ngIf="!isAuthenticated">
-            <button class=" p-2 m-2 mr-4 mt-4 regBtn"      [routerLink]="['/app/main/account/login']">Login</button>
+                                <button
+                    class="btn login-btn d-flex align-items-center m-2 mr-4 mt-4"
+                    type="button"
+                    [routerLink]="['/app/main/account/login']"
+                    >
+                    <i class="fas fa-user-circle mr-2"></i>
+                    <span>Login</span>
+                    </button>
+
+            <!-- <button class=" p-2 m-2 mr-4 mt-4 regBtn"      [routerLink]="['/app/main/account/login']">Login</button> -->
         </div>
         <!-- Collapsible wrapper -->
 
@@ -423,12 +434,18 @@
                         <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand" />
                     </a>
                 </li>
-                <li class="nav-item pt-1">
-                    <a *ngIf="'Pages.Marketplace' | permission" class="nav-link active d-flex flex-column text-center"
-                        aria-current="page" [routerLink]="['/app/main/marketplace/']"
-                        [ngClass]="{ 'header-link-active': displayMarketPlace }">
-                        <img src="../../../assets/landingPage/marketPlace.png"
-                            class="navbar-brand _navbar-brand m-auto" />
+                <li class="nav-item pt-1" >
+                    <a
+                        *ngIf="'Pages.Marketplace' | permission"
+                        class="nav-link active d-flex flex-column text-center"
+                        aria-current="page"
+                        [routerLink]="['/app/main/marketplace/']"
+                        [ngClass]="{ 'header-link-active': displayMarketPlace }"
+                    >
+                        <img
+                            src="../../../assets/landingPage/marketPlace.png"
+                            class="navbar-brand _navbar-brand m-auto"
+                        />
                     </a>
                 </li>
                 <li *ngIf="shoppingCartSummary?.shoppingCartId >0" class="nav-item pt-1">

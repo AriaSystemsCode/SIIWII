@@ -35,5 +35,7 @@ export class FooterComponent extends AppComponentBase implements OnInit {
       .subscribe((result) => {
         this.tenantFooterText = result
       });
+
+
   }
 }

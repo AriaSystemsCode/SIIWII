@@ -29,7 +29,7 @@
         border: none;
         filter: grayscale(1);
     }
-    width: 200px;
+    width: 330px;
   //  height: 276px;
     background-color: white;
     margin-right: 2rem;
@@ -137,3 +137,10 @@
 .required{
     color:#F6851D !important;
 }
+
+.upload-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }

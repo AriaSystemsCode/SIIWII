@@ -20,10 +20,10 @@
             <!-- BEGIN: Left Aside -->
             <div *ngIf="isAuthenticated" [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
                 <div class="text-center">
-                <img *ngIf="!tenantLogo" [src]="defaultLogo" alt="logo" height="38" class="rounded-circle" />
+                <!-- <img *ngIf="!tenantLogo" [src]="defaultLogo" alt="logo" height="38" class="rounded-circle" /> -->
 
        
-                <img *ngIf="tenantLogo" [src]="tenantLogo" alt="logo" (error)="handleFailedImage($event)"  class="logoTanant rounded-circle" />
+                <img  [src]="tenantLogo" alt="logo" (error)="handleFailedImage($event)"  class="logoTanant rounded-circle" />
                 <p *ngIf="!isMinimized" class="tenant">{{accountSummary?.name}}</p>
             </div>
                 <button *ngIf="isMinimized" class="arr" (click)="toggleSidebar()">
@@ -319,7 +319,7 @@
             <!-- END: Left Aside -->
             <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="isAuthenticated ?'kt-wrapper':'' " id="kt_wrapper">
                 <!-- BEGIN: Header -->
-                <div *ngIf="hideTopbar" class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
+                <div *ngIf="!hideTopbar" class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
 
    
                     <div class="kt-header-menu-wrapper" id="kt_header_menu_wrapper"></div>
@@ -356,7 +356,7 @@
                 </div>
 
 
-                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="!hideTopbar ? '':'rout-c'">
+                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="hideTopbar ? '':'rout-c'">
 
                     <router-outlet></router-outlet>
                 </div>

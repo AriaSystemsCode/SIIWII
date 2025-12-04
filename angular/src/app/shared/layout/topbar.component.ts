@@ -99,6 +99,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     tenantLogo:string
     currentLang: string
     isArabic: boolean
+    defaultHomeUrl = '/app/main/Home'; // fallback
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -173,7 +174,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     ngOnInit() {
-        console.log(this.isAuthenticated,'this.isAuthenticated');
+       this.loadDefaultPage()
         this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
@@ -532,15 +533,30 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             result ? this.bgCol = result : this.bgCol = '#4A0D4A'
     
         });
-        this._AppEntitiesServiceProxy.getHostSettingValue(1206,"file")
+        this._AppEntitiesServiceProxy.getHostSettingValue(1204,"file")
         .subscribe((result) => {
-            // const str = result
-            // const after = str.split("|")[1];
+          
            this.tenantLogo = result
-           console.log(this.tenantLogo,'logo')
+  
         });
     }
 
+    loadDefaultPage(): void {
+        this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
+          .subscribe({
+            next: (res2: string) => {
+              if (res2 === 'Marketplace Landing page') {
+                this.defaultHomeUrl = '/app/main/marketplace';
+              } else {
+                this.defaultHomeUrl = '/app/main/Home';
+              }
+            },
+            error: err2 => {
+              console.error('Failed to load host setting 1203', err2);
+              this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
+            }
+          });
+      }
 }
 
 

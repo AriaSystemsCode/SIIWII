@@ -89,6 +89,9 @@ export class MarketplaceProductsComponent
     @Input() marketplaceAccCurrency: string
     @ViewChildren(ProdcutCardComponent)
 productCards!: QueryList<ProdcutCardComponent>; 
+    brandIdFromUrl: number | null = null;
+    catIdFromUrl: number | null = null;
+    
     constructor(
         injector: Injector,
         private _router: Router,
@@ -183,157 +186,46 @@ productCards!: QueryList<ProdcutCardComponent>;
           this.skipCount = parsedFilters.skipCount || this.skipCount;
           this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
-      
-        // 🔗 URL takes priority if present
-        this.route.queryParamMap.subscribe(async (params) => {
-            const q = params.get('q'); // <-- new
-
-            if (q !== null) {
-              this.searchInput = q; // URL wins over local storage
-            }
-            const brandNames = params.getAll('brand');   // 👈 may be [], one, or many
-
-            if (brandNames && brandNames.length) {
-              const ids: (number | string)[] = [];
-            
-              for (const name of brandNames) {
-                const id = await this.resolveBrandNameToId(name);
-                if (id != null) {
-                  ids.push(id);
-                }
-              }
-            
-              this.brands = ids;   // applies all selected brands
-            }
-
-          const DepartmentName = params.get('dept');
-      
-          if (DepartmentName) {
-            // resolve human-readable name -> id
-            const id = await this.resolveDeptNameToId(DepartmentName);
-            this.selectedDepartments = id ? [id] : [];
-            this.filters.preselectDeptId = id ?? undefined;  // tell the child to highlight
-          }
-          // If no brand param, we keep the restored localStorage brands as-is.
-          const listName = params.get('proList');
-          if (listName) {
-            const listId = await this.resolveListNameToId(listName);
-            this.appItemListId = listId || null;
-          
-            // (optional) make the sidebar visually highlight the selected list
-            if (this.filters) this.filters.catalogId = listId ?? null;
-          }
-          const catName = params.get('cat');
-          if (catName) {
-            const id = await this.resolveCategoryNameToId(catName);
-            this.selectedCategories = id ? [id] : [];
-            if (this.filters) this.filters.preselectCategoryId = id ?? undefined; // optional if you add it in child
-          }
-        
-          this.getAllProducts(); // 
-        });
-      }
-      
-    
-    private async resolveBrandNameToId(brandName: string): Promise<number | string | null> {
-        // Call your brands endpoint and find the matching brand by name.
-        // You can optimize this with a dedicated "getByName" if you have one.
-        const res = await this._AppMarketplaceItemsServiceProxy
-          .getAllBrandsWithPaging(
-            null, null, null, null, null,false, 'BRAND', null, null,
-            86, 'name', 0, 200, this.sellerSSIN
-          )
-          .toPromise();
-      
-        const items = res?.items ?? [];
-        const match = items.find((b: any) =>
-          (b.name ?? b.label ?? '').toLowerCase() === brandName.toLowerCase()
-        );
-      
-        return match ? (match.id ?? match.value) : null;
-      }
-
-      private async resolveBrandIdToName(brandId: number | string): Promise<string | null> {
-        const res = await this._AppMarketplaceItemsServiceProxy
-          .getAllBrandsWithPaging(
-            null, null, null, null, null,
-            false,
-            'BRAND',
-            null,
-            null,
-            86,             // tenant or language as you already use
-            'name',
-            0,
-            200,
-            this.sellerSSIN
-          )
-          .toPromise();
-      
-        const items = res?.items ?? [];
-        const match = items.find((b: any) => {
-          const id = b.id ?? b.value;
-          return id === brandId;
-        });
-      
-        if (!match) return null;
-        return match.name ?? match.label ?? match.displayName ?? null;
-      }
-      
-      private async resolveDeptNameToId(deptName: string): Promise<number | null> {
-        // 1) Load top-level categories once
-        const parents = await this._sycEntityObjectCategoriesServiceProxy
-          .getAllWithChildsForProductWithPaging(
-            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-            undefined, /* includeParents */ true,
-            undefined,
-            [],               // selected parents
-            "name", 0, 50     // sort, paging (tweak page size if you have many parents)
-          )
-          .toPromise();
-      
-        const parentsNodes = (parents?.items ?? []) as any[];
-      
-        // 2) BFS over the tree, loading children lazily until we find a name match
-        const norm = (s: string) => (s || '').trim().toLowerCase();
-        const target = norm(deptName);
-      
-        const queue: any[] = [...parentsNodes];
-      
-        while (queue.length) {
-          const node = queue.shift();
-          const cat = node?.data?.sycEntityObjectCategory;
-          const label = node?.label;
-      
-          const nameHere = norm(cat?.name ?? cat?.displayName ?? label);
-          if (nameHere === target) return cat?.id ?? null;
-      
-          // load children if absent
-          if (!node.children || node.children.length === 0) {
-            const kids = await this._sycEntityObjectCategoriesServiceProxy
-              .getAllChildsWithPaging(
-                undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-                cat?.id, true, undefined, undefined, "name", 0, 50
-              )
-              .toPromise();
-            node.children = kids?.items ?? [];
-          }
-      
-          if (node.children?.length) queue.push(...node.children);
+      // 🔗 URL (by ID) takes priority if present
+      this.route.queryParamMap.subscribe((params) => {
+        const q = params.get('q');
+        if (q !== null) {
+          this.searchInput = q; // URL wins over local storage
         }
+    
+        // brand can be single or multiple: ?brand=1&brand=2
+        const brandParams = params.getAll('brand');
+        if (brandParams && brandParams.length) {
+          this.brands = brandParams.map(v => +v)
+        }
+    
+        const deptParam = params.get('dept');
+        if (deptParam) {
+          const id = +deptParam;
+          this.selectedDepartments = [id];
+          if (this.filters) this.filters.preselectDeptId = id;
+        }
+    
+        const listParam = params.get('proList');
+        if (listParam) {
+          const id = +listParam;
+          this.appItemListId = id || null;
+          if (this.filters) this.filters.catalogId = id ?? null;
+        }
+    
+        const catParam = params.get('cat');
+        if (catParam) {
+          const id = +catParam;
+          this.selectedCategories = [id];
+          if (this.filters) this.filters.preselectCategoryId = id;
+        }
+    
+        this.getAllProducts(); // apply filters
+      });
+    }
+    
       
-        return null;
-      }
-      private async resolveListNameToId(listName: string): Promise<number | null> {
-        const res = await this._AppMarketplaceItemsServiceProxy
-          .getSharedItemLists(null, 'name', 0, 200, this.sellerSSIN)
-          .toPromise();
-      
-        const items = res?.items ?? [];
-        const norm = (s: string) => (s || '').trim().toLowerCase();
-        const match = items.find((x: any) => norm(x.name) === norm(listName));
-        return match ? match.id : null;
-      }
-      
+
     
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
@@ -576,50 +468,53 @@ productCards!: QueryList<ProdcutCardComponent>;
         this.getAllProducts();
     }
 
-    // start filter criteria
     selectCatalog(value: any) {
-        if (!value || !value.id) {
-          this.appItemListId = null;
-          this.updateUrlQueryParams({ proList: null });
-        } else {
-          this.appItemListId = value.id;
-          this.updateUrlQueryParams({ proList: value.name || null });
-        }
-        this.getAllProducts();
+      if (!value || !value.id) {
+        this.appItemListId = null;
+        this.updateUrlQueryParams({ proList: null });
+      } else {
+        this.appItemListId = value.id;
+        this.updateUrlQueryParams({ proList: String(value.id) }); 
       }
+      this.getAllProducts();
+    }
+    
       
-    private updateUrlQueryParams(partial: { dept?: string | null; proList?: string | null; q?: string | null ; cat?: string | null; brand?: string | string[] | null;   }) {
+      private updateUrlQueryParams(partial: {
+        dept?: string | null;
+        proList?: string | null;
+        q?: string | null;
+        cat?: string | null;
+        brand?: string | string[] | null;
+      }) {
         this._router.navigate([], {
           relativeTo: this.route,
           queryParams: {
             dept: partial.dept ?? undefined,
             proList: partial.proList ?? undefined,
             q: partial.q ?? undefined,
-            cat: partial.cat ?? undefined, 
+            cat: partial.cat ?? undefined,
             brand: partial.brand ?? undefined,
           },
           queryParamsHandling: 'merge',
-          // replaceUrl: true, // optional
         });
       }
       
       
+      
 
-    selectDepartment(value) {
+      selectDepartment(value) {
         if (!value) {
           this.selectedDepartments = [];
           this.updateUrlQueryParams({ dept: null });
         } else {
           const id = value.node.data.sycEntityObjectCategory.id;
-          const name = value.node.data.sycEntityObjectCategory.name
-                    ?? value.node.data.sycEntityObjectCategory.displayName
-                    ?? value.node.label;
-      
           this.selectedDepartments = [id];
-          this.updateUrlQueryParams({ dept: name });
+          this.updateUrlQueryParams({ dept: String(id) }); 
         }
         this.getAllProducts();
       }
+      
       
 
 
@@ -659,46 +554,22 @@ productCards!: QueryList<ProdcutCardComponent>;
     async selectBrands(value: any[]) {
       this.brands = value || [];
     
-      // 🔹 No brands selected → remove from URL
+      // No brands -> remove param
       if (!this.brands.length) {
         this.updateUrlQueryParams({ brand: null });
         this.getAllProducts();
         return;
       }
     
-      // 🔹 Load all brands once
-      const res = await this._AppMarketplaceItemsServiceProxy
-        .getAllBrandsWithPaging(
-          null, null, null, null, null,
-          false,
-          'BRAND',
-          null,
-          null,
-          86, 'name', 0, 200, this.sellerSSIN
-        )
-        .toPromise();
+      // Just send IDs as strings
+      const brandIdsAsString = this.brands.map(id => String(id));
     
-      const items = res?.items ?? [];
-      const selectedIdSet = new Set(this.brands.map(x => String(x)));
-    
-      const brandNames: string[] = [];
-    
-      for (const b of items) {
-        const id = (b.id ?? b.value)?.toString();
-        if (id && selectedIdSet.has(id)) {
-          const name = b.name ?? b.label ?? b.displayName;
-          if (name) brandNames.push(name);
-        }
-      }
-    
-      // 👇 this becomes ?brand=Nike&brand=Adidas
-      this.updateUrlQueryParams({ brand: brandNames });
+      // URL becomes ?brand=12&brand=34
+      this.updateUrlQueryParams({ brand: brandIdsAsString });
     
       this.getAllProducts();
     }
-    
-
-    resetProducts($event: any) {
+    resetProducts($event) {
         this.filters.resetFilters();
     
         this.seletedOption = { label: "Public And Shared With Me", value: 2 };
@@ -732,45 +603,12 @@ productCards!: QueryList<ProdcutCardComponent>;
       } else {
         const node = value.node?.data?.sycEntityObjectCategory;
         const id = node?.id;
-        const name = node?.name ?? node?.displayName ?? value.node?.label;
         this.selectedCategories = id ? [id] : [];
-        this.updateUrlQueryParams({ cat: name || null });
+        this.updateUrlQueryParams({ cat: id ? String(id) : null }); 
       }
       this.getAllProducts();
     }
-    private async resolveCategoryNameToId(catName: string): Promise<number | null> {
-      // load category roots
-      const parents = await this._sycEntityObjectCategoriesServiceProxy
-        .getAllWithChildsForProductWithPaging(
-          undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-          undefined, /* departments? */ false,
-          undefined, [], 'name', 0, 50
-        ).toPromise();
     
-      const norm = (s: string) => (s || '').trim().toLowerCase();
-      const target = norm(catName);
-      const queue: any[] = [...(parents?.items ?? [])];
-    
-      while (queue.length) {
-        const node = queue.shift();
-        const cat = node?.data?.sycEntityObjectCategory;
-        const label = node?.label;
-        const here = norm(cat?.name ?? cat?.displayName ?? label);
-        if (here === target) return cat?.id ?? null;
-    
-        if (!node.children || node.children.length === 0) {
-          const kids = await this._sycEntityObjectCategoriesServiceProxy
-            .getAllChildsWithPaging(
-              undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-              cat?.id, /* departments? */ false,
-              undefined, undefined, 'name', 0, 50
-            ).toPromise();
-          node.children = kids?.items ?? [];
-        }
-        if (node.children?.length) queue.push(...node.children);
-      }
-      return null;
-    }
         
     ngOnDestroy() {
 
