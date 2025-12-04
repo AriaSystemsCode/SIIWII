@@ -61,7 +61,7 @@ firstName:string=";"
 
     ngOnInit() {
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.model.inviterTenantId = this._activatedRoute.snapshot.queryParams['tenantid'];
         if (!this.model.inviterTenantId  || this.model.inviterTenantId.toString().toUpperCase()=="NULL") {
             this.model.inviterTenantId = 0;
