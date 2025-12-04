@@ -37,6 +37,7 @@ export class MarketplaceLandingPageComponent
 
   ngOnInit(): void {
     localStorage.removeItem("productFilters");
+    this.addLocal()
     this.pages = this.chunk(this.items, 9); // each page has 9 products
     this.loadSections()
   }
@@ -152,7 +153,11 @@ export class MarketplaceLandingPageComponent
     return out;
   }
   
-
+  addLocal(){
+    localStorage.setItem("fromSellerRoom",JSON.stringify(false));
+    localStorage.setItem("fromMarketPlace",JSON.stringify(true));
+    localStorage.removeItem("productFilters");
+    }
 
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();

@@ -4,11 +4,7 @@
 
       <!-- auto slider with call to action-->
       <div *ngSwitchCase="'ASSB'">
-        <!-- <h4   [style.text-align]="
-        s?.inputs?.titleAlignment === 'Center'
-          ? 'center'
-          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">slider>> {{ s.inputs?.name }}</h4> -->
+
         <app-slider-with-callToAction class="" [sectionId]="s.sectionId">
         </app-slider-with-callToAction>
       </div>
@@ -20,11 +16,7 @@
 
       <!-- auto slider without call to action-->
       <div *ngSwitchCase="'ASMB'">
-        <!-- <h4   [style.text-align]="
-        s?.inputs?.titleAlignment === 'Center'
-          ? 'center'
-          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">slider without>> {{ s.inputs?.name }}</h4> -->
+
 
         <app-slider-without-callToAction class=" d-block" [sectionId]="s.sectionId">
         </app-slider-without-callToAction>
