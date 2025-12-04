@@ -23,10 +23,10 @@
             {{ product?.name  | textSubstring: 20 }}
         </p>
 
-        <!-- <div class="d-flex name-price">
+        <!-- <div class="d-flex name-price"> -->
        
              <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
-            <h5 class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:'symbol-narrow'}}</h5>
+            <!-- <h5 class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:'symbol-narrow'}}</h5>
         </div> -->
 
                <div class="d-flex mb-3 justify-content-between align-items-center">
