@@ -162,7 +162,11 @@ export class CreateEditAppItemVariationsComponent
     get selectedExtraAttributes() {
         return this.extraAttributes.filter((attr) => attr.selected);
     }
-
+    toTitleCase(text: string): string {
+        if (!text) return '';
+        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    }
+    
     getallAtrributes() {
         this._appItemsServiceProxy
             .getProductVariationsTypes(this.productTypeId)

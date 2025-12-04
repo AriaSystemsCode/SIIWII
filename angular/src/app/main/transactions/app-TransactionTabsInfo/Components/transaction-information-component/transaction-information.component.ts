@@ -150,9 +150,10 @@ export class TransactionInformationComponent
     this.priceLevel = localStorage.getItem("tempPriceLevel");
 
   }
+  currentLang: any;
   ngOnInit(): void {
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-    this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+    //this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
     this.defineExtraAttributes();
 
     this.initFilterForm()
