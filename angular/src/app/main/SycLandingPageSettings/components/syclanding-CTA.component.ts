@@ -18,11 +18,12 @@ export class CTAComponent extends AppComponentBase implements OnInit {
     sycAttachmentCategoryCTASlider : SycAttachmentCategoryDto
     ngOnInit(){
         this.handleStorageData()
+        this.addLocal()
         this.getSycAttachmentCategoriesByCodes(['CTASLIDER'])
         .subscribe((res)=>{
             this.sycAttachmentCategoryCTASlider = res[0]
         })
-        localStorage.removeItem("productFilters");
+        
     }
 
     ctaSeeMore(){}
