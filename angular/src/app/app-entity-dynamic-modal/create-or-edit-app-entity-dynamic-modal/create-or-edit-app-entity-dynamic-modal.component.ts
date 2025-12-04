@@ -82,7 +82,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
     statusValues: SycEntityObjectStatusLookupTableDto[]
     hideAddToLookupOption = false;
     // default: normal image
-    imageAttachmentType: 'IMAGE' | 'BANNER' | 'LOGO' = 'IMAGE';
+    imageAttachmentType: 'IMAGE' | 'BANNER' | 'LOGO' = 'LOGO';
 
     constructor(
         injector: Injector,
