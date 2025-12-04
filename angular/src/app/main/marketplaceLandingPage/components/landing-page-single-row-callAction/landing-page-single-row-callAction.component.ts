@@ -146,11 +146,19 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
 
   // ---------- navigation ----------
   goToBrand(brand: { name: string; id: number | string }) {
-    this.router.navigate(['/app/main/marketplace/products'], { queryParams: { brand: brand.name } });
-  }
-  goToCategory(cat: { name: string; id: number | string }) {
-    this.router.navigate(['/app/main/marketplace/products'], { queryParams: { cat: cat.name } });
-  }
+   
+    this.router.navigate(
+        ['/app/main/marketplace/products'],
+        { queryParams: { brand: brand.id } } 
+    );
+}
+goToCategory(cat: { name: string; id: number | string }) {
+   
+  this.router.navigate(
+      ['/app/main/marketplace/products'],
+      { queryParams: { cat: cat.id } }  
+  );
+}
 
   // ---------- optional download helper ----------
   downloadRaw(path?: string) {

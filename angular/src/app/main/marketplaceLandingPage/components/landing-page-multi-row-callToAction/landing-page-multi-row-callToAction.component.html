@@ -69,7 +69,17 @@
           (error)="onImgErr($event)"
         />
 
-
+  <!-- CATEGORY -->
+  <img
+  *ngSwitchCase="'CATEGORY'"
+  class="card-media"
+  [src]="block?.image
+          ? attachmentBaseUrl + '/' + block?.image
+          : '../../../../assets/placeholders/_logo-placeholder.png'"
+  alt="category"
+  (click)="goToCategory(block)"
+  (error)="onImgErr($event)"
+/>
         <ng-container *ngSwitchCase="'ATTACHMENT'">
           <ng-container [ngSwitch]="kindOfPath(block?.image)">
 
