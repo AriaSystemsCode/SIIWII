@@ -12,10 +12,10 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
   brands: any
   tenantLogo: string
   sections: any
-  sectionsFlat: SectionItem[] = [];   // what ngFor iterates
-  bgCol:string
-  tenantName:string
-  constructor(private _sydObjectsAppService: SydObjectsServiceProxy, private _appEntitiesServiceProxy: AppEntitiesServiceProxy,injector: Injector,) {
+  sectionsFlat: SectionItem[] = [];
+  bgCol: string
+  tenantName: string
+  constructor(private _sydObjectsAppService: SydObjectsServiceProxy, private _appEntitiesServiceProxy: AppEntitiesServiceProxy, injector: Injector,) {
     super(injector);
   }
 
@@ -49,8 +49,6 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
         const flat: SectionItem[] = normalized.map((r: any) => {
           switch (r._type) {
             case 'PF':
-              // Expecting inputs like: links array or brands, etc.
-              // You can shape this however your PageLinkFooter needs it.
               return {
                 type: 'PF',
                 order: r._order,
@@ -58,22 +56,22 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
                 inputs: {
                   title: r.title ?? null,
                   name: r.name ?? null,
-                  links: r.items ?? r.links ?? [], // adjust to your BE
+                  links: r.items ?? r.links ?? [],
                 },
               };
             case 'SM':
-              // Social media: pass links array (or empty → component can fallback)
+
               return {
                 type: 'SM',
                 order: r._order,
                 sectionId: r.id,
                 inputs: {
                   links: r.items ?? r.links ?? [], title: r.title ?? null,
-                  name: r.name ?? null,// [{name,url,iconSrc}] or BE shape you map inside component
+                  name: r.name ?? null,
                 },
               };
             default:
-              // Ignore or map other types if needed
+
               return {
                 type: 'ASSBPF',
                 order: r._order,
@@ -83,12 +81,11 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
           }
         });
 
-        // Stable sort by (order, original idx)
+
         flat.sort((a, b) => (a.order - b.order) ||
           (normalized.findIndex((x: any) => x.id === a.sectionId) - normalized.findIndex((x: any) => x.id === b.sectionId))
         );
 
-        // Keep only the footer-relevant types
         this.sectionsFlat = flat.filter(s => s.type === 'PF' || s.type === 'SM');
 
       });
@@ -101,20 +98,19 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
   getTenantData() {
 
 
-    this._appEntitiesServiceProxy.getHostSettingValue(1206,"file" )
+    this._appEntitiesServiceProxy.getHostSettingValue(1206, "file")
       .subscribe((result) => {
         this.tenantLogo = result
       });
 
-      this._appEntitiesServiceProxy.getHostSettingValue(1208,null)
+    this._appEntitiesServiceProxy.getHostSettingValue(1208, null)
       .subscribe((result) => {
-          // result = '#456'
-          result ? this.bgCol = result : this.bgCol = '#4A0D4A'
-  
+        result ? this.bgCol = result : this.bgCol = '#4A0D4A'
+
       });
-      this._appEntitiesServiceProxy.getHostSettingValue(1205,null)
+    this._appEntitiesServiceProxy.getHostSettingValue(1205, null)
       .subscribe((result) => {
-         this.tenantName = result
+        this.tenantName = result
       });
   }
 

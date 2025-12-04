@@ -19,7 +19,7 @@ import { AppMenu } from '../../nav/app-menu';
     animations: [appModuleAnimation()],
 })
 export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements OnInit {
-    defaultLogo = AppConsts.appBaseUrl + 'assets/common/images/default-profile-picture.png';
+    defaultLogo = AppConsts.appBaseUrl + '/assets/common/images/default-profile-picture.png';
     displayMarketPlace : boolean
     menuCanvasOptions: OffcanvasOptions = {
         baseClass: 'kt-aside',

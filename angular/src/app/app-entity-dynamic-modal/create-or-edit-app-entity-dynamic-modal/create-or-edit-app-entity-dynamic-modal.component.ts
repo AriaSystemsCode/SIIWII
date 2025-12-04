@@ -81,9 +81,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
     private pdfRawUrl: { [index: number]: string } = {};
     statusValues: SycEntityObjectStatusLookupTableDto[]
     hideAddToLookupOption = false;
-    // default: normal image
     imageAttachmentType: 'IMAGE' | 'BANNER' | 'LOGO' = 'LOGO';
-
+    imageTypeOptions = [
+        { label: this.l('Logo'),   value: 'LOGO'   },
+        { label: this.l('Image'),  value: 'IMAGE'  },
+        { label: this.l('Banner'), value: 'BANNER' },
+      ];
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,

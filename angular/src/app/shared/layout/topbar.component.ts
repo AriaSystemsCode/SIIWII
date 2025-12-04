@@ -519,7 +519,7 @@ export class TopBarComponent
             result ? this.bgCol = result : this.bgCol = '#4A0D4A'
     
         });
-        this._AppEntitiesServiceProxy.getHostSettingValue(1206,"file")
+        this._AppEntitiesServiceProxy.getHostSettingValue(1204,"file")
         .subscribe((result) => {
           
            this.tenantLogo = result
