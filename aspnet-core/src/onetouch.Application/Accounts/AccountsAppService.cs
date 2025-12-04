@@ -94,6 +94,8 @@ using Abp.MultiTenancy;
 using System.Drawing;
 using SixLabors.Fonts;
 using System.Management.Automation;
+using onetouch.AppSiiwiiTransaction.Dtos;
+using Newtonsoft.Json;
 
 namespace onetouch.Accounts
 {
@@ -1269,6 +1271,7 @@ namespace onetouch.Accounts
             return bReturn;
         }
 
+        [AbpAllowAnonymous]
         public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
         {
             await CreateAdminContact();

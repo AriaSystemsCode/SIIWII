@@ -40,6 +40,7 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     '👍', '👎', '👏', '🙌', '🙏', '🤝', '💪', '👀', '👋', '🤙'
   ];
   onlyMsg:boolean = false
+  isAuthenticated = this.appSession?.user
 
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
 

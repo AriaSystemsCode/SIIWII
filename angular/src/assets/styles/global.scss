@@ -787,6 +787,28 @@ html{
 
 
 
+/* .p-checkbox .p-checkbox-box .p-icon {
+    position: relative;
+    left: 40%;
+    right: 40%;
+} */
+.p-checkbox .p-checkbox-box {
+    display: flex;
+    align-items: center;  
+    justify-content: center; 
+  }
+  
+  .p-checkbox .p-checkbox-box .p-icon {
+    position: static; 
+    margin: 0;
+  }
+  
+
+  .p-accordion-header-text {
+    color: #1B101B !important;
+    font-weight: 700 !important;
+    padding: 10px;
+  }
 .kt-scrolltop--on .kt-scrolltop:hover {
     background-color: #4A0D4A !important;
 }
@@ -819,26 +841,3 @@ html{
     right: 40%;
 }
 }
-
-.progress-bar{
-background-color:  #4A0D4A !important;
-}
-
-
-.swal2-styled.swal2-confirm {
-    background-color: #4A0D4A !important;
-}
-
- .nav-tabs {
-    border-bottom: none !important;
-  }
-  
-   .tab-content {
-    border: none !important;
-  }
-  
-  .btn-outline-primary{
-    border: none !important;
-    background-color: #610061 !important;
-    color: white !important;
-  }

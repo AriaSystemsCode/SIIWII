@@ -16,6 +16,7 @@ export class ReactionsActionComponent extends AppComponentBase {
     showReactionsPopup: boolean = false
     defaultReactionType : Reactions = Reactions.Like
     Reactions = Reactions
+    isAuthenticated = this.appSession?.user
 
 
     constructor(

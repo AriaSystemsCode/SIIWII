@@ -22,6 +22,7 @@ export class AddCommentComponent extends AppComponentBase {
     suggListContLeft:any=0;
     suggListTop:any=0;
     mentionedUsers:Array<any>=[];
+    isAuthenticated = this.appSession?.user
 
     constructor(
         private injector: Injector,
@@ -252,7 +253,10 @@ export class AddCommentComponent extends AppComponentBase {
         this.active = true
         this.commentObject = comment
         this.comment.init(CreateMessageInput.fromJS(this.commentObject))
-        this.getProfilePicture()
+        if(this.isAuthenticated){
+          this.getProfilePicture()
+
+        }
     }
     getProfilePicture(): void {
         this._profileService.getProfilePicture().subscribe(result => {

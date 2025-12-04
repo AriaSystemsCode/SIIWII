@@ -7,6 +7,7 @@ using Abp.Application.Services.Dto;
 using onetouch.AppEntities.Dtos;
 using onetouch.AppItems.Dtos;
 using onetouch.Dto;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppItems
 {
@@ -27,7 +28,7 @@ namespace onetouch.AppItems
         Task<PagedResultDto<string>> GetAppItemDepartmentsNamesWithPaging(GetAppItemAttributesWithPagingInput input);
         Task<PagedResultDto<AppEntityAttachmentDto>> GetAppItemAttachmentsWithPaging(GetAppItemExtraAttributesInput input);
         Task<PagedResultDto<ExtraDataAttrDto>> GetAppItemExtraDataWithPaging(GetAppItemExtraAttributesInput input);
-
+        Task<PagedResultDto<AppItemLookupDto>> GetAppItemRelatedProductsWithPaging(GetAllSycEntityObjectCategoriesInput input);
         Task<GetAppItemForEditOutput> GetAppItemForEdit(GetAppItemWithPagedAttributesForEditInput input);
 
         Task<long> CreateOrEdit(CreateOrEditAppItemDto input);

@@ -133,8 +133,6 @@ export class TransactionInformationComponent
   totalOrderQTY: number = 0;
   totlaOrderPrices: number = 0;
   priceLevel:any
-  currentLang:string
-  isArabic:boolean 
   languageSettingName  =AppConsts.languageSettingName;
   constructor(
     injector: Injector,
@@ -229,6 +227,8 @@ export class TransactionInformationComponent
         undefined,
         [], // ids
         'USD',
+        undefined,
+        undefined,
         'name',
         skipCount,
         maxResultCount
@@ -1399,6 +1399,10 @@ export class TransactionInformationComponent
         undefined,
         undefined,
         undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
         0,
         10
       )
@@ -1703,7 +1707,10 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
                           value:extraAttr.selectedValues,
                           isHostRecord:false,
                           hexaCode:undefined,
-                          image:undefined
+                          image:undefined,
+                          status:undefined,
+                          entityObjectStatusId:undefined
+
                       })
                       result.items.push(tempAtt)
                   }

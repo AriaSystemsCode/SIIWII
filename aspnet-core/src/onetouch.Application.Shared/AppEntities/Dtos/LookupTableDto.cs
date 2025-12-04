@@ -23,6 +23,10 @@ namespace onetouch.AppEntities.Dtos
         //Iteration41[Start]
         public string? HexaCode { set; get; }
         public string? Image { set; get; }
+        //I49[Start]
+        public string? Status { set; get; }
+        public long? EntityObjectStatusId { get; set; }
+        //I49[End]
         //Iteration41[End]
     }
 

@@ -73,14 +73,14 @@ export class SelectCategoriesDynamicModalComponent
         addAsChild = false,
     }: {
         parentCategory?: SycEntityObjectCategoryDto;
-        category?: SycEntityObjectCategoryDto;
+        category?;
         addAsChild?: boolean;
     } = {}): void {
         let config: ModalOptions = new ModalOptions();
         // data to be shared to the modal
         config.initialState = {
             title: "Edit Category",
-        };
+        }; 
         config.class = "right-modal slide-right-in";
         config.backdrop = true;
         config.ignoreBackdropClick = true;
@@ -95,7 +95,7 @@ export class SelectCategoriesDynamicModalComponent
             if (parentCategory) category.parentId = parentCategory.id;
         } else {
             if (!category)
-                category = new CreateOrEditSycEntityObjectCategoryDto();
+               category = new CreateOrEditSycEntityObjectCategoryDto();
             if (parentCategory) category.parentId = parentCategory.id;
         }
         if (parentCategory)

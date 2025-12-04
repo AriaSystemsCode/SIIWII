@@ -48,6 +48,10 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     hideChrome = false; // <— add
 
     private readonly ariaRouteMatchers = ['/app/admin/ariasystem']; // normalize once
+    isAuthenticated = this.appSession?.user
+    hideTopbar:boolean = true
+
+  
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -71,11 +75,14 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.updateChromeVisibility(this.currentRouteUrl);
     
         this._router.events
-          .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-          .subscribe(() => {
-            this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
-            this.updateChromeVisibility(this.currentRouteUrl);
-          });
+            .pipe(filter(event => event instanceof NavigationEnd))
+            .subscribe(event => {this.currentRouteUrl = this._router.url.split(/[?#]/)[0]
+             
+                const path = this.__router.url.split('?')[0]; // ignore query params
+                // show topbar for ANY route under /app/main/account/*
+                this.hideTopbar = !path.startsWith('/app/account/');
+
+            });
     }
 
       toggleSidebar() {

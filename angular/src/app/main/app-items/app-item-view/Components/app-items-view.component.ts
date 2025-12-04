@@ -19,6 +19,7 @@ import {
     AppEntityAttachmentDto,
     AppItemAttributePriceDto,
     AppItemForViewDto,
+    AppItemLookupDto,
     AppItemPriceInfo,
     AppItemSizesScaleInfo,
     AppItemsListsServiceProxy,
@@ -46,6 +47,7 @@ import { AppitemListPublishService } from "../../app-items-list/services/appitem
 import { AppItemViewInput } from "../models/app-item-view-input";
 import { EventEmitter } from "stream";
 import { finalize } from "rxjs";
+import { DomSanitizer } from "@node_modules/@angular/platform-browser";
 
 @Component({
     selector: "app-app-items-view",
@@ -126,6 +128,18 @@ export class AppItemsViewComponent
     scrollClassification: boolean = false;
     maxClassificationCnt: number;
 
+    //RelatedItems
+    showMoreRelatedItems: boolean = false;
+    showLessRelatedItems: boolean = false;
+    totalRelatedItems: number;
+    noOfRelatedItemsToShowInitially: number;
+    maxRelatedItemsCount: number;
+    skipRelatedItemsCount: number;
+    relatedItemsToLoad: number;
+    initRelatedItems: AppItemLookupDto[] = [];
+    scrollRelatedItems: boolean = false;
+    maxRelatedItemsCnt: number;
+
     //Recommended
     initRecommended: ExtraDataAttrDto[] = [];
     showLessRecommended: boolean = false;
@@ -170,6 +184,7 @@ export class AppItemsViewComponent
 
     acceptedAspectRatio;
     languageSettingName  =AppConsts.languageSettingName;
+    pdfCache: { [key: string]: string } = {};
 
     public constructor(
         private _router: Router,
@@ -179,7 +194,8 @@ export class AppItemsViewComponent
         injector: Injector,
         _location: Location,
         public _publishAppItemListingService: PublishAppItemListingService,
-        private datePipe: DatePipe
+        private datePipe: DatePipe,
+        private sanitizer: DomSanitizer
     ) {
         super(injector, _location);
 
@@ -327,8 +343,67 @@ export class AppItemsViewComponent
     }
 
     showImageAtCenter(img) {
+        img.isImageFile =false;
+        img.isPdfFile =false;
+        img.isVideoFile =false;
+
+        if(this.isPdfFile(img.fileName)){
+            img.isPdfFile =true;
+          this.loadPdfFromUrl(img);
+        }
+
+         else if(this.isVideoFile(img.fileName))
+            img.isVideoFile =true;
+
+            else 
+            img.isImageFile =true;
+
         this.centerImage = img;
     }
+
+   
+    loadPdfFromUrl(img) {
+       let  pdfPath: string =  img.url;
+       let fullUrl= this.attachmentBaseUrl + '/'+pdfPath;
+        if (this.pdfCache[pdfPath]) {
+          const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+          pdfViewer.src = this.pdfCache[pdfPath];
+          img.loadingError = false;
+          return;
+        }
+        img.loadingError = true;
+        this.showMainSpinner();
+       const subs = this._appItemsServiceProxy.getFile64FromUrl(fullUrl)
+          .pipe(finalize(() => this.hideMainSpinner()))
+          .subscribe(
+            async (res) => {
+              try {
+                const base64 = res.includes(',') ? res.split(',')[1] : res;
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const pdfUrl = URL.createObjectURL(blob);
+                this.pdfCache[pdfPath] = pdfUrl;
+      
+                const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+                pdfViewer.src = pdfUrl;
+                img.loadingError = false;
+              } catch (error) {
+                console.error('Error processing PDF:', error);
+                img.loadingError = true;
+              }
+            },
+            (error) => {
+              console.error('Error loading PDF:', error);
+              img.loadingError = true;
+            }
+          );
+      }
+      
     showImagesOfVaritaionSelectedValues(img: any) {
         this.varitaionSelectedIndex =
             this.appItemForViewDto.variations[0].selectedValues.indexOf(img);
@@ -365,6 +440,16 @@ export class AppItemsViewComponent
             this.appItemForViewDto.variations[0].selectedValues[
                 this.varitaionSelectedIndex
             ].entityAttachments[0];
+
+
+            if(this.isPdfFile( this.centerImage.fileName))
+                this.centerImage.isPdfFile =true;
+    
+             else if(this.isVideoFile( this.centerImage.fileName))
+                this.centerImage.isVideoFile =true;
+    
+                else 
+                this.centerImage.isImageFile =true;
 
         this.selectedValuesName =
             this.appItemForViewDto.variations[0].selectedValues[
@@ -586,6 +671,75 @@ export class AppItemsViewComponent
         }
     }
 
+
+    //Related items
+    initRelatedItemsVariables(firstInit: boolean) {
+       if (firstInit)
+           this.initRelatedItems = this.appItemForViewDto.relatedAppItems.items;
+       else
+           this.appItemForViewDto.relatedAppItems.items =this.initRelatedItems;
+        this.noOfRelatedItemsToShowInitially = 10;
+        this.maxRelatedItemsCount = 10;
+        this.scrollRelatedItems = false;
+        this.maxRelatedItemsCnt = 40;
+        this.relatedItemsToLoad = 20;
+        this.totalRelatedItems =
+            this.appItemForViewDto.relatedAppItems.totalCount;
+        if (this.noOfRelatedItemsToShowInitially < this.totalRelatedItems)
+            this.showMoreRelatedItems= true;
+        else this.showMoreRelatedItems = false;
+        this.showLessRelatedItems = false;
+    }
+
+    showRelatedItems() {
+        if (this.noOfRelatedItemsToShowInitially < this.totalRelatedItems) {
+            this.maxRelatedItemsCount = this.relatedItemsToLoad;
+            this.skipRelatedItemsCount =
+                this.noOfRelatedItemsToShowInitially;
+            this.noOfRelatedItemsToShowInitially += this.relatedItemsToLoad;
+
+        
+                this._appItemsServiceProxy
+                .getAppItemRelatedProductsWithPaging(
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                    undefined,
+                    this.appItemForViewDto.entityId,
+                    undefined,
+                    undefined,
+                    this.skipClassificationCount,
+                    this.maxClassificationCount
+                )
+                .subscribe((res) => {
+                    if (
+                        this.noOfRelatedItemsToShowInitially >=
+                        this.totalRelatedItems
+                    ) {
+                        this.showMoreRelatedItems = false;
+                        this.showLessRelatedItems = true;
+                    }
+
+                    this.appItemForViewDto.relatedAppItems.items =
+                        this.appItemForViewDto.relatedAppItems.items.concat(
+                            res.items
+                        );
+                    if (
+                        this.appItemForViewDto.relatedAppItems.items
+                            .length >= this.maxRelatedItemsCnt
+                    )
+                        this.scrollRelatedItems= true;
+                });
+        } else {
+            this.initRelatedItemsVariables(false);
+        }
+    }
+
     //Recommended
     initRecommendedVariables(firstInit: boolean) {
         if (firstInit)
@@ -744,7 +898,16 @@ export class AppItemsViewComponent
         this.appItemViewInput.publish = true;
     }
     handleFailedImage($event) {
-        $event.target.src = this.defaultLogo;
+        let fileName =  $event.target.src?.split('/').pop();
+         if(this.isPdfFile(fileName))
+            $event.target.src ="/assets/Items/pdf-Icon.png" ; 
+
+         else if(this.isVideoFile(fileName))
+            $event.target.src ="/assets/Items/video-Icon.png" ; 
+
+            else 
+            $event.target.src = this.defaultLogo;
+
     }
     addingToList: boolean = false;
     addToListHandler($event) {
@@ -846,7 +1009,9 @@ export class AppItemsViewComponent
                 isHostRecord: undefined,
                 stockAvailability: undefined,
                 hexaCode:undefined,
-                image:undefined
+                image:undefined,
+                status:undefined,
+                entityObjectStatusId:undefined
             });
             if (currency.symbol) currency.label += ` ${currency.symbol}`;
             if (currency && !alreadyAdded) {
@@ -931,6 +1096,10 @@ export class AppItemsViewComponent
                 undefined,
                 undefined,
                 undefined,
+                undefined,
+                undefined,
+                10,
+                undefined, //item ssin
                 undefined,
                 0,
                 10

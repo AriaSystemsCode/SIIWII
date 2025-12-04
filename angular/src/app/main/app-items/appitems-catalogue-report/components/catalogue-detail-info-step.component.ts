@@ -45,7 +45,7 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
 
   getbackgrounds() {
     this.backgrounds = [];
-    this._appEntitiesServiceProxy.getAllBackgroundWithPaging(undefined, undefined, undefined, undefined, undefined, "BACKGROUND", undefined, undefined, undefined
+    this._appEntitiesServiceProxy.getAllBackgroundWithPaging(undefined, undefined, undefined, undefined, undefined,false, "BACKGROUND", undefined, undefined, undefined
       , undefined, undefined, undefined).subscribe((res) => {
         this.backgroundsItems = res.items;
         if (res.items.length > 0)

@@ -189,6 +189,10 @@ import { EmailingTemplateServiceProxy } from "@shared/service-proxies/service-pr
 import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
+import { SharedDynamicInputsModule } from '@shared/shared-module';
+import { AccordionModule } from "primeng/accordion";
+import { PortalTenantSettingsComponent } from './settings/Portal-tenant-settings.component';
+import { PortalHostSettingsComponent } from './settings/Portal-host-settings.component';
 
 
 import { TreeSelectModule } from 'primeng/treeselect';
@@ -235,7 +239,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         DropdownModule,
         ReactiveFormsModule,
         CheckboxModule,
-
+        SharedDynamicInputsModule,
+        AccordionModule
     ],
     declarations: [
 		ValidationRulesComponent,
@@ -326,6 +331,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         AuditLogsComponent,
         AuditLogDetailModalComponent,
         HostSettingsComponent,
+        PortalHostSettingsComponent,
         InstallComponent,
         MaintenanceComponent,
         EditionsComponent,
@@ -347,6 +353,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         OrganizationUnitRolesComponent,
         CreateOrEditUnitModalComponent,
         TenantSettingsComponent,
+        PortalTenantSettingsComponent,
         HostDashboardComponent,
         EditionComboComponent,
         InvoiceComponent,

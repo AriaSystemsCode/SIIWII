@@ -109,7 +109,15 @@ font-weight: 700;
   
   }
 
+
+
+  .blur-text {
+    filter: blur(3px);
+    transition: filter 0.3s;
+    user-select: none;      /* prevent copy/paste */
+    pointer-events: none;   /* disable text selection/clicks */
   h5 {
     white-space: nowrap;
     font-size: 14px;
   }
+}

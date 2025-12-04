@@ -1,34 +1,33 @@
 ...<!-- Navbar -->
 <nav class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
-    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }" [ngClass]="isArabic?'rtl-navbar':'ltr-navbar'">
+    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"[ngClass]="[
+    isArabic ? 'rtl-navbar' : 'ltr-navbar',
+    isAuthenticated ? 'navbarMar' : ''
+  ]"    [style.backgroundColor]="bgCol">
     <!-- Container wrapper -->
     <div class="container ml-0  position-lg-static " [ngClass]="isArabic ? '':'position-md-absolute'">
         <!-- Navbar brand -->
 
-        <!--  <a
-            class="navbar-brand pt-0 d-block d-lg-none"
-        >
-            <img
-                src="../../../assets/landingPage/Mob_Home_LeftMenu_Btn.svg"
-                class="navbar-brand"
-            />
-        </a> -->
-
         <p-menu #menu [model]="items" [popup]="true"></p-menu>
-        <!-- <button
-            pButton
+      
+        <a *ngIf="isAuthenticated"
+        class="navbar-brand pt-0"
+       
+        [routerLink]="['/app/main/Home']"
+        routerLinkActive="header-link-active"
+        (click)="userClick('Home')"
+    >
+        <img
+            [src]=" tenantLogo ? attachmentBaseUrl +'/'+ tenantLogo : '../../../assets/landingPage/Logo_Main.png'"
+            class="navbar-brand"
+        />
+    </a>
+        <button
             type="button"
             (click)="menu.toggle($event)"
-            icon="pi pi-plus"
-            label="Create New"
-            iconPos="right"
-            class="Create-New me-2"
-        ></button> -->
-        <a class="navbar-brand pt-0" [routerLink]="['/app/main/Home']" routerLinkActive="header-link-active"
-            (click)="userClick('Home')">
-            <img src="../../../assets/landingPage/Logo_Main.png" class="navbar-brand" />
-        </a>
-        <button type="button" (click)="menu.toggle($event)" class="btn Create-New" *ngIf="!isHost">
+            class="btn Create-New"
+            *ngIf="!isHost && isAuthenticated"
+        >
             <span class="">Create New</span>
             <i class="pi pi-plus"></i>
         </button>
@@ -36,10 +35,12 @@
         <!-- test nav -->
 
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form  d-none">
-            <div class="position-relative search-bar w-100" *ngIf="showSearch">
+        <form class="input-group pt-3 input-group-form d-lg-block d-none">
+            <div class="position-relative search-bar w-75" >
                 <div class="input-group mb-3">
-                    <div class="input-group-prepend" style="
+                    <!-- <div
+                        class="input-group-prepend"
+                        style="
                             background-color: #ededed;
                             height: 39px;
                             width: 77px;
@@ -56,24 +57,26 @@
                                 <a class="dropdown-item" href="#">Something else here</a>
                             </div>
                         </div>
-                    </div>
-                    <input type="text" class="form-control" style="background-color: #f3f6f9; height: 39px"
-                        placeholder="What are you looking for…" />
+                    </div> -->
+                    <input
+                        type="text"
+                        class="form-control"
+                        style="background-color: #f3f6f9; height: 39px"
+                        placeholder="What are you looking for…"
+                        name="globalSearch"                               
+                        [(ngModel)]="searchInput"
+                        [ngModelOptions]="{ standalone: true }"         
+                        (keyup.enter)="onSearch($event)"  
+                    
+                    />
                 </div>
-                <div class="save-icon" style="
-                        position: absolute;
-                        width: 40px;
-                        height: 40px;
-                        padding: 5px;
-                        text-align: center;
-                        border-radius: 5px;
-                        background-color: #f3f6f9;
-                        cursor: pointer;
-                        right: 0px;
-                        background-color: #f88011;
-                        top: 0px;
-                    ">
-                    <img style="width: 30px; height: 30px" src="../../../assets/landingPage/Iconionic-md-search.png" />
+                <div
+                    class="save-icon"
+                >
+                    <img (click)="onSearch($event)"
+                        style="width: 30px; height: 30px"
+                        src="../../../assets/landingPage/Iconionic-md-search.png"
+                    />
                 </div>
             </div>
         </form>
@@ -95,11 +98,17 @@
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a *ngIf="'Pages.Marketplace' | permission" class="nav-link active d-flex flex-column text-center"
-                        aria-current="page" [routerLink]="['/app/main/marketplace/']"
-                        [ngClass]="{ 'header-link-active': displayMarketPlace }">
-                        <img src="../../../assets/landingPage/marketPlace.png"
-                            class="navbar-brand _navbar-brand m-auto" />
+                    <a
+                        *ngIf="('Pages.Marketplace' | permission) || !isAuthenticated"
+                        class="nav-link active d-flex flex-column text-center"
+                        aria-current="page"
+                        [routerLink]="['/app/main/marketplace/']"
+                        [ngClass]="{ 'header-link-active': displayMarketPlace }"
+                    >
+                        <img
+                            src="../../../assets/landingPage/marketPlace.png"
+                            class="navbar-brand _navbar-brand m-auto"
+                        />
                         <span class="small">{{
                             "Marketplace" | localize
                             }}</span>
@@ -152,7 +161,7 @@
             <!-- Left links -->
         </div>
 
-        <div class=" ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" [ngClass]="isArabic ? 'leftList':'rightList'">
+        <div  *ngIf="isAuthenticated" class=" ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" [ngClass]="isArabic ? 'leftList':'rightList'">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-sm-flex d-none " style="justify-content: space-around;">
                 <div class="border-left text-white  d-md-block  mt-1" style="height: 55px;"></div>
                 <li class="nav-item pl-3 pt-2">
@@ -395,6 +404,10 @@
 
             </ul>
 
+        </div>
+
+        <div class="rightList ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" *ngIf="!isAuthenticated">
+            <button class=" p-2 m-2 mr-4 mt-4 regBtn"      [routerLink]="['/app/main/account/login']">Login</button>
         </div>
         <!-- Collapsible wrapper -->
 

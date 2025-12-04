@@ -52,13 +52,10 @@ import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTe
 import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
 import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
 import { AppTransactionsBrowseComponent } from '@app/main/transactions/appTransactions/appTransBrowse/appTransBrowse.component';
+import { AppRouteGuard } from '@app/shared/common/auth/auth-route-guard';
+import { PortalTenantSettingsComponent } from './settings/Portal-tenant-settings.component';
+import { PortalHostSettingsComponent } from './settings/Portal-host-settings.component';
 
-import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
-import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.component';
-// import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
-// import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
-// import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
-// import { EntityDynamicParameterValueComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter-value/entity-dynamic-parameter-value.component';
 
 
 @NgModule({
@@ -66,6 +63,8 @@ import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.comp
         RouterModule.forChild([
             {
                 path: '',
+                //      canActivate: [AppRouteGuard],
+                // canActivateChild: [AppRouteGuard],
                 children: [
                     { path: 'validationRules/validationRules', component: ValidationRulesComponent, data: { permission: 'Pages.Administration.ValidationRules' }  },
                     { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates', component: SycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates' }  },
@@ -105,6 +104,7 @@ import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.comp
                     { path: 'auditLogs', component: AuditLogsComponent, data: { permission: 'Pages.Administration.AuditLogs' } },
                     { path: 'maintenance', component: MaintenanceComponent, data: { permission: 'Pages.Administration.Host.Maintenance' } },
                     { path: 'hostSettings', component: HostSettingsComponent, data: { permission: 'Pages.Administration.Host.Settings' } },
+                    { path: 'portalhostSettings', component: PortalHostSettingsComponent, data: { permission: 'Pages.Administration.Host.Settings' } },
                     { path: 'editions', component: EditionsComponent, data: { permission: 'Pages.Editions' } },
                     { path: 'languages', component: LanguagesComponent, data: { permission: 'Pages.Administration.Languages' } },
                     { path: 'languages/:name/texts', component: LanguageTextsComponent, data: { permission: 'Pages.Administration.Languages.ChangeTexts' } },
@@ -113,8 +113,7 @@ import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.comp
                     { path: 'subscription-management', component: SubscriptionManagementComponent, data: { permission: 'Pages.Administration.Tenant.SubscriptionManagement' } },
                     { path: 'invoice/:paymentId', component: InvoiceComponent, data: { permission: 'Pages.Administration.Tenant.SubscriptionManagement' } },
                     { path: 'tenantSettings', component: TenantSettingsComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
-                    { path: 'AriaSystem', component: AriaIframeComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
-                    { path: 'AriaSystem-en-us', component: AriaEnUsSiwiiComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
+                    { path: 'portaltenantSettings', component: PortalTenantSettingsComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
                     { path: 'hostDashboard', component: HostDashboardComponent, data: { permission: 'Pages.Administration.Host.Dashboard' } },
                     { path: 'demo-ui-components', component: DemoUiComponentsComponent, data: { permission: 'Pages.DemoUiComponents' } },
                     { path: 'install', component: InstallComponent },

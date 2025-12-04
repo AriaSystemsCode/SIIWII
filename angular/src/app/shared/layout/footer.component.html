@@ -2,18 +2,21 @@
     <div [class]="containerClass" *ngIf="useBottomDiv">
         <div class="kt-footer__bottom">
             <div class="kt-footer__copyright pl-4">
-                {{ "SIIWII" | localize }}   <span
+                {{tenantFooterText}}
+
+                <!-- {{ "SIIWII" | localize }}   <span
                     *ngIf="appSession.tenant && appSession.tenant.edition && appSession.tenant.edition.displayName">
-                    {{appSession.tenant.edition.displayName}}</span> | API: v{{appSession.application.version}} | Client: v{{webAppGuiVersion}}
+                    {{appSession.tenant.edition.displayName}}</span> | API: v{{appSession.application.version}} | Client: v{{webAppGuiVersion}} -->
             </div>
         </div>
     </div>
     <div [class]="containerClass" *ngIf="!useBottomDiv">
         <div class="kt-footer__wrapper">
             <div class="kt-footer__copyright pl-4">
-                {{ "SIIWII" | localize }} <span
+                {{tenantFooterText}}
+                <!-- {{ "SIIWII" | localize }} <span
                     *ngIf="appSession.tenant && appSession.tenant.edition && appSession.tenant.edition.displayName">
-                    {{appSession.tenant.edition.displayName}}</span> | API: v{{appSession.application.version}} | Client: v{{webAppGuiVersion}}
+                    {{appSession.tenant.edition.displayName}}</span> | API: v{{appSession.application.version}} | Client: v{{webAppGuiVersion}} -->
             </div>
         </div>
     </div>

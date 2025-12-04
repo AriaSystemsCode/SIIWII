@@ -103,7 +103,6 @@
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
-   
 
     }
 }
@@ -126,6 +125,11 @@
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
         // right: 5% !important;
+    }
+
+    .navbar-expand-lg .navbar-nav .dropdown-menu {
+        position: absolute !important;
+        right: -35% !important;
     }
 }
 
@@ -495,3 +499,16 @@ left: 30px;
     background-color: #fff;
   }
   
+  .save-icon {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    text-align: center;
+    border-radius: 5px;
+    background-color: #f3f6f9;
+    cursor: pointer;
+    right: 0px;
+    background-color: #f88011;
+    top: 0px;
+}

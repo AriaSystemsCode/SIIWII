@@ -39,6 +39,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     creatorUserId : number;
     displayDeleteMessage:boolean=false;
     showRegularComment:boolean=true;
+    @Input() fromOverview:boolean=false;
   addReplyScreen: boolean ;
     currentComment: any;
 
@@ -192,5 +193,6 @@ openReplyScreen(comment: any): void {
    
 }
 
-}
+           }
+         
 

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using onetouch.Accounts.Dtos;
+using onetouch.AppEntities.Dtos;
+using onetouch.AppMarketplaceItems.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,5 +19,15 @@ namespace onetouch.SystemObjects.Dtos
         public int Order { get; set; }
         public string LinkPageUrl { get; set; }
         public string ExternalUrl { get; set; }
+        //I49[Start]
+        public string? BlockType { get; set; }
+        public GetAppMarketItemForViewDto? GetAppMarketItemForViewDto { set; get; }
+        public GetAppEntityForViewDto? GetAppEntityForViewDto { set; get; }
+        public GetAccountForViewDto? GetAccountForViewDto { set; get; }
+        public GetSycEntityObjectCategoryForViewDto? GetSycEntityObjectCategoryForViewDto { set; get; }
+        public string Link { set; get; }
+        public string ButtonText { set; get; }
+        public string TitleAlignment { set; get; }
+        //I49[End]
     }
 }

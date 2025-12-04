@@ -599,4 +599,31 @@ export abstract class AppComponentBase {
         return transactionRole;
 
     }
+
+    isImageFile(fileName: string): boolean {
+        if (!fileName) return false;
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        const imageExtensions = [
+          'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp',
+          'svg', 'ico', 'heic', 'heif', 'avif', 'jfif'
+        ];
+        return imageExtensions.includes(ext);
+      }
+      
+      isVideoFile(fileName: string): boolean {
+        if (!fileName) return false;
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        const videoExtensions = [
+          'mp4', 'm4v', 'mov', 'avi', 'mkv', 'wmv', 'flv', 'webm',
+          'mpeg', 'mpg', '3gp', '3g2', 'f4v', 'ts', 'm2ts', 'vob'
+        ];
+        return videoExtensions.includes(ext);
+      }
+      
+      isPdfFile(fileName: string): boolean {
+        if (!fileName) return false;
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        return ext === 'pdf';
+      }
+      
 }

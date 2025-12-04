@@ -5,6 +5,7 @@ import { accountModuleAnimation } from "@shared/animations/routerTransition";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
     AccountServiceProxy,
+    AppEntitiesServiceProxy,
     IsTenantAvailableInput,
     IsTenantAvailableOutput,
     SessionServiceProxy,
@@ -26,7 +27,8 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     submitting = false;
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
-    oldUserName:string;
+    oldUserName: string;
+
     currentLang:string
     isArabic:boolean 
     
@@ -38,7 +40,8 @@ export class LoginComponent extends AppComponentBase implements OnInit {
         private _sessionAppService: SessionServiceProxy,
         private _reCaptchaV3Service: ReCaptchaV3Service,
         private _tenantAppService: TenantServiceProxy,
-        private _accountService: AccountServiceProxy
+        private _accountService: AccountServiceProxy,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
         super(injector);
     }
@@ -65,7 +68,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
 
     ngOnInit(): void {
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         if (
             this._sessionService.userId > 0 &&
             UrlHelper.getReturnUrl() &&
@@ -74,7 +77,6 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             this._sessionAppService
                 .updateUserSignInToken()
                 .subscribe((result: UpdateUserSignInTokenOutput) => {
-
                     const initialReturnUrl = UrlHelper.getReturnUrl();
                     const returnUrl =
                         initialReturnUrl +
@@ -102,14 +104,21 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             this.showMainSpinner();
 
             this.submitting = true;
-            this.loginService.authenticate(
-                () => {
-                    this.submitting = false;
-                    this.hideMainSpinner();
-                },
-                null,
-                token
-            );
+
+            // decide the default page BEFORE calling authenticate
+            this.chooseDefaultPage((redirectUrl: string) => {
+                // keep your 2s delay if you like the UX
+                setTimeout(() => {
+                    this.loginService.authenticate(
+                        () => {
+                            this.submitting = false;
+                            this.hideMainSpinner();
+                        },
+                        redirectUrl, 
+                        token
+                    );
+                }, 2000);
+            });
         };
 
         if (this.useCaptcha) {
@@ -134,23 +143,19 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     getTenantIdbyUserName() {
-
         var username =
             this.loginService.authenticateModel.userNameOrEmailAddress;
-        if (username && username!=this.oldUserName) {
+        if (username && username != this.oldUserName) {
             this._tenantAppService
                 .getTenantIdByUserName(username)
                 .subscribe((result) => {
-
                     this.changeTenant(result?.tenancyName);
                 });
         }
-        this.oldUserName=username;
+        this.oldUserName = username;
     }
 
-    changeTenant(tenancyName){
-
-
+    changeTenant(tenancyName: string) {
         if (!tenancyName) {
             abp.multiTenancy.setTenantIdCookie(undefined);
             return;
@@ -168,9 +173,35 @@ export class LoginComponent extends AppComponentBase implements OnInit {
                     case TenantAvailabilityState.InActive:
                         this.message.warn(this.l('TenantIsNotActive', tenancyName));
                         break;
-                    case TenantAvailabilityState.NotFound: //NotFound
+                    case TenantAvailabilityState.NotFound:
                         this.message.warn(this.l('ThereIsNoTenantDefinedWithName{0}', tenancyName));
                 }
             });
+    }
+
+    /**
+     * Decide the default page from host setting 1203,
+     * then return it via callback so login() can pass it to authenticate().
+     */
+    chooseDefaultPage(callback: (url: string) => void): void {
+        this._appEntitiesServiceProxy.getHostSettingValue(1203,null).subscribe({
+            next: res2 => {
+                let defaultUrl = '/app/main/Home';
+
+                if (res2) {
+                    // const userNavigation = res2;
+                    defaultUrl = res2 == 'Marketplace Landing page'
+                        ? '/app/main/marketplace'
+                        : '/app/main/Home';
+                }
+
+                callback(defaultUrl);
+            },
+            error: err2 => {
+                console.error('Failed to load host setting 1203', err2);
+
+                callback('/app/main/dashboard');
+            }
+        });
     }
 }

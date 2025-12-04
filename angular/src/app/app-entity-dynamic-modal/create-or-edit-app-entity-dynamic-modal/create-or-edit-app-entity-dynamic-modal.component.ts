@@ -20,15 +20,16 @@ import {
     GetAllEntityObjectTypeOutput,
     GetSycAttachmentCategoryForViewDto,
     SycAttachmentCategoryDto,
+    SycEntityObjectStatusesServiceProxy,
+    SycEntityObjectStatusLookupTableDto,
     SycEntityObjectTypesServiceProxy,
-    
+
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
 import { Observable, Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AppEntityListDynamicModalComponent } from "../app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
-import { throws } from "assert";
-import { SelectItem } from "primeng/api";
+import { DomSanitizer, SafeResourceUrl } from "@node_modules/@angular/platform-browser";
 
 @Component({
     selector: "app-create-or-edit-app-entity-dynamic-modal",
@@ -38,8 +39,7 @@ import { SelectItem } from "primeng/api";
 })
 export class CreateOrEditAppEntityDynamicModalComponent
     extends AppComponentBase
-    implements AfterViewInit
-{
+    implements AfterViewInit {
     @ViewChild("createOreEditLookups", { static: true }) modal: ModalDirective;
 
     entityObjectType: { name: string; code: string };
@@ -61,44 +61,57 @@ export class CreateOrEditAppEntityDynamicModalComponent
     showCodeErrMsg: boolean = false;
     isHost: boolean;
     SelectedVal: any;
-    attCategoriesShow:boolean=false;
-    attCategories: GetSycAttachmentCategoryForViewDto [];
-    @Input() enableAddToLookup:boolean=true;
-    @Input()  wantdisplaySaveSideBar :boolean=true;
-    addToLookup:boolean=true;
+    attCategoriesShow: boolean = false;
+    attCategories: GetSycAttachmentCategoryForViewDto[];
+    @Input() enableAddToLookup: boolean = true;
+    @Input() wantdisplaySaveSideBar: boolean = true;
+    addToLookup: boolean = true;
     @Output() addNonLookupValues: EventEmitter<any> = new EventEmitter<any>();
-    
+
     visual = {
         solid: true,
         image: false
     };
+
+    _displayVisualTypes:boolean=true;
+    pdfSafeMap: { [index: number]: SafeResourceUrl } = {};
+    private pdfRawUrl: { [index: number]: string } = {};
+    statusValues: SycEntityObjectStatusLookupTableDto[]
+
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
-        private _extraAttributeDataService: ExtraAttributeDataService
+        private _extraAttributeDataService: ExtraAttributeDataService,
+        private sanitizer: DomSanitizer,
+        private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy,
     ) {
         super(injector);
         this.initUploaders();
         this.isHost = !this.appSession.tenantId;
     }
 
+    ngOnInit(): void {
+        this.getStatusOptions()
+    }
+
+
     show(
         entityObjectType: { name: string; code: string },
         appEntity?: AppEntityDto,
-        nonlookup:boolean=false
+        nonlookup: boolean = false
     ): void {
         this.entityObjectType = entityObjectType;
+        this.displayVisualTypes();
         this.saving=false;
         if (appEntity) this.appEntity = appEntity;
         else appEntity = new AppEntityDto();
         this.appEntity.tenantId = -1;
-        if(this.appEntity?.id && !nonlookup)
-                {
+        if (this.appEntity?.id && !nonlookup) {
             this.editMode = true;
-            this.addToLookup=true;
-            this.appEntity.nonlookup=false;
-                this._appEntitiesServiceProxy
+            this.addToLookup = true;
+            this.appEntity.nonlookup = false;
+            this._appEntitiesServiceProxy
                 .getAppEntityForEdit(this.appEntity.id)
                 .pipe(
                     finalize(() => {
@@ -107,42 +120,40 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 )
                 .subscribe((res) => {
                     this.appEntity = AppEntityDto.fromJS(res.appEntity);
-                   if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
-                    console.log(">>", this.appEntity);
+                    if (!this.appEntity.tenantId) this.appEntity.tenantId = -1;
                     this.adjustImageSrcsUrls();
                     this.loading = true;
 
 
-                    if(!(this.appEntity.entityAttachments && this.appEntity.entityAttachments ?.length>0) )
-                    this.setSolid(true);
-                else
-                this.setSolid(false);
+                    if (!(this.appEntity.entityAttachments && this.appEntity.entityAttachments?.length > 0))
+                        this.setSolid(true);
+                    else
+                        this.setSolid(false);
                 });
-             
-          
+
+
         }
-        else{
-            if(this.appEntity?.code){
+        else {
+            if (this.appEntity?.code) {
                 this.editMode = true;
-                if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
-                this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
-                this.appEntity.nonlookup=true;
-                this.addToLookup=false;
+                if (!this.appEntity.tenantId) this.appEntity.tenantId = -1;
+                this.appEntity.id = Math.floor((1 + Math.random()) * 0x10000);
+                this.appEntity.nonlookup = true;
+                this.addToLookup = false;
                 this.adjustImageSrcsUrls();
                 this.loading = true;
 
-                if(!(this.appEntity.entityAttachments && this.appEntity.entityAttachments ?.length>0))
-                this.setSolid(true);
-            else
-            this.setSolid(false);
-           
-         this.getExtrAttributes();
-               
+                if (!(this.appEntity.entityAttachments && this.appEntity.entityAttachments?.length > 0))
+                    this.setSolid(true);
+                else
+                    this.setSolid(false);
+
+                this.getExtrAttributes();
+
             }
         }
 
-       
-            console.log("this.entityObjectType.code"+this.entityObjectType.code);
+
         this._sycAttachmentCategoriesServiceProxy.getAllByEntityObjectType(
             0,
             this.entityObjectType.code,
@@ -160,28 +171,24 @@ export class CreateOrEditAppEntityDynamicModalComponent
             undefined,
             undefined
         ).subscribe(result => {
-            //this.primengTableHelper.totalRecordsCount = result.totalCount;
-            //this.primengTableHelper.records = result.items;
-            //this.primengTableHelper.hideLoadingIndicator();
+
             this.attCategories = result.items;
-            if(this.attCategories.length>0)
-            {
-                this.aspectRatio =  Number(this.attCategories[0].sycAttachmentCategory.aspectRatio);
-                this.productImageCategory =  this.attCategories[0];
+            if (this.attCategories.length > 0) {
+                this.aspectRatio = Number(this.attCategories[0].sycAttachmentCategory.aspectRatio);
+                this.productImageCategory = this.attCategories[0];
                 this.attCategoriesShow = true
             }
-            if(this.attCategories.length>0 && this.editMode == true && this.appEntity.entityAttachments?.length > 0)
-            {
-                 
-                 let found = this.attCategories.filter(e=> e.sycAttachmentCategory.id == this.appEntity.entityAttachments[0].attachmentCategoryId);
-                 if(found && found.length>0)
-                 {  this.aspectRatio =  Number(found[0].sycAttachmentCategory.aspectRatio);
-                    this.productImageCategory =  found[0];
+            if (this.attCategories.length > 0 && this.editMode == true && this.appEntity.entityAttachments?.length > 0) {
+
+                let found = this.attCategories.filter(e => e.sycAttachmentCategory.id == this.appEntity.entityAttachments[0].attachmentCategoryId);
+                if (found && found.length > 0) {
+                    this.aspectRatio = Number(found[0].sycAttachmentCategory.aspectRatio);
+                    this.productImageCategory = found[0];
                     this.attCategoriesShow = true
-                     
-                 }
+
+                }
             }
-            
+
         });
         this.getExtrAttributes();
         this.active = true;
@@ -209,39 +216,43 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.aspectRatio = undefined;
     }
 
+    getStatusOptions() {
+        this._sycEntityObjectStatusesAppService.getAllSycEntityStatusForTableDropdown("Lookup").subscribe(result => {
+            this.statusValues = result
+        });
+    }
+
     createAnotherEntityLookup() {
         this.hide();
         this.show(this.entityObjectType);
     }
 
-    changeFn(event: any)
-    {
-        if (this.aspectRatio != Number(this.productImageCategory.sycAttachmentCategory.aspectRatio))
-        {
+    changeFn(event: any) {
+        if (this.aspectRatio != Number(this.productImageCategory.sycAttachmentCategory.aspectRatio)) {
             this.productImageCategory =
-        new GetSycAttachmentCategoryForViewDto({
-            imgURL: null,
-            sycAttachmentCategory: new SycAttachmentCategoryDto({
-                code: "IMAGE",
-                name: "Image",
-                attributes: null,
-                parentCode: null,
-                parentId: null,
-                aspectRatio: this.aspectRatio,
-                id: 3,
-            } as any),
-            sycAttachmentCategoryName: "",
-        });  
+                new GetSycAttachmentCategoryForViewDto({
+                    imgURL: null,
+                    sycAttachmentCategory: new SycAttachmentCategoryDto({
+                        code: "IMAGE",
+                        name: "Image",
+                        attributes: null,
+                        parentCode: null,
+                        parentId: null,
+                        aspectRatio: this.aspectRatio,
+                        id: 3,
+                    } as any),
+                    sycAttachmentCategoryName: "",
+                });
         }
     }
-    getSelectedValue(value:any){
-  
+    getSelectedValue(value: any) {
+
         // Prints selected value
-        console.log(value);
+
         this.aspectRatio = Number(this.attCategories[value].sycAttachmentCategory.aspectRatio);
-        this.productImageCategory =  this.attCategories[value];
-        
-      }
+        this.productImageCategory = this.attCategories[value];
+
+    }
 
     close() {
         this.cancel.emit(true);
@@ -259,65 +270,65 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         this.saving = true;
 
-        if(this.visual.image && this.entityObjectType.code== "COLOR" ) 
-            this.appEntity.entityExtraData=[];
-          
-        if(!this.visual.image)
-           this.appEntity.entityAttachments=[];
-        
-        if(this.addToLookup){ 
-           if(this.appEntity.nonlookup)
-            {
-                this.appEntity.id=0;
-                this.appEntity.nonlookup=false;
+        if (this.visual.image && this.entityObjectType.code == "COLOR")
+            this.appEntity.entityExtraData = [];
+
+        if (!this.visual.image)
+            this.appEntity.entityAttachments = [];
+
+        if (this.addToLookup) {
+            if (this.appEntity.nonlookup) {
+                this.appEntity.id = 0;
+                this.appEntity.nonlookup = false;
             }
 
-            this.appEntity.nonlookup=false;
-        this._appEntitiesServiceProxy
-            .saveEntity(this.appEntity)
-            .pipe(
-                finalize(() => {
-                    this.saving = false;
-                })
-            )
-            .subscribe((result) => {
-                this.notify.info(this.l("SavedSuccessfully"));
-                if(this.wantdisplaySaveSideBar)
-                this.displaySaveSideBar = true;
-                this.appEntity.value=  !this.appEntity.value ? result :this.appEntity.value ; 
-                this.addNonLookupValues.emit(this.appEntity);
-                this.saveDone.emit(true);
-                this.hide();
-            });
+            this.appEntity.nonlookup = false;
+
+            this._appEntitiesServiceProxy
+                .saveEntity(this.appEntity)
+                .pipe(
+                    finalize(() => {
+                        this.saving = false;
+                    })
+                )
+                .subscribe((result) => {
+                    this.notify.info(this.l("SavedSuccessfully"));
+                    if (this.wantdisplaySaveSideBar)
+                        this.displaySaveSideBar = true;
+                    this.appEntity.value = !this.appEntity.value ? result : this.appEntity.value;
+                    this.addNonLookupValues.emit(this.appEntity);
+                    this.saveDone.emit(true);
+                    this.hide();
+                });
         }
         else {
 
-            this.appEntity.nonlookup=true;
-            if(!this.appEntity.id){
-            this._appEntitiesServiceProxy
-            .isCodeExisting(this.appEntity)
-            .subscribe((result:boolean) => {
-                if(!result){
-                this.notify.info(this.l("SavedSuccessfully"));
-                this.appEntity.tenantId=this.appSession.tenantId;
-                this.addNonLookupValues.emit(this.appEntity)
-                     this.saveDone.emit(true);
-                    this.hide();
-                }
-                else{
-                    this.notify.error(this.l("Code is already Exist"));
-                    this.saving = false;
-                }
+            this.appEntity.nonlookup = true;
+            if (!this.appEntity.id) {
+                this._appEntitiesServiceProxy
+                    .isCodeExisting(this.appEntity)
+                    .subscribe((result: boolean) => {
+                        if (!result) {
+                            this.notify.info(this.l("SavedSuccessfully"));
+                            this.appEntity.tenantId = this.appSession.tenantId;
+                            this.addNonLookupValues.emit(this.appEntity)
+                            this.saveDone.emit(true);
+                            this.hide();
+                        }
+                        else {
+                            this.notify.error(this.l("Code is already Exist"));
+                            this.saving = false;
+                        }
 
                     });
-                }
-                else{
+            }
+            else {
                 this.notify.info(this.l("SavedSuccessfully"));
-                this.appEntity.tenantId=this.appSession.tenantId;
+                this.appEntity.tenantId = this.appSession.tenantId;
                 this.addNonLookupValues.emit(this.appEntity)
-                     this.saveDone.emit(true);
-                    this.hide();
-                }
+                this.saveDone.emit(true);
+                this.hide();
+            }
         }
     }
 
@@ -325,14 +336,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this._sycEntityObjectTypesServiceProxy
             .getAllWithExtraAttributesByCode(this.entityObjectType.code)
             .subscribe(async (result) => {
-                console.log(">>", this.entityObjectType.code);
+
                 this.entityObjectType.code === "SIZE";
                 if (result.length > 0) {
                     this.selectedItemTypeData = result[0];
                     this.appEntity.objectId = 1;
-                    this.appEntity.entityObjectTypeId =
-                        this.selectedItemTypeData.id;
-                    this.appEntity.entityObjectStatusId = null;
+                    this.appEntity.entityObjectTypeId = this.selectedItemTypeData.id;
+
                     if (
                         this.selectedItemTypeData?.extraAttributes
                             ?.extraAttributes
@@ -370,7 +380,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             this.extraAttributes.filter((extraAttr) => extraAttr.isLookup);
         const isLookupExtraAttributesCodes: string[] =
             isLookupExtraAttributes.map((extraAttr) => extraAttr.code);
-        console.log(">>", isLookupExtraAttributesCodes);
+
         this.isSize = isLookupExtraAttributesCodes[0] === "SIZE" ? true : false;
         this.isColor =
             isLookupExtraAttributesCodes[0] === "COLOR-SCHEME" ? true : false;
@@ -470,12 +480,58 @@ export class CreateOrEditAppEntityDynamicModalComponent
         }
     }
 
+
+    setStringValue(attrId: number, value: string | boolean): void {
+
+        if (!this.appEntity.entityExtraData) this.appEntity.entityExtraData = [];
+
+        // find existing row
+        let idx = this.appEntity.entityExtraData.findIndex(x => x.attributeId === attrId);
+
+        if (idx === -1) {
+            // create new row
+            const newExtra = new AppEntityExtraDataDto({
+                entityId: undefined,
+                attributeId: attrId,
+                attributeValue: String(value),        //
+                attributeValueId: 0,
+                id: 0,
+                entityObjectTypeCode: this.entityObjectType.code,
+                entityObjectTypeName: undefined,
+                entityObjectTypeId: this.appEntity.entityObjectTypeId,
+                attributeValueFkName: undefined,
+                attributeValueFkCode: undefined,
+                attributeCode: undefined,
+            });
+            this.appEntity.entityExtraData.push(newExtra);
+        } else {
+            // update existing row
+            this.appEntity.entityExtraData[idx].attributeValue = String(value);
+            this.appEntity.entityExtraData[idx].attributeValueId = 0; // ensure non-lookup
+        }
+
+        // reflect in the filtered attributes (keeps UI in sync)
+        const attrMeta = this.extraAttributes?.find(x => x.attributeId === attrId);
+        if (attrMeta) {
+            // for non-lookup/string/boolean attrs we store the raw value
+            (attrMeta as any).selectedValues = String(value);
+        }
+    }
+
     singleValueExtraAttributeOnChange(
         $event: { value: number; originalEvent: MouseEvent },
         extraAttrDefinition: FilteredExtraAttribute<number>
     ) {
         let selectedAttrValue = $event.value;
+        if (this.entityObjectType.code == 'MARKETPLACESECTION') {
+            if ((selectedAttrValue == 486055 || selectedAttrValue == 486056)) {
+                this.setStringValue(1005, 'true')
 
+            } else {
+                this.setStringValue(1005, 'false')
+
+            }
+        }
         if (!this.appEntity.entityExtraData)
             this.appEntity.entityExtraData = [];
 
@@ -507,7 +563,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
     }
 
     onColorChange(value, extraAttrDefinition: FilteredExtraAttribute) {
-        console.log(">>", value);
+
         this.notLookupExtraAttributeOnChange(value, extraAttrDefinition);
     }
 
@@ -515,7 +571,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         value,
         extraAttrDefinition: FilteredExtraAttribute
     ) {
-        console.log(">>", value, extraAttrDefinition);
+
 
         if (!this.appEntity.entityExtraData)
             this.appEntity.entityExtraData = [];
@@ -547,7 +603,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.appEntity.entityExtraData = this.appEntity.entityExtraData.filter(
             (item) => item.attributeId !== extraAttr.attributeId
         );
-        console.log(">>", this.appEntity.entityExtraData);
+
     }
 
     openCreateAppEntityListModal(extraAttr: FilteredExtraAttribute) {
@@ -571,18 +627,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 extraAttr.entityObjectTypeCode,
                 extraAttr.lookupData
             );
-            console.log(
-                ">>",
-                extraAttr.entityObjectTypeCode,
-                extraAttr.lookupData
-            );
 
             let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
             if (modalRefData.selectionDone)
                 extraAttr.selectedValues = modalRefData.selectedRecords;
-           // if (!modalRef.content.isHiddenToCreateOrEdit)
-            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+            // if (!modalRef.content.isHiddenToCreateOrEdit)
+            if (modalRef.content.isHiddenToCreateOrEdit != undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     productImageCategory: GetSycAttachmentCategoryForViewDto =
@@ -600,48 +651,90 @@ export class CreateOrEditAppEntityDynamicModalComponent
         });
     attachmentsSrcs: string[] = Array(1).fill("");
     adjustImageSrcsUrls() {
-        let attachments = this.appEntity?.entityAttachments?.reduce(
-            (accum: string[], elem: AppEntityAttachmentDto) => {
-                let imgUrlSrc = `${this.attachmentBaseUrl}/${elem.url}`;
-                accum.push(imgUrlSrc);
-                return accum;
-            },
-            []
-        );
-        attachments=attachments? attachments : [] ;
-        if (attachments?.length > 0) this.attachmentsSrcs = [];
-        this.attachmentsSrcs.unshift(...attachments);
+        const atts = this.appEntity?.entityAttachments ?? [];
+        this.attachmentsSrcs = [''];                 // reset
+        this.pdfSafeMap = {};                        // reset
+        this.pdfRawUrl = {};                         // reset (server urls won't be revoked)
+
+        atts.forEach((att, idx) => {
+            const full = `${this.attachmentBaseUrl}/${att.url}`;
+            if (/\.pdf$/i.test(att.url)) {
+                this.pdfSafeMap[idx] = this.sanitizer.bypassSecurityTrustResourceUrl(full);
+                this.attachmentsSrcs[idx] = ''; // no image at this index
+            } else {
+                this.attachmentsSrcs[idx] = full;
+            }
+        });
+
+            // ✅ For MARKETPLACESECTIONBLOCK: always keep one empty slot at the end if all filled
+    if (this.canUploadMultipleAttachments &&
+        this.attachmentsSrcs.length &&
+        this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+        this.attachmentsSrcs.length < 10) {
+        this.attachmentsSrcs.push('');
     }
+    }
+
     fileChange(
-        event,
+        event: Event,
         attachmentCategory: GetSycAttachmentCategoryForViewDto,
         index?: number,
         aspectRatio?: number | string,
         cropWithoutOptions?: boolean
     ) {
-        if (event.target.value) {
-            // there is a file
-            // destructing operator => declare 2 variables from the returned object with the same keys names
-            let { onCropDone, data } = this.openImageCropper(
-                event,
-                Number(aspectRatio),
-                cropWithoutOptions
-            );
-            let subs = onCropDone.subscribe((res) => {
-                if (data.isCropDone) {
-                    this.tempUploadImage(
-                        event,
-                        attachmentCategory,
-                        data,
-                        index
-                    );
-                }
-                // reset input
-                event.target.value = null;
-            //  subs.unsubscribe();
-            });
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file) return;
+
+        const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+
+        if (isPdf) {
+            // Create & sanitize blob URL for <object>
+            const url = URL.createObjectURL(file);
+            this.pdfRawUrl[index] = url;
+            this.pdfSafeMap[index] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+            // Ensure image preview slot is cleared for this index
+            this.attachmentsSrcs[index] = '';
+
+            // Prepare attachment dto (no crop)
+            const att = new AppEntityAttachmentDto();
+            att.index = index;
+            att.fileName = file.name;
+            att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
+            att.guid = this.guid();
+
+            if (!this.appEntity.entityAttachments) this.appEntity.entityAttachments = [];
+            this.appEntity.entityAttachments[index] = att;
+
+            // Upload the raw PDF file
+            this.uploadBlobAttachment(file, att);
+
+            if (this.canUploadMultipleAttachments &&
+                this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+                this.attachmentsSrcs.length < 10) {
+                this.attachmentsSrcs.push('');
+            }
+
+            input.value = '';
+            return;
         }
+
+        // Image branch (as you already do)
+        const { onCropDone, data } = this.openImageCropper(event, Number(aspectRatio), cropWithoutOptions);
+        const sub = onCropDone.subscribe(() => {
+            if (data.isCropDone) {
+                this.tempUploadImage(event, attachmentCategory, data, index);
+                // clear any previous pdf in same slot
+                if (this.pdfRawUrl[index]) { URL.revokeObjectURL(this.pdfRawUrl[index]); delete this.pdfRawUrl[index]; }
+                delete this.pdfSafeMap[index];
+            }
+            input.value = '';
+            // sub.unsubscribe(); // if needed
+        });
     }
+
+
 
     tempUploadImage(
         event: Event,
@@ -675,6 +768,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
 
+
+        if (this.canUploadMultipleAttachments &&
+            this.attachmentsSrcs.every((elem, idx) => elem || this.pdfSafeMap[idx]) &&
+            this.attachmentsSrcs.length < 10) {
+            this.attachmentsSrcs.push('');
+        }
         // // if all is filled with images add new input
         // if (
         //     this.attachmentsSrcs.every((elem) => elem) &&
@@ -683,43 +782,110 @@ export class CreateOrEditAppEntityDynamicModalComponent
         //     this.attachmentsSrcs.push("");
     }
 
+    // removePhoto(i: number) {
+    //     if (this.appEntity.entityAttachments.length > 1)
+    //         return this.notify.info(
+    //             "Please set another image as default first"
+    //         );
+    //     this.appEntity.entityAttachments.splice(i, 1);
+    //     this.attachmentsSrcs.splice(i, 1);
+    //     if (this.attachmentsSrcs.length === 0) this.attachmentsSrcs.push("");
+    //     this.uploader.removeFromQueue(this.uploader.queue[i]);
+    // }
+    removePhoto(i: number) {
+        // Single-image behavior for other entity types
+        if (!this.canUploadMultipleAttachments && this.appEntity.entityAttachments.length > 1) {
+            return this.notify.info("Please set another image as default first");
+        }
+    
+        // Clean PDF URLs if needed
+        if (this.pdfRawUrl[i]) {
+            URL.revokeObjectURL(this.pdfRawUrl[i]);
+            delete this.pdfRawUrl[i];
+        }
+        delete this.pdfSafeMap[i];
+    
+        // Remove attachment metadata
+        if (this.appEntity.entityAttachments?.length) {
+            this.appEntity.entityAttachments.splice(i, 1);
+        }
+    
+        // Remove preview slot
+        if (this.attachmentsSrcs?.length) {
+            this.attachmentsSrcs.splice(i, 1);
+        }
+    
+        // Keep at least one empty slot
+        if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
+            this.attachmentsSrcs = [''];
+        }
+    
+        // Remove from uploader queue if exists
+        if (this.uploader?.queue?.[i]) {
+            this.uploader.removeFromQueue(this.uploader.queue[i]);
+        }
+    }
+    
+    // removeAllAttachments() {
+    //     if (this.attachmentsSrcs.length) {
+    //         var isConfirmed: Observable<boolean>;
+    //         isConfirmed = this.askToConfirm(
+    //             "AreYouSureYouWantToDeleteAllTheAttachments?",
+    //             "Confirm"
+    //         );
+
+    //         isConfirmed.subscribe((res) => {
+    //             if (res) {
+    //                 this.attachmentsSrcs = [""];
+    //                 this.appEntity.entityAttachments = [];
+    //                 this.uploader.clearQueue();
+    //             }
+    //         });
+    //     }
+    // }
     removeAllAttachments() {
         if (this.attachmentsSrcs.length) {
-            var isConfirmed: Observable<boolean>;
-            isConfirmed = this.askToConfirm(
-                "AreYouSureYouWantToDeleteAllTheAttachments?",
-                "Confirm"
-            );
-
+            const isConfirmed: Observable<boolean> =
+                this.askToConfirm("AreYouSureYouWantToDeleteAllTheAttachments?", "Confirm");
+    
             isConfirmed.subscribe((res) => {
                 if (res) {
                     this.attachmentsSrcs = [""];
                     this.appEntity.entityAttachments = [];
+                    this.pdfSafeMap = {};
+                    Object.values(this.pdfRawUrl).forEach(url => URL.revokeObjectURL(url));
+                    this.pdfRawUrl = {};
                     this.uploader.clearQueue();
                 }
             });
         }
     }
-    removePhoto(i: number) {
-        if (this.appEntity.entityAttachments.length > 1)
-            return this.notify.info(
-                "Please set another image as default first"
-            );
-        this.appEntity.entityAttachments.splice(i, 1);
-        this.attachmentsSrcs.splice(i, 1);
-        if (this.attachmentsSrcs.length === 0) this.attachmentsSrcs.push("");
-        this.uploader.removeFromQueue(this.uploader.queue[i]);
-    }
+    
     getCodeValue(code: string) {
         this.appEntity.code = code;
     }
-    setSolid(value:boolean){
-        this.visual.solid=value;
-        this.visual.image=!value;
+    setSolid(value: boolean) {
+        this.visual.solid = value;
+        this.visual.image = !value;
     }
 
-    dropdownOptions(validEntries){
+    dropdownOptions(validEntries) {
         return validEntries.split('|');
     }
+    displayVisualTypes():boolean{
+        //i49- what else ? 
+        if(this.entityObjectType.code.toString().toUpperCase() == "CHARGES")
+            this._displayVisualTypes=false;
+        else
+        this._displayVisualTypes=true;
+
+
+        return this._displayVisualTypes ;
+    }
+
+    get canUploadMultipleAttachments(): boolean {
+        return this.entityObjectType?.code === 'MARKETPLACESECTIONBLOCK';
+    }
+    
 }
 

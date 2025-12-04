@@ -1,14 +1,15 @@
 import { HttpParams } from "@angular/common/http";
-import { Component, Input,OnInit } from "@angular/core";
+import { Component, EventEmitter, Injector, Input,OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
 import { AppConsts } from "@shared/AppConsts";
+import { AppComponentBase } from "@shared/common/app-component-base";
 
 @Component({
     selector: "app-prodcut-card",
     templateUrl: "./prodcut-card.component.html",
     styleUrls: ["./prodcut-card.component.scss"],
 })
-export class ProdcutCardComponent {
+export class ProdcutCardComponent   extends AppComponentBase  {
     @Input() product;
     @Input() productCard;
     @Input() currency: string;
@@ -18,13 +19,18 @@ export class ProdcutCardComponent {
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
     params: any;
     languageSettingName:string  =AppConsts.languageSettingName;
-
+    isAuthenticated = this.appSession?.user
     @Input() acceptedAspectRatio;
+
+      @Output() prodcutId = new EventEmitter<number>();
+    constructor(private router: Router ,  injector: Injector) {
+        super(injector);
+    }
+
+
     ngOnInit(){
         this.product?.price % 1 ==0?this.product.price=Math.round(this.product.price * 100 / 100).toFixed(2):null; 
     }
-    constructor(private router: Router) {}
-
     viewProduct(id: number) {
         const productBodyRequestForView = {
             id: id,
@@ -34,7 +40,7 @@ export class ProdcutCardComponent {
         };
         localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
         this.router.navigate(["/app/main/marketplace/products/view", id]);
-
+        this.prodcutId.emit(id)
         // this.router.navigateByUrl(`/view/${id}`)
     }
 }

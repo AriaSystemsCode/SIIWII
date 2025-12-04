@@ -91,9 +91,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     transactionType: string = "";
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     currencySymbol: string = "";
-    visible: boolean = false;
-    displaneSel: boolean = false;
-    displaneBuy: boolean = false;
+    visible:boolean =false;
+    displaneSel :boolean =false;
+    displaneBuy :boolean =false;
+    isAuthenticated = this.appSession?.user
+    searchInput:string
+    bgCol:string 
+    tenantLogo:string
     currentLang: string
     isArabic: boolean
     constructor(
@@ -113,7 +117,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private updateLogoService: UpdateLogoService,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
         private _accountsServiceProxy: AccountsServiceProxy,
        
     ) {
@@ -171,8 +175,10 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     ngOnInit() {
+        console.log(this.isAuthenticated,'this.isAuthenticated');
+        this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
@@ -202,29 +208,32 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this.isMultiTenancyEnabled = this._abpMultiTenancyService.isEnabled;
         this.isImpersonatedLogin =
             this._abpSessionService.impersonatorUserId > 0;
-        this.setCurrentLoginInformations();
-        this.getProfilePicture();
-        this.getRecentlyLinkedUsers();
-        this.appSession.user.memberId;
-        this.appSession.user.id;
-        this.registerToEvents();
-        this.getUnreadMessageCount();
-        if (!this.isHost)
-            this.getShoppingCartInfo();
-
-        this.messageReadService.readMessageSubject$.subscribe((res) => {
-            if (res) {
+            if(this.isAuthenticated != undefined) {
+                this.setCurrentLoginInformations();
+                // this.getProfilePicture();
+                this.getRecentlyLinkedUsers();
+                this.appSession.user.memberId;
+                this.appSession.user.id;
+                this.registerToEvents();
                 this.getUnreadMessageCount();
+                if(!this.isHost)
+                  this.getShoppingCartInfo();
+        
+                this.messageReadService.readMessageSubject$.subscribe((res) => {
+                    if (res) {
+                        this.getUnreadMessageCount();
+                    }
+                });
+                this.getBelowBar();
             }
-        });
-        this.getBelowBar();
+       
     }
 
 
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
-            this.getProfilePicture();
+            // this.getProfilePicture();
         });
 
         abp.event.on("app.chat.unreadMessageCountChanged", (messageCount) => {
@@ -503,6 +512,37 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
                     })
             }
         })
+    }
+
+    onSearch(ev?: Event): void {
+        ev?.preventDefault(); // ✅ stop native form submit
+        const q = (this.searchInput ?? '').trim();
+      
+        this.router.navigate(
+          ['/app/main/marketplace/products'],
+          {
+            queryParams: { q: q || null },      // null removes it when empty
+            queryParamsHandling: 'merge',
+            replaceUrl: false
+          }
+        );
+      }
+      
+      getTenantData() {
+       
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208,null)
+        .subscribe((result) => {
+            // result = '#456'
+            result ? this.bgCol = result : this.bgCol = '#4A0D4A'
+    
+        });
+        this._AppEntitiesServiceProxy.getHostSettingValue(1206,"file")
+        .subscribe((result) => {
+            // const str = result
+            // const after = str.split("|")[1];
+           this.tenantLogo = result
+           console.log(this.tenantLogo,'logo')
+        });
     }
 
 }

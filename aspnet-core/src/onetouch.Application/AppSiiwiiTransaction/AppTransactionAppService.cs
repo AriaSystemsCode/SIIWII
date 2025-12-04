@@ -74,9 +74,8 @@ using onetouch.Globals;
 using MimeKit;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
-using onetouch.AppMarketplaceContacts;
 using MimeKit;
-using onetouch.AppTenantsActivitiesLogs;
+using onetouch.AppMarketplaceContacts;
 
 
 //using NUglify.Helpers;
@@ -217,6 +216,8 @@ namespace onetouch.AppSiiwiiTransaction
             //I46[Start]
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
+            //I46{End}
+            
             //I46{End}
             //I40[Start]
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;

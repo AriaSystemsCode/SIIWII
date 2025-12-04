@@ -36,7 +36,7 @@ namespace onetouch.Web.Startup
 {
 
 
-    
+
     public class OriginBasedConnectionStringResolver : DefaultConnectionStringResolver
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -97,18 +97,18 @@ namespace onetouch.Web.Startup
 
                 }
             }
-             
+
             return base.GetNameOrConnectionString(args);
         }
-  
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
     }
 
 
@@ -132,9 +132,9 @@ namespace onetouch.Web.Startup
             Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44303/";
             Configuration.Modules.AspNetZero().LicenseCode = _appConfiguration["AbpZeroLicenseCode"];
 
-          
+
             IocManager.Register<IConnectionStringResolver, OriginBasedConnectionStringResolver>(Abp.Dependency.DependencyLifeStyle.Transient);
-        
+
 
         }
 

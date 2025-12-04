@@ -151,7 +151,7 @@ namespace onetouch.Web.Startup
                 Console.WriteLine($"[OriginMiddleware] Request Origin: {origin}");
 
                 // Store in HttpContext for later use
-               context.Items["XXXRequestOrigin"] = origin;
+                context.Items["XXXRequestOrigin"] = origin;
             }
 
             await _next(context);

@@ -15,7 +15,7 @@
             <div class="d-flex name-price">
                 <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
                 <!-- <p class="price">MSRP :{{ product?.price  | currency:currency:true}}</p> -->
-                <p class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</p>
+                <p class="price" [ngClass]="isAuthenticated ? '' :'blur-text '">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</p>
             </div>
         </div>
         <!-- <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5>  -->
