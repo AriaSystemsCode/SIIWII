@@ -962,7 +962,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             return
         }
         this.saving = true;
-        if (this.accountLevel === AccountLevelEnum.Profile && !this.accountDataForView?.isConnected) {
+        if (this.accountLevel === AccountLevelEnum.Profile  )  {
 
             if (this.accountInfoOldCurrencyId && this.accountInfoTemp.currencyId != this.accountInfoOldCurrencyId) {
                 this.message.confirm(
@@ -981,11 +981,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                     }
                 );
             }
-            else
+            else {
                 this.saveMyAccount()
 
+            }
+
         } else {
-            this.accountInfoTemp.accountLevel = !this.accountDataForView?.isConnected ? this.accountLevel : 2;
+      
             this.saveExternalOrManualAccount()
         }
     }
