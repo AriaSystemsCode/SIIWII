@@ -135,6 +135,7 @@ export class TransactionInformationComponent
   priceLevel:any
   languageSettingName  =AppConsts.languageSettingName;
   transactionSharing:string="";
+  isAuthenticate= this.appSession?.user
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1802,10 +1803,13 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
 
   getNeeddedSettingValues(){
     //i49-New-Send the right id of setting "Transaction Sharing"
-    this._AppEntitiesServiceProxy
-    .getTenantSettingValue(1111,null)
-    .subscribe((res: any) => {
-        this.transactionSharing= res?.toString().toLowerCase();
-    });
+    if(this.isAuthenticate){
+      this._AppEntitiesServiceProxy
+      .getTenantSettingValue(1111,null)
+      .subscribe((res: any) => {
+          this.transactionSharing= res?.toString().toLowerCase();
+      });
+    }
+
   }
 }

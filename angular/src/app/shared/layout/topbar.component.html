@@ -1,9 +1,13 @@
 ...<!-- Navbar -->
 <nav class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
-    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"[ngClass]="[
-    isArabic ? 'rtl-navbar' : 'ltr-navbar',
-    isAuthenticated ? 'navbarMar' : ''
-  ]"    [style.backgroundColor]="bgCol">
+    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }" 
+    [ngClass]="{
+        'rtl-navbar': isArabic && isAuthenticated,
+        'ltr-navbar': !isArabic && isAuthenticated,
+        'pl-lg-5 ml-0': isAuthenticated,   
+        'm-0 p-0': !isAuthenticated       
+      }"
+     [style.backgroundColor]="bgCol">
     <!-- Container wrapper -->
     <div class="container ml-0  position-lg-static " [ngClass]="isArabic ? '':'position-md-absolute'">
         <!-- Navbar brand -->

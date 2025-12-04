@@ -93,12 +93,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     visible:boolean =false;
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
-    isAuthenticated = this.appSession?.user
+   
     searchInput:string
     bgCol:string 
     tenantLogo:string
-    currentLang: string
-    isArabic: boolean
+    isAuthenticated: boolean = false;
+    currentLang: string = 'en';
+    isArabic: boolean = false;
     defaultHomeUrl = '/app/main/Home'; // fallback
     constructor(
         injector: Injector,
@@ -174,10 +175,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     ngOnInit() {
+        this.isAuthenticated = !!this.appSession?.user;
        this.loadDefaultPage()
         this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        console.log(this.isAuthenticated,'isAuthenticated')
+        console.log(this.isArabic,'isArabic')
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
