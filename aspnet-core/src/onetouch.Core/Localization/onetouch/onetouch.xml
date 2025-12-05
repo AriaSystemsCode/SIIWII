@@ -1,29 +1,43 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
-	<text name="PortalImage">Portal Image</text>
-	<text name="PortalSlogan">Portal Slogan</text>
-	<text name="PortalHomepageIs">Portal Homepage Is</text>
-	<text name="PortalLogo">Portal Logo</text>
-	<text name="PortalToolbarColor">Portal Toolbar Color</text>
-	<text name="PortalFooterText">Portal Footer Text</text>
-	<text name="AllowTenantsToRegisterToThePortal">Allow tenants to register to the portal.</text>
-	<text name="NewRegisteredTenantsAreActiveByDefault">New registered tenants are active by default</text>
-	<text name="TenantTeamMembersAre">Tenant Team members are</text>
-	<text name="MarketplaceOwnerTenantIs">Marketplace Owner Tenant is</text>
-	<text name="PortalMarketplaceAnonymousBrowsing">Portal Marketplace Anonymous Browsing</text>
-	<text name="ProductMSRPVisibilityInMarketplace">Product MSRP Visiblity in Marketplace</text>
-	<text name="ProductInventoryQtyVisibilityInMarketplace">Product Inventory Qty Visiblity in Marketplace</text>
-	<text name="ShowInStockOutOfStockFlagsOn">Show (In Stock / Out of Stock ) flags on</text>
-	<text name="ShowWarningLabelWhenMajorItemIsOutOfStockInMarketplace">
-		Show Warning Label when Major Item is Out of Stock in Marketplace
-	</text>
-	<text name="ApplyTaxRules">Apply Tax Rules</text>
-	<text name="NotifyUsersByEmail">Notify Users by Email</text>
-	<text name="TransactionSharingIs">Transaction Sharing is</text>
-	<text name="InvitePartnerByType">Invite partner By Type</text>
-    <text name="Warningmessage">Warning message</text>
-    <text name="ShowNewsfeed">Show News feed</text>
+	<text name="Portalimage">Portal image</text>
+	<text name="Portalslogan">Portal slogan</text>
+	<text name="Shownewsfeed">Show news feed</text>
+	<text name="Landingpageis">Landing page is</text>
+	<text name="Portallogo">Portal logo</text>
+	<text name="Portaltoolbarcolor">Portal toolbar color</text>
+	<text name="Portalfootertextt">Portal footer text t</text>
+	<text name="Allowtenantstoregistertotheportal">Allow tenants to register to the portal</text>
+	<text name="Newregisteredtenantsareactivebydefault">New registered tenants are active by default</text>
+	<text name="TenantTeammembersare">Tenant Team members are</text>
+	<text name="Marketplaceownertenantis">Marketplace owner tenant is</text>
+	<text name="Marketplaceanonymousbrowsing">Marketplace anonymous browsing</text>
+	<text name="ProductMSRPvisiblityinmarketplace">Product MSRP visiblity in marketplace</text>
+	<text name="ProductinventoryQtyvisiblityinmarketplace">Product inventory Qty visiblity in marketplace </text>
+	<text name="Show-InStock/OutofStock-flagson">Show - In Stock / Out of Stock - flags on</text>
+	<text name="ShowwarningmessagewhenmajorItemisoutofStockinmarketplace">Show warning message when major Item is out of Stock in marketplace</text>
+	<text name="Warningmessage">Warning message</text>
+	<text name="Newsfeed">News feed</text>
+	<text name="Marketplace">Marketplace</text>
+	<text name="Manualcontactpersons">Manual contact persons</text>
+	<text name="Connectedpersonsbasedonrelationships">Connected persons based on relationships</text>
+		<!--<text name="Enable">Enable</text>
+	<text name="Disable">Disable</text>
+	<text name="Yes">Yes</text>
+	<text name="No">No</text>
+	<text name="True">True</text>
+	<text name="False">False</text>-->
+	<text name="ItemColorlevel">Item-Color level</text>
+	<text name="ItemColorSizeLevel">Item-Color-Size Level</text>
+	<text name="Bothlevels">Both levels</text>
+
+	<text name="Notifyusersbyemail">Notify users by email</text>
+	<text name="Transactionsharingis">Transaction sharing is</text>
+	<!--<text name="Manual">Manual</text>-->
+	<text name="Automatic">Automatic</text>
+	<text name="Inquire">Inquire</text>
+
 	<text name="ValidationRules">Validation rules</text>
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>

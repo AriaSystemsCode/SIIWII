@@ -64,14 +64,18 @@
                             <label class="pr-2">
                                 {{extraAttr.name}}
                             </label>
-                            <p-dropdown [options]="getDropdownOptions(extraAttr)"
-                                [styleClass]="'w-100 custom-dropdown'"
-                                [(ngModel)]="extraAttr.selectedValues"
-                                name="extraAttr_{{extraAttr.name}}"
-                                [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                [filter]="true"
-                                filterBy="label">
-                            </p-dropdown>
+                            <p-dropdown
+                            [options]="getDropdownOptions(extraAttr)"
+                            [(ngModel)]="extraAttr.selectedValues"
+                            [placeholder]="l('Select') + ' ' + extraAttr.name"
+                            [filter]="true"
+                            filterBy="label"
+                            [virtualScroll]="true"
+                            [itemSize]="40"
+                            [lazy]="true"
+                            (onLazyLoad)="onLazyLoadDropdown($event, extraAttr)"
+                            [showClear]="true">
+                        </p-dropdown>
 
                         </div>
                     </div>
@@ -81,12 +85,19 @@
                         <label class="pr-2">
                             {{extraAttr.name}}
                         </label>
-                        <p-dropdown [options]="getDropdownOptions(extraAttr)"
-                            [styleClass]="'w-100 custom-dropdown'"
-                            [(ngModel)]="extraAttr.selectedValues"
-                            name="extraAttr_{{extraAttr.name}}"
-                            [placeholder]="l('Select') + ' ' + extraAttr.name">
-                        </p-dropdown>
+                        <p-dropdown
+                        [options]="getDropdownOptions(extraAttr)"
+                        [(ngModel)]="extraAttr.selectedValues"
+                        [placeholder]="l('Select') + ' ' + extraAttr.name"
+                        [filter]="true"
+                        filterBy="label"
+                        [virtualScroll]="true"
+                        [itemSize]="40"
+                        [lazy]="true"
+                        (onLazyLoad)="onLazyLoadDropdown($event, extraAttr)"
+                        [showClear]="true">
+                    </p-dropdown>
+                    <!-- //i49-new show seting related to another setting  -->
 
                     </div>
                 </div>

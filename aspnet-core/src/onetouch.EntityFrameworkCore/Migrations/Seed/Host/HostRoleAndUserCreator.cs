@@ -20,7 +20,8 @@ using PayPalCheckoutSdk.Orders;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Abp.Runtime.Session;
 using onetouch.Configuration;
- 
+using System.IO;
+
 
 namespace onetouch.Migrations.Seed.Host
 {
@@ -46,8 +47,38 @@ namespace onetouch.Migrations.Seed.Host
             //MMT-Iteration37[Start]
             //CreateMessagesCategories();
             //MMT-Iteration37[End]
+            SeedExtraAttributes();
         }
+        
+        public void SeedExtraAttributes()
+        {
+            var _assetsPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Assets");
+            if (System.IO.Directory.Exists(_assetsPath))
+            {
+                // Load all rows where ExtraAttributes is null or empty
+                var items = _context.SycEntityObjectTypes
+                .Where(x => string.IsNullOrEmpty(x.ExtraAttributes) && !string.IsNullOrWhiteSpace(x.Code))
+                .ToList();
 
+                foreach (var item in items)
+                {
+                    // File name = <Code>.json or .txt
+                    string fileName = $"{item.Code}.xml";
+                    string fullPath = Path.Combine(_assetsPath, fileName);
+
+                    if (File.Exists(fullPath))
+                    {
+                        string content = File.ReadAllText(fullPath);
+
+                        if (!string.IsNullOrWhiteSpace(content))
+                        {
+                            item.ExtraAttributes = content;
+                        }
+                    }
+                }
+            }
+            _context.SaveChanges();
+        }
         private void CreateHostRoleAndUsers()
         {
             //Admin role for host
