@@ -7,6 +7,7 @@ import { FileUploaderCustom } from '../import-steps/models/FileUploaderCustom.mo
 import { FileUploader, FileUploaderOptions } from '@node_modules/ng2-file-upload';
 import { AppConsts } from '@shared/AppConsts';
 import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 
 @Component({
   selector: 'app-dynamicInputs',
@@ -29,7 +30,8 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   
       public constructor(
          private _tokenService: TokenService,
-          injector: Injector
+         private dynamicApi:DynamicApiDispatcherService,
+           injector: Injector
       ) {
           super(injector);
       }
@@ -40,6 +42,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   ngOnChanges() {
       this.fillSelectedValuesFromDto();
       this.onAnyInputChange();
+      this.setDropdownOptions();
   }
   
   onAnyInputChange() {
@@ -342,9 +345,47 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       getSafeString = (str: string) => str.replace(/\s+/g, '_');
 
 
-      getDropdownOptions(extraAttr:ExtraAttribute){
-        //i49-New get dropdown options
-        //if(extraAttr.id == )
+  
+      setDropdownOptions() {
+        this.extraAttributeObject.value.filteredExtraAttributes.forEach(extraAttr => {
+          if ((extraAttr.dataType === 'SearchableDropdown' || extraAttr.dataType === 'dropDownList') && extraAttr?.validEntries)
+            this.callDynamicAPI(extraAttr, 0, 10);
+        });
+      }
+ 
+      getDropdownOptions(extraAttr) {
+        return this.extraAttrOptions.get(extraAttr.id)?.items || [];
+      }
+    
+      extraAttrOptions = new Map<number, { items: { label: string, value: number }[], totalCount: number }>();
+
+    
+
+      callDynamicAPI(extraAttr, skipCount: number = 0, maxResultCount: number = 20) {
+        if (!extraAttr?.validEntries) return;
+      
+        ////i49-new use right service name   "MarketplaceAccounts|GetAll"  "accountsServiceProxy" 
+        const [serviceName, methodName] = extraAttr.validEntries.split('|');
+      
+          this.dynamicApi.dispatch(serviceName, methodName, skipCount, maxResultCount).subscribe(result => {
+
+          const dropdownItems = result.items.map(item => ({
+            label: item.account.name.trim(),
+            value: item.account.id
+          }));
+      
+          this.extraAttrOptions.set(extraAttr.id, {
+            items: dropdownItems,
+            totalCount: result.totalCount
+          });
+        });
+      }
+
+      onLazyLoadDropdown(event: any, extraAttr: any) {
+        const skipCount = event.first;
+        const maxResultCount = event.rows; 
+      
+        this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
       }
 
 }
