@@ -15658,6 +15658,62 @@ export class AppItemsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    addExtraAttrs(body: AppItemtExcelRecordDTO | undefined): Observable<AppItemtExcelRecordDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/AddExtraAttrs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddExtraAttrs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddExtraAttrs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemtExcelRecordDTO>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemtExcelRecordDTO>;
+        }));
+    }
+
+    protected processAddExtraAttrs(response: HttpResponseBase): Observable<AppItemtExcelRecordDTO> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppItemtExcelRecordDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     saveFromExcel(body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcel";
         url_ = url_.replace(/[?&]$/, "");
@@ -16570,6 +16626,7 @@ export class AppItemsServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -16579,7 +16636,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllColorsLookUp(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupItems> {
+    getAllColorsLookUp(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupItems> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAllColorsLookUp?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -16591,6 +16648,10 @@ export class AppItemsServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
