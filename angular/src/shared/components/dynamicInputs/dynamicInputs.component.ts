@@ -26,7 +26,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   originalValuesMap = new Map<number, any>();
   @Input() fromSetting:boolean =false;
 
-
+  warningMsg:string="";
   
       public constructor(
          private _tokenService: TokenService,
@@ -124,6 +124,23 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
     this.extraDataChanged.emit(this.selectedExtraData);
   }
+
+
+  onRadioChange(extraAttr) {
+    if (extraAttr?.attributeId === 1217 || 
+        extraAttr?.name?.includes("ShowwarningmessagewhenmajorItemisoutofStockinmarketplace")) {
+  
+      const extraAttrWaningMsg = this.extraAttributeObject.value.extraAttributes
+        .find(x => x.attributeId === 1218 || x.name?.includes("Warningmessage"));
+  
+      if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() !== 'true') {
+        extraAttrWaningMsg.showMsgTxt = false;
+      } else if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() === 'true') {
+        extraAttrWaningMsg.showMsgTxt = true;
+      }
+    }
+  }
+  
 
   reset(extraAttr: any) {
     if (extraAttr.acceptMultipleValues) {
@@ -387,5 +404,11 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       
         this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
       }
+
+      getExtraAttr(attributeId: number, nameIncludes: string) {
+        return this.extraAttributeObject.value.extraAttributes
+          .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
+      }
+      
 
 }

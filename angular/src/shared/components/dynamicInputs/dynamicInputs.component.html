@@ -6,7 +6,8 @@
                 *ngFor="let extraAttr of extraAttributeObject.value.filteredExtraAttributes">
                 <div>
                     <div>
-                        <label class="{{fromSetting ? 'fromSettingLabel':''}}">{{extraAttr.name | localize}}</label>
+                        <label *ngIf="extraAttr.attributeId !== 1218
+                        && !extraAttr.name?.includes('Warningmessage')" class="{{fromSetting ? 'fromSettingLabel':''}}">{{extraAttr.name | localize}}</label>
                     </div>
 
                     <!-- //API GetAllEntitiesByTypeCodeWithPaging -->
@@ -18,7 +19,7 @@
                                 <p-multiSelect (onChange)="onAnyInputChange()"
                                     [options]="extraAttr.paginationSetting.list" [styleClass]="'w-100'"
                                     [(ngModel)]="extraAttr.selectedValues" name="extraAttr_{{extraAttr.name}}"
-                                    [placeholder]="('Select') + ' ' + extraAttr.name">
+                                    [placeholder]="('Select') + ' ' + (extraAttr.name | localize)">
                                     <!-- (onChange)="multiValuesExtraAttributeOnChange($event,extraAttr)" -->
                                 </p-multiSelect>
                             </div>
@@ -41,7 +42,7 @@
                                       (change)="onCheckboxChange($event.target.checked, item.value, extraAttr)"
                                     />
                                     <label class="form-check-label" [for]="'checkbox_' + extraAttr.name + '_' + item.value">
-                                      {{ item.label }}
+                                      {{ item.label | localize }}
                                     </label>
                                   </div>
                             </div>
@@ -51,7 +52,7 @@
                             *ngIf="extraAttr?.paginationSetting && !extraAttr?.acceptMultipleValues && extraAttr.isLookup">
                             <p-dropdown (onChange)="onAnyInputChange()" [options]="extraAttr.paginationSetting.list"
                                 [styleClass]="'w-100'" [(ngModel)]="extraAttr.selectedValues"
-                                name="extraAttr_{{extraAttr.name}}" [placeholder]="('Select') + ' ' + extraAttr.name">
+                                name="extraAttr_{{extraAttr.name}}" [placeholder]="('Select') + ' ' + (extraAttr.name| localize)">
                                 <!-- (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)" -->
                             </p-dropdown>
                         </div>
@@ -62,12 +63,12 @@
                         *ngIf="extraAttr.dataType === 'SearchableDropdown'">
                         <div class="row d-flex align-items-baseline justify-content-start ">
                             <label class="pr-2">
-                                {{extraAttr.name}}
+                                {{extraAttr.name | localize}}
                             </label>
                             <p-dropdown
                             [options]="getDropdownOptions(extraAttr)"
                             [(ngModel)]="extraAttr.selectedValues"
-                            [placeholder]="l('Select') + ' ' + extraAttr.name"
+                            [placeholder]="l('Select') + ' ' + (extraAttr.name| localize)"
                             [filter]="true"
                             filterBy="label"
                             [virtualScroll]="true"
@@ -83,12 +84,12 @@
                     *ngIf="extraAttr.dataType === 'dropDownList'">
                     <div class="row d-flex align-items-baseline justify-content-start ">
                         <label class="pr-2">
-                            {{extraAttr.name}}
+                            {{extraAttr.name | localize}}
                         </label>
                         <p-dropdown
                         [options]="getDropdownOptions(extraAttr)"
                         [(ngModel)]="extraAttr.selectedValues"
-                        [placeholder]="l('Select') + ' ' + extraAttr.name"
+                        [placeholder]="l('Select') + ' ' + (extraAttr.name| localize)"
                         [filter]="true"
                         filterBy="label"
                         [virtualScroll]="true"
@@ -97,17 +98,18 @@
                         (onLazyLoad)="onLazyLoadDropdown($event, extraAttr)"
                         [showClear]="true">
                     </p-dropdown>
-                    <!-- //i49-new show seting related to another setting  -->
-
                     </div>
                 </div>
 
 
                     
 
-                        <div class="flex-grow-1 position-relative"
-                            *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
-                            <input type="text" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
+                <div class="flex-grow-1 position-relative"
+                *ngIf="extraAttr.dataType === 'string'
+                && getExtraAttr(1217, 'ShowwarningmessagewhenmajorItemisoutofStockinmarketplace')?.selectedValues?.toString().toLowerCase() === 'true'"
+                >
+                            <input 
+                            type="text" name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
                                 class="form-control" [(ngModel)]="extraAttr.selectedValues"
                                
                                 (ngModelChange)="onAnyInputChange()" />
@@ -138,9 +140,9 @@
                             [id]="'extraAttr_' + getSafeString(extraAttr.name) + '_' + getSafeString(option)"
                             [value]="option"
                             [(ngModel)]="extraAttr.selectedValues"
-                            (ngModelChange)="onAnyInputChange()"
+                            (ngModelChange)="onAnyInputChange();onRadioChange(extraAttr)"
                           />
-                          {{ option }}
+                          {{ option | localize }}
                         </label>
                       </ng-container>
                       
@@ -192,7 +194,7 @@
            [(ngModel)]="extraAttr.selectedValues"
            (ngModelChange)="onAnyInputChange()" />
 
-    <span>{{ extraAttr.selectedValues }}</span>
+    <span>{{ extraAttr.selectedValues | localize }}</span>
 
     <i class="pi pi-times"
        style="cursor: pointer;"
@@ -283,7 +285,7 @@
   
                         <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
-                                [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name"
+                                [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name| localize"
                                 (ngModelChange)="onAnyInputChange()" appendTo="body" 
                                 [inputStyle]="{'border': '1px solid #EEEEEE','border-radius':'8px','height':'44px' }"
                                 styleClass="w-100"></p-calendar>
@@ -306,7 +308,7 @@
 
                         <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'Numeric' ">
                             <input (ngModelChange)="onAnyInputChange()" type="number" name="{{extraAttr.name}}"
-                                placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}"
+                                placeholder="{{extraAttr.name| localize}}" class="form-control" id="extraAttr{{extraAttr.name}}"
                                 [(ngModel)]="extraAttr.selectedValues">
                                 <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
