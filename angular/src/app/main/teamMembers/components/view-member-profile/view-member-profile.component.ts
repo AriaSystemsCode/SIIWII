@@ -168,6 +168,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
               this.memberIslink = true;
               const linkedUserId = result.entityExtraData[indx].attributeValue;
               this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId && !user.memberId);
+              console.log(this.filteredUsers,'1')
             } else {
               this.memberIslink = false;
               this.filteredUsers = users.items.filter(user => !user.memberId);
@@ -223,35 +224,44 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
 
   EditUserName() {
+  
+    const rawId = this.getUserIdValue();
+
+    if (!rawId) {
+      this.message.warn(this.l('ThisMemberIsNotLinkedToUser')); // or your preferred message
+      return;
+    }
+
+    const userId = Number(rawId);
+
+    if (Number.isNaN(userId) || userId <= 0) {
+      this.message.error('Invalid linked user id: ' + rawId);
+      return;
+    }
 
     this.createOrEditUserModal.user = new UserEditDto();
-    this.createOrEditUserModal.user.id = Number(this.userId?.selectedValues[this.userId.selectedValues.length - 1]?.value);
-    this._userService.getUserForEdit(this.createOrEditUserModal.user.id).subscribe(userResult => {
-      if (userResult) {
-        // this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
-        // this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
-        // this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
-        // this.createOrEditUserModal.user.emailAddress=this.memberData?.eMailAddress
-        // this.createOrEditUserModal.user.phoneNumber=this.memberData?.phone1Number
-        this.createOrEditUserModal.teamMemberId = this.memberData?.id
-        this.createOrEditUserModal.user.name = userResult?.user?.name
-        this.createOrEditUserModal.user.surname = userResult?.user?.surname
-        this.createOrEditUserModal.user.userName = userResult?.user?.userName
-        this.createOrEditUserModal.user.emailAddress = userResult?.user?.emailAddress
-        this.createOrEditUserModal.user.phoneNumber = userResult?.user?.phoneNumber
-        this.createOrEditUserModal.fromTeamMember = true;
-      }
-
-
-      // this.createOrEditUserModal.fromTeamMember=true;
-      this.createOrEditUserModal.show(this.createOrEditUserModal.user.id)
-
-
-
-    });
-
+    this.createOrEditUserModal.user.id = userId;
+    this.createOrEditUserModal.teamMemberId = this.memberData?.id;
+    this.createOrEditUserModal.fromTeamMember = true;
+  
+    this.showMainSpinner();
+  
+    this._userService
+      .getUserForEdit(userId)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe(userResult => {
+        if (userResult) {
+          this.createOrEditUserModal.user.name        = userResult.user?.name;
+          this.createOrEditUserModal.user.surname     = userResult.user?.surname;
+          this.createOrEditUserModal.user.userName    = userResult.user?.userName;
+          this.createOrEditUserModal.user.emailAddress= userResult.user?.emailAddress;
+          this.createOrEditUserModal.user.phoneNumber = userResult.user?.phoneNumber;
+        }
+  
+        this.createOrEditUserModal.show(userId);
+      });
   }
-
+  
   editjobTitleValue: string = '';
   editBranchValue: string = '';
   oldEditBranchValue: string = "";
@@ -422,10 +432,26 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
 
   getUserIdValue(): string | null {
-    const userIdAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 715);
-    const val = userIdAttr?.selectedValues?.[userIdAttr.selectedValues.length - 1]?.value;
-    return val && val.trim() !== '' ? val : null;
+
+    const userAttr = this.memberData?.extraDataAttributes
+      ?.find(attr => attr.extraAttributeId === 715);
+  
+    const extraVal = userAttr?.selectedValues?.length
+      ? userAttr.selectedValues[userAttr.selectedValues.length - 1].value
+      : null;
+  
+    let val = extraVal;
+  
+
+    if (!val || !val.toString().trim()) {
+      const entityAttr = this.memberData?.entityExtraData
+        ?.find(e => e.attributeId === 715);
+      val = entityAttr?.attributeValue ?? null;
+    }
+  
+    return val && val.toString().trim() !== '' ? val.toString() : null;
   }
+  
 
   get jobTitleAttr() {
     return this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);

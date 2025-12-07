@@ -500,7 +500,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         if(this.isManualAccountCreate){
             this.setManualAccCode()
         }
-        // Ensure arrays are initialized
+     
         if (!this.accountInfoTemp.entityAttachments) this.accountInfoTemp.entityAttachments = [];
         if (!this.accountInfoTemp.entityCategories) this.accountInfoTemp.entityCategories = [];
         if (!this.accountInfoTemp.entityClassifications) this.accountInfoTemp.entityClassifications = [];
