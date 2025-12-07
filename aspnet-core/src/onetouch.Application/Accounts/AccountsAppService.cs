@@ -1310,11 +1310,11 @@ namespace onetouch.Accounts
 
                 accountDto.IsManual = (account.TenantId == AbpSession.TenantId && !account.IsProfileData
                    && account.ParentId == null
-                   && account.EntityFk.TenantOwner == AbpSession.TenantId);
+                   && (account.EntityFk.TenantOwner == AbpSession.TenantId || account.EntityFk.TenantOwner == 0));
                 //&& (_appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.SharingLevel == 1) == 0));//account.PartnerId == null);
                 //accountDto.IsConnected = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.TenantOwner != AbpSession.TenantId && z.SharingLevel == 1) > 0;//(account.TenantId == null && !account.IsProfileData && account.ParentId == null);
-                accountDto.IsConnected = (account.EntityFk.TenantOwner != AbpSession.TenantId);
-
+                accountDto.IsConnected = (account.EntityFk.TenantOwner != AbpSession.TenantId && account.EntityFk.TenantOwner != 0);
+                 
                 #endregion I31 fill account type from entity type in AppEntities 
 
 
