@@ -410,19 +410,21 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
   onLazyLoadDropdown(event: any, extraAttr: any) {
 
-      const maxResultCount = event.rows; 
-      const firstIndex = event.first;   
-  
-      const skipCount = Math.floor(firstIndex / maxResultCount) * maxResultCount;
-  
-      const extraAttrData = this.extraAttrOptions.get(extraAttr.id);
-      const loadedItems = extraAttrData?.items?.length || 0;
-      const totalCount = extraAttrData?.totalCount || 0;
-  
-      if (loadedItems >= totalCount || skipCount < loadedItems) return;
-  
-      this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
-  }
+    /////i49-new skip !!
+    const skipCount = event.first;
+    const maxResultCount = event.rows;
+
+    const extraAttrData = this.extraAttrOptions.get(extraAttr.id);
+
+    const loadedItems = extraAttrData?.items?.length || 0;
+    const totalCount = extraAttrData?.totalCount || 0;
+
+    if (loadedItems >= totalCount || skipCount < loadedItems) return;
+
+    this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+}
+
+
 
   getExtraAttr(attributeId: number, nameIncludes: string) {
     return this.extraAttributeObject.value.extraAttributes
