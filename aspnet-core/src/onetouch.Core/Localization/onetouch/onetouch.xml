@@ -2480,6 +2480,7 @@
 		<text name="MSRP">MSRP</text>
 		<text name="PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct">Please check this box if you sell multiple variations of your product</text>
 		<text name="AvailableQty">Available Qty</text>
+		<text name="StockAvailable">Stock Available</text>
 		<text name="ViewEvent">View Event</text>
 		<text name="FormIsInvalid">Form is invalid</text>
 		<text name="CurrenciesCannotBeDublicated">Currencies can't be dublicated</text>
