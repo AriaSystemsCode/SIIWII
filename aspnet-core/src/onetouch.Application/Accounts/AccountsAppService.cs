@@ -4604,13 +4604,14 @@ namespace onetouch.Accounts
 
         #endregion
 
-        public long GetTypeId(string typeName, List<LookupLabelDto> lookupLabelDtos)
+        public long GetTypeId(string typeName, List<LookupLabelDto> lookupLabelDtos, bool matchName=false)
         {
             long value = 0;
             try
             {
                 if (string.IsNullOrEmpty(typeName) == false)
-                    value = lookupLabelDtos.Where(r => r.Code.ToUpper() == typeName.ToUpper()).First<LookupLabelDto>().Value;
+                    value = lookupLabelDtos.Where(r => (r.Code.ToUpper() == typeName.ToUpper())  
+                    || (matchName && r.Label.ToUpper() == typeName.ToUpper())).First<LookupLabelDto>().Value;
             }
             catch (Exception ex) { }
 
@@ -4696,14 +4697,38 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
+            if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) 
+                //&& !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress)
+                )
             {
-                returnList.Add(new ImportContactReturnDto
+                string sepChar = accountExcelDto.EmailAddress.Contains(';') ? ";" : " ";
+                var emailsArray = accountExcelDto.EmailAddress.Split(sepChar);
+                if (emailsArray.Length > 0) 
                 {
-                    RecordKey = accountExcelDto.Code,
-                    ErrorMessage = "Email Address: Not Valid Email Value.",
-                    ErrorType = "Stopper"
-                });
+                    foreach (var e in emailsArray)
+                    {
+                        if (!_helper.ExcelHelper.IsValidEmail(e))
+                        {
+                            returnList.Add(new ImportContactReturnDto
+                            {
+                                RecordKey = accountExcelDto.Code,
+                                ErrorMessage = "Email Address: Not Valid Email Value.",
+                                ErrorType = "Stopper"
+                            });
+
+                            // Stop checking further emails once one invalid is found
+                            break;
+                        }
+                    }
+
+                }
+
+                //returnList.Add(new ImportContactReturnDto
+                //{
+                //    RecordKey = accountExcelDto.Code,
+                //    ErrorMessage = "Email Address: Not Valid Email Value.",
+                //    ErrorType = "Stopper"
+                //});
             }
             AccountExcelAccountType accountExcelAccountType;
             AccountExcelRecordType accountExcelRecordType;
@@ -4740,7 +4765,8 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) 
+                && GetTypeId(accountExcelDto.Phone1Type, phoneTypes, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4764,7 +4790,8 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) 
+                && GetTypeId(accountExcelDto.Phone1Type, phoneTypes, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4805,7 +4832,8 @@ namespace onetouch.Accounts
             // #region check address 
             bool AddressTypeFound = false;
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Address1Type) && GetTypeId(accountExcelDto.Address1Type, addressTypes) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address1Type) 
+                && GetTypeId(accountExcelDto.Address1Type, addressTypes, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4817,7 +4845,8 @@ namespace onetouch.Accounts
             else { AddressTypeFound = true; }
 
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Address2Type) && GetTypeId(accountExcelDto.Address2Type, addressTypes) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address2Type) && 
+                GetTypeId(accountExcelDto.Address2Type, addressTypes, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4827,7 +4856,8 @@ namespace onetouch.Accounts
                 });
             }
             else { AddressTypeFound = true; }
-            if (!string.IsNullOrEmpty(accountExcelDto.Address3Type) && GetTypeId(accountExcelDto.Address3Type, addressTypes) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address3Type) 
+                && GetTypeId(accountExcelDto.Address3Type, addressTypes, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4837,7 +4867,8 @@ namespace onetouch.Accounts
                 });
             }
             else { AddressTypeFound = true; }
-            if (!string.IsNullOrEmpty(accountExcelDto.Address4Type) && GetTypeId(accountExcelDto.Address4Type, addressTypes) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address4Type) 
+                && GetTypeId(accountExcelDto.Address4Type, addressTypes, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4858,7 +4889,8 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Address1Country) && GetTypeId(accountExcelDto.Address1Country, countries) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address1Country) 
+                && GetTypeId(accountExcelDto.Address1Country, countries, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4868,7 +4900,8 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Address2Country) && GetTypeId(accountExcelDto.Address2Country, countries) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address2Country) 
+                && GetTypeId(accountExcelDto.Address2Country, countries, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4878,7 +4911,8 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Address3Country) && GetTypeId(accountExcelDto.Address3Country, countries) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address3Country) 
+                && GetTypeId(accountExcelDto.Address3Country, countries, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -4888,7 +4922,8 @@ namespace onetouch.Accounts
                 });
             }
 
-            if (!string.IsNullOrEmpty(accountExcelDto.Address4Country) && GetTypeId(accountExcelDto.Address4Country, countries) == 0)
+            if (!string.IsNullOrEmpty(accountExcelDto.Address4Country) 
+                && GetTypeId(accountExcelDto.Address4Country, countries, true) == 0)
             {
                 returnList.Add(new ImportContactReturnDto
                 {
@@ -8160,8 +8195,11 @@ namespace onetouch.Accounts
             try
             {
                 if (string.IsNullOrEmpty(typeName) == false)
-                { value = lookupLabelDtos.Where(r => r.Code.ToUpper() == typeName.ToUpper()).FirstOrDefault<LookupLabelDto>().Value; }
-                else
+                {
+                    var value0 = lookupLabelDtos.Where(r => r.Code.ToUpper() == typeName.ToUpper()).FirstOrDefault<LookupLabelDto>();
+                    value = value0!=null ? value0.Value : 0;
+                }
+                if(value==0)
                 {
                     if (isDefaulted && lookupLabelDtos.Count > 0)
                     {
