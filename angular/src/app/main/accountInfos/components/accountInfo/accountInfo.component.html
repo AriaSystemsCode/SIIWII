@@ -373,7 +373,7 @@
                                                 {{l("Code")}}
                                             </label>
                                             <div class="col-sm-8">
-                                                <app-codes *ngIf="!(accountInfoTemp?.id>0)"
+                                                <!-- <app-codes *ngIf="!(accountInfoTemp?.id>0)"
                                                     [objectType]="entityObjectType" [editMode]=false classes="bg-white"
                                                     [code]="accountInfoTemp?.code"
                                                     placeHolder="{{ 'Account Code' | localize}}"
@@ -384,7 +384,17 @@
                                                     [code]="accountInfoTemp?.code"
                                                     placeHolder="{{ 'Account Code' | localize}}"
                                                     (getCodeValue)="getCodeValue($event)" [maxlength]="12"></app-codes>
-                                            </div>
+                                                -->
+                                            <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
+                                            class="form-control form-control-sm aria-input-text"
+                                            [disabled]="accountInfoTemp?.id>0"
+                               
+                                            id="colFormLabelSm" [(ngModel)]="accountInfoTemp.code" name="code"
+                                            required (input)="changeTouchState()"
+                                            [placeholder]=" 'PleaseEnterCompanyCode...' | localize ">
+                                        </div> 
+
+
                                         </div>
 
                                         <div class="form-group row">
