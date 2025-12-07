@@ -6196,7 +6196,7 @@ namespace onetouch.Accounts
         //MMT2
         {
             #region get lists
-
+            
             // get not failed recoreds
             List<AccountExcelDto> result = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
@@ -6739,7 +6739,7 @@ namespace onetouch.Accounts
                     //catch (Exception ex) { }
 
                 }
-
+                
                 var con = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
                 // {
                 //  var oldChange = con.ChangeTracker.AutoDetectChangesEnabled;
@@ -6755,15 +6755,36 @@ namespace onetouch.Accounts
                     await con.SaveChangesAsync();
 
                     // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
-                    // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
+                    // ac  ol6tttttt5countsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
 
                     foreach (var acc in accountsList)
                     {
+                        //xx
+                        foreach (var z in acc.AppContactAddresses)
+                        {
+                            if (z.AddressFk!=null)
+                            z.AddressFk.AccountId = acc.Id;
+                        }
+                        //xx
                         foreach (var br in acc.ParentFkList)
                         {
+                            //xx
+                            foreach (var z in br.AppContactAddresses)
+                            {
+                                if (z.AddressFk != null)
+                                    z.AddressFk.AccountId = acc.Id;
+                            }
+                            //xx
                             br.AccountId = acc.Id;
                             foreach (var cont in br.ParentFkList)
                             {
+                                //xx
+                                foreach (var z in cont.AppContactAddresses)
+                                {
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
+                                }
+                                //xx
                                 cont.AccountId = acc.Id;
                             }
                         }
@@ -6787,17 +6808,38 @@ namespace onetouch.Accounts
                         if (accountsListUpdated.Count > 0)
                             con.AppContacts.UpdateRange(accountsListUpdated);
 
-                        await con.SaveChangesAsync();
-                        foreach (var acc in accountsList)
-                        {
-                            foreach (var br in acc.ParentFkList)
+                            await con.SaveChangesAsync();
+                            foreach (var acc in accountsList)
                             {
-                                br.AccountId = acc.Id;
-                                foreach (var cont in br.ParentFkList)
+                                //xx
+                                foreach (var z in acc.AppContactAddresses)
                                 {
-                                    cont.AccountId = acc.Id;
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
                                 }
-                            }
+                                //xx
+                                foreach (var br in acc.ParentFkList)
+                                {
+                                    //xx
+                                    foreach (var z in br.AppContactAddresses)
+                                    {
+                                        if (z.AddressFk != null)
+                                            z.AddressFk.AccountId = acc.Id;
+                                    }
+                                    //xx
+                                    br.AccountId = acc.Id;
+                                    foreach (var cont in br.ParentFkList)
+                                    {
+                                        //xx
+                                        foreach (var z in cont.AppContactAddresses)
+                                        {
+                                            if (z.AddressFk != null)
+                                                z.AddressFk.AccountId = acc.Id;
+                                        }
+                                        //xx
+                                        cont.AccountId = acc.Id;
+                                    }
+                                }
 
                         }
                         con.AppContacts.UpdateRange(accountsList);
