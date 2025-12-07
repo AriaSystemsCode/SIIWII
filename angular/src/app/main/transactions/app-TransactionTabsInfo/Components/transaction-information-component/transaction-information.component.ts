@@ -1137,7 +1137,7 @@ export class TransactionInformationComponent
       break;
 
       case 'automatic':
-                      //i49-New handle case
+            this.automaticShare();
         break;
 
         case 'inquire':
@@ -1803,5 +1803,33 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
 
+
+
+  automaticShare() {
+    //i49-new sharedWithUsers is null 
+    if (!this.appTransactionsForViewDto?.sharedWithUsers ||
+      this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
+    return; 
+  }
+
+    const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
+        sharedTenantId: u.tenantId,
+        sharedUserId: u.userId,
+        sharedUserEMail: u.email,
+        sharedUserName: u.name,
+        sharedUserSureName: u.name,
+        sharedUserTenantName: u.tenantName,
+        id: u.id
+    })) || [];
+
+    let shareDto :any = {
+        transactionId: this.orderId,
+        message: '',
+        transactionSharing: newsharingArray,
+        subject: undefined
+    };
+    this._AppTransactionServiceProxy.shareTransactionByMessage(shareDto)
+        .subscribe(r => this.notify.success("Transaction shared automatically"));
+}
 
 }
