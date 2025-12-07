@@ -53,8 +53,8 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body p-0">
-                        <h4 class="font-weight-bold p-3" style="background-color: #EEEEEEEE;
-                        border-radius: 5px;"> {{ 'ProductDetails' | localize}} </h4>
+                        <h6 class="font-weight-bold p-3" style="background-color: #EEEEEEEE;
+                        border-radius: 5px;"> {{ 'ProductDetails' | localize}} </h6>
                         <div class="row align-items-baseline mb-4 pl-4">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <h6><span class="text-danger">*</span>{{ 'ProductType' | localize}}</h6>
@@ -480,7 +480,7 @@
                                 </div> -->
                             </div>
                             <div class="d-flex flex-row ml-5 pl-5 mr-5 pr-5">
-                                <h6  class="font-weight-bold ml-5 pl-5 mr-3"><span class="text-danger">*</span>
+                                <h6  class="font-weight-bold mr-3"><span class="text-danger">*</span>
                                     {{ 'AvailableQuantity' | localize}}
                                 </h6>
                                 <p-inputNumber [ariaRequired]="true" mode="decimal" #AppItem_StockAvailability="ngModel"
@@ -525,7 +525,7 @@
                     <div class="kt-portlet__body">
                         <div class="align-items-baseline"
                             *ngIf="!(!appItem?.variationItems?.length  && listingMode !== undefined)">
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                            <div class="col-sm-4 col-6">
                                 <h6 class="font-weight-bold">
                                     <span class="text-danger">*</span>    {{ 'Variations' | localize}}
                                     <span style="color: #5F6368;font-size: 11px;margin-left: 20px;">
@@ -567,11 +567,12 @@
                                         border: #4A0D4A !important;color: white !important;"
                                             (click)="showCreateOrEditVariationPage()">{{ 'EditVariations' |
                                             localize}}</button>
-                                        <button type="button" class="btn btn-outline-hover-danger text-danger font-weight-bold"
+                                        <button type="button" class="btn btn-outline-hover-danger "
                                             *ngIf="listingMode === undefined" (click)="removeAllVariations()"
                                             style="border-radius: 5px;
                                             background-color: white !important;
-                                            border: white !important;color: #4A0D4A  !important;">{{
+                                            border: 1px solid grey !important;
+                                            color: #4A0D4A  !important;">{{
                                             'RemoveAll' | localize}}</button>
                                     </div>
                                 </div>
