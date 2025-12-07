@@ -51,6 +51,8 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
     super(injector);
   }
   ngOnInit(){
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     if(this.oldAppSizeScaleDto){
       this.cellSelectionFormInput = new FormInputs<string,LookupLabelDto[]>({ 
         type: FormInputType.Checkbox,
@@ -157,7 +159,7 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
   openAppEntityListModal(dimension:1|2|3) {
     let config : ModalOptions = new ModalOptions()
     const acceptMultiValues = true
-    config.class = 'right-modal slide-right-in'
+   this.isArabic ? config.class = 'left-modal slide-left-in ngLeft' :  config.class = 'right-modal slide-right-in'
     let selectedRecords = []
     switch (dimension) {
       case 1:

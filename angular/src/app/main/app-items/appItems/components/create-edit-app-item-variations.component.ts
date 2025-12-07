@@ -231,6 +231,8 @@ export class CreateEditAppItemVariationsComponent
     showNewVariation=false;
     activeNewVariation=false;
     deselectedValues=[];
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         private _extraAttributeDataService: ExtraAttributeDataService,
@@ -243,6 +245,8 @@ export class CreateEditAppItemVariationsComponent
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.initUploaders();
         this.initPricingNeededData();
         this.getSiwiiMarketPlaceColor();
@@ -1825,7 +1829,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         let extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+       this.isArabic ?  config.class = "left-modal slide-left-in ngLeft":  config.class = "right-modal slide-right-in";
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,
