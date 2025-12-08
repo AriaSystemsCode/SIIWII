@@ -517,9 +517,11 @@ namespace onetouch.SystemObjects
                     {
                         foreach (var block in extraDataBlocks)
                         {
-                            var blockDetail = await _appEntityRepository.GetAll().Include(z=>z.EntityExtraData)
-                                .Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                            var blockDetail = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                                 .Where(z => z.Id == block.EntityId).FirstOrDefaultAsync();
+                            if (blockDetail == null)
+                                continue;
                             var item = new PageSettingDto();
                             var sectionOrderExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2002);
                             if (sectionOrderExtraDate != null)
@@ -528,20 +530,27 @@ namespace onetouch.SystemObjects
                             var linkExtraData = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
                             if (linkExtraData != null)
                                 item.LinkPageUrl = linkExtraData.AttributeValue;
-                            
-                            item.Type = SliderEnum.SM; 
+
+                            item.Type = SliderEnum.SM;
                             item.Name = blockDetail.Name;
                             //item.Description = block.EntityFk.Name;
                             item.Code = blockDetail.Code;
                             item.Description = blockDetail.Notes;
 
                             if (blockDetail.EntityAttachments != null && blockDetail.EntityAttachments.Count > 0)
+                            {
                                 item.Image = (blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
                                            (blockDetail.EntityAttachments.FirstOrDefault() != null ? "attachments/" + (blockDetail.TenantId.HasValue ? block.EntityFk.TenantId : -1) + "/" +
                                            blockDetail.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
                                            : "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) + "/" +
                                            blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment);
-
+                                item.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(blockDetail.EntityAttachments);
+                                foreach (var attDto in item.EntityAttachments)
+                                {
+                                    attDto.FileName = imagesUrl + (blockDetail.TenantId == null ? "-1" : blockDetail.TenantId.ToString()) + @"/" + attDto.FileName;
+                                    attDto.Url = attDto.FileName;
+                                }
+                            }
                             item.id = blockDetail.Id;
 
                             var blockTypeExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2001);

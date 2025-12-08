@@ -1,12 +1,13 @@
 import { Injectable } from "@angular/core";
-import { AccountsServiceProxy } from "./service-proxies/service-proxies";
+import { AccountsServiceProxy, AppItemsServiceProxy } from "./service-proxies/service-proxies";
 
 @Injectable({ providedIn: 'root' })
 export class DynamicApiDispatcherService {
 
   constructor(
-    //i49-new bind MarketplaceAccountsService
     private accountsServiceProxy: AccountsServiceProxy,
+    private appItemsServiceProxy :AppItemsServiceProxy
+    //i49-F6 bind MarketplaceAccountsService
     //private marketPlaceAccountServiceProxy: MarketPlaceAccountServiceProxy,
   ) {}
 
