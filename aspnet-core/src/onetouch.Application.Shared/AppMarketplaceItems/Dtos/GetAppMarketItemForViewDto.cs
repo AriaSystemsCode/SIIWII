@@ -55,6 +55,9 @@ namespace onetouch.AppMarketplaceItems.Dtos
     }
     public class AppMarketplaceItemForViewDto : GetAppMarketplaceItemDto
     {
+        //I49-MMT[Start]
+        public string BrandAttchment { set; get; } 
+        //I49-MMT[End]
         public string Brand { set; get; }
         public string ProductLabel { set; get; }
         public DateOnly? StartShipDate { get; set; }
