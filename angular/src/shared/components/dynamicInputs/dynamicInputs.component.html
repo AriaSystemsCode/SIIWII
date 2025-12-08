@@ -68,15 +68,26 @@
                             <p-dropdown
                             [options]="getDropdownOptions(extraAttr)"
                             [(ngModel)]="extraAttr.selectedValues"
-                            [placeholder]="l('Select') + ' ' + (extraAttr.name| localize)"
+                            [placeholder]="l('Select') + ' ' + (extraAttr.name | localize)"
                             [filter]="true"
                             filterBy="label"
-                            [virtualScroll]="true"
-                            [itemSize]="40"
-                            [lazy]="true"
-                            (onLazyLoad)="onLazyLoadDropdown($event, extraAttr)"
-                            [showClear]="true">
+                            [showClear]="true"
+                            (onClick)="onDropdownClick(extraAttr)">
+                            
+                            <ng-template let-item pTemplate="item">
+                                <div *ngIf="item.isLoadMore; else normalItem"
+                                     class="load-more-item"
+                                     (click)="onLoadMoreClick($event, extraAttr)">
+                                    Load More...
+                                </div>
+                                <ng-template #normalItem>
+                                    {{item.label}}
+                                </ng-template>
+                            </ng-template>
                         </p-dropdown>
+                        
+                        
+                        
 
                         </div>
                     </div>
@@ -89,15 +100,28 @@
                         <p-dropdown
                         [options]="getDropdownOptions(extraAttr)"
                         [(ngModel)]="extraAttr.selectedValues"
-                        [placeholder]="l('Select') + ' ' + (extraAttr.name| localize)"
+                        [placeholder]="l('Select') + ' ' + (extraAttr.name | localize)"
                         [filter]="true"
                         filterBy="label"
-                        [virtualScroll]="true"
-                        [itemSize]="40"
-                        [lazy]="true"
-                        (onLazyLoad)="onLazyLoadDropdown($event, extraAttr)"
-                        [showClear]="true">
+                        [showClear]="true"
+                        (onClick)="onDropdownClick(extraAttr)">
+                        
+                        <ng-template let-item pTemplate="item">
+                            <div *ngIf="item.isLoadMore; else normalItem"
+                                 class="load-more-item"
+                                 (click)="onLoadMoreClick($event, extraAttr)">
+                                Load More...
+                            </div>
+                            <ng-template #normalItem>
+                                {{item.label}}
+                            </ng-template>
+                        </ng-template>
                     </p-dropdown>
+                    
+                    
+                    
+                    
+                    
                     </div>
                 </div>
 

@@ -1806,7 +1806,6 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
 
 
   automaticShare() {
-    //i49-new sharedWithUsers is null 
     if (!this.appTransactionsForViewDto?.sharedWithUsers ||
       this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
     return; 

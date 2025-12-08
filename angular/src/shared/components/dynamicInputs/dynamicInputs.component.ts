@@ -42,7 +42,6 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   ngOnChanges() {
     this.fillSelectedValuesFromDto();
     this.onAnyInputChange();
-    this.setDropdownOptions();
   }
 
   onAnyInputChange() {
@@ -360,71 +359,78 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     return uploader;
   }
   getSafeString = (str: string) => str.replace(/\s+/g, '_');
+  extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
 
+  getDropdownOptions(extraAttr: any) {
+    const data = this.extraAttrOptions.get(extraAttr.id);
+    if (!data) return [];
 
+    let items = [...data.items];
 
-  setDropdownOptions() {
-    this.extraAttributeObject.value.filteredExtraAttributes.forEach(extraAttr => {
-      if ((extraAttr.dataType === 'SearchableDropdown' || extraAttr.dataType === 'dropDownList') && extraAttr?.validEntries)
-        this.callDynamicAPI(extraAttr, 0, 10);
-    });
-  }
+    if (items.length > 0 && items.length < data.totalCount) {
+        items.push({ label: 'Load More...', value: null, isLoadMore: true });
+    }
 
-  getDropdownOptions(extraAttr) {
-    return this.extraAttrOptions.get(extraAttr.id)?.items || [];
-  }
-
-  extraAttrOptions = new Map<number, { items: { label: string, value: number }[], totalCount: number }>();
-
-
-
-  callDynamicAPI(extraAttr, skipCount: number = 0, maxResultCount: number = 10) {
-    if (!extraAttr?.validEntries) return;
-
-    ////i49-new use right service name   "MarketplaceAccounts|GetAll"  "accountsServiceProxy" 
-    let [serviceName, methodName] = extraAttr.validEntries.split('|');
-    serviceName += "ServiceProxy";
-
-    this.dynamicApi.dispatch(serviceName, methodName, {
-      skipCount: skipCount,
-      maxResultCount: maxResultCount
-    }).subscribe(result => {
-
-
-      const dropdownItems = result.items.map(item => ({
-        label: item.account.name.trim(),
-        value: item.account.id
-      }));
-
-      const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
-      const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
-
-      this.extraAttrOptions.set(extraAttr.id, {
-        items: combinedItems,
-        totalCount: result.totalCount
-      });
-    });
-  }
-
-
-
-  onLazyLoadDropdown(event: any, extraAttr: any) {
-
-    /////i49-new skip !!
-    const skipCount = event.first;
-    const maxResultCount = event.rows;
-
-    const extraAttrData = this.extraAttrOptions.get(extraAttr.id);
-
-    const loadedItems = extraAttrData?.items?.length || 0;
-    const totalCount = extraAttrData?.totalCount || 0;
-
-    if (loadedItems >= totalCount || skipCount < loadedItems) return;
-
-    this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+    return items;
+}
+  
+  onDropdownClick(extraAttr: any) {
+    const data = this.extraAttrOptions.get(extraAttr.id);
+    if (!data || data.items.length === 0) {
+        this.loadNextItems(extraAttr);
+    }
 }
 
+onLoadMoreClick(event: Event, extraAttr: any) {
+  event.stopPropagation(); 
+  this.loadNextItems(extraAttr);
+}
+  loadNextItems(extraAttr: any) {
+      let data = this.extraAttrOptions.get(extraAttr.id);
+      if (!data) {
+          data = { items: [], totalCount: 0, isLoading: false };
+          this.extraAttrOptions.set(extraAttr.id, data);
+      }
+  
+      if (data.isLoading) return;
+  
+      const skipCount = data.items.length;
+      const maxResultCount = 10;
+  
+      data.isLoading = true;
+  
+      this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+  }
+  
+  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
+      if (!extraAttr?.validEntries) return;
+  
+      let [serviceName, methodName, resultField] = extraAttr.validEntries.split('|');
+      serviceName += "ServiceProxy";
+  
+      this.dynamicApi.dispatch(serviceName, methodName, {
+          skipCount: skipCount,
+          maxResultCount: maxResultCount
+      }).subscribe(result => {
+          const dropdownItems = result.items.map(item => ({
+              label: this.getByPath(item, resultField.trim()),
+              value: item.account.id
+          }));
+  
+          const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
+          const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
+  
+          this.extraAttrOptions.set(extraAttr.id, {
+              items: combinedItems,
+              totalCount: result.totalCount,
+              isLoading: false
+          });
+      });
+  }
 
+  getByPath(obj: any, path: string) {
+    return path.split('.').reduce((o, p) => o?.[p], obj);
+  }
 
   getExtraAttr(attributeId: number, nameIncludes: string) {
     return this.extraAttributeObject.value.extraAttributes
