@@ -56,15 +56,11 @@
                                 <!-- (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)" -->
                             </p-dropdown>
                         </div>
-
-   <!-- i49-new - check all seeting options for hsost & tenant -->
                         
                         <div class="flex-grow-1"
                         *ngIf="extraAttr.dataType === 'SearchableDropdown'">
                         <div class="row d-flex align-items-baseline justify-content-start ">
-                            <label class="pr-2">
-                                {{extraAttr.name | localize}}
-                            </label>
+                           
                             <p-dropdown
                             [options]="getDropdownOptions(extraAttr)"
                             [(ngModel)]="extraAttr.selectedValues"
@@ -94,9 +90,7 @@
                     <div class="flex-grow-1"
                     *ngIf="extraAttr.dataType === 'dropDownList'">
                     <div class="row d-flex align-items-baseline justify-content-start ">
-                        <label class="pr-2">
-                            {{extraAttr.name | localize}}
-                        </label>
+                       
                         <p-dropdown
                         [options]="getDropdownOptions(extraAttr)"
                         [(ngModel)]="extraAttr.selectedValues"
