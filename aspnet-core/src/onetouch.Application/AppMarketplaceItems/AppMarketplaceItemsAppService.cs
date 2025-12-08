@@ -624,9 +624,20 @@ namespace onetouch.AppMarketplaceItems
                             appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108).AttributeValueId : 0;
                         if (brandId != 0)
                         {
-                            var brandObj = await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId);
+                            var brandObj = await _appEntityRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk).FirstOrDefaultAsync(a => a.Id == brandId);
                             if (brandObj != null)
+                            {
                                 output.AppItem.Brand = brandObj.Name;
+                                if (brandObj.EntityAttachments != null && brandObj.EntityAttachments.Count > 0)
+                                {
+                                    var firstAttachment = brandObj.EntityAttachments.FirstOrDefault();
+                                    if (firstAttachment != null && !string.IsNullOrEmpty(firstAttachment.AttachmentFk.Name))
+                                    {
+                                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                                        output.AppItem.BrandAttchment = imagesUrl + appItem.TenantOwner.ToString() + @"/" + firstAttachment.AttachmentFk.Attachment; 
+                                    }
+                                }
+                            }
                         }
                         output.AppItem.MaterialContent = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662) != null ?
                             appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662).AttributeValue : "";
