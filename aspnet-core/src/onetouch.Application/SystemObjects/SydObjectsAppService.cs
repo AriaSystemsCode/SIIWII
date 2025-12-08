@@ -520,6 +520,8 @@ namespace onetouch.SystemObjects
                             var blockDetail = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
                                 .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                                 .Where(z => z.Id == block.EntityId).FirstOrDefaultAsync();
+                            if (blockDetail == null)
+                                continue;
                             var item = new PageSettingDto();
                             var sectionOrderExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2002);
                             if (sectionOrderExtraDate != null)
