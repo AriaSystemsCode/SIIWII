@@ -157,7 +157,6 @@ export class TransactionInformationComponent
 
     this.initFilterForm()
     this.calcHight()
-    this.getNeeddedSettingValues();
 
     let CompanyCheck = localStorage.getItem("comNew");
 
@@ -1129,16 +1128,20 @@ export class TransactionInformationComponent
 
 
   askForShareTransactions(){
-    //i49-New set right cases values
-  switch (this.transactionSharing.toString().toUpperCase()){
-    case 'MANUAL':
+      this._AppEntitiesServiceProxy
+    .getTenantSettingValue(1301,null)
+    .subscribe((res: any) => {
+        this.transactionSharing= res?.toString().toLowerCase();
+   
+  switch (this.transactionSharing.toString().toLowerCase()){
+    case 'manual':
       break;
 
-      case 'AUTOMATIC':
-                      //i49-New handle case
+      case 'automatic':
+            this.automaticShare();
         break;
 
-        case 'INQUIRE':
+        case 'inquire':
           Swal.fire({
             title: "",
             text: "Would you like to share the transaction with the other partner or not?",
@@ -1164,7 +1167,7 @@ export class TransactionInformationComponent
   
     default:
       break;
-  }
+  } });
   }
   sync() {
     this.showMainSpinner();
@@ -1810,6 +1813,33 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
           this.transactionSharing= res?.toString().toLowerCase();
       });
     }
-
   }
+
+
+  automaticShare() {
+    if (!this.appTransactionsForViewDto?.sharedWithUsers ||
+      this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
+    return; 
+  }
+
+    const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
+        sharedTenantId: u.tenantId,
+        sharedUserId: u.userId,
+        sharedUserEMail: u.email,
+        sharedUserName: u.name,
+        sharedUserSureName: u.name,
+        sharedUserTenantName: u.tenantName,
+        id: u.id
+    })) || [];
+
+    let shareDto :any = {
+        transactionId: this.orderId,
+        message: '',
+        transactionSharing: newsharingArray,
+        subject: undefined
+    };
+    this._AppTransactionServiceProxy.shareTransactionByMessage(shareDto)
+        .subscribe(r => this.notify.success("Transaction shared automatically"));
+}
+
 }

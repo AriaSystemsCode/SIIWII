@@ -49,36 +49,90 @@ namespace onetouch.Migrations.Seed.Host
             //MMT-Iteration37[End]
             SeedExtraAttributes();
         }
-        
+
         public void SeedExtraAttributes()
         {
-            var _assetsPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Assets");
-            if (System.IO.Directory.Exists(_assetsPath))
-            {
-                // Load all rows where ExtraAttributes is null or empty
-                var items = _context.SycEntityObjectTypes
-                .Where(x => string.IsNullOrEmpty(x.ExtraAttributes) && !string.IsNullOrWhiteSpace(x.Code))
+            var _assetsPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+            if (!Directory.Exists(_assetsPath))
+                return;
+
+            // 1. Read all XML files and parse datetime
+            var xmlFiles = Directory.GetFiles(_assetsPath, "*.xml")
+                .Select(f =>
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(f); // e.g., HOST-2021-05-05 064208.6066667
+                    var parts = fileName.Split('-');
+                    if (parts.Length < 2) return null;
+
+                    string code = parts[0];
+                    DateTime? dt = TryParseDateTimeFromFileName(fileName);
+                    if (dt.HasValue)
+                        return new { Code = code, Path = f, DateTime = dt.Value };
+
+                    return null;
+                })
+                .Where(x => x != null)
+                .GroupBy(x => x.Code)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderByDescending(x => x.DateTime).First() // pick latest
+                );
+
+            if (!xmlFiles.Any())
+                return;
+
+            // 2. Load only the relevant rows from DB
+            var codesToUpdate = xmlFiles.Keys.ToList();
+
+            var items = _context.SycEntityObjectTypes
+                .Where(x => codesToUpdate.Contains(x.Code))
                 .ToList();
 
-                foreach (var item in items)
+            // 3. Update ExtraAttributes
+            foreach (var item in items)
+            {
+                if (xmlFiles.TryGetValue(item.Code, out var latestFile))
                 {
-                    // File name = <Code>.json or .txt
-                    string fileName = $"{item.Code}.xml";
-                    string fullPath = Path.Combine(_assetsPath, fileName);
-
-                    if (File.Exists(fullPath))
-                    {
-                        string content = File.ReadAllText(fullPath);
-
-                        if (!string.IsNullOrWhiteSpace(content))
-                        {
-                            item.ExtraAttributes = content;
-                        }
-                    }
+                    string content = File.ReadAllText(latestFile.Path);
+                    if (!string.IsNullOrWhiteSpace(content))
+                        item.ExtraAttributes = content;
                 }
             }
+
             _context.SaveChanges();
         }
+
+        // Custom parser for filenames like "HOST-2021-05-05 064208.6066667"
+        private DateTime? TryParseDateTimeFromFileName(string fileName)
+        {
+            var parts = fileName.Split('-');
+            if (parts.Length < 2)
+                return null;
+
+            string dateTimeStr = string.Join("-", parts.Skip(1)); // "2021-05-05 064208.6066667"
+
+            // Split date and time
+            var dtParts = dateTimeStr.Split(' ');
+            if (dtParts.Length != 2)
+                return null;
+
+            string datePart = dtParts[0]; // "2021-05-05"
+            string timePart = dtParts[1]; // "064208.6066667"
+
+            // Parse as "yyyy-MM-ddHHmmss.fffffff"
+            if (DateTime.TryParseExact(
+                datePart + timePart,
+                "yyyy-MM-ddHHmmss.fffffff",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out DateTime result))
+            {
+                return result;
+            }
+
+            return null;
+        }
+
         private void CreateHostRoleAndUsers()
         {
             //Admin role for host

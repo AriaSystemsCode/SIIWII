@@ -1702,12 +1702,22 @@ namespace onetouch.AppEntities
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
                     var attributeValue = extraDataList.Items[0].AttributeValue;
-                    if (type.ToUpper() =="FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|') )
+                    if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
                     {
-                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                        attributeValue = imagesUrl +  "-1" + @"/" + attributeValue.Split('|')[1];
+                        // Get the base path and remove omitted part
+                        string imagesUrl = _appConfiguration["Attachment:Path"]
+                                            .Replace(_appConfiguration["Attachment:Omitt"], "");
 
+                        // Split the attribute value
+                        string filePart = attributeValue.Split('|')[1];
+
+                        // Combine safely
+                        string fullPath = Path.Combine(imagesUrl, "-1", filePart);
+
+                        // If you need it as URL for browser/API, convert backslashes to forward slashes
+                        attributeValue = fullPath.Replace("\\", "/");
                     }
+
                     return attributeValue;
                 }
             }
@@ -1724,12 +1734,28 @@ namespace onetouch.AppEntities
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
                     var attributeValue = extraDataList.Items[0].AttributeValue;
+                    //if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
+                    //{
+                    //    string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"\";
+                    //    attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"\" + attributeValue.Split('|')[1];
+
+                    //}
                     if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
                     {
-                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue.Split('|')[1];
+                        // Get base path and remove omitted part
+                        string imagesUrl = _appConfiguration["Attachment:Path"]
+                                            .Replace(_appConfiguration["Attachment:Omitt"], "");
 
+                        // Combine paths safely using Path.Combine (avoids double slashes)
+                        string tenantPart = AbpSession.TenantId?.ToString() ?? "-1";
+                        string filePart = attributeValue.Split('|')[1];
+
+                        string fullPath = Path.Combine(imagesUrl, tenantPart, filePart);
+
+                        // If you need URL format (for browser), replace backslashes with forward slashes
+                        attributeValue = fullPath.Replace("\\", "/");
                     }
+
                     return attributeValue;
                 }
             }
