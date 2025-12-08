@@ -125,7 +125,7 @@
                 *ngIf="
         extraAttr.dataType === 'string' &&
         (
-            extraAttr.name !== 'ShowwarningmessagewhenmajorItemisoutofStockinmarketplace'
+            extraAttr.name == 'Warningmessage'
             ||
             getExtraAttr(1217, 'ShowwarningmessagewhenmajorItemisoutofStockinmarketplace')?.selectedValues?.toString().toLowerCase() === 'true'
         )">
