@@ -122,9 +122,13 @@
                     
 
                 <div class="flex-grow-1 position-relative"
-                *ngIf="extraAttr.dataType === 'string'
-                && getExtraAttr(1217, 'ShowwarningmessagewhenmajorItemisoutofStockinmarketplace')?.selectedValues?.toString().toLowerCase() === 'true'"
-                >
+                *ngIf="
+        extraAttr.dataType === 'string' &&
+        (
+            extraAttr.name !== 'ShowwarningmessagewhenmajorItemisoutofStockinmarketplace'
+            ||
+            getExtraAttr(1217, 'ShowwarningmessagewhenmajorItemisoutofStockinmarketplace')?.selectedValues?.toString().toLowerCase() === 'true'
+        )">
                             <input 
                             type="text" name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
                                 class="form-control" [(ngModel)]="extraAttr.selectedValues"
@@ -302,7 +306,7 @@
   
                         <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
-                                [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name| localize"
+                                [showOtherMonths]="true" [selectOtherMonths]="true" placeholder="{{extraAttr.name| localize}}"
                                 (ngModelChange)="onAnyInputChange()" appendTo="body" 
                                 [inputStyle]="{'border': '1px solid #EEEEEE','border-radius':'8px','height':'44px' }"
                                 styleClass="w-100"></p-calendar>
