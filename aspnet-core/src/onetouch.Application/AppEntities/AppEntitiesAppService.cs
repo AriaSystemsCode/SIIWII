@@ -1686,7 +1686,8 @@ namespace onetouch.AppEntities
             return 0;
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
+        [AbpAllowAnonymous]
         public async Task<string> GetHostSettingValue(long settingId, string type = "")
         {
             var hostId = await GetCurrentHostEntityId();
