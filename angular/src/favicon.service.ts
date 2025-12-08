@@ -5,8 +5,11 @@ import { Title, Meta } from '@angular/platform-browser';
 export class FaviconService {
   private renderer: Renderer2;
 
-  constructor(rendererFactory: RendererFactory2 ,private title: Title,
-    private meta: Meta) {
+  constructor(
+    rendererFactory: RendererFactory2,
+    private title: Title,
+    private meta: Meta
+  ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
@@ -18,25 +21,21 @@ export class FaviconService {
     const head = document.querySelector('head') as HTMLHeadElement;
     let linkEl = document.querySelector('#appFavicon') as HTMLLinkElement;
 
+
     if (!linkEl) {
       linkEl = this.renderer.createElement('link');
       linkEl.id = 'appFavicon';
-      linkEl.rel = 'icon';
+      this.renderer.setAttribute(linkEl, 'rel', 'icon');
       this.renderer.appendChild(head, linkEl);
     }
 
-    linkEl.type = type;
-    linkEl.href = url;
+    this.renderer.setAttribute(linkEl, 'type', type);
+    this.renderer.setAttribute(linkEl, 'href', url);
   }
 
   setSeoText(titleText: string, description: string): void {
-    // <title>
     this.title.setTitle(titleText);
-
-    // normal description
     this.meta.updateTag({ name: 'description', content: description });
-
-    // Open Graph
     this.meta.updateTag({ property: 'og:title', content: titleText });
     this.meta.updateTag({ property: 'og:description', content: description });
   }

@@ -3,16 +3,16 @@
         <div [ngClass]="{'kt-grid__item kt-grid__item--fluid kt-grid kt-grid--desktop kt-grid--ver-desktop kt-grid--hor-tablet-and-mobile': !useFullWidthLayout(), 'col-md-12': useFullWidthLayout()}">
             <div class="account-logo-lg  kt-grid__item kt-grid__item--order-tablet-and-mobile-2 kt-grid kt-grid--hor kt-login__aside" *ngIf="!useFullWidthLayout()"   [ngStyle]="bgCol
             ? {'background-color': bgCol, 'background-image': 'none'}
-            : {'background-image': 'url(/assets/metronic/common/images/bg/Login_BGimage.svg)'}">
+            : ''">
                 <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
                     <div class="kt-grid__item kt-grid__item--middle">
                         <div class="align-items-center d-flex logos">
                             <a (click)="goToHome()" >
-                                <img class="main-logo-image" *ngIf="!appSession.tenant || !appSession.tenant.logoId" [src]=" attachmentBaseUrl + '/' +  tenantLogo" alt="logo" height="38" />
-                                <img class="main-logo-image" *ngIf="appSession.tenant && appSession.tenant.logoId" [src]="attachmentBaseUrl + '/' +  tenantLogo" alt="logo" height="38" />
+                                <img class="main-logo-image" *ngIf="!appSession.tenant || !appSession.tenant.logoId" [src]="tenantLogo" alt="logo" height="38" />
+                                <img class="main-logo-image" *ngIf="appSession.tenant && appSession.tenant.logoId" [src]="tenantLogo" alt="logo" height="38" />
                             </a>
 
-                            <img class="main-logo-image-text" [src]=" attachmentBaseUrl + '/' +  tenantWordLogo " alt="logo" height="38" />
+                            <img class="main-logo-image-text" [src]=" tenantWordLogo " alt="logo" height="38" />
                         </div>
                         <h4 class="kt-login__subtitle">{{ tenantName }}</h4>
                     </div>
@@ -30,7 +30,7 @@
                     <language-switch></language-switch>
                 </div>
 
-                <div class="kt-login__body d-block mt-3 mr-auto ml-auto">
+                <div class="kt-login__body d-block  mr-auto ml-auto">
                     <div *ngIf="showTenantChange()" class="kt-login__signup-label tenant-change-box text-center">
                         <tenant-change class="d-none"></tenant-change>
                     </div>

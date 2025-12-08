@@ -1,11 +1,9 @@
 .topbar {
-    background-color: #4a0d4a;
+ 
     height: 70px;
-    // margin-right: 13px !important;
+  
 }
-.navbar {
-    background: #4A0D4A;
-}
+
 .navbar-brand {
     font-size: unset;
     height: 3.5rem;
@@ -74,14 +72,10 @@
 }
 .navbar {
     border-radius: 0px 0px 20px 20px !important;
-background: #4A0D4A;
+
 box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
 }
-// @media (min-width: 768px) {
-//     .container {
-//         max-width: 973px !important;
-//     }
-// }
+
 @media (min-width: 1024px) {
     .navbar-expand-lg .navbar-collapse {
 

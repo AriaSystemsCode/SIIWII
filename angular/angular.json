@@ -20,7 +20,7 @@
             "assets": [
               "src/assets",
               "src/metronic",
-              "src/favicon.ico",
+
               {
                 "glob": "abp.signalr-client.js",
                 "input": "node_modules/abp-web-resources/Abp/Framework/scripts/libs",
@@ -187,7 +187,7 @@
             ],
             "assets": [
               "src/assets",
-              "src/favicon.ico",
+
               {
                 "glob": "abp.signalr-client.js",
                 "input": "node_modules/abp-web-resources/Abp/Framework/scripts/libs",

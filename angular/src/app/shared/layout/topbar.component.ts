@@ -124,7 +124,8 @@ export class TopBarComponent
     displaneBuy :boolean =false;
     isAuthenticated = this.appSession?.user
     searchInput:string
-    bgCol:string 
+    bgCol?: string;
+    bgColLoaded = false;
     tenantLogo:string
     defaultHomeUrl = '/app/main/Home'; // fallback
     constructor(
@@ -148,7 +149,7 @@ export class TopBarComponent
         
     ) {
         super(injector);
-
+        this.getTenantData()
         this.items = [
             {
                 items: [
@@ -203,7 +204,7 @@ export class TopBarComponent
 
     ngOnInit() {
        this.loadDefaultPage()
-        this.getTenantData()
+        // this.getTenantData()
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
@@ -512,18 +513,15 @@ export class TopBarComponent
       }
       
       getTenantData() {
-       
-        this._AppEntitiesServiceProxy.getHostSettingValue(1208,null)
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208, null)
         .subscribe((result) => {
-            // result = '#456'
-            result ? this.bgCol = result : this.bgCol = '#4A0D4A'
-    
+          this.bgCol = result;
+          this.bgColLoaded = true; 
         });
-        this._AppEntitiesServiceProxy.getHostSettingValue(1204,"file")
+    
+      this._AppEntitiesServiceProxy.getHostSettingValue(1204, "file")
         .subscribe((result) => {
-          
-           this.tenantLogo = result
-  
+          this.tenantLogo = result;
         });
     }
 
