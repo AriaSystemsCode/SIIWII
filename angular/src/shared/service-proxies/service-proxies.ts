@@ -79516,6 +79516,7 @@ export interface IMarketplaceExtraDataAttrDto {
 }
 
 export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewDto {
+    brandAttchment!: string | undefined;
     brand!: string | undefined;
     productLabel!: string | undefined;
     startShipDate!: string | undefined;
@@ -79589,6 +79590,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.brandAttchment = _data["brandAttchment"];
             this.brand = _data["brand"];
             this.productLabel = _data["productLabel"];
             this.startShipDate = _data["startShipDate"];
@@ -79728,6 +79730,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["brandAttchment"] = this.brandAttchment;
         data["brand"] = this.brand;
         data["productLabel"] = this.productLabel;
         data["startShipDate"] = this.startShipDate;
@@ -79856,6 +79859,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
 }
 
 export interface IAppMarketplaceItemForViewDto {
+    brandAttchment: string | undefined;
     brand: string | undefined;
     productLabel: string | undefined;
     startShipDate: string | undefined;
@@ -107226,6 +107230,7 @@ export class PageSettingDto implements IPageSettingDto {
     link!: string | undefined;
     buttonText!: string | undefined;
     titleAlignment!: string | undefined;
+    entityAttachments!: AppEntityAttachmentDto[] | undefined;
 
     [key: string]: any;
 
@@ -107262,6 +107267,11 @@ export class PageSettingDto implements IPageSettingDto {
             this.link = _data["link"];
             this.buttonText = _data["buttonText"];
             this.titleAlignment = _data["titleAlignment"];
+            if (Array.isArray(_data["entityAttachments"])) {
+                this.entityAttachments = [] as any;
+                for (let item of _data["entityAttachments"])
+                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
+            }
         }
     }
 
@@ -107296,6 +107306,11 @@ export class PageSettingDto implements IPageSettingDto {
         data["link"] = this.link;
         data["buttonText"] = this.buttonText;
         data["titleAlignment"] = this.titleAlignment;
+        if (Array.isArray(this.entityAttachments)) {
+            data["entityAttachments"] = [];
+            for (let item of this.entityAttachments)
+                data["entityAttachments"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -107319,6 +107334,7 @@ export interface IPageSettingDto {
     link: string | undefined;
     buttonText: string | undefined;
     titleAlignment: string | undefined;
+    entityAttachments: AppEntityAttachmentDto[] | undefined;
 
     [key: string]: any;
 }

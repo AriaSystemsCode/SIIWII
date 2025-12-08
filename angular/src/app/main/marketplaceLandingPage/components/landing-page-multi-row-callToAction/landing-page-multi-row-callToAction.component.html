@@ -80,48 +80,39 @@
   (click)="goToCategory(block)"
   (error)="onImgErr($event)"
 />
-        <ng-container *ngSwitchCase="'ATTACHMENT'">
-          <ng-container [ngSwitch]="kindOfPath(block?.image)">
+      <!-- ATTACHMENT -->
+<ng-container *ngSwitchCase="'ATTACHMENT'">
+  <!-- Prefer an image attachment if available -->
+  <img
+    *ngIf="getAttachmentImage(block) as imgSrc"
+    class="card-media only-media"
+    [src]="imgSrc"
+    [alt]="block?.name || 'Attachment'"
+    (click)="onAttachmentClick(block)"
+    (error)="onImgErr($event)"
+  />
 
-            <!-- image -->
-            <img
-              *ngSwitchCase="'image'"
-              class="card-media only-media"
-              [src]="fullUrl(block?.image)"
-              alt="{{ block?.name || 'Attachment' }}"
-              (click)="openTab(block?.link)"
-              (error)="onImgErr($event)"
-            />
+  <!-- If no image but there is a PDF, show PDF icon -->
+  <img
+    *ngIf="!getAttachmentImage(block) && hasPdfAttachment(block)"
+    class="card-media only-media pdf-icon"
+    src="assets/Items/pdf-Icon.png"
+    alt="PDF"
+    (click)="onAttachmentClick(block)"
+  />
 
-            <!-- video -->
-            <video
-              *ngSwitchCase="'video'"
-              class="card-media only-media"
-              controls
-              playsinline>
-              <source [src]="fullUrl(block?.image)" />
-            </video>
+  <!-- Fallback: generic link if neither image nor pdf is detected -->
+  <a
+    *ngIf="!getAttachmentImage(block) && !hasPdfAttachment(block)"
+    class="card-media only-media other-file"
+    [href]="getAttachmentClickUrl(block)"
+    target="_blank"
+    rel="noopener"
+  >
+    Open file
+  </a>
+</ng-container>
 
-            <!-- pdf icon -->
-            <img
-              *ngSwitchCase="'pdf'"
-              class="card-media only-media pdf-icon"
-              src="assets/Items/pdf-Icon.png"
-              alt="PDF"
-              (click)="openNewTab(block?.image)"
-            />
-
-            <!-- other -->
-            <a
-              *ngSwitchDefault
-              class="card-media only-media other-file"
-              [href]="fullUrl(block?.image)"
-              target="_blank"
-              rel="noopener">
-              Open file
-            </a>
-          </ng-container>
-        </ng-container>
 
       </ng-container>
     </div>

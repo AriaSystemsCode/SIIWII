@@ -91,43 +91,39 @@
     (click)="goToCategory(item)"
     (error)="onImgErr($event)"
   />
-        <!-- ATTACHMENT -->
-        <ng-container *ngSwitchCase="'ATTACHMENT'">
-          <ng-container [ngSwitch]="kindOfPath(item?.image)">
-            <img
-              *ngSwitchCase="'image'"
-              class="card-media"
-              [src]="fullUrl(item?.image)"
-              alt="{{ item?.name || 'Attachment' }}"
-              (click)="openTab(item?.link)"
-              (error)="onImgErr($event)"
-            />
-            <video
-              *ngSwitchCase="'video'"
-              class="card-media"
-              controls
-              playsinline
-            >
-              <source [src]="fullUrl(item?.image)" />
-            </video>
-            <img
-              *ngSwitchCase="'pdf'"
-              class="card-media pdf-icon"
-              src="assets/Items/pdf-Icon.png"
-              alt="PDF"
-              (click)="openNewTab(item?.image)"
-            />
-            <a
-              *ngSwitchDefault
-              class="card-media other-file"
-              [href]="fullUrl(item?.image)"
-              target="_blank"
-              rel="noopener"
-            >
-              Open file
-            </a>
-          </ng-container>
-        </ng-container>
+    <!-- ATTACHMENT -->
+<ng-container *ngSwitchCase="'ATTACHMENT'">
+  <!-- Prefer an image attachment if available -->
+  <img
+    *ngIf="getAttachmentImage(item) as imgSrc"
+    class="card-media"
+    [src]="imgSrc"
+    [alt]="item?.name || 'Attachment'"
+    (click)="onAttachmentClick(item)"
+    (error)="onImgErr($event)"
+  />
+
+  <!-- If no image but there is a PDF, show PDF icon -->
+  <img
+    *ngIf="!getAttachmentImage(item) && hasPdfAttachment(item)"
+    class="card-media pdf-icon"
+    src="assets/Items/pdf-Icon.png"
+    alt="PDF"
+    (click)="onAttachmentClick(item)"
+  />
+
+  <!-- Fallback: generic link if neither image nor pdf is detected -->
+  <a
+    *ngIf="!getAttachmentImage(item) && !hasPdfAttachment(item)"
+    class="card-media other-file"
+    [href]="getAttachmentClickUrl(item)"
+    target="_blank"
+    rel="noopener"
+  >
+    Open file
+  </a>
+</ng-container>
+
 
       </div>
     </div>

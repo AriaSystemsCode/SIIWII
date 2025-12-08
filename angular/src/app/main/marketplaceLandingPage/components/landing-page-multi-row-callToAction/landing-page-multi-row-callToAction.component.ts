@@ -216,7 +216,76 @@ getAspectatio(): void {
  
     // this.router.navigateByUrl(`/view/${id}`)
 }
-  
+
+getAttachmentImage(b: PageSettingDto): string | null {
+  if (!b) return null;
+
+  // 1) block.image itself is an image path
+  if (this.isImg(b.image)) {
+    return this.fullUrl(b.image);
+  }
+
+  // 2) try entityAttachments: find first image attachment
+  const imgAtt = b.entityAttachments?.find(att =>
+    this.isImg(att?.url || att?.fileName)
+  );
+
+  if (imgAtt) {
+    return this.fullUrl(imgAtt.url || imgAtt.fileName);
+  }
+
+  return null;
+}
+
+
+hasPdfAttachment(b: PageSettingDto): boolean {
+  if (!b?.entityAttachments) return false;
+  return b.entityAttachments.some(att =>
+    this.isPdf(att?.url || att?.fileName)
+  );
+}
+
+
+getAttachmentPdfUrl(b: PageSettingDto): string | null {
+  if (!b?.entityAttachments) return null;
+
+  const pdfAtt = b.entityAttachments.find(att =>
+    this.isPdf(att?.url || att?.fileName)
+  );
+  if (!pdfAtt) return null;
+
+  return this.fullUrl(pdfAtt.url || pdfAtt.fileName);
+}
+
+
+getAttachmentClickUrl(b: PageSettingDto): string | null {
+  if (!b) return null;
+
+ 
+  const pdfUrl = this.getAttachmentPdfUrl(b);
+  if (pdfUrl) {
+    return pdfUrl;
+  }
+
+  if ((b as any).link)        return (b as any).link;
+  if (b.externalUrl)          return b.externalUrl;
+  if (b.linkPageUrl)          return b.linkPageUrl;
+
+
+  if (b.image) return this.fullUrl(b.image);
+
+  return null;
+}
+
+
+onAttachmentClick(b: PageSettingDto): void {
+  const url = this.getAttachmentClickUrl(b);
+  if (!url) { return; }
+
+  const finalUrl = /^https?:\/\//i.test(url) ? url : this.fullUrl(url);
+  window.open(finalUrl, '_blank');
+}
+
 ngOnDestroy() {
   Object.values(this.objectUrlById).forEach(u => { try { URL.revokeObjectURL(u); } catch {} });
   this.objectUrlById = {};
