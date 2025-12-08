@@ -28,6 +28,7 @@ namespace onetouch.SystemObjects.Dtos
         public string Link { set; get; }
         public string ButtonText { set; get; }
         public string TitleAlignment { set; get; }
+        public List<AppEntityAttachmentDto> EntityAttachments { get; set; }
         //I49[End]
     }
 }
