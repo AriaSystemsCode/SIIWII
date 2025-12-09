@@ -116,15 +116,22 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.entityObjectType = entityObjectType;
         this.displayVisualTypes();
         this.getStatusOptions();
-        this.getLookupCode()
         this.saving = false;
-        if (appEntity) this.appEntity = appEntity;
-        else appEntity = new AppEntityDto();
+    
+      
+        if (appEntity) {
+            this.appEntity = appEntity;
+        } else {
+            this.appEntity = new AppEntityDto();
+        }
+    
         this.appEntity.tenantId = -1;
+
         if (this.appEntity?.id && !nonlookup) {
             this.editMode = true;
             this.addToLookup = true;
             this.appEntity.nonlookup = false;
+    
             this._appEntitiesServiceProxy
                 .getAppEntityForEdit(this.appEntity.id)
                 .pipe(
@@ -134,81 +141,104 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 )
                 .subscribe((res) => {
                     this.appEntity = AppEntityDto.fromJS(res.appEntity);
-                    if (!this.appEntity.tenantId) this.appEntity.tenantId = -1;
+                    if (!this.appEntity.tenantId) {
+                        this.appEntity.tenantId = -1;
+                    }
+    
                     this.adjustImageSrcsUrls();
                     this.loading = true;
-
-
-                    if (!(this.appEntity.entityAttachments && this.appEntity.entityAttachments?.length > 0))
+    
+                    if (!(this.appEntity.entityAttachments && this.appEntity.entityAttachments.length > 0)) {
                         this.setSolid(true);
-                    else
+                    } else {
                         this.setSolid(false);
+                    }
                 });
 
-
-        }
-        else {
-            if (this.appEntity?.code) {
-                this.editMode = true;
-                if (!this.appEntity.tenantId) this.appEntity.tenantId = -1;
-                this.appEntity.id = Math.floor((1 + Math.random()) * 0x10000);
-                this.appEntity.nonlookup = true;
-                this.addToLookup = false;
-                this.adjustImageSrcsUrls();
-                this.loading = true;
-
-                if (!(this.appEntity.entityAttachments && this.appEntity.entityAttachments?.length > 0))
-                    this.setSolid(true);
-                else
-                    this.setSolid(false);
-
-                this.getExtrAttributes();
-
+        } else if (this.appEntity?.code) {
+            this.editMode = true;
+    
+            if (!this.appEntity.tenantId) {
+                this.appEntity.tenantId = -1;
             }
-        }
-
-
-        this._sycAttachmentCategoriesServiceProxy.getAllByEntityObjectType(
-            0,
-            this.entityObjectType.code,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            0,
-            "",
-            undefined,
-            undefined,
-            undefined,
-            undefined
-        ).subscribe(result => {
-
-            this.attCategories = result.items;
-            if (this.attCategories.length > 0) {
-                this.aspectRatio = Number(this.attCategories[0].sycAttachmentCategory.aspectRatio);
-                this.productImageCategory = this.attCategories[0];
-                this.attCategoriesShow = true
+    
+            this.appEntity.id = this.appEntity.id || Math.floor((1 + Math.random()) * 0x10000);
+            this.appEntity.nonlookup = true;
+            this.addToLookup = false;
+    
+            this.adjustImageSrcsUrls();
+            this.loading = true;
+    
+            if (!(this.appEntity.entityAttachments && this.appEntity.entityAttachments.length > 0)) {
+                this.setSolid(true);
+            } else {
+                this.setSolid(false);
             }
-            if (this.attCategories.length > 0 && this.editMode == true && this.appEntity.entityAttachments?.length > 0) {
-
-                let found = this.attCategories.filter(e => e.sycAttachmentCategory.id == this.appEntity.entityAttachments[0].attachmentCategoryId);
-                if (found && found.length > 0) {
-                    this.aspectRatio = Number(found[0].sycAttachmentCategory.aspectRatio);
-                    this.productImageCategory = found[0];
-                    this.attCategoriesShow = true
-
+    
+            this.getExtrAttributes();
+    
+    
+        } else {
+            this.editMode = false;
+            this.addToLookup = true;
+            this.appEntity.nonlookup = false;
+    
+            this.getLookupCode();
+    
+            this.getExtrAttributes();
+        }
+    
+        // attachment categories – unchanged
+        this._sycAttachmentCategoriesServiceProxy
+            .getAllByEntityObjectType(
+                0,
+                this.entityObjectType.code,
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                0,
+                "",
+                undefined,
+                undefined,
+                undefined,
+                undefined
+            )
+            .subscribe(result => {
+    
+                this.attCategories = result.items;
+    
+                if (this.attCategories.length > 0) {
+                    this.aspectRatio = Number(this.attCategories[0].sycAttachmentCategory.aspectRatio);
+                    this.productImageCategory = this.attCategories[0];
+                    this.attCategoriesShow = true;
                 }
-            }
-
-        });
-        this.getExtrAttributes();
+    
+                if (this.attCategories.length > 0 &&
+                    this.editMode === true &&
+                    this.appEntity.entityAttachments?.length > 0) {
+    
+                    const found = this.attCategories.filter(
+                        e => e.sycAttachmentCategory.id == this.appEntity.entityAttachments[0].attachmentCategoryId
+                    );
+    
+                    if (found && found.length > 0) {
+                        this.aspectRatio = Number(found[0].sycAttachmentCategory.aspectRatio);
+                        this.productImageCategory = found[0];
+                        this.attCategoriesShow = true;
+                    }
+                }
+            });
+    
         this.initAttachmentSlots();
         this.active = true;
         this.modal.show();
     }
+    
+    
 
     ngAfterViewInit() {
         this.modal.config.backdrop = "static";
@@ -296,12 +326,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
         }
 
         this.saving = true;
-
-        if (this.visual.image && this.entityObjectType.code == "COLOR")
-            this.appEntity.entityExtraData = [];
-
-        if (!this.visual.image)
-            this.appEntity.entityAttachments = [];
+    
+                    if (this.visual.image && this.entityObjectType.code == "COLOR")
+                        this.appEntity.entityExtraData = [];
+            
+                    if (!this.visual.image)
+                        this.appEntity.entityAttachments = [];
+          
 
         if (this.addToLookup) {
             if (this.appEntity.nonlookup) {
@@ -549,16 +580,23 @@ export class CreateOrEditAppEntityDynamicModalComponent
         $event: { value: number; originalEvent: MouseEvent },
         extraAttrDefinition: FilteredExtraAttribute<number>
     ) {
+     
         let selectedAttrValue = $event.value;
-        if (this.entityObjectType.code == 'MARKETPLACESECTION') {
-            if ((selectedAttrValue == 486055 || selectedAttrValue == 486056)) {
-                this.setStringValue(1005, 'true')
-
-            } else {
-                this.setStringValue(1005, 'false')
-
-            }
+        if (this.entityObjectType.code === 'MARKETPLACESECTION' &&
+            extraAttrDefinition.attributeId === 1001) {
+    
+        
+            const selectedLookup = extraAttrDefinition.lookupData
+                ?.find(x => x.value === selectedAttrValue);
+    
+       
+            const selectedCode = selectedLookup?.code; 
+    
+            const shouldBeTrue = selectedCode === 'PF' || selectedCode === 'SM';
+    
+            this.setStringValue(1005, shouldBeTrue ? 'true' : 'false');
         }
+    
         if (!this.appEntity.entityExtraData)
             this.appEntity.entityExtraData = [];
 
@@ -681,7 +719,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
 
     adjustImageSrcsUrls() {
-        debugger
+        
         const atts = this.appEntity?.entityAttachments ?? [];
         this.attachmentsSrcs = [];
         this.pdfSafeMap = {};
@@ -772,13 +810,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
     async getLookupCode() {
         if (!this.appEntity.code) {
             let sequance = "";
+                const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType.code, this.appSession.tenantId).toPromise()
+                if (getNextEntityCodeRes)
+                    sequance = getNextEntityCodeRes;
+    
+                this.appEntity.code = sequance;
 
-
-            const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType.code, this.appSession.tenantId).toPromise()
-            if (getNextEntityCodeRes)
-                sequance = getNextEntityCodeRes;
-
-            this.appEntity.code = sequance;
+    
         }
     }
 
@@ -796,7 +834,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         sycAttachmentCategory: SycAttachmentCategoryDto,
         index: number
     ): void {
-        debugger;
+        
         if (!output) {
             return;
         }
@@ -900,7 +938,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
     }
 
     private initAttachmentSlots(): void {
-        debugger
+        
         if (!this.attachmentsSrcs || this.attachmentsSrcs.length === 0) {
             this.attachmentsSrcs = [''];
         }

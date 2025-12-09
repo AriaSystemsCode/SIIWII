@@ -29,17 +29,19 @@
                                 <span class="text-danger ml-3" *ngIf="showCodeErrMsg">{{ 'CodeIsRequired' | localize
                                     }}</span>
                             </label>
-
+                            <input type="string" id="AppEntity_Code"
+                            class="form-control form-control-sm   mr-3 w-100" [(ngModel)]="appEntity.code"
+                            name="code" [disabled]="editMode && appEntity?.id" />
                             <!-- Create -->
-                            <app-codes *ngIf="!appEntity?.id" [objectType]="entityObjectType.code"
+                            <!-- <app-codes *ngIf="!appEntity?.id" [objectType]="entityObjectType.code"
                                 [code]="appEntity.code" [editMode]="false" placeHolder="Add your code"
                                 (getCodeValue)="getCodeValue($event)" [maxlength]="6">
-                            </app-codes>
+                            </app-codes> -->
 
                             <!-- Edit -->
-                            <app-codes *ngIf="appEntity?.id" [objectType]="entityObjectType.code" [editMode]="true"
+                            <!-- <app-codes *ngIf="appEntity?.id" [objectType]="entityObjectType.code" [editMode]="true"
                                 [code]="appEntity.code" (getCodeValue)="getCodeValue($event)" [maxlength]="6">
-                            </app-codes>
+                            </app-codes> -->
 
 
                         </div>
@@ -340,7 +342,7 @@
                                                     [(ngModel)]="extraAttr.selectedValues">
                                             </div>
                                             <div class="flex-grow-1 mx-2"
-                                                *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup && visual.solid">
+                                                *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup ">
                                                 <div class="row d-flex align-items-baseline justify-content-start ">
                                                     <label>
                                                         {{extraAttr.name}}
