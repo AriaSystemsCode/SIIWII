@@ -1182,7 +1182,10 @@ export class MainImportComponent
             .subscribe((result: ImportItemReturnDto[]) => {
                 const hasErrors = Array.isArray(result) && result.length > 0;
 
-                record.fieldsErrors = hasErrors ? result : [];
+                //record.fieldsErrors = hasErrors ? result : [];
+                record.fieldsErrors = hasErrors
+                    ? result.map(err => err.errorMessage)
+                    : [];
                 record.errorMessage = hasErrors ? "" : record.errorMessage;
                 let allWarnings = result.every(
                     x => x.errorType?.toLowerCase() === "warning" ||
