@@ -115,10 +115,10 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     
     this.getAllProductCAtalogs();
     this.getParentDepartments();
-    if(this.isAuthenticated){
+    // if(this.isAuthenticated){
     this.getAllBrands();
 
-    }
+    // }
 
 
 

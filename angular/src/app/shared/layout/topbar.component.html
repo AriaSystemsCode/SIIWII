@@ -17,10 +17,13 @@
         [routerLink]="defaultHomeUrl"
         routerLinkActive="header-link-active"
         (click)="userClick('Home')"
+        [ngClass]="isAuthenticated? 'ml-3':''"
       >
         <img
           [src]=" attachmentBaseUrl + '/' + tenantLogo"
           class="navbar-brand"
+          [ngClass]="tenantLogo ? '':'rounded-c'"
+          (error)="onImgErr($event)"
         />
       </a>
       

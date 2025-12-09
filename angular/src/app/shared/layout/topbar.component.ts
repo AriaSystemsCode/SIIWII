@@ -548,6 +548,9 @@ export class TopBarComponent
             }
           });
       }
+      onImgErr(evt: Event) {
+        (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
+      }
 }
 
 export interface TopbardropDown {
