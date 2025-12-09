@@ -147,7 +147,8 @@ export class MainImportComponent
         if (attachmetnCategoriesCodes) {
             this.getSycAttachmentCategoriesByCodes(attachmetnCategoriesCodes).subscribe((result) => {
                 result.forEach(attach => {
-                    var aspectRatioNumbers = attach.aspectRatio.split(":");
+                    var _aspectRatioNumbers = attach.aspectRatio ? attach.aspectRatio : "1:1";
+                    var aspectRatioNumbers = _aspectRatioNumbers.split(":");
                     var num1 = Number(aspectRatioNumbers[0]);
                     var num2 = Number(aspectRatioNumbers[1]);
                     let aspectRatio = num1 / num2;
