@@ -324,6 +324,8 @@ namespace onetouch.AppEntities
                 var appEntity = _appEntityRepository.GetAll().Where(x => x.Id == id)
                     .Include(x => x.RelatedEntitiesRelationships).ThenInclude(x => x.RelatedEntityFk)
                     .Include(x => x.EntitiesRelationships).FirstOrDefault();
+                if (appEntity == null)
+                    return new GetAppEntityForViewDto();
 
                 var output = new GetAppEntityForViewDto { AppEntity = ObjectMapper.Map<AppEntityDto>(appEntity) };
 
