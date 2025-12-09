@@ -95,7 +95,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     displaneBuy :boolean =false;
    
     searchInput:string
-    bgCol:string 
+    bgCol?: string;
+    bgColLoaded = false;
     tenantLogo:string
     isAuthenticated: boolean = false;
     currentLang: string = 'en';
@@ -122,7 +123,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
-
+        this.getTenantData()
         this.items = [
             {
                 items: [
@@ -530,18 +531,15 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
       }
       
       getTenantData() {
-       
-        this._AppEntitiesServiceProxy.getHostSettingValue(1208,null)
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208, null)
         .subscribe((result) => {
-            // result = '#456'
-            result ? this.bgCol = result : this.bgCol = '#4A0D4A'
-    
+          this.bgCol = result;
+          this.bgColLoaded = true; 
         });
-        this._AppEntitiesServiceProxy.getHostSettingValue(1204,"file")
+    
+      this._AppEntitiesServiceProxy.getHostSettingValue(1204, "file")
         .subscribe((result) => {
-          
-           this.tenantLogo = result
-  
+          this.tenantLogo = result;
         });
     }
 

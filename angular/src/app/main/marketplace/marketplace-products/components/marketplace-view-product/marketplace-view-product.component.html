@@ -960,7 +960,7 @@ top: 4px;">
                             ?.entityDepartmentsNames.items.length  ==0">
                               -
                             </p>
-                            <p>{{ productDetails?.brand ? productDetails?.brand : '-' }}</p>
+                            <p>{{ productDetails?.brand ? productDetails?.brand : '-' }} <img *ngIf="productDetails?.brandAttchment" style="width: 60px;height: 60px;" [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" alt="" srcset=""></p>
                             <p>{{ productDetails?.soldOutDate ? productDetails?.soldOutDate : '-' }}</p>
                             <p>{{ productDetails?.startShipDate ? productDetails?.startShipDate : '-' }}</p>
                         </div>
@@ -1786,7 +1786,7 @@ top: 4px;">
                                                     ?.entityDepartmentsNames.items
                                             ">{{ item }}</span>
                                         </p>
-                                        <p>{{ productDetails?.brand }}</p>
+                                        <p>{{ productDetails?.brand }} <img *ngIf="productDetails?.brandAttchment" style="width: 60px;height: 60px;" [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" alt="" srcset=""></p>
                                         <p>{{ productDetails?.soldOutDate }}</p>
                                         <p>{{ productDetails?.startShipDate }}</p>
                                     </div>

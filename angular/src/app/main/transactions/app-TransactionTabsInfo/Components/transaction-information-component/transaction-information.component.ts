@@ -135,7 +135,7 @@ export class TransactionInformationComponent
   priceLevel:any
   languageSettingName  =AppConsts.languageSettingName;
   transactionSharing:string="";
-  isAuthenticate= this.appSession?.user
+  isAuthenticated = this.appSession?.user
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1804,23 +1804,25 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
 
-  getNeeddedSettingValues(){
-    //i49-New-Send the right id of setting "Transaction Sharing"
-    if(this.isAuthenticate){
-      this._AppEntitiesServiceProxy
-      .getTenantSettingValue(1111,null)
-      .subscribe((res: any) => {
-          this.transactionSharing= res?.toString().toLowerCase();
-      });
-    }
-  }
+  
 
 
   automaticShare() {
     if (!this.appTransactionsForViewDto?.sharedWithUsers ||
       this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
     return; 
-  }
+      }}
+  getNeeddedSettingValues(){
+    //i49-New-Send the right id of setting "Transaction Sharing"
+    if(this.isAuthenticated){
+      this._AppEntitiesServiceProxy
+      .getTenantSettingValue(1111,null)
+      .subscribe((res: any) => {
+          this.transactionSharing= res?.toString().toLowerCase();
+      });
+    }
+  
+  
 
     const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
         sharedTenantId: u.tenantId,
