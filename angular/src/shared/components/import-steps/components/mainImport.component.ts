@@ -147,7 +147,8 @@ export class MainImportComponent
         if (attachmetnCategoriesCodes) {
             this.getSycAttachmentCategoriesByCodes(attachmetnCategoriesCodes).subscribe((result) => {
                 result.forEach(attach => {
-                    var aspectRatioNumbers = attach.aspectRatio.split(":");
+                    var _aspectRatioNumbers = attach.aspectRatio ? attach.aspectRatio : "1:1";
+                    var aspectRatioNumbers = _aspectRatioNumbers.split(":");
                     var num1 = Number(aspectRatioNumbers[0]);
                     var num2 = Number(aspectRatioNumbers[1]);
                     let aspectRatio = num1 / num2;
@@ -1182,7 +1183,10 @@ export class MainImportComponent
             .subscribe((result: ImportItemReturnDto[]) => {
                 const hasErrors = Array.isArray(result) && result.length > 0;
 
-                record.fieldsErrors = hasErrors ? result : [];
+                //record.fieldsErrors = hasErrors ? result : [];
+                record.fieldsErrors = hasErrors
+                    ? result.map(err => err.errorMessage)
+                    : [];
                 record.errorMessage = hasErrors ? "" : record.errorMessage;
                 let allWarnings = result.every(
                     x => x.errorType?.toLowerCase() === "warning" ||
