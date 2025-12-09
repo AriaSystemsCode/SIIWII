@@ -119,7 +119,7 @@
         <div class="ml-4 d-sm-flex d-none sec-section" style="justify-content: center;margin-left: 35px;">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item" *ngIf="isAuthenticated">
+                <li class="nav-item" *ngIf="isAuthenticated && allowFeeds =='true'">
                     <a
                         *ngIf="('Pages.Marketplace' | permission) || !isAuthenticated"
                         class="nav-link active d-flex flex-column text-center"

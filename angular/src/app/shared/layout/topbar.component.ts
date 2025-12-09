@@ -127,6 +127,7 @@ export class TopBarComponent
     bgCol?: string;
     bgColLoaded = false;
     tenantLogo:string
+    allowFeeds:string
     defaultHomeUrl = '/app/main/Home'; // fallback
     constructor(
         injector: Injector,
@@ -204,7 +205,6 @@ export class TopBarComponent
 
     ngOnInit() {
        this.loadDefaultPage()
-        // this.getTenantData()
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
@@ -523,13 +523,20 @@ export class TopBarComponent
         .subscribe((result) => {
           this.tenantLogo = result;
         });
+
+            
+      this._AppEntitiesServiceProxy.getHostSettingValue(1207, null)
+      .subscribe((result) => {
+        this.allowFeeds = result;
+      });
     }
 
     loadDefaultPage(): void {
+        this.getTenantData()
         this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
           .subscribe({
             next: (res2: string) => {
-              if (res2 === 'Marketplace Landing page') {
+              if (res2 === 'Marketplace' && this.allowFeeds != 'true') {
                 this.defaultHomeUrl = '/app/main/marketplace';
               } else {
                 this.defaultHomeUrl = '/app/main/Home';

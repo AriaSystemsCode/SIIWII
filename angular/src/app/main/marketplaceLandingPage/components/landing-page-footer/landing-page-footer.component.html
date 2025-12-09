@@ -4,7 +4,11 @@
       <ng-container [ngSwitch]="s.type">
 
         <div *ngSwitchCase="'PF'" class="col-12 col-md-4 mb-4">
-
+          <!-- <h4   [style.text-align]="
+          s?.inputs?.titleAlignment === 'Center'
+            ? 'center'
+            : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
+        ">{{ s.inputs?.title }}</h4> -->
           <app-footer-page-link [sectionId]="s.sectionId" [sectionData]="s.inputs">
           </app-footer-page-link>
         </div>
