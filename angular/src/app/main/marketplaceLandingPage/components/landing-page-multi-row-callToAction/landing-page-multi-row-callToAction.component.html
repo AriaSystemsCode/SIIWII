@@ -58,16 +58,9 @@
           </div>
         </div>
 
-        <img
-          *ngSwitchCase="'BRAND'"
-          class="card-media only-media"
-          [src]="block?.image
-                  ? attachmentBaseUrl + '/' + block?.image
-                  : '../../../../assets/placeholders/_logo-placeholder.png'"
-          alt="Brand"
-          (click)="goToBrand(block)"
-          (error)="onImgErr($event)"
-        />
+        <img  *ngSwitchCase="'BRAND'" class="card-media only-media" [src]="block?.image ?  attachmentBaseUrl + '/' + block?.image: attachmentBaseUrl + '/' + block?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url " title="Brand {{block?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(block)"
+(error)="onImgErr($event)" />
+   
 
   <!-- CATEGORY -->
   <img

@@ -190,7 +190,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
 
                 if (res2) {
                     // const userNavigation = res2;
-                    defaultUrl = res2 == 'Marketplace Landing page'
+                    defaultUrl = res2 == 'Marketplace'
                         ? '/app/main/marketplace'
                         : '/app/main/Home';
                 }

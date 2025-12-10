@@ -101,6 +101,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     isAuthenticated: boolean = false;
     currentLang: string = 'en';
     isArabic: boolean = false;
+    allowFeeds:string
     defaultHomeUrl = '/app/main/Home'; // fallback
     constructor(
         injector: Injector,
@@ -541,13 +542,20 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         .subscribe((result) => {
           this.tenantLogo = result;
         });
+
+            
+      this._AppEntitiesServiceProxy.getHostSettingValue(1207, null)
+      .subscribe((result) => {
+        this.allowFeeds = result;
+      });
     }
 
     loadDefaultPage(): void {
+        this.getTenantData()
         this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
           .subscribe({
             next: (res2: string) => {
-              if (res2 === 'Marketplace Landing page') {
+              if (res2 === 'Marketplace' && this.allowFeeds != 'true') {
                 this.defaultHomeUrl = '/app/main/marketplace';
               } else {
                 this.defaultHomeUrl = '/app/main/Home';
@@ -558,6 +566,9 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
               this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
             }
           });
+      }
+      onImgErr(evt: Event) {
+        (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
       }
 }
 

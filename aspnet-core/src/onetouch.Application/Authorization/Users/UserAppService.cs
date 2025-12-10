@@ -640,7 +640,9 @@ namespace onetouch.Authorization.Users
             CheckErrors(await UserManager.CreateAsync(user));
 
             //Update Entity/Contact table[Start-Mariam] 
-            if(AbpSession.TenantId != null && AbpSession.TenantId != 0 )
+            //string createContactSetting = await _appEntitiesAppService.GetHostSettingValue(1212); 
+            //createContactSetting.ToLower()== "Manualcontactpersons".ToLower() &&
+            if (AbpSession.TenantId != null && AbpSession.TenantId != 0 )
             {
                 if (input.ContactId!=null && input.ContactId!=0)
                 {

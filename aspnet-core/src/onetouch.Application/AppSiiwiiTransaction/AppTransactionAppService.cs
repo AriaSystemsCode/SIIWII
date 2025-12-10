@@ -2476,8 +2476,12 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     if (tran.TenantOwner != null)
                     {
-                        var creatorTenant = await TenantManager.GetByIdAsync(int.Parse(tran.TenantOwner.ToString()));
-                        tran.CreatorTenantName = creatorTenant.Name;
+                        try
+                        {
+                            var creatorTenant = await TenantManager.GetByIdAsync(int.Parse(tran.TenantOwner.ToString()));
+                            tran.CreatorTenantName = creatorTenant.Name;
+                        }
+                        catch { }
                     }
                 }
                 return new PagedResultDto<GetAllAppTransactionsForViewDto>(
@@ -4605,18 +4609,22 @@ namespace onetouch.AppSiiwiiTransaction
                                         //contactDto.Email = usr.SharedUserEMail;
                                         //contactDto.TenantId = usr.SharedTenantId;
                                         //contactDto.Id = usr.Id;
-                                        var user = UserManager.GetUserById(long.Parse(usr.SharedUserId.ToString()));
-                                        if (user != null)
-                                            viewTrans.SharedWithUsers.Add(new ContactInformationOutputDto
-                                            {
-                                                Id = usr.Id,
-                                                Email = usr.SharedUserEMail,
-                                                Name = user.Name,
-                                                UserId = long.Parse(usr.SharedUserId.ToString()),
-                                                UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
-                                                UserName = user.UserName,
-                                                TenantId = int.Parse(user.TenantId.ToString())
-                                            });
+                                        try
+                                        {
+                                            var user = UserManager.GetUserById(long.Parse(usr.SharedUserId.ToString()));
+                                            if (user != null)
+                                                viewTrans.SharedWithUsers.Add(new ContactInformationOutputDto
+                                                {
+                                                    Id = usr.Id,
+                                                    Email = usr.SharedUserEMail,
+                                                    Name = user.Name,
+                                                    UserId = long.Parse(usr.SharedUserId.ToString()),
+                                                    UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                                                    UserName = user.UserName,
+                                                    TenantId = int.Parse(user.TenantId.ToString())
+                                                });
+                                        }
+                                        catch { }
                                     }
                                 }
                             }

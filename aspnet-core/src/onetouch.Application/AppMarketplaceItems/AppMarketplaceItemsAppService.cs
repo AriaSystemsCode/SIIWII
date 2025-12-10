@@ -1964,6 +1964,12 @@ namespace onetouch.AppMarketplaceItems
                     var rating = await _messageAppService.GetOverAllRatings(getAppMarketItemForViewDto.AppItem.Id);
                     getAppMarketItemForViewDto.AverageRating = rating.OverAllRating;
                 }
+                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var contact = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
+                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId &&
+                               a.TenantId == marketpaceItem.TenantOwner).FirstOrDefaultAsync();
+                if (contact != null)
+                    getAppMarketItemForViewDto.AppItem.SellerName = contact.Name;
                 return getAppMarketItemForViewDto;
             }
         }                                                   

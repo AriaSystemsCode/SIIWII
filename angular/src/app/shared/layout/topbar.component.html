@@ -19,10 +19,13 @@
         [routerLink]="defaultHomeUrl"
         routerLinkActive="header-link-active"
         (click)="userClick('Home')"
+        [ngClass]="isAuthenticated? 'ml-3':''"
       >
         <img
           [src]=" attachmentBaseUrl + '/' + tenantLogo"
           class="navbar-brand"
+          [ngClass]="tenantLogo ? '':'rounded-c'"
+          (error)="onImgErr($event)"
         />
       </a>
       
@@ -103,7 +106,7 @@
             [ngClass]="isArabic ? 'rt-sec-section':'sec-section'">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item" *ngIf="isAuthenticated">
+                <li class="nav-item" *ngIf="isAuthenticated && allowFeeds =='true'">
                     <a
                         *ngIf="('Pages.Marketplace' | permission) || !isAuthenticated"
                         class="nav-link active d-flex flex-column text-center"

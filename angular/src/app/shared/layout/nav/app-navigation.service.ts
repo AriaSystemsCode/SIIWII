@@ -39,7 +39,7 @@ export class AppNavigationService {
             );
         }
     
-  
+   
         menu.items.push(
             new AppMenuItem('Tenants', 'Pages.Tenants', 'flaticon-list-3', '/app/admin/tenants'),
             new AppMenuItem('Editions', 'Pages.Editions', 'flaticon-app', '/app/admin/editions'),
@@ -72,11 +72,11 @@ export class AppNavigationService {
                 new AppMenuItem('AccountProfile', 'Pages.Accounts', 'flaticon-more', '/app/main/account'),
             );
         }
-        if (this.isHost) {
+        // if (this.isHost) {
             adminMenu.items.push(
                 new AppMenuItem('Lookups', 'Pages.AppEntities', 'flaticon-more', '/app/main/lookups'),
             );
-        }
+        // }
   
         adminMenu.items.push(
             new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [

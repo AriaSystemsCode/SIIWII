@@ -7,6 +7,7 @@
 .navbar-brand {
     font-size: unset;
     height: 3.5rem;
+    cursor:pointer;
 }
 
 @media (min-width: 1399px) {
@@ -551,3 +552,9 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
             box-shadow: 0 0 0 2px rgba(246, 133, 29, 0.7);
           }
           
+
+
+
+          .rounded-c {
+            border-radius: 8px;
+          }

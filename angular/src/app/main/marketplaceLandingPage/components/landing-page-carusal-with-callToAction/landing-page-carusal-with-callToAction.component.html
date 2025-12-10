@@ -34,22 +34,3 @@
 
 </div>
 
-<!-- <div class="d-md-none d-flex row flexContainer w-100" *ngIf="blocksSorted.length">
-    <div *ngFor="let ctaSection of blocksSorted; " class="col-6 mt-4">
-        <div class="ctaChildection p-4 ml-4 mr-4 h-100">
-            <a [routerLink]="['/app/main/' + ctaSection.linkPageUrl]">
-                <app-image-display
-                    [image]="ctaSection.image ? (attachmentBaseUrl + '/' + ctaSection.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
-                    [sycAttachmentCategory]="sycAttachmentCategoryCTASlider" [staticHeight]="100">
-                </app-image-display>
-                <h3>{{ ctaSection.title || ctaSection.name }}</h3>
-            </a>
-        </div>
-    </div>
-    <div class="mr-5 mt-5 pr-5 w-100">
-        <button (click)="ctaSeeMore()" *ngIf="blocksSorted.length > numVisible"
-            class="btn btn-primary btnSeeMore ml-5 w-100">
-            <span>{{ l('SeeMore') }}</span>
-        </button>
-    </div>
-</div> -->
