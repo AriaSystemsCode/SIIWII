@@ -1810,20 +1810,8 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
     if (!this.appTransactionsForViewDto?.sharedWithUsers ||
       this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
     return; 
-      }}
-  getNeeddedSettingValues(){
-    //i49-New-Send the right id of setting "Transaction Sharing"
-    if(this.isAuthenticated){
-      this._AppEntitiesServiceProxy
-      .getTenantSettingValue(1111,null)
-      .subscribe((res: any) => {
-          this.transactionSharing= res?.toString().toLowerCase();
-      });
-    }
-  
-  
-
-    const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
+      }
+      const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
         sharedTenantId: u.tenantId,
         sharedUserId: u.userId,
         sharedUserEMail: u.email,
@@ -1835,12 +1823,29 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
 
     let shareDto :any = {
         transactionId: this.orderId,
-        message: '',
+        message: `Hi,
+Kindly check attached`,
         transactionSharing: newsharingArray,
         subject: undefined
     };
     this._AppTransactionServiceProxy.shareTransactionByMessage(shareDto)
         .subscribe(r => this.notify.success("Transaction shared automatically"));
-}
+
+  }
+
+  getNeeddedSettingValues(){
+    if(this.isAuthenticated){
+      this._AppEntitiesServiceProxy
+      .getTenantSettingValue(1111,null)
+      .subscribe((res: any) => {
+          this.transactionSharing= res?.toString().toLowerCase();
+      });
+    }
+  
+  
+
+ 
 
 }
+
+  }
