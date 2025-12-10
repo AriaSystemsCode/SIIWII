@@ -593,9 +593,21 @@ namespace onetouch.SystemObjects
                                                     a.TenantId != null && a.PartnerId == null && a.ParentId == null).FirstOrDefaultAsync();
                                                 if (account != null)
                                                 {
-                                                    var brandObject = await _appEntityRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId== account.TenantId).FirstOrDefaultAsync();
-                                                    if (brandObject!=null)
-                                                    item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                    var brandObject = await _appEntityRepository.GetAll().Include(x=>x.EntityAttachments).ThenInclude(x=>x.AttachmentFk)
+                                                        .Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId== account.TenantId).FirstOrDefaultAsync();
+                                                    if (brandObject != null)
+                                                    {
+                                                        item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                        if (brandObject.EntityAttachments.Count > 0)
+                                                        {
+                                                            var imageAttch = brandObject.EntityAttachments.Where(z=>z.AttachmentCategoryCode.ToUpper()=="IMAGE" ||
+                                                            z.AttachmentCategoryCode.ToUpper() == "BANNER" ||
+                                                            z.AttachmentCategoryCode.ToUpper() == "LOGO").FirstOrDefault();
+                                                            if (imageAttch!= null)
+                                                            item.Image = "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) 
+                                                                    + "/" + imageAttch .AttachmentFk.Attachment;
+                                                        }
+                                                    }
                                                 }
                                             }
                                             break;
