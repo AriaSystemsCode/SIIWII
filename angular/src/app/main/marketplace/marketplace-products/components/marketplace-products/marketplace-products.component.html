@@ -17,7 +17,7 @@
 
     >
         <div class="marketplace-products" [ngClass]="fromMarketAcoount ? 'marketplace-mg':''">
-            <div *ngIf="items?.length > 0 && (!fromOverView)"  class="row" >
+            <div   class="row" >
                 <div class="col-md-12 mb-4 app-seller"  [ngClass]="   fromOverView ? 'd-none':  ''">
                     <app-seller-data *ngIf="isSellerIdExists && isFromSellerRoom "></app-seller-data>
                 </div>
