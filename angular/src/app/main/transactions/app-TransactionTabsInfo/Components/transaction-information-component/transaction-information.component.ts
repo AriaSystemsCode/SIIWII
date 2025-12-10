@@ -1809,7 +1809,7 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
   automaticShare() {
     if (!this.appTransactionsForViewDto?.sharedWithUsers ||
       this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
-    return; 
+    return;
       }
       const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
         sharedTenantId: u.tenantId,
@@ -1820,7 +1820,6 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
         sharedUserTenantName: u.tenantName,
         id: u.id
     })) || [];
-
     let shareDto :any = {
         transactionId: this.orderId,
         message: `Hi,
@@ -1830,9 +1829,7 @@ Kindly check attached`,
     };
     this._AppTransactionServiceProxy.shareTransactionByMessage(shareDto)
         .subscribe(r => this.notify.success("Transaction shared automatically"));
-
   }
-
   getNeeddedSettingValues(){
     if(this.isAuthenticated){
       this._AppEntitiesServiceProxy
@@ -1841,11 +1838,8 @@ Kindly check attached`,
           this.transactionSharing= res?.toString().toLowerCase();
       });
     }
-  
-  
-
- 
-
 }
+  
+
 
   }
