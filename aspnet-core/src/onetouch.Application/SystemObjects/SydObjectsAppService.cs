@@ -528,6 +528,8 @@ namespace onetouch.SystemObjects
                                 .Where(z => z.Id == block.EntityId).FirstOrDefaultAsync();
                             if (blockDetail == null)
                                 continue;
+                            if(blockDetail.EntityObjectStatusId != sectionActiveStatusId)
+                                continue;
                             var item = new PageSettingDto();
                             var sectionOrderExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2002);
                             if (sectionOrderExtraDate != null)
