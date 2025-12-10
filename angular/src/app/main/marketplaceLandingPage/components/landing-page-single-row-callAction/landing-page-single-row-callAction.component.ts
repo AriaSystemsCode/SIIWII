@@ -77,7 +77,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   getBlocksData() {
     this.syd.getAllSectionBlocks(this.sectionId).subscribe(res => {
       this.items = res ?? [];
-      console.log(res,'res')
+
 
       // Pre-prepare PDFs so iframes have src ready
       this.items
@@ -145,11 +145,11 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   // }
 
   // ---------- navigation ----------
-  goToBrand(brand: { name: string; id: number | string }) {
+  goToBrand(brand) {
    
     this.router.navigate(
         ['/app/main/marketplace/products'],
-        { queryParams: { brand: brand.id } } 
+        { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } } 
     );
 }
 goToCategory(cat: { name: string; id: number | string }) {

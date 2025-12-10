@@ -40,7 +40,7 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
   private getBlocksData(): void {
     this.sydObjectsService.getAllSectionBlocks(this.sectionId).subscribe({
-      next: (res) =>{ this.applyData(res ?? []);console.log(res,'multiii')},
+      next: (res) =>{ this.applyData(res ?? []);},
       error: () => this.applyData([])
     });
     
@@ -76,11 +76,11 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   goToProduct(ssin?: string) {
     if (ssin) this.router.navigate(['/app/main/app-items/view', ssin]);
   }
-  goToBrand(brand: { name: string; id: number | string }) {
+  goToBrand(brand) {
    
     this.router.navigate(
         ['/app/main/marketplace/products'],
-        { queryParams: { brand: brand.id } } 
+        { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } } 
     );
 }
 goToCategory(cat: { name: string; id: number | string }) {

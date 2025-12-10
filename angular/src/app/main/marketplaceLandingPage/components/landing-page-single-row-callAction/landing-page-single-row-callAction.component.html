@@ -54,10 +54,16 @@
         </div>
 
         <!-- BRAND -->
-        <img *ngSwitchCase="'BRAND'" class="card-media" [src]="item?.image
-                  ? attachmentBaseUrl + '/' + item?.image
-                  : '../../../../assets/placeholders/_logo-placeholder.png'" alt="Brand" (click)="goToBrand(item)"
-          (error)="onImgErr($event)" />
+ 
+
+    <img  *ngSwitchCase="'BRAND'"  class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
+           " title="Brand {{item?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(item)"
+  (error)="onImgErr($event)" />
+
+ 
+      
+  
+    
         <!-- CATEGORY -->
         <img *ngSwitchCase="'CATEGORY'" class="card-media" [src]="item?.image
             ? attachmentBaseUrl + '/' + item?.image

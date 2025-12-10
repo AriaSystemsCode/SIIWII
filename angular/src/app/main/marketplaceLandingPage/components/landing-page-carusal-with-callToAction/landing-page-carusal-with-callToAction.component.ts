@@ -30,10 +30,10 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
             this.getBlocksData()
 
         }
-        console.log(this.sycLangingPageSetting,'sycLangingPageSetting')
+   
     }
 
-    ctaSeeMore(){}
+   
     handleStorageData(){
     localStorage.setItem("fromSellerRoom",JSON.stringify(false));
     localStorage.setItem("fromMarketPlace",JSON.stringify(true));
