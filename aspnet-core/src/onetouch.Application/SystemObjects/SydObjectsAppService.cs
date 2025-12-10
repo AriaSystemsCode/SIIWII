@@ -606,14 +606,24 @@ namespace onetouch.SystemObjects
                                                     if (brandObject != null)
                                                     {
                                                         item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
-                                                        if (brandObject.EntityAttachments.Count > 0)
+                                                        //if (brandObject.EntityAttachments.Count > 0)
                                                         {
-                                                            var imageAttch = brandObject.EntityAttachments.Where(z=>z.AttachmentCategoryCode.ToUpper()=="IMAGE" ||
+                                                            if (brandObject.EntityAttachments!= null && brandObject.EntityAttachments.Count > 0)
+                                                            {
+                                                                
+                                                                item.GetAppEntityForViewDto.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(brandObject.EntityAttachments);
+                                                                foreach (var attDto in item.GetAppEntityForViewDto.AppEntity.EntityAttachments)
+                                                                {
+                                                                    attDto.FileName = imagesUrl + (brandObject.TenantId == null ? "-1" : brandObject.TenantId.ToString()) + @"/" + attDto.FileName;
+                                                                    attDto.Url = attDto.FileName;
+                                                                }
+                                                            }
+                                                            /*var imageAttch = brandObject.EntityAttachments.Where(z=>z.AttachmentCategoryCode.ToUpper()=="IMAGE" ||
                                                             z.AttachmentCategoryCode.ToUpper() == "BANNER" ||
                                                             z.AttachmentCategoryCode.ToUpper() == "LOGO").FirstOrDefault();
                                                             if (imageAttch!= null)
                                                             item.Image = "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) 
-                                                                    + "/" + imageAttch .AttachmentFk.Attachment;
+                                                                    + "/" + imageAttch .AttachmentFk.Attachment;*/
                                                         }
                                                     }
                                                 }
