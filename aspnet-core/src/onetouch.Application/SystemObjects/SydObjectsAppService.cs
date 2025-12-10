@@ -33,6 +33,10 @@ using System.Runtime.CompilerServices;
 using onetouch.Accounts.Dtos;
 using onetouch.Accounts;
 using onetouch.AppContacts;
+using Org.BouncyCastle.Crypto;
+using onetouch.Migrations;
+using Abp.Net.Mail;
+using System.Net.Mail;
 
 namespace onetouch.SystemObjects
 {
@@ -59,6 +63,7 @@ namespace onetouch.SystemObjects
         private readonly IAccountsAppService _accountsAppService;
         private readonly IRepository<AppContact, long> _appContactRepository;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
+        private readonly IEmailSender _emailSender;
         //I49[End]
         public SydObjectsAppService(
             IRepository<SydObject, long> sydObjectRepository,
@@ -76,7 +81,7 @@ namespace onetouch.SystemObjects
             IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
             IMessageAppService messageAppService, ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService,
             IAccountsAppService accountsAppService, IRepository<AppContact, long> appContactRepository,
-            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository) 
+            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, IEmailSender emailSender) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
 			_sydObjectsExcelExporter = sydObjectsExcelExporter;
@@ -98,6 +103,7 @@ namespace onetouch.SystemObjects
             _sycEntityObjectCategoriesAppService = sycEntityObjectCategoriesAppService;
             _accountsAppService = accountsAppService;
             _appContactRepository = appContactRepository;
+            _emailSender = emailSender;
             //I49[End]
         }
 
@@ -638,6 +644,25 @@ namespace onetouch.SystemObjects
             }
             return result;
         }
-                //I49[End]
+
+        [AbpAllowAnonymous]
+        public async Task SendContactUsInfo(string firstName, string lastName, string email,string phone,string message)
+        {
+            //string salesEmail = await _appEntitiesAppService.GetHostSettingValue(xxxx);
+            string salesEmail = "customercare@ariasystems.biz";
+            await _emailSender.SendAsync(new MailMessage
+            {
+                To = { salesEmail },
+                Subject = "New client needs to register",
+                Body = "<!DOCTYPE html><html><head/><body><p>Hello Sales Team, "+ "First Name:"+ firstName + "<br><br>"+
+                        "Last Name:" + lastName + "<br><br>" +
+                        "Email:" + email + "<br><br>" +
+                        "Phone :" + phone + "<br><br>" +
+                        "Message:" + message + "<br><br></body></html>",
+                IsBodyHtml = true
+            });
+
+        }
+        //I49[End]
     }
 }
