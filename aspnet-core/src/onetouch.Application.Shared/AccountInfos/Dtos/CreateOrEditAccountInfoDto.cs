@@ -14,7 +14,8 @@ namespace onetouch.AccountInfos.Dtos
     {
         Profile,
         Manual,
-        External
+        External,
+        Connected
     }
     public enum SourceAccountEnum
     {

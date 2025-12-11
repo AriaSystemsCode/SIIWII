@@ -7,11 +7,11 @@
                         <h3 class="kt-subheader__title">
                             <span class="pageTitle">
                                 <span
-                                    *ngIf="isRecordOwner || (!accountDataForView?.isConnected && accountLevel != accountLevelEnum.Manual)">{{l("MyAccount")}}</span>
-                                <span *ngIf="(accountDataForView?.isConnected) && !isRecordOwner">{{l("Connected
+                                    *ngIf="isRecordOwner && ( accountLevel == accountLevelEnum.Profile )">{{l("MyAccount")}}</span>
+                                <span *ngIf="(accountDataForView?.isConnected) && !isRecordOwner  ">{{l("Connected
                                     Account")}}</span>
                                 <span
-                                    *ngIf="(accountDataForView?.isManual) && !isRecordOwner">{{l("ManualAccount")}}</span>
+                                    *ngIf="(accountDataForView?.isManual) && !isRecordOwner && accountLevel == accountLevelEnum.Manual">{{l("ManualAccount")}}</span>
                             </span>
                         </h3>
                         <span class="kt-subheader__separator kt-subheader__separator--v"></span>
