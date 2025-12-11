@@ -1,5 +1,5 @@
         <!-- Show when there are no items -->
-        <p *ngIf="items?.length === 0 && (fromOverView)" class="text-center mx-auto mt-5 py-5">
+        <p *ngIf="items?.length === 0 && (fromOverView) && !fromMarketAcoount" class="text-center mx-auto mt-5 py-5">
             <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
             <span class="noDataTxt">There is no data to show ....</span>
           </p>
@@ -145,6 +145,11 @@
                             ></app-prodcut-card>
                         </div>
                     </div>
+
+                    <p *ngIf="items?.length === 0 && (fromMarketAcoount)" class="text-center mx-auto mt-5 pt-5" style="margin-top: 150px !important;">
+                        <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
+                        <span class="noDataTxt">There is no data to show ....</span>
+                      </p>
                 </div>
                 <div  class="col-md-12" [ngClass]="fromOverView ? 'd-none':''">
                     <div class="">
@@ -160,10 +165,7 @@
                 </div>
             </div>
 
-            <p *ngIf="items?.length === 0 && (!fromOverView)" class="text-center mx-auto mt-5 py-5">
-                <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
-                <span class="noDataTxt">There is no data to show ....</span>
-              </p>
+      
         </div>
     </div>
 

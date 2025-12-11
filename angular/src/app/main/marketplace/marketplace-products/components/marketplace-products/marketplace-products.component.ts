@@ -254,7 +254,7 @@ productCards!: QueryList<ProdcutCardComponent>;
         const selectedCurrency =
             (this.fromMarketAcoount || this.fromOverView)
                 ? (this.marketplaceAccCurrency || 'USD')
-                : (this.selectedCurrrency || 'USD');  // ✅ string
+                : (this.selectedCurrrency || 'USD');  
     
                 const requestParams = {
                     contactSSIN: this.contactSSIN,
