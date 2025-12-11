@@ -326,7 +326,7 @@ private initCurrencyCode(): void {
 getSettingData(){
   this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
   .subscribe((result) => {
-    this.showMsrP = result?.toString().toLowerCase() =='true' ? true : false;
+    this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
 
   });
 
