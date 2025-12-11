@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy, AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
 
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
@@ -49,15 +49,23 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
       numScroll: 1
     }
   ];
-  
+  currencyCode: string; 
+  languageSettingName:string  =AppConsts.languageSettingName;
+  showMsrP:boolean
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
     private router: Router,
+       private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
   ) { super(injector); }
 
   ngOnInit() {
-    if (this.sectionId) this.getBlocksData();
+    this.initCurrencyCode();  
+  
+
+    if (this.sectionId) {
+      this.getBlocksData();
+    }
   }
 
   ngOnDestroy() {
@@ -278,4 +286,49 @@ onAttachmentClick(b: PageSettingDto): void {
   window.open(finalUrl, '_blank');
 }
 
+private initCurrencyCode(): void {
+  // 1) try localStorage("currencyCode")
+  const stored = localStorage.getItem('currencyCode');
+
+  if (stored && stored !== 'undefined' && stored !== 'null') {
+    try {
+      const parsed = JSON.parse(stored);
+
+      // stored as "GBP"
+      if (typeof parsed === 'string' && parsed.trim()) {
+        this.currencyCode = parsed.trim();
+        return;
+      }
+
+      // stored as { code: "GBP", ... }
+      if (parsed && typeof parsed === 'object' && parsed.code) {
+        this.currencyCode = parsed.code;
+        return;
+      }
+    } catch {
+      // not JSON, maybe raw 'GBP'
+      if (stored.trim()) {
+        this.currencyCode = stored.trim();
+        return;
+      }
+    }
+  }
+
+  // 2) fallback to tenant default currency from AppComponentBase
+  if ((this as any).tenantDefaultCurrency?.code) {
+    this.currencyCode = (this as any).tenantDefaultCurrency.code;
+    return;
+  }
+
+  // 3) last fallback
+  this.currencyCode = 'USD';
+}
+getSettingData(){
+  this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
+  .subscribe((result) => {
+    this.showMsrP = result?.toString().toLowerCase() =='true' ? true : false;
+
+  });
+
+}
 }

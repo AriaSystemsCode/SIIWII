@@ -297,7 +297,7 @@ export class MarketplaceProductsComponent
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
         
-    
+        const currencyCode = this.getCurrencyCodeForRequest();
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
@@ -319,7 +319,7 @@ export class MarketplaceProductsComponent
                 requestParams.startShipData || this.startShipData,
                 requestParams.endShipData ||  this.endShipData,
                 requestParams.brands ||  this.brands, // ids
-                requestParams.selectedCurrency ||  this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                currencyCode,
                 undefined,
                 requestParams.selectedCategory || this.selectedCategories,  //category
                 requestParams.selectedSort || this.selectedSort.value,
@@ -347,7 +347,11 @@ export class MarketplaceProductsComponent
     }
     
 
-    setCurrency() {
+     setCurrency() {
+        console.log(this.tenantDefaultCurrency,'tenantDefaultCurrency')
+        console.log(this.selectedCurrrency,'selectedCurrrency')
+        console.log(this.currency,'currency')
+        console.log(localStorage.getItem("currencyCode"),'localStorage')
         this.selectedCurrrency =
             localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
                 ? this.tenantDefaultCurrency
@@ -359,6 +363,11 @@ export class MarketplaceProductsComponent
             if (indx >= 0)
                 this.selectedCurrrency = this.currencies[indx];
         }
+
+        console.log(this.tenantDefaultCurrency,'//////tenantDefaultCurrency')
+        console.log(this.selectedCurrrency,'//////selectedCurrrency')
+        console.log(this.currency,'//////currency')
+        console.log(localStorage.getItem("currencyCode"),'//////localStorage')
     }
 
     onPageChange(value: any) {
@@ -573,4 +582,42 @@ export class MarketplaceProductsComponent
       }
      
     }
+
+private getCurrencyCodeForRequest(): string {
+   
+    if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
+      return this.selectedCurrrency.code;
+    }
+
+    if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
+      return this.selectedCurrrency.trim();
+    }
+
+    const stored = localStorage.getItem('currencyCode');
+    if (stored && stored !== 'undefined' && stored !== 'null') {
+      try {
+        const parsed = JSON.parse(stored);
+
+        if (typeof parsed === 'string' && parsed.trim()) {
+          return parsed.trim();
+        }
+
+        if (parsed && typeof parsed === 'object' && parsed.code) {
+          return parsed.code;
+        }
+      } catch {
+
+        if (stored.trim()) {
+          return stored.trim();
+        }
+      }
+    }
+
+    if ((this as any).tenantDefaultCurrency?.code) {
+      return (this as any).tenantDefaultCurrency.code;
+    }
+  
+    return 'USD';
+  }
+  
 }
