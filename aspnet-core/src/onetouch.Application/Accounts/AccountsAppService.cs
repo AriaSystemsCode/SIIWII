@@ -3207,9 +3207,10 @@ namespace onetouch.Accounts
             contact.SSIN = input.SSIN;
             entity.SSIN = input.SSIN;
 
-            if (input.Id != null && input.Id != 0)
+            if (entity.Id != null && entity.Id != 0)
             {
-                var currentEntity = _appEntityRepository.GetAll().Where(e => e.Id == input.EntityId).FirstOrDefault();
+                var currentEntity = _appEntityRepository.GetAll().Where(e => e.Id == entity.Id).FirstOrDefault();
+                if(currentEntity!=null)
                 entity.TenantOwner = currentEntity.TenantOwner;
             }
 
