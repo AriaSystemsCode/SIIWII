@@ -3,7 +3,7 @@
       <h5 class="text-white">{{sectionData?.title}}</h5>
     <div *ngFor="let s of pageLiksData" class=" text-white">
       <a
-      [href]="s?.link || '/app/main/Home'"
+      
       [attr.target]="s?.name === 'Contact Us' ? null : '/app/main/Home'"
       (click)="onMenuClick($event, s)"
       class="text-white"
