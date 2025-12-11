@@ -1674,7 +1674,7 @@ namespace onetouch.Accounts
 
         private async Task<GetAccountInfoForEditOutput> DoGetAccountForEdit(EntityDto<long> input)
         {
-            var accountInfo = await _appContactRepository.GetAll()
+            var accountInfo = await _appContactRepository.GetAll().Include(z=>z.EntityFk)
                 //MyAccount case
                 .WhereIf(input == null || input.Id == 0,
                     x => x.IsProfileData && x.ParentId == null)
@@ -1691,6 +1691,25 @@ namespace onetouch.Accounts
             output.AccountInfo.ContactPaymentMethods = ObjectMapper.Map<IList<AppContactPaymentMethodDto>>(accountInfo.AppContactPaymentMethods);
             //using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             //{
+            //I49[Start]
+            //I49
+            if (input != null && input.Id != 0)
+            {
+                bool isManual = (accountInfo.TenantId == AbpSession.TenantId && !accountInfo.IsProfileData
+                                   && accountInfo.ParentId == null
+                                   && (accountInfo.EntityFk.TenantOwner == AbpSession.TenantId || accountInfo.EntityFk.TenantOwner == 0));
+                //&& (_appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.SharingLevel == 1) == 0));//account.PartnerId == null);
+                //accountDto.IsConnected = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.TenantOwner != AbpSession.TenantId && z.SharingLevel == 1) > 0;//(account.TenantId == null && !account.IsProfileData && account.ParentId == null);
+                bool isConnected = (accountInfo.EntityFk.TenantOwner != AbpSession.TenantId && accountInfo.EntityFk.TenantOwner != 0);
+
+                if (isManual)
+                    output.AccountInfo.AccountLevel = AccountLevelEnum.Manual;
+
+                if (isConnected)
+                    output.AccountInfo.AccountLevel = AccountLevelEnum.Connected;
+            }
+            //i49
+            //I49[End]
             var entity = await _appEntityRepository.GetAll()
                 .Include(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
                 .Include(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk)
