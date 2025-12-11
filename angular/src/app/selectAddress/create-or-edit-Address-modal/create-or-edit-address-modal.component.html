@@ -16,7 +16,7 @@
           <div class="modal-body">
             <div class="form-group">
               <label for="address_Code">{{l("Code")}} *</label>
-              <app-codes *ngIf="!(address?.id>0)"
+              <!-- <app-codes *ngIf="!(address?.id>0)"
                 [objectType]="entityObjectType"
                 [editMode]=false
                 (getCodeValue)="getCodeValue($event)" ></app-codes>
@@ -25,7 +25,8 @@
                 [objectType]="entityObjectType"
                 [editMode]=true
                 [code]="addressCode"
-                (getCodeValue)="getCodeValue($event)" ></app-codes> 
+                (getCodeValue)="getCodeValue($event)" ></app-codes>  -->
+                <input [disabled]="address?.id>0" type="text" id="address_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="addressCode" name="code" />
             </div>
 
             <div class="form-group">
