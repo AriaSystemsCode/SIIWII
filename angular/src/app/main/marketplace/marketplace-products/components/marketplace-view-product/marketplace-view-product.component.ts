@@ -90,6 +90,7 @@ export class MarketplaceViewProductComponent
     overRating: OverAllRatingDto
     isAuthenticated = this.appSession?.user
     relatedItems:any
+
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1113,7 +1114,7 @@ get relatedItemsUi(): any[] {
   openRelatedProduct(id: number) {
     this.router.navigate(['/app/main/marketplace/products/view', id]);
   }
-    
+  
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

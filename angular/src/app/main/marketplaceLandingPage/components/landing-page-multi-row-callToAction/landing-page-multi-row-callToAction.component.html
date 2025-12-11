@@ -25,8 +25,9 @@
               <span class="code">
                 {{ block?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
               </span>
-              <span class="price">
-                RRP: {{ block?.getAppMarketItemForViewDto?.appItem?.price | currency }}
+              <span class="price" *ngIf="showMsrP">
+                {{ languageSettingName !== 'en-GB' ? 'MSRP' : 'RRP' }}:
+                {{ block?.getAppMarketItemForViewDto?.appItem?.price | currency: currencyCode:true }}
               </span>
             </div>
 

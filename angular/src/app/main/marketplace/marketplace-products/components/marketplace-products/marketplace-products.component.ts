@@ -324,7 +324,7 @@ productCards!: QueryList<ProdcutCardComponent>;
             maxResultCount: this.fromOverView ? 4 : this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
-        
+        const currencyCode = this.getCurrencyCodeForRequest();
     
         this._AppMarketplaceItemsServiceProxy
             .getAll(
@@ -647,4 +647,40 @@ productCards!: QueryList<ProdcutCardComponent>;
         }
 
     }
+    private getCurrencyCodeForRequest(): string {
+   
+        if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
+          return this.selectedCurrrency.code;
+        }
+    
+        if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
+          return this.selectedCurrrency.trim();
+        }
+    
+        const stored = localStorage.getItem('currencyCode');
+        if (stored && stored !== 'undefined' && stored !== 'null') {
+          try {
+            const parsed = JSON.parse(stored);
+    
+            if (typeof parsed === 'string' && parsed.trim()) {
+              return parsed.trim();
+            }
+    
+            if (parsed && typeof parsed === 'object' && parsed.code) {
+              return parsed.code;
+            }
+          } catch {
+    
+            if (stored.trim()) {
+              return stored.trim();
+            }
+          }
+        }
+    
+        if ((this as any).tenantDefaultCurrency?.code) {
+          return (this as any).tenantDefaultCurrency.code;
+        }
+      
+        return 'USD';
+      }
 }

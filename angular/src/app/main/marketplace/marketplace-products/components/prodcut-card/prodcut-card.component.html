@@ -12,10 +12,10 @@
             <div class="ssin  font-weight-bold text-black">
                 {{ product?.manufacturerCode }}
             </div>
-            <div class="d-flex name-price">
+            <div class="d-flex name-price" *ngif="showMsrP">
                 <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
                 <!-- <p class="price">MSRP :{{ product?.price  | currency:currency:true}}</p> -->
-                <p class="price" >{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</p>
+                <p class="price" >{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:   {{ displayPrice | currency: currencyCode : true }}</p>
             </div>
         </div>
         <!-- <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5>  -->
