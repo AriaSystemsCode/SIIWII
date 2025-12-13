@@ -297,9 +297,29 @@ namespace onetouch.AppEvents
             #endregion save entity
 
 
-            appEvent.UTCFromDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.FromDate, appEvent.FromTime, appEvent.TimeZone);
-            appEvent.UTCToDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.ToDate, appEvent.ToTime, appEvent.TimeZone);
-            
+            //appEvent.UTCFromDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.FromDate, appEvent.FromTime, appEvent.TimeZone);
+            //appEvent.UTCToDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.ToDate, appEvent.ToTime, appEvent.TimeZone);
+
+            var localTime = DateTime.SpecifyKind(
+                    input.FromTime,
+                    DateTimeKind.Unspecified
+                        );
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(input.TimeZone);
+
+            var utcTime = TimeZoneInfo.ConvertTimeToUtc(localTime, timeZone);
+            appEvent.UTCFromDateTime = DateTime.SpecifyKind(utcTime, DateTimeKind.Utc);
+
+            var localTimeTo = DateTime.SpecifyKind(
+            input.ToTime,
+            DateTimeKind.Unspecified
+               );
+            var timeZoneTo = TimeZoneInfo.FindSystemTimeZoneById(input.TimeZone);
+
+            var utcTimeTo = TimeZoneInfo.ConvertTimeToUtc(localTimeTo, timeZone);
+            appEvent.UTCToDateTime = DateTime.SpecifyKind(utcTimeTo, DateTimeKind.Utc);
+
+
+
             if (input.Id == 0)
             { await _appEventRepository.InsertAsync(appEvent); }
             else { await _appEventRepository.UpdateAsync(appEvent); }
