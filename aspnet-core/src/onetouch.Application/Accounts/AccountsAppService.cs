@@ -4679,6 +4679,9 @@ namespace onetouch.Accounts
                         #endregion check record type
 
                         #region phone validation
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Number))
+                        { accountExcelDto.Phone1Number = accountExcelDto.Phone1Number.Replace("'", ""); }
+
                         if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
                             !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
                             !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
@@ -4688,16 +4691,20 @@ namespace onetouch.Accounts
                         { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Type is InValid."); hasError = true; }
 
 
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone2Number))
+                        { accountExcelDto.Phone2Number = accountExcelDto.Phone2Number.Replace("'", ""); }
 
                         if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
                            !string.IsNullOrEmpty(accountExcelDto.Phone2Number) &&
                            !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone2Code + accountExcelDto.Phone2Number))
                         { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Is Filled With a InValid Phone# and Code."); hasError = true; }
 
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone2Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
                         { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Type is InValid."); hasError = true; }
 
 
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone3Number))
+                        { accountExcelDto.Phone3Number = accountExcelDto.Phone3Number.Replace("'", ""); }
 
                         if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
                             !string.IsNullOrEmpty(accountExcelDto.Phone3Number) &&
