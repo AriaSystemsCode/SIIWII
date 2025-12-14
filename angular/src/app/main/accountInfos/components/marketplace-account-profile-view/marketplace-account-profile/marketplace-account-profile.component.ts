@@ -198,12 +198,5 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   }
   
 
-  onVisitShowroomClick() {
-    this.goSvR();
-
-
-
-  }
-  
   
 }
