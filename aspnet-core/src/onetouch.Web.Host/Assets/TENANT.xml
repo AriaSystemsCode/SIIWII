@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ItemExtraAttributes
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<ExtraAttributes>
+		<ExtraAttribute>
+			<AttributeId>1232</AttributeId>
+			<Code>TN-002</Code>
+			<Name>Notifyusersbyemail</Name>
+			<Description>Notify users by email</Description>
+			<DataType>boolean</DataType>
+			<Width>50</Width>
+			<Decimals>0</Decimals>
+			<DefaultValue></DefaultValue>
+			<Usage>Messages Management</Usage>
+			<IsLookup>false</IsLookup>
+			<EntityObjectTypeCode></EntityObjectTypeCode>
+			<AllowAddNew>false</AllowAddNew>
+			<AcceptMultipleValues>false</AcceptMultipleValues>
+			<ValidEntries></ValidEntries>
+			<IsVariation>false</IsVariation>
+			<IsAdvancedSearch>false</IsAdvancedSearch>
+		</ExtraAttribute>
+		<ExtraAttribute>
+			<AttributeId>1301</AttributeId>
+			<Code>TN-005</Code>
+			<Name>Transactionsharingis</Name>
+			<Description>Transaction sharing is</Description>
+			<DataType>Boolean</DataType>
+			<Width>50</Width>
+			<Decimals>0</Decimals>
+			<DefaultValue></DefaultValue>
+			<Usage>Transaction Management</Usage>
+			<IsLookup>false</IsLookup>
+			<EntityObjectTypeCode></EntityObjectTypeCode>
+			<AllowAddNew>false</AllowAddNew>
+			<AcceptMultipleValues>false</AcceptMultipleValues>
+			<ValidEntries>Manual|Automatic|Inquire</ValidEntries>
+			<IsVariation>false</IsVariation>
+			<IsAdvancedSearch>false</IsAdvancedSearch>
+		</ExtraAttribute>	
+	</ExtraAttributes>
+</ItemExtraAttributes>
