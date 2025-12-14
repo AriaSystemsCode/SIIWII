@@ -8398,6 +8398,14 @@ namespace onetouch.Accounts
                             }
                         }
                         //I46 [End]
+                        #region phone validation
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Number))
+                        { accountExcelDto.Phone1Number = accountExcelDto.Phone1Number.Replace("'", ""); }
+
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
+                            !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
+                            !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
+                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Is Filled With a InValid Phone# and Code."); hasError = true; }
 
                         //#region phone validation
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
@@ -8408,6 +8416,8 @@ namespace onetouch.Accounts
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
                         //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Type is InValid."); hasError = true; }
 
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone2Number))
+                        { accountExcelDto.Phone2Number = accountExcelDto.Phone2Number.Replace("'", ""); }
 
 
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone2Code) &&
@@ -8418,6 +8428,8 @@ namespace onetouch.Accounts
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
                         //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 2: Phone 2 Type is InValid."); hasError = true; }
 
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone3Number))
+                        { accountExcelDto.Phone3Number = accountExcelDto.Phone3Number.Replace("'", ""); }
 
 
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone3Code) &&
