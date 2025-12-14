@@ -64,6 +64,10 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     companyLoading = false;
     private companySearchTimer: any;
     private companySearchSub?: import('rxjs').Subscription;
+
+
+    currentLang:string
+    isArabic:boolean 
     constructor(
         injector: Injector,
 
@@ -77,6 +81,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     async ngOnInit(): Promise<void> {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.getAppTransactionContactsIndex();
 
         const value = localStorage.getItem("comNew");

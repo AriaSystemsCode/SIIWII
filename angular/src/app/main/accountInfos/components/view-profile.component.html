@@ -31,7 +31,7 @@
                                             [staticWidth]="viewProfileCover?.offsetWidth"
                                             >
                                         </app-image-display>
-                                        <div class="d-flex view-profile-action-buttons" *ngIf="!viewMode">
+                                        <div class="d-flex " *ngIf="!viewMode" [ngClass]="isArabic?'view-profile-action-buttons-ar':'view-profile-action-buttons'">
                                             <button class="btn mb-3 mt-4 w-100 btn-success" (click)="editAccount()" >
                                                 {{ "Edit" | localize }}
                                             </button>
@@ -46,7 +46,7 @@
                                             </button>
                                         </div>
 
-                                        <div class="d-flex view-profile-action-buttons" *ngIf="accountData.isConnected && showEditConnected">
+                                        <div class="d-flex " *ngIf="accountData.isConnected && showEditConnected"  [ngClass]="isArabic?'view-profile-action-buttons-ar':'view-profile-action-buttons'">
                                             <!-- <button class="btn mb-3 mt-4 w-100 btn-success" (click)="this.showEditConnected =false" >
                                                 {{ "Edit" | localize }}
                                             </button> -->
@@ -54,7 +54,7 @@
                                                 {{ "Edit" | localize }}
                                             </button>
                                         </div>
-                                        <div class="d-flex view-profile-action-buttons" *ngIf="accountData.isConnected && !showEditConnected">
+                                        <div class="d-flex " *ngIf="accountData.isConnected && !showEditConnected"  [ngClass]="isArabic?'view-profile-action-buttons-ar':'view-profile-action-buttons'">
                                             <button class="btn mb-3 mt-4 w-100 btn-success" [disabled]="priceLevel==this.accountData.priceLevel"  (click)="editConnnectedAccount()" >
                                                 {{ "Save" | localize }}
                                             </button>

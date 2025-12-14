@@ -1,11 +1,11 @@
 ...<!-- Navbar -->
 <nav
     class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
-    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
+    [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }" [ngClass]="isArabic?'rtl-navbar':'ltr-navbar'"
   
 >
     <!-- Container wrapper -->
-    <div class="container ml-0 position-md-absolute position-lg-static ">
+    <div class="container ml-0  position-lg-static " [ngClass]="isArabic ? '':'position-md-absolute'">
         <!-- Navbar brand -->
 
         <!--  <a
@@ -137,7 +137,7 @@
         </a>
 
         <!-- Collapsible wrapper -->
-        <div class="ml-4 d-sm-flex d-none sec-section" style="justify-content: center;margin-left: 35px;">
+        <div class="ml-4 d-sm-flex d-none " style="justify-content: center;margin-left: 35px;" [ngClass]="isArabic ? 'rt-sec-section':'sec-section'">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -217,7 +217,7 @@
             <!-- Left links -->
         </div>
 
-        <div class="rightList ml-4 ml-lg-0 navbar-collapse d-sm-block d-none">
+        <div class=" ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" [ngClass]="isArabic ? 'leftList':'rightList'">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-sm-flex d-none " style="justify-content: space-around;">
                 <div class="border-left text-white  d-md-block  mt-1" style="height: 55px;"></div>
                 <li class="nav-item pl-3 pt-2">

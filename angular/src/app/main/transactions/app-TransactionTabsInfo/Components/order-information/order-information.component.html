@@ -453,7 +453,7 @@
                 <!-- categories -->
 
                 <!-- dates -->
-                <div class="col-md-6 mt-2 position-relative dates">
+                <div class="col-md-6 mt-2 position-relative "  [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
                         <div class="">
@@ -479,7 +479,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-2 position-relative dates">
+                <div class="col-md-6 mt-2 position-relative "  [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
                         <p-calendar #calendar2 appendTo="body" [(ngModel)]="startDate" name="startDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
@@ -502,7 +502,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-2 position-relative dates">
+                <div class="col-md-6 mt-2 position-relative " [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Available Date</label>
                         <p-calendar #calendar3 appendTo="body" [(ngModel)]="availableDate" name="availableDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
@@ -526,7 +526,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-2 position-relative dates">
+                <div class="col-md-6 mt-2 position-relative "  [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
                         <p-calendar #calendar4 appendTo="body" [(ngModel)]="completeDate" name="completeDate" [showIcon]="true" [dateFormat]="primeDateFormat" 

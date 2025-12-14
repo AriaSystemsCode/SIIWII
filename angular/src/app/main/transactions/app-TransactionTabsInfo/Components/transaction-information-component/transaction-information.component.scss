@@ -65,10 +65,7 @@
 button:disabled,
 button[disabled] {
     cursor: not-allowed !important;
-    // background: #B8B8B8 !important;
-    // color: white !important;
-    // font-weight: 700 !important;
-    // opacity: 1 !important;
+
 }
 
 //---------------------------------------------------------------------------------//
@@ -170,13 +167,9 @@ button[disabled] {
         height: 14px !important;
     }
     .form-control , .form-control:focus, .form-control:active {
-//         background: #FFF !important;
-//         border-radius: 8px !important;
-//         font-size: 14px;
-// // font-style: normal;
-// font-weight: 600;
+
 color: #9E9E9E !important;
-// border: 1px #D9D9D9  !important;
+
     }
     .p-treetable-thead {
 
@@ -214,15 +207,42 @@ color: #9E9E9E !important;
         
         
           }
+
           .p-accordion  {
             margin-bottom: 20px !important;
           }
+
+
     }
-    .p-icon-wrapper {
-        position: absolute !important;
-        right: 3px !important;
+
+
+}
+::ng-deep {
+    .ltr-arr-acc {
+        
+        .p-accordion-toggle-icon {
+            position: absolute !important;
+            right: 3px !important;
+            bottom: 20px;
+        }
+    }
+
+
+}
+
+::ng-deep {
+
+
+    .rtl-arr-acc {
+        .p-accordion-toggle-icon {
+            position: absolute !important;
+            left: 10px !important;
+            transform: rotate(180deg);
+            bottom: 20px;
+        }
     }
 }
+
 
 .imgIcon {
     width: 50px;
@@ -360,8 +380,7 @@ input.ng-invalid.ng-touched {
 /*---------------------custome style for comment component--------------------*/
 .comment-warper{
     position: relative;
-    // height: 95vh;
-    // min-height: 40vh !important;
+
 }
 
 // handle responsive screens
@@ -372,10 +391,7 @@ input.ng-invalid.ng-touched {
     }
     .tablet {
         display: block;
-        .tabview-custom {
-   
-       
-           }
+
     }
 
 }
@@ -482,27 +498,7 @@ input.ng-invalid.ng-touched {
         margin-left: -1px !important;
     }
 }
-//     .dot {
-//     .dropdown{
-//         position: absolute;
-//     z-index: 999999 !important;
-//     right: -15px !important;
-//     height: 234px !important;
-//     width: 260px !important
-//     }
-//     .dropdown-menu-mob{
-//         right: 35px !important;
-//         margin-top: 65px !important;
-//         inset: auto !important;
-//         position: absolute;
-// border: 0.5px solid #7A7A7A;
-//         top: 76px !important;
-//         background: white;
-//         width: 75%;
-//         padding: 11px 2px;
-//         border-radius: 6px;
-//     }
-// }
+
     .p-tabview .p-tabview-nav {
         padding: 8px 14px !important;
     }
@@ -582,10 +578,8 @@ input.ng-invalid.ng-touched {
     .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
         background-color: white !important; 
         color: #777 !important;
-        // border-bottom: 1px solid #eee !important;
         border-radius: 0 !important;
         padding: 0 !important;
-        //  width: 66px  !important;
          height: 66px !important;
          max-width: 92px !important;
          .tab-header {
@@ -618,8 +612,6 @@ input.ng-invalid.ng-touched {
         flex-direction: column !important;
         font-size: 14px !important;
         width: 140px  !important;
-        // border-right: 1px solid #eee !important ;
-        // border-bottom: 1px solid #eee !important ;
         height: 82px !important;
         align-items: center !important;
         fill:#777777 !important;
@@ -629,24 +621,10 @@ input.ng-invalid.ng-touched {
 
         }
     }
-    // .p-accordion {
-    //     padding: 12px !important;
-    // }
+
 
 }
-// .openAcs{
-//     border-radius: 0px 0px 12px 12px;
-// border-right: 1px #F7F7F7;
 
-// border-left: 1px #F7F7F7;
-
-// background: #FFF;
-// color: 
-// #7A7A7A;
-// width: 182px;height: 64px;    position: absolute;
-//         right: 7%;
-//         top: 121%; z-index: 99999 !important;
-// }
 @media only screen and (min-width: 992px) {
     .web {
         display: flex;
@@ -659,7 +637,7 @@ input.ng-invalid.ng-touched {
 @media only screen and (min-width: 576px) {
 
   .parentDiv {
-        margin: 2em 2em 0em 10em;
+        margin: 2em 10em 0em 10em;
     }
 }
 .bgPurple {
@@ -705,10 +683,6 @@ color: #4A0D4A;
             background:  #4A0D4A;
             box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10);
             color: #fff;
-            // position: absolute;
-            // top: 5px;
-            // right: 5px;
-            // z-index: 9999;
             width: 99px;
             height: 46px;
         }
@@ -716,10 +690,6 @@ color: #4A0D4A;
             background-color: #fff;
             color: #700066;
             border:1px solid #EBEBEB;
-            // position: absolute;
-            // top: 5px;
-            // right: 127px;
-            // z-index: 9999;
             border-radius: 6px;
               
             width: 99px;

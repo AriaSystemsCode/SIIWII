@@ -65,7 +65,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
-    
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -82,6 +83,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         }
     }
     ngOnInit(){
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
         this.getAllForAccountInfo()
         this.allPriceLevel=this.getPriceLevel();
         this.allPriceLevel.push({ label :'MSRP' ,value: 'MSRP'});
