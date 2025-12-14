@@ -5855,6 +5855,7 @@ namespace onetouch.Accounts
         }
 
         #endregion
+        
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<AppContactPaymentMethodDto> CreateOrEditPaymentMethod(AppContactPaymentMethodDto input)
         {
@@ -8366,7 +8367,7 @@ namespace onetouch.Accounts
                         //if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
                         //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Email Address: Not Valid Email Value."); hasError = true; }
 
-                        //#endregion code, name, email and website validation
+                        #endregion code, name, email and website validation
 
                         //#region check record type
                         //if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
