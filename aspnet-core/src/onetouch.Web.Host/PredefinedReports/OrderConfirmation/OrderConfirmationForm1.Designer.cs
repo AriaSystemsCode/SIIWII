@@ -86,6 +86,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.GroupHeader1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader1");
             this.Detail = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail");
             this.ReportFooter = reportInitializer.GetControl<DevExpress.XtraReports.UI.ReportFooterBand>("ReportFooter");
+            this.label55 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label55");
             this.label54 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label54");
             this.label51 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label51");
             this.label40 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label40");
@@ -117,7 +118,6 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.label43 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label43");
             this.label45 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label45");
             this.label46 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label46");
-            this.label55 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label55");
 
             // Parameters
             this.TransactionId = reportInitializer.GetParameter("TransactionId");
@@ -127,6 +127,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.userId = reportInitializer.GetParameter("userId");
             this.roleType = reportInitializer.GetParameter("roleType");
             this.saveToPDF = reportInitializer.GetParameter("saveToPDF");
+            this.PrintDate = reportInitializer.GetParameter("PrintDate");
+            this.PrintTime = reportInitializer.GetParameter("PrintTime");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -205,6 +207,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader1;
         private DevExpress.XtraReports.UI.DetailBand Detail;
         private DevExpress.XtraReports.UI.ReportFooterBand ReportFooter;
+        private DevExpress.XtraReports.UI.XRLabel label55;
         private DevExpress.XtraReports.UI.XRLabel label54;
         private DevExpress.XtraReports.UI.XRLabel label51;
         private DevExpress.XtraReports.UI.XRLabel label40;
@@ -245,6 +248,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.Parameters.Parameter userId;
         private DevExpress.XtraReports.Parameters.Parameter roleType;
         private DevExpress.XtraReports.Parameters.Parameter saveToPDF;
-        private DevExpress.XtraReports.UI.XRLabel label55;
+        private DevExpress.XtraReports.Parameters.Parameter PrintDate;
+        private DevExpress.XtraReports.Parameters.Parameter PrintTime;
     }
 }
