@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<XtraReportsLayoutSerializer SerializerVersion="22.2.4.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="OrderConfirmation" SnapGridSize="25" SnapGridStepCount="1" SnappingMode="None" ReportUnit="TenthsOfAMillimeter" Margins="254, 254, 30, 38.3679733" PageWidth="2159" PageHeight="2794" Version="22.2" DataMember="AppTransactionHeaders" DataSource="#Ref-0" Dpi="254" Font="Arial, 9.75pt">
+<XtraReportsLayoutSerializer SerializerVersion="22.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="OrderConfirmation" SnapGridSize="25" SnapGridStepCount="1" SnappingMode="None" ReportUnit="TenthsOfAMillimeter" Margins="254, 254, 30, 38.3679733" PageWidth="2159" PageHeight="2794" Version="22.2" DataMember="AppTransactionHeaders" DataSource="#Ref-0" Dpi="254" Font="Arial, 9.75pt">
   <Extensions>
     <Item1 Ref="2" Key="VSReportExtInfo" Value=".repx" />
   </Extensions>
@@ -35,9 +35,9 @@
           </ExpressionBindings>
           <StylePriority Ref="23" UseFont="false" UseTextAlignment="false" />
         </Item2>
-        <Item3 Ref="24" ControlType="XRPanel" Name="panel3" SizeF="730.872559,230.965637" LocationFloat="826.868164,5.513714" Dpi="254" Borders="None">
+        <Item3 Ref="24" ControlType="XRPanel" Name="panel3" SizeF="730.872559,230.965637" LocationFloat="826.868164,5.513714" Dpi="254" Borders="All">
           <Controls>
-            <Item1 Ref="25" ControlType="XRLabel" Name="label20" Multiline="true" Text="Seller Information" SizeF="253.999985,33.96167" LocationFloat="34.458313,0" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
+            <Item1 Ref="25" ControlType="XRLabel" Name="label20" Multiline="true" Text="Seller Information" SizeF="253.999985,33.96167" LocationFloat="34.458313,3" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
               <ExpressionBindings>
                 <Item1 Ref="26" EventName="BeforePrint" PropertyName="Text" Expression="iif(?roleType='Independent Sales Rep', 'Seller Information','Buyer Information')&#xA;" />
                 <Item2 Ref="27" EventName="BeforePrint" PropertyName="Visible" Expression="?roleType='Independent Sales Rep' or ?roleType='Independent Buying Office'" />
