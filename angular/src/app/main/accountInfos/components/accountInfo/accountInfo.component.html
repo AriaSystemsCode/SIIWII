@@ -537,7 +537,7 @@
                                         </div>
 
                                         <div class="form-group row"
-                                            *ngIf="accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit) ">
+                                            *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
                                             <div class="col-sm-8">
@@ -545,9 +545,10 @@
                                                     styleClass="form-control aria-select" [filter]="false"
                                                     name="PriceLevelId" [(ngModel)]="accountInfoTemp.priceLevel"
                                                     (onChange)="changeTouchState()"
-                                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+                                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown> 
 
                                             </div>
+                                            <span  *ngIf="accountInfoTemp?.priceLevel" class="mt-2"><a class="reset-link" (click)="accountInfoTemp.priceLevel =null; changeTouchState()">Reset</a></span>
                                         </div>
 
 
