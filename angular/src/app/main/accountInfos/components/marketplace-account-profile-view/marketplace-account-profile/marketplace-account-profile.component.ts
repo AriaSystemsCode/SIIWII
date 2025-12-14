@@ -1,4 +1,4 @@
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AfterViewInit, Component, Injector, OnInit } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -26,6 +26,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     private route: ActivatedRoute,
     private _AccountsServiceProxy: AccountsServiceProxy,
     private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+     private _router: Router,
   ) {
     super(injector);
   }
@@ -68,7 +69,8 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     ).subscribe((res) => {
       this.accountDataForView = res.account
       this.marketPlaceData = res
-
+      this.activeTabIndex = 0;
+      this.onActiveIndexChange(0);
     })
   }
 
@@ -174,4 +176,34 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       ? { connectionName: m[1], disConnectLabel: m[2] }
       : { connectionName: raw || '', disConnectLabel: '' };
   }
+
+  
+
+  onActiveIndexChange(index: number) {
+    this.activeTabIndex = index;
+
+    if (index === 1 && this.accountDataForView?.accountType === 'BUSINESS') {
+      this.goSvR();
+    }
+    if (index === 0) {
+      this.goSvR();
+    }
+  }
+
+  goSvR() {
+    sessionStorage.setItem(
+      'SellerSSIN',
+      JSON.stringify(this.accountDataForView?.ssin)
+    );
+  }
+  
+
+  onVisitShowroomClick() {
+    this.goSvR();
+
+
+
+  }
+  
+  
 }
