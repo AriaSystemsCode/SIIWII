@@ -72,6 +72,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
         solid: true,
         image: false
     };
+    currentLang: string;
+isArabic: boolean = false;
+
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -88,6 +91,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
         appEntity?: AppEntityDto,
         nonlookup:boolean=false
     ): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+        this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
         this.entityObjectType = entityObjectType;
         this.saving=false;
         if (appEntity) this.appEntity = appEntity;

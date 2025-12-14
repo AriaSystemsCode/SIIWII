@@ -218,9 +218,21 @@ color: #9E9E9E !important;
             margin-bottom: 20px !important;
           }
     }
-    .p-icon-wrapper {
-        position: absolute !important;
-        right: 3px !important;
+    .ltr-icon {
+        .p-icon-wrapper {
+            position: absolute !important;
+            right: 3px !important;
+        }
+    }
+    .rtl-icon {
+        .p-icon-wrapper {
+            position: absolute !important;
+            left: 3px !important;
+        }
+     
+    }
+    .p-paginator .p-dropdown .p-dropdown-label {
+        padding-right: 5px !important;
     }
 }
 

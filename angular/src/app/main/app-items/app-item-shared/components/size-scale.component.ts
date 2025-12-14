@@ -42,7 +42,8 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
   cellSelectionFormInput:FormInputs<string,LookupLabelDto[]> // any to be changed
   appSizeScalesDetails;
   sizeScaleName:string="";
-
+  currentLang:string
+  isArabic:boolean
   constructor(
     private _extraAttributeDataService:ExtraAttributeDataService,
     private _appSizeScaleServiceProxy:AppSizeScaleServiceProxy,

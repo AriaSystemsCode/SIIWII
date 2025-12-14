@@ -134,6 +134,8 @@ export class TransactionInformationComponent
   totlaOrderPrices: number = 0;
   priceLevel:any
   languageSettingName  =AppConsts.languageSettingName;
+  currentLang:string
+  isArabic:boolean 
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -151,6 +153,8 @@ export class TransactionInformationComponent
 
   }
   ngOnInit(): void {
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
     this.defineExtraAttributes();
 
     this.initFilterForm()
