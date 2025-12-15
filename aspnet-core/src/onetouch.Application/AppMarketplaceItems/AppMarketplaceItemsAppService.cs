@@ -62,7 +62,7 @@ namespace onetouch.AppMarketplaceItems
         private readonly IMessageAppService _messageAppService;
         //I48[End]
         //I40[Start]
-        IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I40[End]
         public AppMarketplaceItemsAppService(IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemList,
             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetail, IRepository<AppMarketplaceItemSelectors, long> appMarketplaceItemsSelector,
@@ -73,7 +73,8 @@ namespace onetouch.AppMarketplaceItems
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<AppTransactionDetails, long> appTransactionDetailsRepository,
             IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
         IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService,
-        IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository)
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> appMarketplaceContactRepository,
+        IRepository<AppEntitiesRelationship, long> appEntitiesRelationship)
         {
             _messageAppService = messageAppService;
             _appTransactionHeadersRepository = appTransactionHeadersRepository;
