@@ -7572,7 +7572,16 @@ namespace onetouch.Accounts
             catch (Exception ex)
             {
                 //throw new UserFriendlyException("Code '" + input.Code + "' Is Already Exists.");
-                throw new UserFriendlyException(L("CodeIsAlreadyExists", input.Code));
+                if (ex != null && ex.InnerException != null && ex.InnerException.Message != null)
+                {
+                    if (ex.InnerException.Message.Contains("duplicate key"))
+                    { throw new UserFriendlyException(L("CodeIsAlreadyExists", input.Code)); }
+                    else
+                    {
+                        throw new UserFriendlyException(ex.InnerException.Message);
+                    }
+                    //
+                }
 
             }
             //return ObjectMapper.Map<AppAddressDto>(value);
