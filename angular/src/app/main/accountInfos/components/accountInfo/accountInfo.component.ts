@@ -163,14 +163,21 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
 
 
-    async ngOnInit() {
-        await this.handleComponentMode()
 
-        this.isHost = !this._abpSessionService.tenantId;
-        this.handleRoutingChange()
-        this.initUploaders();
-        this.GetContactDefaults();
+    async ngOnInit() {
+
+      if (this.accountLevel == null) {
+        this.accountLevel = AccountLevelEnum.Profile;
+      }
+    
+      await this.handleComponentMode();
+    
+      this.isHost = !this._abpSessionService.tenantId;
+      this.handleRoutingChange();
+      this.initUploaders();
+      this.GetContactDefaults();
     }
+    
     get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }
     get isExternalAccountCreate(): boolean { return this.isExternalAccount && !Boolean(this.accountId) }
     get isExternalAccountEdit(): boolean { return this.isExternalAccount && Boolean(this.accountId) }
@@ -228,7 +235,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                     break;
                 case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ProfileCreateOrEdit]:
                     if (this.isMyAccount) this.getMyAccountDataForEdit()
-                    else if (this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView.isConnected) this.getAccountDataForEdit()
+                    else if (this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView?.isConnected) this.getAccountDataForEdit()
                     break;
                 default:
                     break;
@@ -979,7 +986,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             return
         }
         this.saving = true;
-        if (this.accountLevel === AccountLevelEnum.Profile  )  {
+        if (this.accountLevel === AccountLevelEnum.Profile &&  (this.isRecordOwner || !this.accountInfoTemp.id ))  {
 
             if (this.accountInfoOldCurrencyId && this.accountInfoTemp.currencyId != this.accountInfoOldCurrencyId) {
                 this.message.confirm(

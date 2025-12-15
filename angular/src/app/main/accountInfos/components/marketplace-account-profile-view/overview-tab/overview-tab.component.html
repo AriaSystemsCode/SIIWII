@@ -300,14 +300,32 @@
       <hr class="hr">
       <div class="d-flex justify-content-between">
         <h4 class="" style="font-size: 14px;">For full viewing of {{ "''"+ accountDataForView?.name + "''"}}</h4>
-        <button (click)="goSvR() " class="vist-btn d-flex">
+        <button   (click)="goSvR($event)" class="vist-btn d-flex">
           <p class="m-auto">Visit Virtual Showroom</p>
         </button>
 
       </div>
-      <app-marketplace-products    [accountDataForView]="accountDataForView"
-        [fromOverView]="true" [marketplaceAccCurrency]="accountDataForView.currencyName"></app-marketplace-products>
-
+ 
+        <div class="row" *ngIf="items?.length > 0 ">
+          <div
+              class="my-2 col-6 col-lg-3 "
+            
+              *ngFor="let product of items"
+          >
+              <app-prodcut-card
+                  [currency]="accountDataForView.currencyName"
+                  [product]="product.appItem"
+                  [productCard]="product"
+                 
+                  
+              ></app-prodcut-card>
+          </div>
+      </div>
+        <!-- Show when there are no items -->
+        <p *ngIf="items?.length === 0 " class="text-center mx-auto mt-5 py-5">
+          <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
+          <span class="noDataTxt">There is no data to show ....</span>
+        </p>
     </div>
 
 

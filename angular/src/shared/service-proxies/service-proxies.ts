@@ -62725,6 +62725,7 @@ export enum AccountLevelEnum {
     Profile = 0,
     Manual = 1,
     External = 2,
+    Connected = 3,
 }
 
 export class AppEntityCategoryDto implements IAppEntityCategoryDto {
