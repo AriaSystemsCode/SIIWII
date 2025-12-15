@@ -394,12 +394,12 @@
                             <h6 class="font-weight-bold p-4" style="background-color: #FAFAFAFA;
                             border-radius: 5px;">{{ "Attributes" | localize }} </h6>
                                     <button [disabled]="shouldDisableCreateVarButton()"
-                                        class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="right: 0px;
+                                        class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="
                                         position: absolute;
                                         border-radius: 5px;
                                         background-color: #4A0D4A !important;
                                         border: #4A0D4A !important;
-                                        color: white !important;">
+                                        color: white !important;" [ngClass]="isArabic ? 'rtlPos':'ltrPos'">
                                        {{ "Create" | localize }}
                                        {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
                                        {{ "Variations" | localize }}

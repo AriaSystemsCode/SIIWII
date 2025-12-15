@@ -91,7 +91,8 @@ export abstract class AppComponentBase {
     tenantDefaultCurrency: CurrencyInfoDto
     _sycAttachmentCategoriesServiceProxy: SycAttachmentCategoriesServiceProxy
     public transactionReportTemplateName:"OrderConfirmationForm1";
-
+    currentLang: string
+    isArabic: boolean
     constructor(injector: Injector, private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
@@ -113,6 +114,8 @@ export abstract class AppComponentBase {
         this.onDestroyHandler();
         this.setAppItemsFilterBody();
         this.transactionReportTemplateName="OrderConfirmationForm1";
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
 
 
@@ -370,8 +373,9 @@ export abstract class AppComponentBase {
             config.initialState["resizeToWidth"] = resizeToWidth;
         }
     
-        config.class = "right-modal";
+     
     
+        this.isArabic ?  config.class = "left-modal":config.class = "right-modal";
         let mgCropperModalRef = this.bsModalService.show(
             ImageCropperComponent,
             config

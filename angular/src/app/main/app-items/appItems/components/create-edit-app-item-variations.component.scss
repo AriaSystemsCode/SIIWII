@@ -306,3 +306,18 @@ a.nav-link.active {
   border: 1px solid #4A0D4A !important;
   border-top-left-radius: 12px;
 }
+
+::ng-deep {
+  .ngLeft {
+      margin-left: 0 !important;
+      margin-top: 0 !important;
+  }
+}
+
+.rtlPos {
+  left: 0 !important;
+}
+
+.ltrPos {
+  right: 0 !important;
+}

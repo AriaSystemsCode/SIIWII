@@ -136,6 +136,8 @@ export class TransactionInformationComponent
   languageSettingName  =AppConsts.languageSettingName;
   transactionSharing:string="";
   isAuthenticated = this.appSession?.user
+  currentLang:string
+  isArabic:boolean 
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -153,6 +155,8 @@ export class TransactionInformationComponent
 
   }
   ngOnInit(): void {
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
     this.defineExtraAttributes();
 
     this.initFilterForm()

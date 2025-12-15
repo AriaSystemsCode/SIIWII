@@ -36,7 +36,7 @@ import { ImageCropperComponent } from "@app/shared/common/image-cropper/image-cr
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { AppEntityListDynamicModalComponent } from "@app/app-entity-dynamic-modal/app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
-import { Observable, Subscription } from "rxjs";
+import { finalize, Observable, Subscription } from "rxjs";
 import { IsVariationExtraAttribute } from "../../app-item-shared/models/IsVariationExtraAttribute";
 import { IVaritaionAttachment } from "../../app-item-shared/models/IVaritaionAttachment";
 import { ExtraAttributeDataService } from "../../app-item-shared/services/extra-attribute-data.service";
@@ -231,6 +231,8 @@ export class CreateEditAppItemVariationsComponent
     showNewVariation=false;
     activeNewVariation=false;
     deselectedValues=[];
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         private _extraAttributeDataService: ExtraAttributeDataService,
@@ -243,6 +245,8 @@ export class CreateEditAppItemVariationsComponent
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.initUploaders();
         this.initPricingNeededData();
         this.getSiwiiMarketPlaceColor();
@@ -1870,90 +1874,88 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
 
     // }
 
-    openCreateNewAppEntityModal() {
-        
-        let extraAttr =
-            this.selectedExtraAttributes[this.activeExtraAttributeIndex];
-        let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
-        let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
-            entityObjectType: {
-                name: extraAttr.name,
-                code: extraAttr.entityObjectTypeCode, //to be discussed with Farag
-            },
-            selectedRecords:extraAttr.displayedSelectedValues.map(item => {
-                const codeExistsInNonLookupValues = this.appItem.nonLookupValues.some(nonLookupItem => nonLookupItem.code === item.code);
-                return codeExistsInNonLookupValues ? item.code : item.value;
-              }),
-            acceptMultiValues: extraAttr.acceptMultipleValues,
-            nonLookupValues:  this.appItem.nonLookupValues ? this.appItem.nonLookupValues : []
-        };
-        config.initialState = modalDefaultData;
-        let modalRef: BsModalRef = this._BsModalService.show(
-            AppEntityListDynamicModalComponent,
-            config
-        );
-        let isProcessing = false; 
-   const subs = this._BsModalService.onHidden.subscribe(() => {
-    if (isProcessing) return;  // Prevent multiple processing
-    isProcessing = true;
-
-            const  subscription=  this._extraAttributeDataService.getExtraAttributeLookupData(
-                extraAttr.entityObjectTypeCode,
-                extraAttr.lookupData,
-                extraAttr
-            );
-    
-        this.showMainSpinner();
-            subscription.subscribe((result) => {
-                extraAttr.lookupData=result;
-                extraAttr.displayedSelectedValues = 
-                   extraAttr.displayedSelectedValues.filter(item => {    const isDeselected = this.deselectedValues.includes(item.code) || this.deselectedValues.includes(item.value);    return !isDeselected;});
-                let modalRefData: AppEntityListDynamicModalComponent =
-                modalRef.content;
-                if (modalRefData.selectionDone)
-                this.onselectionDone(modalRefData,extraAttr);
-           
-                if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
-           
-                isProcessing = false;
-                this.hideMainSpinner();
-            });
-
-          /*   let modalRefData: AppEntityListDynamicModalComponent =
-                modalRef.content;
-            if (modalRefData.selectionDone){
-                extraAttr.selectedValues = modalRefData.selectedRecords;
-              this.appItem.nonLookupValues =   this.appItem.nonLookupValues ? this.appItem.nonLookupValues : [] ;
-               //this.appItem.nonLookupValues?.push(...modalRefData.nonLookupValues?.filter(item => this.appItem.nonLookupValues.includes(item.code)));
-
-               let existingCodes = this.appItem.nonLookupValues.map(item => item.code);
-
-               let newCodes = modalRefData.nonLookupValues?.filter(item => !existingCodes.includes(item.code));
-               newCodes= newCodes ? newCodes : [] ;
-               this.appItem.nonLookupValues.push(...newCodes);
-
-               let x=extraAttr.lookupData?.filter(item => existingCodes.includes(item.code))
-               if(x && x.length >0)
-               {
-                for (let index = 0; index < x.length; index++) {
-                    const element = x[index];
-                let y=this.appItem.nonLookupValues.filter(item => item.code == element.code);
-                if(y && y.length>0)
-                      y[0].value=element.value
-               }
-            }
-
-               extraAttr.lookupData= extraAttr.lookupData?.filter(item => !existingCodes.includes(item.code))
-               extraAttr.lookupData.push(...this.appItem.nonLookupValues);
-                extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
-                //this.appItem.nonLookupValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
-                extraAttr.displayedSelectedValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
-
-            } */
+    openCreateNewAppEntityModal(): void {
+        const extraAttr = this.selectedExtraAttributes?.[this.activeExtraAttributeIndex];
+        if (!extraAttr) return;
+      
+   
+        const isArabic = this.isArabicLang();
+      
+        const config: ModalOptions = new ModalOptions();
+        config.class = isArabic
+          ? 'left-modal slide-left-in ngLeft'
+          : 'right-modal slide-right-in';
+      
+        const selectedRecords = (extraAttr.displayedSelectedValues || []).map((item) => {
+          const nonLookup = this.appItem?.nonLookupValues || [];
+          const existsInNonLookup = nonLookup.some((x) => x.code === item.code);
+          return existsInNonLookup ? item.code : item.value;
         });
-    }
+      
+        const modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
+          entityObjectType: {
+            name: extraAttr.name,
+            code: extraAttr.entityObjectTypeCode,
+          },
+          selectedRecords,
+          acceptMultiValues: extraAttr.acceptMultipleValues,
+          nonLookupValues: this.appItem?.nonLookupValues || [],
+        };
+      
+        config.initialState = modalDefaultData;
+      
+        const modalRef: BsModalRef = this._BsModalService.show(
+          AppEntityListDynamicModalComponent,
+          config
+        );
+      
+ 
+        let isProcessing = false;
+        const sub = modalRef.onHidden?.subscribe(() => {
+          if (isProcessing) return;
+          isProcessing = true;
 
+          const modalContent = modalRef.content as AppEntityListDynamicModalComponent;
+          const selectionDone = !!modalContent?.selectionDone;
+      
+          this.showMainSpinner();
+      
+          this._extraAttributeDataService
+            .getExtraAttributeLookupData(extraAttr.entityObjectTypeCode, extraAttr.lookupData, extraAttr)
+            .pipe(
+              finalize(() => {
+                this.hideMainSpinner();
+                isProcessing = false;
+                sub?.unsubscribe();
+              })
+            )
+            .subscribe((result) => {
+     
+              extraAttr.lookupData = result;
+      
+          
+              extraAttr.displayedSelectedValues =
+                (extraAttr.displayedSelectedValues || []).filter((item) => {
+                  const isDeselected =
+                    this.deselectedValues?.includes(item.code) ||
+                    this.deselectedValues?.includes(item.value);
+                  return !isDeselected;
+                });
+
+              if (selectionDone) {
+                this.onselectionDone(modalContent, extraAttr);
+              }
+            });
+        });
+      
+   
+      }
+      
+      private isArabicLang(): boolean {
+        const lang = (abp.utils.getCookieValue('Abp.Localization.CultureName') || '').toLowerCase();
+        return lang === 'ar' || lang.startsWith('ar-');
+      }
+      
    onselectionDone(modalRefData: AppEntityListDynamicModalComponent,extraAttr) {
    
         extraAttr.selectedValues = modalRefData.selectedRecords;

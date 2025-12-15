@@ -202,3 +202,9 @@ textarea.ng-pristine.ng-invalid.ng-touched {
 .text-purple{
     color: #4A0D4A !important;
 }
+::ng-deep {
+    .ngLeft {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+    }
+}

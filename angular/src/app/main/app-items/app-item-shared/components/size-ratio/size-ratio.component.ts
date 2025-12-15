@@ -26,6 +26,8 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
   @ViewChild("SizeRatioForm", { static: true }) sizeRatioForm: NgForm;
   @Output('StatusChanged') statusChanged:EventEmitter<boolean> = new EventEmitter<boolean>() 
   appSizeRatios : AppItemSizesScaleInfo
+  currentLang:string
+  isArabic:boolean
   constructor(
     private _appSizeScaleServiceProxy:AppSizeScaleServiceProxy,
     private injector : Injector
@@ -40,7 +42,8 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
     }
   }
   ngOnInit(){
-    console.log('on init')
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.sizeRatioForm.statusChanges.subscribe(status=>{
       this.statusChanged.emit('VALID' == status)
     })

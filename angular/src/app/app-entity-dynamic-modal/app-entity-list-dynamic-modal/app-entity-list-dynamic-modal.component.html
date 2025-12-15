@@ -3,7 +3,7 @@
         <h4 class="modal-title">
             <p class="desc-menu-item">{{l(entityObjectType.name)}} {{l("values")}} </p>
         </h4>
-        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
+        <button style="position: absolute;top: 8px;" type="button" class="close" (click)="close()"  [ngClass]="isArabic ? 'closeIcon-ar':'closeIcon-en'"
             aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
