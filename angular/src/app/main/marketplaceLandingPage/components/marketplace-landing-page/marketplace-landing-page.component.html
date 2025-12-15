@@ -4,11 +4,7 @@
 
       <!-- auto slider with call to action-->
       <div *ngSwitchCase="'ASSB'">
-        <h4   [style.text-align]="
-        s?.inputs?.titleAlignment === 'Center'
-          ? 'center'
-          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
-      ">{{ s.inputs?.title }}</h4>
+     
         <app-slider-with-callToAction class="" [sectionId]="s.sectionId">
         </app-slider-with-callToAction>
       </div>

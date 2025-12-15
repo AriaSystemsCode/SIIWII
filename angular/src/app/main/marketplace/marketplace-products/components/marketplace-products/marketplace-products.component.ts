@@ -508,7 +508,7 @@ export class MarketplaceProductsComponent
                     : JSON.parse(localStorage.getItem("currencyCode")));
         this.currency =
             localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                ? this.tenantDefaultCurrency.code
+                ? this.tenantDefaultCurrency?.code
                 : JSON.parse(localStorage.getItem("currencyCode")).code;
         this.tentantID = this.appSession?.tenant?.id;
         this.selectedSort = { label: "Product Name", value: "name" };
