@@ -118,6 +118,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
 
             // Parameters
             this.TransactionId = reportInitializer.GetParameter("TransactionId");
+            this.PrintTime = reportInitializer.GetParameter("PrintTime");
+            this.PrintDate = reportInitializer.GetParameter("PrintDate");
             this.Country = reportInitializer.GetParameter("Country");
             this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
             this.tenantId = reportInitializer.GetParameter("tenantId");
@@ -234,6 +236,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
         private DevExpress.XtraReports.UI.CalculatedField calculatedField1;
         private DevExpress.XtraReports.Parameters.Parameter TransactionId;
+        private DevExpress.XtraReports.Parameters.Parameter PrintTime;
+        private DevExpress.XtraReports.Parameters.Parameter PrintDate;
         private DevExpress.XtraReports.Parameters.Parameter Country;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter tenantId;
