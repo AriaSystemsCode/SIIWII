@@ -61,6 +61,9 @@ namespace onetouch.AppMarketplaceItems
         //I48[Start]
         private readonly IMessageAppService _messageAppService;
         //I48[End]
+        //I40[Start]
+        IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        //I40[End]
         public AppMarketplaceItemsAppService(IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemList,
             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetail, IRepository<AppMarketplaceItemSelectors, long> appMarketplaceItemsSelector,
             IRepository<AppMarketplaceItems, long> appMarketplaceItem, Helper helper, IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository,
@@ -69,7 +72,8 @@ namespace onetouch.AppMarketplaceItems
             IRepository<onetouch.AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevels,
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<AppTransactionDetails, long> appTransactionDetailsRepository,
             IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
-        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService, IRepository<AppEntitiesRelationship, long> appEntitiesRelationship)
+        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService,
+        IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository)
         {
             _messageAppService = messageAppService;
             _appTransactionHeadersRepository = appTransactionHeadersRepository;
@@ -88,6 +92,7 @@ namespace onetouch.AppMarketplaceItems
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
             _appEntitiesRelationship = appEntitiesRelationship;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[Start]
         [AbpAllowAnonymous]
@@ -1386,17 +1391,21 @@ namespace onetouch.AppMarketplaceItems
                         }
                         //I46[Start]
                         var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                        var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
-                               && a.TenantId== appItem.TenantOwner
-                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                        var contactSeller = await _appMarketplaceContactRepository.GetAll().Where(a=> a.ParentId == null
+                               && a.TenantOwner == appItem.TenantOwner
+                               && a.IsProfileData == true && a.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+
+                        //var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
+                         //      && a.TenantId== appItem.TenantOwner
+                          //     && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
                         if (contactSeller != null)
                         {
-                            var marketplaceSellerAccount =  await _appContactRepository.GetAll().Where(a => a.TenantId == null && a.ParentId == null
-                               && a.PartnerId == contactSeller.Id && a.IsProfileData == false && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
-                            if (marketplaceSellerAccount!=null)
-                            {
-                                output.SellerMarketPlaceAccountId = marketplaceSellerAccount.Id;
-                            }
+                            //var marketplaceSellerAccount =  await _appContactRepository.GetAll().Where(a => a.TenantId == null && a.ParentId == null
+                             //  && a.PartnerId == contactSeller.Id && a.IsProfileData == false && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                            //if (marketplaceSellerAccount!=null)
+                            //{
+                                output.SellerMarketPlaceAccountId = contactSeller.Id;
+                            //}
 
                             output.SellerSSIN = contactSeller.SSIN;
                             output.SellerCompanyName = contactSeller.Name;

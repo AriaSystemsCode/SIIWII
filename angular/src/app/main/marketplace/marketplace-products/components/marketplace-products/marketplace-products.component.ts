@@ -12,8 +12,6 @@ import {
 } from "@angular/core";
 import {  ActivatedRoute, Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
-import { AppItemBrowseEvents } from "@app/main/app-items/app-items-browse/models/appItems-browse-events";
-import { ActionsMenuEventEmitter } from "@app/main/app-items/app-items-browse/models/ActionsMenuEventEmitter";
 import {
     AppEntitiesServiceProxy,
     AppMarketplaceItemsServiceProxy,
@@ -84,7 +82,6 @@ export class MarketplaceProductsComponent
     selectedCategories: number[] = []; 
 
     @Input() fromMarketAcoount: boolean;
-    @Input() fromOverView: boolean = false
     @Input() accountDataForView: any
     @Input() marketplaceAccCurrency: string
     @ViewChildren(ProdcutCardComponent)
@@ -158,11 +155,11 @@ productCards!: QueryList<ProdcutCardComponent>;
         const state = (this._router.getCurrentNavigation()?.extras?.state ?? history.state) as any;
 
         if (state?.accountDataForView) {
-          this.fromMarketAcoount = !!state.fromMarketAcoount;
-          this.accountDataForView = state.accountDataForView;
-          this.marketplaceAccCurrency = state.marketplaceAccCurrency;
+            this.fromMarketAcoount = !!state.fromMarketAcoount;
+            this.accountDataForView = state.accountDataForView;
+            this.marketplaceAccCurrency = state.marketplaceAccCurrency;
 
-          localStorage.removeItem('productFilters');
+            localStorage.removeItem('productFilters');
         }
         const savedFilters = localStorage.getItem("productFilters");
         if (savedFilters) {
@@ -233,14 +230,7 @@ productCards!: QueryList<ProdcutCardComponent>;
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        // if (changes['accountDataForView'] && this.accountDataForView?.ssin) {
-        //     if (this.fromMarketAcoount || this.fromOverView) {
-        //         localStorage.removeItem("productFilters");
-        //     }
-        //     this.getAllProducts();
-        // } else {
 
-        // }
         document.getElementById("_searchInput").focus();
     }
     getAspectatio() {
@@ -284,23 +274,15 @@ productCards!: QueryList<ProdcutCardComponent>;
         this.isFilterHidden = !this.isFilterHidden;
     }
 
-    // viewProductHandler(
-    //     $event: ActionsMenuEventEmitter<AppItemBrowseEvents, number>
-    // ) {
-    //     if ($event.event != AppItemBrowseEvents.View) return;
-    //     this._router.navigate([
-    //         "/app/main/marketplace/products/view",
-    //         $event.data,
-    //     ]);
-    // }
-
 
     getAllProducts() {
         this.showMainSpinner();
+
         const selectedCurrency =
-        (this.fromMarketAcoount || this.fromOverView)
-            ? (this.marketplaceAccCurrency || 'USD')
-            : (this.selectedCurrrency || 'USD');  // ✅ string
+            (this.fromMarketAcoount)
+                ? (this.marketplaceAccCurrency || 'USD')
+                : (this.selectedCurrrency || 'USD');
+
         const requestParams = {
             contactSSIN: this.contactSSIN,
             sellerSSIN: this.sellerSSIN,
@@ -321,7 +303,7 @@ productCards!: QueryList<ProdcutCardComponent>;
             selectedCurrency: selectedCurrency,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
-            maxResultCount: this.fromOverView ? 4 : this.maxResultCount
+            maxResultCount:  this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
         const currencyCode = this.getCurrencyCodeForRequest();
@@ -329,7 +311,7 @@ productCards!: QueryList<ProdcutCardComponent>;
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                this.fromMarketAcoount || this.fromOverView
+                this.fromMarketAcoount 
                 ? this.accountDataForView?.ssin
                 : sessionStorage.getItem("SellerSSIN"),
                 null,
@@ -360,69 +342,40 @@ productCards!: QueryList<ProdcutCardComponent>;
                 finalize(() => {
                     this.displayFitlers = false;
                     this.hideMainSpinner();
-                    this.setCurrency(); // keeps `selectedCurrrency` in sync with localStorage
+                    this.setCurrency();
                 })
             )
             .subscribe((result) => {
                 this.items = result.items;
                 this.pagesNumber = result.totalCount;
-    
+
                 if (
                     result.items.length == 1 &&
-                    !this.fromOverView &&
                     !this.fromMarketAcoount &&
                     this.searchInput != ''
                 ) {
                     setTimeout(() => {
                         const firstCard = this.productCards.first;
-                        firstCard?.viewProduct(firstCard.product.id);   // ✅ now valid
-                      }, 500);
+                        firstCard?.viewProduct(firstCard.product.id);
+                    }, 500);
                 }
             });
     }
-    
 
 
-    // setCurrency() {
-    //     const currencyCodeRaw = localStorage.getItem("currencyCode");
-    //     if (!currencyCodeRaw || currencyCodeRaw === "undefined" || currencyCodeRaw === "null") {
-    //         this.selectedCurrrency = this.tenantDefaultCurrency;
-    //     } else {
-    //         try {
-    //             const parsed = JSON.parse(currencyCodeRaw);
-    //             this.selectedCurrrency = parsed;
-
-    //         } catch (e) {
-    //             // Fallback to string if it's not a JSON object
-    //             this.selectedCurrrency = currencyCodeRaw;
-
-    //         }
-    //     }
-
-    //     this.currency = this.selectedCurrrency?.code ?? this.selectedCurrrency;
-
-    //     // If it's just a code (e.g., "AFN"), find matching currency object
-    //     if (!this.selectedCurrrency?.code) {
-    //         const match = this.currencies?.find(x => x.code === this.selectedCurrrency);
-
-    //         if (match) {
-    //             this.selectedCurrrency = match;
-    //         }
-    //     }
-    // }
 
 
     setCurrency() {
         // read string code from localStorage
         const saved = localStorage.getItem('currencyCode');
         const code = saved && saved !== 'null' && saved !== 'undefined' ? saved : (this.tenantDefaultCurrency?.code ?? 'USD');
-      
-        this.selectedCurrrency = code;            // keep it a string
-        this.currency = code;                     // if you still use this elsewhere
-      }
-      
 
-      
+        this.selectedCurrrency = code;
+        this.currency = code;
+    }
+
+
+
     onPageChange(value: any) {
         this.skipCount = value.first;
         this.maxResultCount = value.rows;
@@ -441,25 +394,17 @@ productCards!: QueryList<ProdcutCardComponent>;
     handleSharingLevelsOptions(data: any) {
         this.getAllProducts();
     }
-    // handleCurrencyChange(data: any) {
-    //     setTimeout(
-    //         () => {
-    //             this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
-    //             localStorage.setItem("currencyCode", this.currency);
-    //             this.getAllProducts();
-    //         }, 500);
 
-    // }
     handleCurrencyChange(event: any) {
-        this.selectedCurrrency = event.value;  // ✅ string
+        this.selectedCurrrency = event.value;
         this.currency = event.value;
-    
+
         localStorage.setItem("currencyCode", this.currency);
-    
-       
-        this.getAllProducts();                // ✅ immediate reload
+
+
+        this.getAllProducts();
     }
-    
+
     handleSortingChange(data: any) {
         this.getAllProducts();
     }
@@ -571,17 +516,17 @@ productCards!: QueryList<ProdcutCardComponent>;
     }
     resetProducts($event) {
         this.filters.resetFilters();
-    
+
         this.seletedOption = { label: "Public And Shared With Me", value: 2 };
-    
+
         const saved = localStorage.getItem("currencyCode");
         this.selectedCurrrency =
             saved && saved !== 'null' && saved !== 'undefined'
                 ? saved
                 : (this.tenantDefaultCurrency?.code ?? 'USD');
-    
+
         this.currency = this.selectedCurrrency;
-    
+
         this.tentantID = this.appSession?.tenant?.id;
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
@@ -616,16 +561,16 @@ productCards!: QueryList<ProdcutCardComponent>;
   const inSellerRoom = JSON.parse(localStorage.getItem('fromSellerRoom') || 'false');
   const inMarketplace = JSON.parse(localStorage.getItem('fromMarketPlace') || 'false');
 
-  if (!inSellerRoom || inMarketplace) {
-    sessionStorage.removeItem('SellerSSIN');
-    localStorage.removeItem('BuyerSSIN');
-  }
+        if ((!inSellerRoom || inMarketplace) && !this.fromMarketAcoount) {
+            sessionStorage.removeItem('SellerSSIN');
+            localStorage.removeItem('BuyerSSIN');
+        }
+
 
         localStorage.setItem("currencyCode", null);
     }
 
 
-    // start mobile filters
     cancel() {
         this.displayFitlers = false;
     }

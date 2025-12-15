@@ -983,3 +983,23 @@ border-radius: 6px;
    font-size: 24px;
 }
 
+.reset-link {
+   display: inline-flex;
+   align-items: center;
+   padding: 4px 10px;
+   border: 1px solid transparent;
+   border-radius: 6px;
+   cursor: pointer;
+   text-decoration: none;
+   transition: border-color .2s ease, background-color .2s ease, color .2s ease;
+ 
+   &:hover {
+     border-color:  #EBEBEB;     // or your theme color
+   //   background: rgba(21, 122, 248, 0.08);
+   }
+ 
+   &:active {
+     transform: translateY(1px);
+   }
+ }
+ 
