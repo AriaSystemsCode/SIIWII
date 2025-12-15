@@ -44,18 +44,7 @@
               required
               minlength="2"
               maxlength="100" />
-              <!-- <select class="form-control form-control-sm"
-                      name="subject"
-                      [(ngModel)]="model.subject"
-                      required>
-                <option value="Registration request">Registration request</option>
-                <option value="General inquiry">option1</option>
-                <option value="Support">option2</option>
-              </select> -->
-              <!-- <small class="text-danger"
-                     *ngIf="contactForm.submitted && !contactForm.controls.subject?.valid">
-                Subject is required
-              </small> -->
+  
             </div>
 
             <!-- First Name -->
@@ -103,7 +92,7 @@
                      #emailInput="ngModel"
                      maxlength="150" />
               <small class="text-danger"
-                     *ngIf="emailInput.touched && emailInput.valid">
+                     *ngIf="emailInput.touched && emailInput.invalid">
                 Enter a valid email
               </small>
             </div>

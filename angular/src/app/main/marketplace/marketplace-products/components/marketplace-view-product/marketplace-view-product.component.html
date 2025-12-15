@@ -275,7 +275,7 @@
                                 <div class="msrp d-flex " *ngIf="productData?.showMSRP == 'Yes'">
                              
                                     <h5 class="mr-2" style="color: black !important;font-size: 16px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
-                                    <h5 [ngClass]="!isAuthenticated ?'blur-text':''">
+                                    <h5 >
 
                                         {{
                                         currencySymbol
@@ -291,7 +291,7 @@
                                     <h5 *ngIf="
                                         productDetails?.minMSRP !==
                                         productDetails?.maxMSRP
-                                    "  [ngClass]="!isAuthenticated ?'blur-text':''">
+                                    "  >
 
                                         {{
                                         currencySymbol
@@ -309,7 +309,7 @@
 
 
 
-                                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice"  [ngClass]="!isAuthenticated ?'blur-text':''">
+                                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice" >
                                                 {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                             </h5>
 
@@ -1111,7 +1111,7 @@ top: 4px;">
                                         <div class="msrp d-flex mb-2"  *ngIf="productData?.showMSRP == 'Yes'">
                                             <h5 class="mr-2" style="color: black !important;font-size: 12px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:
                                             </h5>
-                                            <h5  [ngClass]="!isAuthenticated ?'blur-text':''">
+                                            <h5>
 
                                                 {{
                                                 currencySymbol
@@ -1127,7 +1127,7 @@ top: 4px;">
                                             <h5 *ngIf="
                                                     productDetails?.minMSRP !==
                                                     productDetails?.maxMSRP
-                                                "  [ngClass]="!isAuthenticated ?'blur-text':''">
+                                                " >
 
                                                 {{
                                                 currencySymbol
@@ -1144,7 +1144,7 @@ top: 4px;">
 
 
 
-                                                    <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice"  [ngClass]="!isAuthenticated ?'blur-text':''">
+                                                    <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice" >
 
                                                         {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                                     </h5>

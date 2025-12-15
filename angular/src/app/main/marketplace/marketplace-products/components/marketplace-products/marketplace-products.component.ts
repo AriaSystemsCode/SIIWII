@@ -348,10 +348,7 @@ export class MarketplaceProductsComponent
     
 
      setCurrency() {
-        console.log(this.tenantDefaultCurrency,'tenantDefaultCurrency')
-        console.log(this.selectedCurrrency,'selectedCurrrency')
-        console.log(this.currency,'currency')
-        console.log(localStorage.getItem("currencyCode"),'localStorage')
+      
         this.selectedCurrrency =
             localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
                 ? this.tenantDefaultCurrency
@@ -364,10 +361,6 @@ export class MarketplaceProductsComponent
                 this.selectedCurrrency = this.currencies[indx];
         }
 
-        console.log(this.tenantDefaultCurrency,'//////tenantDefaultCurrency')
-        console.log(this.selectedCurrrency,'//////selectedCurrrency')
-        console.log(this.currency,'//////currency')
-        console.log(localStorage.getItem("currencyCode"),'//////localStorage')
     }
 
     onPageChange(value: any) {
@@ -527,7 +520,7 @@ export class MarketplaceProductsComponent
         this.skipCount= 0;
         this.maxResultCount= 12;
         this.selectedDepartments =[]
-        this.onlyAvialbleStock = null
+        this.onlyAvialbleStock = undefined
         localStorage.removeItem("productFilters");
         this.getAllProducts();
 
