@@ -738,7 +738,7 @@ export class MarketplaceViewProductComponent
                             .pipe(finalize(() => {
                                 Swal.fire({
                                     title: "",
-                                    text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                                    text: `Quantities have been added to the cart and purchase order # ${this.orderNo} has been created?`,
                                     icon: "info",
                                     showCancelButton: true,
                                     confirmButtonText:
