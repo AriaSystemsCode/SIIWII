@@ -1392,9 +1392,10 @@ namespace onetouch.AppMarketplaceItems
                         }
                         //I46[Start]
                         var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                        var tenantOwner = TenantManager.GetById(appItem.TenantOwner);
                         var contactSeller = await _appMarketplaceContactRepository.GetAll().Where(a=> a.ParentId == null
-                               && a.TenantOwner == appItem.TenantOwner
-                               && a.IsProfileData == true && a.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                               && a.TenantOwner == appItem.TenantOwner && a.Name== tenantOwner.Name
+                               && a.IsProfileData == true).FirstOrDefaultAsync();
 
                         //var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
                          //      && a.TenantId== appItem.TenantOwner

@@ -558,3 +558,9 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
           .rounded-c {
             border-radius: 8px;
           }
+
+::ng-deep .addRT{
+    .notification-show{
+        right: -210px !important;
+    }
+}
