@@ -494,3 +494,9 @@ left: 30px;
     background-color: #fff;
   }
   
+
+::ng-deep .addRT{
+    .notification-show{
+        right: -210px !important;
+    }
+}

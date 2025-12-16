@@ -1439,10 +1439,11 @@ namespace onetouch.AppMarketplaceAccounts
                     if (isPublic != null)
                     {
                         relation.SharingLevel = isPublic == true ? 1 : 4;
-                        await _appContactRelationshipInfoRepository.UpdateAsync(relation);
-                        await CurrentUnitOfWork.SaveChangesAsync();
+                       
                     }
-
+                    relation.EntityObjectStatusId = activeRealtionshipStatusId;
+                    await _appContactRelationshipInfoRepository.UpdateAsync(relation);
+                    await CurrentUnitOfWork.SaveChangesAsync();
                 }
             }
             else

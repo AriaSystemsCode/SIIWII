@@ -179,7 +179,7 @@
                 </li>
                 <li class="nav-item pl-3 pt-2">
                     <a class="nav-link active d-flex flex-column text-center" routerLinkActive="header-link-active">
-                        <div headerNotifications class="kt-header__topbar-item dropdown" dropdown
+                        <div headerNotifications class="kt-header__topbar-item dropdown" dropdown [ngClass]="isArabic?'addRT':''"
                             id="header_notification_bar"></div>
                         <span class="small">
                             {{ "Notification" | localize }}
