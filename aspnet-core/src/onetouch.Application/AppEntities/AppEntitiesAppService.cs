@@ -2347,6 +2347,7 @@ namespace onetouch.AppEntities
                 attach.FileName = Path.GetFileName(input.Image);
                 attach.Url = input.Image;
                 attach.guid =  Path.GetFileNameWithoutExtension(input.Image);
+                attach.AttachmentCategoryId = 3;
                 returnObject.EntityAttachments.Add(attach);
             }
             if (!string.IsNullOrEmpty(input.HexaCode))
