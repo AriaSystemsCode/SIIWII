@@ -130,6 +130,7 @@ namespace onetouch.Accounts
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
         private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        private readonly IRepository<AppMarketplaceAddress, long> _appMarketplaceAddressRepository;
         private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
         //I40[start]
         private readonly ISycEntityObjectTypesAppService _sycEntityObjectTypesAppService;
@@ -169,7 +170,8 @@ namespace onetouch.Accounts
               IRepository<AppEntityClassification, long> appEntityClassficationRepository,
               ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<ValidationRule> validationRuleRepo,
               IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
-              IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository)
+              IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository,
+              IRepository<AppMarketplaceAddress, long> appMarketplaceAddressRepository)
              // IRepository<onetouch.AppMarketplaceItems.AppMarketplaceItem, long> appMarketplaceItemRepository
              
               
@@ -209,7 +211,8 @@ namespace onetouch.Accounts
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             _sycEntityObjectTypesAppService= sycEntityObjectTypesAppService;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
-           // _appMarketplaceItemRepository = appMarketplaceItemRepository;
+            // _appMarketplaceItemRepository = appMarketplaceItemRepository;
+            _appMarketplaceAddressRepository = appMarketplaceAddressRepository;
         }
         private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
         {
@@ -1922,7 +1925,7 @@ namespace onetouch.Accounts
                                     foreach (var mcontactAddress in originalPublishContactFortCurrTenant.ContactAddresses)
                                     {
                                         AppAddress address = new AppAddress();
-                                        var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
+                                        var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
                                         if (savedAddress != null)
                                         {
                                             var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == originalContact.TenantOwner &&
@@ -2031,7 +2034,7 @@ namespace onetouch.Accounts
                                 foreach (var mcontactAddress in originalContact.ContactAddresses)
                                 {
                                     AppAddress address = new AppAddress();
-                                    var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
+                                    var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
                                     if (savedAddress != null)
                                     {
                                         var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == tenantId &&
@@ -2141,7 +2144,7 @@ namespace onetouch.Accounts
                                 foreach (var mcontactAddress in originalContact.ContactAddresses)
                                 {
                                     AppAddress address = new AppAddress();
-                                    var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
+                                    var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
                                     if (savedAddress != null)
                                     {
                                         var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == originalContact.TenantOwner &&
@@ -3154,7 +3157,7 @@ namespace onetouch.Accounts
 
             contact.Id = contactOriginal == null ? 0 : contactOriginal.Id;
             //I46[Start]
-            if (input.AccountLevel == AccountLevelEnum.External && input.Id != 0)
+            if ((input.AccountLevel == AccountLevelEnum.External || input.AccountLevel == AccountLevelEnum.Connected) && input.Id != 0)
             {
                 var externalAcc = await _appContactRepository.GetAll()
                     .Where(z => z.TenantId == AbpSession.TenantId && z.Id == input.Id).FirstOrDefaultAsync();

@@ -2220,7 +2220,7 @@ namespace onetouch.AppSiiwiiTransaction
                 //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
                 .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null &&
                         ((string.IsNullOrEmpty(transactionType) || transactionType == "SO") ? (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id) :
-                         _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == a.SSIN) > 0));
+                         (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id) && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == a.SSIN) > 0));
                
                                                                                                                                                                                                                                                   //&& (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || ((string.IsNullOrEmpty(transactionType) || transactionType =="PO") ? false :a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id)));
 
@@ -4881,7 +4881,7 @@ namespace onetouch.AppSiiwiiTransaction
 
 
             // var Tenants = (await contact.ToListAsync()).Where(z => z.TenantId != null).Select(z => z.TenantId).ToList();
-            var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+           var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
                  .WhereIf(!string.IsNullOrEmpty(filter), z => z.Name.Contains(filter))
                 .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
 
