@@ -2296,7 +2296,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
 
         if(item){
             
-            const isTempId = item.value > 1e10;
+            const isTempId = !item.value  || item.value > 1e10;
 
             if (!isTempId) {
                 appEntity.id = item.value;
