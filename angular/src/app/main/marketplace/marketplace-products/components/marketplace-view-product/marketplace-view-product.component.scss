@@ -888,10 +888,10 @@ p-dialog {
     font-weight: 500;
 }
 
-.blur-text {
-    filter: blur(5px);
-    transition: filter 0.3s;
-    user-select: none;      /* prevent copy/paste */
-    pointer-events: none;   /* disable text selection/clicks */
-  }
+// .blur-text {
+//     filter: blur(5px);
+//     transition: filter 0.3s;
+//     user-select: none;      /* prevent copy/paste */
+//     pointer-events: none;   /* disable text selection/clicks */
+//   }
   

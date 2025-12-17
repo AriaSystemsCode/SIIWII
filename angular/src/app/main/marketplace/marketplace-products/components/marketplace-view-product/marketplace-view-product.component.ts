@@ -315,7 +315,8 @@ export class MarketplaceViewProductComponent
         // this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
         let originalIndex = this.colorsData.findIndex(color => color?.colorCodeSelectedValues?.toLowerCase()?.trim() === this.filteredColors[index].colorCodeSelectedValues?.toLowerCase()?.trim());
         this.colorAttachmentForMainIamge = this.filteredColors[index]?.colorImg
-        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments
+        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments ?   this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments : 
+                                  [  this.productData?.appItem?.entityAttachments?.find(x=>x.isDefault) ]; 
     }
     setColorView(value: boolean) {
         this.isColorView = value
@@ -738,7 +739,7 @@ export class MarketplaceViewProductComponent
                             .pipe(finalize(() => {
                                 Swal.fire({
                                     title: "",
-                                    text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                                    text: `Quantities have been added to the cart and purchase order # ${this.orderNo} has been created?`,
                                     icon: "info",
                                     showCancelButton: true,
                                     confirmButtonText:

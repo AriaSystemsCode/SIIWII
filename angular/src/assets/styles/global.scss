@@ -425,17 +425,6 @@ color: #700066 !important;
     background:white !important;
     // border-color: #700066 !important;
 }
-//  p-treetable
-// .p-treetable .p-treetable-thead > tr {
-//     border: none !important;
-//    // background: white !important;
-// }
-
-// .p-treetable .p-treetable-thead > tr >  th
-// {
-//     border: 1px solid white !important;
-//     background: white !important;
-// }
 
 .p-treetable .p-treetable-scrollable-body{
     // overflow: hidden scroll;
@@ -444,9 +433,7 @@ color: #700066 !important;
 }
 
 
-.shoppingCartAccordionTabBG path {
-    // color: #700066;
-}
+
   .shoppingCartAccordionTabBG.shoppingCartAccordionNotValidTab .p-accordion .p-accordion-header .p-accordion-header-link  {
     background: red !important;
 }
@@ -720,10 +707,7 @@ border: 1px solid #D9D9D9 !important;
       overflow: scroll !important;
       overflow-y: scroll !important;
     }
-    // .p-dropdown-panel {
-    //     z-index: 9999999999999 !important;
-    
-    // } 
+ 
 }
 
 .p-datepicker:not(.p-datepicker-inline) {
@@ -787,11 +771,7 @@ html{
 
 
 
-/* .p-checkbox .p-checkbox-box .p-icon {
-    position: relative;
-    left: 40%;
-    right: 40%;
-} */
+
 .p-checkbox .p-checkbox-box {
     display: flex;
     align-items: center;  

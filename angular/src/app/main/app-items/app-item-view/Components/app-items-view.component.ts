@@ -436,16 +436,17 @@ export class AppItemsViewComponent
         } else this.setVariationsRelatedValues();
     }
     setVariationsRelatedValues() {
+        let img= this.appItemForViewDto.variations[0].selectedValues[
+            this.varitaionSelectedIndex
+        ].entityAttachments[0] ;
+
         this.centerImage =
-            this.appItemForViewDto.variations[0].selectedValues[
-                this.varitaionSelectedIndex
-            ].entityAttachments[0];
+          img ?  img :  this.appItemForViewDto.entityAttachments.find(x=>x.isDefault);
 
-
-            if(this.isPdfFile( this.centerImage.fileName))
+            if(this.isPdfFile( this.centerImage?.fileName))
                 this.centerImage.isPdfFile =true;
     
-             else if(this.isVideoFile( this.centerImage.fileName))
+             else if(this.isVideoFile( this.centerImage?.fileName))
                 this.centerImage.isVideoFile =true;
     
                 else 

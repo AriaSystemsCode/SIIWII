@@ -179,10 +179,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    /**
-     * Decide the default page from host setting 1203,
-     * then return it via callback so login() can pass it to authenticate().
-     */
+ 
     chooseDefaultPage(callback: (url: string) => void): void {
         this._appEntitiesServiceProxy.getHostSettingValue(1203,null).subscribe({
             next: res2 => {

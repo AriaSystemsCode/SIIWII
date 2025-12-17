@@ -331,7 +331,7 @@ productCards!: QueryList<ProdcutCardComponent>;
                 requestParams.startShipData || this.startShipData,
                 requestParams.endShipData ||  this.endShipData,
                 requestParams.brands ||  this.brands, // ids
-                requestParams.selectedCurrency ||  this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                currencyCode,
                 undefined,
                 requestParams.selectedCategory || this.selectedCategories,  //category
                 requestParams.selectedSort || this.selectedSort.value,
@@ -362,16 +362,15 @@ productCards!: QueryList<ProdcutCardComponent>;
             });
     }
 
+     setCurrency() {
+      
+        this.selectedCurrrency =
+            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+                ? this.tenantDefaultCurrency
+                : JSON.parse(localStorage.getItem("currencyCode"));
+        this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
 
 
-
-    setCurrency() {
-        // read string code from localStorage
-        const saved = localStorage.getItem('currencyCode');
-        const code = saved && saved !== 'null' && saved !== 'undefined' ? saved : (this.tenantDefaultCurrency?.code ?? 'USD');
-
-        this.selectedCurrrency = code;
-        this.currency = code;
     }
 
 
@@ -516,17 +515,15 @@ productCards!: QueryList<ProdcutCardComponent>;
     }
     resetProducts($event) {
         this.filters.resetFilters();
-
-        this.seletedOption = { label: "Public And Shared With Me", value: 2 };
-
-        const saved = localStorage.getItem("currencyCode");
-        this.selectedCurrrency =
-            saved && saved !== 'null' && saved !== 'undefined'
-                ? saved
-                : (this.tenantDefaultCurrency?.code ?? 'USD');
-
-        this.currency = this.selectedCurrrency;
-
+        (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
+            (this.selectedCurrrency =
+                localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+                    ? this.tenantDefaultCurrency
+                    : JSON.parse(localStorage.getItem("currencyCode")));
+        this.currency =
+            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+                ? this.tenantDefaultCurrency?.code
+                : JSON.parse(localStorage.getItem("currencyCode")).code;
         this.tentantID = this.appSession?.tenant?.id;
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
@@ -537,7 +534,7 @@ productCards!: QueryList<ProdcutCardComponent>;
         this.skipCount= 0;
         this.maxResultCount= 12;
         this.selectedDepartments =[]
-        this.onlyAvialbleStock = null
+        this.onlyAvialbleStock = undefined
         localStorage.removeItem("productFilters");
         this.getAllProducts();
     }
