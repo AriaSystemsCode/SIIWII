@@ -35,8 +35,9 @@
 
                         
                     <h5>{{"Dropyourfolderhereorclickheretoupload" | localize}} </h5>
-                    <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB, Files supported :xsls,images" | localize}}</span>
-                    <p style="color: #F6851D !important;">*Image Aspect-Ratio is 16:9 </p>
+                    <h5> {{"FilesformatsSupportedareXLSX,JPGandPNG" | localize}}</h5>
+                    <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB" | localize}}</span>
+                    <p style="color: #F6851D !important;">*Image Aspect-Ratio is {{aspectRatioNumbers}} </p>
                 </label>
             </div>
             

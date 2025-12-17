@@ -2570,5 +2570,8 @@
 	<text name="Absolute">Absolute</text>
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
-  </texts>  
+		<text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
+		<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
+
+	</texts>  
 </localizationDictionary>
