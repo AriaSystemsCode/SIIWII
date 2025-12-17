@@ -362,7 +362,7 @@ productCards!: QueryList<ProdcutCardComponent>;
             });
     }
 
-     setCurrency() {
+    setCurrency() {
       
         this.selectedCurrrency =
             localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
@@ -370,6 +370,11 @@ productCards!: QueryList<ProdcutCardComponent>;
                 : JSON.parse(localStorage.getItem("currencyCode"));
         this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
 
+        if (!this.selectedCurrrency?.code) {
+            var indx = this.currencies?.findIndex(x => x.code == this.selectedCurrrency);
+            if (indx >= 0)
+                this.selectedCurrrency = this.currencies[indx];
+        }
 
     }
 
@@ -394,14 +399,14 @@ productCards!: QueryList<ProdcutCardComponent>;
         this.getAllProducts();
     }
 
-    handleCurrencyChange(event: any) {
-        this.selectedCurrrency = event.value;
-        this.currency = event.value;
+    handleCurrencyChange(data: any) {
+        setTimeout(
+            () => {
+                this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
+                localStorage.setItem("currencyCode", this.currency);
+                this.getAllProducts();
+            }, 1500);
 
-        localStorage.setItem("currencyCode", this.currency);
-
-
-        this.getAllProducts();
     }
 
     handleSortingChange(data: any) {
