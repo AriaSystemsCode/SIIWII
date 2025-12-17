@@ -2320,11 +2320,11 @@ namespace onetouch.Accounts
                             {
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.EntityId = 0);
-                                var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
-                                if (userIdExtraData != null)
-                                {
-                                    userIdExtraData.AttributeValue = "";
-                                }
+                                //var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                                //if (userIdExtraData != null)
+                                //{
+                                //    userIdExtraData.AttributeValue = "";
+                                //}
 
                             }
                             if (createOrEditAccountInfoDto.EntityAttachments != null)
@@ -2398,11 +2398,11 @@ namespace onetouch.Accounts
                             {
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.EntityId = 0);
-                                var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
-                                if (userIdExtraData != null)
-                                {
-                                    userIdExtraData.AttributeValue = "";
-                                }
+                                //var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                                //if (userIdExtraData != null)
+                                //{
+                                //    userIdExtraData.AttributeValue = "";
+                                //}
                             }
                             if (createOrEditAccountInfoDto.EntityAttachments != null)
                             {
