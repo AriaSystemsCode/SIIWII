@@ -90,7 +90,7 @@ export class MarketplaceViewProductComponent
     overRating: OverAllRatingDto
     isAuthenticated = this.appSession?.user
     relatedItems:any
-
+    Warningmessage:string
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -110,10 +110,10 @@ export class MarketplaceViewProductComponent
         this.priceLevel = localStorage.getItem("tempPriceLevel");
         // this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
-      
+       
     }
     ngOnInit(): void {
-        // 🔁 Re-run when /view/:id changes
+   
         this.route.paramMap.subscribe(params => {
           const idParam = params.get('id');          // adjust if your route param name is different
           const id = idParam ? +idParam : null;
@@ -197,7 +197,7 @@ export class MarketplaceViewProductComponent
             const handleItemDetails = (res: GetAppMarketplaceItemDetailForViewDto) => {
               this.productDetails = res?.appItem;
               this.productData = res;
-          
+          this.getSettingData()
               this.productDetails.maxSpecialPrice = this.productDetails?.maxSpecialPrice ?? 0;
               this.updatedSpecialPrice = this.productDetails.maxSpecialPrice;
           
@@ -273,6 +273,7 @@ export class MarketplaceViewProductComponent
                     this.getOverAllRatings();
                     this.getRelatedProducts(true)
                     this.hideMainSpinner();
+                  
                   })
                 )
                 .subscribe(handleItemDetails);
@@ -288,7 +289,7 @@ export class MarketplaceViewProductComponent
                 if (res?.buyerSSIN) this.productBodyData.buyerSSIN = res.buyerSSIN;
                 if (res?.sellerSSIN) this.productBodyData.sellerSSIN = res.sellerSSIN;
                 if (res?.currencyCode) this.productBodyData.currencyCode = res.currencyCode;
-          
+             
                 fetchDetails();
                 this.GetCurrencyInfo();
               });
@@ -1115,7 +1116,15 @@ get relatedItemsUi(): any[] {
   openRelatedProduct(id: number) {
     this.router.navigate(['/app/main/marketplace/products/view', id]);
   }
-  
+  getSettingData(){
+    
+    this._AppEntitiesServiceProxy.getHostSettingValue(1218, null).subscribe({
+        next: (res) => {
+            this.Warningmessage = res
+        },
+     
+      });
+  }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

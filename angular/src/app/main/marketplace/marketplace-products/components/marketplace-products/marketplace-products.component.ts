@@ -347,21 +347,21 @@ export class MarketplaceProductsComponent
     }
     
 
-     setCurrency() {
-      
-        this.selectedCurrrency =
-            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                ? this.tenantDefaultCurrency
-                : JSON.parse(localStorage.getItem("currencyCode"));
-        this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
-
-        if (!this.selectedCurrrency?.code) {
-            var indx = this.currencies?.findIndex(x => x.code == this.selectedCurrrency);
-            if (indx >= 0)
-                this.selectedCurrrency = this.currencies[indx];
-        }
-
+    setCurrency() {
+      const raw = localStorage.getItem("currencyCode");
+      let code = this.tenantDefaultCurrency?.code || 'USD';
+    
+      if (raw && raw !== 'undefined' && raw !== 'null') {
+        try {
+          const parsed = JSON.parse(raw);
+          code = parsed?.code ?? parsed ?? code;
+        } catch { code = raw; }
+      }
+    
+      this.selectedCurrrency = this.currencies?.find(c => c.code === code) || this.currencies?.[0] || null;
+      this.currency = this.selectedCurrrency?.code || code;
     }
+
 
     onPageChange(value: any) {
         this.skipCount = value.first;

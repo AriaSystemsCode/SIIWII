@@ -111,7 +111,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
     const companySSIN = buyerContact.companySSIN;
     this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySSIN, null).subscribe(defaults => {
-      if (!defaults?.length) return;
+      // if (!defaults?.length) return;
 
       this._AppTransactionServiceProxy.getCompanyAddresses(companySSIN, null).subscribe(allAddresses => {
         const shipToDefault = defaults.find(a => a.addressType === 'Shipping');

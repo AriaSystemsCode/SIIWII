@@ -7,7 +7,6 @@ import {
 import { SectionType, ApiRow, SectionConfig, SectionItem } from "../../models/landingPage-types";
 
 
-
 @Component({
   selector: "app-marketplace-landing-page",
   templateUrl: "./marketplace-landing-page.component.html",
@@ -29,13 +28,13 @@ export class MarketplaceLandingPageComponent
     injector: Injector,
     private _sydObjectsAppService: SydObjectsServiceProxy,
 
-
   ) {
     super(injector);
 
   }
 
   ngOnInit(): void {
+   
     localStorage.removeItem("productFilters");
     this.addLocal()
     this.pages = this.chunk(this.items, 9); // each page has 9 products

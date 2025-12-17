@@ -14,25 +14,19 @@ export class FaviconService {
   }
 
   setFaviconFromUrl(url: string, type: string = 'image/png'): void {
-    if (!url) {
-      return;
-    }
-
-    const head = document.querySelector('head') as HTMLHeadElement;
-    let linkEl = document.querySelector('#appFavicon') as HTMLLinkElement;
-
-
-    if (!linkEl) {
-      linkEl = this.renderer.createElement('link');
-      linkEl.id = 'appFavicon';
-      this.renderer.setAttribute(linkEl, 'rel', 'icon');
-      this.renderer.appendChild(head, linkEl);
-    }
-
+    const head = document.head;
+  
+    head.querySelectorAll("link[rel*='icon']").forEach(el => el.remove());
+  
+    const linkEl = this.renderer.createElement('link') as HTMLLinkElement;
+    linkEl.id = 'appFavicon';
+    this.renderer.setAttribute(linkEl, 'rel', 'icon');
     this.renderer.setAttribute(linkEl, 'type', type);
     this.renderer.setAttribute(linkEl, 'href', url);
+  
+    this.renderer.appendChild(head, linkEl);
   }
-
+  
   setSeoText(titleText: string, description: string): void {
     this.title.setTitle(titleText);
     this.meta.updateTag({ name: 'description', content: description });
