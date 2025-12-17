@@ -4196,11 +4196,13 @@ namespace onetouch.Accounts
                     ssin = account.SSIN;
                 else
                 {
-                    var accountLoc = await _appContactRepository.GetAll().Where(z => z.Id == input).FirstOrDefaultAsync();
+                    var accountLoc = await _appContactRepository.GetAll().IgnoreQueryFilters().Where(z => z.Id == input).FirstOrDefaultAsync();
                     if (accountLoc != null)
                     {
                         ssin = accountLoc.SSIN;
                         account = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN== ssin && z.SharingLevel == 1).FirstOrDefaultAsync();
+                        if(account!=null)
+                            input = account.Id;
                     }
                 }
             }
