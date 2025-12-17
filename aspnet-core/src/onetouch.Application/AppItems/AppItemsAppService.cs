@@ -2053,15 +2053,81 @@ namespace onetouch.AppItems
         }
         //MMT30[End]
         private async Task<long> DoCreateOrEdit(CreateOrEditAppItemDto input)
+
         {
+
+            ////MMT30[Start]
+            //foreach (var item in input.VariationItems )
+            //{
+            //    //MMT30
+            //    var marketplacesize = item.EntityExtraData.Where(s => s.AttributeId == 205).FirstOrDefault();
+            //    if (marketplacesize != null)
+            //        marketplacesize.EntityObjectTypeCode = "";
+            //}
+            //MMT30
+            //input.VariationItems = await GetVariationsCodes(1241, input.Code, input.VariationItems,input.EntityObjectTypeId);
+            //if (input.Id == 0)
+            //{
+            //    if (!string.IsNullOrEmpty(input.OriginalCode) && input.OriginalCode == input.Code)
+            //    {
+
+            //        bool llNewCodeFound = false;
+            //        while (!llNewCodeFound)
+            //        {
+            //            var nextCode = await GenerateProductCode(int.Parse(input.EntityObjectTypeId.ToString()), true);
+            //            if (!string.IsNullOrEmpty(nextCode))
+            //            {
+            //                var appItemExist = await _appItemRepository.GetAll().Where(r => r.Code == nextCode && r.ItemType == input.ItemType).FirstOrDefaultAsync();
+            //                if (appItemExist != null)
+            //                {
+            //                    continue;
+            //                }
+            //                else
+            //                {
+            //                    llNewCodeFound = true;
+            //                    if (nextCode != input.Code)
+            //                    {
+            //                        input.VariationItems.ForEach(z => z.Code = z.Code.Replace(input.Code, nextCode));
+            //                        input.Code = nextCode;
+            //                    }
+            //                }
+            //            }
+            //            else
+            //            {
+            //                llNewCodeFound = true;
+            //            }
+
+            //        }
+
+
+            //    }
+            //}
+            //else
+            //{
+            //    var appItemExist = await _appItemRepository.GetAll().Where(r => r.Code == input.Code && r.ItemType == input.ItemType).FirstOrDefaultAsync();
+            //    if (appItemExist != null)
+            //    {
+            //        throw new Exception("This product code already existing. Please use different code.");
+            //    }
+            //}
+
             var timeStamp = DateTime.Now;
+            //MMT30[End]
+            /*if(input.ItemType == 0)
+            {
+                var codeIsDublicated = await _appItemRepository.FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && input.Code == x.Code && x.Id != input.Id && x.ItemType == input.ItemType );
+                if(codeIsDublicated != null) throw new UserFriendlyException("Code is Dublicated, Please choose another code");
+            }*/
+            //MMT33-3
             var currencyVar = await TenantManager.GetTenantCurrency();
             string currency = currencyVar.Code;
+            //MMT33-3
             DateTime start = DateTime.Now;
             var itemObjectId = await _helper.SystemTables.GetObjectItemId();
             if (input.ItemType == 1)
             { itemObjectId = await _helper.SystemTables.GetObjectListingId(); }
 
+            //var itemEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeItemIds();
             var itemStatusId = input.Status == "ACTIVE" ? await _helper.SystemTables.GetEntityObjectStatusItemActive() : await _helper.SystemTables.GetEntityObjectStatusItemDraft();
 
             //add the department list into the categories list, because they are all save as a categories list
@@ -2071,9 +2137,10 @@ namespace onetouch.AppItems
                     input.EntityCategories = new List<AppEntityCategoryDto>();
 
                 foreach (var d in input.EntityDepartments)
-                {   input.EntityCategories.Add(d); }
+                {
+                    input.EntityCategories.Add(d);
+                }
             }
-
             AppItem appItem;
             var appItemChildrenTmp = new List<AppItem>();
             if (input.Id == 0)
@@ -2087,33 +2154,31 @@ namespace onetouch.AppItems
             {
                 
 
-                var appItemAll = await _appItemRepository.GetAll()
+                var appItemAll = await _appItemRepository.GetAll()//.Include(x => x.ItemPricesFkList).AsNoTracking()
+                                                           //.Include(x => x.ItemSizeScaleHeadersFkList).AsNoTracking().ThenInclude(x => x.AppItemSizeScalesDetails).AsNoTracking()
+                                                           //.Include(x => x.EntityFk).AsNoTracking()
+                                                           // .Include(x => x.EntityFk).AsNoTracking ().t.ThenInclude(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk).AsNoTracking()
+                                                           // .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk).AsNoTracking()
                 .Where(r => r.Id == input.Id || r.ParentId== input.Id)
                 .ToListAsync();
-
                 appItem = appItemAll.Where(z => z.Id == input.Id).FirstOrDefault();
                 appItemChildrenTmp = appItemAll.Where(z => z.ParentId == input.Id).ToList();
                 var orgSSIN = appItem.SSIN;
                 ObjectMapper.Map(input, appItem);
                 appItem.SSIN = orgSSIN;
             }
-
             AppEntityDto entity = new AppEntityDto();
             ObjectMapper.Map(input, entity);
             entity.Id = 0;
             entity.SSIN = appItem.SSIN;
             entity.Code = input.Code;
             entity.ObjectId = itemObjectId;
-
             if(entity.TenantId==null)
                 entity.TenantId = AbpSession.TenantId;
-
             entity.EntityObjectStatusId = itemStatusId;
             entity.Id = appItem.EntityId;
-            
             try
             {
-                // look what for?
                 if (appItem.ListingItemId != null && appItem.ListingItemId > 0 && input.Id == 0)
                 {
                     entity.EntityCategories = new List<AppEntityCategoryDto>();
@@ -2126,7 +2191,6 @@ namespace onetouch.AppItems
                 }
             }
             catch (Exception ex) { }
-          
             if (appItem.EntityId != 0)
             {
                 var entityObj = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
@@ -2203,16 +2267,31 @@ namespace onetouch.AppItems
             if (appItem.Id == 0)
             {
                 appItem = await _appItemRepository.InsertAsync(appItem);
-                await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
+
+                //var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
+                //if (available == true)
+                {
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
+                }
             }
             //MMT
             else
             {
                 //await CurrentUnitOfWork.SaveChangesAsync();
                 appItem = await _appItemRepository.UpdateAsync(appItem);
-                await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
+               // var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
+                //if (availableFeature == true)
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
             }
-            
+            //MMT
+
+            //var appItemChildrenTmp = new List<AppItem>();
+           // if (input.Id != 0)
+            //{
+             //   appItemChildrenTmp = await _appItemRepository.GetAll().AsNoTracking().Where(a => a.ParentId == input.Id).AsNoTracking().ToListAsync();
+
+            //}
+
 
             if (input.VariationItems != null && input.VariationItems.Count > 0)
             {
@@ -2480,18 +2559,6 @@ namespace onetouch.AppItems
                                     {
                                         if (string.IsNullOrEmpty(colorHexa.AttributeValue))
                                             colorHexa.AttributeValue = colorHex.AttributeValue;
-                                    }
-
-                                }
-                                else
-                                {
-                                    var colorHexaList = childEntity.EntityExtraData
-                                        .Where(z => z.AttributeId == 201)
-                                        .ToList();
-
-                                    foreach (var item in colorHexaList)
-                                    {
-                                        childEntity.EntityExtraData.Remove(item);
                                     }
 
                                 }

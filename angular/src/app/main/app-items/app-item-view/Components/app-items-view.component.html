@@ -133,7 +133,11 @@
                                                                 attachmentBaseUrl +
                                                                 '/' +
                                                                 img?.colorImage
-                                                            "  [ngClass]="{
+                                                            " alt="defaultImage" (error)="
+                                                                handleFailedImage(
+                                                                    $event
+                                                                )
+                                                            " [ngClass]="{
                                                                 leftImageBorder:
                                                                     appItemForViewDto
                                                                         .variations[0]
