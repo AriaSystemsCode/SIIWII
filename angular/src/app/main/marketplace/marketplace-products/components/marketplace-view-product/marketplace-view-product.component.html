@@ -425,12 +425,12 @@ top: 4px;">
                             <div class="mr-3" *ngFor="let color of filteredColors; let i = index"
                                 [title]="color.colorName" position="top" class="imagAndHexaCode d-flex flex-column "
                                 tooltipPositionStyleClass="custom-tooltip">
-                                <p *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                class="mb-1"
+                                <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
+                                class="mb-1" style="margin-right: 10px;"
                                 [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
                               >
                                 {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
-                              </p>
+                    </h6>
 
                                 <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                     [ngClass]="
@@ -724,9 +724,25 @@ top: 4px;">
                                             style="gap: 5px">
 
                                             <div class="d-flex" style="height: 36px;">
-                                                <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                <!-- <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                     style="width: 24px; height: 24px; border-radius: 6px;"
-                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
+                                                    <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                        <div
+                                                          style="width:24px;height:24px;border-radius:6px;"
+                                                          [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                        </div>
+                                                      </ng-container>
+                                                      
+                                                      <ng-template #showThumb>
+                                                        <img
+                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                          class="mt-2"
+                                                         
+                                                          style="width: 24px; height: 24px; border-radius: 6px;"
+                                                        />
+                                                      </ng-template>
+                                                      
                                                 <div>
                                                     <p class="ml-2 mb-0" style="
                                     font-style: normal;
@@ -1266,12 +1282,12 @@ top: 4px;">
                                         [title]="color.colorName" position="top" class="imagAndHexaCode"
                                         tooltipPositionStyleClass="custom-tooltip">
 
-                                        <p *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                        class="mb-1"
+                                        <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
+                                        class="mb-1" style="margin-right: 10px;"
                                         [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
                                       >
                                         {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
-                                      </p>
+                            </h6>
                                         <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                             [ngClass]="
                                         i === currentIndex
@@ -1579,10 +1595,26 @@ top: 4px;">
                                         ">
                                             <div class="orderHeader  d-flex align-items-center justify-content-between">
                                                 <div class="d-flex" style="height: 36px;">
-                                                    <img class="mt-2"
+                                                    <!-- <img class="mt-2"
                                                         [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                         style="width: 24px; height: 24px; border-radius: 6px;"
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
+                                                        <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                            <div
+                                                              style="width:24px;height:24px;border-radius:6px;"
+                                                              [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                            </div>
+                                                          </ng-container>
+                                                          
+                                                          <ng-template #showThumb>
+                                                            <img
+                                                            [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                              class="mt-2"
+                                                             
+                                                              style="width: 24px; height: 24px; border-radius: 6px;"
+                                                            />
+                                                          </ng-template>
+                                                          
                                                     <div>
                                                         <p class="ml-2 mb-0" style="
                                             font-style: normal;
