@@ -75,6 +75,7 @@ using MimeKit;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
 using onetouch.AppMarketplaceContacts;
+using AuthorizeNet.APICore;
 
 
 //using NUglify.Helpers;
@@ -1079,12 +1080,14 @@ namespace onetouch.AppSiiwiiTransaction
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
                     var contact = await _appContactRepository.GetAll()
-                        .Where(s => s.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && s.EntityFk.EntityExtraData.Count(z => z.AttributeId == 715 && z.AttributeValue == AbpSession.UserId.ToString()) > 0).FirstOrDefaultAsync();
+                        .Where(s => s.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &&  s.TenantId == AbpSession.TenantId
+                        && s.EntityFk.EntityExtraData.Count(z => z.AttributeId == 715 && z.AttributeValue == AbpSession.UserId.ToString()) > 0).FirstOrDefaultAsync();
 
                     if (contact != null)
                     {
                         var contactCompany = await _appContactRepository.GetAll()
-                        .Where(s => s.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && s.Id == contact.ParentId).FirstOrDefaultAsync();
+                        .Where(s => s.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && s.TenantId == AbpSession.TenantId &&
+                        s.ParentId == null && s.IsProfileData==true).FirstOrDefaultAsync();
 
                         appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                         {
@@ -2661,7 +2664,7 @@ namespace onetouch.AppSiiwiiTransaction
 
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Where(e => e.TenantId == AbpSession.TenantId
                 && e.CreatorUserId == AbpSession.UserId && e.EntityObjectStatusCode == "DRAFT"
-                && e.SellerCompanySSIN == sellerSSIN && e.BuyerCompanySSIN == buyerSSIN).FirstOrDefault();
+                && e.SellerCompanySSIN == sellerSSIN && e.BuyerCompanySSIN == buyerSSIN && e.EntityObjectTypeCode.ToUpper()== orderType.ToString().ToUpper()).FirstOrDefault();
 
                 if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
                 {
@@ -3737,6 +3740,10 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     header.EntityObjectStatusId = null;
                     header.EntityObjectStatusCode = null;
+                    header.SellerCompanySSIN = "";
+                    header.SellerCompanyName = "";
+                    header.BuyerCompanyName = "";
+                    header.BuyerCompanySSIN = "";
                     header.Notes = "";
                     //header.en
                     await _appTransactionsHeaderRepository.UpdateAsync(header);
