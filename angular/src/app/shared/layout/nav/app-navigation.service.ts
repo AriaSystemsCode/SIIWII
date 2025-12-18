@@ -19,7 +19,7 @@ export class AppNavigationService {
         let menu: AppMenu = new AppMenu('MainMenu', 'MainMenu', [
             new AppMenuItem('Dashboard', 'Pages.Administration.Host.Dashboard', 'flaticon-line-graph', '/app/admin/hostDashboard'),
             new AppMenuItem('My Transactions', 'Pages.AppSiiwiiTransactions', 'flaticon-more', '/app/main/transactions/appTransactions/MyTransactions'),
-            new AppMenuItem('MyAccounts', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
+            new AppMenuItem('My Connections', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
         ]);
     
      

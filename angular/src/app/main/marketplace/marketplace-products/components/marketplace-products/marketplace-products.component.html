@@ -51,10 +51,8 @@
                             [options]="currencies"
                             [(ngModel)]="selectedCurrrency"
                             optionLabel="code"
-                            optionValue="code" 
-                            class="cur "
-                            (onChange)="handleCurrencyChange($event)"
-                        ></p-dropdown>
+                            (onChange)="handleCurrencyChange($event)">
+                          </p-dropdown>
                         <p-dropdown
                         [options]="sortingData"
                         [(ngModel)]="selectedSort"
