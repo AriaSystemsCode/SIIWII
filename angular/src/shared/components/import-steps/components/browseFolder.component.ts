@@ -54,6 +54,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   @ViewChild('fileInput') fileInputRef!: ElementRef;
 
   @Output() _hasImages = new EventEmitter<boolean>();
+  aspectRatioNumbers;
 
   public constructor(private _downloadService: FileDownloadService,
     private _BsModalService: BsModalService,
