@@ -724,9 +724,25 @@ top: 4px;">
                                             style="gap: 5px">
 
                                             <div class="d-flex" style="height: 36px;">
-                                                <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                <!-- <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                     style="width: 24px; height: 24px; border-radius: 6px;"
-                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
+                                                    <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                        <div
+                                                          style="width:24px;height:24px;border-radius:6px;"
+                                                          [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                        </div>
+                                                      </ng-container>
+                                                      
+                                                      <ng-template #showThumb>
+                                                        <img
+                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                          class="mt-2"
+                                                         
+                                                          style="width: 24px; height: 24px; border-radius: 6px;"
+                                                        />
+                                                      </ng-template>
+                                                      
                                                 <div>
                                                     <p class="ml-2 mb-0" style="
                                     font-style: normal;
@@ -1579,10 +1595,26 @@ top: 4px;">
                                         ">
                                             <div class="orderHeader  d-flex align-items-center justify-content-between">
                                                 <div class="d-flex" style="height: 36px;">
-                                                    <img class="mt-2"
+                                                    <!-- <img class="mt-2"
                                                         [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                         style="width: 24px; height: 24px; border-radius: 6px;"
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
+                                                        <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                            <div
+                                                              style="width:24px;height:24px;border-radius:6px;"
+                                                              [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                            </div>
+                                                          </ng-container>
+                                                          
+                                                          <ng-template #showThumb>
+                                                            <img
+                                                            [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                              class="mt-2"
+                                                             
+                                                              style="width: 24px; height: 24px; border-radius: 6px;"
+                                                            />
+                                                          </ng-template>
+                                                          
                                                     <div>
                                                         <p class="ml-2 mb-0" style="
                                             font-style: normal;
