@@ -425,12 +425,12 @@ top: 4px;">
                             <div class="mr-3" *ngFor="let color of filteredColors; let i = index"
                                 [title]="color.colorName" position="top" class="imagAndHexaCode d-flex flex-column "
                                 tooltipPositionStyleClass="custom-tooltip">
-                                <p *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                class="mb-1"
+                                <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
+                                class="mb-1" style="margin-right: 10px;"
                                 [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
                               >
                                 {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
-                              </p>
+                    </h6>
 
                                 <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                     [ngClass]="
@@ -1266,12 +1266,12 @@ top: 4px;">
                                         [title]="color.colorName" position="top" class="imagAndHexaCode"
                                         tooltipPositionStyleClass="custom-tooltip">
 
-                                        <p *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                        class="mb-1"
+                                        <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
+                                        class="mb-1" style="margin-right: 10px;"
                                         [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
                                       >
                                         {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
-                                      </p>
+                            </h6>
                                         <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                             [ngClass]="
                                         i === currentIndex
