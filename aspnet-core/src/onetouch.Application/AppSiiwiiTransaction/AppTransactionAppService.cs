@@ -7149,6 +7149,13 @@ namespace onetouch.AppSiiwiiTransaction
                     if (accountOrg != null && accountOrg.PartnerId == null)
                     {
                         CreateOrEditAccountInfoDto accountInput = ObjectMapper.Map<CreateOrEditAccountInfoDto>(accountOrg);
+                        if (accountInput.ContactAddresses != null && accountInput.ContactAddresses.Count > 0)
+                        {
+                            foreach (var conAd in accountInput.ContactAddresses)
+                            {
+                                conAd.Id = 0;
+                            }
+                        }
                         accountInput.TenantId = int.Parse(tenantId.ToString());
                         accountInput.ReturnId = true;
                         accountInput.Id = 0;
