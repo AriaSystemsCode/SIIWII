@@ -2611,6 +2611,8 @@
 	<text name="Relatedproducts">Related products</text>
 	<text name="noproductsarelinked">no products are linked</text>
 
+		<text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
+		<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 
 	</texts>  
 </localizationDictionary>

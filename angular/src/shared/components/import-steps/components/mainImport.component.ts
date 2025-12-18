@@ -135,6 +135,7 @@ export class MainImportComponent
         this.guids = [];
     }
 
+    aspectRatioNumbers;
     async show(importType: ImportTypes, importService: any, serviceUtilites: any, attachmetnCategoriesCodes: string[], hasImages: boolean, importStepsInfo: ImportStepInfo[]) {
         this.invalidImport = false;
         this.importStepsInfo = importStepsInfo;
@@ -148,6 +149,8 @@ export class MainImportComponent
             this.getSycAttachmentCategoriesByCodes(attachmetnCategoriesCodes).subscribe((result) => {
                 result.forEach(attach => {
                     var _aspectRatioNumbers = attach.aspectRatio ? attach.aspectRatio : "1:1";
+                    this.aspectRatioNumbers=  attach?.name?.toLowerCase()?.includes('image')  ?   _aspectRatioNumbers  :"1:1" ; 
+                    this.BrowseModal.aspectRatioNumbers =  this.aspectRatioNumbers;
                     var aspectRatioNumbers = _aspectRatioNumbers.split(":");
                     var num1 = Number(aspectRatioNumbers[0]);
                     var num2 = Number(aspectRatioNumbers[1]);
@@ -367,8 +370,11 @@ export class MainImportComponent
             this.folder_details = false;
             this.progress = 0;
             this.ProgressModal.show();
-            this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
-            this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+           // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
+           // this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+           
+           this.progressHeader =  "Uploading Folder";
+           this.ProgressDetail ="Uploading the files that you want to import";
 
 
             /*  this.uploader.onProgressAll = (progress) => {
@@ -418,8 +424,11 @@ export class MainImportComponent
 
             this.folder_details = false;
             this.ProgressModal.show();
-            this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
-            this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+            //this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
+            //this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
+            
+            this.progressHeader =  "Uploading Folder";
+            this.ProgressDetail ="Uploading the files that you want to import";
         }
 
     }
@@ -742,10 +751,11 @@ export class MainImportComponent
                 };
                // this.ProgressModal.show();
                 // this.progressHeader = this.l(("Import" + ImportTypes[this.importType]));
-                this.progressHeader = "Uploading folder contents";
+              //  this.progressHeader = "Uploading folder contents";
+                this.progressHeader =  "Uploading Folder";
                 //this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
-                this.folder_details = true;
 
+                
 
 
                 this.imagesUploader.onProgressAll = (progress) => {

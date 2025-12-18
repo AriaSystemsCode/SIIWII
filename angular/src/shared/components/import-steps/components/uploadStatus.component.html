@@ -62,13 +62,24 @@
           <ng-container *ngIf="records?.length > 0; else noData">
 
             <!-- Tabs -->
-            <ul class="tabs no-gutters">
-              <li [class.active]="activeRecordType === 'Image'" (click)="switchTab('Image')"
-                class="col-6 text-center py-2" *ngIf="hasImageRecords">Image Records</li>
-              <li [class.active]="activeRecordType === 'Data'" (click)="switchTab('Data')"
-                class="col-6 text-center py-2" *ngIf="hasDataRecords">
-                Data Records</li>
+            <ul class="tabs no-gutters d-flex justify-content-center">
+              <li
+                *ngIf="hasImageRecords"
+                [class.active]="activeRecordType === 'Image'"
+                (click)="switchTab('Image')"
+                class="tab-item text-center py-2">
+                Product Images
+              </li>
+            
+              <li
+                *ngIf="hasDataRecords"
+                [class.active]="activeRecordType === 'Data'"
+                (click)="switchTab('Data')"
+                class="tab-item text-center py-2">
+                Product Data
+              </li>
             </ul>
+            
 
             <div class="table-scroll-container" #tableScrollContainer>
               <table class="browser-table min-width-table" style="min-width: 1000px;">
@@ -115,7 +126,7 @@
                           }">
                           <ng-container *ngIf="record.recordType !== 'Image'">
                             <li (click)="handleAction(record, UploadActionEnum.ValidateDataRecord)">
-                              Validate Data Record
+                              Edit data record
                             </li>
                           </ng-container>
 
