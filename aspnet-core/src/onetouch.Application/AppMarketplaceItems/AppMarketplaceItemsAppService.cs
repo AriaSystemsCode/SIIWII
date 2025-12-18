@@ -335,29 +335,34 @@ namespace onetouch.AppMarketplaceItems
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
                 var attBannerId = await _helper.SystemTables.GetAttachmentCategoryId("BANNER");
                 accountSSIN = accountSSIN.StartsWith("\"") ? accountSSIN.Substring(1) : accountSSIN;
                 accountSSIN = accountSSIN.EndsWith("\"") ? accountSSIN.Substring(0, accountSSIN.Length - 1) : accountSSIN;
-                var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
+                /*var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
                     .ThenInclude(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
                     .ThenInclude(a=>a.AttachmentFk)
-                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);*/
+                var account = await _appMarketplaceContactRepository.GetAll()
+                    .Include(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
+                    .ThenInclude(a => a.AttachmentFk)
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId == null);
                 GetAccountImagesOutputDto returnDto = new GetAccountImagesOutputDto();
                 if (account != null)
                 {
                     returnDto.Name = account.Name;
-                    if (account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId) != null)
+                    if (account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId) != null)
                     {
-                        returnDto.LogoImage = string.IsNullOrEmpty(account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
+                        returnDto.LogoImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : "attachments/" + (account.EntityFk.TenantId == null ? "-1" : account.EntityFk.TenantId.ToString()) + "/" + account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
+                                                        : imagesUrl + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
                     }
-                    if (account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId) != null)
+                    if (account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId) != null)
                     {
-                        returnDto.BannerImage = string.IsNullOrEmpty(account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment) ?
+                        returnDto.BannerImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : "attachments/" + (account.EntityFk.TenantId == null ? "-1" : account.EntityFk.TenantId.ToString()) + "/" + account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
+                                                        : imagesUrl + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
                     }
                 }
                 return returnDto;
