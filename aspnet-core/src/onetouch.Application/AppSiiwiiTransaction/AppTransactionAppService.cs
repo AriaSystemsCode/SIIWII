@@ -4606,9 +4606,52 @@ namespace onetouch.AppSiiwiiTransaction
                             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                             {
                                 var sharedUsersList = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == viewTrans.Id).ToListAsync();
+                                viewTrans.SharedWithUsers = new List<ContactInformationOutputDto>();
+
+                                //if (sharedUsersList == null || (sharedUsersList!=null && sharedUsersList.Count == 0))
+                                {
+                                    var contacts  = _appTransactionContactsRepository.GetAll()
+                                        .Where(e => e.TransactionId == viewTrans.Id && e.ContactRole == "Creator").ToList();
+
+                                    if (contacts != null && contacts.Count > 0)
+                                    { var contactsSSIN = contacts.Select(e => e.ContactSSIN).Distinct().ToList();
+                                      var contactsRows = _appContactRepository.GetAll()
+                                            .Where(e => contactsSSIN.Contains(e.SSIN) 
+                                            && e.IsDeleted == false && e.TenantId != viewTrans.TenantId)
+                                            .ToList();
+                                        if(contactsRows != null && contactsRows.Count>0)
+                                        {
+                                            var contactsRowsEntities = contactsRows.Select(e => e.EntityId).ToList();
+                                            var contactsUsers = _appEntityExtraData.GetAll().Where(e => contactsRowsEntities.Contains(e.EntityId) && e.AttributeId == 715).ToList();
+                                            var contactsUserIds = contactsUsers.Where(e=> e.AttributeValue != null).Select(e => e.AttributeValue).Distinct().ToList();
+                                            if(contactsUserIds != null && contactsUserIds.Count>0)
+                                            {
+                                                if (sharedUsersList != null && sharedUsersList.Count > 0)
+                                                { var sharedUsersListIds = sharedUsersList.Select(e => e.SharedUserId.ToString()).ToList();
+                                                    contactsUserIds = contactsUserIds.Where(e => !sharedUsersListIds.Contains(e)).ToList();
+                                                }
+
+                                                foreach (var user in contactsUserIds){
+                                                    
+                                                    var userObject = UserManager.GetUserById(long.Parse(user.ToString()));
+
+                                                    AppEntitySharings shareWith = new AppEntitySharings();
+                                                    shareWith.SharedUserId = userObject.Id;
+                                                    shareWith.SharedTenantId = userObject.TenantId;
+                                                    shareWith.EntityId = viewTrans.Id;
+                                                    shareWith.SharedUserEMail = userObject.EmailAddress;
+                                                    await _appEntitySharingsRepository.InsertAsync(shareWith);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                sharedUsersList = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == viewTrans.Id).ToListAsync();
                                 if (sharedUsersList != null && sharedUsersList.Count > 0)
                                 {
-                                    viewTrans.SharedWithUsers = new List<ContactInformationOutputDto>();
+                                    
                                     foreach (var usr in sharedUsersList)
                                     {
                                         //ContactInformationOutputDto contactDto = new ContactInformationOutputDto();
