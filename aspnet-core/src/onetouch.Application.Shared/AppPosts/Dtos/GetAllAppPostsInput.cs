@@ -22,5 +22,9 @@ namespace onetouch.AppPosts.Dtos
 
         public long PostId { get; set; }
 
+        //Iteration#I40 - X527[Start]
+        public long? TenantId { get; set; }
+        public int? NoOfPostToReturn { get; set; }  
+        //Iteration#I40 - X527[End]
     }
 }

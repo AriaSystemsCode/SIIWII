@@ -27,6 +27,9 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
     oldUserName:string;
+    currentLang:string
+    isArabic:boolean 
+    
     constructor(
         injector: Injector,
         public loginService: LoginService,
@@ -61,7 +64,8 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         if (
             this._sessionService.userId > 0 &&
             UrlHelper.getReturnUrl() &&
@@ -93,22 +97,21 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     login(): void {
-        const recaptchaCallback = (token: string) => {
+
+        let recaptchaCallback = (token: string) => {
             this.showMainSpinner();
+
             this.submitting = true;
-    
-            setTimeout(() => {
-                this.loginService.authenticate(
-                    () => {
-                        this.submitting = false;
-                        this.hideMainSpinner();
-                    },
-                    null,
-                    token
-                );
-            }, 2000); // 2 seconds delay
+            this.loginService.authenticate(
+                () => {
+                    this.submitting = false;
+                    this.hideMainSpinner();
+                },
+                null,
+                token
+            );
         };
-     
+
         if (this.useCaptcha) {
             this._reCaptchaV3Service.execute(
                 this.recaptchaSiteKey,
@@ -121,7 +124,6 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             recaptchaCallback(null);
         }
     }
-    
 
     externalLogin(provider: ExternalLoginProvider) {
         this.loginService.externalAuthenticate(provider);

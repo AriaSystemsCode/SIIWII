@@ -25,7 +25,7 @@ export class AppNavigationService {
                new AppMenuItem('My Transactions', 'Pages.AppSiiwiiTransactions', 'flaticon-more', '/app/main/transactions/appTransactions/MyTransactions'),
               //  new AppMenuItem('My Transactions', '', 'flaticon-more', '/app/admin/appTransactions/MyTransactions'),
 
-                new AppMenuItem('MyAccounts', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
+                new AppMenuItem('My Connections', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
 
                // new AppMenuItem("Messages", 'Pages.AppMessage', "flaticon-app", "/app/main/Messages"),
 

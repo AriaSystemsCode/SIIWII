@@ -2252,7 +2252,6 @@ export class CreateEditAppItemVariationsComponent
                         this.createOreEditAppEntityModal.show(entityObjectType, appEntity, true);
                     });
             }
-
         }
 
         else

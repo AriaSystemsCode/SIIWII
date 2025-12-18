@@ -17,14 +17,15 @@ export class CTAComponent extends AppComponentBase implements OnInit {
     }
     sycAttachmentCategoryCTASlider : SycAttachmentCategoryDto
     ngOnInit(){
+     
         this.handleStorageData()
         this.getSycAttachmentCategoriesByCodes(['CTASLIDER'])
         .subscribe((res)=>{
             this.sycAttachmentCategoryCTASlider = res[0]
         })
+        
     }
 
-    ctaSeeMore(){}
     handleStorageData(){
     localStorage.setItem("fromSellerRoom",JSON.stringify(false));
     localStorage.setItem("fromMarketPlace",JSON.stringify(true));

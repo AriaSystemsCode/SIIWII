@@ -826,6 +826,7 @@ export class MarketplaceViewProductComponent
             
                                                 localStorage.setItem("fromSellerRoom", JSON.stringify(true));
                                                 localStorage.setItem("fromMarketPlace", JSON.stringify(false));
+                                                sessionStorage.setItem("SellerSSIN", JSON.stringify(this.productData?.sellerSSIN));
                                                 localStorage.setItem("transNO", this.orderNo);
                                                this.goToShowroom()
                                             });
@@ -922,7 +923,7 @@ export class MarketplaceViewProductComponent
     connect(): void {
         this.showMainSpinner();
         this.AccountsServiceProxy
-            .connect(this.productData.sellerMarketPlaceAccountId,null)
+            .applyRelationOnProfile(this.productData.sellerMarketPlaceAccountId,undefined,true,undefined)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();

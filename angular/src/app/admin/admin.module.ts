@@ -377,7 +377,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         StepperComponent,
 
     ],
-    exports: [AddMemberModalComponent, AddRoleModalComponent],
+    exports: [AddMemberModalComponent, AddRoleModalComponent,CreateOrEditUserModalComponent],
     providers: [
         ImpersonationService,
         TreeDragDropService,

@@ -2,11 +2,11 @@
     <div class="col-lg-8 col-md-10 col">
         <div class="row  pt-4">
             <!-- //API GetAllWithExtraAttributes -->
-            <div class="col-md-6 col-12 mb-4"
+            <div class="{{fromSetting ? 'col-12' : 'col-md-6'}}  col-12 mb-4"
                 *ngFor="let extraAttr of extraAttributeObject.value.filteredExtraAttributes">
                 <div>
                     <div>
-                        <label>{{extraAttr.name | localize}}</label>
+                        <label class="{{fromSetting ? 'fromSettingLabel':''}}">{{extraAttr.name | localize}}</label>
                     </div>
 
 
@@ -14,7 +14,7 @@
                     <div class="d-flex align-items-center">
 
                         <div class="wide-drop-down d-flex flex-grow-1"
-                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup">
+                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup && !fromSetting">
                             <div class="flex-grow-1 mr-1">
                                 <p-multiSelect (onChange)="onAnyInputChange()"
                                     [options]="extraAttr.paginationSetting.list" [styleClass]="'w-100'"
@@ -22,6 +22,29 @@
                                     [placeholder]="('Select') + ' ' + extraAttr.name">
                                     <!-- (onChange)="multiValuesExtraAttributeOnChange($event,extraAttr)" -->
                                 </p-multiSelect>
+                            </div>
+                        </div>
+
+                        
+                        <div class="wide-drop-down d-flex flex-grow-1"
+                            *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup && fromSetting">
+                            <div class="flex-grow-1 mr-1">
+                            
+                                
+                                  <div class="form-check" *ngFor="let item of extraAttr.paginationSetting.list">
+                                    <input
+                                      class="form-check-input"
+                                      type="checkbox"
+                                      [id]="'checkbox_' + extraAttr.name + '_' + item.value"
+                                      [value]="item.value"
+                                  
+                                      [checked]="isArray(extraAttr.selectedValues) && extraAttr.selectedValues.includes(item.value)"
+                                      (change)="onCheckboxChange($event.target.checked, item.value, extraAttr)"
+                                    />
+                                    <label class="form-check-label" [for]="'checkbox_' + extraAttr.name + '_' + item.value">
+                                      {{ item.label }}
+                                    </label>
+                                  </div>
                             </div>
                         </div>
 
@@ -38,30 +61,28 @@
                             *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
                             <input type="text" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
                                 class="form-control" [(ngModel)]="extraAttr.selectedValues"
-                                style="background-color: #EEEEEE !important; border: none !important"
+                               
                                 (ngModelChange)="onAnyInputChange()" />
-                            <i class="pi pi-times position-absolute" style="right: 10px; top: 10px; cursor: pointer;"
+                            <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
                             <!-- (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" -->
                         </div>
 
                         <div class="flex-grow-1"
-                            *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
+                            *ngIf=" extraAttr.dataType === 'bit' ">
                             <div class="radio-inline mt-2">
                                 <label class="radio radio-accent radio-primary mr-4"
                                     for="extraAttr{{extraAttr.name}}_1">
                                     <input (ngModelChange)="onAnyInputChange()" type="radio"
                                         name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_1"
-                                        [value]="'true'" [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                         border: none !important" />
+                                        [value]="'true'" [(ngModel)]="extraAttr.selectedValues"  />
                                     <!-- (click)="notLookupExtraAttributeOnChange('true',extraAttr)" -->
                                     {{ "Yes" | localize }}
                                 </label>
                                 <label class="radio radio-accent radio-primary" for="extraAttr{{extraAttr.name}}_0">
                                     <input (onChange)="onAnyInputChange()" type="radio"
                                         name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_0"
-                                        [value]="'false'" [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                         border: none !important">
+                                        [value]="'false'" [(ngModel)]="extraAttr.selectedValues" >
                                     <!-- (click)="notLookupExtraAttributeOnChange('true',extraAttr)" -->
                                     {{ "No" | localize }}
                                 </label>
@@ -74,23 +95,53 @@
                         </div>
 
 
-                        <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'Datetime'">
+                        <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'boolean'">
+                            <div class="form-group d-flex align-items-center">
+                            
+                              <p-inputSwitch 
+                              [(ngModel)]="extraAttr.selectedValues" 
+                              [trueValue]="'true'" 
+                              [falseValue]="'false'" 
+                              (onChange)="onAnyInputChange()">
+                            </p-inputSwitch>
+                            
+                            <a *ngIf="extraAttr.selectedValues" class="ml-5 pointer text-black-50 font-weight-bold"
+                            (click)="extraAttr.selectedValues = null">
+                            Reset
+                        </a>
+                            </div>
+                          </div>
+                          
+
+                        <div class=" position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
                             <p-calendar #calendarRef [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                                 [showOtherMonths]="true" [selectOtherMonths]="true" [placeholder]="extraAttr.name"
-                                (ngModelChange)="onAnyInputChange()" appendTo="body"
-                                [inputStyle]="{ 'background-color': '#EEEEEE', 'border': 'none' }"
+                                (ngModelChange)="onAnyInputChange()" appendTo="body" 
+                                [inputStyle]="{'border': '1px solid #EEEEEE','border-radius':'8px','height':'44px' }"
                                 styleClass="w-100"></p-calendar>
-                            <i class="pi pi-times position-absolute" style="right: 10px; top: 10px; cursor: pointer;"
+                            <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
                                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
 
                         </div>
+                        <!-- <div class="flex-grow-1"
+                        >
+                       <app-image-upload
+                           [sycAttachmentCategory]="sycAttachmentCategoryImage"
+                           [image]="extraAttr.selectedValues"
+                           [staticWidth]="170"
+                           [showGuidelines]="true"
+                           (imageBrowseDone)="onImageSelected($event, extraAttr)"
+                           (removeImage)="onImageRemoved(extraAttr)">
+                       </app-image-upload>
+                   </div> -->
+                   
 
-
-                        <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric' ">
+                        <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'Numeric' ">
                             <input (ngModelChange)="onAnyInputChange()" type="number" name="{{extraAttr.name}}"
                                 placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}"
-                                [(ngModel)]="extraAttr.selectedValues" style="background-color: #EEEEEE !important;
-                                                                    border: none !important">
+                                [(ngModel)]="extraAttr.selectedValues">
+                                <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
+                                *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
                             <!-- (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" -->
                         </div>
 

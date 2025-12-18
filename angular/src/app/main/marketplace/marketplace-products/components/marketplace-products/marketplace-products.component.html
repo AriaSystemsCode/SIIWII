@@ -1,17 +1,22 @@
+
 <div
     [@routerTransition]
-    style="margin-top: -50px;overflow: hidden;"
+  
+    style="margin-top: -50px;"
     class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0"
+    [ngClass]="[
+    fromMarketAcoount ? 'addPadding' : ''
+]"
 >
     <div
-        class=""
+
     >
-        <div class="marketplace-products">
-            <div class="row">
-                <div class="col-md-12 mb-4 app-seller">
+        <div class="marketplace-products" [ngClass]="fromMarketAcoount ? 'marketplace-mg':''">
+            <div   class="row" >
+                <div class="col-md-12 mb-4 app-seller" >
                     <app-seller-data *ngIf="isSellerIdExists && isFromSellerRoom "></app-seller-data>
                 </div>
-                <div class="col-md-12">
+                <div  class="col-md-12">
                     <div
                         class="d-flex align-items-center main-c "
                     >
@@ -46,6 +51,7 @@
                             [options]="currencies"
                             [(ngModel)]="selectedCurrrency"
                             optionLabel="code"
+                            optionValue="code" 
                             class="cur "
                             (onChange)="handleCurrencyChange($event)"
                         ></p-dropdown>
@@ -88,7 +94,7 @@
                      
                     </div>
                 </div>
-                <div *ngIf="!isFilterHidden" class="col-lg-3 col-5 my-3 text-dark pr-0">
+                <div *ngIf="!isFilterHidden " class="col-lg-3 col-5 my-3 text-dark pr-0">
                     <app-product-filters
                         [isSellerIdExists]="isSellerIdExists"
                         (handleCatalogSelections)="selectCatalog($event)"
@@ -109,8 +115,10 @@
                 </div>
 
                 <div
-                    [ngClass]="!isFilterHidden ? 'col-lg-9 col-7' : 'col-md-12'"
-                    class="my-3"
+                [ngClass]="[
+                !isFilterHidden? 'col-lg-9 col-7' : 'col-md-12'
+              ]"
+                    
                 >
                     <div class="row">
                         <div
@@ -132,8 +140,13 @@
                             ></app-prodcut-card>
                         </div>
                     </div>
+
+                    <p *ngIf="items?.length === 0 && (fromMarketAcoount)" class="text-center mx-auto mt-5 pt-5" style="margin-top: 150px !important;">
+                        <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
+                        <span class="noDataTxt">There is no data to show ....</span>
+                      </p>
                 </div>
-                <div class="col-md-12">
+                <div  class="col-md-12" >
                     <div class="">
                         <p-paginator
                             (onPageChange)="onPageChange($event)"
@@ -146,15 +159,20 @@
                     </div>
                 </div>
             </div>
+
+      
         </div>
     </div>
+
+
+
 </div>
 
 <!-- mobile ui design -->
 <div class="mobile">
     <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
     <div class="container-fluid">
-        <div class="quickFilters">
+        <div class="quickFilters" >
         
             <span class="p-input-icon-right " style="width: 40%;">
                 <i class="pi pi-search"></i>
@@ -215,7 +233,7 @@
                     [buyerSSIN]="buyerSSIN"
                 ></app-prodcut-card>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-12" >
                 <div class="">
                     <p-paginator
                         (onPageChange)="onPageChange($event)"

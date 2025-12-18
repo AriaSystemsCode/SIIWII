@@ -30,7 +30,6 @@ export class AddOnsComponent extends AppComponentBase implements OnInit {
   ngOnInit() {
     this.getAppTenantAddOns()
   }
-
   getAppTenantAddOns() {
     this.showMainSpinner();
 

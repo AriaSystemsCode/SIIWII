@@ -19,7 +19,7 @@ namespace onetouch.ConsoleApiClient
 
     class Program
     {
-        private const string ServerUrlBase = "https://localhost:44303/";
+        private const string ServerUrlBase = "https://localhost:44308/";
         
         // If you have changed "Configuration.MultiTenancy.TenantIdResolveKey" in your web app, use the same value here. 
         private const string TenantIdResolveKey = "Abp.TenantId";

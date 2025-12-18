@@ -15,4 +15,5 @@ namespace onetouch.Message.Dto
         public int TotalUnread { get; set; }
 
     }
+   
 }

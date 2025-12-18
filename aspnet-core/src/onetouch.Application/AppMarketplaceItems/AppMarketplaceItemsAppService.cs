@@ -32,6 +32,7 @@ using onetouch.Sessions.Dto;
 using Abp.UI;
 using onetouch.Message;
 using Nito.AsyncEx;
+using onetouch.AppMarketplaceContacts;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -55,6 +56,9 @@ namespace onetouch.AppMarketplaceItems
         //I48[Start]
         private readonly IMessageAppService _messageAppService;
         //I48[End]
+        //I40[Start]
+        IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        //I40[End]
         public AppMarketplaceItemsAppService(IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemList,
             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetail, IRepository<AppMarketplaceItemSelectors, long> appMarketplaceItemsSelector,
             IRepository<AppMarketplaceItems, long> appMarketplaceItem, Helper helper, IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository,
@@ -63,7 +67,8 @@ namespace onetouch.AppMarketplaceItems
             IRepository<onetouch.AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevels,
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<AppTransactionDetails, long> appTransactionDetailsRepository,
             IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
-        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService)
+        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService,
+        IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository)
         {
             _messageAppService = messageAppService;
             _appTransactionHeadersRepository = appTransactionHeadersRepository;
@@ -81,6 +86,7 @@ namespace onetouch.AppMarketplaceItems
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
         }
         public async Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAll(GetAllAppMarketItemsInput input)
        {
@@ -329,29 +335,34 @@ namespace onetouch.AppMarketplaceItems
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
                 var attBannerId = await _helper.SystemTables.GetAttachmentCategoryId("BANNER");
                 accountSSIN = accountSSIN.StartsWith("\"") ? accountSSIN.Substring(1) : accountSSIN;
                 accountSSIN = accountSSIN.EndsWith("\"") ? accountSSIN.Substring(0, accountSSIN.Length - 1) : accountSSIN;
-                var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
+                /*var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
                     .ThenInclude(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
                     .ThenInclude(a=>a.AttachmentFk)
-                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);*/
+                var account = await _appMarketplaceContactRepository.GetAll()
+                    .Include(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
+                    .ThenInclude(a => a.AttachmentFk)
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId == null);
                 GetAccountImagesOutputDto returnDto = new GetAccountImagesOutputDto();
                 if (account != null)
                 {
                     returnDto.Name = account.Name;
-                    if (account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId) != null)
+                    if (account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId) != null)
                     {
-                        returnDto.LogoImage = string.IsNullOrEmpty(account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
+                        returnDto.LogoImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : "attachments/" + (account.EntityFk.TenantId == null ? "-1" : account.EntityFk.TenantId.ToString()) + "/" + account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
+                                                        : "attachments/" + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
                     }
-                    if (account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId) != null)
+                    if (account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId) != null)
                     {
-                        returnDto.BannerImage = string.IsNullOrEmpty(account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment) ?
+                        returnDto.BannerImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : "attachments/" + (account.EntityFk.TenantId == null ? "-1" : account.EntityFk.TenantId.ToString()) + "/" + account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
+                                                        : "attachments/" + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
                     }
                 }
                 return returnDto;
@@ -1314,17 +1325,22 @@ namespace onetouch.AppMarketplaceItems
                         }
                         //I46[Start]
                         var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                        var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
-                               && a.TenantId== appItem.TenantOwner
-                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                        var tenantOwner = TenantManager.GetById(appItem.TenantOwner);
+                        var contactSeller = await _appMarketplaceContactRepository.GetAll().Where(a=> a.ParentId == null
+                               && a.TenantOwner == appItem.TenantOwner && a.Name== tenantOwner.Name
+                               && a.IsProfileData == true).FirstOrDefaultAsync();
+
+                        //var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
+                         //      && a.TenantId== appItem.TenantOwner
+                          //     && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
                         if (contactSeller != null)
                         {
-                            var marketplaceSellerAccount =  await _appContactRepository.GetAll().Where(a => a.TenantId == null && a.ParentId == null
-                               && a.PartnerId == contactSeller.Id && a.IsProfileData == false && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
-                            if (marketplaceSellerAccount!=null)
-                            {
-                                output.SellerMarketPlaceAccountId = marketplaceSellerAccount.Id;
-                            }
+                            //var marketplaceSellerAccount =  await _appContactRepository.GetAll().Where(a => a.TenantId == null && a.ParentId == null
+                             //  && a.PartnerId == contactSeller.Id && a.IsProfileData == false && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                            //if (marketplaceSellerAccount!=null)
+                            //{
+                                output.SellerMarketPlaceAccountId = contactSeller.Id;
+                            //}
 
                             output.SellerSSIN = contactSeller.SSIN;
                             output.SellerCompanyName = contactSeller.Name;

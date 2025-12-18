@@ -2399,7 +2399,7 @@ namespace onetouch.AppItems
                 List<AppEntity> colorsList = new List<AppEntity>();
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
-
+                   
                     foreach (var child in input.VariationItems)
                     {
                         var ext = child.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
@@ -2422,6 +2422,7 @@ namespace onetouch.AppItems
                         }
                     }
                 }
+                //MMT
                 //MMT
 
 
@@ -2593,7 +2594,7 @@ namespace onetouch.AppItems
                                     {
                                         var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
 
-                                        //  if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
+                                      //  if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
                                             {

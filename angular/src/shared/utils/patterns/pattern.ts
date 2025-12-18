@@ -7,6 +7,7 @@ export const Patterns: {
     email: RegExp;
     charactersWithoutSpaces: RegExp;
     domainName: RegExp;
+    workspaceName:RegExp;
 } = {
     positiveInteger: /^[0-9]*[1-9][0-9]*$/,
     charactersWithSpaces: /^[a-zA-Z\s]*$/,
@@ -15,5 +16,8 @@ export const Patterns: {
     positiveNumbersFromZero: /^[0-9]\d*(\.\d+)?$/,
     email: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     charactersWithoutSpaces: /(.*\S+.*)/,
-    domainName: new RegExp("^[A-Za-z0-9-_]+([\\-\\.]{1}[a-z0-9]+)*\\.?[A-Za-z]{2,6}$")
+    domainName: new RegExp("^[A-Za-z0-9-_]+([\\-\\.]{1}[a-z0-9]+)*\\.?[A-Za-z]{2,6}$"),
+    workspaceName: new RegExp(
+        '^[A-Za-z0-9!@#$%^&*()_\\-+=\\[\\]{};:\'",.<>/?\\\\|`~]{2,64}$'
+      ),
 };
