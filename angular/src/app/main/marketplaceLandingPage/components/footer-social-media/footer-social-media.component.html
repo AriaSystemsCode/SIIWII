@@ -1,7 +1,7 @@
 <div class="footer-bottom-wrapper pt-5">
   <!-- <h2>{{sectionData?.name}}</h2> -->
     <a *ngFor="let s of links; "
-       [href]="s.url" target="_blank" rel="noopener"
+         rel="noopener" (click)="openTab(s?.link)"
        class="generic-anchor pr-4 ">
       <ng-container >
         <div class="d-inline-block pl-1" style="background-color:#fff;width:40px;height:35px;border-radius:5px;">

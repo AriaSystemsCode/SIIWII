@@ -124,8 +124,10 @@ export class TopBarComponent
     displaneBuy :boolean =false;
     isAuthenticated = this.appSession?.user
     searchInput:string
-    bgCol:string 
+    bgCol?: string;
+    bgColLoaded = false;
     tenantLogo:string
+    allowFeeds:string
     defaultHomeUrl = '/app/main/Home'; // fallback
     constructor(
         injector: Injector,
@@ -148,7 +150,7 @@ export class TopBarComponent
         
     ) {
         super(injector);
-
+        this.getTenantData()
         this.items = [
             {
                 items: [
@@ -203,7 +205,6 @@ export class TopBarComponent
 
     ngOnInit() {
        this.loadDefaultPage()
-        this.getTenantData()
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
@@ -512,26 +513,30 @@ export class TopBarComponent
       }
       
       getTenantData() {
-       
-        this._AppEntitiesServiceProxy.getHostSettingValue(1208,null)
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208, null)
         .subscribe((result) => {
-            // result = '#456'
-            result ? this.bgCol = result : this.bgCol = '#4A0D4A'
+          this.bgCol = result;
+          this.bgColLoaded = true; 
+        });
     
-        });
-        this._AppEntitiesServiceProxy.getHostSettingValue(1204,"file")
+      this._AppEntitiesServiceProxy.getHostSettingValue(1204, "file")
         .subscribe((result) => {
-          
-           this.tenantLogo = result
-  
+          this.tenantLogo = result;
         });
+
+            
+      this._AppEntitiesServiceProxy.getHostSettingValue(1207, null)
+      .subscribe((result) => {
+        this.allowFeeds = result;
+      });
     }
 
     loadDefaultPage(): void {
+        this.getTenantData()
         this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
           .subscribe({
             next: (res2: string) => {
-              if (res2 === 'Marketplace Landing page') {
+              if (res2 === 'Marketplace' && this.allowFeeds != 'true') {
                 this.defaultHomeUrl = '/app/main/marketplace';
               } else {
                 this.defaultHomeUrl = '/app/main/Home';
@@ -542,6 +547,9 @@ export class TopBarComponent
               this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
             }
           });
+      }
+      onImgErr(evt: Event) {
+        (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
       }
 }
 

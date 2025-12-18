@@ -1,13 +1,5 @@
-<p-carousel
-  [value]="blocksSorted"
-  [numVisible]="5"
-  [numScroll]="5"
-  [circular]="false"
-  [showIndicators]="false"
-  [showNavigators]="true"
-  [responsiveOptions]="responsiveOptions"
-  class="p-4 m-2 rounded"
->
+<p-carousel [value]="blocksSorted" [numVisible]="5" [numScroll]="5" [circular]="false" [showIndicators]="false"
+  [showNavigators]="true" [responsiveOptions]="responsiveOptions" class="p-4 m-2 rounded">
   <ng-template pTemplate="item" let-item>
 
     <div class="carousel-card">
@@ -16,15 +8,10 @@
         <!-- PRODUCT -->
         <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
           <div class="product-image-wrapper">
-            <img
-              class="product-image"
-              (error)="onImgErr($event)"
-              [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
+            <img class="product-image" (error)="onImgErr($event)" [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
                       ? attachmentBaseUrl + '/' + item?.getAppMarketItemForViewDto?.appItem.imageUrl
-                      : 'assets/placeholders/appitem-placeholder.png'"
-              alt="Product Image"
-              (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)"
-            />
+                      : 'assets/placeholders/appitem-placeholder.png'" alt="Product Image"
+              (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)" />
           </div>
 
           <div class="product-info">
@@ -32,9 +19,12 @@
               <span class="code">
                 {{ item?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
               </span>
-              <span class="price">
-                RRP: {{ item?.getAppMarketItemForViewDto?.appItem?.price | currency }}
-              </span>
+           
+                <span class="price" *ngIf="showMsrP">
+                  {{ languageSettingName !== 'en-GB' ? 'MSRP' : 'RRP' }}:
+                  {{ item?.getAppMarketItemForViewDto?.appItem?.price | currency: currencyCode:true }}
+                </span>
+         
             </div>
 
             <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)">
@@ -52,12 +42,9 @@
               <div class="star-rating">
                 <div class="stars-outer">
                   ★★★★★
-                  <div
-                    class="stars-inner"
-                    [style.width]="
+                  <div class="stars-inner" [style.width]="
                       (item?.getAppMarketItemForViewDto?.averageRating / 5) * 100 + '%'
-                    "
-                  >
+                    ">
                     ★★★★★
                   </div>
                 </div>
@@ -70,64 +57,38 @@
         </div>
 
         <!-- BRAND -->
-        <img
-          *ngSwitchCase="'BRAND'"
-          class="card-media"
-          [src]="item?.image
-                  ? attachmentBaseUrl + '/' + item?.image
-                  : '../../../../assets/placeholders/_logo-placeholder.png'"
-          alt="Brand"
-          (click)="goToBrand(item)"
-          (error)="onImgErr($event)"
-        />
-    <!-- CATEGORY -->
-    <img
-    *ngSwitchCase="'CATEGORY'"
-    class="card-media"
-    [src]="item?.image
+ 
+
+    <img  *ngSwitchCase="'BRAND'"  class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
+           " title="Brand {{item?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(item)"
+  (error)="onImgErr($event)" />
+
+ 
+      
+  
+    
+        <!-- CATEGORY -->
+        <img *ngSwitchCase="'CATEGORY'" class="card-media" [src]="item?.image
             ? attachmentBaseUrl + '/' + item?.image
-            : '../../../../assets/placeholders/_logo-placeholder.png'"
-    alt="category"
-    (click)="goToCategory(item)"
-    (error)="onImgErr($event)"
-  />
+            : '../../../../assets/placeholders/_logo-placeholder.png'" alt="category" (click)="goToCategory(item)"
+          (error)="onImgErr($event)" />
         <!-- ATTACHMENT -->
         <ng-container *ngSwitchCase="'ATTACHMENT'">
-          <ng-container [ngSwitch]="kindOfPath(item?.image)">
-            <img
-              *ngSwitchCase="'image'"
-              class="card-media"
-              [src]="fullUrl(item?.image)"
-              alt="{{ item?.name || 'Attachment' }}"
-              (click)="openTab(item?.link)"
-              (error)="onImgErr($event)"
-            />
-            <video
-              *ngSwitchCase="'video'"
-              class="card-media"
-              controls
-              playsinline
-            >
-              <source [src]="fullUrl(item?.image)" />
-            </video>
-            <img
-              *ngSwitchCase="'pdf'"
-              class="card-media pdf-icon"
-              src="assets/Items/pdf-Icon.png"
-              alt="PDF"
-              (click)="openNewTab(item?.image)"
-            />
-            <a
-              *ngSwitchDefault
-              class="card-media other-file"
-              [href]="fullUrl(item?.image)"
-              target="_blank"
-              rel="noopener"
-            >
-              Open file
-            </a>
-          </ng-container>
+          <!-- Prefer an image attachment if available -->
+          <img *ngIf="getAttachmentImage(item) as imgSrc" class="card-media" [src]="imgSrc"
+            [alt]="item?.name || 'Attachment'" (click)="onAttachmentClick(item)" (error)="onImgErr($event)" />
+
+          <!-- If no image but there is a PDF, show PDF icon -->
+          <img *ngIf="!getAttachmentImage(item) && hasPdfAttachment(item)" class="card-media pdf-icon"
+            src="assets/Items/pdf-Icon.png" alt="PDF" (click)="onAttachmentClick(item)" />
+
+          <!-- Fallback: generic link if neither image nor pdf is detected -->
+          <a *ngIf="!getAttachmentImage(item) && !hasPdfAttachment(item)" class="card-media other-file"
+            [href]="getAttachmentClickUrl(item)" target="_blank" rel="noopener">
+            Open file
+          </a>
         </ng-container>
+
 
       </div>
     </div>

@@ -48668,6 +48668,68 @@ export class SydObjectsServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param firstName (optional) 
+     * @param lastName (optional) 
+     * @param email (optional) 
+     * @param phone (optional) 
+     * @param message (optional) 
+     * @return Success
+     */
+    sendContactUsInfo(firstName: string | null | undefined, lastName: string | null | undefined, email: string | null | undefined, phone: string | null | undefined, message: string | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/SydObjects/SendContactUsInfo?";
+        if (firstName !== undefined && firstName !== null)
+            url_ += "firstName=" + encodeURIComponent("" + firstName) + "&";
+        if (lastName !== undefined && lastName !== null)
+            url_ += "lastName=" + encodeURIComponent("" + lastName) + "&";
+        if (email !== undefined && email !== null)
+            url_ += "email=" + encodeURIComponent("" + email) + "&";
+        if (phone !== undefined && phone !== null)
+            url_ += "phone=" + encodeURIComponent("" + phone) + "&";
+        if (message !== undefined && message !== null)
+            url_ += "message=" + encodeURIComponent("" + message) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSendContactUsInfo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSendContactUsInfo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSendContactUsInfo(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -79516,6 +79578,7 @@ export interface IMarketplaceExtraDataAttrDto {
 }
 
 export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewDto {
+    brandAttchment!: string | undefined;
     brand!: string | undefined;
     productLabel!: string | undefined;
     startShipDate!: string | undefined;
@@ -79589,6 +79652,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.brandAttchment = _data["brandAttchment"];
             this.brand = _data["brand"];
             this.productLabel = _data["productLabel"];
             this.startShipDate = _data["startShipDate"];
@@ -79728,6 +79792,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["brandAttchment"] = this.brandAttchment;
         data["brand"] = this.brand;
         data["productLabel"] = this.productLabel;
         data["startShipDate"] = this.startShipDate;
@@ -79856,6 +79921,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
 }
 
 export interface IAppMarketplaceItemForViewDto {
+    brandAttchment: string | undefined;
     brand: string | undefined;
     productLabel: string | undefined;
     startShipDate: string | undefined;
@@ -107226,6 +107292,7 @@ export class PageSettingDto implements IPageSettingDto {
     link!: string | undefined;
     buttonText!: string | undefined;
     titleAlignment!: string | undefined;
+    entityAttachments!: AppEntityAttachmentDto[] | undefined;
 
     [key: string]: any;
 
@@ -107262,6 +107329,11 @@ export class PageSettingDto implements IPageSettingDto {
             this.link = _data["link"];
             this.buttonText = _data["buttonText"];
             this.titleAlignment = _data["titleAlignment"];
+            if (Array.isArray(_data["entityAttachments"])) {
+                this.entityAttachments = [] as any;
+                for (let item of _data["entityAttachments"])
+                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
+            }
         }
     }
 
@@ -107296,6 +107368,11 @@ export class PageSettingDto implements IPageSettingDto {
         data["link"] = this.link;
         data["buttonText"] = this.buttonText;
         data["titleAlignment"] = this.titleAlignment;
+        if (Array.isArray(this.entityAttachments)) {
+            data["entityAttachments"] = [];
+            for (let item of this.entityAttachments)
+                data["entityAttachments"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -107319,6 +107396,7 @@ export interface IPageSettingDto {
     link: string | undefined;
     buttonText: string | undefined;
     titleAlignment: string | undefined;
+    entityAttachments: AppEntityAttachmentDto[] | undefined;
 
     [key: string]: any;
 }

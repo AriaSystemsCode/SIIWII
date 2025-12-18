@@ -499,7 +499,9 @@ namespace onetouch.Authorization.Users
             CheckErrors(await UserManager.CreateAsync(user));
 
             //Update Entity/Contact table[Start-Mariam] 
-            if(AbpSession.TenantId != null && AbpSession.TenantId != 0 )
+            //string createContactSetting = await _appEntitiesAppService.GetHostSettingValue(1212); 
+            //createContactSetting.ToLower()== "Manualcontactpersons".ToLower() &&
+            if (AbpSession.TenantId != null && AbpSession.TenantId != 0 )
             {
                 var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                 if (account != null)

@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy, AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
 
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
@@ -49,15 +49,23 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
       numScroll: 1
     }
   ];
-  
+  currencyCode: string; 
+  languageSettingName:string  =AppConsts.languageSettingName;
+  showMsrP:boolean
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
     private router: Router,
+       private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
   ) { super(injector); }
 
   ngOnInit() {
-    if (this.sectionId) this.getBlocksData();
+    this.initCurrencyCode();  
+  
+
+    if (this.sectionId) {
+      this.getBlocksData();
+    }
   }
 
   ngOnDestroy() {
@@ -77,7 +85,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   getBlocksData() {
     this.syd.getAllSectionBlocks(this.sectionId).subscribe(res => {
       this.items = res ?? [];
-      console.log(res,'res')
+
 
       // Pre-prepare PDFs so iframes have src ready
       this.items
@@ -145,11 +153,11 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   // }
 
   // ---------- navigation ----------
-  goToBrand(brand: { name: string; id: number | string }) {
+  goToBrand(brand) {
    
     this.router.navigate(
         ['/app/main/marketplace/products'],
-        { queryParams: { brand: brand.id } } 
+        { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } } 
     );
 }
 goToCategory(cat: { name: string; id: number | string }) {
@@ -206,4 +214,121 @@ viewProduct(prod: any) {
   // this.router.navigateByUrl(`/view/${id}`)
 }
 
+
+getAttachmentImage(b: PageSettingDto): string | null {
+  if (!b) return null;
+
+  // 1) block.image itself is an image path
+  if (this.isImg(b.image)) {
+    return this.fullUrl(b.image);
+  }
+
+  // 2) try entityAttachments: find first image attachment
+  const imgAtt = b.entityAttachments?.find(att =>
+    this.isImg(att?.url || att?.fileName)
+  );
+
+  if (imgAtt) {
+    return this.fullUrl(imgAtt.url || imgAtt.fileName);
+  }
+
+  return null;
+}
+
+/** Returns true if there is a PDF attachment on this block. */
+hasPdfAttachment(b: PageSettingDto): boolean {
+  if (!b?.entityAttachments) return false;
+  return b.entityAttachments.some(att =>
+    this.isPdf(att?.url || att?.fileName)
+  );
+}
+
+
+getAttachmentPdfUrl(b: PageSettingDto): string | null {
+  if (!b?.entityAttachments) return null;
+
+  const pdfAtt = b.entityAttachments.find(att =>
+    this.isPdf(att?.url || att?.fileName)
+  );
+  if (!pdfAtt) return null;
+
+  return this.fullUrl(pdfAtt.url || pdfAtt.fileName);
+}
+
+
+getAttachmentClickUrl(b: PageSettingDto): string | null {
+  if (!b) return null;
+
+  // Case 2: image + PDF
+  const pdfUrl = this.getAttachmentPdfUrl(b);
+  if (pdfUrl) {
+    return pdfUrl;
+  }
+
+  // Case 1: image + external link
+  if (b.link) return b.link;
+  if (b.externalUrl) return b.externalUrl;
+  if (b.linkPageUrl) return b.linkPageUrl;
+
+  // Fallback to the main image/url
+  if (b.image) return this.fullUrl(b.image);
+
+  return null;
+}
+
+
+onAttachmentClick(b: PageSettingDto): void {
+  const url = this.getAttachmentClickUrl(b);
+  if (!url) { return; }
+
+  // if it's relative to attachments, normalize to fullUrl
+  const finalUrl = /^https?:\/\//i.test(url) ? url : this.fullUrl(url);
+  window.open(finalUrl, '_blank');
+}
+
+private initCurrencyCode(): void {
+  // 1) try localStorage("currencyCode")
+  const stored = localStorage.getItem('currencyCode');
+
+  if (stored && stored !== 'undefined' && stored !== 'null') {
+    try {
+      const parsed = JSON.parse(stored);
+
+      // stored as "GBP"
+      if (typeof parsed === 'string' && parsed.trim()) {
+        this.currencyCode = parsed.trim();
+        return;
+      }
+
+      // stored as { code: "GBP", ... }
+      if (parsed && typeof parsed === 'object' && parsed.code) {
+        this.currencyCode = parsed.code;
+        return;
+      }
+    } catch {
+      // not JSON, maybe raw 'GBP'
+      if (stored.trim()) {
+        this.currencyCode = stored.trim();
+        return;
+      }
+    }
+  }
+
+  // 2) fallback to tenant default currency from AppComponentBase
+  if ((this as any).tenantDefaultCurrency?.code) {
+    this.currencyCode = (this as any).tenantDefaultCurrency.code;
+    return;
+  }
+
+  // 3) last fallback
+  this.currencyCode = 'USD';
+}
+getSettingData(){
+  this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
+  .subscribe((result) => {
+    this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
+
+  });
+
+}
 }

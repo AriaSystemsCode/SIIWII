@@ -135,6 +135,7 @@ export class TransactionInformationComponent
   priceLevel:any
   languageSettingName  =AppConsts.languageSettingName;
   transactionSharing:string="";
+  isAuthenticated = this.appSession?.user
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1320,8 +1321,8 @@ export class TransactionInformationComponent
 
         // Asynchronous handling for setting orderConfirmationRole
         this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId).subscribe((res) => {
-          this.printInfoParam.orderConfirmationRole = res.contactRole;
-          this.printInfoParam.contactName = res.contactName;
+          this.printInfoParam.orderConfirmationRole = res.contactRole ? res.contactRole : 'buyer';
+          this.printInfoParam.contactName = res.contactName ? res.contactName : 'Savty';
 
 
 
@@ -1808,10 +1809,9 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
   automaticShare() {
     if (!this.appTransactionsForViewDto?.sharedWithUsers ||
       this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
-    return; 
-  }
-
-    const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
+    return;
+      }
+      const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
         sharedTenantId: u.tenantId,
         sharedUserId: u.userId,
         sharedUserEMail: u.email,
@@ -1820,15 +1820,26 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
         sharedUserTenantName: u.tenantName,
         id: u.id
     })) || [];
-
     let shareDto :any = {
         transactionId: this.orderId,
-        message: '',
+        message: `Hi,
+Kindly check attached`,
         transactionSharing: newsharingArray,
         subject: undefined
     };
     this._AppTransactionServiceProxy.shareTransactionByMessage(shareDto)
         .subscribe(r => this.notify.success("Transaction shared automatically"));
+  }
+  getNeeddedSettingValues(){
+    if(this.isAuthenticated){
+      this._AppEntitiesServiceProxy
+      .getTenantSettingValue(1111,null)
+      .subscribe((res: any) => {
+          this.transactionSharing= res?.toString().toLowerCase();
+      });
+    }
 }
+  
 
-}
+
+  }

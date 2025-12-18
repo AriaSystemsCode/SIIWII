@@ -28,7 +28,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
     oldUserName: string;
-
+    isHost:boolean
     constructor(
         injector: Injector,
         public loginService: LoginService,
@@ -107,7 +107,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
                             this.submitting = false;
                             this.hideMainSpinner();
                         },
-                        redirectUrl, // 👈 this is where user goes after login
+                        redirectUrl, 
                         token
                     );
                 }, 2000);
@@ -172,29 +172,31 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    /**
-     * Decide the default page from host setting 1203,
-     * then return it via callback so login() can pass it to authenticate().
-     */
+ 
     chooseDefaultPage(callback: (url: string) => void): void {
-        this._appEntitiesServiceProxy.getHostSettingValue(1203,null).subscribe({
-            next: res2 => {
-                let defaultUrl = '/app/main/Home';
-
-                if (res2) {
-                    // const userNavigation = res2;
-                    defaultUrl = res2 == 'Marketplace Landing page'
-                        ? '/app/main/marketplace'
-                        : '/app/main/Home';
-                }
-
-                callback(defaultUrl);
-            },
-            error: err2 => {
-                console.error('Failed to load host setting 1203', err2);
-
-                callback('/app/main/dashboard');
-            }
+      
+        const tenantIdCookie = abp.multiTenancy.getTenantIdCookie(); 
+        const isHost = tenantIdCookie === null || tenantIdCookie === undefined;
+      
+        if (isHost) {
+          callback('/app/admin/hostDashboard');
+          return; 
+        }
+   
+        this._appEntitiesServiceProxy.getHostSettingValue(1203, null).subscribe({
+          next: (res2) => {
+            const url = (res2 === 'Marketplace')
+              ? '/app/main/marketplace'
+              : '/app/main/Home';
+      
+            callback(url);
+          },
+          error: (err) => {
+            console.error('Failed to load host setting 1203', err);
+            callback('/app/main/Home'); 
+          }
         });
-    }
+      }
+      
+      
 }

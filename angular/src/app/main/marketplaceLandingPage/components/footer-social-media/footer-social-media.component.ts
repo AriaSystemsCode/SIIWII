@@ -18,14 +18,7 @@ export class FooterSocialMediaComponent extends AppComponentBase   {
 
 
     ngOnInit(){
-        // this.links = [
-        //     { name: 'facebook',  url: 'https://www.facebook.com/siiwii.network/',  iconSrc: 'assets/landingPage/Footer_FB_Btn.svg' },
-        //     { name: 'instagram', url: 'https://www.instagram.com/siiwii.network/', iconSrc: 'assets/landingPage/Footer_Instagram_Btn.svg' },
-        //     { name: 'twitter',   url: 'https://twitter.com/siiwii_net',            iconSrc: 'assets/landingPage/Footer_Twitter_Btn.svg' },
-        //     { name: 'linkedin',  url: 'https://www.linkedin.com/company/siiwii/',   iconSrc: 'assets/landingPage/Footer_Linkedin_Btn.svg' },
-        //     { name: 'youtube',   url: 'https://www.youtube.com/channel/UCv_4Ao0myNHsjfxyg4lbLbg', iconSrc: 'assets/landingPage/Footer_Youtube_Btn.jpg' },
-        //   ];
-
+   
           if(this.sectionId){
             this.getBlocksData()
 
@@ -57,5 +50,9 @@ export class FooterSocialMediaComponent extends AppComponentBase   {
             
               get blocksSorted(): PageSettingDto[] {
                 return (this.links ?? []).slice().sort(this.compareByOrder);
+              }
+
+              openTab(link:any){
+                window.open(link)
               }
   }

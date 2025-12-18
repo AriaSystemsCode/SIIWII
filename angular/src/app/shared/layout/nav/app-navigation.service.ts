@@ -19,7 +19,7 @@ export class AppNavigationService {
         let menu: AppMenu = new AppMenu('MainMenu', 'MainMenu', [
             new AppMenuItem('Dashboard', 'Pages.Administration.Host.Dashboard', 'flaticon-line-graph', '/app/admin/hostDashboard'),
             new AppMenuItem('My Transactions', 'Pages.AppSiiwiiTransactions', 'flaticon-more', '/app/main/transactions/appTransactions/MyTransactions'),
-            new AppMenuItem('MyAccounts', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
+            new AppMenuItem('My Connections', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
         ]);
     
      
@@ -39,7 +39,7 @@ export class AppNavigationService {
             );
         }
     
-        // 🟣 عناصر عامة في الـ main menu
+   
         menu.items.push(
             new AppMenuItem('Tenants', 'Pages.Tenants', 'flaticon-list-3', '/app/admin/tenants'),
             new AppMenuItem('Editions', 'Pages.Editions', 'flaticon-app', '/app/admin/editions'),
@@ -72,11 +72,11 @@ export class AppNavigationService {
                 new AppMenuItem('AccountProfile', 'Pages.Accounts', 'flaticon-more', '/app/main/account'),
             );
         }
-        if (this.isHost) {
+        // if (this.isHost) {
             adminMenu.items.push(
                 new AppMenuItem('Lookups', 'Pages.AppEntities', 'flaticon-more', '/app/main/lookups'),
             );
-        }
+        // }
   
         adminMenu.items.push(
             new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [

@@ -215,14 +215,31 @@ namespace onetouch.AppPosts
                         o.AppPost.AccountId = currPublishContact.Id;
                         o.AppPost.AccountName = currPublishContact.Name;
                     }
-                    o.AppPost.UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).FullName;
+                    var userObj = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId);
+                    if (userObj != null)
+                    {
+                        o.AppPost.UserName = userObj.FullName;
+                        var profilePictureId = userObj.ProfilePictureId;
+                        if (profilePictureId != null)
+                        { o.AppPost.ProfilePictureId = (Guid)profilePictureId; }
+                    }
                     if (o.AppPost.AccountName == null) {
-                        o.AppPost.AccountName = o.AppPost.TenantId == null ? "" : TenantManager.GetById((int)o.AppPost.TenantId).Name;
+                        o.AppPost.AccountName = "";
+                        if (o.AppPost.TenantId != null)
+                        {
+                            try
+                            {
+                                var tenantObj = TenantManager.GetById((int)o.AppPost.TenantId);
+                                if (tenantObj != null)
+                                    o.AppPost.AccountName = tenantObj.Name;
+                            }
+                            catch { }
+                        }
                     }
                     //o.AppPost.ProfilePictureId = Guid.Parse("7AE60C74-2523-EBAF-BDD5-39FE1E7099B0");
-                    var profilePictureId = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).ProfilePictureId;
-                    if (profilePictureId != null)
-                    { o.AppPost.ProfilePictureId = (Guid)profilePictureId; }
+                    //var profilePictureId = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).ProfilePictureId;
+                    //if (profilePictureId != null)
+                    //{ o.AppPost.ProfilePictureId = (Guid)profilePictureId; }
                     //string tenant = imagesUrl + o.AppPost.TenantId == null ? "-1" : o.AppPost.TenantId.ToString() + @"/";
                     //o.AttachmentsURLs = o.AttachmentsURLs.Select(r => tenant + r).ToList();
 

@@ -2,7 +2,8 @@ import { Component, Injector, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
-
+import { SydObjectsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { finalize } from 'rxjs';
 @Component({
   selector: 'app-contact-us-modal',
   templateUrl: './contact-us-modal.component.html',
@@ -12,7 +13,8 @@ export class ContactUsModalComponent extends AppComponentBase {
 
   @ViewChild('contactUsModal', { static: false }) modal: ModalDirective;
   @ViewChild('contactForm', { static: false }) contactForm: NgForm;
-  emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+  emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   active = false;
   saving = false;
 
@@ -25,7 +27,7 @@ export class ContactUsModalComponent extends AppComponentBase {
     message: ''
   };
 
-  constructor(injector: Injector) {
+  constructor(injector: Injector, private SydObjectsServiceProxy:SydObjectsServiceProxy) {
     super(injector);
   }
 
@@ -47,17 +49,16 @@ export class ContactUsModalComponent extends AppComponentBase {
 
     this.saving = true;
 
-    // TODO: call your API here
-    // example:
-    // this._contactService.sendContactUs(this.model)
-    //   .pipe(finalize(() => this.saving = false))
-    //   .subscribe(() => { ... });
+  
+    this.SydObjectsServiceProxy.sendContactUsInfo(this.model.firstName,this.model.lastName,this.model.email,this.model.telephone,this.model.message)
+      .pipe(finalize(() => {
+        this.saving = false;
+        this.notify.info(this.l('YourMessageHasBeenSent'));
+        this.close();
+      }))
+      .subscribe(() => { });
 
-    setTimeout(() => {
-      this.saving = false;
-      this.notify.info(this.l('YourMessageHasBeenSent'));
-      this.close();
-    }, 800);
+ 
   }
 
   private resetForm(): void {

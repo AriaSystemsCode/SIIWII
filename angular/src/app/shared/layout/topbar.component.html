@@ -1,11 +1,11 @@
-...<!-- Navbar -->
 <nav
-    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"    [ngClass]="isAuthenticated ? 'navbarMar':''"
-    [style.top.px]="_belowBar ? 25 : 0"
-    [style.backgroundColor]="bgCol"
-
-  
+  *ngIf="bgColLoaded"
+  class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-0"
+  [ngClass]="isAuthenticated ? 'navbarMar' : ''"
+  [style.top.px]="_belowBar ? 25 : 0"
+  [style.backgroundColor]="bgCol"
 >
+
     <!-- Container wrapper -->
     <div class="container ml-0 position-md-absolute position-lg-static ">
         <!-- Navbar brand -->
@@ -17,10 +17,13 @@
         [routerLink]="defaultHomeUrl"
         routerLinkActive="header-link-active"
         (click)="userClick('Home')"
+        [ngClass]="isAuthenticated? 'ml-3':''"
       >
         <img
           [src]=" attachmentBaseUrl + '/' + tenantLogo"
           class="navbar-brand"
+          [ngClass]="tenantLogo ? '':'rounded-c'"
+          (error)="onImgErr($event)"
         />
       </a>
       
@@ -119,7 +122,7 @@
         <div class="ml-4 d-sm-flex d-none sec-section" style="justify-content: center;margin-left: 35px;">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item" *ngIf="isAuthenticated">
+                <li class="nav-item" *ngIf="isAuthenticated && allowFeeds =='true'">
                     <a
                         *ngIf="('Pages.Marketplace' | permission) || !isAuthenticated"
                         class="nav-link active d-flex flex-column text-center"
@@ -348,7 +351,7 @@
                                     <!--Sara start-->
                                     <li
                                         class="kt-nav__item"
-                                        *ngIf="appSession.user.memberId"
+                                        *ngIf="appSession?.user?.memberId"
                                     >
                                         <!--  <a class="kt-nav__link" [routerLink]="['/app/main/account']" routerLinkActive="router-link-active"  > -->
                                         <!--  'ViewMemberProfile/:id' -->
@@ -358,8 +361,8 @@
                                             [queryParams]="{
                                                 tab: 'ViewMember',
                                                 memberId:
-                                                    appSession.user.memberId,
-                                                userId: appSession.user.id
+                                                    appSession?.user?.memberId,
+                                                userId: appSession?.user?.id
                                             }"
                                             queryParamsHandling="merge"
                                             routerLinkActive="router-link-active"

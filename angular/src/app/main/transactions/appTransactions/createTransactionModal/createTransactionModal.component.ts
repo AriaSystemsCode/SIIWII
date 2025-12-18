@@ -379,62 +379,73 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
 
     }
+
     handleBuyerCompanySearch(event: any) {
+        const filter = typeof event === 'string' ? event : (event?.filter ?? '');
+      
         this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                event.filter,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined, true, this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase()
-            )
-            .subscribe((res: any) => {
-                this.buyerCompanies = [...res.items];
-            });
-    }
+          .getRelatedAccounts(
+            filter,
+            undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            true,
+            this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase()
+          )
+          .subscribe((res: any) => {
+            this.buyerCompanies = [...(res.items || [])];
+
+            // if (this.buyerCompanies.length === 1) {
+            //   const only = this.buyerCompanies[0];
+      
+            //   this.buyerComapnyId = only.id;
+            //   this.buyerCompanySSIN = only.accountSSIN;
+            //   this.currencyCode = only.currencyCode;
+
+            //   this.orderForm.get("buyerCompanyName")?.setValue(only, { emitEvent: false });
+
+            //   this.orderForm.get("buyerContactPhoneNumber")?.setValue(only.phone);
+            //   this.orderForm.get("buyerContactEMailAddress")?.setValue(only.email);
+
+            //   this.handleBuyerCompanyChange({ value: only });
+            // }
+          });
+      }
+      
     handleSellerCompanySearch(event: any) {
+        const filter = typeof event === 'string' ? event : (event?.filter ?? '');
+      
         this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                event.filter,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined, true, this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase()
-            )
-            .subscribe((res: any) => {
-                this.sellerCompanies = [...res.items];
-            });
-    }
+          .getRelatedAccounts(
+            filter,
+            undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            true,
+            this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase()
+          )
+          .subscribe((res: any) => {
+            this.sellerCompanies = [...(res.items || [])];
+   
+            if (this.sellerCompanies.length === 1) {
+              const only = this.sellerCompanies[0];
+      
+              this.sellerCompanyId = only.id;
+              this.sellerCompanySSIN = only.accountSSIN;
+              this.sellerCurrencyCode = only.currencyCode;
+
+              this.orderForm.get("sellerCompanyName")?.setValue(only, { emitEvent: false });
+      
+              this.orderForm.get("sellerContactPhoneNumber")?.setValue(only.phone);
+              this.orderForm.get("sellerContactEMailAddress")?.setValue(only.email);
+
+              this.handleSellerCompanyChange({ value: only });
+            }
+          });
+      }
+      
 
     handleBuyerCompanyChange(event: any) {
         this.searchTerm = ''

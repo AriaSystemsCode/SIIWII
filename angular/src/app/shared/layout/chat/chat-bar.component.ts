@@ -81,12 +81,13 @@ export class ChatBarComponent extends AppComponentBase implements OnInit, AfterV
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     appChatSide: typeof ChatSide = ChatSide;
     appChatMessageReadState: typeof ChatMessageReadState = ChatMessageReadState;
-
+    isAuthenticated = this.appSession?.user
     get chatUserSearchHint(): string {
         return this.l('ChatUserSearch_Hint');
     }
 
     _isOpen: boolean;
+    
     set isOpen(newValue: boolean) {
         if (newValue === this._isOpen) {
             return;
@@ -377,13 +378,16 @@ export class ChatBarComponent extends AppComponentBase implements OnInit, AfterV
     }
 
     getFriendsAndSettings(callback: any): void {
-        this._chatService.getUserChatFriendsWithSettings().subscribe(result => {
-            this.friends = (result.friends as ChatFriendDto[]);
-            this.serverClientTimeDifference = moment(abp.clock.now()).diff(result.serverTime, 'seconds');
-
-            this.triggerUnreadMessageCountChangeEvent();
-            callback();
-        });
+        if(this.isAuthenticated){
+            this._chatService.getUserChatFriendsWithSettings().subscribe(result => {
+                this.friends = (result.friends as ChatFriendDto[]);
+                this.serverClientTimeDifference = moment(abp.clock.now()).diff(result.serverTime, 'seconds');
+    
+                this.triggerUnreadMessageCountChangeEvent();
+                callback();
+            });
+        }
+      
     }
 
     scrollToBottom(): void {
