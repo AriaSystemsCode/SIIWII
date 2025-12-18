@@ -383,13 +383,13 @@ namespace onetouch.AppMarketplaceItems
                     {
                         returnDto.LogoImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : imagesUrl + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
+                                                        : "attachments/" + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
                     }
                     if (account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId) != null)
                     {
                         returnDto.BannerImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : imagesUrl + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
+                                                        : "attachments/" + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
                     }
                 }
                 return returnDto;
