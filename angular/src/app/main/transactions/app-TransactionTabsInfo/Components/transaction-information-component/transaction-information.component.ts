@@ -1321,8 +1321,8 @@ export class TransactionInformationComponent
 
         // Asynchronous handling for setting orderConfirmationRole
         this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId).subscribe((res) => {
-          this.printInfoParam.orderConfirmationRole = res.contactRole;
-          this.printInfoParam.contactName = res.contactName;
+          this.printInfoParam.orderConfirmationRole = res.contactRole ? res.contactRole : 'buyer';
+          this.printInfoParam.contactName = res.contactName ? res.contactName : 'Savty';
 
 
 
