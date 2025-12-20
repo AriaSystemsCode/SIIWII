@@ -121,14 +121,14 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
 
             // Parameters
             this.TransactionId = reportInitializer.GetParameter("TransactionId");
+            this.PrintDate = reportInitializer.GetParameter("PrintDate");
+            this.PrintTime = reportInitializer.GetParameter("PrintTime");
             this.attachmentClientUrl = reportInitializer.GetParameter("attachmentClientUrl");
             this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
             this.tenantId = reportInitializer.GetParameter("tenantId");
             this.userId = reportInitializer.GetParameter("userId");
             this.roleType = reportInitializer.GetParameter("roleType");
             this.saveToPDF = reportInitializer.GetParameter("saveToPDF");
-            this.PrintDate = reportInitializer.GetParameter("PrintDate");
-            this.PrintTime = reportInitializer.GetParameter("PrintTime");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -242,13 +242,13 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
         private DevExpress.XtraReports.UI.CalculatedField calculatedField1;
         private DevExpress.XtraReports.Parameters.Parameter TransactionId;
+        private DevExpress.XtraReports.Parameters.Parameter PrintDate;
+        private DevExpress.XtraReports.Parameters.Parameter PrintTime;
         private DevExpress.XtraReports.Parameters.Parameter attachmentClientUrl;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter tenantId;
         private DevExpress.XtraReports.Parameters.Parameter userId;
         private DevExpress.XtraReports.Parameters.Parameter roleType;
         private DevExpress.XtraReports.Parameters.Parameter saveToPDF;
-        private DevExpress.XtraReports.Parameters.Parameter PrintDate;
-        private DevExpress.XtraReports.Parameters.Parameter PrintTime;
     }
 }
