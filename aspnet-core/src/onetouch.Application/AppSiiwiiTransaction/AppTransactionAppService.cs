@@ -5986,7 +5986,7 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
         //MMT-OC[Start]
-        public async Task<TenantContactRole> GetTenantRoleInTransaction(long transactionId,long? tenantId)
+        public async Task<TenantContactRole> GetTenantRoleInTransaction(long transactionId, long? tenantId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -6001,7 +6001,7 @@ namespace onetouch.AppSiiwiiTransaction
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                     var transactionContacts = await _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == transactionId).ToListAsync();
                     var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk)
-                                   .Where(z => z.TenantId == tenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.AccountId == myAccount.Id).ToListAsync();
+                                   .Where(z => z.TenantId == tenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
 
                     //from o in _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == transactionId)
                     //           join c in _appContactRepository.GetAll().Include(z => z.EntityFk)
