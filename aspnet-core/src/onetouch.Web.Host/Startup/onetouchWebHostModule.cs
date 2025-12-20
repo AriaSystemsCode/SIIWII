@@ -52,6 +52,18 @@ namespace onetouch.Web.Startup
             _configurationAccessor = appConfiguration;
         }
 
+        private void ConfigureXtraReportConnectionStrings()
+        {
+            var _appConfiguration = _configurationAccessor.Configuration;
+            var globalConnectionStrings = _appConfiguration
+                .GetSection("ConnectionStrings")
+                .AsEnumerable(true)
+                .Where(x => x.Key == "Reports")
+                .ToDictionary(x => x.Key, x => x.Value);
+            DevExpress.DataAccess.DefaultConnectionStringProvider.AssignConnectionStrings(globalConnectionStrings);
+        }
+
+
         public override string GetNameOrConnectionString(ConnectionStringResolveArgs args)
         {
 
@@ -73,6 +85,7 @@ namespace onetouch.Web.Startup
                             if (reader.Read()) // only first row
                             {
                                 var connectionString = reader["ConnectionString"]?.ToString();
+                                var reportsConnectionString = reader["ReportsConnectionString"]?.ToString();
                                 var url = reader["Url"]?.ToString();
                                 var path = reader["Path"]?.ToString();   // <-- Path column
                                 var pathTemp = reader["TempPath"]?.ToString();   // <-- Path Temp column
@@ -85,6 +98,8 @@ namespace onetouch.Web.Startup
                                     _appConfiguration["Attachment:Path"] = @path;   // <-- set from DB
                                     _appConfiguration["Attachment:PathTemp"] = @pathTemp;   // <-- set from DB
                                     _appConfiguration["Attachment:Omitt"] = @omitt;   // <-- set from DB
+                                    _appConfiguration["ConnectionStrings:Reports"] = @reportsConnectionString;   // <-- set from DB
+                                    ConfigureXtraReportConnectionStrings();
 
                                     return connectionString;
                                 }
