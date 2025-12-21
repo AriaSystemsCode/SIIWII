@@ -6561,7 +6561,7 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
         //MMT-OC[Start]
-        public async Task<TenantContactRole> GetTenantRoleInTransaction(long transactionId,long? tenantId)
+        public async Task<TenantContactRole> GetTenantRoleInTransaction(long transactionId, long? tenantId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
