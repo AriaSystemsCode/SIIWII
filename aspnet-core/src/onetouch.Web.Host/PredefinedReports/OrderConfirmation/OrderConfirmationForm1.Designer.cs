@@ -86,10 +86,13 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.GroupHeader1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader1");
             this.Detail = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail");
             this.ReportFooter = reportInitializer.GetControl<DevExpress.XtraReports.UI.ReportFooterBand>("ReportFooter");
+            this.label55 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label55");
+            this.label54 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label54");
+            this.label51 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label51");
+            this.label40 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label40");
             this.label53 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label53");
             this.label52 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label52");
             this.pictureBox1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox1");
-            this.label40 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label40");
             this.xrTable2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTable>("xrTable2");
             this.xrTableRow5 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableRow>("xrTableRow5");
             this.tableRow1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableRow>("tableRow1");
@@ -118,9 +121,9 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
 
             // Parameters
             this.TransactionId = reportInitializer.GetParameter("TransactionId");
-            this.PrintTime = reportInitializer.GetParameter("PrintTime");
             this.PrintDate = reportInitializer.GetParameter("PrintDate");
-            this.Country = reportInitializer.GetParameter("Country");
+            this.PrintTime = reportInitializer.GetParameter("PrintTime");
+            this.attachmentClientUrl = reportInitializer.GetParameter("attachmentClientUrl");
             this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
             this.tenantId = reportInitializer.GetParameter("tenantId");
             this.userId = reportInitializer.GetParameter("userId");
@@ -204,10 +207,13 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader1;
         private DevExpress.XtraReports.UI.DetailBand Detail;
         private DevExpress.XtraReports.UI.ReportFooterBand ReportFooter;
+        private DevExpress.XtraReports.UI.XRLabel label55;
+        private DevExpress.XtraReports.UI.XRLabel label54;
+        private DevExpress.XtraReports.UI.XRLabel label51;
+        private DevExpress.XtraReports.UI.XRLabel label40;
         private DevExpress.XtraReports.UI.XRLabel label53;
         private DevExpress.XtraReports.UI.XRLabel label52;
         private DevExpress.XtraReports.UI.XRPictureBox pictureBox1;
-        private DevExpress.XtraReports.UI.XRLabel label40;
         private DevExpress.XtraReports.UI.XRTable xrTable2;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow5;
         private DevExpress.XtraReports.UI.XRTableRow tableRow1;
@@ -236,9 +242,9 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
         private DevExpress.XtraReports.UI.CalculatedField calculatedField1;
         private DevExpress.XtraReports.Parameters.Parameter TransactionId;
-        private DevExpress.XtraReports.Parameters.Parameter PrintTime;
         private DevExpress.XtraReports.Parameters.Parameter PrintDate;
-        private DevExpress.XtraReports.Parameters.Parameter Country;
+        private DevExpress.XtraReports.Parameters.Parameter PrintTime;
+        private DevExpress.XtraReports.Parameters.Parameter attachmentClientUrl;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter tenantId;
         private DevExpress.XtraReports.Parameters.Parameter userId;

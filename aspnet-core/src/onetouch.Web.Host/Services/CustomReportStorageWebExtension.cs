@@ -34,6 +34,7 @@ using Tweetinvi.Core.Extensions;
 using onetouch.AppSiiwiiTransaction;
 using System.Security.Cryptography;
 using Microsoft.CodeAnalysis;
+using DevExpress.Data.Extensions;
 
 namespace onetouch.Web.Services
 {
@@ -120,6 +121,7 @@ namespace onetouch.Web.Services
 
                 var dir = Path.Combine(ReportDirectory, tenantId.ToString());
                 Directory.CreateDirectory(dir);
+
                 if (Directory.EnumerateFiles(dir).Select(Path.GetFileNameWithoutExtension).Contains(reportName))
                 {
                     //report = File.ReadAllBytes(Path.Combine(dir, reportName + FileExtension));
@@ -147,33 +149,49 @@ namespace onetouch.Web.Services
                     string subject = "";
                     string fileName = reportName + ".pdf";
                     string transactionId = "";
-                    
+
                     bool saveToPdf = true;
                     string orderConfirmationRole = "";
                     foreach (string parameterName in parameters.AllKeys)
                     {
                         try
-                        { 
+                        {
 
                             if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null
-                                
+
+                                || (parameterName.ToUpper() == "ATTACHMENTBASEURL" &&
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentBaseUrl") != null &&
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentClientUrl") != null
+                                )
                                 || (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE" &&
                                 report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "roleType") != null)
                                 || (parameterName.ToUpper() == "LANGUAGENAME" &&
                                 report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name.ToUpper() == "MUSERCOUNTRY") != null)
-                                
+
                                 )
                             {
                                 switch (parameterName.ToUpper())
                                 {
+                                    case "ATTACHMENTBASEURL":
+                                        var attachmentPath = _appConfiguration[$"Attachment:Path"];
+                                        attachmentPath = attachmentPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+                                        attachmentPath = attachmentPath.Replace(@"\", @"/");
+
+                                        report.Parameters["attachmentClientUrl"].Value = attachmentPath;
+                                        report.Parameters["attachmentBaseUrl"].Value = parameters.Get("attachmentBaseUrl");
+                                        break;
+
                                     case "ORDERCONFIRMATIONROLE":
-                                      report.Parameters["roleType"].Value = Convert.ChangeType(
-                                      parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
+                                        report.Parameters["roleType"].Value = Convert.ChangeType(
+                                        parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
 
                                         break;
                                     case "LANGUAGENAME":
-                                        report.Parameters["muserCountry"].Value = Convert.ChangeType(
-                                      parameters.Get("languageName").ToUpper(), report.Parameters["muserCountry"].Type);
+                                        if (report.Parameters.FindIndex(e => e.Name.ToUpper() == "muserCountry".ToUpper()) > -1)
+                                        {
+                                            report.Parameters["muserCountry"].Value = Convert.ChangeType(
+                                            parameters.Get("languageName").ToUpper(), report.Parameters["muserCountry"].Type);
+                                        }
                                         break;
                                     default:
                                         report.Parameters[parameterName].Value = Convert.ChangeType(
@@ -243,7 +261,7 @@ namespace onetouch.Web.Services
                         }
                         //Iteration45[Start]
                         var transactionHeader = _appTransactionHeadersRepository.GetAll().Where(z => z.Id == long.Parse(transactionId)).FirstOrDefault();
-                        if (transactionHeader!=null)
+                        if (transactionHeader != null)
                         {
                             transactionHeader.OrderConfirmationTimeStamp = DateTime.UtcNow;
                             _appTransactionHeadersRepository.Update(transactionHeader);
