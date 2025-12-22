@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 
 @Component({
@@ -12,6 +12,15 @@ export class ProgressComponent implements OnInit {
   @Input() progressHeader: string;
   @Input() ProgressDetail: string;
 
+      @Input() _totalFiles;
+      @Input() _totalSizeMB;
+      @Input() _folderName;
+      @Input() _folder_details;
+      @Input() _remainingFiles
+      @Input() _estimatedRemainingTime;
+      @Input() _uploadedFilesCount;
+      @Output() close = new EventEmitter<boolean>();
+      
   constructor() { }
 
   ngOnInit(): void {
@@ -24,5 +33,10 @@ export class ProgressComponent implements OnInit {
   hide() {
     this.modal.hide();
   }
+
+  askToClose()
+{
+    this.close.emit(true);
+}
 
 }

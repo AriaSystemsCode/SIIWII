@@ -1,6 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>	<text name="InvitePartnerByType">Invite partner By Type</text>
+	<texts>
+	<text name="InvitePartnerByType">Invite partner By Type</text>
     <text name="ValidationRules">Validation rules</text>
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
@@ -2572,5 +2573,9 @@
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
     <text name="UpdateAccountInformation">Update Account Information</text>
+	</texts>  
+		<text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
+		<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
+
 	</texts>  
 </localizationDictionary>

@@ -31,7 +31,7 @@ export class itemsImport extends AppComponentBase implements ServiceUtilites {
             let ret = this._importService.setImageData(
                 imagesList[i].file.name,
                 code,
-                'IMAGE', imagesList, sycAttachmentCategory
+                "IMPORT", imagesList, sycAttachmentCategory
             );
             this.imagePassed += ret.imagePassed;
             this.imageFailed += ret.imageFailed;

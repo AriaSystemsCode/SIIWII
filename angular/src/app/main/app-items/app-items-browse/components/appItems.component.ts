@@ -528,8 +528,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         let serviceUtilites=itemsImport;
         let importStepsInfo:ImportStepInfo[];
         importStepsInfo= this._importService.getOriginalImportSteps();
-
-        this.ImportProductsModal.show(ImportTypes.Items,importService,serviceUtilites,["IMAGE"],true,importStepsInfo);
+        this.ImportProductsModal.show(ImportTypes.Items,importService,serviceUtilites,["IMPORT"],true,importStepsInfo);
     }
 
     showImportAvailableInventory(){

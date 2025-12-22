@@ -1,5 +1,5 @@
 // <!-- Iteration-8 -->
-import { Input, OnInit, ViewChild } from "@angular/core";
+import { ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { Injector } from "@angular/core";
 import { Component } from "@angular/core";
 import { AppConsts } from "@shared/AppConsts";
@@ -8,121 +8,226 @@ import { BsModalRef, BsModalService, ModalDirective, ModalOptions } from "ngx-bo
 import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { Output } from "@angular/core";
 import { EventEmitter } from "@angular/core";
-import {  TreeNodeOfGetSycEntityObjectTypeForViewDto } from "@shared/service-proxies/service-proxies";
+import { TreeNodeOfGetSycEntityObjectTypeForViewDto } from "@shared/service-proxies/service-proxies";
 import { SelectAppItemTypeComponent } from "@app/app-item-type/select-app-item-type/select-app-item-type.component";
 import { Subscription } from "rxjs";
 import { ImportTypes } from "../models/ImportTypes";
 import { finalize } from "rxjs/operators";
 
 @Component({
-    selector: "BrowseFolderModal",
-    templateUrl: './browseFolder.component.html',
-    styleUrls: ['./browseFolder.component.scss'],
+  selector: "BrowseFolderModal",
+  templateUrl: './browseFolder.component.html',
+  styleUrls: ['./browseFolder.component.scss'],
 
 })
 export class BrowseFolderComponent extends AppComponentBase implements OnInit {
-    @ViewChild('BrowseFolder', { static: true }) modal: ModalDirective;
-    @Output() UploadedFolder = new EventEmitter<any>();
-    templateUrl: string;
-    templateFileName: string;
-    templateVersion: string;
-    templateDate: string;
-    importType: ImportTypes;
-    ImportTypes = ImportTypes;
-    itemType: string = "";
-    itemTypeId: number = 0;
-    importServiceProxy:any;
-    hasImages:boolean;
+  @ViewChild('BrowseFolder', { static: true }) modal: ModalDirective;
+  @Output() UploadedFolder = new EventEmitter<any>();
+  templateUrl: string;
+  templateFileName: string;
+  templateVersion: string;
+  templateDate: string;
+  importType: ImportTypes;
+  ImportTypes = ImportTypes;
+  itemType: string = "";
+  itemTypeId: number = 0;
+  importServiceProxy: any;
+  hasImages: boolean;
 
-    public constructor(private _downloadService: FileDownloadService,
-        private _BsModalService: BsModalService,
-        private injector: Injector) {
-        super(injector);
+
+  imData: boolean = false;
+  imImages: boolean = false;
+  @Output() _imData = new EventEmitter<boolean>();
+  @Output() _imImages = new EventEmitter<boolean>();
+
+  isAnyOptionSelected: boolean = false;
+  showUploadModal = false;
+  folderName = 'Main Folder';
+  totalFiles = 0;
+  totalSizeMB = 0;
+  fileevent;
+
+  @Output() _openVideoModal = new EventEmitter<boolean>();
+  @Output() _totalFiles = new EventEmitter<any>();
+  @Output() _totalSizeMB = new EventEmitter<any>();
+  @Output() _folderName = new EventEmitter<any>();
+  @ViewChild('fileInput') fileInputRef!: ElementRef;
+
+  @Output() _hasImages = new EventEmitter<boolean>();
+  aspectRatioNumbers;
+
+  public constructor(private _downloadService: FileDownloadService,
+    private _BsModalService: BsModalService,
+    private injector: Injector) {
+    super(injector);
+  }
+
+  ngOnInit() {
+
+  }
+
+  show(importType: ImportTypes, importService: any, hasImages: boolean) {
+    this.spinnerService.show();
+    this.hasImages = hasImages;
+    this.itemType = "";
+    this.itemTypeId = 0;
+    this.importServiceProxy = this.injector.get(importService);
+    this.importType = importType;
+    this.importServiceProxy
+      .getExcelTemplate(this.itemTypeId)
+      .pipe(finalize(() => this.spinnerService.hide()))
+      .subscribe((result) => {
+        this.templateUrl = result.excelTemplateFullPath;
+        this.templateFileName = result.excelTemplateFile;
+        this.templateVersion = this.l(result.excelTemplateVersion);
+        this.templateDate = this.l(result.excelTemplateDate);
+        this.modal.show();
+      });
+
+
+  }
+
+  hide() {
+    this.imData = false;
+    this.imImages = false;
+    this.isAnyOptionSelected = false;
+    this.modal.hide();
+  }
+
+  fileChangeEvent(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const input = event.target as HTMLInputElement;
+
+    this.fileevent = event;
+    if (input.files && input.files.length > 0) {
+      const files = input.files;
+      this.showUploadModal = true;
+      //this.totalFiles = files.length;
+      const cleanFiles = Array.from(files).filter(file => !file.name.startsWith("~$"));
+      this.totalFiles = cleanFiles.length;
+
+      this.totalSizeMB = this.getTotalSizeInMB(files);
+      this.folderName = this.extractFolderName(files[0]);
+      this._totalFiles.emit(this.totalFiles);
+      this._totalSizeMB.emit(this.totalSizeMB);
+      this._folderName.emit(this.folderName);
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        document.body.style.overflow = '';
+      }, 500);
+    }
+  }
+
+
+  openSelectAppItemTypeModal() {
+    let config: ModalOptions = new ModalOptions();
+    config.class = "right-modal slide-right-in";
+    let modalDefaultData: Partial<SelectAppItemTypeComponent> = {
+      savedId: this.itemTypeId,
+    };
+    config.initialState = modalDefaultData;
+    let modalRef: BsModalRef = this._BsModalService.show(
+      SelectAppItemTypeComponent,
+      config
+    );
+    let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
+      this.selectAppItemTypeHandler(modalRef);
+      subs.unsubscribe();
+    });
+  }
+  selectAppItemTypeHandler(modalRef: BsModalRef) {
+    let data: SelectAppItemTypeComponent = modalRef.content;
+    if (data.selectionDone && data.selectedRecord)
+      this.addSelectedAppItemType(data.selectedRecord);
+  }
+  addSelectedAppItemType(
+    selected: TreeNodeOfGetSycEntityObjectTypeForViewDto
+  ): void {
+    this.formTouched = true;
+    this.itemTypeId = selected.data.sycEntityObjectType.id;
+    this.itemType = selected.data.sycEntityObjectType.name;
+  }
+  // <!-- Iteration-8 -->
+
+  onOptionChange() {
+    this.isAnyOptionSelected = this.imData || this.imImages;
+  }
+
+  openVideoModal(event: boolean = false) {
+    if (event)
+      this._openVideoModal.emit(event);
+  }
+
+  extractFolderName(file: File): string {
+    const pathParts = file.webkitRelativePath.split('/');
+    return pathParts.length > 1 ? pathParts[0] : 'Main Folder';
+  }
+
+  getTotalSizeInMB(files: FileList): number {
+    let totalBytes = 0;
+    for (let i = 0; i < files.length; i++) {
+      totalBytes += files[i].size;
+    }
+    return +(totalBytes / (1024 * 1024)).toFixed(2); // 2 decimal MB
+  }
+
+  confirmUpload() {
+    this.showUploadModal = false;
+    // Call your upload method here
+    this.uploadSelectedFiles();
+  }
+
+  cancelUpload() {
+    this.showUploadModal = false;
+    this.clearFileInput();
+  }
+
+
+  uploadSelectedFiles() {
+    let event = this.fileevent;
+    let _UploadedFolder = [];
+    for (let index = 0; index < event.target.files.length; index++) {
+      let file = event.target.files[index];
+      if (!(file.webkitRelativePath.split('/').length > 2))
+        _UploadedFolder.push(file);
     }
 
-    ngOnInit() {
-
+    if(this.importType == ImportTypes.Items){
+    this._imData.emit(this.imData);
+    this._imImages.emit(this.imImages);
+    this._hasImages.emit(this.imImages);
     }
+    this.UploadedFolder.emit(_UploadedFolder);
+    event.target.value = "";
 
-    show(importType: ImportTypes,importService:any,hasImages:boolean) {
-        this.spinnerService.show();
-        this.hasImages=hasImages;
-        this.itemType="";
-        this.itemTypeId=0;
-        this.importServiceProxy = this.injector.get(importService);
-        this.importType = importType;
-        this.importServiceProxy
-            .getExcelTemplate(this.itemTypeId)
-            .pipe(finalize(() => this.spinnerService.hide()))
-            .subscribe((result) => {
-                this.templateUrl = result.excelTemplateFullPath;
-                this.templateFileName = result.excelTemplateFile;
-                this.templateVersion = this.l(result.excelTemplateVersion);
-                this.templateDate = this.l(result.excelTemplateDate);
-                this.modal.show();
-            });
+  }
+
+  downloadTemplate() {
+    this.importServiceProxy
+      .getExcelTemplate(this.itemTypeId)
+      .subscribe((result) => {
+        this.templateUrl = result.excelTemplateFullPath;
+        let attach = AppConsts.attachmentBaseUrl
+        let fullURL = `${attach}/${this.templateUrl}`;
+
+        //let fullURL = `${url}`; // FOR Local Use
+        this._downloadService.download(fullURL,
+          this.templateFileName);
+      });
+  }
 
 
+  clearFileInput(): void {
+    if (this.fileevent?.target?.value)
+      this.fileevent.target.value = '';
+
+    if (this.fileInputRef?.nativeElement) {
+      this.fileInputRef.nativeElement.value = '';
     }
-
-    hide() {
-        this.modal.hide();
-    }
-
-    fileChangeEvent(event: any) {
-        let _UploadedFolder = [];
-        for (let index = 0; index < event.target.files.length; index++) {
-            let file = event.target.files[index];
-            if (!(file.webkitRelativePath.split('/').length > 2))
-                _UploadedFolder.push(file);
-        }
-        this.UploadedFolder.emit(_UploadedFolder);
-        event.target.value = "";
-
-    }
-
-    downloadTemplate() {
-        this.importServiceProxy
-            .getExcelTemplate(this.itemTypeId)
-            .subscribe((result) => {
-                this.templateUrl = result.excelTemplateFullPath;
-                let attach = AppConsts.attachmentBaseUrl
-                let fullURL = `${attach}/${this.templateUrl}`;
-
-                //let fullURL = `${url}`; // FOR Local Use
-                this._downloadService.download(fullURL,
-                    this.templateFileName);
-            });
-
-    }
-
-    openSelectAppItemTypeModal() {
-        let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
-        let modalDefaultData: Partial<SelectAppItemTypeComponent> = {
-            savedId: this.itemTypeId,
-        };
-        config.initialState = modalDefaultData;
-        let modalRef: BsModalRef = this._BsModalService.show(
-            SelectAppItemTypeComponent,
-            config
-        );
-        let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
-            this.selectAppItemTypeHandler(modalRef);
-            subs.unsubscribe();
-        });
-    }
-    selectAppItemTypeHandler(modalRef: BsModalRef) {
-        let data: SelectAppItemTypeComponent = modalRef.content;
-        if (data.selectionDone && data.selectedRecord)
-            this.addSelectedAppItemType(data.selectedRecord);
-    }
-    addSelectedAppItemType(
-        selected: TreeNodeOfGetSycEntityObjectTypeForViewDto
-    ): void {
-        this.formTouched = true;
-        this.itemTypeId = selected.data.sycEntityObjectType.id;
-        this.itemType = selected.data.sycEntityObjectType.name;
-    }
+    this.folderName = '';
+    this.totalFiles = 0;
+    this.totalSizeMB = 0;
+  }
 }
-// <!-- Iteration-8 -->

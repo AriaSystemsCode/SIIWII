@@ -388,7 +388,20 @@
               <Rows>
                 <Item1 Ref="202" ControlType="XRTableRow" Name="xrTableRow5" Weight="1" Dpi="254">
                   <Cells>
+<<<<<<< HEAD
                     <Item1 Ref="203" ControlType="XRTableCell" Name="xrTableCell18" Weight="1.6140021983648403" Multiline="true" Text="Manufacturer Item Code " TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
+=======
+                    <Item1 Ref="197" ControlType="XRTableCell" Name="xrTableCell18" Weight="1.6140021983648403" Multiline="true" Text="Manufacturer Item Code " TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
+                      <StylePriority Ref="198" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
+                    </Item1>
+                    <Item2 Ref="199" ControlType="XRTableCell" Name="xrTableCell14" Weight="2.0366281270768831" Multiline="true" Text="Description" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
+                      <StylePriority Ref="200" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
+                    </Item2>
+                    <Item3 Ref="201" ControlType="XRTableCell" Name="xrTableCell15" Weight="0.86719914214686566" Multiline="true" Text="Total Qty" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
+                      <StylePriority Ref="202" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
+                    </Item3>
+                    <Item4 Ref="203" ControlType="XRTableCell" Name="xrTableCell16" Weight="0.65663691253760226" Multiline="true" Text="Price" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
+>>>>>>> iteration44-46-backup-risk
                       <StylePriority Ref="204" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item1>
                     <Item2 Ref="205" ControlType="XRTableCell" Name="xrTableCell14" Weight="2.0366281270768831" Multiline="true" Text="Description" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke">
@@ -422,8 +435,13 @@
                       </ExpressionBindings>
                       <StylePriority Ref="220" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item2>
+<<<<<<< HEAD
                     <Item3 Ref="221" ControlType="XRTableCell" Name="tableCell4" Weight="0.86719914206686588" Multiline="true" Text="tableCell4" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="Transparent">
                       <Summary Ref="222" Running="Group" />
+=======
+                    <Item3 Ref="215" ControlType="XRTableCell" Name="tableCell4" Weight="0.86719914214686588" Multiline="true" Text="tableCell4" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="Transparent">
+                      <Summary Ref="216" Running="Group" />
+>>>>>>> iteration44-46-backup-risk
                       <ExpressionBindings>
                         <Item1 Ref="223" EventName="BeforePrint" PropertyName="Text" Expression="sumSum([Quantity])" />
                       </ExpressionBindings>
@@ -462,7 +480,11 @@
               </ExpressionBindings>
               <StylePriority Ref="239" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
             </Item1>
+<<<<<<< HEAD
             <Item2 Ref="240" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.420002" LocationFloat="11.3750324,8" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
+=======
+            <Item2 Ref="234" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.421402" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
+>>>>>>> iteration44-46-backup-risk
               <ExpressionBindings>
                 <Item1 Ref="241" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeSizeCode]" />
               </ExpressionBindings>

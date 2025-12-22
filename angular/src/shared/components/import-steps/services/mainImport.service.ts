@@ -92,7 +92,7 @@ export class MainImportService extends AppComponentBase  {
        
         var imageExt= imageName.substring(imageName.lastIndexOf(".")+1);
 
-        var indx =sycAttachmentCategory[imageType.toUpperCase()].sycAttachmentTypeDto.findIndex(
+        var indx =sycAttachmentCategory[imageType.toUpperCase()]?.sycAttachmentTypeDto.findIndex(
                             (x) =>
                                 x.extension.toUpperCase() ==
                                 imageExt.toUpperCase()
@@ -107,10 +107,16 @@ export class MainImportService extends AppComponentBase  {
         let maxHeight = sourceImageDimensions.height;
         let croppingHeight = maxWidth / acceptedRatio;;
         let croppingWidth = maxHeight / acceptedRatio;
+       let  cropper = {
+            x1: 0,
+            y1: 0,
+            x2: maxWidth,
+            y2: maxHeight
+        };
 
         if ((acceptedRatio > 1) || ((acceptedRatio <= 1) && (maxHeight > maxWidth))) {
             const Offset = (maxHeight - croppingHeight) / 2
-            var cropper = {
+             cropper = {
                 x1: 0,
                 x2: maxWidth,
                 y1: Offset,

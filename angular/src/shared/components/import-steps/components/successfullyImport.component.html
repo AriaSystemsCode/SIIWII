@@ -4,7 +4,7 @@
  <div bsModal #successfullyImport="bs-modal" class="modal  fade" tabindex="-1" role="dialog"
   aria-labelledby="successfullyImport" aria-hidden="true" >
     
-  <div class="modal-dialog modal-lg modalCenter">
+  <div class="modal-dialog modal-xl modalCenter">
     <div class="modal-content text-center">
        <div class="border-bottom pb-3">
         <div class="row pt-4  pb-3" style="justify-content: center;"> 
@@ -16,7 +16,7 @@
 </div>
 
  <div class="pt-3">
-    <a class="_download font-weight-bold" (click)="downloadLogFile()"> {{"DownloadtheImportlogfile" | localize}} </a>
+    <a class="_download font-weight-bold" (click)="downloadLogFile()" style="color: #4A0D4A !important;"> {{"DownloadtheImportlogfile" | localize}} </a>
     <button class="btn btn-secondary  _Btn mr-2 pointer mt-4 " (click)="close()">
         {{"Close" | localize}}  
     </button>
