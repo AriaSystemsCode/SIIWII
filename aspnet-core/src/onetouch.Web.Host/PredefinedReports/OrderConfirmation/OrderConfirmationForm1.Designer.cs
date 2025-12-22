@@ -86,10 +86,6 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.GroupHeader1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader1");
             this.Detail = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail");
             this.ReportFooter = reportInitializer.GetControl<DevExpress.XtraReports.UI.ReportFooterBand>("ReportFooter");
-            this.label55 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label55");
-            this.label54 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label54");
-            this.label51 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label51");
-            this.label40 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label40");
             this.label53 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label53");
             this.label52 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label52");
             this.pictureBox1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox1");
@@ -207,10 +203,6 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader1;
         private DevExpress.XtraReports.UI.DetailBand Detail;
         private DevExpress.XtraReports.UI.ReportFooterBand ReportFooter;
-        private DevExpress.XtraReports.UI.XRLabel label55;
-        private DevExpress.XtraReports.UI.XRLabel label54;
-        private DevExpress.XtraReports.UI.XRLabel label51;
-        private DevExpress.XtraReports.UI.XRLabel label40;
         private DevExpress.XtraReports.UI.XRLabel label53;
         private DevExpress.XtraReports.UI.XRLabel label52;
         private DevExpress.XtraReports.UI.XRPictureBox pictureBox1;
