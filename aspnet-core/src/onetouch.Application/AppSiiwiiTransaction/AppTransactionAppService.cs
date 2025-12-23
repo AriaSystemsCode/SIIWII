@@ -4608,7 +4608,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 var sharedUsersList = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == viewTrans.Id).ToListAsync();
                                 viewTrans.SharedWithUsers = new List<ContactInformationOutputDto>();
 
-                                //if (sharedUsersList == null || (sharedUsersList!=null && sharedUsersList.Count == 0))
+                                ////if (sharedUsersList == null || (sharedUsersList!=null && sharedUsersList.Count == 0))
                                 //{
                                 //    var contacts  = _appTransactionContactsRepository.GetAll()
                                 //        .Where(e => e.TransactionId == viewTrans.Id && e.ContactRole == "Creator").ToList();
