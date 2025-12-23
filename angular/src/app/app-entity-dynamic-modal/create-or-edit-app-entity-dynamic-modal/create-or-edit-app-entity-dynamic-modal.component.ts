@@ -125,7 +125,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
             if(this.appEntity?.code){
                 this.editMode = true;
                 if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
-                this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
+                //this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
+                this.appEntity.id = Math.floor(1e10 + Math.random() * 1e6);
                 this.appEntity.nonlookup=true;
                 this.addToLookup=false;
                 this.adjustImageSrcsUrls();
