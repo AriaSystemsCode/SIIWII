@@ -285,6 +285,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 if(this.wantdisplaySaveSideBar)
                 this.displaySaveSideBar = true;
                 this.appEntity.value=  !this.appEntity.value ? result :this.appEntity.value ; 
+                this.appEntity.id=result;
                 this.addNonLookupValues.emit(this.appEntity);
                 this.saveDone.emit(true);
                 this.hide();
