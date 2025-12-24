@@ -355,7 +355,8 @@
             this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBox1.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.pictureBox1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "ImageUrl", "[Attachment]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "ImageUrl", "[Attachment]"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "BackColor", "iif(Contains([Attachment], \'http\'),\'\',[Attachment])")});
             this.pictureBox1.KeepTogether = false;
             this.pictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(11.91817F, 0F);
             this.pictureBox1.Name = "pictureBox1";
