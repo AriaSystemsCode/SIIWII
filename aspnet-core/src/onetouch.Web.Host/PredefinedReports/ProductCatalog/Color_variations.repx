@@ -60,9 +60,9 @@
       </ExpressionBindings>
       <StylePriority Ref="40" UseBackColor="false" UseTextAlignment="false" />
     </Item3>
-    <Item4 Ref="41" ControlType="PageHeaderBand" Name="PageHeader" HeightF="131.083359" Dpi="254">
+    <Item4 Ref="41" ControlType="PageHeaderBand" Name="PageHeader" HeightF="131.083374" Dpi="254">
       <Controls>
-        <Item1 Ref="42" ControlType="XRLabel" Name="label7" TextFormatString="{0:MM/dd/yyyy}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="352.3982,60" LocationFloat="38.7315979,71.08336" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+        <Item1 Ref="42" ControlType="XRLabel" Name="label7" TextFormatString="{0:MM/dd/yyyy}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="352.3982,51.08333" LocationFloat="38.7316055,72" Dpi="254" Font="Arial, 9pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
           <ExpressionBindings>
             <Item1 Ref="43" EventName="BeforePrint" PropertyName="Text" Expression="'Available Colors :'" />
           </ExpressionBindings>
