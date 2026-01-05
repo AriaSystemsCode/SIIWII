@@ -494,8 +494,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this._downloadService.download(fullURL, name);
     }
 
-    favoriteMessage(message) {
-        this._MessageServiceProxy.favorite(message.id).subscribe((result) => {
+    favoriteMessage(message) { 
+        this._MessageServiceProxy.favorite(this.selectedMessage).subscribe((result) => {
             //xxx
             // if (this.messageTypeIndex == 3)
             if (message.isFavorite) {
@@ -517,7 +517,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
 
     archiveMessage(message) {
-        this._MessageServiceProxy.archive(message.id).subscribe((result) => {
+        this._MessageServiceProxy.archive(this.selectedMessage).subscribe((result) => {
             if (this.messageTypeIndex == 4) {
                 this.notify.info(this.l("MessageUnarchive"));
             } else {
