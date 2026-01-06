@@ -8430,6 +8430,8 @@ namespace onetouch.Accounts
 
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
                         //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Type is InValid."); hasError = true; }
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Number))
+                        { accountExcelDto.Phone1Number = accountExcelDto.Phone1Number.Replace("'", ""); }
 
                         if (!string.IsNullOrEmpty(accountExcelDto.Phone2Number))
                         { accountExcelDto.Phone2Number = accountExcelDto.Phone2Number.Replace("'", ""); }
