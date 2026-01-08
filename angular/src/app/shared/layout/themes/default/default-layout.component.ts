@@ -45,6 +45,11 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     isAuthenticated = this.appSession?.user
     hideTopbar: boolean = false;
 
+
+    // merge
+    hideChrome = false; // <— add
+
+    private readonly ariaRouteMatchers = ['/app/admin/ariasystem']; // normalize once
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -57,6 +62,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     }
 
     ngOnInit() {
+     
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
@@ -64,12 +70,13 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
         this.updateTopbarVisibility(this.currentRouteUrl);
       
-    
+        this.updateChromeVisibility(this.currentRouteUrl);
         this._router.events
           .pipe(filter(event => event instanceof NavigationEnd))
           .subscribe(() => {
             this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
             this.updateTopbarVisibility(this.currentRouteUrl);
+            this.updateChromeVisibility(this.currentRouteUrl);
          
           });
       }
@@ -158,4 +165,21 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         );
       }
       
+    // merge
+    openAria(){
+        let bt = 'app/admin/AriaSystem'
+        window.open(bt);
+        
+    }
+    private updateChromeVisibility(url: string) {
+        const u = (url || '').toLowerCase();
+        this.hideChrome = this.ariaRouteMatchers.some(p => u.startsWith(p) || u.includes(p));
+    
+        // keep your localStorage switch if you like
+        if (this.hideChrome) {
+          localStorage.setItem('openArya', 'true');
+        } else {
+          localStorage.removeItem('openArya');
+        }
+      }
 }

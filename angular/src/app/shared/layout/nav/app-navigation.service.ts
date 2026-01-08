@@ -46,16 +46,14 @@ export class AppNavigationService {
             new AppMenuItem('MyProducts', 'Pages.AppItems', 'flaticon-more', '/app/main/products'),
             new AppMenuItem('ProductsList', 'Pages.AppItemsLists', 'flaticon-more', '/app/main/productslists'),
             new AppMenuItem('Linesheet', 'Pages.AppItems', 'flaticon-more', '/app/main/linesheet/print'),
-        );
-    
 
-        let adminMenu = new AppMenuItem('Administration', '', 'flaticon-interface-8', '', [], []);
-    
-    
-        let AppSubscriptionPlanHeaders = new AppMenuItem('Subscription Plans', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders');
-        let AppSubscriptionPlanDetail = new AppMenuItem('Subscription Plan Details', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails');
-        let AppTenantSubscriptionPlan = new AppMenuItem('Tenant Subscription Plans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans');
-    
+            // new AppMenuItem('Product Selector Test Page', 'Pages.AppItems', 'flaticon-more', '/app/demo/AppItemsMultiSelection'),
+            // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
+        )
+        let adminMenu = new AppMenuItem('Administration', '', 'flaticon-interface-8', '', [], [])
+        let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscription Plans', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
+        let AppSubscriptionPlanDetail=  new AppMenuItem('Subscription Plan Details', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails')
+        let AppTenantSubscriptionPlan = new AppMenuItem('Tenant Subscription Plans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans')
         if (this.isHost) {
             let AppTenantActivityLog = new AppMenuItem('Tenant Activities Log', '', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantActivitiesLog');
             adminMenu.items.push(
@@ -110,6 +108,8 @@ export class AppNavigationService {
             new AppMenuItem('Settings', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/tenantSettings'),
             new AppMenuItem('Portal Settings', 'Pages.Administration.Host.Settings', 'flaticon-settings', '/app/admin/portalhostSettings'),
             new AppMenuItem('Portal Settings', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/portaltenantSettings'),
+            new AppMenuItem('AriaSystem', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/AriaSystem'),
+            new AppMenuItem('AriaSystem-en-us', 'Pages.Administration.Tenant.Settings', 'flaticon-settings', '/app/admin/AriaSystem-en-us'),
             new AppMenuItem('WebhookSubscriptions', 'Pages.Administration.WebhookSubscription', 'flaticon2-world', '/app/admin/webhook-subscriptions'),
         );
     
