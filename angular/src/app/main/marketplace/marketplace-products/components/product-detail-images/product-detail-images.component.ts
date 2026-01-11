@@ -63,11 +63,18 @@ export class ProductDetailImagesComponent implements OnDestroy {
   get mediaLen(): number { return this.productImages?.length ?? 0; }
 
   setMainImage(index: number) {
-    this.setColorView.emit(false);
-    this.colorView = false;
     this.currentIndex = index;
+  
+    const isPdf = this.kindOf(this.productImages?.[index]) === 'pdf';
+
+    if (!isPdf) {
+      this.setColorView.emit(false);
+      this.colorView = false;
+    }
+  
     this.preparePdfIfNeeded(index);
   }
+  
 
   slideToNextImage(): void {
     if (!this.mediaLen) return;
