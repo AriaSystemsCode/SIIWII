@@ -26,7 +26,7 @@
                 [editMode]=true
                 [code]="addressCode"
                 (getCodeValue)="getCodeValue($event)" ></app-codes>  -->
-                <input [disabled]="address?.id>0" type="text" id="address_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="addressCode" name="code" />
+                <input [disabled]="address?.id>0" type="text" id="address_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="addressCode" name="code" maxlength="6"/>
             </div>
 
             <div class="form-group">
