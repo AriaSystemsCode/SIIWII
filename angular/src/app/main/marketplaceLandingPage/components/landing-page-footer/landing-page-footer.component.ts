@@ -15,11 +15,15 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
   sectionsFlat: SectionItem[] = [];
   bgCol: string
   tenantName: string
+  currentLang: string = 'en';
+    isArabic: boolean = false;
   constructor(private _sydObjectsAppService: SydObjectsServiceProxy, private _appEntitiesServiceProxy: AppEntitiesServiceProxy, injector: Injector,) {
     super(injector);
   }
 
   ngOnInit(): void {
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.getTenantData()
     this.loadSections()
   }

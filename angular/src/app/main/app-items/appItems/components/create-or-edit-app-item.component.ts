@@ -135,7 +135,8 @@ export class CreateOrEditAppItemComponent
      taxCodes;
      appEntities;
      _isTexable:boolean=false;
-
+     currentLang: string
+     isArabic: boolean
     constructor(
         injector: Injector,
         _location: Location,
@@ -212,6 +213,8 @@ export class CreateOrEditAppItemComponent
     
     ngOnInit(): void {
         this.isTexable();
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defineExtraAttributes();
         this.initUploaders();
         this.id = this.detectComponentMode();
@@ -695,7 +698,7 @@ export class CreateOrEditAppItemComponent
 
     openSelectAppItemTypeModal() {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+          !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectAppItemTypeComponent> = {
             savedId: this.appItem.entityObjectTypeId,
         };
@@ -747,7 +750,7 @@ export class CreateOrEditAppItemComponent
     // Categories
     openSelectCategoriesModal() {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectCategoriesDynamicModalComponent> = {
             savedIds: this.selectedCategoriesIds,
             showAddAction: true,
@@ -898,7 +901,7 @@ export class CreateOrEditAppItemComponent
     openSelectDepartmentsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectCategoriesDynamicModalComponent> = {
             savedIds: this.selectedDepartmentsIds,
             showAddAction: false,
@@ -920,7 +923,7 @@ export class CreateOrEditAppItemComponent
     openSelectRelatedItemsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+          !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectRelatedItemDynamicModalComponent> = {
             savedIds: this.selectedRelatedItemsIds,
             showAddAction: false,
@@ -1119,7 +1122,7 @@ export class CreateOrEditAppItemComponent
     openSelectClassificationsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectClassificationDynamicModalComponent> =
         {
             savedIds: this.selectedClassificationsIds,
@@ -1885,7 +1888,7 @@ export class CreateOrEditAppItemComponent
     openCreateNewAppEntityModal(extraAttr: FilteredExtraAttribute) {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,
