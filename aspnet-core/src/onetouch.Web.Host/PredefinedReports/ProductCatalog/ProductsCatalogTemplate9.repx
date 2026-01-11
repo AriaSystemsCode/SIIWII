@@ -115,7 +115,7 @@
               </ExpressionBindings>
               <StylePriority Ref="74" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item2>
-            <Item3 Ref="75" ControlType="XRLabel" Name="label11" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="593.1691,60" LocationFloat="19.4766846,1103.22192" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item3 Ref="75" ControlType="XRLabel" Name="label11" TextFormatString="{0:C2}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="593.1691,60" LocationFloat="36.2919273,1103.22192" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="DeepSkyBlue" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
                 <Item1 Ref="76" EventName="BeforePrint" PropertyName="Text" Expression="Iif(?showPrice  And (([ItemMSRPPriceFrom] &gt;= 0 and [ItemMSRPPriceFrom]!= [MajorMSRP]) Or ([ItemMSRPPriceTo] &gt; 0 and [ItemMSRPPriceTo]!= [MajorMSRP])), &#xA;Iif(?muserCountry=='RRP','RRP','MSRP')+'  '+[currencySymbol]+ToStr([ItemMSRPPriceFrom])+' - '+[currencySymbol]+ToStr( [ItemMSRPPriceTo]),'' )" />
               </ExpressionBindings>
