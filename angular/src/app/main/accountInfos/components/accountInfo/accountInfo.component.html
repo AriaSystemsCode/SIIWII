@@ -386,7 +386,7 @@
                                                     (getCodeValue)="getCodeValue($event)" [maxlength]="12"></app-codes>
                                                 -->
                                             <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
-                                            class="form-control form-control-sm aria-input-text"
+                                            class="form-control form-control-sm aria-input-text" maxlength="6"
                                             [disabled]="accountInfoTemp?.id>0"
                                
                                             id="colFormLabelSm" [(ngModel)]="accountInfoTemp.code" name="code"
