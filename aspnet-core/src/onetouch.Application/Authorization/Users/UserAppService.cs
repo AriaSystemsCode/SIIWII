@@ -788,7 +788,7 @@ namespace onetouch.Authorization.Users
                 var rolesOfUser = userRoles.Where(userRole => userRole.UserId == user.Id).ToList();
                 user.Roles = ObjectMapper.Map<List<UserListRoleDto>>(rolesOfUser);
                 //Mariam[start]
-                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == user.Id.ToString());
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId && x.AttributeId == 715 && x.AttributeValue == user.Id.ToString());
                 if (contactEntityExtraData != null)
                 {
                     var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
