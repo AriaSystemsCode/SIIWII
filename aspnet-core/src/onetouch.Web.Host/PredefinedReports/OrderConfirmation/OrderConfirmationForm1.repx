@@ -455,15 +455,15 @@
           <Controls>
             <Item1 Ref="235" ControlType="XRLabel" Name="label33" KeepTogether="true" Multiline="true" CanGrow="false" Text="label33" TextAlignment="MiddleCenter" SizeF="111.124992,49.42" LocationFloat="11.3750324,53.43746" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="White" Padding="5,5,0,0,254">
               <ExpressionBindings>
-                <Item1 Ref="236" EventName="BeforePrint" PropertyName="Visible" Expression="&#xA;" />
-                <Item2 Ref="237" EventName="BeforePrint" PropertyName="Text" Expression="[Quantity]" />
+                <Item1 Ref="236" EventName="BeforePrint" PropertyName="Visible" Expression="&#xA;&#xA;" />
+                <Item2 Ref="237" EventName="BeforePrint" PropertyName="Text" Expression="iif(Sum(Iif([AttributeValue] == ^.[AttributeValue], 1, 0)) &gt; 1&#xA;,&#xA;[Quantity],'')" />
               </ExpressionBindings>
               <StylePriority Ref="238" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
             </Item1>
             <Item2 Ref="239" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.4263039" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
               <ExpressionBindings>
-                <Item1 Ref="240" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.RowCount]&gt;2" />
-                <Item2 Ref="241" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeSizeCode]" />
+                <Item1 Ref="240" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeSizeCode]" />
+                <Item2 Ref="241" EventName="BeforePrint" PropertyName="Visible" Expression="Sum(Iif([AttributeValue] == ^.[AttributeValue], 1, 0)) &gt; 1&#xA;&#xA;" />
               </ExpressionBindings>
               <StylePriority Ref="242" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
             </Item2>
