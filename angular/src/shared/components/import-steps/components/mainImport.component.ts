@@ -232,7 +232,7 @@ export class MainImportComponent
             if (file.name.startsWith("~$")) 
                 continue;
 
-            const isSheet = file.type.includes("sheet");
+            const isSheet = file.type.includes("sheet") ||  file.type.includes("text/csv");
             const isImage =   file.type.includes("image")
             if (isSheet && (this.importType !== ImportTypes.Items || this.imData)) {   
                 hasExcelFile = true;
