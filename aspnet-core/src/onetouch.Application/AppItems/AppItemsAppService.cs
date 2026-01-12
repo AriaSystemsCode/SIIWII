@@ -6352,10 +6352,10 @@ namespace onetouch.AppItems
             // Logger helper
             void LogRegion(string regionName, DateTime start, DateTime end, int? counter = null)
             {
-                string logText = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | Region: {regionName} | Start: {start:HH:mm:ss} | End: {end:HH:mm:ss} | Duration: {(end - start).TotalSeconds:F2}s";
-                if (counter.HasValue)
-                    logText += $" | Counter: {counter.Value}";
-                System.IO.File.AppendAllText(@"C:\hassan\log.txt", logText + Environment.NewLine);
+                //string logText = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | Region: {regionName} | Start: {start:HH:mm:ss} | End: {end:HH:mm:ss} | Duration: {(end - start).TotalSeconds:F2}s";
+                //if (counter.HasValue)
+                //    logText += $" | Counter: {counter.Value}";
+                //System.IO.File.AppendAllText(@"C:\hassan\log.txt", logText + Environment.NewLine);
             }
 
             #region Initialize Result DTO
@@ -7133,17 +7133,17 @@ namespace onetouch.AppItems
 
 
         private static readonly object _logLock = new object();
-        private const string LogFilePath = @"C:\Hassan\log.txt";
+        //private const string LogFilePath = @"C:\Hassan\log.txt";
 
         private static void LogRegion(string regionName, int index, TimeSpan duration)
         {
-            var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | Index:{index} | Region:{regionName} | Duration:{duration.TotalMilliseconds} ms";
+            //var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | Index:{index} | Region:{regionName} | Duration:{duration.TotalMilliseconds} ms";
 
-            lock (_logLock)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(LogFilePath)!);
-                System.IO.File.AppendAllText(LogFilePath, line + Environment.NewLine);
-            }
+            //lock (_logLock)
+            //{
+            //    Directory.CreateDirectory(Path.GetDirectoryName(LogFilePath)!);
+            //    System.IO.File.AppendAllText(LogFilePath, line + Environment.NewLine);
+            //}
         }
 
         public async Task<List<ImportItemReturnDto>> ValidateImportItemData(
