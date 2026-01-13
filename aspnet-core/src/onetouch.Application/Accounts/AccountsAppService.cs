@@ -935,13 +935,28 @@ namespace onetouch.Accounts
                             account.ConnectionName = "";
                         }
                         //I40[Start]
-                        var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
+                        /*var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
                               .Where(z => ((z.RequesterContactSSIN == account.Account.SSIN)
                               || (z.RecipientContactSSIN == account.Account.SSIN)) &&
                               _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN && z.SharingLevel == 1) > 0 &&
                               _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN && z.SharingLevel == 1) > 0 &&
                               z.EntityObjectStatusId == activeRelationshipStatusId &&
-                              (z.SharingLevel == 1)).CountAsync();
+                              (z.SharingLevel == 1)).CountAsync();*/
+                        var relationships1 = _appContactRelationshipInfoRepository.GetAll()
+                              .Where(z => ((z.RequesterContactSSIN == account.Account.SSIN)
+                              || (z.RecipientContactSSIN == account.Account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                              (z.SharingLevel == 1)).Count();
+                        var relationshipsQuery1 = _appContactRelationshipInfoRepository.GetAll()
+                                .Where(z => ((z.RequesterContactSSIN == account.Account.SSIN)
+                                || (z.RecipientContactSSIN == account.Account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                                (z.SharingLevel == 1));
+
+                        var relationshipQ = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.Account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                                            from a in relationshipsQuery1
+                                            where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
+                                            select new { obj = b };
+
+                        var relationshipsConut = await relationshipQ.CountAsync();
                         account.ConnectionCount = relationshipsConut;
                         //I40[End]
                     }
