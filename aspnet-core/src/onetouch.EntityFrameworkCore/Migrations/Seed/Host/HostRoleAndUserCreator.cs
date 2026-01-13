@@ -52,64 +52,110 @@ namespace onetouch.Migrations.Seed.Host
 
         public void SeedExtraAttributes()
         {
-            var _assetsPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
-            if (!Directory.Exists(_assetsPath))
+            var assetsPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+
+            if (!Directory.Exists(assetsPath))
                 return;
 
-            // 1. Read all XML files and parse datetime
-            var xmlFiles = Directory.GetFiles(_assetsPath, "*.xml")
-                .Select(f =>
+            // 1. Read all XML files and extract ObjectCode and ParentCode
+            var xmlFiles = Directory.GetFiles(assetsPath, "*.xml")
+                .Select(file =>
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(f); // e.g., HOST-2021-05-05 064208.6066667
-                    var parts = fileName.Split('-');
-                    if (parts.Length < 2) return null;
+                    var fileInfo = new FileInfo(file);
 
-                    string code = parts[0];
-                    DateTime? dt = TryParseDateTimeFromFileName(fileName);
-                    if (dt.HasValue)
-                        return new { Code = code, Path = f, DateTime = dt.Value };
+                    string name = Path.GetFileNameWithoutExtension(file);
 
-                    return null;
+                    // Split by double underscore "__"
+                    string objectCode = null;
+                    string parentCode = null;
+                    string code = null;
+                    string remainder = null;
+
+                    var parts = name.Split(new string[] { "_" }, StringSplitOptions.None);
+
+                    if (parts.Length == 4)
+                    {
+                        objectCode = string.IsNullOrWhiteSpace(parts[0]) ? null : parts[0].ToUpper();
+                        parentCode = string.IsNullOrWhiteSpace(parts[1]) ? null : parts[1].ToUpper();
+                        code = string.IsNullOrWhiteSpace(parts[2]) ? null : parts[2].ToUpper();
+                        remainder = parts[3];
+                    }
+                    else
+                    {
+                        return null; // invalid file
+                    }
+
+                    // Extract ParentCode (everything before the last underscore)
+                    //int lastUnderscore = remainder.LastIndexOf('_');
+                    //if (lastUnderscore < 0) return null;
+
+                    //string parentCode = remainder.Substring(0, lastUnderscore).ToUpper();
+
+                    // Determine the effective file time
+                    DateTime? fileTime = TryParseDateTimeFromFileName(name);
+
+                    return new
+                    {
+                        ObjectCode = objectCode,
+                        ParentCode = parentCode,
+                        Code = code,
+                        Path = file,
+                        FileTime = fileTime
+                    };
                 })
                 .Where(x => x != null)
-                .GroupBy(x => x.Code)
+                // 2. Group by ObjectCode + ParentCode
+                .GroupBy(x => new { x.ObjectCode, x.ParentCode , x.Code})
+                // 3. Pick the file with the latest FileTime in each group
                 .ToDictionary(
                     g => g.Key,
-                    g => g.OrderByDescending(x => x.DateTime).First() // pick latest
+                    g => g.OrderByDescending(x => x.FileTime).First()
                 );
 
-            if (!xmlFiles.Any())
-                return;
+            if (!xmlFiles.Any()) return;
 
-            // 2. Load only the relevant rows from DB
-            var codesToUpdate = xmlFiles.Keys.ToList();
-
-            var items = _context.SycEntityObjectTypes
-                .Where(x => codesToUpdate.Contains(x.Code))
-                .ToList();
+            // 2. Load matching DB records
+            var items = _context.SycEntityObjectTypes.ToList();
 
             // 3. Update ExtraAttributes
             foreach (var item in items)
             {
-                if (xmlFiles.TryGetValue(item.Code, out var latestFile))
+                var key = new
                 {
-                    string content = File.ReadAllText(latestFile.Path);
-                    if (!string.IsNullOrWhiteSpace(content))
-                        item.ExtraAttributes = content;
+                    ObjectCode = (item.ObjectCode ?? "").ToUpper(),
+                    ParentCode = (item.ParentCode ?? "").ToUpper(),
+                    Code = (item.Code ?? "").ToUpper()
+                };
+
+                if (xmlFiles.TryGetValue(key, out var file))
+                {
+                    string xml = File.ReadAllText(file.Path);
+
+                    if (!string.IsNullOrWhiteSpace(xml))
+                    {
+                        // Compare file time with DB record update time
+                        DateTime dbUpdateTime = item.LastModificationTime ?? item.CreationTime;
+
+                        if (file.FileTime > dbUpdateTime)
+                        {
+                            item.ExtraAttributes = xml;
+                        }
+                    }
                 }
             }
 
             _context.SaveChanges();
         }
 
+
         // Custom parser for filenames like "HOST-2021-05-05 064208.6066667"
         private DateTime? TryParseDateTimeFromFileName(string fileName)
         {
-            var parts = fileName.Split('-');
+            var parts = fileName.Split('_');
             if (parts.Length < 2)
                 return null;
 
-            string dateTimeStr = string.Join("-", parts.Skip(1)); // "2021-05-05 064208.6066667"
+            string dateTimeStr = string.Join("_", parts.Skip(3)); // "2021-05-05 064208.6066667"
 
             // Split date and time
             var dtParts = dateTimeStr.Split(' ');

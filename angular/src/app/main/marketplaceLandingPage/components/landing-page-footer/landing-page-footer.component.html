@@ -18,7 +18,7 @@
   </div>
 
   <section class="footer-bottom-section flex-rw">
-    <div class="footer-bottom-wrapper pt-5">
+    <div class="footer-bottom-wrapper pt-5"  [ngClass]="isArabic ? 'ar-mg':'en-mg'">
 
       <div class="pb-4"><a href='#'>
           <img [src]=" attachmentBaseUrl + '/' +tenantLogo " style="width: 50px;" />
@@ -26,7 +26,7 @@
 
       <!-- <i class="fa fa-copyright" role="copyright"></i> -->
       <i class="fa fa-copyright" role="copyright"></i>
-      <span class="footer-bottom-rights"> 2025 {{tenantName}} Security Your Privacy Terms</span>
+      <span class="footer-bottom-rights"> 2026 {{tenantName}} Security Your Privacy Terms</span>
     </div>
     <div class="footer-bottom-wrapper pt-5">
       <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">

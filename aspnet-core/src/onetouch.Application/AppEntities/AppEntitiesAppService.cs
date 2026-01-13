@@ -685,6 +685,35 @@ namespace onetouch.AppEntities
                 })
                 .ToListAsync();
         }
+        //T-SII-20251105.0001
+        //public async Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code)
+        //{
+        //    string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+        //    var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+        //        .Include(z=>z.EntityObjectStatusFk)
+        //        .Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+        //        .OrderBy("Name asc")
+        //        .Select(appEntity => new LookupLabelDto
+        //        {
+        //            Value = appEntity.Id,
+        //            //I49[Start]
+        //            EntityObjectStatusId = appEntity.EntityObjectStatusId,
+        //            Status = (appEntity.EntityObjectStatusFk != null ? appEntity.EntityObjectStatusFk.Name : ""),
+        //            //I49[End]
+        //            Label = appEntity.Name.ToString(),
+        //            Code = appEntity.Code,
+        //            IsHostRecord = appEntity.TenantId == null,
+        //            HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
+        //            Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
+        //                          (imagesUrl + (appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId == null ? "-1" : appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
+        //        })
+        //        .ToListAsync();
+        //    }
+        //}
+        //MMT30
 
         public async Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code)
         {

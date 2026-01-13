@@ -81,6 +81,7 @@
                 </div>
                 <div
                     class="save-icon"
+                    [ngClass]="isArabic ? 'search-ar':'search-en'"
                 >
                     <img (click)="onSearch($event)"
                         style="width: 30px; height: 30px"
@@ -214,7 +215,7 @@
                                     <img class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle"
                                         style="width: 35px;" alt="Pic" [src]="
                                         profilePicture
-                                            ? profilePicture
+                                            ?attachmentBaseUrl + '/' + profilePicture
                                             : 'assets/common/images/default-profile-picture.png'
                                     " />
                                     <div>
@@ -415,7 +416,7 @@
 
         </div>
 
-        <div class="rightList ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" *ngIf="!isAuthenticated">
+        <div class=" ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" [ngClass]="isArabic ?'leftList':'rightList'" *ngIf="!isAuthenticated">
                                 <button
                     class="btn login-btn d-flex align-items-center m-2 mr-4 mt-4"
                     type="button"

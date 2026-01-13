@@ -89,7 +89,7 @@
 
 
       <!-- MAIN PDF -->
-      <ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
+      <!-- <ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
         <div class="position-relative w-100">
           <iframe class="w-100 imageContainer" [src]="pdfSafeMap[currentIndex]" 
             [ngStyle]="{ height: loadingError ? '0px' : '48vh' }" frameborder="0" (error)="loadingError = true">
@@ -104,7 +104,37 @@
            <i class="fa fa-eye"></i>
           </button>
         </div>
-      </ng-container>
+      </ng-container> -->
+
+<!-- MAIN PDF (thumbnail image + click opens PDF) -->
+<ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
+
+  <!-- 🔄 Loading -->
+  <div *ngIf="pdfThumbLoading" 
+       class="d-flex align-items-center justify-content-center"
+       style="min-width: 200px;height: 150px;">
+    <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
+    <span class="mx-3">Loading preview...</span>
+  </div>
+
+  <!-- 🖼 Thumbnail -->
+  <img *ngIf="!pdfThumbLoading && pdfThumbMap[currentIndex]"
+       class="w-100 imageContainer main"
+       [src]="pdfThumbMap[currentIndex]"
+       style="cursor:pointer; object-fit:contain;"
+       (click)="openNewTab(productImages[currentIndex])" />
+
+ 
+  <div *ngIf="!pdfThumbLoading && loadingError" class="p-2 text-danger">
+    Unable to generate PDF preview.
+    <a [href]="getUrl(productImages[currentIndex])"
+       target="_blank"
+       rel="noopener">
+       Open in new tab
+    </a>
+  </div>
+
+</ng-container>
 
 
     </div>
