@@ -75,6 +75,7 @@ using MimeKit;
 using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
 using onetouch.AppMarketplaceContacts;
+using AuthorizeNet.APICore;
 
 
 //using NUglify.Helpers;
@@ -1079,12 +1080,14 @@ namespace onetouch.AppSiiwiiTransaction
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
                     var contact = await _appContactRepository.GetAll()
-                        .Where(s => s.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && s.EntityFk.EntityExtraData.Count(z => z.AttributeId == 715 && z.AttributeValue == AbpSession.UserId.ToString()) > 0).FirstOrDefaultAsync();
+                        .Where(s => s.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &&  s.TenantId == AbpSession.TenantId
+                        && s.EntityFk.EntityExtraData.Count(z => z.AttributeId == 715 && z.AttributeValue == AbpSession.UserId.ToString()) > 0).FirstOrDefaultAsync();
 
                     if (contact != null)
                     {
                         var contactCompany = await _appContactRepository.GetAll()
-                        .Where(s => s.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && s.Id == contact.ParentId).FirstOrDefaultAsync();
+                        .Where(s => s.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && s.TenantId == AbpSession.TenantId &&
+                        s.ParentId == null && s.IsProfileData==true).FirstOrDefaultAsync();
 
                         appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                         {
@@ -2217,7 +2220,7 @@ namespace onetouch.AppSiiwiiTransaction
                 //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
                 .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null &&
                         ((string.IsNullOrEmpty(transactionType) || transactionType == "SO") ? (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id) :
-                         _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == a.SSIN) > 0));
+                         (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id) && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == a.SSIN) > 0));
                
                                                                                                                                                                                                                                                   //&& (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || ((string.IsNullOrEmpty(transactionType) || transactionType =="PO") ? false :a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id)));
 
@@ -2661,7 +2664,7 @@ namespace onetouch.AppSiiwiiTransaction
 
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Where(e => e.TenantId == AbpSession.TenantId
                 && e.CreatorUserId == AbpSession.UserId && e.EntityObjectStatusCode == "DRAFT"
-                && e.SellerCompanySSIN == sellerSSIN && e.BuyerCompanySSIN == buyerSSIN).FirstOrDefault();
+                && e.SellerCompanySSIN == sellerSSIN && e.BuyerCompanySSIN == buyerSSIN && e.EntityObjectTypeCode.ToUpper()== orderType.ToString().ToUpper()).FirstOrDefault();
 
                 if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
                 {
@@ -3737,6 +3740,10 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     header.EntityObjectStatusId = null;
                     header.EntityObjectStatusCode = null;
+                    header.SellerCompanySSIN = "";
+                    header.SellerCompanyName = "";
+                    header.BuyerCompanyName = "";
+                    header.BuyerCompanySSIN = "";
                     header.Notes = "";
                     //header.en
                     await _appTransactionsHeaderRepository.UpdateAsync(header);
@@ -4870,7 +4877,7 @@ namespace onetouch.AppSiiwiiTransaction
 
 
             // var Tenants = (await contact.ToListAsync()).Where(z => z.TenantId != null).Select(z => z.TenantId).ToList();
-            var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+           var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
                  .WhereIf(!string.IsNullOrEmpty(filter), z => z.Name.Contains(filter))
                 .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
 
@@ -7144,6 +7151,13 @@ namespace onetouch.AppSiiwiiTransaction
                     if (accountOrg != null && accountOrg.PartnerId == null)
                     {
                         CreateOrEditAccountInfoDto accountInput = ObjectMapper.Map<CreateOrEditAccountInfoDto>(accountOrg);
+                        if (accountInput.ContactAddresses != null && accountInput.ContactAddresses.Count > 0)
+                        {
+                            foreach (var conAd in accountInput.ContactAddresses)
+                            {
+                                conAd.Id = 0;
+                            }
+                        }
                         accountInput.TenantId = int.Parse(tenantId.ToString());
                         accountInput.ReturnId = true;
                         accountInput.Id = 0;
