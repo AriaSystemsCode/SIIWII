@@ -2816,6 +2816,7 @@ namespace onetouch.AppItems
                                     {
                                         if (string.IsNullOrEmpty(colorNRFEnt.AttributeValue))
                                             colorNRFEnt.AttributeValue = colorNRFlook.AttributeValue;
+                                            colorNRFEnt.AttributeValue = colorNRFlook.AttributeValue;
                                     }
 
                                 }
