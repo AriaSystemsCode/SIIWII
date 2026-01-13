@@ -93,6 +93,7 @@ using System.Drawing;
 using SixLabors.Fonts;
 using System.Management.Automation;
 using Newtonsoft.Json;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace onetouch.Accounts
 {
@@ -2875,7 +2876,26 @@ namespace onetouch.Accounts
             if (input.AccountLevel != AccountLevelEnum.Profile)
                 throw new UserFriendlyException("Ooppps! this function is not allowed...");
 
-            return await Update(input);
+            var returnValue =  await Update(input);
+            //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
+            if (input.EntityAttachments.Count > 0 && (input.AccountType.ToLower() == "personal" || input.AccountType.ToLower() == "people"))
+            {
+                var userId = AbpSession.UserId;
+                if (userId != null && userId > 0)
+                {
+                    var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
+                    var logoAttach = input.EntityAttachments.Where(x => x.AttachmentCategoryId == attPhotoId).FirstOrDefault();
+                    if (logoAttach != null && !string.IsNullOrEmpty(logoAttach.FileName))
+                    {
+                        if (!string.IsNullOrEmpty(logoAttach.guid))
+                            await UpdateProfilePicture(logoAttach.guid + "." + logoAttach.FileName.Split('.')[1], long.Parse(userId.ToString()));
+                        else
+                            await UpdateProfilePicture(logoAttach.FileName, long.Parse(userId.ToString()));
+                    }
+                }
+            }
+            //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
+            return returnValue;
         }
 
         public async Task<bool> UpdateConnectedAccountPriceLevel(long id, string priceLevel)
@@ -3219,7 +3239,7 @@ namespace onetouch.Accounts
             }
 
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
-
+            
             contact.EntityId = savedEntity;
             //I40[Start]
             foreach (var contactAddress in contact.ContactAddresses)
@@ -3282,8 +3302,8 @@ namespace onetouch.Accounts
             }
             //I40
             await CurrentUnitOfWork.SaveChangesAsync();
+            
 
-           
             return await GetAccountForEdit(new EntityDto<long> { Id = newId });
 
         }
@@ -6960,6 +6980,27 @@ namespace onetouch.Accounts
             accountDto.AccountLevel = AccountLevelEnum.Manual;
             accountDto.ContactRecordType = "C";
             var output = await CreateOrEditAccount(accountDto);
+            //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
+            if (accountDto.EntityAttachments.Count > 0)
+            {
+                var userId = accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null ||
+                    accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null ||
+                    string.IsNullOrEmpty(accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue) ? 0 :
+                    long.Parse(accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue);
+                if (userId != null && userId > 0)
+                {
+                    var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
+                    var logoAttach = accountDto.EntityAttachments.Where(x => x.AttachmentCategoryId == attPhotoId).FirstOrDefault();
+                    if (logoAttach != null && !string.IsNullOrEmpty(logoAttach.FileName))
+                    {
+                        if (!string.IsNullOrEmpty(logoAttach.guid))
+                            await UpdateProfilePicture(logoAttach.guid + "." + logoAttach.FileName.Split('.')[1], long.Parse(userId.ToString()));
+                        else
+                            await UpdateProfilePicture(logoAttach.FileName, long.Parse(userId.ToString()));
+                    }
+                }
+            }
+            //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
             AppContact account = new AppContact();
             if (output != null && output.AccountInfo.Id != null)
             {
@@ -8665,7 +8706,7 @@ namespace onetouch.Accounts
                     document.LoadFromFile(accountExcelResultsDTO.FilePath);
 
                     // Get worksheet by name
-                    Worksheet Sheet = document.Workbook.Worksheets[0];
+                    Bytescout.Spreadsheet.Worksheet Sheet = document.Workbook.Worksheets[0];
                     // Set current cell
                     Sheet.Cell("CB1").Value = "Processing Status";
                     Sheet.Cell("CC1").Value = "Processing Error Message";
@@ -10385,7 +10426,7 @@ namespace onetouch.Accounts
 
                 #region fill accounts valid entries
                 // Get worksheet by name [Accounts]
-                Worksheet Sheet = document.Workbook.Worksheets.ByName("Accounts");
+                Bytescout.Spreadsheet.Worksheet Sheet = document.Workbook.Worksheets.ByName("Accounts");
                 // Set currecy "A"
                 string column = "EA";
                 int row = 2;
@@ -10506,7 +10547,7 @@ namespace onetouch.Accounts
 
                 #region fill valid entries sheet
                 // Get worksheet by name [Accounts]
-                Worksheet Sheetvalid = document.Workbook.Worksheets.ByName("Valid Entries");
+                Bytescout.Spreadsheet.Worksheet Sheetvalid = document.Workbook.Worksheets.ByName("Valid Entries");
                 // Set currecy "A"
                 column = "A";
                 row = 2;
