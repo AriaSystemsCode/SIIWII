@@ -103,8 +103,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     isArabic: boolean = false;
     allowFeeds:string
     defaultHomeUrl = '/app/main/Home'; // fallback
-    currentLang: string = 'en';
-    isArabic: boolean = false;
+   
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
