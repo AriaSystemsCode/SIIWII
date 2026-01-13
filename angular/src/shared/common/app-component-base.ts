@@ -93,8 +93,7 @@ export abstract class AppComponentBase {
     public transactionReportTemplateName:"OrderConfirmationForm1";
     currentLang: string
     isArabic: boolean
-    currentLang: string
-    isArabic: boolean
+  
     constructor(injector: Injector, private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
