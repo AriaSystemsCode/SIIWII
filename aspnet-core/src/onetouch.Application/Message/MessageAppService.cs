@@ -113,6 +113,13 @@ namespace onetouch.Message
             if (input.messageTypeIndex == 0)
                 return null;
 
+            if (input.messageTypeIndex == 2 || input.messageTypeIndex == 3 || input.messageTypeIndex == 4 || input.messageTypeIndex == 5)
+            {
+                if (string.IsNullOrEmpty(input.MessageCategoryFilter))
+                  input.MessageCategoryFilter = "MESSAGE";
+
+            }
+
             IQueryable<AppMessage> filteredMessages = null;
 
             var entityObjectReadID = await _helper.SystemTables.GetEntityObjectStatusReadMessageID();
@@ -148,7 +155,8 @@ namespace onetouch.Message
          x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted))
 )
 
-.WhereIf(input.messageTypeIndex == 2 && (!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE"), x => x.SenderId == AbpSession.UserId && ((x.EntityFk.EntityObjectStatusId == entityObjectSentID)
+.WhereIf(input.messageTypeIndex == 2 && (!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE"),
+x => x.SenderId == AbpSession.UserId && ((x.EntityFk.EntityObjectStatusId == entityObjectSentID)
 || (x.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectSentID) > 0))
   &&
         (x.EntityFk.EntityObjectStatusId != entityObjectArchiveID &&
@@ -175,11 +183,14 @@ namespace onetouch.Message
                                      e.SenderFk.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.UserFk.UserName.ToUpper().Contains(input.Filter.ToUpper()))
                                      .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
-                         .WhereIf(string.IsNullOrEmpty(input.MessageCategoryFilter) || input.MessageCategoryFilter.ToUpper() != "THREAD", x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)
+                         .WhereIf(string.IsNullOrEmpty(input.MessageCategoryFilter) || 
+                         (input.MessageCategoryFilter.ToUpper() != "THREAD" && input.messageTypeIndex == 1),
+                         x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)
            ||
            (x.SenderId == AbpSession.UserId)))
-                         .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD",x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId))
-                         .Where(r => r.Id == _MessagesRepository.GetAll().Where(rr => rr.ThreadId == r.ThreadId).Max(rr => rr.Id));
+                         .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && 
+                         input.MessageCategoryFilter.ToUpper() == "THREAD",x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId))
+                         .WhereIf(input.messageTypeIndex != 2, r => r.Id == _MessagesRepository.GetAll().Where(rr => rr.ThreadId == r.ThreadId).Max(rr => rr.Id));
                 /*.Where(x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)                
            ||
            (x.SenderId == AbpSession.UserId)));*/
@@ -198,7 +209,7 @@ namespace onetouch.Message
 
 
 
-                var pagedAndFilteredMessages = filteredMessages
+                 var pagedAndFilteredMessages = filteredMessages
                     .OrderBy(input.Sorting ?? "CreationTime desc")
                     .PageBy(input);
            
@@ -276,7 +287,7 @@ namespace onetouch.Message
                 }
                 //mm
                 unreadCount = await filteredMessages.CountAsync(z=>z.EntityFk.EntityObjectStatusId== entityObjectStatusUnreadID
-                || (input.MessageCategoryFilter.ToUpper() == "THREAD" && z.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0)); 
+                || (!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD" && z.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0)); 
                 //mm
 
                 foreach (var message in listmessages)
