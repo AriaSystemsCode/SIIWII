@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnDestroy, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { AppConsts } from '@shared/AppConsts';
@@ -30,6 +30,7 @@ export class ProductDetailImagesComponent implements OnDestroy {
   pdfThumbMap: Record<number, string | null> = {};
   private pdfThumbByPath: Record<string, string> = {};
   pdfThumbLoading = false;
+  pdfThumbLoadingMap: Record<number, boolean> = {};
 
 
   constructor(private http: HttpClient, private sanitizer: DomSanitizer, private _appItemsServiceProxy: AppItemsServiceProxy,) {
@@ -42,11 +43,33 @@ export class ProductDetailImagesComponent implements OnDestroy {
     this.currentIndex = 0;
 
     this.preparePdfIfNeeded(this.currentIndex);
-    
+    const maxThumbs = Math.min(this.productImages.length, 7);
+  for (let i = 0; i < maxThumbs; i++) {
+    if (this.kindOf(this.productImages[i]) === 'pdf') {
+      this.preparePdfIfNeeded(i);
+    }
+  }
   }
 
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['productImages'] && this.productImages?.length) {
+    
+      this.preloadVisiblePdfThumbs();
+    }
+  }
   ngOnDestroy(): void {
     this.revokeAllObjectUrls();
+  }
+
+  private preloadVisiblePdfThumbs() {
+    const visibleCount = this.productImages.length <= 7 ? this.productImages.length : 7;
+
+    for (let i = 0; i < visibleCount; i++) {
+      if (this.kindOf(this.productImages[i]) === 'pdf') {
+        this.preparePdfIfNeeded(i);
+      }
+    }
   }
   private async buildPdfThumbFromBlob(blob: Blob, targetWidth = 420): Promise<string> {
     const ab = await blob.arrayBuffer();
@@ -210,24 +233,71 @@ private objectUrlByPath: Record<string, string> = {};
   //     }
   //   }
   // }
+  pdfThumbLoadingIndex: number | null = null;
+
+  // private async preparePdfIfNeeded(index: number) {
+  //   const item = this.productImages[index];
+  //   this.loadingError = false;
+  //   this.pdfThumbLoading = false;
+  
+  //   if (!item || this.kindOf(item) !== 'pdf') {
+  //     this.pdfThumbMap[index] = null;
+  //     return;
+  //   }
+  
+  //   this.pdfThumbLoading = true;  
+  
+  //   const path = (item.url ?? '').trim();
+  //   const fullUrl = this.getUrl(item);
+  
+  //   if (this.pdfThumbByPath[path]) {
+  //     this.pdfThumbMap[index] = this.pdfThumbByPath[path];
+  //     this.pdfThumbLoading = false;  
+  //     return;
+  //   }
+  
+  //   try {
+  //     const res = await this._appItemsServiceProxy.getFile64FromUrl(fullUrl).toPromise();
+  //     const base64 = res.includes(',') ? res.split(',')[1] : res;
+  
+  //     const byteChars = atob(base64);
+  //     const byteNumbers = new Array(byteChars.length);
+  //     for (let i = 0; i < byteChars.length; i++) {
+  //       byteNumbers[i] = byteChars.charCodeAt(i);
+  //     }
+  
+  //     const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+  
+  //     const thumb = await this.buildPdfThumbFromBlob(blob, 420);
+  
+  //     this.pdfThumbByPath[path] = thumb;
+  //     this.pdfThumbMap[index] = thumb;
+  //     this.pdfThumbLoading = false;  
+  //   } catch {
+  //     this.loadingError = true;
+  //     this.pdfThumbMap[index] = null;
+  //     this.pdfThumbLoading = false;  
+  //   }
+  // }
+
   private async preparePdfIfNeeded(index: number) {
-    const item = this.productImages[index];
+    const item = this.productImages?.[index];
     this.loadingError = false;
-    this.pdfThumbLoading = false;
   
     if (!item || this.kindOf(item) !== 'pdf') {
       this.pdfThumbMap[index] = null;
+      this.pdfThumbLoadingMap[index] = false;
       return;
     }
   
-    this.pdfThumbLoading = true;  
+    this.pdfThumbLoadingMap[index] = true;
   
     const path = (item.url ?? '').trim();
     const fullUrl = this.getUrl(item);
   
     if (this.pdfThumbByPath[path]) {
       this.pdfThumbMap[index] = this.pdfThumbByPath[path];
-      this.pdfThumbLoading = false;  
+      this.pdfThumbLoadingMap[index] = false;
       return;
     }
   
@@ -237,9 +307,7 @@ private objectUrlByPath: Record<string, string> = {};
   
       const byteChars = atob(base64);
       const byteNumbers = new Array(byteChars.length);
-      for (let i = 0; i < byteChars.length; i++) {
-        byteNumbers[i] = byteChars.charCodeAt(i);
-      }
+      for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
   
       const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
   
@@ -247,13 +315,15 @@ private objectUrlByPath: Record<string, string> = {};
   
       this.pdfThumbByPath[path] = thumb;
       this.pdfThumbMap[index] = thumb;
-      this.pdfThumbLoading = false;  
     } catch {
       this.loadingError = true;
       this.pdfThumbMap[index] = null;
-      this.pdfThumbLoading = false;  
+    } finally {
+      this.pdfThumbLoadingMap[index] = false;
     }
   }
+  
+  
   
 
   private revokeObjectUrlByPath(path: string) {
@@ -284,4 +354,13 @@ private objectUrlByPath: Record<string, string> = {};
     window.open(this.getUrl(url))
 
   }
+  showImagePreview = false;
+previewImageUrl: string = '';
+
+openImagePreview(url: string) {
+  if (!url) return;
+  this.previewImageUrl = url;
+  this.showImagePreview = true;
+}
+
 }
