@@ -7384,6 +7384,7 @@ namespace onetouch.Accounts
                             newContactAddress.ContactCode = contactOriginal.Code;
                             await _appContactAddressRepository.InsertAsync(newContactAddress);
                             await CurrentUnitOfWork.SaveChangesAsync();
+                            returnValue = true;
                         }
                     }
                     
@@ -7403,6 +7404,7 @@ namespace onetouch.Accounts
                         newContactAddress.ContactCode = contactOriginal.Code;
                         await _appContactAddressRepository.UpdateAsync(newContactAddress);
                         await CurrentUnitOfWork.SaveChangesAsync();
+                        returnValue = true;
                     }
                 }
             }
