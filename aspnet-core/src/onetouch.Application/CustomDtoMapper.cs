@@ -1179,6 +1179,7 @@ namespace onetouch
              .ForMember(d => d.Phone2Ex, s => s.MapFrom(ss => ss.Phone2Ext))
              .ForMember(d => d.Phone3Ex, s => s.MapFrom(ss => ss.Phone3Ext))
              .ForMember(d => d.Notes, s => s.MapFrom(ss => ss.EntityFk.Notes))
+             .ForMember(d => d.TenantOwner, s => s.MapFrom(ss => ss.EntityFk.TenantOwner))
              ;
             configuration.CreateMap<AppMarketplaceContact, CreateOrEditAccountInfoDto>()
               .ForMember(a => a.Name, b => b.MapFrom(ent => ent.Name))
