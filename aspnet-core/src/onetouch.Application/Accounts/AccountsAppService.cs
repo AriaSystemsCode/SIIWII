@@ -1532,7 +1532,7 @@ namespace onetouch.Accounts
                                  && x.IsProfileData == true
                                  && x.SharingLevel == 1
                                  && x.TenantOwner == account.TenantId
-                                 && x.SSIN == account.SSIN);
+                                 && (x.SSIN == account.SSIN || (x.Name== account.Name && x.EntityObjectTypeId ==account.EntityFk.EntityObjectTypeId)));
                 output.IsSync = false;
                 output.IsPublished = false;
                 if (publishedRecord != null)
@@ -2559,7 +2559,9 @@ namespace onetouch.Accounts
                         .Where(x => x.TenantId == connectTenant)
                         .Where(x=>x.SSIN == branchesPublishedParentContact.SSIN)
                         .FirstOrDefaultAsync();*/
-                    var connectedBranchContact = await connectedBranchContactQ.FirstOrDefaultAsync();
+                    //AppContact? connectedBranchContact = null;
+                    //if (connectedBranchContactQ!= null)
+                    var  connectedBranchContact = await connectedBranchContactQ.FirstOrDefaultAsync();
                     // var connectedParentContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == connectTenant &&
                     //x.SSIN== branchesPublishedParentContact.SSIN);
 
