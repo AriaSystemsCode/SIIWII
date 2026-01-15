@@ -7,7 +7,8 @@ import {
     LookupLabelDto,
     AppEntitiesServiceProxy,
     AppContactAddressDto,
-    AppAddressDto
+    AppAddressDto,
+    AccountDto
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
@@ -24,7 +25,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     @Input() directShippingAddressDef: LookupLabelDto
     @Input() distributionCenterAddressDef: LookupLabelDto
     @Input() mailingAddressDef: LookupLabelDto
-
+   @Input('accountData') accountData: AccountDto
+   
     @Output() branchAdded: EventEmitter<any> = new EventEmitter<any>();
     @Output() branchUpdated: EventEmitter<any> = new EventEmitter<any>();
     @Output() selectAddress: EventEmitter<any> = new EventEmitter<any>();
