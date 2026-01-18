@@ -12,9 +12,13 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
     sycLangingPageSetting: PageSettingDto[];
     @Input() sectionId:number;
     numVisible: number = 4;
-    numScroll: number = 4;
+    // numScroll: number = 4;
     appBaseUrl: string=AppConsts.appBaseUrl;
-
+    ctaResponsiveOptions = [
+        { breakpoint: '960px', numVisible: 2, numScroll: 1 },  // tablet
+        { breakpoint: '640px', numVisible: 1, numScroll: 1 },  // mobile
+      ];
+      
     constructor(injector: Injector,private SydObjectsServiceProxy:SydObjectsServiceProxy) {
         super(injector);
 

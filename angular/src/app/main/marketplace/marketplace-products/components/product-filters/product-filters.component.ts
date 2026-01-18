@@ -11,6 +11,7 @@ import {
 } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+  AppEntitiesServiceProxy,
   AppMarketplaceItemsServiceProxy,
   GetAllMarketplaceItemListsOutputDto,
   PagedResultDtoOfGetAllMarketplaceItemListsOutputDto,
@@ -70,11 +71,12 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   @Input() preselectDeptId?: number;
   categories:any
   @Input() preselectCategoryId?: number;
-
+  sellerSSin:string
   constructor(
     private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     private _appMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
+            private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     injector: Injector
 
   ) {
@@ -144,7 +146,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       .getAllBrandsWithPaging(
         null, null, null, null, null,
         false, 'BRAND', null, null,
-        86, 'name', 0, 200, this.accountSSIN
+        86, 'name', 0, 200, this.sellerSSin ? this.sellerSSin: this.accountSSIN
       )
       .subscribe(res => {
         this.brands = (res.items || []).map((b: any) => ({
@@ -509,6 +511,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   }
   
   ngOnInit(): void {
+    this.getSettingData()
     this.savedFilters = localStorage.getItem('productFilters');
   
     const init = async () => {
@@ -681,7 +684,18 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     }
     return null;
   }
+
+  getSettingData(){
+    
+    this._AppEntitiesServiceProxy.getHostSettingValue(1216, null).subscribe({
+        next: (res) => {
+            this.sellerSSin = 'PERSONAL-000000000039'
+        },
+     
+      });
+  }
   selectionKeys: { [key: string]: boolean } = {}; 
+
   ngAfterViewInit() {
     // wait until deptTree is populated (if it's async, call this after you set it)
     queueMicrotask(() => {

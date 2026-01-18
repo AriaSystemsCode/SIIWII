@@ -1,4 +1,5 @@
-<p-carousel [value]="blocksSorted" [numVisible]="5" [numScroll]="5" [circular]="false" [showIndicators]="false"
+<p-carousel [value]="blocksSorted"   [numVisible]="numVisible"
+[numScroll]="1" [circular]="false" [showIndicators]="false"
   [showNavigators]="true" [responsiveOptions]="responsiveOptions" class="p-4 m-2 rounded">
   <ng-template pTemplate="item" let-item>
 
@@ -11,7 +12,7 @@
             <img class="product-image" (error)="onImgErr($event)" [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
                       ? attachmentBaseUrl + '/' + item?.getAppMarketItemForViewDto?.appItem.imageUrl
                       : 'assets/placeholders/appitem-placeholder.png'" alt="Product Image"
-              (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)" />
+              (click)="viewProduct(item?.getAppMarketItemForViewDto)" />
           </div>
 
           <div class="product-info">
@@ -27,7 +28,7 @@
          
             </div>
 
-            <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto?.appItem?.id)">
+            <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto)">
               {{ item?.getAppMarketItemForViewDto?.appItem?.name }}
             </div>
 
