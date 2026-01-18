@@ -67,6 +67,15 @@ namespace onetouch.AppItems.Dtos
         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
     }
     //I46[Start]
+    public class AppItemPriceCsvDto
+    {
+        public string Code { get; set; }
+        public string SSIN { get; set; }
+        public string StyMajor { get; set; }
+        public string Currency { get; set; }
+        public string Price { get; set; }
+        public int RowNumber { get; set; }
+    }
     public class ImportItemReturnDto
     { 
        public string RecordKey { set; get; }

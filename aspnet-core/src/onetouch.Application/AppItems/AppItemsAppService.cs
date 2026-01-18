@@ -5739,6 +5739,137 @@ namespace onetouch.AppItems
             // ExcelLogDto exceld =await SaveFromExcel(itemExcelResultsDTO);
             return itemExcelResultsDTO;
         }
+
+        public async Task<AppItemExcelResultsDTO> ValidateExcelPrice(string guidFile)
+        {
+            var resultDto = new AppItemExcelResultsDTO
+            {
+                ExcelRecords = new List<AppItemtExcelRecordDTO>(),
+                TotalRecords = 0,
+                TotalPassedRecords = 0,
+                TotalFailedRecords = 0
+            };
+
+            if (string.IsNullOrEmpty(guidFile))
+                return resultDto;
+
+            try
+            {
+                var tenantId = AbpSession.TenantId ?? -1;
+                var path = _appConfiguration["Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".csv";
+
+                if (!System.IO.File.Exists(path))
+                    throw new UserFriendlyException("CSV file not found.");
+
+                var lines = System.IO.File.ReadAllLines(path);
+                if (lines.Length < 2)
+                    throw new UserFriendlyException("CSV file is empty.");
+
+                var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+                if (!headers.Contains("Code") || !headers.Contains("Price") || !headers.Contains("Currency"))
+                    throw new UserFriendlyException("CSV must contain Code, Price, and Currency columns.");
+
+                var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+                int rowNumber = 1;
+
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    rowNumber++;
+
+                    var values = lines[i].Split(',');
+                    var row = headers.Zip(values, (h, v) => new { h, v }).ToDictionary(x => x.h, x => x.v);
+
+                    var record = new AppItemtExcelRecordDTO
+                    {
+                        Status = ExcelRecordStatus.Passed.ToString(),
+                        FieldsErrors = new List<string>(),
+                        ErrorMessage = ""
+                    };
+
+                    var dto = new AppItemPriceCsvDto    
+                    {   
+                        Code = row["priccode"]?.Trim(),
+                        SSIN = row["ssin"]?.Trim(),
+                        StyMajor = row["stymajor"]?.Trim(),
+                        Currency = row["currcode"]?.Trim(),
+                        Price = row["discsplit"]?.Trim(),
+                        RowNumber = rowNumber
+                    };
+
+                    record.Code = dto.Code;
+                    record.RecordType = "Price";
+
+                    bool hasError = false;
+
+                    // Code validation
+                    if (string.IsNullOrWhiteSpace(dto.Code))
+                    {
+                        record.FieldsErrors.Add("Code is required.");
+                        hasError = true;
+                    }
+
+                    var item = _appItemRepository
+                        .GetAll()
+                        .FirstOrDefault(x => x.Code.Replace(" ", "") == dto.Code.Replace(" ", ""));
+
+                    if (item == null)
+                    {
+                        record.FieldsErrors.Add($"Item code {dto.Code} not found.");
+                        hasError = true;
+                    }
+
+                    // Price validation
+                    if (!decimal.TryParse(row["Price"], out decimal price) || price <= 0)
+                    {
+                        record.FieldsErrors.Add("Invalid price value.");
+                        hasError = true;
+                    }
+                    else
+                    {
+                        dto.Price = price.ToString();
+                    }
+
+                    // Currency validation
+                    if (currencies.All(c => c.Code != dto.Currency))
+                    {
+                        record.FieldsErrors.Add("Invalid currency code.");
+                        hasError = true;
+                    }
+
+                    if (hasError)
+                    {
+                        record.Status = ExcelRecordStatus.Failed.ToString();
+                        record.ErrorMessage = "Invalid price data.";
+                        resultDto.TotalFailedRecords++;
+                    }
+                    else
+                    {
+                        record.ExcelDto = new AppItemExcelDto
+                        {
+                            Code = dto.Code,
+                            Price = dto.Price.ToString(),
+                            Currency = dto.Currency
+                        };
+                        resultDto.TotalPassedRecords++;
+                    }
+
+                    resultDto.ExcelRecords.Add(record);
+                }
+
+                resultDto.TotalRecords = resultDto.ExcelRecords.Count;
+                resultDto.FilePath = path;
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return resultDto;
+        }
+
+
         //Iteation#46[Start]
         private async Task<AppEntityClassificationDto> GetItemClassification(string classificationDescription)
         {
@@ -9026,6 +9157,7 @@ namespace onetouch.AppItems
 
         }
     }
+
     //MMT
     public sealed class AppItemExcelDtoProfile : Profile
     {
