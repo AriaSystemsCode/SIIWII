@@ -92,12 +92,12 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
                         post.type == PostType.SINGLEIMAGE &&
                         post.attachmentsURLs
                     "
-                    class="w-100"
+                    class="w-100" style="max-width: 700px;"
                 >
                     <div class="row justify-content-center">
                         <div
                             *ngIf="post.attachmentsURLs.length == 1"
-                            style="width: 700px"
+                        
                         >
                             <div class="row w-100 h-100">
                                 <img
@@ -109,14 +109,14 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
                             </div>
                         </div>
                         <div
-                        *ngIf="post.attachmentsURLs.length == 2"
-                        style="width: 700px;"
+                        *ngIf="post.attachmentsURLs.length == 2" style="max-width: 700px;"
+                     
                         [ngStyle]="{
                             'height':
                                 getAppEntityForViewDto?.relatedEntityTypeCode.toUpperCase() !=
                                 appEntityTypes[appEntityTypes.EVENT].toString()
                                 .toUpperCase()
-                                    ? '700px'
+                                    ? '100%'
                                     : '100%'
                         }"
                         [ngClass]="getAppEntityForViewDto?.relatedEntityTypeCode.toUpperCase() !=
@@ -146,13 +146,13 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
                         <div class="row w-100 h-100" *ngIf="getAppEntityForViewDto?.relatedEntityTypeCode.toUpperCase() !=
                         appEntityTypes[appEntityTypes.EVENT]?.toString()?.toUpperCase() ">
                             <img
-                                class="attachmentImage cover col-6"
+                                class="attachmentImage cover col-lg-6 col-12"
                                 src="{{ attachmentBaseUrl }}/{{
                                     post.attachmentsURLs[0]
                                 }}"
                             />
                             <img
-                                class="attachmentImage cover col-6"
+                                class="attachmentImage cover col-lg-6 col-12"
                                 src="{{ attachmentBaseUrl }}/{{
                                     post.attachmentsURLs[1]
                                 }}"
@@ -162,26 +162,26 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
 
 
                         <div
-                            *ngIf="post.attachmentsURLs.length == 3"
-                            style="width: 700px; height: 700px"
+                            *ngIf="post.attachmentsURLs.length == 3" style="max-width: 700px;"
+                          
                         >
-                            <div class="row w-100 h-50">
+                            <div class="row w-100 ">
                                 <img
-                                    class="attachmentImage cover col-12"
+                                    class="attachmentImage cover col-12 h-100"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[0]
                                     }}"
                                 />
                             </div>
-                            <div class="row w-100 h-50">
+                            <div class="row w-100 ">
                                 <img
-                                    class="attachmentImage cover col-6"
+                                    class="attachmentImage cover col-md-6 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[1]
                                     }}"
                                 />
                                 <img
-                                    class="attachmentImage cover col-6"
+                                    class="attachmentImage cover col-md-6 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[2]
                                     }}"
@@ -191,9 +191,9 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
 
                         <div
                             *ngIf="post.attachmentsURLs.length == 4"
-                            style="width: 700px; height: 700px"
+                            style="max-width: 700px; "
                         >
-                            <div class="row w-100 h-50">
+                            <div class="row w-100 ">
                                 <img
                                     class="attachmentImage cover col-12"
                                     src="{{ attachmentBaseUrl }}/{{
@@ -201,21 +201,21 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
                                     }}"
                                 />
                             </div>
-                            <div class="row w-100 h-50">
+                            <div class="row w-100">
                                 <img
-                                    class="attachmentImage cover col-4"
+                                    class="attachmentImage cover col-md-4 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[1]
                                     }}"
                                 />
                                 <img
-                                    class="attachmentImage cover col-4"
+                                    class="attachmentImage cover col-md-4 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[2]
                                     }}"
                                 />
                                 <img
-                                    class="attachmentImage cover col-4"
+                                    class="attachmentImage cover col-md-4 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[3]
                                     }}"
@@ -225,37 +225,37 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
 
                         <div
                             *ngIf="post.attachmentsURLs.length == 5"
-                            style="width: 700px; height: 700px"
+                            style="max-width: 700px"
                         >
-                            <div class="row w-100 h-50">
+                            <div class="row w-100 ">
                                 <img
-                                    class="attachmentImage cover col-6"
+                                    class="attachmentImage cover col-md-6 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[0]
                                     }}"
                                 />
                                 <img
-                                    class="attachmentImage cover col-6"
+                                    class="attachmentImage cover col-md-6 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[1]
                                     }}"
                                 />
                             </div>
-                            <div class="row w-100 h-50">
+                            <div class="row w-100 ">
                                 <img
-                                    class="attachmentImage cover col-4"
+                                    class="attachmentImage cover col-md-4 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[2]
                                     }}"
                                 />
                                 <img
-                                    class="attachmentImage cover col-4"
+                                    class="attachmentImage cover col-md-4 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[3]
                                     }}"
                                 />
                                 <img
-                                    class="attachmentImage cover col-4"
+                                    class="attachmentImage cover col-md-4 col-12"
                                     src="{{ attachmentBaseUrl }}/{{
                                         post.attachmentsURLs[4]
                                     }}"
