@@ -1,4 +1,4 @@
-<h3 class="register_label_margin titleLog ml-5 pl-4 Login_container">
+<h3 class="register_label_margin titleLog ml-md-5 ml-3 pl-4 Login_container">
     {{ "AccountSignUp" | localize }}
 </h3>
 
@@ -15,7 +15,7 @@
         </h5>
 
         <div class="form-group row">
-            <div class="col-9 col-lg-12 pl-0 p-0 MB20">
+            <div class="col-12 pl-0 p-0 MB20">
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"Work Space Name"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/workSpaceIcon.png" class=" icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
@@ -47,7 +47,7 @@
 
         <div class="row mt-5 ml-0 PR2L10">
             <label  *ngIf="!accountTypeLabel?.includes('PERSONAL')" class="Personal_Info co-lg-12"> {{"AdminInformation" | localize}} </label>
-            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2">
+            <div class="form-group col-12 col-lg-6 col-md-6 col-sm-6 pr-2">
                 <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{"FirstName" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/user.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
@@ -60,7 +60,7 @@
                     <validation-messages [formCtrl]="firstNameInput"></validation-messages>
                 </span>
             </div>
-            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6">
+            <div class="form-group col-12 col-lg-6 col-md-6 col-sm-6">
                 <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{ "last Name" | localize }} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/user.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">

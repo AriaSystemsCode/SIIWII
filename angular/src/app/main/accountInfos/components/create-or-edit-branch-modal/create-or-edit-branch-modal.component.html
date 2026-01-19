@@ -6,7 +6,7 @@
         <div class="modal-header" style="display: block;">
           <h4 class="modal-title">
             <span *ngIf="branch.id">{{ accountData?.accountTypeId != 21 ?   l("EditBranch") : l("EditAddress")}}</span>
-            <span *ngIf="!branch.id">{{l("AddnewBranchDetails")}}</span>
+            <span *ngIf="!branch.id">{{ accountData?.accountTypeId != 21 ?  l("AddnewBranchDetails") : l("AddnewAddressDetails")}}</span>
           </h4>
           <p>{{ accountData?.accountTypeId != 21 ? l("PleaseFillTheNewBranchDetailsBelow") : l("PleaseFillTheNewAddressDetailsBelow")}}</p>
           <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
