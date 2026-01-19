@@ -16,7 +16,7 @@ $default-font-weight : 400;
 }
 .single-item-photo{
     width: 116px;
-    height: 120px;
+    // height: 120px;
     background-size: contain;
     background-image: url('../../../../../assets/placeholders/card-placeholder.png');
     cursor:pointer;
@@ -91,7 +91,7 @@ a.btn {
 
 
 .divHight {
-    min-height: 130px !important;
+    // min-height: 130px !important;
     border-top-left-radius:6px !important;
     border-bottom-left-radius:6px !important
 }
