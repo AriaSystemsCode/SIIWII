@@ -7357,7 +7357,7 @@ namespace onetouch.Accounts
                 addressDto.State = appContactAddressDto.State;
                 addressDto.PostalCode = appContactAddressDto.PostalCode;
                 if (string.IsNullOrEmpty(appContactAddressDto.CountryIdName)) appContactAddressDto.CountryIdName = "USA";
-                var countryId = GetTypeId(appContactAddressDto.CountryIdName, countries);
+                var countryId = appContactAddressDto.CountryId;// GetTypeId(appContactAddressDto.CountryIdName, countries);
                 addressDto.CountryId = countryId == 0 ? null : countryId;
                 addressDto.AccountId = long.Parse(appContactAddressDto.AccountId.ToString()); ;
                 var appAddressDtoRet = await CreateOrEditAddress(addressDto);
