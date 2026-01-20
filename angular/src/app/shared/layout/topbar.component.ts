@@ -23,6 +23,7 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
+    LanguageServiceProxy,
     AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
@@ -34,10 +35,6 @@ import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
 import { MenuItem } from "primeng/api";
-import {
-    FormBuilder,
-    FormGroup,
-} from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import Swal from "sweetalert2";
@@ -235,6 +232,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             }
        
     }
+
+
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {

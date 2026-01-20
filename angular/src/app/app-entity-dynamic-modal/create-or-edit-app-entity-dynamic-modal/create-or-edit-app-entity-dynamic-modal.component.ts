@@ -346,7 +346,7 @@ isArabic: boolean = false;
             }
 
             this.appEntity.nonlookup=false;
-        this._appEntitiesServiceProxy
+            this._appEntitiesServiceProxy
             .saveEntity(this.appEntity)
             .pipe(
                 finalize(() => {

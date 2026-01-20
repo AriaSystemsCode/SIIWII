@@ -4235,9 +4235,10 @@ export class AccountsServiceProxy {
     /**
      * @param typeName (optional) 
      * @param lookupLabelDtos (optional) 
+     * @param matchName (optional) 
      * @return Success
      */
-    getTypeId(typeName: string | null | undefined, lookupLabelDtos: LookupLabelDto[] | null | undefined): Observable<number> {
+    getTypeId(typeName: string | null | undefined, lookupLabelDtos: LookupLabelDto[] | null | undefined, matchName: boolean | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetTypeId?";
         if (typeName !== undefined && typeName !== null)
             url_ += "typeName=" + encodeURIComponent("" + typeName) + "&";
@@ -4248,6 +4249,10 @@ export class AccountsServiceProxy {
         				url_ += "lookupLabelDtos[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
         			}
             });
+        if (matchName === null)
+            throw new Error("The parameter 'matchName' cannot be null.");
+        else if (matchName !== undefined)
+            url_ += "matchName=" + encodeURIComponent("" + matchName) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
 	<text name="Portalimage">Portal image</text>
@@ -39,6 +39,8 @@
 	<text name="Inquire">Inquire</text>
 
 	<text name="ValidationRules">Validation rules</text>
+	<text name="InvitePartnerByType">Invite partner By Type</text>
+    <text name="ValidationRules">Validation rules</text>
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
     <text name="FieldName">Field name</text>
@@ -2518,6 +2520,7 @@
 		<text name="MSRP">MSRP</text>
 		<text name="PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct">Please check this box if you sell multiple variations of your product</text>
 		<text name="AvailableQty">Available Qty</text>
+		<text name="StockAvailable">Stock Available</text>
 		<text name="ViewEvent">View Event</text>
 		<text name="FormIsInvalid">Form is invalid</text>
 		<text name="CurrenciesCannotBeDublicated">Currencies can't be dublicated</text>

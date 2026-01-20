@@ -80,6 +80,7 @@ export class MarketplaceProductsComponent
     isAuthenticate= this.appSession?.user
 
     selectedCategories: number[] = []; 
+ 
 
     @Input() fromMarketAcoount: boolean;
     @Input() accountDataForView: any
