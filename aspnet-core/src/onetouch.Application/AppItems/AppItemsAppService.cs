@@ -82,6 +82,9 @@ using Newtonsoft.Json;
 using System.Drawing;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
+using Abp.Timing;
+using ClosedXML.Excel;
+using NPOI.POIFS.Properties;
 
 namespace onetouch.AppItems
 {
@@ -4955,7 +4958,7 @@ namespace onetouch.AppItems
 
             return itemExcelTemplateDto;
         }
-        public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+        public async Task<AppItemExcelResultsDTO> ValidateExcel_(string guidFile, string[] imagesList)
         {
             AppItemExcelResultsDTO itemExcelResultsDTO = new AppItemExcelResultsDTO();
             itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>();
@@ -5143,7 +5146,7 @@ namespace onetouch.AppItems
                     List<AppItemExcelDto> result;
                     try
                     {
-                         
+
                         {
                             foreach (DataRow itemExcelDto in ds.Tables["Products"].Rows)
                             {
@@ -5166,12 +5169,12 @@ namespace onetouch.AppItems
                             index++;
                             if (itemExcelDto["RecordType"].ToString() == "Color")
                             {
-                                
+
                                 result[index].ColorCode = itemExcelDto["COLORCode"].ToString();
                                 result[index].ColorName = itemExcelDto["COLORName"].ToString();
                             }
                         }
-                        }
+                    }
                     catch (Exception exObj)
                     {
                         throw new UserFriendlyException("This Excel file format is invalid");
@@ -5370,7 +5373,7 @@ namespace onetouch.AppItems
                                 var colorImage = imagesList.Where(x => x.ToUpper().StartsWith(("C-") + itemExcelDto.ColorCode.ToUpper())).ToList();
                                 if (colorImage.Count == 0)
                                 {
-                                  
+
                                     {
                                         hasWarning = true;
                                         itemExcelRecordErrorDTO.FieldsErrors.Add("Color Code :" + itemExcelDto.ColorCode + " does not have an image in images folder.!");
@@ -5381,7 +5384,8 @@ namespace onetouch.AppItems
                                 else
                                 {
                                     foreach (var img in colorImage)
-                                    {    itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
+                                    {
+                                        itemExcelDto.Images.Add(new AppItemImage { ImageFileName = img });  //, ImageGuid = (new Guid(img)).ToString()
                                     }
                                     itemExcelDto.ImageFolderName = colorImage[0];
 
@@ -5681,6 +5685,329 @@ namespace onetouch.AppItems
 
             return itemExcelResultsDTO;
         }
+
+        public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+        {
+            var resultDto = new AppItemExcelResultsDTO
+            {
+                ExcelRecords = new List<AppItemtExcelRecordDTO>(),
+                TotalRecords = 0,
+                TotalPassedRecords = 0,
+                TotalFailedRecords = 0
+            };
+
+            if (string.IsNullOrEmpty(guidFile))
+                return resultDto;
+
+            try
+            {
+                var tenantId = AbpSession.TenantId ?? -1;
+                var path = _appConfiguration["Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".csv";
+
+                if (!System.IO.File.Exists(path))
+                    throw new UserFriendlyException("CSV file not found.");
+
+                var lines = System.IO.File.ReadAllLines(path);
+                if (lines.Length < 2)
+                    throw new UserFriendlyException("CSV file is empty.");
+
+                var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+                if (!headers.Contains("ssin") || !headers.Contains("discsplit") || !headers.Contains("currcode"))
+                    throw new UserFriendlyException("CSV must contain Code, Price, and Currency columns.");
+
+                var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+                int rowNumber = 1;
+
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    rowNumber++;
+
+                    var values = lines[i].Split(',');
+                    var row = headers.Zip(values, (h, v) => new { h, v }).ToDictionary(x => x.h, x => x.v);
+
+                    var record = new AppItemtExcelRecordDTO
+                    {
+                        Status = ExcelRecordStatus.Passed.ToString(),
+                        FieldsErrors = new List<string>(),
+                        ErrorMessage = ""
+                    };
+
+                    var dto = new AppItemPriceCsvDto
+                    {
+                        Code = row["stymajor"]?.Trim(),
+                        SSIN = row["ssin"]?.Trim(),
+                        //StyMajor = row["stymajor"]?.Trim(),
+                        Currency = row["currcode"]?.Trim(),
+                        Price = row["discsplit"]?.Trim(),
+                        RowNumber = rowNumber
+                    };
+
+                    record.Code = dto.Code;
+                    record.RecordType = "Price";
+
+                    bool hasError = false;
+
+                    // SSIN validation
+                    if (string.IsNullOrWhiteSpace(dto.SSIN))
+                    {
+                        record.FieldsErrors.Add("SSIN is required.");
+                        hasError = true;
+                    }
+
+                    var item = _appItemRepository
+                        .GetAll()
+                        .FirstOrDefault(x => x.Code.Replace(" ", "") == dto.Code.Replace(" ", ""));
+
+
+                    if (item == null)
+                    {
+                        record.FieldsErrors.Add($"Item code {dto.Code} not found.");
+                        hasError = true;
+                    }
+
+                    // Price validation
+                    if (!decimal.TryParse(row["discsplit"], out decimal price) || price <= 0)
+                    {
+                        record.FieldsErrors.Add("Invalid price value.");
+                        hasError = true;
+                    }
+                    else
+                    {
+                        dto.Price = price.ToString();
+                    }
+
+                    // Currency validation
+                    //if (currencies.All(c => c.Code != dto.Currency))
+                    //{
+                    //    record.FieldsErrors.Add("Invalid currency code.");
+                    //    hasError = true;
+                    //}
+                    long currencyId = 0;
+                    string currencyCode = "";
+                    var matchedCurrency = currencies
+                    .FirstOrDefault(c => c.Code.Equals(dto.Currency, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchedCurrency == null)
+                    {
+                        record.FieldsErrors.Add("Invalid currency code.");
+                        hasError = true;
+                    }
+                    else
+                    {
+                        // You can now use the matched currency object
+                        currencyId = matchedCurrency.Value;
+                        currencyCode = matchedCurrency.Code;
+                    }
+
+
+
+
+                    if (hasError)
+                    {
+                        record.Status = ExcelRecordStatus.Failed.ToString();
+                        record.ErrorMessage = "Invalid price data.";
+                        resultDto.TotalFailedRecords++;
+                    }
+                    else
+                    {
+                        record.ExcelDto = new AppItemExcelDto
+                        {
+                            Code = dto.Code,
+                            EntityObjectCategoryID = item.Id,
+
+                            Name = dto.SSIN,
+                            Price = dto.Price.ToString(),
+                            Currency = currencyCode,
+                            ParentId = currencyId,
+
+
+                        };
+                        resultDto.TotalPassedRecords++;
+                    }
+
+                    resultDto.ExcelRecords.Add(record);
+                }
+
+                resultDto.TotalRecords = resultDto.ExcelRecords.Count;
+                resultDto.FilePath = path;
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return resultDto;
+        }
+
+
+        public async Task<ExcelLogDto> SavePriceFromExcelAsync(AppItemExcelResultsDTO itemExcelResultsDTO)
+        {
+            var excelLog = new ExcelLogDto(); // default ExcelLogDto to return
+
+            if (itemExcelResultsDTO?.ExcelRecords == null || !itemExcelResultsDTO.ExcelRecords.Any())
+                return excelLog; // return empty log if no records
+
+            var tenantId = AbpSession.TenantId;
+            var userId = AbpSession.UserId;
+            var now = Clock.Now;
+
+            //// Preload AppItems
+            var appItems = await _appItemRepository.GetAll().ToListAsync();
+            var appItemDict = appItems.ToDictionary(x => x.Code.Trim().ToUpper(), x => x);
+
+            //// Preload Currencies
+            var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper(), x => x);
+
+            var updatedAppItemIds = new HashSet<long>();
+
+            // Open the Excel document
+            using (var document = new XLWorkbook(itemExcelResultsDTO.FilePath))
+            {
+                var sheet = document.Worksheet(1);
+                int rowNumber = 1;
+
+                foreach (var logRecord in itemExcelResultsDTO.ExcelRecords)
+                {
+                    rowNumber++;
+                    var excelDto = logRecord.ExcelDto;
+
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(excelDto.Code) ||
+                            string.IsNullOrWhiteSpace(excelDto.Name) ||
+                            string.IsNullOrWhiteSpace(excelDto.Currency) ||
+                            string.IsNullOrWhiteSpace(excelDto.Price))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "Required field is missing";
+                            continue;
+                        }
+
+                        if (!decimal.TryParse(excelDto.Price, out var price))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "Invalid price value";
+                            continue;
+                        }
+
+                        var appItemKey = excelDto.Code.Trim().ToUpper();
+                        var currencyKey = excelDto.Currency.Trim().ToUpper();
+
+                        if (!appItemDict.TryGetValue(appItemKey, out var appItem))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "AppItem not found";
+                            continue;
+                        }
+
+                        if (!currencyDict.TryGetValue(currencyKey, out var currency))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "Currency not found";
+                            continue;
+                        }
+
+                        // Normalize keys
+                        var priceCode = excelDto.Name.Trim();
+                        var currencyCode = currency.Code.Trim();
+
+                        // Query per row (no preload)
+                        var existingPrice = await _appItemPricesRepository.GetAll()
+                            .Where(x =>
+                                x.AppItemId == appItem.Id &&
+                                x.Code == priceCode &&
+                                x.CurrencyCode == currencyCode &&
+                                !x.IsDeleted)
+                            .FirstOrDefaultAsync();
+
+                        if (existingPrice != null)
+                        {
+                            // 🔄 UPDATE
+                            existingPrice.Price = price;
+                            existingPrice.LastModificationTime = now;
+                            existingPrice.LastModifierUserId = userId;
+                            existingPrice.IsDefault = true;
+
+                            await _appItemPricesRepository.UpdateAsync(existingPrice);
+                        }
+                        else
+                        {
+                            //  INSERT
+                            var priceEntity = new AppItemPrices
+                            {
+                                CreationTime = now,
+                                CreatorUserId = userId,
+                                TenantId = tenantId,
+
+                                Code = excelDto.Name,
+                                Price = price,
+
+                                AppItemId = (long)excelDto.EntityObjectCategoryID,
+                                AppItemCode = excelDto.Code,
+
+                                CurrencyId = excelDto.ParentId,
+                                CurrencyCode = excelDto.Currency,
+
+                                IsDefault = true,
+                                IsDeleted = false
+                            };
+
+                            await _appItemPricesRepository.InsertAsync(priceEntity);
+                        }
+
+                        // Update AppItem timestamp once
+                        if (updatedAppItemIds.Add(appItem.Id))
+                        {
+                            appItem.LastModificationTime = now;
+                            appItem.LastModifierUserId = userId;
+                        }
+
+                        logRecord.Status = "Success";
+                        logRecord.ErrorMessage = "";
+                    }
+                    catch (Exception ex)
+                    {
+                        logRecord.Status = "Failed";
+                        logRecord.ErrorMessage = ex.Message;
+                    }
+
+                    // Write status and error columns to Excel
+                    sheet.Cell("AB" + rowNumber).Value = logRecord.Status;
+                    sheet.Cell("AC" + rowNumber).Value = logRecord.ErrorMessage;
+                    sheet.Cell("AD" + rowNumber).Value = string.Join(",", logRecord.FieldsErrors ?? new List<string>());
+                }
+
+                // Update AppItems in DB
+                foreach (var appItemId in updatedAppItemIds)
+                {
+                    var appItem = appItems.First(x => x.Id == appItemId);
+                    await _appItemRepository.UpdateAsync(appItem);
+                }
+
+                // Move file to attachment folder
+                var attachmentFolder = Path.Combine(_appConfiguration[$"Attachment:Path"], tenantId.ToString());
+                if (!Directory.Exists(attachmentFolder))
+                    Directory.CreateDirectory(attachmentFolder);
+
+                itemExcelResultsDTO.FilePath = itemExcelResultsDTO.FilePath
+                    .Replace(_appConfiguration[$"Attachment:PathTemp"], attachmentFolder);
+
+                document.SaveAs(itemExcelResultsDTO.FilePath);
+            }
+
+            // Populate ExcelLogDTO
+            excelLog.ExcelLogPath = itemExcelResultsDTO.FilePath
+                .Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "")
+                .ToLower();
+            excelLog.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
+
+            return excelLog;
+        }
+
+
         //Iteation#46[Start]
         private async Task<AppEntityClassificationDto> GetItemClassification(string classificationDescription)
         {
@@ -5908,7 +6235,7 @@ namespace onetouch.AppItems
                         returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage, ErrorType = "Stopper" });
                     }
                 }
-                
+
                 if (itemExcelDto.RecordType == "Item")
                 {
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
@@ -10666,6 +10993,9 @@ namespace onetouch.AppItems
 
         }
     }
+
+
+
     //MMT
     public sealed class AppItemExcelDtoProfile : Profile
     {
@@ -10791,7 +11121,7 @@ namespace onetouch.AppItems
 
             }
 
-           
+
             return returnList;
         }
     }
@@ -11003,7 +11333,8 @@ namespace onetouch.AppItems
             RuleFor(x => x.Description).NotEmpty().WithMessage("Item Descripion cannot be empty");
             RuleFor(x => x.EntityAttachments).NotNull().Must(x => x.Count > 0).WithMessage("Item must have an image");
             // var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
-            RuleFor(x => x.Code).Custom((z, context) => {
+            RuleFor(x => x.Code).Custom((z, context) =>
+            {
                 if (x.AppItems.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == z.Replace(" ", string.Empty) && x.ItemType == 0) != null)
                 {
                     context.AddFailure("The code:" + z + "is already existing.");
