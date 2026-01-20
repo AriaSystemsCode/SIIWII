@@ -6998,7 +6998,7 @@ namespace onetouch.Accounts
             accountDto.ContactRecordType = "C";
             var output = await CreateOrEditAccount(accountDto);
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
-            if (accountDto.EntityAttachments.Count > 0)
+            if (accountDto.EntityAttachments!= null && accountDto.EntityAttachments.Count > 0)
             {
                 var userId = accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null ||
                     accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null ||
@@ -7053,7 +7053,7 @@ namespace onetouch.Accounts
                                     await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                                 }
                             }
-                            if (accountDto.ParentId != null && accountDto.AccountId != null )
+                            if (accountDto.ParentId != null && accountDto.AccountId != null && (accountDto.TenantOwner == 0 || accountDto.TenantOwner==AbpSession.TenantId))
                             {
                                 var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == accountDto.AccountId).FirstOrDefaultAsync();
                                 if (accountObj != null)
