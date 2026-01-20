@@ -248,6 +248,7 @@ namespace onetouch.AppItems
             //MMT
         }
         //MMT2024
+
         public async Task<PagedResultDto<GetAppItemForViewDto>> GetAll(GetAllAppItemsInput input)
         {
             var stopwatch = new System.Diagnostics.Stopwatch();
@@ -5177,6 +5178,7 @@ namespace onetouch.AppItems
 
             return itemExcelTemplateDto;
         }
+        #region Iteration 44 save not used images
         //public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         //{
         //    AppItemExcelResultsDTO itemExcelResultsDTO = new AppItemExcelResultsDTO();
@@ -7137,9 +7139,9 @@ namespace onetouch.AppItems
                 validateResults,
                 true);
 
-                if (ValidateResults.Count > 0)
+                if (validateResults.Count > 0)
                 {
-                    foreach (var res in ValidateResults)
+                    foreach (var res in validateResults)
                     {
                         returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage, ErrorType = "Stopper" });
                     }
@@ -7157,7 +7159,7 @@ namespace onetouch.AppItems
                             ErrorType = "Stopper"
                         });
 
-                    if (noOfDims == 2 &&
+                    if (int.Parse(itemExcelDto.NoOfDimensions) == 2 &&
                         (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) ||
                          string.IsNullOrEmpty(itemExcelDto.Dimension2Name)))
                         returnList.Add(new ImportItemReturnDto
@@ -7167,7 +7169,7 @@ namespace onetouch.AppItems
                             ErrorType = "Stopper"
                         });
 
-                    if (noOfDims == 3 &&
+                    if (int.Parse(itemExcelDto.NoOfDimensions) == 3 &&
                         (string.IsNullOrEmpty(itemExcelDto.Dimension1Name) ||
                          string.IsNullOrEmpty(itemExcelDto.Dimension2Name) ||
                          string.IsNullOrEmpty(itemExcelDto.Dimension3Name)))
