@@ -4958,7 +4958,7 @@ namespace onetouch.AppItems
 
             return itemExcelTemplateDto;
         }
-        public async Task<AppItemExcelResultsDTO> ValidateExcel_(string guidFile, string[] imagesList)
+        public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         {
             AppItemExcelResultsDTO itemExcelResultsDTO = new AppItemExcelResultsDTO();
             itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>();
@@ -5686,7 +5686,8 @@ namespace onetouch.AppItems
             return itemExcelResultsDTO;
         }
 
-        public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+        public async Task<AppItemExcelResultsDTO> ValidatePriceCSV(string guidFile, string[] imagesList)
+        //public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         {
             var resultDto = new AppItemExcelResultsDTO
             {
@@ -5842,7 +5843,7 @@ namespace onetouch.AppItems
         }
 
 
-        public async Task<ExcelLogDto> SavePriceFromExcelAsync(AppItemExcelResultsDTO itemExcelResultsDTO)
+        public async Task<ExcelLogDto> SavePriceFromCSV(AppItemExcelResultsDTO itemExcelResultsDTO)
         {
             var excelLog = new ExcelLogDto(); // default ExcelLogDto to return
 
