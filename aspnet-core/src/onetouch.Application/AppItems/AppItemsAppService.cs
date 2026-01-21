@@ -5943,9 +5943,9 @@ namespace onetouch.AppItems
                                 CreatorUserId = userId,
                                 TenantId = tenantId,
 
-                                Code = excelDto.Name,
+                                //Code = excelDto.Name,
                                 Price = price,
-
+                                BuyerSSIN = excelDto.Name,
                                 AppItemId = (long)excelDto.EntityObjectCategoryID,
                                 AppItemCode = excelDto.Code,
 
