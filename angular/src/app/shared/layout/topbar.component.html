@@ -505,20 +505,8 @@
                                         </a>
                                     </li>
                                     <hr />
-                                    <!-- <li class="kt-nav__item">
-                                        <a class="kt-nav__link">
-                                            <span class="kt-nav__link-icon">
-                                                <i class="fas fa-stream"></i>
-                                            </span>
-                                            <span class="kt-nav__link-text">
-                                                {{
-                                                    "PostsAndActivity"
-                                                        | localize
-                                                }}
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <hr /> -->
+                               
+                                
                                     <li class="kt-nav__item">
                                         <a
                                             class="kt-nav__link"
@@ -554,13 +542,13 @@
                     <span>Login</span>
                     </button>
 
-            <!-- <button class=" p-2 m-2 mr-4 mt-4 regBtn"      [routerLink]="['/app/main/account/login']">Login</button> -->
+        
         </div>
         <!-- Collapsible wrapper -->
 
         <!-- Mobile UI-->
         <div
-            class="navbar navbar-expand-lg topbar fixed-bottom d-sm-none d-block"   [style.backgroundColor]="bgCol"
+            class="navbar navbar-expand-lg topbar fixed-bottom d-sm-none " [ngClass]="isAuthenticated ? 'd-block':'d-none'"  [style.backgroundColor]="bgCol"
         >
             <!-- Collapsible wrapper -->
 

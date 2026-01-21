@@ -1,5 +1,4 @@
 .sliderContainer {
-    // height: 554px;
     width: 100%;
     object-fit: fill;
     overflow: hidden;
@@ -24,3 +23,15 @@
 }
 
 .cursor-pointer { cursor: pointer; }
+::ng-deep {
+  @media (max-width: 576px) {
+    .sliderContainer, .p-carousel .p-carousel-item {
+      padding: 0 !important;
+    }
+    .img-thumbnail {
+      height: 170px !important;
+      // object-fit: cover;
+    }
+  }
+  
+}

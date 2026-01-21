@@ -81,6 +81,7 @@ export class MarketplaceProductsComponent
     selectedCategories: number[] = []; 
     brandIdFromUrl: number | null = null;
     catIdFromUrl: number | null = null;
+  sellerSSin:string
     
     constructor(
         injector: Injector,
@@ -145,6 +146,7 @@ export class MarketplaceProductsComponent
         
     }
     ngOnInit() {
+      this.getSettingData()
       const savedFilters = localStorage.getItem("productFilters");
       if (savedFilters) {
         const parsedFilters = JSON.parse(savedFilters);
@@ -300,7 +302,7 @@ export class MarketplaceProductsComponent
         const currencyCode = this.getCurrencyCodeForRequest();
         this._AppMarketplaceItemsServiceProxy
             .getAll(
-                this.contactSSIN,
+              this.sellerSSin? this.sellerSSin: this.contactSSIN,
                 sessionStorage.getItem("SellerSSIN"),
                 null,
                 requestParams.appItemListId ||  this.appItemListId,
@@ -613,4 +615,13 @@ private getCurrencyCodeForRequest(): string {
     return 'USD';
   }
   
+  getSettingData(){
+    
+    this._AppEntitiesServiceProxy.getHostSettingValue(1216, null).subscribe({
+        next: (res) => {
+            this.sellerSSin = 'PERSONAL-000000000039'
+        },
+     
+      });
+  }
 }
