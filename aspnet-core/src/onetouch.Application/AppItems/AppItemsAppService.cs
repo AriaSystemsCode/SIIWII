@@ -5746,7 +5746,7 @@ namespace onetouch.AppItems
                     };
 
                     record.Code = dto.Code;
-                    record.RecordType = "Price";
+                    record.RecordType = "Account Code";
 
                     bool hasError = false;
 
@@ -5813,6 +5813,10 @@ namespace onetouch.AppItems
                     }
                     else
                     {
+                        record.Code = "Item code: "+ dto.Code;
+                        //record.RecordType = "Account Code: " + dto.SSIN;
+                        record.RecordType = "Price";
+
                         record.ExcelDto = new AppItemExcelDto
                         {
                             Code = dto.Code,
