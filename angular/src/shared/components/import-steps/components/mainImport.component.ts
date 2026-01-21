@@ -167,7 +167,7 @@ export class MainImportComponent
         this.importService = importService;
         this.serviceUtilites = serviceUtilites;
         this.importServiceProxy = this.injector.get(this.importService);
-        this.validMethodName = this.importType!=ImportTypes.price ? 'validateExcel' : 'ValidatePriceCSV';
+        this.validMethodName = this.importType!=ImportTypes.price ? 'validateExcel' : 'validatePriceCSV';
         this.saveMethodName = this.importType!=ImportTypes.price ? 'saveFromExcel' : 'saveFromCSV';
         this.serviceUtilitesProxy = this.injector.get(this.serviceUtilites);
         this.UploadedFolder = [];
