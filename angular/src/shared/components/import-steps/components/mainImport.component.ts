@@ -108,6 +108,8 @@ export class MainImportComponent
     currentStep: ImportStepInfo;
     importStepsInfo: ImportStepInfo[];
     @Output() finishImport = new EventEmitter<boolean>();
+    validMethodName;
+    saveMethodName;
 
     @ViewChild("videoModal", { static: true })
     videoModal: videoTutorialComponent;
@@ -165,6 +167,8 @@ export class MainImportComponent
         this.importService = importService;
         this.serviceUtilites = serviceUtilites;
         this.importServiceProxy = this.injector.get(this.importService);
+        this.validMethodName = this.importType!=ImportTypes.price ? 'validateExcel' : 'validatePriceCSV';
+        this.saveMethodName = this.importType!=ImportTypes.price ? 'saveFromExcel' : 'savePriceFromCSV';
         this.serviceUtilitesProxy = this.injector.get(this.serviceUtilites);
         this.UploadedFolder = [];
         this.imagesName = [];
@@ -326,8 +330,7 @@ export class MainImportComponent
 
                     this.callValid=true;
 
-                    this.importServiceProxy
-                        .validateExcel(this._guid, this.imagesName)
+                    this.importServiceProxy[this.validMethodName](this._guid, this.imagesName)
                         .pipe(finalize(() => {
                             this.progress = 100;
                             clearInterval(interval);
@@ -392,8 +395,7 @@ export class MainImportComponent
                 this.CheckRatio();
             }, 0);
 
-            this.importServiceProxy
-                .validateExcel(this._guid, this.imagesName)
+            this.importServiceProxy[this.validMethodName](this._guid, this.imagesName)
                 .pipe(finalize(() => {
                     this.progress = 100;
                     clearInterval(interval);
@@ -559,8 +561,8 @@ export class MainImportComponent
         const hasImageRecords = this.uploadindResultExcelList.some(r => r.recordType === 'Image');
     
         if (hasImageRecords) {
-            this.importServiceProxy
-                .saveFromExcel(this.uploadingResult)
+            
+            this.importServiceProxy[this.saveMethodName](this.uploadingResult)
                 .pipe(finalize(() => {
                     this.spinnerService.hide();
                    // this.notify.success("Your import has been completed successfully.");
@@ -594,8 +596,7 @@ export class MainImportComponent
         const hasImData = !!this.imData;
         const shouldFinish = (isLastIteration && (hasImData || !isItemsImport)) || (isItemsImport && !hasImData);
     
-        this.importServiceProxy
-            .saveFromExcel(this.uploadingResult)
+        this.importServiceProxy[this.saveMethodName](this.uploadingResult)
             .pipe(finalize(() => {
                 if (shouldFinish) {
                     this.spinnerService.hide();
