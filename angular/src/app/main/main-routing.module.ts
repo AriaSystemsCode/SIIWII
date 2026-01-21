@@ -12,6 +12,11 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                 // component: MainComponent,
 
                 children: [
+                    {
+                        path: "account/login",
+                        redirectTo: "/account/login",
+                        pathMatch: "full",
+                      },
                     { path: 'appSubScriptionPlan/appSubscriptionPlanHeaders', component: AppSubscriptionPlanHeadersComponent, data: { permission: 'Pages.AppSubscriptionPlanHeaders' }  },
                     { path: 'systemObjects/sycAttachmentTypes', component: SycAttachmentTypesComponent, data: { permission: 'Pages.SycAttachmentTypes' }  },
                     //Iteration13
