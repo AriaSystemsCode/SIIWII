@@ -560,7 +560,7 @@ export class MainImportComponent
     
         const hasImageRecords = this.uploadindResultExcelList.some(r => r.recordType === 'Image');
     
-        if (hasImageRecords) {
+        if (hasImageRecords || this.importType == ImportTypes.price){
             
             this.importServiceProxy[this.saveMethodName](this.uploadingResult)
                 .pipe(finalize(() => {
