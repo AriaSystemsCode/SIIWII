@@ -19,7 +19,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
 
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
-
+  numVisible: number = 5;
   private objectUrlById: Record<number, string> = {};
   acceptedAspectRatio;
   responsiveOptions = [
@@ -35,8 +35,8 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     },
     {
       breakpoint: '991px',
-      numVisible: 3,
-      numScroll: 3
+      numVisible: 2,
+      numScroll: 2
     },
     {
       breakpoint: '767px',

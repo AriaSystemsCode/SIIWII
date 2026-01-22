@@ -26,7 +26,7 @@
 
       <!--single row Call to Action  (can be brands or products)-->
       <div *ngSwitchCase="'SRCTA'" class="rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg">
-        <h4   [style.text-align]="
+        <h4 class="px-2"  [style.text-align]="
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
@@ -38,7 +38,7 @@
 
       <!--multi row Call to Action  (can be brands or products)-->
       <div *ngSwitchCase="'MRCTA'" class=" rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg" >
-        <h4   [style.text-align]=" 
+        <h4  class="px-2" [style.text-align]=" 
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')

@@ -100,6 +100,7 @@ namespace onetouch.AppItems.Dtos
         public virtual string CurrencySymbol { get; set; }
         public virtual string CurrencyName { get; set; }
         public virtual bool IsDefault { set; get; }
+        public virtual string BuyerSSIN { set; get; }
     }
     public class AppItemSizesScaleInfo : AppSizeScaleDto
     {

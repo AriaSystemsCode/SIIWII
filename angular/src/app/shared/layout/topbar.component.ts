@@ -327,7 +327,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     logout(): void {
-        this._authService.logout();
+        // this._authService.logout();
+        this._authService.logoutUsingSetting(true);
     }
 
     onMySettingsModalSaved(): void {

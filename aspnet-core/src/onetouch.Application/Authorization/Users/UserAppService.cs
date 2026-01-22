@@ -436,10 +436,13 @@ namespace onetouch.Authorization.Users
                 );
             }
             //Mariam[Start]
-            
-            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x =>x.EntityFk.TenantId== AbpSession.TenantId &&  x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
-            if (contactEntityExtraData != null)
+            string createContactSetting = await _appEntitiesAppService.GetHostSettingValue(1212);
+
+            if (createContactSetting.ToLower() == "Manualcontactpersons".ToLower())
             {
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId && x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
+                if (contactEntityExtraData != null)
+                {
 
                 var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
                 if (contact != null)
@@ -640,9 +643,9 @@ namespace onetouch.Authorization.Users
             CheckErrors(await UserManager.CreateAsync(user));
 
             //Update Entity/Contact table[Start-Mariam] 
-            //string createContactSetting = await _appEntitiesAppService.GetHostSettingValue(1212); 
-            //createContactSetting.ToLower()== "Manualcontactpersons".ToLower() &&
-            if (AbpSession.TenantId != null && AbpSession.TenantId != 0 )
+            string createContactSetting = await _appEntitiesAppService.GetHostSettingValue(1212); 
+            
+            if (createContactSetting.ToLower() == "Manualcontactpersons".ToLower() && AbpSession.TenantId != null && AbpSession.TenantId != 0 )
             {
                 if (input.ContactId!=null && input.ContactId!=0)
                 {
