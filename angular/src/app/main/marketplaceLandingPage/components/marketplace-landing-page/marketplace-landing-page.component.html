@@ -11,9 +11,10 @@
 
 
       <!-- carusal slider multi blocks-->
-      <app-carusal-with-callToAction *ngSwitchCase="'CSMP'" [sectionId]="s.sectionId" [sectionData]="s.inputs">
+       <div *ngSwitchCase="'CSMP'" class="mt-4">
+      <app-carusal-with-callToAction  [sectionId]="s.sectionId" [sectionData]="s.inputs">
       </app-carusal-with-callToAction>
-
+    </div>
       <!-- auto slider without call to action-->
       <div *ngSwitchCase="'ASMB'">
 
