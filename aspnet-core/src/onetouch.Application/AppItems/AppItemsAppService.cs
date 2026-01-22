@@ -5817,12 +5817,7 @@ namespace onetouch.AppItems
                         //record.RecordType = "Account Code: " + dto.SSIN;
                         record.RecordType = "Price";
 
-                        record.ExcelDto.Code = "Item";
-                        record.ExcelDto.RecordType = "Price";
-                        record.ExcelDto.ProductDescription = "-";
-                        record.ExcelDto.ProductType = "-";
-                        record.ExcelDto.Code = "-";
-                        record.ExcelDto.Code = "-";
+                       
                         record.ExcelDto = new AppItemExcelDto
                         {
                             Code = dto.Code,
@@ -5833,8 +5828,14 @@ namespace onetouch.AppItems
                             Currency = currencyCode,
                             ParentId = currencyId,
 
-
                         };
+                        record.ExcelDto.Code = "Item";
+                        record.ExcelDto.RecordType = "Price";
+                        record.ExcelDto.ProductDescription = "-";
+                        record.ExcelDto.ProductType = "-";
+                        record.ExcelDto.Code = "-";
+                        record.ExcelDto.Code = "-";
+
                         resultDto.TotalPassedRecords++;
                     }
 
@@ -5866,11 +5867,18 @@ namespace onetouch.AppItems
 
             //// Preload AppItems
             var appItems = await _appItemRepository.GetAll().ToListAsync();
-            var appItemDict = appItems.ToDictionary(x => x.Code.Trim().ToUpper(), x => x);
+            var appItemDict = appItems
+    .GroupBy(x => x.Code?.Trim().ToUpper())
+    .ToDictionary(g => g.Key, g => g.First());
+
 
             //// Preload Currencies
             var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
-            var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper(), x => x);
+            //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
+            var currencyDict = currencies
+    .GroupBy(x => x.Code?.Trim().ToUpper())
+    .ToDictionary(g => g.Key, g => g.First());
+
 
             var updatedAppItemIds = new HashSet<long>();
 
