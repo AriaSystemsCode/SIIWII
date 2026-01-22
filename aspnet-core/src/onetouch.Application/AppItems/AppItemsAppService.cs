@@ -96,6 +96,7 @@ namespace onetouch.AppItems
         //I46[End]
         private readonly IRepository<AppItemsListDetail, long> _appItemsListDetailRepository;
         private readonly IRepository<AppItem, long> _appItemRepository;
+        private readonly IRepository<AppContact, long> _appContactRepository;
         private readonly IAppItemsExcelExporter _appItemsExcelExporter;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<AppEntity, long> _appEntityRepository;
@@ -140,6 +141,7 @@ namespace onetouch.AppItems
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         private readonly IRepository<ValidationRule> _validationRuleRepo;
         public AppItemsAppService(
+            IRepository<AppContact, long> appContactRepository,
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
             , IRepository<AppEntityCategory, long> appEntityCategoryRepository
@@ -167,6 +169,7 @@ namespace onetouch.AppItems
              IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails, IRepository<ValidationRule> validationRuleRepo
             )
         {
+            _appContactRepository = appContactRepository;
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             //MMT33-2
             _appMarketplaceItemsListDetails = appMarketplaceItemsListDetails;
@@ -5719,6 +5722,16 @@ namespace onetouch.AppItems
 
                 var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
 
+                //// Preload Contacts
+                var appContacts = await _appContactRepository.GetAll().ToListAsync();
+                //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
+                var appContactsDict = appContacts
+    .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+    .GroupBy(x => x.SSIN.Trim().ToUpper())
+    .ToDictionary(g => g.Key, g => g.First());
+
+
+
                 int rowNumber = 1;
 
                 for (int i = 1; i < lines.Length; i++)
@@ -5755,6 +5768,15 @@ namespace onetouch.AppItems
                     {
                         record.FieldsErrors.Add("SSIN is required.");
                         hasError = true;
+                    }
+                    else
+                    {
+
+                        if (!appContactsDict.TryGetValue(dto.SSIN, out var appContact))
+                        {
+                            record.FieldsErrors.Add("SSIN is not found.");
+                            hasError = true;
+                        }
                     }
 
                     var item = _appItemRepository
@@ -5802,9 +5824,6 @@ namespace onetouch.AppItems
                         currencyCode = matchedCurrency.Code;
                     }
 
-
-
-
                     if (hasError)
                     {
                         record.Status = ExcelRecordStatus.Failed.ToString();
@@ -5813,11 +5832,11 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        record.Code = "Item code: "+ dto.Code;
+                        record.Code = "Item code: " + dto.Code;
                         //record.RecordType = "Account Code: " + dto.SSIN;
                         record.RecordType = "Price";
 
-                       
+
                         record.ExcelDto = new AppItemExcelDto
                         {
                             Code = dto.Code,
@@ -5861,6 +5880,9 @@ namespace onetouch.AppItems
             if (itemExcelResultsDTO?.ExcelRecords == null || !itemExcelResultsDTO.ExcelRecords.Any())
                 return excelLog; // return empty log if no records
 
+            var result = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status !=
+            ExcelRecordStatus.Failed.ToString()).ToList();
+
             var tenantId = AbpSession.TenantId;
             var userId = AbpSession.UserId;
             var now = Clock.Now;
@@ -5879,16 +5901,33 @@ namespace onetouch.AppItems
     .GroupBy(x => x.Code?.Trim().ToUpper())
     .ToDictionary(g => g.Key, g => g.First());
 
+            //// Preload Contacts
+            var appContacts = await _appContactRepository.GetAll().ToListAsync();
+            //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
+            var appContactsDict = appContacts
+            .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+            .GroupBy(x => x.SSIN.Trim().ToUpper())
+            .ToDictionary(g => g.Key, g => g.First());
+
+
 
             var updatedAppItemIds = new HashSet<long>();
 
+            // To Do
+            // Validate SSIN
+            // send notificatons to user
+
+            // add for variations
+            // excel sheet path
+
+
             // Open the Excel document
-            using (var document = new XLWorkbook(itemExcelResultsDTO.FilePath))
+            // using (var document = new XLWorkbook(itemExcelResultsDTO.FilePath))
             {
-                var sheet = document.Worksheet(1);
+                // var sheet = document.Worksheet(1);
                 int rowNumber = 1;
 
-                foreach (var logRecord in itemExcelResultsDTO.ExcelRecords)
+                foreach (var logRecord in result)
                 {
                     rowNumber++;
                     var excelDto = logRecord.ExcelDto;
@@ -5914,6 +5953,7 @@ namespace onetouch.AppItems
 
                         var appItemKey = excelDto.Code.Trim().ToUpper();
                         var currencyKey = excelDto.Currency.Trim().ToUpper();
+                        var appContactKey = excelDto.Name.Trim().ToUpper();
 
                         if (!appItemDict.TryGetValue(appItemKey, out var appItem))
                         {
@@ -5921,6 +5961,14 @@ namespace onetouch.AppItems
                             logRecord.ErrorMessage = "AppItem not found";
                             continue;
                         }
+
+                        if (!appContactsDict.TryGetValue(appContactKey, out var appContact))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "SSIN not found";
+                            continue;
+                        }
+
 
                         if (!currencyDict.TryGetValue(currencyKey, out var currency))
                         {
@@ -5938,6 +5986,7 @@ namespace onetouch.AppItems
                             .Where(x =>
                                 x.AppItemId == appItem.Id &&
                                 x.Code == priceCode &&
+                                x.BuyerSSIN == excelDto.Name &&
                                 x.CurrencyCode == currencyCode &&
                                 !x.IsDeleted)
                             .FirstOrDefaultAsync();
@@ -5946,6 +5995,7 @@ namespace onetouch.AppItems
                         {
                             // 🔄 UPDATE
                             existingPrice.Price = price;
+                            existingPrice.BuyerSSIN = excelDto.Name;
                             existingPrice.LastModificationTime = now;
                             existingPrice.LastModifierUserId = userId;
                             existingPrice.IsDefault = true;
@@ -5994,9 +6044,9 @@ namespace onetouch.AppItems
                     }
 
                     // Write status and error columns to Excel
-                    sheet.Cell("AB" + rowNumber).Value = logRecord.Status;
-                    sheet.Cell("AC" + rowNumber).Value = logRecord.ErrorMessage;
-                    sheet.Cell("AD" + rowNumber).Value = string.Join(",", logRecord.FieldsErrors ?? new List<string>());
+                    //sheet.Cell("AB" + rowNumber).Value = logRecord.Status;
+                    //sheet.Cell("AC" + rowNumber).Value = logRecord.ErrorMessage;
+                    //sheet.Cell("AD" + rowNumber).Value = string.Join(",", logRecord.FieldsErrors ?? new List<string>());
                 }
 
                 // Update AppItems in DB
@@ -6014,7 +6064,7 @@ namespace onetouch.AppItems
                 itemExcelResultsDTO.FilePath = itemExcelResultsDTO.FilePath
                     .Replace(_appConfiguration[$"Attachment:PathTemp"], attachmentFolder);
 
-                document.SaveAs(itemExcelResultsDTO.FilePath);
+                //document.SaveAs(itemExcelResultsDTO.FilePath);
             }
 
             // Populate ExcelLogDTO
@@ -6022,6 +6072,20 @@ namespace onetouch.AppItems
                 .Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "")
                 .ToLower();
             excelLog.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
+
+
+            #region send notification to current user
+            if (AbpSession.UserId != null)
+            {
+                long AbpSessionUserId = (long)AbpSession.UserId;
+                string message = "Items imported successfully.";
+                if (!string.IsNullOrEmpty(itemExcelResultsDTO.FilePath) && !itemExcelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + itemExcelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+                await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
+                    message,
+                    Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+            }
+
+            #endregion send notification to current user
 
             return excelLog;
         }
