@@ -40,6 +40,10 @@ namespace onetouch.AppMarketplaceItems.Dtos
         //public virtual string MaterialContent{ set; get; }
         public virtual long[] Brands { set; get; }
         public virtual string CurrencyCode { set; get; }
+        //I49[Start]
+        public virtual string ItemSSIN { set; get; }
+        public virtual long[] CategoryFilters { set; get; }
+        //I49[End]
     }
     public class GetAccountImagesOutputDto
     { 

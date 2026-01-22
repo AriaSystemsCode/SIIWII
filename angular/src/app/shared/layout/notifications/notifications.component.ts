@@ -24,7 +24,8 @@ export class NotificationsComponent extends AppComponentBase {
     readStateFilter = 'ALL';
     dateRange: Date[] = [moment().startOf('day').toDate(), moment().endOf('day').toDate()];
     loading = false;
-    
+    isAuthenticated = this.appSession?.user
+
     constructor(
         injector: Injector,
         private _notificationService: NotificationServiceProxy,
@@ -99,7 +100,10 @@ export class NotificationsComponent extends AppComponentBase {
 
     setAllNotificationsAsRead(): void {
         this._userNotificationHelper.setAllAsRead(() => {
+        if(this.isAuthenticated) {
+
             this.getNotifications();
+        }
         });
     }
 

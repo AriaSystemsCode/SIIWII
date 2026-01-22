@@ -10,11 +10,12 @@ import {
     Input,
     QueryList
 } from "@angular/core";
-import { Router } from "@angular/router";
+import {  ActivatedRoute, Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
 import {
     AppEntitiesServiceProxy,
     AppMarketplaceItemsServiceProxy,
+    SycEntityObjectCategoriesServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { PricingHelpersService } from "@app/main/app-items/app-item-shared/services/pricing-helpers.service";
@@ -75,13 +76,20 @@ export class MarketplaceProductsComponent
     onlyAvialbleStock: boolean;
     appItemListId: any;
     selectedDepartments: any;
+
+    isAuthenticate= this.appSession?.user
+
+    selectedCategories: number[] = []; 
  
 
     @Input() fromMarketAcoount: boolean;
     @Input() accountDataForView: any
     @Input() marketplaceAccCurrency: string
     @ViewChildren(ProdcutCardComponent)
-    productCards!: QueryList<ProdcutCardComponent>;
+productCards!: QueryList<ProdcutCardComponent>; 
+    brandIdFromUrl: number | null = null;
+    catIdFromUrl: number | null = null;
+    
     constructor(
         injector: Injector,
         private _router: Router,
@@ -90,6 +98,8 @@ export class MarketplaceProductsComponent
         private _pricingHelperService: PricingHelpersService,
         public datepipe: DatePipe,
         public breakpointObserver: BreakpointObserver,
+        private route: ActivatedRoute,   
+         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     ) {
         super(injector);
         this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom"));
@@ -130,17 +140,17 @@ export class MarketplaceProductsComponent
             { label: "Shared With Me", value: 1 },
         ];
         (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
-            this.getAllCurrencies();
-
-
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
 
 
 
         this.checkMediaQuery();
-        this.getAspectatio();
-
+        if(this.isAuthenticate){
+            this.getAllCurrencies();
+            this.getAspectatio();
+        }
+        
     }
     ngOnInit() {
         const state = (this._router.getCurrentNavigation()?.extras?.state ?? history.state) as any;
@@ -153,32 +163,68 @@ export class MarketplaceProductsComponent
             localStorage.removeItem('productFilters');
         }
         const savedFilters = localStorage.getItem("productFilters");
-
         if (savedFilters) {
-            const parsedFilters = JSON.parse(savedFilters);
-            this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? undefined;
-            this.selectedCurrrency = parsedFilters.selectedCurrency || this.selectedCurrrency;
-            this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
-
-            this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
-            this.searchInput = parsedFilters.searchText || this.searchInput;
-            this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
-            this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
-            this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
-            this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData
-            this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
-            this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : this.startShipData;
-            this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : this.endShipData;
-            this.brands = parsedFilters.brands || this.brands;
-            this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
-            this.skipCount = parsedFilters.skipCount || this.skipCount;
-            this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
+          const parsedFilters = JSON.parse(savedFilters);
+          this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? null;
+          this.selectedCurrrency = parsedFilters.selectedCurrency ?? this.selectedCurrrency;
+          this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
+      
+          this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
+          this.searchInput = parsedFilters.searchText || this.searchInput;
+          this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
+          this.selectedCategories = parsedFilters.selectedCategory || this.selectedCategories;
+          this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
+          this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
+          this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData;
+          this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
+          this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : this.startShipData;
+          this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : this.endShipData;
+          this.brands = parsedFilters.brands || this.brands;
+          this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
+          this.skipCount = parsedFilters.skipCount || this.skipCount;
+          this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
-
-        this.getAllProducts(); 
-
+      // 🔗 URL (by ID) takes priority if present
+      this.route.queryParamMap.subscribe((params) => {
+        const q = params.get('q');
+        if (q !== null) {
+          this.searchInput = q; // URL wins over local storage
+        }
+    
+        // brand can be single or multiple: ?brand=1&brand=2
+        const brandParams = params.getAll('brand');
+        if (brandParams && brandParams.length) {
+          this.brands = brandParams.map(v => +v)
+        }
+    
+        const deptParam = params.get('dept');
+        if (deptParam) {
+          const id = +deptParam;
+          this.selectedDepartments = [id];
+          if (this.filters) this.filters.preselectDeptId = id;
+        }
+    
+        const listParam = params.get('proList');
+        if (listParam) {
+          const id = +listParam;
+          this.appItemListId = id || null;
+          if (this.filters) this.filters.catalogId = id ?? null;
+        }
+    
+        const catParam = params.get('cat');
+        if (catParam) {
+          const id = +catParam;
+          this.selectedCategories = [id];
+          if (this.filters) this.filters.preselectCategoryId = id;
+        }
+    
+        this.getAllProducts(); // apply filters
+      });
     }
+    
+      
 
+    
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
 
@@ -245,54 +291,54 @@ export class MarketplaceProductsComponent
             appItemListId: this.appItemListId || null,
             searchText: this.searchInput || '',
             selectedDepartments: this.selectedDepartments || [],
-            minimumPrice: this.minimumPrice,
-            maximumPrice: this.maximumPrice,
+            selectedCategory: this.selectedCategories || [], 
+            minimumPrice: this.minimumPrice || null,
+            maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
-            onlyAvailableStock: this.onlyAvialbleStock ?? undefined,
-            startSoldOutData: this.startSoldOutData,
-            endSoldOutData: this.endSoldOutData,
-            startShipData: this.startShipData,
-            endShipData: this.endShipData,
-
+            onlyAvailableStock: this.onlyAvialbleStock ?? false,
+            startSoldOutData: this.startSoldOutData || null,
+            endSoldOutData: this.endSoldOutData || null,
+            startShipData: this.startShipData || null,
+            endShipData: this.endShipData || null,
             brands: this.brands || [],
-            selectedCurrency,
+            selectedCurrency: selectedCurrency,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
-            maxResultCount: this.maxResultCount
+            maxResultCount:  this.maxResultCount
         };
-
-
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
-
+        const currencyCode = this.getCurrencyCodeForRequest();
+    
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
-                this.fromMarketAcoount
-                    ? this.accountDataForView?.ssin
-                    : sessionStorage.getItem("SellerSSIN"),
+                this.fromMarketAcoount 
+                ? this.accountDataForView?.ssin
+                : sessionStorage.getItem("SellerSSIN"),
                 null,
-                requestParams.appItemListId,
-                false,
-                requestParams.searchText,
-                null,
-                null,
-                null,
-                requestParams.selectedDepartments,
-                requestParams.minimumPrice,
-                requestParams.maximumPrice,
-                requestParams.selectedOption,
-                requestParams.onlyAvailableStock,
-                requestParams.startSoldOutData,
-                requestParams.endSoldOutData,
-                requestParams.startShipData,
-                requestParams.endShipData,
-                requestParams.brands,
-                requestParams.selectedCurrency,
-                requestParams.selectedSort,
-                requestParams.skipCount,
-                requestParams.maxResultCount
+                requestParams.appItemListId ||  this.appItemListId,
+                false, // false
+                requestParams.searchText || this.searchInput,
+                null, //null
+                null, //null
+                null, // null
+                requestParams.selectedDepartments ||     this.selectedDepartments,
+                requestParams.minimumPrice||     this.minimumPrice,
+                requestParams.maximumPrice || this.maximumPrice,
+               this.seletedOption.value,
+                requestParams.onlyAvailableStock ||    this.onlyAvialbleStock,
+                requestParams.startSoldOutData || this.startSoldOutData,
+                requestParams.endSoldOutData ||  this.endSoldOutData,
+                requestParams.startShipData || this.startShipData,
+                requestParams.endShipData ||  this.endShipData,
+                requestParams.brands ||  this.brands, // ids
+                currencyCode,
+                undefined,
+                requestParams.selectedCategory || this.selectedCategories,  //category
+                requestParams.selectedSort || this.selectedSort.value,
+                requestParams.skipCount || this.skipCount,
+                requestParams.maxResultCount ||  this.maxResultCount
             )
-
             .pipe(
                 finalize(() => {
                     this.displayFitlers = false;
@@ -317,16 +363,19 @@ export class MarketplaceProductsComponent
             });
     }
 
-
-
-
     setCurrency() {
-        // read string code from localStorage
-        const saved = localStorage.getItem('currencyCode');
-        const code = saved && saved !== 'null' && saved !== 'undefined' ? saved : (this.tenantDefaultCurrency?.code ?? 'USD');
-
-        this.selectedCurrrency = code;
-        this.currency = code;
+      const raw = localStorage.getItem("currencyCode");
+      let code = this.tenantDefaultCurrency?.code || 'USD';
+    
+      if (raw && raw !== 'undefined' && raw !== 'null') {
+        try {
+          const parsed = JSON.parse(raw);
+          code = parsed?.code ?? parsed ?? code;
+        } catch { code = raw; }
+      }
+    
+      this.selectedCurrrency = this.currencies?.find(c => c.code === code) || this.currencies?.[0] || null;
+      this.currency = this.selectedCurrrency?.code || code;
     }
 
 
@@ -350,14 +399,14 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
     }
 
-    handleCurrencyChange(event: any) {
-        this.selectedCurrrency = event.value;
-        this.currency = event.value;
+    handleCurrencyChange(data: any) {
+        setTimeout(
+            () => {
+                this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
+                localStorage.setItem("currencyCode", this.currency);
+                this.getAllProducts();
+            }, 1500);
 
-        localStorage.setItem("currencyCode", this.currency);
-
-
-        this.getAllProducts();
     }
 
     handleSortingChange(data: any) {
@@ -368,23 +417,54 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
     }
 
-    // start filter criteria
-    selectCatalog(value) {
+    selectCatalog(value: any) {
+      if (!value || !value.id) {
+        this.appItemListId = null;
+        this.updateUrlQueryParams({ proList: null });
+      } else {
         this.appItemListId = value.id;
-        this.getAllProducts();
+        this.updateUrlQueryParams({ proList: String(value.id) }); 
+      }
+      this.getAllProducts();
     }
+    
+      
+      private updateUrlQueryParams(partial: {
+        dept?: string | null;
+        proList?: string | null;
+        q?: string | null;
+        cat?: string | null;
+        brand?: string | string[] | null;
+      }) {
+        this._router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {
+            dept: partial.dept ?? undefined,
+            proList: partial.proList ?? undefined,
+            q: partial.q ?? undefined,
+            cat: partial.cat ?? undefined,
+            brand: partial.brand ?? undefined,
+          },
+          queryParamsHandling: 'merge',
+        });
+      }
+      
+      
+      
 
-    selectDepartment(value) {
-
-        if (value == null) {
-            this.selectedDepartments = [];
+      selectDepartment(value) {
+        if (!value) {
+          this.selectedDepartments = [];
+          this.updateUrlQueryParams({ dept: null });
         } else {
-            this.selectedDepartments = [
-                value.node.data.sycEntityObjectCategory.id,
-            ];
+          const id = value.node.data.sycEntityObjectCategory.id;
+          this.selectedDepartments = [id];
+          this.updateUrlQueryParams({ dept: String(id) }); 
         }
         this.getAllProducts();
-    }
+      }
+      
+      
 
 
     setPriceFrom(value) {
@@ -418,46 +498,70 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
     }
 
-    brands: [] = [];
-    selectBrands(value) {
-        this.brands = value;
+    brands: any[] = [];
+
+    async selectBrands(value: any[]) {
+      this.brands = value || [];
+    
+      // No brands -> remove param
+      if (!this.brands.length) {
+        this.updateUrlQueryParams({ brand: null });
         this.getAllProducts();
+        return;
+      }
+    
+      // Just send IDs as strings
+      const brandIdsAsString = this.brands.map(id => String(id));
+    
+      // URL becomes ?brand=12&brand=34
+      this.updateUrlQueryParams({ brand: brandIdsAsString });
+    
+      this.getAllProducts();
     }
-
-    resetProducts($event: any) {
+    resetProducts($event) {
         this.filters.resetFilters();
-
-        this.seletedOption = { label: "Public And Shared With Me", value: 2 };
-
-        const saved = localStorage.getItem("currencyCode");
-        this.selectedCurrrency =
-            saved && saved !== 'null' && saved !== 'undefined'
-                ? saved
-                : (this.tenantDefaultCurrency?.code ?? 'USD');
-
-        this.currency = this.selectedCurrrency;
-
+        (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
+            (this.selectedCurrrency =
+                localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+                    ? this.tenantDefaultCurrency
+                    : JSON.parse(localStorage.getItem("currencyCode")));
+        this.currency =
+            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+                ? this.tenantDefaultCurrency?.code
+                : JSON.parse(localStorage.getItem("currencyCode")).code;
         this.tentantID = this.appSession?.tenant?.id;
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
-        this.appItemListId = '';
-        this.brands = [];
-        this.skipCount = 0;
-        this.maxResultCount = 12;
-        this.selectedDepartments = [];
-        this.onlyAvialbleStock = undefined;
-
+         this.appItemListId =''
+         this.selectedCategories = [];
+        this.brands =[]
+        this.skipCount= 0;
+        this.maxResultCount= 12;
+        this.selectedDepartments =[]
+        this.onlyAvialbleStock = undefined
         localStorage.removeItem("productFilters");
         this.getAllProducts();
     }
-
-
+    selectCategory(value: any) {
+      if (!value) {
+        this.selectedCategories = [];
+        this.updateUrlQueryParams({ cat: null });
+      } else {
+        const node = value.node?.data?.sycEntityObjectCategory;
+        const id = node?.id;
+        this.selectedCategories = id ? [id] : [];
+        this.updateUrlQueryParams({ cat: id ? String(id) : null }); 
+      }
+      this.getAllProducts();
+    }
+    
+        
     ngOnDestroy() {
 
-        // Keep SellerSSIN while navigating inside the seller room / product views
-        const inSellerRoom = JSON.parse(localStorage.getItem('fromSellerRoom') || 'false');
-        const inMarketplace = JSON.parse(localStorage.getItem('fromMarketPlace') || 'false');
+          // Keep SellerSSIN while navigating inside the seller room / product views
+  const inSellerRoom = JSON.parse(localStorage.getItem('fromSellerRoom') || 'false');
+  const inMarketplace = JSON.parse(localStorage.getItem('fromMarketPlace') || 'false');
 
         if ((!inSellerRoom || inMarketplace) && !this.fromMarketAcoount) {
             sessionStorage.removeItem('SellerSSIN');
@@ -490,4 +594,40 @@ export class MarketplaceProductsComponent
         }
 
     }
+    private getCurrencyCodeForRequest(): string {
+   
+        if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
+          return this.selectedCurrrency.code;
+        }
+    
+        if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
+          return this.selectedCurrrency.trim();
+        }
+    
+        const stored = localStorage.getItem('currencyCode');
+        if (stored && stored !== 'undefined' && stored !== 'null') {
+          try {
+            const parsed = JSON.parse(stored);
+    
+            if (typeof parsed === 'string' && parsed.trim()) {
+              return parsed.trim();
+            }
+    
+            if (parsed && typeof parsed === 'object' && parsed.code) {
+              return parsed.code;
+            }
+          } catch {
+    
+            if (stored.trim()) {
+              return stored.trim();
+            }
+          }
+        }
+    
+        if ((this as any).tenantDefaultCurrency?.code) {
+          return (this as any).tenantDefaultCurrency.code;
+        }
+      
+        return 'USD';
+      }
 }

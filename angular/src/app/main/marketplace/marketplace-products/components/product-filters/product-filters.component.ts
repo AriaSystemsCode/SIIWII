@@ -2,10 +2,12 @@ import {
 
   Component,
   EventEmitter,
+  Injector,
   Input,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
 } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
@@ -14,7 +16,6 @@ import {
   GetAllMarketplaceItemListsOutputDto,
   PagedResultDtoOfGetAllMarketplaceItemListsOutputDto,
   SycEntityObjectCategoriesServiceProxy,
-  SycEntityObjectTypesServiceProxy,
   TreeNodeOfGetSycEntityObjectCategoryForViewDto,
 } from "@shared/service-proxies/service-proxies";
 import { finalize } from "rxjs";
@@ -24,7 +25,7 @@ import { finalize } from "rxjs";
   templateUrl: "./product-filters.component.html",
   styleUrls: ["./product-filters.component.scss"],
 })
-export class ProductFiltersComponent implements OnInit, OnDestroy {
+export class ProductFiltersComponent extends AppComponentBase implements OnInit, OnDestroy {
   isExpanded: boolean = true;
   productList: GetAllMarketplaceItemListsOutputDto[];
   selectedList: boolean = false;
@@ -32,6 +33,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
   files: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
   loading: boolean;
   selectedFile: any;
+  selectedCatFile: any;
   startShipDate: Date;
   endShipDate: Date;
   startSoldout: string;
@@ -43,6 +45,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
   max: any;
   brands: any[] = [];
   @Input() isSellerIdExists: boolean = false;
+  @Input() selectedBrands: (number | string)[] = []; 
+  @Input() selectedDepartmentId?: number;
 
   // emit all values to parent component
   @Output() handleCatalogSelections: EventEmitter<any> = new EventEmitter();
@@ -57,17 +61,26 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
   @Output() handleStockSiwtch: EventEmitter<any> = new EventEmitter();
   @Output() handleBrandsSelection: EventEmitter<any> = new EventEmitter();
   @Output() clearAll: EventEmitter<any> = new EventEmitter();
+  @Output() handleCategoriesTreeSelections: EventEmitter<any> = new EventEmitter();
   accountSSIN: string;
   savedFilters: any
   isSelected: boolean = false
   isFromSellerRoom: boolean
   ismarketPLace: boolean
+  isAuthenticated = this.appSession?.user
+  @Input() preselectDeptId?: number;
+  categories:any
+  @Input() preselectCategoryId?: number;
+  sellerSSin:string
   constructor(
     private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     private _appMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
+            private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+    injector: Injector
 
   ) {
+    super(injector);
     this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom"));
     this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
     this.savedFilters = localStorage.getItem("productFilters");
@@ -76,6 +89,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
       const parsedFilters = JSON.parse(this.savedFilters);
 
       this.selectedFile = parsedFilters.selectedDepartments;
+  this.selectedCatFile = parsedFilters.selectedCategory
+
       this.min = parsedFilters.minimumPrice;
       this.max = parsedFilters.maximumPrice;
       this.catalogId = parsedFilters.appItemListId;
@@ -88,7 +103,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
       this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
       this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
 
-      this.selctedBradns = parsedFilters.brands;
+      // this.selctedBradns = parsedFilters.brands;
 
 
     }
@@ -104,31 +119,44 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     this.getParentDepartments();
     this.getAllBrands();
 
-
-
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedBrands']) {
+      const curr = changes['selectedBrands'].currentValue;
+      this.selctedBradns = Array.isArray(curr) ? [...curr] : [];
+    }
+  
+    if (changes['selectedDepartmentId'] && this.selectedDepartmentId) {
+      if (this.files?.length) {
+        this.expandAndSelectFullPath(this.selectedDepartmentId);
+      }
+    }
+  
+    if (changes['preselectCategoryId'] && this.preselectCategoryId) {
+      if (this.categories?.length) {
+        this.expandAndSelectFullPathCat(this.preselectCategoryId);
+      }
+    }
+  }
+  
+  
   getAllBrands() {
-
     this._appMarketplaceItemsServiceProxy
       .getAllBrandsWithPaging(
-        null,
-        null,
-        null,
-        null,
-        null,
-        "BRAND",
-        null,
-        null,
-        86,
-        "name",
-        0,
-        10, this.accountSSIN
+        null, null, null, null, null,
+        false, 'BRAND', null, null,
+        86, 'name', 0, 200, this.sellerSSin ? this.sellerSSin: this.accountSSIN
       )
-      .subscribe((res) => {
-        this.brands = res.items;
+      .subscribe(res => {
+        this.brands = (res.items || []).map((b: any) => ({
+          label: b.name ?? b.label ?? b.displayName ?? '',
+          value: b.id   ?? b.value
+        }));
       });
   }
+  
+  
 
   handlebrandsSelction() {
     this.handleBrandsSelection.emit(this.selctedBradns);
@@ -333,6 +361,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     this.catalogId = null;
     this.collapseAll();
     this.selectedFile = []
+    this.selectedCatFile = []
     this.selctedBradns = [];
     this.min = "";
     this.max = "";
@@ -362,49 +391,167 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         10
       ).subscribe((res: any) => {
         this.files = res.items;
-        resolve(); // ✅ Important!
+        resolve(); 
       });
     });
   }
 
 
-
-  ngOnInit(): void {
-    this.savedFilters = localStorage.getItem("productFilters");
-
-    if (this.savedFilters) {
-      const parsedFilters = JSON.parse(this.savedFilters);
-      const selectedDepartmentId = parsedFilters.selectedDepartments?.[0];
-
-      this.selectedFile = parsedFilters.selectedDepartments;
-      this.min = parsedFilters.minimumPrice;
-      this.max = parsedFilters.maximumPrice;
-      this.catalogId = parsedFilters.appItemListId;
-      this.stockAvailablty = parsedFilters.onlyAvailableStock;
-      this.startSoldout = parsedFilters.startSoldOutData;
-      this.endSoldout = parsedFilters.endSoldOutData;
-      this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
-      this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
-      this.selctedBradns = parsedFilters.brands;
-      this.getParentDepartments().then(async () => {
-        if (selectedDepartmentId) {
-          await this.expandAndSelectFullPath(selectedDepartmentId);
+  getParentCategories(): Promise<void> {
+    return new Promise((resolve) => {
+      const apiMethod = 'getAllWithChildsForProductWithPaging';
+      this._sycEntityObjectCategoriesServiceProxy[apiMethod](
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+        undefined,
+        false,
+        undefined,
+        [],
+        'name',
+        0,
+        10
+      ).subscribe((res: any) => {
+        this.categories = res.items;
+  
+        // 🔹 If we already know which category to preselect, expand to it
+        if (this.preselectCategoryId) {
+          this.expandAndSelectFullPathCat(this.preselectCategoryId);
         }
+  
+        resolve();
       });
-      
-
-
-    } else {
-      this.getParentDepartments();
+    });
+  }
+  
+  
+  nodeCatExpand(evt: any) {
+    if (!evt?.node) return;
+    this.loading = true;
+    this._sycEntityObjectCategoriesServiceProxy
+      .getAllChildsWithPaging(
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+        evt.node.data.sycEntityObjectCategory.id,
+        false,   
+        undefined, undefined, 'name', 0, 10
+      )
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe((res: any) => (evt.node.children = res.items));
+  }
+  
+  nodeCatSelect(evt: any) {
+    this.handleCategoriesTreeSelections.emit(evt);
+  }
+  
+  nodeCatUnselect(_: any) {
+    this.handleCategoriesTreeSelections.emit(null);
+  }
+  async expandAndSelectNodeLazyCat(
+    targetId: number,
+    nodes: any[] = this.categories,
+    parentNode?: any
+  ): Promise<boolean> {
+    for (const node of nodes ?? []) {
+      const currentId = node?.data?.sycEntityObjectCategory?.id;
+  
+      if (currentId === targetId) {
+        if (parentNode) parentNode.expanded = true;
+        node.expanded = true;
+        this.selectedCatFile = node;
+        return true;
+      }
+  
+      if (!node.children || node.children.length === 0) {
+        const res = await this._sycEntityObjectCategoriesServiceProxy
+          .getAllChildsWithPaging(
+            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+            currentId,
+            /* forDepartments? */ false,
+            undefined, undefined, 'name', 0, 10
+          )
+          .toPromise();
+        node.children = res.items;
+      }
+  
+      const found = await this.expandAndSelectNodeLazyCat(targetId, node.children, node);
+      if (found) {
+        node.expanded = true;
+        if (parentNode) parentNode.expanded = true;
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  async expandAndSelectFullPathCat(targetId: number) {
+    // build path from node to root
+    const pathIds: number[] = [];
+    let currentId = targetId;
+    while (currentId) {
+      pathIds.unshift(currentId);
+      const res = await this._sycEntityObjectCategoriesServiceProxy
+        .getSycEntityObjectCategoryForEdit(currentId)
+        .toPromise();
+      currentId = res?.sycEntityObjectCategory?.parentId;
+    }
+  
+    // walk down the path, expanding as we go
+    let currentNodes = this.categories;
+    for (const id of pathIds) {
+      const ok = await this.expandAndSelectNodeLazyCat(id, currentNodes);
+      if (!ok) break;
+      const n = this.findNodeById(this.categories, id);
+      currentNodes = n?.children ?? [];
+    }
+  
+    // final select
+    const finalNode = this.findNodeById(this.categories, targetId);
+    if (finalNode) {
+      finalNode.expanded = true;
+      this.selectedCatFile = finalNode;
     }
   }
+  
+  ngOnInit(): void {
+    this.getSettingData()
+    this.savedFilters = localStorage.getItem('productFilters');
+  
+    const init = async () => {
+      if (this.savedFilters) {
+        const parsed = JSON.parse(this.savedFilters);
+        const selectedDeptId = parsed.selectedDepartments?.[0];
+        const selectedCatId  = parsed.selectedCategory?.[0];
+  
+        // mirror saved values into component state
+        this.selectedFile = parsed.selectedDepartments;
+        this.selectedCatFile = parsed.selectedCategory;
+        this.min = parsed.minimumPrice;
+        this.max = parsed.maximumPrice;
+        this.catalogId = parsed.appItemListId;
+        this.stockAvailablty = parsed.onlyAvailableStock;
+        this.startSoldout = parsed.startSoldOutData;
+        this.endSoldout = parsed.endSoldOutData;
+        this.startShipDate = parsed.startShipData ? new Date(parsed.startShipData) : null;
+        this.endShipDate   = parsed.endShipData   ? new Date(parsed.endShipData)   : null;
+        // this.selctedBradns = parsed.brands;
+  
+        await Promise.all([this.getParentDepartments(), this.getParentCategories()]);
+  
+        if (selectedDeptId) await this.expandAndSelectFullPath(selectedDeptId);
+        if (selectedCatId)  await this.expandAndSelectFullPathCat(selectedCatId);
+      } else {
+        await Promise.all([this.getParentDepartments(), this.getParentCategories()]);
+      }
+    };
+  
+    init();
+  }
+  
   expandAndSelectNode(targetId: number, nodes: any[] = this.files, parentNode?: any): void {
     if (!nodes) return;
 
     for (let node of nodes) {
       if (node.data.sycEntityObjectCategory.id === targetId) {
         if (parentNode) {
-          parentNode.expanded = true; // ✅ expand parent
+          parentNode.expanded = true; 
         }
         node.expanded = true;
         this.selectedFile = node;
@@ -449,6 +596,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     this.handleStartShipDate.emit(undefined);
     this.handleEndSoldOutDate.emit(undefined);
     this.handleSatrtsoldOutDate.emit(undefined);
+    this.handleCategoriesTreeSelections.emit(null);
     this.clearAll.emit(true);
 
   }
@@ -536,7 +684,26 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     }
     return null;
   }
+
+  getSettingData(){
     
+    this._AppEntitiesServiceProxy.getHostSettingValue(1216, null).subscribe({
+        next: (res) => {
+            this.sellerSSin = 'PERSONAL-000000000039'
+        },
+     
+      });
+  }
+  selectionKeys: { [key: string]: boolean } = {}; 
+
+  ngAfterViewInit() {
+    // wait until deptTree is populated (if it's async, call this after you set it)
+    queueMicrotask(() => {
+      if (this.preselectDeptId) {
+        this.selectedFile = { [this.preselectDeptId]: true };
+      }
+    });
+  }
   ngOnDestroy(): void {
     clearTimeout(this.timeOut);
   }

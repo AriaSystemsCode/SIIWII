@@ -81,7 +81,7 @@ html[dir=rtl] .input-group span.input-group-btn button {
 }
 
 .kt-grid.kt-grid--hor.kt-grid--root {
-    height: 100vh;
+    /* height: 100vh; */
 }
 
 .form-control:disabled{

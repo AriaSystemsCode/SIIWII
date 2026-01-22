@@ -35,6 +35,9 @@
           
 
         }
+        .addMGtop {
+          margin-top: 120px !important;
+        }
     }
 
     @media only screen and (max-width: 575px) {
@@ -43,6 +46,9 @@
             padding-right: 10px !important;
             overflow-x: hidden;
             padding-top: 70px;
+        }
+        .addMGtop {
+          margin-top: 70px !important;
         }
     }
     @media only screen and (min-width: 575px) and (max-width: 1024px) {
@@ -54,6 +60,9 @@
     padding-top: 50px;
 
  }
+ .addMGtop {
+  margin-top: 50px !important;
+}
 }
 .spLeng {
   height: 65vh !important;

@@ -136,6 +136,8 @@ export class TransactionInformationComponent
   languageSettingName  =AppConsts.languageSettingName;
   currentLang:string
   isArabic:boolean 
+  transactionSharing:string="";
+  isAuthenticated = this.appSession?.user
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -229,6 +231,8 @@ export class TransactionInformationComponent
         undefined,
         [], // ids
         'USD',
+        undefined,
+        undefined,
         'name',
         skipCount,
         maxResultCount
@@ -1096,6 +1100,7 @@ export class TransactionInformationComponent
   PlaceOrder() {
 
     this.showMainSpinner();
+
     this.saveDates()
     this.appTransactionsForViewDto.lFromPlaceOrder = true;
     this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -1106,6 +1111,7 @@ export class TransactionInformationComponent
         this.removeLocalStorage()
         this.show(this.orderId, this.showCarousel, this.validateOrder, this._transactionCartMode.view);
         this.getShoppingCartData()
+
 
 
       }
@@ -1124,6 +1130,49 @@ export class TransactionInformationComponent
       });
   }
 
+
+  askForShareTransactions(){
+      this._AppEntitiesServiceProxy
+    .getTenantSettingValue(1301,null)
+    .subscribe((res: any) => {
+        this.transactionSharing= res?.toString().toLowerCase();
+   
+  switch (this.transactionSharing.toString().toLowerCase()){
+    case 'manual':
+      break;
+
+      case 'automatic':
+            this.automaticShare();
+        break;
+
+        case 'inquire':
+          Swal.fire({
+            title: "",
+            text: "Would you like to share the transaction with the other partner or not?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Share Now",
+            cancelButtonText: "Cancel",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+            customClass: {
+              popup: 'popup-class',
+              icon: 'icon-class',
+              content: 'content-class',
+              actions: 'actions-class',
+              confirmButton: 'confirm-button-class2',
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.onShareTransaction();
+            }})
+          break;
+  
+    default:
+      break;
+  } });
+  }
   sync() {
     this.showMainSpinner();
     this._AppTransactionServiceProxy.syncTransaction(this.orderId)
@@ -1276,8 +1325,8 @@ export class TransactionInformationComponent
 
         // Asynchronous handling for setting orderConfirmationRole
         this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId).subscribe((res) => {
-          this.printInfoParam.orderConfirmationRole = res.contactRole;
-          this.printInfoParam.contactName = res.contactName;
+          this.printInfoParam.orderConfirmationRole = res.contactRole ? res.contactRole : 'buyer';
+          this.printInfoParam.contactName = res.contactName ? res.contactName : 'Savty';
 
 
 
@@ -1389,6 +1438,10 @@ export class TransactionInformationComponent
         this.appTransactionsForViewDto?.sellerCompanySSIN,
        this.appTransactionsForViewDto?.priceLevel,
         id,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
         undefined,
         undefined,
         undefined,
@@ -1703,7 +1756,10 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
                           value:extraAttr.selectedValues,
                           isHostRecord:false,
                           hexaCode:undefined,
-                          image:undefined
+                          image:undefined,
+                          status:undefined,
+                          entityObjectStatusId:undefined
+
                       })
                       result.items.push(tempAtt)
                   }
@@ -1751,4 +1807,43 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
     this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
+
+
+
+  automaticShare() {
+    if (!this.appTransactionsForViewDto?.sharedWithUsers ||
+      this.appTransactionsForViewDto.sharedWithUsers.length === 0) {
+    return;
+      }
+      const newsharingArray = this.appTransactionsForViewDto?.sharedWithUsers?.map(u => ({
+        sharedTenantId: u.tenantId,
+        sharedUserId: u.userId,
+        sharedUserEMail: u.email,
+        sharedUserName: u.name,
+        sharedUserSureName: u.name,
+        sharedUserTenantName: u.tenantName,
+        id: u.id
+    })) || [];
+    let shareDto :any = {
+        transactionId: this.orderId,
+        message: `Hi,
+Kindly check attached`,
+        transactionSharing: newsharingArray,
+        subject: undefined
+    };
+    this._AppTransactionServiceProxy.shareTransactionByMessage(shareDto)
+        .subscribe(r => this.notify.success("Transaction shared automatically"));
+  }
+  getNeeddedSettingValues(){
+    if(this.isAuthenticated){
+      this._AppEntitiesServiceProxy
+      .getTenantSettingValue(1111,null)
+      .subscribe((res: any) => {
+          this.transactionSharing= res?.toString().toLowerCase();
+      });
+    }
 }
+  
+
+
+  }

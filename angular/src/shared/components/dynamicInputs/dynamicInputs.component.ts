@@ -3,7 +3,12 @@ import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit,
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AppAdvertisementsServiceProxy, ExtraAttribute, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { FileUploaderCustom } from '../import-steps/models/FileUploaderCustom.model';
+import { FileUploader, FileUploaderOptions } from '@node_modules/ng2-file-upload';
+import { AppConsts } from '@shared/AppConsts';
+import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 
 @Component({
   selector: 'app-dynamicInputs',
@@ -11,7 +16,7 @@ import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttach
   styleUrls: ['./dynamicInputs.component.scss'],
   animations: [appModuleAnimation()]
 })
-export class dynamicInputs implements OnInit, OnChanges {
+export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges {
   @Input("extraAttributeObject") extraAttributeObject;
   @Input("entityType") entityType;
   @Input("entityObjectTypeId") entityObjectTypeId;
@@ -20,10 +25,21 @@ export class dynamicInputs implements OnInit, OnChanges {
   selectedExtraData: any[] = [];
   @Input() appTransactionsForViewDto: any;
   @Input() fromSetting: boolean = false;
+  @Input() dynamicInputsForViewDto: any;
   originalValuesMap = new Map<number, any>();
+
 
   sycAttachmentCategoryImage: SycAttachmentCategoryDto;
   @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
+  warningMsg: string = "";
+
+  public constructor(
+    private _tokenService: TokenService,
+    private dynamicApi: DynamicApiDispatcherService,
+    injector: Injector
+  ) {
+    super(injector);
+  }
 
   openCalendar(calendar: any) {
     calendar.overlayVisible = true;
@@ -32,9 +48,8 @@ export class dynamicInputs implements OnInit, OnChanges {
     this.fillSelectedValuesFromDto();
     this.onAnyInputChange();
   }
+
   onAnyInputChange() {
-
-
     const updatedDataMap = new Map<number, any>();
 
     // Preserve existing values
@@ -44,6 +59,9 @@ export class dynamicInputs implements OnInit, OnChanges {
 
     if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
       for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
+
+        if (attr.dataType === 'pills')
+          attr.themes = this.getThemes(attr);
 
         if (attr.isSelectedOnVariation || attr.isVariation) {
           continue;
@@ -74,14 +92,7 @@ export class dynamicInputs implements OnInit, OnChanges {
         }
 
         // ✅ Handle Numeric input
-        if (attr.dataType === 'Numeric') {
-          if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
-            formattedValue = '';
-          }
-        }
-
-        // ✅ Handle Boolean / Bit
-        if (attr.dataType === 'boolean' || attr.dataType === 'bit') {
+        if (attr.dataType === 'Numeric' || attr.dataType === 'boolean' || attr.dataType === 'Boolean' || attr.dataType === 'bit' || attr.dataType === 'color') {
           if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
             formattedValue = '';
           }
@@ -119,15 +130,61 @@ export class dynamicInputs implements OnInit, OnChanges {
   }
 
 
+  onRadioChange(extraAttr) {
+    if (extraAttr?.attributeId === 1217 ||
+      extraAttr?.name?.includes("ShowwarningmessagewhenmajorItemisoutofStockinmarketplace")) {
+
+      const extraAttrWaningMsg = this.extraAttributeObject.value.extraAttributes
+        .find(x => x.attributeId === 1218 || x.name?.includes("Warningmessage"));
+
+      if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() !== 'true') {
+        extraAttrWaningMsg.showMsgTxt = false;
+      } else if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() === 'true') {
+        extraAttrWaningMsg.showMsgTxt = true;
+      }
+    }
+  }
+
+
+  reset(extraAttr: any) {
+    if (extraAttr.acceptMultipleValues) {
+      extraAttr.selectedValues = [];
+    } else {
+      extraAttr.selectedValues = '';
+    }
+
+    this.onAnyInputChange();
+  }
+
+
+
+  themes = [];
+  selectedTheme: any;
+
+  // set thems  ?
+  getThemes(extraAttr: any) {
+    return this.themes =
+      [
+        { name: 'Default', image: 'assets/themes/default.png' },
+        { name: 'Theme 2', image: 'assets/themes/theme2.png' },
+        { name: 'Theme 3', image: 'assets/themes/theme3.png' },
+        { name: 'Theme 4', image: 'assets/themes/theme4.png' },
+        { name: 'Theme 5', image: 'assets/themes/theme5.png' },
+      ];
+  }
+
+  selectTheme(theme: any) {
+    this.selectedTheme = theme;
+  }
 
 
 
   fillSelectedValuesFromDto() {
-    if (!this.extraAttributeObject?.value?.extraAttributes || !this.appTransactionsForViewDto?.extraDataAttributes) {
+    if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
       return;
     }
 
-    const dtoData = this.appTransactionsForViewDto.extraDataAttributes;
+    const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
     const allAttributes = [
       ...(this.extraAttributeObject.value.extraAttributes || []),
@@ -135,6 +192,7 @@ export class dynamicInputs implements OnInit, OnChanges {
     ];
 
     for (const attr of allAttributes) {
+
       const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
 
       if (matchedDto && matchedDto.selectedValues?.length) {
@@ -247,16 +305,14 @@ export class dynamicInputs implements OnInit, OnChanges {
   
     setTimeout(() => this.onAnyInputChange(), 0);
   }
-  
+
   isArray(val: any): boolean {
     return Array.isArray(val);
   }
-  
   onCheckboxChange(checked: boolean, value: any, extraAttr: any): void {
     if (!Array.isArray(extraAttr.selectedValues)) {
       extraAttr.selectedValues = [];
     }
-  
     if (checked) {
       if (!extraAttr.selectedValues.includes(value)) {
         extraAttr.selectedValues.push(value);
@@ -264,10 +320,162 @@ export class dynamicInputs implements OnInit, OnChanges {
     } else {
       extraAttr.selectedValues = extraAttr.selectedValues.filter(val => val !== value);
     }
-  
     this.onAnyInputChange(); // emit changes
   }
+
+  onFileSelected(event: any, extraAttr: any) {
+    const file = event.target.files[0];
+    if (file) {
+      /* if (file.size > 30 * 1024) {
+        alert('File must be less than 30 KB.');
+        return;
+      } */
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Only JPG, PNG, or GIF files are allowed.');
+        return;
+      }
+      const dotIndex = file.name.lastIndexOf('.');
+      const baseName = file.name.substring(0, dotIndex);
+      const extension = file.name.substring(dotIndex);
+      const guid = this.guid();
+
+      const newFileName = `${baseName}${extension}|${guid}${extension}`;
+      const newFile = new File([file], newFileName, { type: file.type });
+      extraAttr.selectedValues = newFile;
+      extraAttr.showUploadBtn = true;
+      this.onAnyInputChange();
+    }
+  }
+
+  attachmentsUploader: FileUploader;
+  onUploadFile(file) {
+    this.attachmentsUploader = this.createUploader(
+      '/Attachment/UploadFiles',
+      result => {
+      }
+    );
+
+    const blob = new Blob([file], { type: file.type });
+    const originalName = file.name.split('|')[0];
+    const guid = file.name.split('|')[1].split('.')[0]
+    const newFile = new File([blob], originalName, { type: file.type });
+
+    this.attachmentsUploader.addToQueue([newFile]);
+
+    this.attachmentsUploader.onErrorItem = (item, response, status) => {
+      this.notify.error(this.l("UploadFailed"));
+    };
+    this.attachmentsUploader.onBuildItemForm = (fileItem: any, form: any) => {
+      form.append("guid", guid);
+    };
+
+    this.attachmentsUploader.uploadAll()
+  }
+
+  createUploader(url: string, success?: (result: any) => void): FileUploader {
+    const uploader = new FileUploader({ url: AppConsts.remoteServiceBaseUrl + url });
+
+    uploader.onAfterAddingFile = (file) => {
+      file.withCredentials = false;
+    };
+
+    uploader.onSuccessItem = (item, response, status) => {
+      const ajaxResponse = <IAjaxResponse>JSON.parse(response);
+      if (ajaxResponse?.success) {
+        this.notify.info(this.l('UploadSuccessfully'));
+        if (success) {
+          success(ajaxResponse.result);
+        }
+      } else {
+        this.message.error(ajaxResponse.error.message);
+      }
+    };
+
+    const uploaderOptions: Partial<FileUploaderOptions> = {};
+    uploaderOptions.authToken = 'Bearer ' + this._tokenService.getToken();
+    uploaderOptions.removeAfterUpload = true;
+    uploader.setOptions(uploaderOptions as FileUploaderOptions);
+    return uploader;
+  }
+  getSafeString = (str: string) => str.replace(/\s+/g, '_');
+  extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
+
+  getDropdownOptions(extraAttr: any) {
+    const data = this.extraAttrOptions.get(extraAttr.id);
+    if (!data) return [];
+
+    let items = [...data.items];
+
+    if (items.length > 0 && items.length < data.totalCount) {
+        items.push({ label: 'Load More...', value: null, isLoadMore: true });
+    }
+
+    return items;
+}
   
+  onDropdownClick(extraAttr: any) {
+    const data = this.extraAttrOptions.get(extraAttr.id);
+    if (!data || data.items.length === 0) {
+        this.loadNextItems(extraAttr);
+    }
+}
+
+onLoadMoreClick(event: Event, extraAttr: any) {
+  event.stopPropagation(); 
+  this.loadNextItems(extraAttr);
+}
+  loadNextItems(extraAttr: any) {
+      let data = this.extraAttrOptions.get(extraAttr.id);
+      if (!data) {
+          data = { items: [], totalCount: 0, isLoading: false };
+          this.extraAttrOptions.set(extraAttr.id, data);
+      }
   
+      if (data.isLoading) return;
   
+      const skipCount = data.items.length;
+      const maxResultCount = 10;
+  
+      data.isLoading = true;
+  
+      this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+  }
+  
+  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
+      if (!extraAttr?.validEntries) return;
+  
+      let [serviceName, methodName, resultField] = extraAttr.validEntries.split('|');
+      serviceName += "ServiceProxy";
+  
+      this.dynamicApi.dispatch(serviceName, methodName, {
+          skipCount: skipCount,
+          maxResultCount: maxResultCount
+      }).subscribe(result => {
+          const dropdownItems = result.items.map(item => ({
+              label: this.getByPath(item, resultField.trim()),
+              value: item.account.id
+          }));
+  
+          const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
+          const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
+  
+          this.extraAttrOptions.set(extraAttr.id, {
+              items: combinedItems,
+              totalCount: result.totalCount,
+              isLoading: false
+          });
+      });
+  }
+
+  getByPath(obj: any, path: string) {
+    return path.split('.').reduce((o, p) => o?.[p], obj);
+  }
+
+  getExtraAttr(attributeId: number, nameIncludes: string) {
+    return this.extraAttributeObject.value.extraAttributes
+      .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
+  }
+
+
 }

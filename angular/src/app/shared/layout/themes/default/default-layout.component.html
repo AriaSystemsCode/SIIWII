@@ -18,12 +18,12 @@
     <div class="kt-grid kt-grid--hor kt-grid--root">
         <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
             <!-- BEGIN: Left Aside -->
-            <div [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
+            <div *ngIf="isAuthenticated" [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
                 <div class="text-center">
-                <img *ngIf="!tenantLogo" [src]="defaultLogo" alt="logo" height="38" class="rounded-circle" />
+                <!-- <img *ngIf="!tenantLogo" [src]="defaultLogo" alt="logo" height="38" class="rounded-circle" /> -->
 
        
-                <img *ngIf="tenantLogo" [src]="tenantLogo" alt="logo" (error)="handleFailedImage($event)"  class="logoTanant rounded-circle" />
+                <img  [src]="tenantLogo" alt="logo" (error)="handleFailedImage($event)"  class="logoTanant rounded-circle" />
                 <p *ngIf="!isMinimized" class="tenant">{{accountSummary?.name}}</p>
             </div>
                 <button *ngIf="isMinimized" [ngClass]="isArabic? 'rtl-arr': 'arr'" (click)="toggleSidebar()">
@@ -58,7 +58,6 @@
                           </clipPath>
                         </defs>
                       </svg>
-                      <!-- merge -->
                       <svg *ngIf="item.name == 'My Connections'" (click)="openSub = false  ; openAdSub = false " xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none"   class="svgIcon">
                         <path d="M25.3346 28L29.3346 24M29.3346 24L25.3346 20M29.3346 24H21.3346M20.668 4.38768C22.6225 5.17886 24.0013 7.09508 24.0013 9.33333C24.0013 11.5716 22.6225 13.4878 20.668 14.279M16.0013 20H10.668C8.18295 20 6.94044 20 5.96032 20.406C4.65351 20.9473 3.61525 21.9855 3.07394 23.2924C2.66797 24.2725 2.66797 25.515 2.66797 28M18.0013 9.33333C18.0013 12.2789 15.6135 14.6667 12.668 14.6667C9.72245 14.6667 7.33464 12.2789 7.33464 9.33333C7.33464 6.38781 9.72245 4 12.668 4C15.6135 4 18.0013 6.38781 18.0013 9.33333Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
@@ -317,9 +316,9 @@
               </div>
               
             <!-- END: Left Aside -->
-            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor kt-wrapper" id="kt_wrapper">
+            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="isAuthenticated ?'kt-wrapper':'' " id="kt_wrapper">
                 <!-- BEGIN: Header -->
-                <div class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
+                <div *ngIf="!hideTopbar" class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
 
             
                     <div class="kt-header-menu-wrapper" id="kt_header_menu_wrapper"></div>
@@ -356,7 +355,7 @@
                 </div>
 
 
-                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor rout-c" >
+                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="hideTopbar ? '':'rout-c'">
 
                     <router-outlet></router-outlet>
                 </div>

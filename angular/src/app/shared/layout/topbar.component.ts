@@ -87,11 +87,20 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     transactionType: string = "";
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     currencySymbol: string = "";
-    visible: boolean = false;
-    displaneSel: boolean = false;
-    displaneBuy: boolean = false;
-    currentLang: string
-    isArabic: boolean
+    visible:boolean =false;
+    displaneSel :boolean =false;
+    displaneBuy :boolean =false;
+   
+    searchInput:string
+    bgCol?: string;
+    bgColLoaded = false;
+    tenantLogo:string
+    isAuthenticated: boolean = false;
+    currentLang: string = 'en';
+    isArabic: boolean = false;
+    allowFeeds:string
+    defaultHomeUrl = '/app/main/Home'; // fallback
+   
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -109,11 +118,11 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private updateLogoService: UpdateLogoService,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
         private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
-
+        this.getTenantData()
         this.items = [
             {
                 items: [
@@ -166,11 +175,17 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     ngOnInit() {
+        this.isAuthenticated = !!this.appSession?.user;
+       this.loadDefaultPage()
+        this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        console.log(this.isAuthenticated,'isAuthenticated')
+        console.log(this.isArabic,'isArabic')
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "refreshShoppingInfoInTopbar") {
                 this.getShoppingCartInfo();
@@ -197,29 +212,32 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this.isMultiTenancyEnabled = this._abpMultiTenancyService.isEnabled;
         this.isImpersonatedLogin =
             this._abpSessionService.impersonatorUserId > 0;
-        this.setCurrentLoginInformations();
-        this.getProfilePicture();
-        this.getRecentlyLinkedUsers();
-        this.appSession.user.memberId;
-        this.appSession.user.id;
-        this.registerToEvents();
-        this.getUnreadMessageCount();
-        if (!this.isHost)
-            this.getShoppingCartInfo();
-
-        this.messageReadService.readMessageSubject$.subscribe((res) => {
-            if (res) {
+            if(this.isAuthenticated != undefined) {
+                this.setCurrentLoginInformations();
+                // this.getProfilePicture();
+                this.getRecentlyLinkedUsers();
+                this.appSession.user.memberId;
+                this.appSession.user.id;
+                this.registerToEvents();
                 this.getUnreadMessageCount();
+                if(!this.isHost)
+                  this.getShoppingCartInfo();
+        
+                this.messageReadService.readMessageSubject$.subscribe((res) => {
+                    if (res) {
+                        this.getUnreadMessageCount();
+                    }
+                });
+                this.getBelowBar();
             }
-        });
-        this.getBelowBar();
+       
     }
 
 
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
-            this.getProfilePicture();
+            // this.getProfilePicture();
         });
 
         abp.event.on("app.chat.unreadMessageCountChanged", (messageCount) => {
@@ -500,6 +518,59 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         })
     }
 
+    onSearch(ev?: Event): void {
+        ev?.preventDefault(); // ✅ stop native form submit
+        const q = (this.searchInput ?? '').trim();
+      
+        this.router.navigate(
+          ['/app/main/marketplace/products'],
+          {
+            queryParams: { q: q || null },      // null removes it when empty
+            queryParamsHandling: 'merge',
+            replaceUrl: false
+          }
+        );
+      }
+      
+      getTenantData() {
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208, null)
+        .subscribe((result) => {
+          this.bgCol = result;
+          this.bgColLoaded = true; 
+        });
+    
+      this._AppEntitiesServiceProxy.getHostSettingValue(1204, "file")
+        .subscribe((result) => {
+          this.tenantLogo = result;
+        });
+
+            
+      this._AppEntitiesServiceProxy.getHostSettingValue(1207, null)
+      .subscribe((result) => {
+        this.allowFeeds = result;
+      });
+    }
+
+    loadDefaultPage(): void {
+        this.getTenantData()
+        this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
+          .subscribe({
+            next: (res2: string) => {
+              if (res2 === 'Marketplace' && this.allowFeeds != 'true') {
+                this.defaultHomeUrl = '/app/main/marketplace';
+              } else {
+                this.defaultHomeUrl = '/app/main/Home';
+              }
+            },
+            error: err2 => {
+              console.error('Failed to load host setting 1203', err2);
+              this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
+            }
+          });
+      }
+      onImgErr(evt: Event) {
+        (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
+      }
 }
 
 

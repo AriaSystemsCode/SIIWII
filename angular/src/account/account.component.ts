@@ -2,10 +2,11 @@ import { Component, Injector, OnInit, ViewContainerRef, ViewEncapsulation } from
 import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppUiCustomizationService } from '@shared/common/ui/app-ui-customization.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { LoginService } from './login/login.service';
+import { AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
     templateUrl: './account.component.html',
@@ -36,12 +37,17 @@ export class AccountComponent extends AppComponentBase implements OnInit {
         'session-locked'
     ];
 
+    tenantLogo:any
+    tenantName:string
+    tenantWordLogo:any
+    bgCol:string
     public constructor(
         injector: Injector,
         private _router: Router,
         private _loginService: LoginService,
-        private _uiCustomizationService: AppUiCustomizationService,
-        viewContainerRef: ViewContainerRef
+        viewContainerRef: ViewContainerRef,
+           private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+           private sanitizer: DomSanitizer
     ) {
         super(injector);
 
@@ -68,6 +74,7 @@ export class AccountComponent extends AppComponentBase implements OnInit {
     ngOnInit(): void {
         this._loginService.init();
        // document.body.className = this._uiCustomizationService.getAccountModuleBodyClass();
+       this.getTenantData()
     }
 
     goToHome(): void {
@@ -80,5 +87,28 @@ export class AccountComponent extends AppComponentBase implements OnInit {
 
     private supportsTenancyNameInUrl() {
         return (AppConsts.appBaseUrlFormat && AppConsts.appBaseUrlFormat.indexOf(AppConsts.tenancyNamePlaceHolderInUrl) >= 0);
+    }
+
+    getTenantData() {
+        this._appEntitiesServiceProxy.getHostSettingValue(1204,"file")
+        .subscribe((result) => {
+            const url = this.attachmentBaseUrl + '/' + result;
+            this.tenantWordLogo = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        });
+        this._appEntitiesServiceProxy.getHostSettingValue(1205,null)
+        .subscribe((result) => {
+           this.tenantName = result
+        });
+        this._appEntitiesServiceProxy.getHostSettingValue(1206,"file")
+        .subscribe((result) => {
+            const url = this.attachmentBaseUrl + '/' + result;
+            this.tenantLogo = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+        });
+        this._appEntitiesServiceProxy.getHostSettingValue(1208,null)
+        .subscribe((result) => {
+           this.bgCol = result 
+    
+        });
     }
 }

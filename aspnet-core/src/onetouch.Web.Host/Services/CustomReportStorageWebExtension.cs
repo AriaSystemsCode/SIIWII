@@ -158,7 +158,7 @@ namespace onetouch.Web.Services
                         {
 
                             if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null
-
+                                
                                 || (parameterName.ToUpper() == "ATTACHMENTBASEURL" &&
                                 report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentBaseUrl") != null &&
                                 report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentClientUrl") != null
@@ -174,12 +174,10 @@ namespace onetouch.Web.Services
                                 {
                                     case "ATTACHMENTBASEURL":
                                         var attachmentPath = _appConfiguration[$"Attachment:Path"];
-                                        attachmentPath = attachmentPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+                                        attachmentPath = attachmentPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(),"");
                                         attachmentPath = attachmentPath.Replace(@"\", @"/");
 
-                                        if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentClientUrl") != null)
-                                        { report.Parameters["attachmentClientUrl"].Value = attachmentPath; }
-
+                                        report.Parameters["attachmentClientUrl"].Value = attachmentPath;
                                         report.Parameters["attachmentBaseUrl"].Value = parameters.Get("attachmentBaseUrl");
                                         break;
 

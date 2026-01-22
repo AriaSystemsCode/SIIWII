@@ -17,6 +17,7 @@ export class ReactionsActionComponent extends AppComponentBase {
     defaultReactionType : Reactions = Reactions.Like
     Reactions = Reactions
 
+    isAuthenticated = this.appSession?.user
 
     constructor(
         private injector:Injector,

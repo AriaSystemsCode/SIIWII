@@ -1,0 +1,68 @@
+<div class="modal-content-wrapper" *ngIf="active">
+    <div class="modal-header">
+        <h4 class="modal-title">
+            <span>{{ entityObjectDisplayName | localize }} </span>
+            <p class="desc-menu-item">
+                {{ l("SelectFromTheBelow") }} {{ " " }}
+                {{ l(entityObjectDisplayName) }}
+            </p>
+        </h4>
+        <button style="position: absolute;  top: 8px;width: 80px;" [ngClass]="isArabic ? 'icon-ar':'icon-en'" type="button" class="close" (click)="close()"
+            aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body p-0 mr-2">
+        <p class="title-tree ml-3">
+            {{ entityObjectDisplayName | localize }}
+        </p>
+        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded">
+            <span class="mr-3">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" name="search" id="search" placeholder="Search" (input)="onFilter()"
+                [(ngModel)]="searchQuery" class="form-control bg-white border-0" />
+        </div>
+        <p-tree styleClass="p-tree-with-actions" [value]="displayedRecords" selectionMode="checkbox" [filter]="false"
+            [(selection)]="selectedRecords" [loading]="loading" (onNodeExpand)="loadRelatedItemNode($event)"
+            (onNodeSelect)="nodeSelect($event)">
+            <ng-template let-node let-i="index" pTemplate="default">
+                <div class="d-flex align-items-center p-2 border-bottom w-100">
+                    <img 
+                    [src]="attachmentBaseUrl + '/' + node.data.sycEntityObjectCategory?.appItemImageUrl" alt="product" class="rounded mr-3"
+                    style="width:40px; height:40px; object-fit:cover;"
+                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"/>
+
+                    <div>
+                        <div class="font-weight-bold text-primary">
+                            {{ node.label }}
+                        </div>
+                        <div class="text-muted">
+                            {{ node.data?.sycEntityObjectCategory?.name }}
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-tree>
+        <div>
+            <button class="btn btn-font-hover-brand ml-3" (click)="showMoreListData()" *ngIf="showMoreListDataButton">
+                {{ "showmore" | localize }} ...
+            </button>
+        </div>
+    </div>
+    <div class="modal-footer d-fex align-items-center justify-content-between">
+        <div>
+            <button type="button" class="btn btn-default btn-gray" (click)="close()" style="border-radius: 5px;
+                background-color: white !important;
+                border: white !important;color: #4A0D4A !important;">
+                {{ l("Cancel") }}
+            </button>
+            <button type="submit" [disabled]="!selectedRecords?.length" (click)="submitSelection()"
+                class="btn btn-primary blue btn-blue" style="border-radius: 5px;
+                background-color: #4A0D4A !important;
+                border: #4A0D4A !important;color: white;">
+                <span>{{ l("Add") }}</span>
+            </button>
+        </div>
+    </div>
+</div>

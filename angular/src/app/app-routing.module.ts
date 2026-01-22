@@ -11,14 +11,15 @@ import { NgxSpinnerService } from 'ngx-spinner';
             {
                 path: 'app',
                 component: AppComponent,
-                canActivate: [AppRouteGuard],
-                canActivateChild: [AppRouteGuard],
+                // canActivate: [AppRouteGuard],
+                // canActivateChild: [AppRouteGuard],
                 children: [
                     {
                         path: '',
                         children: [
+                            { path: '', redirectTo: '/app/main/home', pathMatch: 'full' },
                             { path: 'notifications', component: NotificationsComponent },
-                            { path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' }
+
                         ]
                     },
                     {
@@ -27,16 +28,6 @@ import { NgxSpinnerService } from 'ngx-spinner';
                         data: { preload: true }
                     },
 
-                    // {
-                    //     path: 'systemObjects',
-                    //     loadChildren: () => import('app/main/systemObjects/systemObjects.module').then(m => m.SystemObjectsModule),
-                    //     data: { preload: true }
-                    // },
-                    // {
-                    //     path: 'accounts',
-                    //     loadChildren: () => import('app/main/accounts/generalAccount.module').then(m => m.GeneralAccountModule),
-                    //     data: { preload: true }
-                    // },
                     {
                         path: 'admin',
                         loadChildren: () => import('app/admin/admin.module').then(m => m.AdminModule), //Lazy load admin module

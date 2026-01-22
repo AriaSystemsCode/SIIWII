@@ -216,7 +216,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
 
     getCurrenciesList(componentRef: { onListLoadCallback: Function }) {
         const subs = this._appEntitiesServiceProxy.getAllCurrencyForTableDropdownWithPaging(
-            this.currencyFilter,           
+            this.currencyFilter,           undefined,
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             undefined,
             this.sortBy,
@@ -231,7 +231,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
 
     getCountriesList(componentRef: { onListLoadCallback: Function }) {
         const subs = this._appEntitiesServiceProxy.getAllCountryForTableDropdowWithPaging(
-            this.countryFilter,   // ✅ now uses the live query
+            this.countryFilter,   undefined,
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             undefined,
             this.sortBy,
@@ -250,6 +250,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             undefined,
             undefined,
             undefined,
+            false,
             undefined,
             undefined,
             undefined,
@@ -271,6 +272,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             undefined,
             undefined,
             undefined,
+            // false,
             undefined,
             undefined,
             undefined,

@@ -23,6 +23,8 @@ namespace onetouch.AppEntities.Dtos
 
         public long? RelatedEntityId { get; set; }
 
+        public IList<long>? RelatedEntitiesIds { get; set; }
+
         public long EntityObjectTypeId { get; set; }
         public string EntityObjectTypeCode { get; set; }
 
@@ -38,6 +40,7 @@ namespace onetouch.AppEntities.Dtos
         public virtual IList<AppEntityAttachmentDto> EntityAttachments { get; set; }
 
         public IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
+        public IList<int> ExtraDataFileTypeIndex { get; set; }
 
         public virtual IList<AppEntitiesRelationshipDto> EntitiesRelationships { get; set; }
 

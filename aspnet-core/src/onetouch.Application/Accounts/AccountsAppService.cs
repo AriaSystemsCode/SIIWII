@@ -1290,6 +1290,7 @@ namespace onetouch.Accounts
             return bReturn;
         }
 
+        [AbpAllowAnonymous]
         public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
         {
             await CreateAdminContact();

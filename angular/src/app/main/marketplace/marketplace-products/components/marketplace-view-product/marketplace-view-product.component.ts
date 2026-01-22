@@ -1,5 +1,5 @@
 import { Component, Injector, OnDestroy, OnInit} from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 import { animate, style, transition, trigger } from "@node_modules/@angular/animations";
 import { AppConsts } from "@shared/AppConsts";
@@ -16,6 +16,7 @@ import {
     MarketplaceExtraDataAttrDto,
     MessageServiceProxy,
     OverAllRatingDto,
+    SharingLevels,
     ShoppingCartSummary,
     TransactionType,
 } from "@shared/service-proxies/service-proxies";
@@ -87,7 +88,9 @@ export class MarketplaceViewProductComponent
     languageSettingName  =AppConsts.languageSettingName;
     IsConnected : boolean = false
     overRating: OverAllRatingDto
-    
+    isAuthenticated = this.appSession?.user
+    relatedItems:any
+    Warningmessage:string
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -97,6 +100,7 @@ export class MarketplaceViewProductComponent
         private AccountsServiceProxy: AccountsServiceProxy,
         private appItemsAppservice: AppItemsServiceProxy,
          private messageServiceProxy: MessageServiceProxy,
+         private route: ActivatedRoute,  
         injector: Injector
     ) {
         super(injector);
@@ -104,23 +108,41 @@ export class MarketplaceViewProductComponent
         this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.priceLevel = localStorage.getItem("tempPriceLevel");
-        this.getProductDetailsForView();
+        // this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
+       
     }
     ngOnInit(): void {
-        this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
+   
+        this.route.paramMap.subscribe(params => {
+          const idParam = params.get('id');          // adjust if your route param name is different
+          const id = idParam ? +idParam : null;
+      
+          // Reset local state for new product
+          this.resetProductViewState();
+      
+          // Ensure productBodyData exists
+          if (!this.productBodyData) {
+            this.productBodyData = {};
+          }
+          this.productBodyData.id = id;              // use route id as main source
+      
+          // Load details + related products
+          this.getProductDetailsForView();
+        });
+      
+        // Your existing screen-size logic can stay:
         const screenWidth = window.innerWidth;
-        if (screenWidth >= 992) { // lg screen
-            this.handleSCreenSelect = 5
-        } else if (screenWidth >= 768) { // md screen
-            this.handleSCreenSelect = 3
-
+        if (screenWidth >= 992) {
+          this.handleSCreenSelect = 5;
+        } else if (screenWidth >= 768) {
+          this.handleSCreenSelect = 3;
         }
-
+      
         this.filteredColors = this.colorsData;
-
         // this.IsVariationOrdered()
-    }
+      }
+      
     onFilterTextChanged() {
         this.showIconClose = this.filterText.trim() !== '';
     
@@ -168,102 +190,116 @@ export class MarketplaceViewProductComponent
             this.setSizes(this.currentIndex);
             this.scrollIntoView();
           }
-    getProductDetailsForView() {
-        this.showMainSpinner();
-        this.showEditSpecialPrice = true;
-        this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
-            .subscribe((res: ShoppingCartSummary) => {
-                if (res?.orderType == TransactionType.SalesOrder)
-                    this.orderType = 'SO';
-                else if (res?.orderType == TransactionType.PurchaseOrder)
-                    this.orderType = 'PO';
-
-                if (res?.buyerSSIN)
-                    this.productBodyData.buyerSSIN = res?.buyerSSIN;
-                if (res?.sellerSSIN)
-                    this.productBodyData.sellerSSIN = res?.sellerSSIN;
-
-                if (res?.currencyCode)
-                    this.productBodyData.currencyCode = res?.currencyCode;
-              
-                this._AppMarketplaceItemsServiceProxy
-                    .getMarketplaceAppItemForView(
-                        undefined,
-                        0,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        this.productBodyData.currencyCode,
-                        this.productBodyData.buyerSSIN,
-                        this.productBodyData.sellerSSIN,
-                        this.priceLevel,
-                        this.productBodyData.id,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        0,
-                        10
-                    )
-                    .pipe(
-                        finalize(() => {
-                            this.getOverAllRatings()
-                            this.hideMainSpinner();
-                        })
-                    )
-                    .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
-                        this.productDetails = res?.appItem;
-                        this.productData = res;
-                        this.productDetails.maxSpecialPrice = this.productDetails?.maxSpecialPrice ? this.productDetails?.maxSpecialPrice : 0;
-                        this.updatedSpecialPrice = this.productDetails?.maxSpecialPrice;
-                        this.productDetails?.minMSRP % 1 == 0 ? this.productDetails.minMSRP = Math.round(this.productDetails?.minMSRP * 100 / 100).toFixed(2) : null;
-                        this.productDetails?.maxMSRP % 1 == 0 ? this.productDetails.maxMSRP = Math.round(this.productDetails?.maxMSRP * 100 / 100).toFixed(2) : null;
-                        this.productImages = res?.appItem?.entityAttachments;
-                        this.productVarImages = res?.appItem?.variations;
-                        let colorVariation: any[] = res?.appItem?.variations?.filter(
-                            (variation: any) => variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName
-                        );
-                        let selectedValues = [
-                            ...colorVariation.map(
-                                (selected: any) => selected?.selectedValues
-                            ),
-                        ];
-
-                        this.colorsData = selectedValues[0]?.map((variation: any) => {
-                            let sizesValue = variation?.edRestAttributes?.map(
-                                (attr: any) => {
-                                    if (attr?.extraAttrName === "SIZE") {
-                                        return [...attr.values];
-                                    }
-                                }
-                            );
-                            return {
-                                colorName: variation?.value,
-                                sizes: sizesValue[0],
-                                colorImg: variation?.colorImage,
-                                colorCode: variation?.colorHexaCode,
-                                colorCodeSelectedValues: variation?.code
-                            };
-                        });
-                        this.filteredColors = this.colorsData
-                        this.chk_Order_by_prepack = [];
-                        this.chk_Order_by_prepack = new Array(this.colorsData?.length).fill(true);
-                    });
-
-
-
+          getProductDetailsForView() {
+            this.showMainSpinner();
+            this.showEditSpecialPrice = true;
+                    
+            const handleItemDetails = (res: GetAppMarketplaceItemDetailForViewDto) => {
+              this.productDetails = res?.appItem;
+              this.productData = res;
+          this.getSettingData()
+              this.productDetails.maxSpecialPrice = this.productDetails?.maxSpecialPrice ?? 0;
+              this.updatedSpecialPrice = this.productDetails.maxSpecialPrice;
+          
+              // keep your formatting logic
+              this.productDetails?.minMSRP % 1 == 0
+                ? (this.productDetails.minMSRP = Math.round((this.productDetails?.minMSRP * 100) / 100).toFixed(2) as any)
+                : null;
+          
+              this.productDetails?.maxMSRP % 1 == 0
+                ? (this.productDetails.maxMSRP = Math.round((this.productDetails?.maxMSRP * 100) / 100).toFixed(2) as any)
+                : null;
+          
+              this.productImages = res?.appItem?.entityAttachments;
+              this.productVarImages = res?.appItem?.variations;
+          
+              const colorVariation: any[] = res?.appItem?.variations?.filter(
+                (v: any) => v.extraAttrName === this.productDetails?.variations?.[0]?.extraAttrName
+              );
+          
+              const selectedValues = [...(colorVariation?.map((s: any) => s?.selectedValues) ?? [])];
+          
+              this.colorsData = selectedValues?.[0]?.map((variation: any) => {
+                const sizesValue = variation?.edRestAttributes?.map((attr: any) => {
+                  if (attr?.extraAttrName === 'SIZE') return [...attr.values];
+                });
+                return {
+                  colorName: variation?.value,
+                  sizes: sizesValue?.[0],
+                  colorImg: variation?.colorImage,
+                  colorCode: variation?.colorHexaCode,
+                  colorCodeSelectedValues: variation?.code,
+                };
+              });
+          
+              this.filteredColors = this.colorsData;
+              this.chk_Order_by_prepack = new Array(this.colorsData?.length || 0).fill(true);
+            };
+          
+            const fetchDetails = () => {
+              this._AppMarketplaceItemsServiceProxy
+                .getMarketplaceAppItemForView(
+                  undefined,
+                  0,
+                  undefined,
+                  undefined,
+                  undefined,
+                  0,
+                  10,
+                  this.productBodyData.currencyCode,
+                  this.productBodyData.buyerSSIN,
+                  this.productBodyData.sellerSSIN,
+                  this.priceLevel,
+                  this.productBodyData.id,
+                  undefined,
+                  0,
+                  10,
+                  undefined,
+                  0,
+                  10,
+                  undefined,
+                  0,
+                  10,
+                  undefined,
+                  0,
+                  10,
+                  undefined,
+                  undefined,
+                  0,
+                  10
+                )
+                .pipe(
+                  finalize(() => {
+                    this.getOverAllRatings();
+                    this.getRelatedProducts(true)
+                    this.hideMainSpinner();
+                  
+                  })
+                )
+                .subscribe(handleItemDetails);
+            };
+          
+            if (this.isAuthenticated) {
+              // Fetch current active transaction first
+              this._AppTransactionServiceProxy.getCurrentUserActiveTransaction().subscribe((res: ShoppingCartSummary) => {
+                
+                if (res?.orderType == TransactionType.SalesOrder) this.orderType = 'SO';
+                else if (res?.orderType == TransactionType.PurchaseOrder) this.orderType = 'PO';
+          
+                if (res?.buyerSSIN) this.productBodyData.buyerSSIN = res.buyerSSIN;
+                if (res?.sellerSSIN) this.productBodyData.sellerSSIN = res.sellerSSIN;
+                if (res?.currencyCode) this.productBodyData.currencyCode = res.currencyCode;
+             
+                fetchDetails();
                 this.GetCurrencyInfo();
+              });
+            } else {
+              // Not authenticated: skip active-transaction call
+              fetchDetails();
+            //   this.GetCurrencyInfo();
             }
-            );
-    }
+          }
+          
 
     GetCurrencyInfo() {
         this._AppEntitiesServiceProxy.getCurrencyInfo(this.productBodyData?.currencyCode)
@@ -280,7 +316,8 @@ export class MarketplaceViewProductComponent
         // this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
         let originalIndex = this.colorsData.findIndex(color => color?.colorCodeSelectedValues?.toLowerCase()?.trim() === this.filteredColors[index].colorCodeSelectedValues?.toLowerCase()?.trim());
         this.colorAttachmentForMainIamge = this.filteredColors[index]?.colorImg
-        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments
+        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments ?   this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments : 
+                                  [  this.productData?.appItem?.entityAttachments?.find(x=>x.isDefault) ]; 
     }
     setColorView(value: boolean) {
         this.isColorView = value
@@ -703,7 +740,7 @@ export class MarketplaceViewProductComponent
                             .pipe(finalize(() => {
                                 Swal.fire({
                                     title: "",
-                                    text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                                    text: `Quantities have been added to the cart and purchase order # ${this.orderNo} has been created?`,
                                     icon: "info",
                                     showCancelButton: true,
                                     confirmButtonText:
@@ -969,7 +1006,126 @@ handleRefreshRating(event: boolean) {
   }
 }
 
+
+hasColorStock(color: any): boolean {
+    if (!color || !color.sizes || !color.sizes.length) {
+      return false;
+    }
+  
+ 
+    return color.sizes.some((s: any) =>
+      (s.stockAvailability ?? 0) > 0 || (s.noOfAvailablePrepacks ?? 0) > 0
+    );
+  }
+  
+
+relatedTotal = 0;                 // from API totalCount
+pageSize = 11;
+loadingMore = false;
+
+
+
+getRelatedProducts(initial = false) {
+    const skipCount = initial ? 0 : this.relatedItems.length;
+    const maxResultCount = this.pageSize;
+  
+    this.loadingMore = true;
+  
+    this._AppMarketplaceItemsServiceProxy
+      .getAppItemRelatedItems(
+        /* contactSSIN */ undefined,
+        /* accountSSIN */ undefined,
+        /* tenantId */ null,
+        /* appItemListId */ null,
+        /* selectorOnly */ null,
+        /* filter */ null,
+        /* lastKey */ null,
+        /* selectorKey */ null,
+        /* arrtibuteFilters */ null,
+        /* departmentFilters */ null,
+        /* minimumPrice */ null,
+        /* maximumPrice */ null,
+        /* sharingLevel */ SharingLevels.Public,
+        /* onlyAvailableStock */ undefined,
+        /* soldOutFromDate */ undefined,
+        /* soldOutToDate */ undefined,
+        /* startShipFromDate */ undefined,
+        /* startShipToDate */ undefined,
+        /* brands */ null,
+        /* currencyCode */ this.productBodyData?.currencyCode ?? null,
+        /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
+        /* categoryFilters */ null,
+        /* sorting */ null,
+        /* skipCount */ skipCount,
+        /* maxResultCount */ maxResultCount
+      )
+      .pipe(finalize(() => (this.loadingMore = false)))
+      .subscribe(res => {
+        this.relatedTotal = res?.totalCount ?? this.relatedTotal;
+        const next = res?.items ?? [];
+  
+        // accumulate pages in order
+        this.relatedItems = initial ? next : [...this.relatedItems, ...next];
+      });
+  }
+  
+get relatedItemsUi(): any[] {
+    const loaded = this.relatedItems || [];
+    const hasMore = loaded.length < (this.relatedTotal || 0);
+  
+    if (!hasMore) {
+      // all items loaded; no ghost needed
+      return loaded;
+    }
+  
+    // add one full ghost page
+    const ghostPage = Array.from({ length: this.pageSize }, () => ({ __ghost: true }));
+    return [...loaded, ...ghostPage];
+  }
+  
+
+  onRelatedPage(e: { first: number; rows: number }) {
+    const startIndex = e.first;
+    const pageSize   = e.rows;          // == this.pageSize
+    const ui         = this.relatedItemsUi;
+    const current    = ui[startIndex];
+    const hasMore    = this.relatedItems.length < this.relatedTotal;
+  
+    // If current page starts with a ghost, load the next page
+    if (current?.__ghost && hasMore && !this.loadingMore) {
+      this.getRelatedProducts(false);
+    }
+  }
+  
+  private resetProductViewState(): void {
+    this.productDetails = null;
+    this.productImages = [];
+    this.productVarImages = [];
+    this.colorsData = [];
+    this.filteredColors = [];
+    this.orderSummary = [];
+    this.totalOrderQTY = 0;
+    this.totlaOrderPrices = 0;
+    this.currentIndex = 0;
+    this.isColorView = false;
+  
+    // related products reset
+    this.relatedItems = [];
+    this.relatedTotal = 0;
+  }
+  
+  openRelatedProduct(id: number) {
+    this.router.navigate(['/app/main/marketplace/products/view', id]);
+  }
+  getSettingData(){
     
+    this._AppEntitiesServiceProxy.getHostSettingValue(1218, null).subscribe({
+        next: (res) => {
+            this.Warningmessage = res
+        },
+     
+      });
+  }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
