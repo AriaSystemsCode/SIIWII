@@ -1907,8 +1907,17 @@ namespace onetouch.Accounts
                             var tenantObj = await TenantManager.GetByIdAsync(int.Parse(originalContact.TenantOwner.ToString()));
                             if (tenantObj != null)
                             {
-                                string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", originalContact.TenantOwner);
-                                createOrEditAccountInfoDto.Code =  "M" + sequance;//tenantObj.TenancyName.Trim() 
+                                if (originalPublishContactFortCurrTenant.EntityObjectTypeCode == "BUSINESS")
+                                {
+                                    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", originalContact.TenantOwner);
+                                    createOrEditAccountInfoDto.Code = "M" + sequance;//tenantObj.TenancyName.Trim() 
+                                    createOrEditAccountInfoDto.ContactRecordType = "M";
+                                }
+                                else {
+                                    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("PERSONAL", originalContact.TenantOwner);
+                                    createOrEditAccountInfoDto.Code = "C" + sequance;//tenantObj.TenancyName.Trim() 
+                                    createOrEditAccountInfoDto.ContactRecordType = "C";
+                                }
                             }
                             createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
                             //createOrEditAccountInfoDto.PartnerId = originalPublishContactFortCurrTenant.Id;
@@ -1929,7 +1938,7 @@ namespace onetouch.Accounts
                                 }
                             }
                             //if (originalPublishContactFortCurrTenant.EntityObjectTypeId == presonEntityObjectTypeId)
-                            createOrEditAccountInfoDto.ContactRecordType = "C";
+                            
                             saveAccountDest = await CreateOrEditAccount(createOrEditAccountInfoDto);
                             var accountSaved = saveAccountDest;
                             if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
@@ -2011,8 +2020,17 @@ namespace onetouch.Accounts
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenantObj != null)
                         {
-                            string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", tenantId);
-                            createOrEditAccountInfoDto.Code =  "M" + sequance;//tenantObj.TenancyName.Trim() +
+                            if (originalContact.EntityObjectTypeCode == "BUSINESS")
+                            {
+                                string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", tenantId);
+                                createOrEditAccountInfoDto.Code = "M" + sequance;//tenantObj.TenancyName.Trim() +
+                                createOrEditAccountInfoDto.ContactRecordType = "M";
+                            }
+                            else {
+                                string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("PERSONAL", tenantId);
+                                createOrEditAccountInfoDto.Code = "C" + sequance;//tenantObj.TenancyName.Trim() +
+                                createOrEditAccountInfoDto.ContactRecordType = "C";
+                            }
                         }
                         createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
                         //createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Connected;
@@ -2038,7 +2056,7 @@ namespace onetouch.Accounts
                             if(accountMainObject!=null)
                                 createOrEditAccountInfoDto.AccountId = accountMainObject.Id;
                         }
-                        createOrEditAccountInfoDto.ContactRecordType = "C";
+                        
                         savedAccountSrc = await CreateOrEditAccount(createOrEditAccountInfoDto);
                         var accountSaved = savedAccountSrc;
                         if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
@@ -6998,7 +7016,7 @@ namespace onetouch.Accounts
             accountDto.ContactRecordType = "C";
             var output = await CreateOrEditAccount(accountDto);
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
-            if (accountDto.EntityAttachments.Count > 0)
+            if (accountDto.EntityAttachments != null && accountDto.EntityAttachments.Count > 0)
             {
                 var userId = accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null ||
                     accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null ||
@@ -7093,8 +7111,30 @@ namespace onetouch.Accounts
                     }
                 }
             }
-            
+            if (accountDto.EntityExtraData != null && accountDto.EntityExtraData.Count > 0)
+            {
+                var userObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                if (userObj != null && !string.IsNullOrEmpty(userObj.AttributeValue) && int.Parse(userObj.AttributeValue)>0)
+                {
+                    string firstName = "";
+                    string lastName = "";
+                    var userFirstNameObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 701).FirstOrDefault();
+                    if (userFirstNameObj != null)
+                        firstName = userFirstNameObj.AttributeValue;
+                    var userLastNameObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 702).FirstOrDefault();
+                    if (userLastNameObj != null)
+                        lastName = userLastNameObj.AttributeValue;
+                    var user = await UserManager.FindByIdAsync(userObj.AttributeValue);
+                    if (user != null)
+                    {
+                        user.Surname = lastName;
+                        user.Name = firstName;
+                        await UserManager.UpdateAsync(user);
+                    }
+                }            
+            }            
             return returnObject;
+
             
         }
         //public async Task<bool> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN,bool? disconnect)
