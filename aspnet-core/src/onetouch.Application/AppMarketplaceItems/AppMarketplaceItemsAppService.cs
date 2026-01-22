@@ -576,7 +576,7 @@ namespace onetouch.AppMarketplaceItems
                         {
                             //I49[End]
                             appItem = await _appMarketplaceItem.GetAll()
-                           .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                           .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.Code=="" && x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
                            .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
                            .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
                            .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -593,7 +593,7 @@ namespace onetouch.AppMarketplaceItems
                         else
                         {
                           appItem = await _appMarketplaceItem.GetAll()
-                         .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                         .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.Code == "" && x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
                          .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
                          .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
                          .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -607,7 +607,7 @@ namespace onetouch.AppMarketplaceItems
                         }
 
                         var varAppItems = await _appMarketplaceItem.GetAll()
-                            .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                            .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.Code == "" && x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                         .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                         .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
@@ -730,7 +730,45 @@ namespace onetouch.AppMarketplaceItems
 
                                     }
                                 }
+                                //I49[Start]
+                                if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                {
+                                    var buyerPrice = appItem.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == currencyCode &&
+                                    x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                    if (buyerPrice != null)
+                                    {
+                                        output.AppItem.MinSpecialPrice = buyerPrice.Price;
+                                        output.AppItem.MaxSpecialPrice = buyerPrice.Price;
+                                    }
+                                    else
+                                    {
+                                        var buyerPriceObjUsd = appItem.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == "USD" &&
+                                            x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                        if (buyerPriceObjUsd != null)
+                                        {
+                                            output.AppItem.MinSpecialPrice = buyerPriceObjUsd.Price * exchangeRate;
+                                            output.AppItem.MaxSpecialPrice = buyerPriceObjUsd.Price * exchangeRate;
+                                        }
+                                        else
+                                        {
+                                            var buyerObjDef = appItem.ItemPricesFkList.Where(x => x.Code == "" && x.IsDefault &&
+                                            x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                            if (buyerObjDef != null)
+                                            {
+                                                decimal exchangeRateDef = 1;
+                                                if (buyerObjDef.CurrencyCode != null)
+                                                {
+                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", buyerObjDef.CurrencyCode);
+                                                    output.AppItem.MinSpecialPrice = buyerObjDef.Price * exchangeRateDef;
+                                                    output.AppItem.MaxSpecialPrice = buyerObjDef.Price * exchangeRateDef;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                //I49[End]
                             }
+
                             if (output.AppItem.MinMSRP != null)
                                 mainItemLevelPrice = decimal.Parse(output.AppItem.MinMSRP.ToString());
 
@@ -808,6 +846,46 @@ namespace onetouch.AppMarketplaceItems
 
                                         }
                                     }
+                                    //I49[Start]
+                                    if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                    {
+                                        var buyerPrice = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == currencyCode &&
+                                        x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                        if (buyerPrice != null && buyerPrice.Price>0)
+                                        {
+                                            output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > buyerPrice.Price ? buyerPrice.Price: output.AppItem.MinSpecialPrice;
+                                            output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > buyerPrice.Price? output.AppItem.MaxSpecialPrice : buyerPrice.Price;
+                                        }
+                                        else
+                                        {
+                                            var buyerPriceObjUsd = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == "USD" &&
+                                                x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                            if (buyerPriceObjUsd != null && buyerPriceObjUsd.Price > 0)
+                                            {
+                                                var pirceValue = buyerPriceObjUsd.Price * exchangeRate;
+                                                output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > pirceValue ? pirceValue : output.AppItem.MinSpecialPrice;
+                                                output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > pirceValue ? output.AppItem.MaxSpecialPrice : pirceValue;
+                                            }
+                                            else
+                                            {
+                                                var buyerObjDef = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.IsDefault &&
+                                                x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                                if (buyerObjDef != null && buyerObjDef.Price>0)
+                                                {
+                                                    decimal exchangeRateDef = 1;
+                                                    if (buyerObjDef.CurrencyCode != null)
+                                                    {
+                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", buyerObjDef.CurrencyCode);
+                                                        var pirceValue = buyerObjDef.Price * exchangeRateDef;
+                                                        output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > pirceValue ? pirceValue : output.AppItem.MinSpecialPrice;
+                                                        output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > pirceValue ? output.AppItem.MaxSpecialPrice : pirceValue;
+                                                        
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //I49[End]
                                 }
                             }
                             //MMT

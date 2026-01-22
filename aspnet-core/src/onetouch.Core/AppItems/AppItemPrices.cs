@@ -32,5 +32,6 @@ namespace onetouch.AppItems
         [ForeignKey("AppItemId")]
         public virtual AppItem AppItemFk { get; set; }
         public virtual bool IsDefault { set; get; }
+        public virtual string BuyerSSIN { get; set; }
     }
 }
