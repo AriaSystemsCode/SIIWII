@@ -164,10 +164,10 @@
                                             *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
                                             style="color: #F88011;"></i>
                                         <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
-                                            {{l("MyBranches/Addresses")}}
+                                            {{ accountDataForView?.accountTypeId != 21 ? l("MyBranches/Addresses") : l("My Addresses") }}
                                         </span>
                                         <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
-                                            {{l("AccountBranches/Addresses")}}
+                                            {{ accountDataForView?.accountTypeId != 21 ? l("MyBranches/Addresses") : l("My Addresses") }}
                                         </span>
                                     </a>
                                 </li>
@@ -817,7 +817,7 @@
                         </div>
                         <div class="tab2" *ngIf="currentTab == accountInfoPageTabsEnum.Branches ">
                             <app-branches [branches]='accountDataForView.branches' [accountId]='accountId'
-                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode"></app-branches>
+                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode"  [accountData]="accountDataForView" ></app-branches>
                         </div>
                         <div class="tab3" *ngIf="currentTab == accountInfoPageTabsEnum.Payments">
                             <app-payment-methods-list [accountId]='accountId'

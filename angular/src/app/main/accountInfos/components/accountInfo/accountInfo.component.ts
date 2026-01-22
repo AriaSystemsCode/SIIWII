@@ -915,8 +915,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
             this.updateLogoService.updateLogo();
-            this.getAccountDataForView()
-          this.saving = false;          // ✅ flags only
+         
+          this.saving = false;          
         }))
         .subscribe(result => {
           if (!result) return;

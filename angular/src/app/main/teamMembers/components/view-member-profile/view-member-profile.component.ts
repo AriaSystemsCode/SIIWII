@@ -626,7 +626,14 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.memberIslink = true;
         this.hideMainSpinner();
       }))
-      .subscribe();
+      .subscribe({
+        next: () => {
+       
+          this.refresh(true);
+  
+        },
+        
+      });
   }
   private getAttributeStringFromDto(
     dto: CreateOrEditAccountInfoDto | undefined,

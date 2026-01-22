@@ -6,7 +6,7 @@
                     <div class="kt-portlet__body">
                         <div class="row">
                             <div class="col-12 list-toolbar pb-md-4">
-                                <div class="row mb-3 justify-content-between mt-3">
+                                <div class="row mb-3 justify-content-between mt-3 px-md-0 px-3">
                                     <div class="col-6 col-md-3 col-sm-3 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                             *ngIf="showMainFiltersOptions">
@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
-                                    <div class="mb-lg-4 mb-0 text-center mt-lg-0 mt-3">
+                                    <div class="mb-lg-4 mb-0 text-center ">
                                         <a class="btn   toolbar-btn btn_Primary SendMail"
                                
                                             (click)="showSendMail()">
@@ -115,7 +115,7 @@
                                     </div>
                                     <div class=""></div>
 
-                                    <div class="text-center d-flex mt-lg-0 mt-3" style="height: 40px; width: 160px;">
+                                    <div class="text-center d-flex mt-lg-0 mt-3" style="height: 40px;">
 
                                         <button
                                       
@@ -161,9 +161,9 @@
                             <div *ngIf=" filterVisiblelg"   class="d-md-block d-none col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
                                 <app-accounts-list-filters [filterForm]="filterForm" [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
                             </div> 
-                            <div class="col-12  " [ngClass]="filterVisiblelg ? 'col-lg-9 col-md-7':'col-lg-12 col-md-12'">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
+                            <div class="col-12  px-0" [ngClass]="filterVisiblelg ? 'col-lg-9 col-md-7':'col-lg-12 col-md-12'">
+                                <div class="d-flex justify-content-between align-items-center mb-4 px-md-0 px-3">
+                                    <div class="list-toolbar-data-summary pl-lg-5 pl-md-3" *ngIf="active">
                                         {{
                                         paginator.getPage() *
                                         primengTableHelper.defaultRecordsCountPerPage
@@ -230,9 +230,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col d-flex flex-column justify-content-between">
+                                <div class="col d-flex flex-column justify-content-between px-0">
                              
-                                    <div class="row  pl-5 pr-2">
+                                    <div class="pl-lg-5 pl-md-3 row">
                                         <div *ngFor="
                                                 let account of accounts;
                                                 index as i;
