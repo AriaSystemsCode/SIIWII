@@ -180,8 +180,6 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
-        console.log(this.isAuthenticated,'isAuthenticated')
-        console.log(this.isArabic,'isArabic')
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
@@ -260,11 +258,11 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     fullName: string = "";
     setCurrentLoginInformations(): void {
         this.shownLoginName = this.appSession.getShownLoginName();
-        this.tenancyName = this.appSession.tenancyName;
-        this.userName = this.appSession.user.userName;
-        this.name = this.appSession.user.name;
+        this.tenancyName = this.appSession?.tenancyName;
+        this.userName = this.appSession?.user?.userName;
+        this.name = this.appSession?.user?.name;
         this.fullName =
-            this.appSession.user.name + ' ' + this.appSession.user.surname;
+            this.appSession?.user?.name + ' ' + this.appSession?.user?.surname;
         console.log(">>", this.appSession.user);
     }
     closeModal(value: boolean) {
