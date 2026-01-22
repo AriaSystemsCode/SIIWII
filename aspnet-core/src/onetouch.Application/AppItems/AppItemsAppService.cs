@@ -5817,6 +5817,12 @@ namespace onetouch.AppItems
                         //record.RecordType = "Account Code: " + dto.SSIN;
                         record.RecordType = "Price";
 
+                        record.ExcelDto.Code = "Item";
+                        record.ExcelDto.RecordType = "Price";
+                        record.ExcelDto.ProductDescription = "-";
+                        record.ExcelDto.ProductType = "-";
+                        record.ExcelDto.Code = "-";
+                        record.ExcelDto.Code = "-";
                         record.ExcelDto = new AppItemExcelDto
                         {
                             Code = dto.Code,
