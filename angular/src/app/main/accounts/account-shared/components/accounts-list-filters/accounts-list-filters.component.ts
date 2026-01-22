@@ -272,7 +272,7 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             undefined,
             undefined,
             undefined,
-            // false,
+            false,
             undefined,
             undefined,
             undefined,
