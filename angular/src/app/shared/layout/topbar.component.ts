@@ -214,8 +214,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
                 this.setCurrentLoginInformations();
                 // this.getProfilePicture();
                 this.getRecentlyLinkedUsers();
-                this.appSession.user.memberId;
-                this.appSession.user.id;
+                this.appSession?.user?.memberId;
+                this.appSession?.user?.id;
                 this.registerToEvents();
                 this.getUnreadMessageCount();
                 if(!this.isHost)
@@ -257,13 +257,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     fullName: string = "";
     setCurrentLoginInformations(): void {
-        this.shownLoginName = this.appSession.getShownLoginName();
+        this.shownLoginName = this.appSession?.getShownLoginName();
         this.tenancyName = this.appSession?.tenancyName;
         this.userName = this.appSession?.user?.userName;
         this.name = this.appSession?.user?.name;
         this.fullName =
             this.appSession?.user?.name + ' ' + this.appSession?.user?.surname;
-        console.log(">>", this.appSession.user);
+       
     }
     closeModal(value: boolean) {
         this.display = false;
@@ -271,13 +271,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     getShownUserName(linkedUser: LinkedUserDto): string {
         if (!this._abpMultiTenancyService.isEnabled) {
-            return linkedUser.username;
+            return linkedUser?.username;
         }
 
         return (
             (linkedUser.tenantId ? linkedUser.tenancyName : ".") +
             "\\" +
-            linkedUser.username
+            linkedUser?.username
         );
     }
 

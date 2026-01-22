@@ -8326,7 +8326,7 @@ export class AppEntitiesServiceProxy {
      * @param hasManual (optional) 
      * @return Success
      */
-    getAllAccountTypesForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, hasManual: boolean | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
+    getAllAccountTypesForTableDropdownWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, hasManual: boolean | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllAccountTypesForTableDropdownWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -10961,67 +10961,6 @@ export class AppEntitiesServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AppEntityDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param entityId (optional) 
-     * @param entityObjectTypeId (optional) 
-     * @return Success
-     */
-    getAppEntityExtraDataWithPaging(entityId: number | undefined, entityObjectTypeId: number | undefined): Observable<PagedResultDtoOfExtraDataAttrDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAppEntityExtraDataWithPaging?";
-        if (entityId === null)
-            throw new Error("The parameter 'entityId' cannot be null.");
-        else if (entityId !== undefined)
-            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
-        if (entityObjectTypeId === null)
-            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
-        else if (entityObjectTypeId !== undefined)
-            url_ += "entityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAppEntityExtraDataWithPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAppEntityExtraDataWithPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
-        }));
-    }
-
-    protected processGetAppEntityExtraDataWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfExtraDataAttrDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PagedResultDtoOfExtraDataAttrDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -15724,6 +15663,62 @@ export class AppItemsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    addExtraAttrs(body: AppItemtExcelRecordDTO | undefined): Observable<AppItemtExcelRecordDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/AddExtraAttrs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddExtraAttrs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddExtraAttrs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemtExcelRecordDTO>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemtExcelRecordDTO>;
+        }));
+    }
+
+    protected processAddExtraAttrs(response: HttpResponseBase): Observable<AppItemtExcelRecordDTO> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppItemtExcelRecordDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     saveFromExcel(body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcel";
         url_ = url_.replace(/[?&]$/, "");
@@ -16636,6 +16631,7 @@ export class AppItemsServiceProxy {
      * @param codeFilter (optional) 
      * @param descriptionFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param includeExtraDataFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
      * @param sycEntityObjectStatusNameFilter (optional) 
      * @param sydObjectNameFilter (optional) 
@@ -16645,7 +16641,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllColorsLookUp(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupItems> {
+    getAllColorsLookUp(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, includeExtraDataFilter: boolean | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfLookupItems> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAllColorsLookUp?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -16657,6 +16653,10 @@ export class AppItemsServiceProxy {
             url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (includeExtraDataFilter === null)
+            throw new Error("The parameter 'includeExtraDataFilter' cannot be null.");
+        else if (includeExtraDataFilter !== undefined)
+            url_ += "IncludeExtraDataFilter=" + encodeURIComponent("" + includeExtraDataFilter) + "&";
         if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
             url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
         if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
@@ -57265,6 +57265,162 @@ export class SystemTablesServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    getObjectSectionId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectSectionId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectSectionId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectSectionId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectSectionId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectBlockId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectBlockId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectBlockId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectBlockId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectBlockId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectStatusActiveLookup(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectStatusActiveLookup";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectStatusActiveLookup(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectStatusActiveLookup(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectStatusActiveLookup(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -64840,6 +64996,8 @@ export class LookupLabelDto implements ILookupLabelDto {
     isHostRecord!: boolean | undefined;
     hexaCode!: string | undefined;
     image!: string | undefined;
+    status!: string | undefined;
+    entityObjectStatusId!: number | undefined;
 
     [key: string]: any;
 
@@ -64865,6 +65023,8 @@ export class LookupLabelDto implements ILookupLabelDto {
             this.isHostRecord = _data["isHostRecord"];
             this.hexaCode = _data["hexaCode"];
             this.image = _data["image"];
+            this.status = _data["status"];
+            this.entityObjectStatusId = _data["entityObjectStatusId"];
         }
     }
 
@@ -64888,6 +65048,8 @@ export class LookupLabelDto implements ILookupLabelDto {
         data["isHostRecord"] = this.isHostRecord;
         data["hexaCode"] = this.hexaCode;
         data["image"] = this.image;
+        data["status"] = this.status;
+        data["entityObjectStatusId"] = this.entityObjectStatusId;
         return data;
     }
 }
@@ -64900,6 +65062,8 @@ export interface ILookupLabelDto {
     isHostRecord: boolean | undefined;
     hexaCode: string | undefined;
     image: string | undefined;
+    status: string | undefined;
+    entityObjectStatusId: number | undefined;
 
     [key: string]: any;
 }
@@ -71583,6 +71747,9 @@ export interface ITreeNodeOfGetSycEntityObjectClassificationForViewDto {
 export class SycEntityObjectCategoryDto implements ISycEntityObjectCategoryDto {
     code!: string | undefined;
     name!: string | undefined;
+    defaultAttachment!: string | undefined;
+    appItemImageUrl!: string | undefined;
+    appItemImageName!: string | undefined;
     objectId!: number;
     parentId!: number | undefined;
     id!: number;
@@ -71606,6 +71773,9 @@ export class SycEntityObjectCategoryDto implements ISycEntityObjectCategoryDto {
             }
             this.code = _data["code"];
             this.name = _data["name"];
+            this.defaultAttachment = _data["defaultAttachment"];
+            this.appItemImageUrl = _data["appItemImageUrl"];
+            this.appItemImageName = _data["appItemImageName"];
             this.objectId = _data["objectId"];
             this.parentId = _data["parentId"];
             this.id = _data["id"];
@@ -71627,6 +71797,9 @@ export class SycEntityObjectCategoryDto implements ISycEntityObjectCategoryDto {
         }
         data["code"] = this.code;
         data["name"] = this.name;
+        data["defaultAttachment"] = this.defaultAttachment;
+        data["appItemImageUrl"] = this.appItemImageUrl;
+        data["appItemImageName"] = this.appItemImageName;
         data["objectId"] = this.objectId;
         data["parentId"] = this.parentId;
         data["id"] = this.id;
@@ -71637,6 +71810,9 @@ export class SycEntityObjectCategoryDto implements ISycEntityObjectCategoryDto {
 export interface ISycEntityObjectCategoryDto {
     code: string | undefined;
     name: string | undefined;
+    defaultAttachment: string | undefined;
+    appItemImageUrl: string | undefined;
+    appItemImageName: string | undefined;
     objectId: number;
     parentId: number | undefined;
     id: number;
@@ -73985,242 +74161,6 @@ export interface IAppEntityDto {
     [key: string]: any;
 }
 
-export class EDRestAttributes implements IEDRestAttributes {
-    extraAttrName!: string | undefined;
-    totalCount!: number;
-    extraAttributeId!: number;
-    values!: LookupLabelDto[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IEDRestAttributes) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.extraAttrName = _data["extraAttrName"];
-            this.totalCount = _data["totalCount"];
-            this.extraAttributeId = _data["extraAttributeId"];
-            if (Array.isArray(_data["values"])) {
-                this.values = [] as any;
-                for (let item of _data["values"])
-                    this.values!.push(LookupLabelDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): EDRestAttributes {
-        data = typeof data === 'object' ? data : {};
-        let result = new EDRestAttributes();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["extraAttrName"] = this.extraAttrName;
-        data["totalCount"] = this.totalCount;
-        data["extraAttributeId"] = this.extraAttributeId;
-        if (Array.isArray(this.values)) {
-            data["values"] = [];
-            for (let item of this.values)
-                data["values"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IEDRestAttributes {
-    extraAttrName: string | undefined;
-    totalCount: number;
-    extraAttributeId: number;
-    values: LookupLabelDto[] | undefined;
-
-    [key: string]: any;
-}
-
-export class ExtraDataSelectedValues implements IExtraDataSelectedValues {
-    code!: string | undefined;
-    value!: string | undefined;
-    totalCount!: number;
-    entityAttachments!: AppEntityAttachmentDto[] | undefined;
-    defaultEntityAttachment!: AppEntityAttachmentDto;
-    edRestAttributes!: EDRestAttributes[] | undefined;
-    colorImage!: string | undefined;
-    colorHexaCode!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IExtraDataSelectedValues) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.code = _data["code"];
-            this.value = _data["value"];
-            this.totalCount = _data["totalCount"];
-            if (Array.isArray(_data["entityAttachments"])) {
-                this.entityAttachments = [] as any;
-                for (let item of _data["entityAttachments"])
-                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
-            }
-            this.defaultEntityAttachment = _data["defaultEntityAttachment"] ? AppEntityAttachmentDto.fromJS(_data["defaultEntityAttachment"]) : <any>undefined;
-            if (Array.isArray(_data["edRestAttributes"])) {
-                this.edRestAttributes = [] as any;
-                for (let item of _data["edRestAttributes"])
-                    this.edRestAttributes!.push(EDRestAttributes.fromJS(item));
-            }
-            this.colorImage = _data["colorImage"];
-            this.colorHexaCode = _data["colorHexaCode"];
-        }
-    }
-
-    static fromJS(data: any): ExtraDataSelectedValues {
-        data = typeof data === 'object' ? data : {};
-        let result = new ExtraDataSelectedValues();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["code"] = this.code;
-        data["value"] = this.value;
-        data["totalCount"] = this.totalCount;
-        if (Array.isArray(this.entityAttachments)) {
-            data["entityAttachments"] = [];
-            for (let item of this.entityAttachments)
-                data["entityAttachments"].push(item.toJSON());
-        }
-        data["defaultEntityAttachment"] = this.defaultEntityAttachment ? this.defaultEntityAttachment.toJSON() : <any>undefined;
-        if (Array.isArray(this.edRestAttributes)) {
-            data["edRestAttributes"] = [];
-            for (let item of this.edRestAttributes)
-                data["edRestAttributes"].push(item.toJSON());
-        }
-        data["colorImage"] = this.colorImage;
-        data["colorHexaCode"] = this.colorHexaCode;
-        return data;
-    }
-}
-
-export interface IExtraDataSelectedValues {
-    code: string | undefined;
-    value: string | undefined;
-    totalCount: number;
-    entityAttachments: AppEntityAttachmentDto[] | undefined;
-    defaultEntityAttachment: AppEntityAttachmentDto;
-    edRestAttributes: EDRestAttributes[] | undefined;
-    colorImage: string | undefined;
-    colorHexaCode: string | undefined;
-
-    [key: string]: any;
-}
-
-export class ExtraDataAttrDto implements IExtraDataAttrDto {
-    extraAttrUsage!: string | undefined;
-    extraAttrName!: string | undefined;
-    selectedValuesTotalCount!: number;
-    extraAttrDataType!: string | undefined;
-    extraAttributeId!: number;
-    selectedValues!: ExtraDataSelectedValues[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IExtraDataAttrDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.extraAttrUsage = _data["extraAttrUsage"];
-            this.extraAttrName = _data["extraAttrName"];
-            this.selectedValuesTotalCount = _data["selectedValuesTotalCount"];
-            this.extraAttrDataType = _data["extraAttrDataType"];
-            this.extraAttributeId = _data["extraAttributeId"];
-            if (Array.isArray(_data["selectedValues"])) {
-                this.selectedValues = [] as any;
-                for (let item of _data["selectedValues"])
-                    this.selectedValues!.push(ExtraDataSelectedValues.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): ExtraDataAttrDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ExtraDataAttrDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["extraAttrUsage"] = this.extraAttrUsage;
-        data["extraAttrName"] = this.extraAttrName;
-        data["selectedValuesTotalCount"] = this.selectedValuesTotalCount;
-        data["extraAttrDataType"] = this.extraAttrDataType;
-        data["extraAttributeId"] = this.extraAttributeId;
-        if (Array.isArray(this.selectedValues)) {
-            data["selectedValues"] = [];
-            for (let item of this.selectedValues)
-                data["selectedValues"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IExtraDataAttrDto {
-    extraAttrUsage: string | undefined;
-    extraAttrName: string | undefined;
-    selectedValuesTotalCount: number;
-    extraAttrDataType: string | undefined;
-    extraAttributeId: number;
-    selectedValues: ExtraDataSelectedValues[] | undefined;
-
-    [key: string]: any;
-}
-
 export class GetAppEntityForViewDto implements IGetAppEntityForViewDto {
     appEntity!: AppEntityDto;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
@@ -76393,66 +76333,6 @@ export interface IContactInformationOutputDto {
     [key: string]: any;
 }
 
-export class PagedResultDtoOfExtraDataAttrDto implements IPagedResultDtoOfExtraDataAttrDto {
-    totalCount!: number;
-    items!: ExtraDataAttrDto[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IPagedResultDtoOfExtraDataAttrDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.totalCount = _data["totalCount"];
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(ExtraDataAttrDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): PagedResultDtoOfExtraDataAttrDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PagedResultDtoOfExtraDataAttrDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["totalCount"] = this.totalCount;
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IPagedResultDtoOfExtraDataAttrDto {
-    totalCount: number;
-    items: ExtraDataAttrDto[] | undefined;
-
-    [key: string]: any;
-}
-
 export enum ResponceType {
     OTHER = 0,
     INTEREST = 1,
@@ -78064,6 +77944,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
     currencySymbol!: string | undefined;
     currencyName!: string | undefined;
     isDefault!: boolean;
+    buyerSSIN!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -78090,6 +77971,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
             this.currencySymbol = _data["currencySymbol"];
             this.currencyName = _data["currencyName"];
             this.isDefault = _data["isDefault"];
+            this.buyerSSIN = _data["buyerSSIN"];
             this.id = _data["id"];
         }
     }
@@ -78114,6 +77996,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
         data["currencySymbol"] = this.currencySymbol;
         data["currencyName"] = this.currencyName;
         data["isDefault"] = this.isDefault;
+        data["buyerSSIN"] = this.buyerSSIN;
         data["id"] = this.id;
         return data;
     }
@@ -78127,6 +78010,7 @@ export interface IAppItemPriceInfo {
     currencySymbol: string | undefined;
     currencyName: string | undefined;
     isDefault: boolean;
+    buyerSSIN: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -79642,6 +79526,66 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
 export interface IGetAppItemDetailForViewDto {
     appItem: AppItemForViewDto;
     nonLookupValues: LookupLabelDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto implements IPagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto {
+    totalCount!: number;
+    items!: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(TreeNodeOfGetSycEntityObjectCategoryForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto {
+    totalCount: number;
+    items: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] | undefined;
 
     [key: string]: any;
 }
@@ -93942,6 +93886,7 @@ export class AppItemPrices implements IAppItemPrices {
     currencyFk!: AppEntity;
     appItemFk!: AppItem;
     isDefault!: boolean;
+    buyerSSIN!: string | undefined;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -93978,6 +93923,7 @@ export class AppItemPrices implements IAppItemPrices {
             this.currencyFk = _data["currencyFk"] ? AppEntity.fromJS(_data["currencyFk"]) : <any>undefined;
             this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
             this.isDefault = _data["isDefault"];
+            this.buyerSSIN = _data["buyerSSIN"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -94012,6 +93958,7 @@ export class AppItemPrices implements IAppItemPrices {
         data["currencyFk"] = this.currencyFk ? this.currencyFk.toJSON() : <any>undefined;
         data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
         data["isDefault"] = this.isDefault;
+        data["buyerSSIN"] = this.buyerSSIN;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -94035,6 +93982,7 @@ export interface IAppItemPrices {
     currencyFk: AppEntity;
     appItemFk: AppItem;
     isDefault: boolean;
+    buyerSSIN: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
