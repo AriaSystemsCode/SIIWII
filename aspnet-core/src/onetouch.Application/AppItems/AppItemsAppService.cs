@@ -844,20 +844,31 @@ namespace onetouch.AppItems
             }
         }
         //MMT
-        
+
+        //public async Task<Byte[]> GetFile64FromUrl(string Url)
+        //{
+        //    Byte[] returnList = new Byte[1];
+        //    var app = _appConfiguration[$"App:ServerRootAddress"];
+        //    Url = Url.Replace(_appConfiguration[$"App:ServerRootAddress"],"");
+        //    Url = _appConfiguration[$"Attachment:Omitt"] + @"\" + Url;
+        //    if (System.IO.File.Exists(Url))
+        //    {
+        //    returnList = System.IO.File.ReadAllBytes(Url);
+        //    }
+        //    return returnList;
+        //}
         public async Task<Byte[]> GetFile64FromUrl(string Url)
         {
             Byte[] returnList = new Byte[1];
-            var app = _appConfiguration[$"App:ServerRootAddress"];
-            Url = Url.Replace(_appConfiguration[$"App:ServerRootAddress"],"");
+            Uri uri = new Uri(Url);
+            Url = uri.AbsolutePath;
             Url = _appConfiguration[$"Attachment:Omitt"] + @"\" + Url;
             if (System.IO.File.Exists(Url))
             {
-            returnList = System.IO.File.ReadAllBytes(Url);
+                returnList = System.IO.File.ReadAllBytes(Url);
             }
             return returnList;
         }
-
         public async Task<GetAppItemDetailForViewDto> GetAppItemForView(GetAppItemWithPagedAttributesForViewInput input)
         {
             //MMT

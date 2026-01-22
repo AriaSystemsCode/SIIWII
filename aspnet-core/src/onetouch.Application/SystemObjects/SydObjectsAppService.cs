@@ -665,8 +665,10 @@ namespace onetouch.SystemObjects
             await _emailSender.SendAsync(new MailMessage
             {
                 To = { salesEmail },
-                Subject = "New client needs to register",
-                Body = "<!DOCTYPE html><html><head/><body><p>Hello Sales Team, "+ "First Name:"+ firstName + "<br><br>"+
+                Subject = "A new enquiry has been made on the Orbit website",
+                Body = "<!DOCTYPE html><html><head/><body><p>Dear Support, " + "<br><br>" +
+                        "A new enquiry has been made on the Orbit website,\r\nDetails are as follows:" + "<br><br>" +
+                        "First Name:"+ firstName + "<br><br>"+
                         "Last Name:" + lastName + "<br><br>" +
                         "Email:" + email + "<br><br>" +
                         "Phone :" + phone + "<br><br>" +
