@@ -6032,6 +6032,7 @@ namespace onetouch.AppItems
                         {
                             appItem.LastModificationTime = now;
                             appItem.LastModifierUserId = userId;
+                            appItem.TimeStamp = now;
                         }
 
                         logRecord.Status = "Success";
