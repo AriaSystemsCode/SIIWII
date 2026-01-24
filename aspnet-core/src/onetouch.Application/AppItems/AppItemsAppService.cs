@@ -85,6 +85,7 @@ using onetouch.MultiTenancy;
 using Abp.Timing;
 using ClosedXML.Excel;
 using NPOI.POIFS.Properties;
+using OfficeOpenXml;
 
 namespace onetouch.AppItems
 {
@@ -5690,7 +5691,6 @@ namespace onetouch.AppItems
         }
 
         public async Task<AppItemExcelResultsDTO> ValidatePriceCSV(string guidFile, string[] imagesList)
-        //public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         {
             var resultDto = new AppItemExcelResultsDTO
             {
@@ -5706,7 +5706,11 @@ namespace onetouch.AppItems
             try
             {
                 var tenantId = AbpSession.TenantId ?? -1;
-                var path = _appConfiguration["Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".csv";
+                var path = Path.Combine(
+                    _appConfiguration["Attachment:PathTemp"],
+                    tenantId.ToString(),
+                    guidFile + ".csv"
+                );
 
                 if (!System.IO.File.Exists(path))
                     throw new UserFriendlyException("CSV file not found.");
@@ -5717,20 +5721,32 @@ namespace onetouch.AppItems
 
                 var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
 
-                if (!headers.Contains("ssin") || !headers.Contains("discsplit") || !headers.Contains("currcode"))
-                    throw new UserFriendlyException("CSV must contain Code, Price, and Currency columns.");
+                if (!headers.Any(h => h.Equals("ssin", StringComparison.OrdinalIgnoreCase)) ||
+                    !headers.Any(h => h.Equals("discsplit", StringComparison.OrdinalIgnoreCase)) ||
+                    !headers.Any(h => h.Equals("currcode", StringComparison.OrdinalIgnoreCase)))
+                {
+                    throw new UserFriendlyException("CSV must contain ssin, discsplit, and currcode columns.");
+                }
+
+                // Ensure Status & ErrorMessage columns
+                if (!headers.Any(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase)))
+                    headers.Add("Status");
+
+                if (!headers.Any(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase)))
+                    headers.Add("ErrorMessage");
+
+                var outputLines = new List<string>
+        {
+            string.Join(",", headers)
+        };
 
                 var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
 
-                //// Preload Contacts
                 var appContacts = await _appContactRepository.GetAll().ToListAsync();
-                //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
                 var appContactsDict = appContacts
-    .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
-    .GroupBy(x => x.SSIN.Trim().ToUpper())
-    .ToDictionary(g => g.Key, g => g.First());
-
-
+                    .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+                    .GroupBy(x => x.SSIN.Trim().ToUpper())
+                    .ToDictionary(g => g.Key, g => g.First());
 
                 int rowNumber = 1;
 
@@ -5739,7 +5755,10 @@ namespace onetouch.AppItems
                     rowNumber++;
 
                     var values = lines[i].Split(',');
-                    var row = headers.Zip(values, (h, v) => new { h, v }).ToDictionary(x => x.h, x => x.v);
+
+                    var row = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    for (int h = 0; h < headers.Count; h++)
+                        row[headers[h]] = h < values.Length ? values[h] : "";
 
                     var record = new AppItemtExcelRecordDTO
                     {
@@ -5750,9 +5769,8 @@ namespace onetouch.AppItems
 
                     var dto = new AppItemPriceCsvDto
                     {
-                        Code = row["stymajor"]?.Trim(),
+                        Code = row.ContainsKey("stymajor") ? row["stymajor"]?.Trim() : "",
                         SSIN = row["ssin"]?.Trim(),
-                        //StyMajor = row["stymajor"]?.Trim(),
                         Currency = row["currcode"]?.Trim(),
                         Price = row["discsplit"]?.Trim(),
                         RowNumber = rowNumber
@@ -5769,20 +5787,14 @@ namespace onetouch.AppItems
                         record.FieldsErrors.Add("SSIN is required.");
                         hasError = true;
                     }
-                    else
+                    else if (!appContactsDict.TryGetValue(dto.SSIN.ToUpper(), out var appContact))
                     {
-
-                        if (!appContactsDict.TryGetValue(dto.SSIN, out var appContact))
-                        {
-                            record.FieldsErrors.Add("SSIN is not found.");
-                            hasError = true;
-                        }
+                        record.FieldsErrors.Add("SSIN is not found.");
+                        hasError = true;
                     }
 
-                    var item = _appItemRepository
-                        .GetAll()
+                    var item = _appItemRepository.GetAll()
                         .FirstOrDefault(x => x.Code.Replace(" ", "") == dto.Code.Replace(" ", ""));
-
 
                     if (item == null)
                     {
@@ -5791,26 +5803,18 @@ namespace onetouch.AppItems
                     }
 
                     // Price validation
-                    if (!decimal.TryParse(row["discsplit"], out decimal price) || price <= 0)
+                    if (!decimal.TryParse(dto.Price, out decimal price) || price <= 0)
                     {
                         record.FieldsErrors.Add("Invalid price value.");
                         hasError = true;
                     }
-                    else
-                    {
-                        dto.Price = price.ToString();
-                    }
 
                     // Currency validation
-                    //if (currencies.All(c => c.Code != dto.Currency))
-                    //{
-                    //    record.FieldsErrors.Add("Invalid currency code.");
-                    //    hasError = true;
-                    //}
                     long currencyId = 0;
                     string currencyCode = "";
+
                     var matchedCurrency = currencies
-                    .FirstOrDefault(c => c.Code.Equals(dto.Currency, StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefault(c => c.Code.Equals(dto.Currency, StringComparison.OrdinalIgnoreCase));
 
                     if (matchedCurrency == null)
                     {
@@ -5819,7 +5823,6 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        // You can now use the matched currency object
                         currencyId = matchedCurrency.Value;
                         currencyCode = matchedCurrency.Code;
                     }
@@ -5827,42 +5830,53 @@ namespace onetouch.AppItems
                     if (hasError)
                     {
                         record.Status = ExcelRecordStatus.Failed.ToString();
-                        record.ErrorMessage = "Invalid price data.";
+                        record.ErrorMessage = string.Join(" | ", record.FieldsErrors);
                         resultDto.TotalFailedRecords++;
                     }
                     else
                     {
-                        record.Code = "Item code: " + dto.Code;
-                        //record.RecordType = "Account Code: " + dto.SSIN;
-                        record.RecordType = "Price";
-
+                        record.Status = ExcelRecordStatus.Passed.ToString();
+                        record.ErrorMessage = "";
 
                         record.ExcelDto = new AppItemExcelDto
                         {
                             Code = dto.Code,
                             EntityObjectCategoryID = item.Id,
-
                             Name = dto.SSIN,
-                            Price = dto.Price.ToString(),
+                            Price = price.ToString(),
                             Currency = currencyCode,
                             ParentId = currencyId,
-
+                            RecordType = "Price",
+                            ProductDescription = "-",
+                            ProductType = "-"
                         };
-                        record.ExcelDto.Code = "Item";
-                        record.ExcelDto.RecordType = "Price";
-                        record.ExcelDto.ProductDescription = "-";
-                        record.ExcelDto.ProductType = "-";
-                        record.ExcelDto.Code = "-";
-                        record.ExcelDto.Code = "-";
 
                         resultDto.TotalPassedRecords++;
                     }
+
+                    row["Status"] = record.Status;
+                    row["ErrorMessage"] = record.ErrorMessage;
+
+                    outputLines.Add(string.Join(",", headers.Select(h => row[h])));
 
                     resultDto.ExcelRecords.Add(record);
                 }
 
                 resultDto.TotalRecords = resultDto.ExcelRecords.Count;
-                resultDto.FilePath = path;
+
+                var newFileName = $"{Path.GetFileNameWithoutExtension(path)}_Validated_{DateTime.Now:yyyyMMddHHmmss}.csv";
+                var newPath = Path.Combine(Path.GetDirectoryName(path), newFileName);
+                
+                newPath = newPath.Replace(_appConfiguration[$"Attachment:PathTemp"].ToString(), _appConfiguration[$"Attachment:Path"]);
+                resultDto.FilePath = newPath;
+
+                System.IO.File.WriteAllLines(newPath, outputLines);
+                newPath = newPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+                
+
+                resultDto.ExcelLogDTO = new ExcelLogDto();
+                resultDto.ExcelLogDTO.ExcelLogPath = newPath;
+                resultDto.ExcelLogDTO.ExcelLogFileName = newFileName;
             }
             catch (Exception ex)
             {
@@ -5870,6 +5884,261 @@ namespace onetouch.AppItems
             }
 
             return resultDto;
+        }
+
+
+        //    public async Task<AppItemExcelResultsDTO> ValidatePriceCSV(string guidFile, string[] imagesList)
+        //    //public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+        //    {
+        //        var resultDto = new AppItemExcelResultsDTO
+        //        {
+        //            ExcelRecords = new List<AppItemtExcelRecordDTO>(),
+        //            TotalRecords = 0,
+        //            TotalPassedRecords = 0,
+        //            TotalFailedRecords = 0
+        //        };
+
+        //        if (string.IsNullOrEmpty(guidFile))
+        //            return resultDto;
+
+        //        try
+        //        {
+        //            var tenantId = AbpSession.TenantId ?? -1;
+        //            var path = _appConfiguration["Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".csv";
+
+        //            if (!System.IO.File.Exists(path))
+        //                throw new UserFriendlyException("CSV file not found.");
+
+        //            var lines = System.IO.File.ReadAllLines(path);
+        //            if (lines.Length < 2)
+        //                throw new UserFriendlyException("CSV file is empty.");
+
+        //            var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+        //            if (!headers.Contains("ssin") || !headers.Contains("discsplit") || !headers.Contains("currcode"))
+        //                throw new UserFriendlyException("CSV must contain Code, Price, and Currency columns.");
+
+        //            var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+        //            //// Preload Contacts
+        //            var appContacts = await _appContactRepository.GetAll().ToListAsync();
+        //            //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
+        //            var appContactsDict = appContacts
+        //.Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+        //.GroupBy(x => x.SSIN.Trim().ToUpper())
+        //.ToDictionary(g => g.Key, g => g.First());
+
+
+
+        //            int rowNumber = 1;
+
+        //            for (int i = 1; i < lines.Length; i++)
+        //            {
+        //                rowNumber++;
+
+        //                var values = lines[i].Split(',');
+        //                var row = headers.Zip(values, (h, v) => new { h, v }).ToDictionary(x => x.h, x => x.v);
+
+        //                var record = new AppItemtExcelRecordDTO
+        //                {
+        //                    Status = ExcelRecordStatus.Passed.ToString(),
+        //                    FieldsErrors = new List<string>(),
+        //                    ErrorMessage = ""
+        //                };
+
+        //                var dto = new AppItemPriceCsvDto
+        //                {
+        //                    Code = row["stymajor"]?.Trim(),
+        //                    SSIN = row["ssin"]?.Trim(),
+        //                    //StyMajor = row["stymajor"]?.Trim(),
+        //                    Currency = row["currcode"]?.Trim(),
+        //                    Price = row["discsplit"]?.Trim(),
+        //                    RowNumber = rowNumber
+        //                };
+
+        //                record.Code = dto.Code;
+        //                record.RecordType = "Account Code";
+
+        //                bool hasError = false;
+
+        //                // SSIN validation
+        //                if (string.IsNullOrWhiteSpace(dto.SSIN))
+        //                {
+        //                    record.FieldsErrors.Add("SSIN is required.");
+        //                    hasError = true;
+        //                }
+        //                else
+        //                {
+
+        //                    if (!appContactsDict.TryGetValue(dto.SSIN, out var appContact))
+        //                    {
+        //                        record.FieldsErrors.Add("SSIN is not found.");
+        //                        hasError = true;
+        //                    }
+        //                }
+
+        //                var item = _appItemRepository
+        //                    .GetAll()
+        //                    .FirstOrDefault(x => x.Code.Replace(" ", "") == dto.Code.Replace(" ", ""));
+
+
+        //                if (item == null)
+        //                {
+        //                    record.FieldsErrors.Add($"Item code {dto.Code} not found.");
+        //                    hasError = true;
+        //                }
+
+        //                // Price validation
+        //                if (!decimal.TryParse(row["discsplit"], out decimal price) || price <= 0)
+        //                {
+        //                    record.FieldsErrors.Add("Invalid price value.");
+        //                    hasError = true;
+        //                }
+        //                else
+        //                {
+        //                    dto.Price = price.ToString();
+        //                }
+
+        //                // Currency validation
+        //                //if (currencies.All(c => c.Code != dto.Currency))
+        //                //{
+        //                //    record.FieldsErrors.Add("Invalid currency code.");
+        //                //    hasError = true;
+        //                //}
+        //                long currencyId = 0;
+        //                string currencyCode = "";
+        //                var matchedCurrency = currencies
+        //                .FirstOrDefault(c => c.Code.Equals(dto.Currency, StringComparison.OrdinalIgnoreCase));
+
+        //                if (matchedCurrency == null)
+        //                {
+        //                    record.FieldsErrors.Add("Invalid currency code.");
+        //                    hasError = true;
+        //                }
+        //                else
+        //                {
+        //                    // You can now use the matched currency object
+        //                    currencyId = matchedCurrency.Value;
+        //                    currencyCode = matchedCurrency.Code;
+        //                }
+
+        //                if (hasError)
+        //                {
+        //                    record.Status = ExcelRecordStatus.Failed.ToString();
+        //                    record.ErrorMessage = "Invalid price data.";
+        //                    resultDto.TotalFailedRecords++;
+        //                }
+        //                else
+        //                {
+        //                    record.Code = "Item code: " + dto.Code;
+        //                    //record.RecordType = "Account Code: " + dto.SSIN;
+        //                    record.RecordType = "Price";
+
+
+        //                    record.ExcelDto = new AppItemExcelDto
+        //                    {
+        //                        Code = dto.Code,
+        //                        EntityObjectCategoryID = item.Id,
+
+        //                        Name = dto.SSIN,
+        //                        Price = dto.Price.ToString(),
+        //                        Currency = currencyCode,
+        //                        ParentId = currencyId,
+
+        //                    };
+        //                    record.ExcelDto.Code = "Item";
+        //                    record.ExcelDto.RecordType = "Price";
+        //                    record.ExcelDto.ProductDescription = "-";
+        //                    record.ExcelDto.ProductType = "-";
+        //                    record.ExcelDto.Code = "-";
+        //                    record.ExcelDto.Code = "-";
+
+        //                    resultDto.TotalPassedRecords++;
+        //                }
+
+        //                resultDto.ExcelRecords.Add(record);
+        //            }
+
+        //            resultDto.TotalRecords = resultDto.ExcelRecords.Count;
+        //            resultDto.FilePath = path;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            throw new UserFriendlyException(ex.Message);
+        //        }
+
+        //        return resultDto;
+        //    }
+
+        public void UpdateCsvStatusFromErrorLog(
+        string filePath,
+            List<AppItemtExcelRecordDTO> errorLogList)
+        {
+            var guidFile = Path.GetFileName(filePath);
+            var tenantId = AbpSession.TenantId ?? -1;
+            var csvFilePath = Path.Combine(
+                _appConfiguration["Attachment:Path"],
+                tenantId.ToString(),
+                guidFile 
+            );
+
+
+            if (string.IsNullOrWhiteSpace(csvFilePath))
+                throw new UserFriendlyException("CSV file path is empty.");
+
+            if (!System.IO.File.Exists(csvFilePath))
+                throw new UserFriendlyException("CSV file not found.");
+
+            if (errorLogList == null || !errorLogList.Any())
+                return;
+
+            var lines = System.IO.File.ReadAllLines(csvFilePath).ToList();
+            if (lines.Count < 2)
+                return;
+
+            var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+            if (!headers.Any(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase)))
+                throw new UserFriendlyException("CSV does not contain Status column.");
+
+            if (!headers.Any(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase)))
+                throw new UserFriendlyException("CSV does not contain ErrorMessage column.");
+
+            //if (!headers.Any(h => h.Equals("Code", StringComparison.OrdinalIgnoreCase)))
+            //    throw new UserFriendlyException("CSV does not contain Code column.");
+
+            var statusCol = headers.FindIndex(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase));
+            var errorMsgCol = headers.FindIndex(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase));
+            //var codeCol = headers.FindIndex(h => h.Equals("Code", StringComparison.OrdinalIgnoreCase));
+
+            //// Fast lookup for error logs
+            //var errorDict = errorLogList
+            //    .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+            //    .GroupBy(x => x.Code.Trim(), StringComparer.OrdinalIgnoreCase)
+            //    .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+            for (int i = 1; i < lines.Count; i++)
+            {
+                var values = lines[i].Split(',');
+
+                //if (values.Length <= Math.Max(codeCol, Math.Max(statusCol, errorMsgCol)))
+                 //   continue;
+
+                //var code = values[codeCol]?.Trim();
+                //if (string.IsNullOrEmpty(code))
+                //    continue;
+
+                //if (!errorDict.TryGetValue(code, out var error))
+                //    continue;
+
+                values[statusCol] = errorLogList[i-1].Status;
+                values[errorMsgCol] = errorLogList[i-1].ErrorMessage;
+
+                lines[i] = string.Join(",", values);
+            }
+
+            // Save updated file (overwrite)
+            System.IO.File.WriteAllLines(csvFilePath, lines);
         }
 
 
@@ -6062,18 +6331,19 @@ namespace onetouch.AppItems
                 if (!Directory.Exists(attachmentFolder))
                     Directory.CreateDirectory(attachmentFolder);
 
-                itemExcelResultsDTO.FilePath = itemExcelResultsDTO.FilePath
-                    .Replace(_appConfiguration[$"Attachment:PathTemp"], attachmentFolder);
+                //itemExcelResultsDTO.FilePath = itemExcelResultsDTO.FilePath
+                //    .Replace(_appConfiguration[$"Attachment:PathTemp"], attachmentFolder);
 
                 //document.SaveAs(itemExcelResultsDTO.FilePath);
             }
 
             // Populate ExcelLogDTO
-            excelLog.ExcelLogPath = itemExcelResultsDTO.FilePath
-                .Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "")
-                .ToLower();
-            excelLog.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
+            //excelLog.ExcelLogPath = itemExcelResultsDTO.FilePath
+            //    .Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "")
+            //    .ToLower();
+            //excelLog.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
 
+            this.UpdateCsvStatusFromErrorLog(itemExcelResultsDTO.FilePath, itemExcelResultsDTO.ExcelRecords);
 
             #region send notification to current user
             if (AbpSession.UserId != null)
@@ -6088,7 +6358,7 @@ namespace onetouch.AppItems
 
             #endregion send notification to current user
 
-            return excelLog;
+            return itemExcelResultsDTO.ExcelLogDTO;
         }
 
 
