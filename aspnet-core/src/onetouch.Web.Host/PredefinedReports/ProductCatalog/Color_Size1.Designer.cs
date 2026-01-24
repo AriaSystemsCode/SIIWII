@@ -182,7 +182,7 @@
             // 
             this.tableCell26.Dpi = 254F;
             this.tableCell26.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Trim([AttributeValue3])")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[AttributeValue3]")});
             this.tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell26.Name = "tableCell26";
             this.tableCell26.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
@@ -196,16 +196,15 @@
             this.tableCell34.CanGrow = false;
             this.tableCell34.Dpi = 254F;
             this.tableCell34.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Trim([Total])")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Total]")});
             this.tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell34.Name = "tableCell34";
             this.tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell34.StyleName = "DetailData1";
             this.tableCell34.StylePriority.UseFont = false;
             this.tableCell34.StylePriority.UsePadding = false;
-            this.tableCell34.StylePriority.UseTextAlignment = false;
-            this.tableCell34.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
             this.tableCell34.Weight = 0.0771926251920879D;
+            this.tableCell34.WordWrap = false;
             // 
             // sqlDataSource1
             // 
