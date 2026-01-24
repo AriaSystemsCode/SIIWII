@@ -356,8 +356,8 @@ namespace onetouch.AppItems
                 )
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                 .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyItems || input.FilterType == ItemsFilterTypesEnum.MyListing, a => a.TenantId == AbpSession.TenantId)
-                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyOwnedItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner == AbpSession.TenantId)
-                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyPatrnersItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner != AbpSession.TenantId)
+                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyOwnedItems, a => a.TenantId == AbpSession.TenantId && (a.TenantOwner == AbpSession.TenantId || a.TenantOwner ==0))
+                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyPatrnersItems, a => a.TenantId == AbpSession.TenantId && (a.TenantOwner != AbpSession.TenantId && a.TenantOwner != 0))
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
                 //xx
                 .WhereIf(input.ScalesFilters != null && input.ScalesFilters.Count() > 0, a => a.ItemSizeScaleHeadersFkList.Where(r => allScales.Contains(r.Name.TrimEnd())).Count() > 0)
