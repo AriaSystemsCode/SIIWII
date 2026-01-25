@@ -6979,6 +6979,7 @@ namespace onetouch.Accounts
         {
             ContactDto returnObject = new ContactDto();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            string accountTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
             if (string.IsNullOrEmpty(accountDto.SSIN))
             {
                 AppEntity entity = new AppEntity();
@@ -6987,7 +6988,7 @@ namespace onetouch.Accounts
                 //entity.EntityObjectTypeCode = "";//entityParent.EntityObjectTypeCode"";
                 var contactObjectId = await _helper.SystemTables.GetObjectContactId();
                 entity.ObjectId = contactObjectId;
-                entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                entity.EntityObjectTypeCode = accountTypeCode;
                 accountDto.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
             }
@@ -6997,6 +6998,8 @@ namespace onetouch.Accounts
             accountDto.UseDTOTenant = true;
             accountDto.AccountLevel = AccountLevelEnum.Manual;
             accountDto.ContactRecordType = "C";
+            accountDto.AccountTypeId = presonEntityObjectTypeId;
+            accountDto.AccountType = accountTypeCode;
             var output = await CreateOrEditAccount(accountDto);
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
             if (accountDto.EntityAttachments.Count > 0)
