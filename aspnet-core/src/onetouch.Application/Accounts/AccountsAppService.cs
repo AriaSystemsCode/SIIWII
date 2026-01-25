@@ -94,7 +94,6 @@ using SixLabors.Fonts;
 using System.Management.Automation;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using Newtonsoft.Json;
-using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace onetouch.Accounts
