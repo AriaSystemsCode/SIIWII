@@ -859,6 +859,7 @@ namespace onetouch.AppItems
         //    }
         //    return returnList;
         //}
+        [AbpAllowAnonymous]
         public async Task<Byte[]> GetFile64FromUrl(string Url)
         {
             Byte[] returnList = new Byte[1];
