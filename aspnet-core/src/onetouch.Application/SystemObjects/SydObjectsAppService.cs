@@ -660,19 +660,30 @@ namespace onetouch.SystemObjects
         [AbpAllowAnonymous]
         public async Task SendContactUsInfo(string firstName, string lastName, string email,string phone,string message)
         {
-            //string salesEmail = await _appEntitiesAppService.GetHostSettingValue(xxxx);
-            string salesEmail = "customercare@ariasystems.biz";
+            string salesEmail = await _appEntitiesAppService.GetHostSettingValue(1219);
+            string contactUsEmailTemplate = await _appEntitiesAppService.GetHostSettingValue(1220);
+            
+            //string salesEmail = "customercare@ariasystems.biz";
+            string contactUsData = "First Name:" + firstName + "\r\n" +
+                        "Last Name:" + lastName + "\r\n" +
+                        "Email:" + email + "\r\n" +
+                        "Phone :" + phone + "\r\n" +
+                        "Message:" + message + "\r\n" ;
+            string body = contactUsEmailTemplate.Replace("CONTACTUSINFO", contactUsData);
+            body = body.Replace("\r\n", "<br><br>");
+            body = body.Replace("\n", "<br><br>");
             await _emailSender.SendAsync(new MailMessage
             {
                 To = { salesEmail },
-                Subject = "A new enquiry has been made on the Orbit website",
-                Body = "<!DOCTYPE html><html><head/><body><p>Dear Support, " + "<br><br>" +
+                Subject = "Registration Request",
+                Body = "<!DOCTYPE html><html><head/><body><p>"+body+ "<br><br></body></html>",
+                /*Body = "<!DOCTYPE html><html><head/><body><p>Dear Support, " + "<br><br>" +
                         "A new enquiry has been made on the Orbit website,\r\nDetails are as follows:" + "<br><br>" +
                         "First Name:"+ firstName + "<br><br>"+
                         "Last Name:" + lastName + "<br><br>" +
                         "Email:" + email + "<br><br>" +
                         "Phone :" + phone + "<br><br>" +
-                        "Message:" + message + "<br><br></body></html>",
+                        "Message:" + message + "<br><br></body></html>",*/
                 IsBodyHtml = true
             });
 

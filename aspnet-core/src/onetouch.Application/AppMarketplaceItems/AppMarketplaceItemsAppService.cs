@@ -37,6 +37,7 @@ using Abp.Authorization;
 using onetouch.AppItems;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using onetouch.AppItemsLists;
+using onetouch.AppMarketplaceContacts;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -94,6 +95,7 @@ namespace onetouch.AppMarketplaceItems
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
             _appEntitiesRelationship = appEntitiesRelationship;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
+            _appEntitiesRelationship = appEntitiesRelationship;
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[Start]
         [AbpAllowAnonymous]

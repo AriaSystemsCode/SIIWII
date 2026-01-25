@@ -615,8 +615,10 @@ namespace onetouch.AppItems
         {
             string tempId = colorEntityId;
             long saveEntity = 0;
+            
             #region create color lookup
-            if ((string.IsNullOrEmpty(colorEntityId) || colorEntityId == "0" || colorEntityId == "-") && (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Actions) || appItemtExcelRecordDTO.ExcelDto.Actions == "7" || appItemtExcelRecordDTO.ExcelDto.Actions == "10"))
+            if ((string.IsNullOrEmpty(colorEntityId) || colorEntityId == "0" || colorEntityId == "-") &&
+                (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Actions) || appItemtExcelRecordDTO.ExcelDto.Actions == "7" || appItemtExcelRecordDTO.ExcelDto.Actions == "10"))
             {
                 var codeExist = _appEntityRepository.GetAll().FirstOrDefaultAsync(x =>
                 x.Code == appItemtExcelRecordDTO.ExcelDto.ColorCode && x.EntityObjectTypeId == 16
@@ -634,7 +636,9 @@ namespace onetouch.AppItems
                     var returnColorEntityCreation = _appEntitiesAppService.SaveEntity(colorEntity).Result;
                     tempId = returnColorEntityCreation.ToString();
                 }
-                else { tempId = codeExist.Id.ToString(); }
+                else { tempId = codeExist.Id.ToString(); 
+                   
+                }
 
             }
             #endregion create color lookup
@@ -688,6 +692,14 @@ namespace onetouch.AppItems
 
 
                 appEntityDto.EntityAttachments = color.AppEntity.EntityAttachments;
+
+                if (appItemtExcelRecordDTO.ExcelDto.Actions == "4")
+                {
+                    await _appEntityAttachmentRepository.DeleteAsync(
+                    x => x.EntityId == appEntityDto.Id
+                    );
+                    appEntityDto.EntityAttachments = new List<AppEntityAttachmentDto>();
+                }
 
                 if (appEntityAttachmentDto.IsDefault)
                 {

@@ -124,6 +124,11 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
         // right: 5% !important;
     }
 
+    .leftList {
+        position: absolute;
+left: 30px;
+    }
+
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
         right: -35% !important;
@@ -170,6 +175,11 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
     .leftList {
         position: absolute;
         left: 30px;
+    }
+
+    .leftList {
+        position: absolute;
+left: 30px;
     }
 
     .navbar-nav {
@@ -366,6 +376,18 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
     .rtl-navbar {
         margin-right: 75px !important;
 
+    @media (min-width: 567px) {
+
+        .ltr-navbar {
+            margin-left: 75px !important;
+          
+        }
+
+        .rtl-navbar {
+            margin-right: 75px !important;
+          
+        }
+        }
     }
 }
 

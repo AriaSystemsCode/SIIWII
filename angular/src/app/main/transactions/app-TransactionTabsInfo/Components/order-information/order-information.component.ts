@@ -105,6 +105,10 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
   isContactsValid = false;
   primeDateFormat = 'mm/dd/yy'; // default
  languageSettingName  =AppConsts.languageSettingName;
+
+  currentLang:string
+  isArabic:boolean 
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -119,6 +123,8 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     this.primeDateFormat = this.languageSettingName != 'en-GB'
     ? 'mm/dd/yy'
     : 'dd/mm/yy';
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     if (this.currentTab === TransactionCartoccordionTabs.orderInfo) {
       this.fullName = `${this.appSession.user.name}${this.appSession.user.surname}`;
       this.initDates();

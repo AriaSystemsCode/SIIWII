@@ -23,6 +23,7 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
+    LanguageServiceProxy,
     AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
@@ -34,10 +35,6 @@ import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
 import { MenuItem } from "primeng/api";
-import {
-    FormBuilder,
-    FormGroup,
-} from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import Swal from "sweetalert2";
@@ -183,8 +180,6 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
-        console.log(this.isAuthenticated,'isAuthenticated')
-        console.log(this.isArabic,'isArabic')
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
@@ -219,8 +214,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
                 this.setCurrentLoginInformations();
                 // this.getProfilePicture();
                 this.getRecentlyLinkedUsers();
-                this.appSession.user.memberId;
-                this.appSession.user.id;
+                this.appSession?.user?.memberId;
+                this.appSession?.user?.id;
                 this.registerToEvents();
                 this.getUnreadMessageCount();
                 if(!this.isHost)
@@ -235,6 +230,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             }
        
     }
+
+
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
@@ -260,13 +257,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     fullName: string = "";
     setCurrentLoginInformations(): void {
-        this.shownLoginName = this.appSession.getShownLoginName();
-        this.tenancyName = this.appSession.tenancyName;
-        this.userName = this.appSession.user.userName;
-        this.name = this.appSession.user.name;
+        this.shownLoginName = this.appSession?.getShownLoginName();
+        this.tenancyName = this.appSession?.tenancyName;
+        this.userName = this.appSession?.user?.userName;
+        this.name = this.appSession?.user?.name;
         this.fullName =
-            this.appSession.user.name + ' ' + this.appSession.user.surname;
-        console.log(">>", this.appSession.user);
+            this.appSession?.user?.name + ' ' + this.appSession?.user?.surname;
+       
     }
     closeModal(value: boolean) {
         this.display = false;
@@ -274,13 +271,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     getShownUserName(linkedUser: LinkedUserDto): string {
         if (!this._abpMultiTenancyService.isEnabled) {
-            return linkedUser.username;
+            return linkedUser?.username;
         }
 
         return (
             (linkedUser.tenantId ? linkedUser.tenancyName : ".") +
             "\\" +
-            linkedUser.username
+            linkedUser?.username
         );
     }
 
@@ -327,8 +324,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     logout(): void {
-        // this._authService.logout();
-        this._authService.logoutUsingSetting(true);
+        this._authService.logout();
     }
 
     onMySettingsModalSaved(): void {

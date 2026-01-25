@@ -5,8 +5,8 @@
         <div
             class="kt-subheader kt-grid__item"
             [ngStyle]="{
-                position: appItemViewInput?.marketPlace ? 'fixed' : 'absolute',
-                'z-index': !addingToList ? '5' : '1041'
+                position : appItemViewInput?.marketPlace ? 'fixed'  : 'absolute',
+                'z-index' : !addingToList ? '5'  : '1041'
             }"
         >
             <div [class]="containerClass">
@@ -39,7 +39,7 @@
         <div
             [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
             [ngClass]="{
-                marketPlaceDataContainer: appItemViewInput?.marketPlace
+                marketPlaceDataContainer : appItemViewInput?.marketPlace
             }"
         >
             <div
@@ -54,11 +54,11 @@
                                 "
                                 class="p-2 leftContainer thin-scroll mr-5"
                                 [ngStyle]="{
-                                    'overflow-y':
+                                    'overflow-y' :
                                         appItemForViewDto?.entityAttachments
                                             ?.length > numLeftContainerImages
                                             ? 'scroll'
-                                            : 'hidden'
+                                             : 'hidden'
                                 }"
                             >
                                 <div class="leftImage pr-2" #leftImage>
@@ -74,14 +74,14 @@
                                         (error)="handleFailedImage($event)"
                                         class="mb-3"
                                         [ngClass]="{
-                                            leftImageBorder:
+                                            leftImageBorder :
                                                 imageSelectedIndex == i
                                         }"
                                         (click)="
                                             imageSelectedIndex = i;
                                             showImageAtCenter(img)
                                         "
-                                        [ngStyle]="{'height.px':  (leftImage.clientWidth / acceptedAspectRatio )}"
+                                        [ngStyle]="{'height.px' :  (leftImage.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
@@ -93,11 +93,11 @@
                                 "
                                 class="p-2 leftContainer thin-scroll mr-5"
                                 [ngStyle]="{
-                                    'overflow-y':
+                                    'overflow-y' :
                                         appItemForViewDto?.entityAttachments
                                             ?.length > numLeftContainerImages
                                             ? 'scroll'
-                                            : 'hidden'
+                                             : 'hidden'
                                 }"
                             >
                                 <div class="leftImage pr-2" #leftImage>
@@ -116,18 +116,19 @@
                                         (error)="handleFailedImage($event)"
                                         class="mb-3"
                                         [ngClass]="{
-                                            leftImageBorder:
+                                            leftImageBorder :
                                                 imageSelectedIndex == i
                                         }"
                                         (click)="
                                             imageSelectedIndex = i;
                                             showImageAtCenter(img)
                                         "
-                                        [ngStyle]="{'height.px':  (leftImage.clientWidth / acceptedAspectRatio )}"
+                                        [ngStyle]="{'height.px' :  (leftImage.clientWidth / acceptedAspectRatio )}"
                                     />
                                 </div>
                             </div>
-                            <div class="p-2 ml-2 center-dev">
+
+                            <div class="p-2 ml-2 center-dev" #centerdiv>
                                 <div class="centerContatiner"  #centerContatiner>
                                    
                                    
@@ -175,8 +176,11 @@
 
                                 </div>
                             </div>
+
+                            <!-- [ngStyle]="{'left.px' : centerdiv.offsetLeft}" -->
                             <div
-                                class="pt-4 pl-3 mb-5 text-center"
+                                class="pt-4  mb-5 text-center position-relative"
+                                style="left: 50%; transform: translateX(-50%);"
                                 *ngIf="
                                     appItemForViewDto?.variations[0]
                                         ?.selectedValues?.length > 0
@@ -191,21 +195,21 @@
                                         else nocarousel
                                     "
                                 >
-                                    <div class="col-12">
+                                    <div class="col-12 pl-0">
                                         <h6 class="header">
                                             {{
                                                 appItemForViewDto?.variations[0]
                                                     .extraAttrName
-                                            }}: {{ selectedValuesName }}
+                                            }} : {{ selectedValuesName }}
                                         </h6>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12 pl-0">
                                         <div
                                             class="attachImage thin-scroll d-flex justify-content-center"
                                         >
                                             <p-carousel
-                                                [style]="{ width: '430px' }"
-                                                itemstyle="width:77px"
+                                                [style]="{ width : '430px' }"
+                                                itemstyle="width :77px"
                                                 [value]="
                                                     appItemForViewDto
                                                         ?.variations[0]
@@ -226,8 +230,8 @@
                                                 >
                                                     <div
                                                         class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
-                                                    >
-                                                        <img *ngIf="img?.colorImage && !img?.colorHexaCode"
+                                                    > 
+                                                        <img *ngIf="img?.colorImage"
                                                             [src]="
                                                                 attachmentBaseUrl +
                                                                 '/' +
@@ -240,7 +244,7 @@
                                                                 )
                                                             "
                                                             [ngClass]="{
-                                                                leftImageBorder:
+                                                                leftImageBorder :
                                                                     appItemForViewDto
                                                                         .variations[0]
                                                                         .selectedValues[
@@ -255,11 +259,11 @@
                                                             "
                                                         />
                                                         <div
-                                                        *ngIf="(!img?.colorImage && img?.colorHexaCode ) || (img?.colorImage && img?.colorHexaCode)"
+                                                        *ngIf="(!img?.colorImage && img?.colorHexaCode )"
                                     class="colorBox"
-                                    [ngStyle]="{'background-color':img?.colorHexaCode}"
+                                    [ngStyle]="{'background-color' :img?.colorHexaCode}"
                                     [ngClass]="{
-                                        leftImageBorder:
+                                        leftImageBorder :
                                             appItemForViewDto
                                                 .variations[0]
                                                 .selectedValues[
@@ -279,7 +283,7 @@
                                 [src]="defaultLogo"
             class="colorBox"
             [ngClass]="{
-                leftImageBorder:
+                leftImageBorder :
                     appItemForViewDto
                         .variations[0]
                         .selectedValues[
@@ -303,16 +307,16 @@
 
                                 <ng-template #nocarousel>
                                     <div class="row">
-                                        <div class="col-12">
+                                        <div class="col-12 pl-0">
                                             <h6 class="header">
                                                 {{
                                                     appItemForViewDto
                                                         ?.variations[0]
                                                         .extraAttrName
-                                                }}: {{ selectedValuesName }}
+                                                }} : {{ selectedValuesName }}
                                             </h6>
                                         </div>
-                                        <div class="col-12">
+                                        <div class="col-12 pl-0">
                                             <div
                                                 class="attachImage thin-scroll d-flex justify-content-center"
                                             >
@@ -340,7 +344,7 @@
                                                                 )
                                                             "
                                                             [ngClass]="{
-                                                                leftImageBorder:
+                                                                leftImageBorder :
                                                                     appItemForViewDto
                                                                         .variations[0]
                                                                         .selectedValues[
@@ -359,9 +363,9 @@
                                                         <div
                                     *ngIf=" (!img?.colorImage && img?.colorHexaCode ) || (img?.colorImage && img?.colorHexaCode)"
                                     class="colorBox"
-                                    [ngStyle]="{'background-color':img?.colorHexaCode}"
+                                    [ngStyle]="{'background-color' :img?.colorHexaCode}"
                                     [ngClass]="{
-                                        leftImageBorder:
+                                        leftImageBorder :
                                             appItemForViewDto
                                                 .variations[0]
                                                 .selectedValues[
@@ -380,7 +384,7 @@
                                 [src]="defaultLogo"
             class="colorBox"
             [ngClass]="{
-                leftImageBorder:
+                leftImageBorder :
                     appItemForViewDto
                         .variations[0]
                         .selectedValues[
@@ -444,7 +448,7 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{  languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  | localize }}:
+                                {{  languageSettingName!='en-GB' ? "MSRP"   :  "RRP"  | localize }} :
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{ appItemForViewDto?.minPrice }} -
                                 {{ tenantDefaultCurrency.symbol
@@ -457,9 +461,9 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  | localize }}:
+                                {{ languageSettingName!='en-GB' ? "MSRP"   :  "RRP"  | localize }} :
                                 {{ tenantDefaultCurrency.symbol
-                                }}{{appItemForViewDto?.minPrice | currency:' '}}
+                                }}{{appItemForViewDto?.minPrice | currency :' '}}
                              
                             </div>
                             <div class="d-flex">
@@ -467,6 +471,8 @@
                                     class="btn btn-primary"
                                     type="button"
                                     (click)="showAdvancedPricingModal()"
+                                    style="background-color : #4A0D4A !important;
+    border : none !important;"
                                 >
                                     {{ "AdvancedPricing" | localize }}
                                 </button>
@@ -501,7 +507,7 @@
                         </div>
                         <div
                             *ngIf="productDescription"
-                            class="pt-4 pb-3 border-bottom"
+                            class="pt-4 pb-3"
                         >
                             <div class="header">
                                 {{ "ProductDescription" | localize }}
@@ -509,10 +515,10 @@
                             <div
                                 class="big-scroll"
                                 [ngStyle]="{
-                                    'overflow-y': scrollDesc
+                                    'overflow-y' : scrollDesc
                                         ? 'scroll'
-                                        : 'auto',
-                                    height: scrollDesc ? '200px' : 'auto'
+                                         : 'auto',
+                                    height : scrollDesc ? '200px'  : 'auto'
                                 }"
                             >
                                 <p
@@ -546,7 +552,7 @@
                                 >
                                     <div class="col p-4 row">
                                         <div class="header">
-                                            {{ attr.extraAttrName }}:
+                                            {{ attr.extraAttrName }} :
                                         </div>
                                         <p-dropdown
                                             (click)="
@@ -627,6 +633,7 @@
                                                                 i
                                                             "
                                                             readOnly
+                                                            class="pl-3"
                                                         />
                                                     </div>
                                                 </div>
@@ -731,6 +738,7 @@
                                                                     parentProductPriceIndex
                                                                 "
                                                                 readOnly
+                                                            class="pl-3"
                                                             />
                                                         </div>
                                                     </div>
@@ -750,7 +758,7 @@
                                             <div
                                                 class=" col ratio-container thin-scroll"
                                             >
-                                                <div class="d-flex flex-wrap">
+                                                <div class="d-flex flex-wrap" #containerDiv>
                                                     <div
                                                         class="ratio-item prices-count"
                                                         *ngFor="
@@ -776,12 +784,13 @@
                                                                 "
                                                                 readOnly
                                                             />-->
-                                                            <label>{{priceDto.price | currency:' '}}</label>
+                                                            <label>{{priceDto.price | currency :' '}}</label>
                                                         </div>
-                                                        <div class="ratio-qty w-100" 
-                                                        [class]="{'w-400':index==0&&!priceHasSamePrices&&prices.length==4}" 
+                                                        <div class="ratio-qty " 
+                                                        [ngStyle]="{'width.px' : containerDiv.clientWidth}"
+                                                        [class]="{'w-400' :index==0&&!priceHasSamePrices&&prices.length==4}" 
                                                         *ngIf="priceHasSamePrices&&index==0||priceHasSamePrices&&priceHasSamePrices&&(index/4)==1" >
-                                                             <label>{{prices[0].price | currency:' '}}</label>
+                                                             <label>{{prices[0].price | currency :' '}}</label>
                                                          </div>
                                                     </div>
 
@@ -801,29 +810,29 @@
             [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
             "
-            [ngClass]="{ 'pt-5': appItemViewInput?.marketPlace }"
+            [ngClass]="{ 'pt-5' : appItemViewInput?.marketPlace }"
         >
             <div class="productDetailContainer p-4">
                 <h6 class="header">{{ "ProductDetails" | localize }}</h6>
                 <div class="details p-3">
                     <div class="row">
-                        <h5>{{ "ProductType" | localize }}:</h5>
+                        <h5>{{ "ProductType" | localize }}  :</h5>
                         &nbsp;
                         {{ appItemForViewDto?.entityObjectTypeName }}
                     </div>
                     <div class="row">
-                        <h5>{{ "ProductCode" | localize }}:</h5>
+                        <h5>{{ "ProductCode" | localize }}  :</h5>
                         &nbsp;
                         {{ appItemForViewDto?.code }}
                     </div>
                     <div class="row">
-                        <h5>{{ "ProductName" | localize }}:</h5>
+                        <h5>{{ "ProductName" | localize }}  :</h5>
                         &nbsp;
                         {{ appItemForViewDto?.name }}
                     </div>
 
                     <div *ngIf="appItemForViewDto?.manufacturerCode" class="row">
-                        <h5>Manufacture Code:</h5>
+                        <h5>Manufacture Code  :</h5>
                         &nbsp;
                         {{ appItemForViewDto?.manufacturerCode }}
                     </div>
@@ -838,7 +847,7 @@
             <div class="p-4 seeMoreContainer">
                 <div class="row pl-3">
                     <div>
-                        <h6 class="header">{{ "Categories" | localize }}:</h6>
+                        <h6 class="header">{{ "Categories" | localize }} :</h6>
                     </div>
                     <div class="col text-right">
                         <a
@@ -859,12 +868,12 @@
                 </div>
                 <div
                     class="row details pt-4"
-                    [ngClass]="{ 'thin-scroll': scrollCategory }"
+                    [ngClass]="{ 'thin-scroll' : scrollCategory }"
                     [ngStyle]="{
-                        'overflow-y': scrollCategory ? 'scroll' : 'hidden',
-                        height: scrollCategory
+                        'overflow-y' : scrollCategory ? 'scroll'  : 'hidden',
+                        height : scrollCategory
                             ? maxContainerHeight + 'px'
-                            : 'auto'
+                             : 'auto'
                     }"
                     *ngIf="
                         appItemForViewDto?.entityCategoriesNames.items.length >
@@ -902,7 +911,7 @@
             <div class="p-4 seeMoreContainer">
                 <div class="row pl-3">
                     <div>
-                        <h6 class="header">{{ "Departments" | localize }}:</h6>
+                        <h6 class="header">{{ "Departments" | localize }} :</h6>
                     </div>
                     <div class="col text-right">
                         <a
@@ -923,12 +932,12 @@
                 </div>
                 <div
                     class="row details pt-4"
-                    [ngClass]="{ 'thin-scroll': scrollDepartment }"
+                    [ngClass]="{ 'thin-scroll' : scrollDepartment }"
                     [ngStyle]="{
-                        'overflow-y': scrollDepartment ? 'scroll' : 'hidden',
-                        height: scrollDepartment
+                        'overflow-y' : scrollDepartment ? 'scroll'  : 'hidden',
+                        height : scrollDepartment
                             ? maxContainerHeight + 'px'
-                            : 'auto'
+                             : 'auto'
                     }"
                     *ngIf="
                         appItemForViewDto?.entityDepartmentsNames.items.length >
@@ -967,7 +976,7 @@
                 <div class="row pl-3">
                     <div>
                         <h6 class="header">
-                            {{ "Classifications" | localize }}:
+                            {{ "Classifications" | localize }} :
                         </h6>
                     </div>
                     <div class="col text-right">
@@ -989,14 +998,14 @@
                 </div>
                 <div
                     class="row details pt-4"
-                    [ngClass]="{ 'thin-scroll': scrollClassification }"
+                    [ngClass]="{ 'thin-scroll' : scrollClassification }"
                     [ngStyle]="{
-                        'overflow-y': scrollClassification
+                        'overflow-y' : scrollClassification
                             ? 'scroll'
-                            : 'hidden',
-                        height: scrollClassification
+                             : 'hidden',
+                        height : scrollClassification
                             ? maxContainerHeight + 'px'
-                            : 'auto'
+                             : 'auto'
                     }"
                     *ngIf="
                         appItemForViewDto?.entityClassificationsNames.items
@@ -1111,7 +1120,7 @@
             <div class="p-4 recomendedandAdditionalContainer">
                 <div class="row pl-3">
                     <div>
-                        <h6 class="header">{{ "Recommended" | localize }}:</h6>
+                        <h6 class="header">{{ "Recommended" | localize }} :</h6>
                     </div>
                     <div class="col text-right">
                         <a
@@ -1132,12 +1141,12 @@
                 </div>
                 <div
                     class="recomendedandAdditionalData details pt-4"
-                    [ngClass]="{ 'thin-scroll': scrollRecommended }"
+                    [ngClass]="{ 'thin-scroll' : scrollRecommended }"
                     [ngStyle]="{
-                        'overflow-y': scrollRecommended ? 'scroll' : 'hidden',
-                        height: scrollRecommended
+                        'overflow-y' : scrollRecommended ? 'scroll'  : 'hidden',
+                        height : scrollRecommended
                             ? maxContainerHeight + 'px'
-                            : 'auto'
+                             : 'auto'
                     }"
                     *ngIf="
                         appItemForViewDto?.recommended.length > 0;
@@ -1148,7 +1157,7 @@
                         class="row details pl-3"
                         *ngFor="let recommend of appItemForViewDto?.recommended"
                     >
-                        <h5>{{ recommend.extraAttrName }}:&nbsp;</h5>
+                        <h5>{{ recommend.extraAttrName }} :&nbsp;</h5>
                         <div
                             *ngFor="
                                 let selectedValue of recommend.selectedValues;
@@ -1156,7 +1165,7 @@
                             "
                             class="row"
                         >
-                            <span [ngClass]="i == 0 ? 'pl-3' : 'pl-4'">
+                            <span [ngClass]="i == 0 ? 'pl-3'  : 'pl-4'">
                                 <div
                                     *ngIf="
                                         recommend.extraAttrDataType.toUpperCase() ==
@@ -1229,7 +1238,7 @@
                     <div class="row">
                         <div>
                             <h6 class="header">
-                                {{ "Additional" | localize }}:
+                                {{ "Additional" | localize }} :
                             </h6>
                         </div>
                         <div class="col text-right">
@@ -1251,14 +1260,14 @@
                     </div>
                     <div
                         class="recomendedandAdditionalData details pt-4"
-                        [ngClass]="{ 'thin-scroll': scrollAdditional }"
+                        [ngClass]="{ 'thin-scroll' : scrollAdditional }"
                         [ngStyle]="{
-                            'overflow-y': scrollAdditional
+                            'overflow-y' : scrollAdditional
                                 ? 'scroll'
-                                : 'hidden',
-                            height: scrollAdditional
+                                 : 'hidden',
+                            height : scrollAdditional
                                 ? maxContainerHeight + 'px'
-                                : 'auto'
+                                 : 'auto'
                         }"
                         *ngIf="
                             appItemForViewDto?.additional.length > 0;
@@ -1271,7 +1280,7 @@
                                 let _additional of appItemForViewDto?.additional
                             "
                         >
-                            <h5>{{ _additional.extraAttrName }}:&nbsp;</h5>
+                            <h5>{{ _additional.extraAttrName }} :&nbsp;</h5>
                             <div
                                 *ngFor="
                                     let selectedValue of _additional.selectedValues;
@@ -1279,7 +1288,7 @@
                                 "
                                 class="row"
                             >
-                                <span [ngClass]="i == 0 ? 'pl-3' : 'pl-4'">
+                                <span [ngClass]="i == 0 ? 'pl-3'  : 'pl-4'">
                                     <div
                                         *ngIf="
                                             _additional.extraAttrDataType.toUpperCase() ==
@@ -1490,8 +1499,8 @@
 </app-advanced-pricing>
 
 <!-- <p-dialog
-    [style]="{ width: '30vw' }"
-    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
+    [style]="{ width : '30vw' }"
+    [breakpoints]="{ '960px' : '75vw', '640px' : '97vw' }"
     [baseZIndex]="10000"
     [modal]="true"
     [(visible)]="display"

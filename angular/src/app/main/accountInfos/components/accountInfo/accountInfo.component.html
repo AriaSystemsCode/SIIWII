@@ -154,7 +154,7 @@
 
                                 </li>
                                 <li class="nav-item"
-                                    *ngIf=" accountDataForView?.accountTypeId != 21 && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
+                                 >
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)"
                                         [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
                                         <img class="sidebar-menu-item-img"
@@ -386,7 +386,7 @@
                                                     (getCodeValue)="getCodeValue($event)" [maxlength]="12"></app-codes>
                                                 -->
                                             <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
-                                            class="form-control form-control-sm aria-input-text"
+                                            class="form-control form-control-sm aria-input-text" maxlength="6"
                                             [disabled]="accountInfoTemp?.id>0"
                                
                                             id="colFormLabelSm" [(ngModel)]="accountInfoTemp.code" name="code"

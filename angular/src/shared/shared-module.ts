@@ -27,6 +27,7 @@ import { dynamicInputsView } from '@shared/components/dynamic-inputs-view/dynami
 import { relatedItemModule } from '@app/relatedItems/relatedItem.module';
 import { InputSwitchModule } from 'primeng/inputswitch';
 
+
 @NgModule({
   imports: [
     // other modules

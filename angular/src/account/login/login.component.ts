@@ -32,6 +32,8 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     currentLang:string
     isArabic:boolean 
     
+
+
     isHost:boolean
     constructor(
         injector: Injector,

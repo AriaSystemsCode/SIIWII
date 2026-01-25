@@ -4235,9 +4235,10 @@ export class AccountsServiceProxy {
     /**
      * @param typeName (optional) 
      * @param lookupLabelDtos (optional) 
+     * @param matchName (optional) 
      * @return Success
      */
-    getTypeId(typeName: string | null | undefined, lookupLabelDtos: LookupLabelDto[] | null | undefined): Observable<number> {
+    getTypeId(typeName: string | null | undefined, lookupLabelDtos: LookupLabelDto[] | null | undefined, matchName: boolean | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetTypeId?";
         if (typeName !== undefined && typeName !== null)
             url_ += "typeName=" + encodeURIComponent("" + typeName) + "&";
@@ -4248,6 +4249,10 @@ export class AccountsServiceProxy {
         				url_ += "lookupLabelDtos[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
         			}
             });
+        if (matchName === null)
+            throw new Error("The parameter 'matchName' cannot be null.");
+        else if (matchName !== undefined)
+            url_ += "matchName=" + encodeURIComponent("" + matchName) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -10895,67 +10900,6 @@ export class AppEntitiesServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AppEntityDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param entityId (optional) 
-     * @param entityObjectTypeId (optional) 
-     * @return Success
-     */
-    getAppEntityExtraDataWithPaging(entityId: number | undefined, entityObjectTypeId: number | undefined): Observable<PagedResultDtoOfExtraDataAttrDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAppEntityExtraDataWithPaging?";
-        if (entityId === null)
-            throw new Error("The parameter 'entityId' cannot be null.");
-        else if (entityId !== undefined)
-            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
-        if (entityObjectTypeId === null)
-            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
-        else if (entityObjectTypeId !== undefined)
-            url_ += "entityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAppEntityExtraDataWithPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAppEntityExtraDataWithPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
-        }));
-    }
-
-    protected processGetAppEntityExtraDataWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfExtraDataAttrDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PagedResultDtoOfExtraDataAttrDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -76268,66 +76212,6 @@ export interface IContactInformationOutputDto {
     [key: string]: any;
 }
 
-export class PagedResultDtoOfExtraDataAttrDto implements IPagedResultDtoOfExtraDataAttrDto {
-    totalCount!: number;
-    items!: ExtraDataAttrDto[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IPagedResultDtoOfExtraDataAttrDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.totalCount = _data["totalCount"];
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(ExtraDataAttrDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): PagedResultDtoOfExtraDataAttrDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PagedResultDtoOfExtraDataAttrDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["totalCount"] = this.totalCount;
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IPagedResultDtoOfExtraDataAttrDto {
-    totalCount: number;
-    items: ExtraDataAttrDto[] | undefined;
-
-    [key: string]: any;
-}
-
 export enum ResponceType {
     OTHER = 0,
     INTEREST = 1,
@@ -77939,6 +77823,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
     currencySymbol!: string | undefined;
     currencyName!: string | undefined;
     isDefault!: boolean;
+    buyerSSIN!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -77965,6 +77850,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
             this.currencySymbol = _data["currencySymbol"];
             this.currencyName = _data["currencyName"];
             this.isDefault = _data["isDefault"];
+            this.buyerSSIN = _data["buyerSSIN"];
             this.id = _data["id"];
         }
     }
@@ -77989,6 +77875,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
         data["currencySymbol"] = this.currencySymbol;
         data["currencyName"] = this.currencyName;
         data["isDefault"] = this.isDefault;
+        data["buyerSSIN"] = this.buyerSSIN;
         data["id"] = this.id;
         return data;
     }
@@ -78002,6 +77889,7 @@ export interface IAppItemPriceInfo {
     currencySymbol: string | undefined;
     currencyName: string | undefined;
     isDefault: boolean;
+    buyerSSIN: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -93877,6 +93765,7 @@ export class AppItemPrices implements IAppItemPrices {
     currencyFk!: AppEntity;
     appItemFk!: AppItem;
     isDefault!: boolean;
+    buyerSSIN!: string | undefined;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -93913,6 +93802,7 @@ export class AppItemPrices implements IAppItemPrices {
             this.currencyFk = _data["currencyFk"] ? AppEntity.fromJS(_data["currencyFk"]) : <any>undefined;
             this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
             this.isDefault = _data["isDefault"];
+            this.buyerSSIN = _data["buyerSSIN"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -93947,6 +93837,7 @@ export class AppItemPrices implements IAppItemPrices {
         data["currencyFk"] = this.currencyFk ? this.currencyFk.toJSON() : <any>undefined;
         data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
         data["isDefault"] = this.isDefault;
+        data["buyerSSIN"] = this.buyerSSIN;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -93970,6 +93861,7 @@ export interface IAppItemPrices {
     currencyFk: AppEntity;
     appItemFk: AppItem;
     isDefault: boolean;
+    buyerSSIN: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

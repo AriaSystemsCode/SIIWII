@@ -33,7 +33,12 @@
             // width: 305px !important;
         }
     }
+    .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+        background-color: #2DC74F !important;
+    }
 }
+
+
 .form-check-label {
     color: #595959;
 }

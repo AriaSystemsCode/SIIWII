@@ -55,7 +55,11 @@
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"  (onSelect)="onChangeCompany($event)" (onFocus)="handleCompanySearch('')"
                     [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" field="name"
-                    [forceSelection]="false" class="w-100" [ngClass]="{'tempAccount': tempAccount}">
+                    [forceSelection]="false" class="w-100" [ngClass]="{'tempAccount': tempAccount}" [ngClass]="{
+                        'tempAccount': tempAccount,
+                        'rtl-autoC': isArabic,
+                        'ltr-autoC': !isArabic
+                      }">
 
 
                 </p-autoComplete>
@@ -129,12 +133,16 @@
                 </div>
 
 
-                <p-autoComplete #autoComplete [dropdown]="!tempAccount" [suggestions]="filteredContacts "
+                <p-autoComplete #autoComplete [dropdown]="!tempAccount" [suggestions]="filteredContacts " 
                     [ngModelOptions]="{standalone: true}" *ngIf="activeTab != transactionCartoccordionTabs.orderInfo"
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
                     (completeMethod)="handleContactSearch($event);" (onSelect)="onChangeContact($event)"
                     (click)="onClearText()" (onClear)="onClearText()" [placeholder]=" defaultcontactNamePlaceholder"
-                    field="name" [forceSelection]="false" class="w-100" [ngClass]="tempAccount ?  'tempCon' : ''">
+                    field="name" [forceSelection]="false" class="w-100" [ngClass]="{
+                        'tempCon': tempAccount,
+                        'rtl-autoC': isArabic,
+                        'ltr-autoC': !isArabic
+                      }">
 
 
                 </p-autoComplete>
@@ -258,7 +266,11 @@
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch"
                     (keydown)="preventTyping($event)" (completeMethod)="handleBranchSearch($event)"
                     [placeholder]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch || ' Main'"
-                    field="name" [forceSelection]="false" class="w-100" [ngClass]="{'tempAccount': tempContact}"
+                    field="name" [forceSelection]="false" class="w-100"  [ngClass]="{
+                        'tempContact': tempAccount,
+                        'rtl-autoC': isArabic,
+                        'ltr-autoC': !isArabic
+                      }"
                     (onSelect)="onChangeBranch($event)">
 
 

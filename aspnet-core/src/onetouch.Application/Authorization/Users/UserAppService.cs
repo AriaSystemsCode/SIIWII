@@ -512,10 +512,10 @@ namespace onetouch.Authorization.Users
                         }
                         ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
                         //I40[End]
-
                     }
-                    //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[Start]
+
                 }
+                //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[Start]
                 else
                 {
                     var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
@@ -589,9 +589,9 @@ namespace onetouch.Authorization.Users
                         //I40[End]
                     }
                 }
-                //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[End]
-                //Mariam[End]
             }
+            //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[End]
+            //Mariam[End]
         }
 
         [AbpAuthorize(AppPermissions.Pages_Administration_Users_Create)]
@@ -795,7 +795,7 @@ namespace onetouch.Authorization.Users
                 var rolesOfUser = userRoles.Where(userRole => userRole.UserId == user.Id).ToList();
                 user.Roles = ObjectMapper.Map<List<UserListRoleDto>>(rolesOfUser);
                 //Mariam[start]
-                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == user.Id.ToString());
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId && x.AttributeId == 715 && x.AttributeValue == user.Id.ToString());
                 if (contactEntityExtraData != null)
                 {
                     var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);

@@ -23,10 +23,14 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   @Output() extraDataChanged = new EventEmitter<any[]>();
   @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
   selectedExtraData: any[] = [];
+  @Input() appTransactionsForViewDto: any;
+  @Input() fromSetting: boolean = false;
   @Input() dynamicInputsForViewDto: any;
   originalValuesMap = new Map<number, any>();
-  @Input() fromSetting: boolean = false;
 
+
+  sycAttachmentCategoryImage: SycAttachmentCategoryDto;
+  @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
   warningMsg: string = "";
 
   public constructor(
