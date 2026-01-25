@@ -7002,7 +7002,7 @@ namespace onetouch.Accounts
             accountDto.AccountType = accountTypeCode;
             var output = await CreateOrEditAccount(accountDto);
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
-            if (accountDto.EntityAttachments.Count > 0)
+            if (accountDto.EntityAttachments!=null && accountDto.EntityAttachments.Count > 0)
             {
                 var userId = accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null ||
                     accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null ||
@@ -7097,7 +7097,28 @@ namespace onetouch.Accounts
                     }
                 }
             }
-            
+            if (accountDto.EntityExtraData != null && accountDto.EntityExtraData.Count > 0)
+            {
+                var userObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                if (userObj != null && !string.IsNullOrEmpty(userObj.AttributeValue) && int.Parse(userObj.AttributeValue) > 0)
+                {
+                    string firstName = "";
+                    string lastName = "";
+                    var userFirstNameObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 701).FirstOrDefault();
+                    if (userFirstNameObj != null)
+                        firstName = userFirstNameObj.AttributeValue;
+                    var userLastNameObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 702).FirstOrDefault();
+                    if (userLastNameObj != null)
+                        lastName = userLastNameObj.AttributeValue;
+                    var user = await UserManager.FindByIdAsync(userObj.AttributeValue);
+                    if (user != null)
+                    {
+                        user.Surname = lastName;
+                        user.Name = firstName;
+                        await UserManager.UpdateAsync(user);
+                    }
+                }
+            }
             return returnObject;
             
         }
