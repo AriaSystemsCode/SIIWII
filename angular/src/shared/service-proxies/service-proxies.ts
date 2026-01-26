@@ -6443,6 +6443,67 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
+     * @param entityId (optional) 
+     * @param entityObjectTypeId (optional) 
+     * @return Success
+     */
+    getAppEntityExtraDataWithPaging(entityId: number | undefined, entityObjectTypeId: number | undefined): Observable<PagedResultDtoOfExtraDataAttrDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAppEntityExtraDataWithPaging?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        if (entityObjectTypeId === null)
+            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
+        else if (entityObjectTypeId !== undefined)
+            url_ += "entityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppEntityExtraDataWithPaging(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppEntityExtraDataWithPaging(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfExtraDataAttrDto>;
+        }));
+    }
+
+    protected processGetAppEntityExtraDataWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfExtraDataAttrDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfExtraDataAttrDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param names (optional) 
      * @param body (optional) 
      * @return Success
@@ -15115,11 +15176,16 @@ export class AppItemsServiceProxy {
     }
 
     /**
+     * @param index (optional) 
      * @param body (optional) 
      * @return Success
      */
-    validateImportItemData(body: ImportItemInputDto | undefined): Observable<ImportItemReturnDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateImportItemData";
+    validateImportItemData(index: number | undefined, body: ImportItemInputDto | undefined): Observable<ImportItemReturnDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateImportItemData?";
+        if (index === null)
+            throw new Error("The parameter 'index' cannot be null.");
+        else if (index !== undefined)
+            url_ += "index=" + encodeURIComponent("" + index) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -74232,6 +74298,66 @@ export class PagedResultDtoOfGetAppEntityForViewDto implements IPagedResultDtoOf
 export interface IPagedResultDtoOfGetAppEntityForViewDto {
     totalCount: number;
     items: GetAppEntityForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfExtraDataAttrDto implements IPagedResultDtoOfExtraDataAttrDto {
+    totalCount!: number;
+    items!: ExtraDataAttrDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfExtraDataAttrDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ExtraDataAttrDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfExtraDataAttrDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfExtraDataAttrDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfExtraDataAttrDto {
+    totalCount: number;
+    items: ExtraDataAttrDto[] | undefined;
 
     [key: string]: any;
 }
