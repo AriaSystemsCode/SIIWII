@@ -2,6 +2,8 @@
 <localizationDictionary culture="en">
 	<texts>
 	<text name="Defaultcontactusemail">Default contact us email </text>
+	<text name="MarketplacesellerSSIN">Marketplace seller SSIN</text>	
+		
 	<text name="Defaultcontactusemailtemplate">Default contact us email template</text>
 	<text name="Portalimage">Portal image</text>
 	<text name="Portalslogan">Portal slogan</text>
