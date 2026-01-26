@@ -1638,7 +1638,6 @@ export class CreateOrEditAppItemComponent
             )
             .subscribe((res) => {
                 this.appItem.id = res;
-                this.stopFormListening = true;
                 this.emitDestroy();
                 this.removeAllUnusedTempAttachments();
                 this.notify.info(this.l("SavedSuccessfully"));
