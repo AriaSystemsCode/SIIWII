@@ -1591,6 +1591,7 @@ export class CreateOrEditAppItemComponent
                 this.l("Please,CompleteAllTheRequiredFields(*)")
             );
         }
+        this.stopFormListening=true;
         if (!this.appItem?.entityAttachments?.length) {
             return this.notify.error(
                 this.l("Please,UploadAtLeastOneImageToThisProduct")
