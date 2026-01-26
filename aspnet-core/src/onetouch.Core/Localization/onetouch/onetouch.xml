@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>	<text name="Portalimage">Portal image</text>
+	<texts>
+	<text name="Portalimage">Portal image</text>
 	<text name="Portalslogan">Portal slogan</text>
 	<text name="Shownewsfeed">Show news feed</text>
 	<text name="Landingpageis">Landing page is</text>

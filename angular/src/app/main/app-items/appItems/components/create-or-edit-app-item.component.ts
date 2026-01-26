@@ -1489,6 +1489,9 @@ export class CreateOrEditAppItemComponent
         this.defaultImageIndex = index;
         this.appItem.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
+            if (item.isDefault) 
+                item.isPublish = true;
+            
             return item;
         });
     }
@@ -2099,6 +2102,9 @@ export class CreateOrEditAppItemComponent
     }
 
     setVisibleinMarketplaceImage(index) {
+        if (this.defaultImageIndex == index) 
+            return;
+        
         this.formTouched = true;
         this.appItem.entityAttachments?.map((item, i) => {
             if (index == i) {

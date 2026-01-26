@@ -892,6 +892,8 @@ export class CreateEditAppItemVariationsComponent
         this.activeAttachmentOption.defaultImageIndex = index;
         this.activeAttachmentOption.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
+            if (item.isDefault) 
+                item.isPublish = true;
             return item;
         });
         this.updateVaritaionAttachments();
@@ -1067,7 +1069,7 @@ export class CreateEditAppItemVariationsComponent
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
         //  att.index = index;
         att.fileName = file?.name;
-        att.isPublic=false;
+        //att.isPublic=false;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
         // let optionValue = this.activeAttachmentOption.lookupData.value;
         let optionValue;
@@ -2456,6 +2458,8 @@ export class CreateEditAppItemVariationsComponent
     }
 
     setVisibleinMarketplaceImage(index) {
+        if (this.activeAttachmentOption.defaultImageIndex === index) 
+            return;
         this.formTouched = true;
         this.activeAttachmentOption?.entityAttachments?.map((item, i) => {
             if (index == i) {

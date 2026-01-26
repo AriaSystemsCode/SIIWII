@@ -459,15 +459,15 @@
                                         <img *ngIf="isPdfFile(appItem.entityAttachments[i]?.fileName)"
                                             src="../../../../../assets/Items/pdf-Icon.png" />
 
-                                            
-                                            <a class="select-default-image p-2"
+                                            <!-- [ngClass]="{'d-block' : defaultImageIndex == i}" -->
+
+                                            <a class="select-default-image p-2 d-block"
                                             *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)"
                                             style="    border: 1px solid #EEEEEEEE !important;
     border-radius: 12px;"
-                                                [ngClass]="{'d-block' : defaultImageIndex == i}"
                                                 (click)="setDefaultImage(i)">
-                                                <i class="fa fa-check-square mr-2"
-                                                    [ngClass]="defaultImageIndex == i? 'text-purple':'text-grey' "> </i>
+                                                <i class="fa  mr-2"
+                                                    [ngClass]="defaultImageIndex == i? 'fa-check-square text-purple':'fa-square text-grey' "> </i>
                                              <label class="text-purple">  {{ 'Default Image' | localize}}</label> 
                                             </a>
 
@@ -478,7 +478,8 @@
                                              <input 
                                                type="checkbox" 
                                                class="mr-2" 
-                                               [checked]="appItem?.entityAttachments[i]?.isPublic" 
+                                               [checked]="appItem?.entityAttachments[i]?.isPublic || defaultImageIndex == i" 
+                                               [disabled]="defaultImageIndex == i"
                                                (change)="setVisibleinMarketplaceImage(i)"
                                              />
                                              {{ 'Visible in Marketplace' | localize }}
