@@ -11,6 +11,23 @@ namespace onetouch.AppItems.Dtos
 
         public string DisplayName { get; set; }
     }
+    public class AppItemPriceCsvDto
+    {
+        public string Code { get; set; }
+        public string SSIN { get; set; }
+        public string StyMajor { get; set; }
+        public string Currency { get; set; }
+        public string Price { get; set; }
+        public int RowNumber { get; set; }
+    }
+    public class PriceImportFailureLogDto
+    {
+        public string AppItemCode { get; set; }   // StyMajor
+        public string SSIN { get; set; }
+        public string Currency { get; set; }
+        public string Price { get; set; }
+        public string Reason { get; set; }
+    }
 
     public partial class AppItemExcelResultsDTO
     {
@@ -68,13 +85,13 @@ namespace onetouch.AppItems.Dtos
 
     public class RecordTypeValidationAttribute : ValidationAttribute
     {
-        private static readonly string[] allowedValues = new[] { "Item", "Item Variant", "Image", "Color" };
+        private static readonly string[] allowedValues = new[] { "Item", "Item Variant", "Image", "Color", "Price" };
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value == null || !allowedValues.Contains(value.ToString()))
             {
-                return new ValidationResult("Record Type must be Item, Item Variant, or Image.");
+                return new ValidationResult("Record Type must be Item, Item Variant, Price, or Image.");
             }
 
             return ValidationResult.Success;

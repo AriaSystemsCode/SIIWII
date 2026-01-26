@@ -82,6 +82,10 @@ using Newtonsoft.Json;
 using System.Drawing;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
+using Abp.Timing;
+using ClosedXML.Excel;
+using NPOI.POIFS.Properties;
+using OfficeOpenXml;
 using System.Diagnostics;
 using Org.BouncyCastle.Crypto.Agreement.JPake;
 
@@ -95,6 +99,7 @@ namespace onetouch.AppItems
         //I46[End]
         private readonly IRepository<AppItemsListDetail, long> _appItemsListDetailRepository;
         private readonly IRepository<AppItem, long> _appItemRepository;
+        private readonly IRepository<AppContact, long> _appContactRepository;
         private readonly IAppItemsExcelExporter _appItemsExcelExporter;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<AppEntity, long> _appEntityRepository;
@@ -140,6 +145,7 @@ namespace onetouch.AppItems
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         private readonly IRepository<ValidationRule> _validationRuleRepo;
         public AppItemsAppService(
+            IRepository<AppContact, long> appContactRepository,
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
             , IRepository<AppEntityCategory, long> appEntityCategoryRepository
@@ -169,6 +175,7 @@ namespace onetouch.AppItems
             )
         {
             _appEntitiesRelationship = appEntitiesRelationship;
+            _appContactRepository = appContactRepository;
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             //MMT33-2
             _appMarketplaceItemsListDetails = appMarketplaceItemsListDetails;
@@ -7087,6 +7094,678 @@ namespace onetouch.AppItems
             return itemExcelResultsDTO;
         }
 
+        public async Task<AppItemExcelResultsDTO> ValidatePriceCSV(string guidFile, string[] imagesList)
+        {
+            var resultDto = new AppItemExcelResultsDTO
+            {
+                ExcelRecords = new List<AppItemtExcelRecordDTO>(),
+                TotalRecords = 0,
+                TotalPassedRecords = 0,
+                TotalFailedRecords = 0
+            };
+
+            if (string.IsNullOrEmpty(guidFile))
+                return resultDto;
+
+            try
+            {
+                var tenantId = AbpSession.TenantId ?? -1;
+                var path = Path.Combine(
+                    _appConfiguration["Attachment:PathTemp"],
+                    tenantId.ToString(),
+                    guidFile + ".csv"
+                );
+
+                if (!System.IO.File.Exists(path))
+                    throw new UserFriendlyException("CSV file not found.");
+
+                var lines = System.IO.File.ReadAllLines(path);
+                if (lines.Length < 2)
+                    throw new UserFriendlyException("CSV file is empty.");
+
+                var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+                if (!headers.Any(h => h.Equals("ssin", StringComparison.OrdinalIgnoreCase)) ||
+                    !headers.Any(h => h.Equals("discsplit", StringComparison.OrdinalIgnoreCase)) ||
+                    !headers.Any(h => h.Equals("currcode", StringComparison.OrdinalIgnoreCase)))
+                {
+                    throw new UserFriendlyException("CSV must contain ssin, discsplit, and currcode columns.");
+                }
+
+                // Ensure Status & ErrorMessage columns
+                if (!headers.Any(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase)))
+                    headers.Add("Status");
+
+                if (!headers.Any(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase)))
+                    headers.Add("ErrorMessage");
+
+                var outputLines = new List<string>
+        {
+            string.Join(",", headers)
+        };
+
+                var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+                var appContacts = await _appContactRepository.GetAll().ToListAsync();
+                var appContactsDict = appContacts
+                    .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+                    .GroupBy(x => x.SSIN.Trim().ToUpper())
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                int rowNumber = 1;
+
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    rowNumber++;
+
+                    var values = lines[i].Split(',');
+
+                    var row = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    for (int h = 0; h < headers.Count; h++)
+                        row[headers[h]] = h < values.Length ? values[h] : "";
+
+                    var record = new AppItemtExcelRecordDTO
+                    {
+                        Status = ExcelRecordStatus.Passed.ToString(),
+                        FieldsErrors = new List<string>(),
+                        ErrorMessage = ""
+                    };
+
+                    var dto = new AppItemPriceCsvDto
+                    {
+                        Code = row.ContainsKey("stymajor") ? row["stymajor"]?.Trim() : "",
+                        SSIN = row["ssin"]?.Trim(),
+                        Currency = row["currcode"]?.Trim(),
+                        Price = row["discsplit"]?.Trim(),
+                        RowNumber = rowNumber
+                    };
+
+                    record.Code = dto.Code;
+                    record.RecordType = "Account Code";
+
+                    bool hasError = false;
+
+                    // SSIN validation
+                    if (string.IsNullOrWhiteSpace(dto.SSIN))
+                    {
+                        record.FieldsErrors.Add("SSIN is required.");
+                        hasError = true;
+                    }
+                    else if (!appContactsDict.TryGetValue(dto.SSIN.ToUpper(), out var appContact))
+                    {
+                        record.FieldsErrors.Add("SSIN is not found.");
+                        hasError = true;
+                    }
+
+                    var item = _appItemRepository.GetAll()
+                        .FirstOrDefault(x => x.Code.Replace(" ", "") == dto.Code.Replace(" ", ""));
+
+                    if (item == null)
+                    {
+                        record.FieldsErrors.Add($"Item code {dto.Code} not found.");
+                        hasError = true;
+                    }
+
+                    // Price validation
+                    if (!decimal.TryParse(dto.Price, out decimal price) || price <= 0)
+                    {
+                        record.FieldsErrors.Add("Invalid price value.");
+                        hasError = true;
+                    }
+
+                    // Currency validation
+                    long currencyId = 0;
+                    string currencyCode = "";
+
+                    var matchedCurrency = currencies
+                        .FirstOrDefault(c => c.Code.Equals(dto.Currency, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchedCurrency == null)
+                    {
+                        record.FieldsErrors.Add("Invalid currency code.");
+                        hasError = true;
+                    }
+                    else
+                    {
+                        currencyId = matchedCurrency.Value;
+                        currencyCode = matchedCurrency.Code;
+                    }
+
+                    if (hasError)
+                    {
+                        record.Status = ExcelRecordStatus.Failed.ToString();
+                        record.ErrorMessage = string.Join(" | ", record.FieldsErrors);
+                        resultDto.TotalFailedRecords++;
+                    }
+                    else
+                    {
+                        record.Status = ExcelRecordStatus.Passed.ToString();
+                        record.ErrorMessage = "";
+
+                        record.ExcelDto = new AppItemExcelDto
+                        {
+                            Code = dto.Code,
+                            EntityObjectCategoryID = item.Id,
+                            Name = dto.SSIN,
+                            Price = price.ToString(),
+                            Currency = currencyCode,
+                            ParentId = currencyId,
+                            RecordType = "Price",
+                            ProductDescription = "-",
+                            ProductType = "-"
+                        };
+
+                        resultDto.TotalPassedRecords++;
+                    }
+
+                    row["Status"] = record.Status;
+                    row["ErrorMessage"] = record.ErrorMessage;
+
+                    outputLines.Add(string.Join(",", headers.Select(h => row[h])));
+
+                    resultDto.ExcelRecords.Add(record);
+                }
+
+                resultDto.TotalRecords = resultDto.ExcelRecords.Count;
+
+                var newFileName = $"{Path.GetFileNameWithoutExtension(path)}_Validated_{DateTime.Now:yyyyMMddHHmmss}.csv";
+                var newPath = Path.Combine(Path.GetDirectoryName(path), newFileName);
+                
+                newPath = newPath.Replace(_appConfiguration[$"Attachment:PathTemp"].ToString(), _appConfiguration[$"Attachment:Path"]);
+                resultDto.FilePath = newPath;
+
+                System.IO.File.WriteAllLines(newPath, outputLines);
+                newPath = newPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+                
+
+                resultDto.ExcelLogDTO = new ExcelLogDto();
+                resultDto.ExcelLogDTO.ExcelLogPath = newPath;
+                resultDto.ExcelLogDTO.ExcelLogFileName = newFileName;
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return resultDto;
+        }
+
+
+        //    public async Task<AppItemExcelResultsDTO> ValidatePriceCSV(string guidFile, string[] imagesList)
+        //    //public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
+        //    {
+        //        var resultDto = new AppItemExcelResultsDTO
+        //        {
+        //            ExcelRecords = new List<AppItemtExcelRecordDTO>(),
+        //            TotalRecords = 0,
+        //            TotalPassedRecords = 0,
+        //            TotalFailedRecords = 0
+        //        };
+
+        //        if (string.IsNullOrEmpty(guidFile))
+        //            return resultDto;
+
+        //        try
+        //        {
+        //            var tenantId = AbpSession.TenantId ?? -1;
+        //            var path = _appConfiguration["Attachment:PathTemp"] + @"\" + tenantId + @"\" + guidFile + ".csv";
+
+        //            if (!System.IO.File.Exists(path))
+        //                throw new UserFriendlyException("CSV file not found.");
+
+        //            var lines = System.IO.File.ReadAllLines(path);
+        //            if (lines.Length < 2)
+        //                throw new UserFriendlyException("CSV file is empty.");
+
+        //            var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+        //            if (!headers.Contains("ssin") || !headers.Contains("discsplit") || !headers.Contains("currcode"))
+        //                throw new UserFriendlyException("CSV must contain Code, Price, and Currency columns.");
+
+        //            var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+        //            //// Preload Contacts
+        //            var appContacts = await _appContactRepository.GetAll().ToListAsync();
+        //            //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
+        //            var appContactsDict = appContacts
+        //.Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+        //.GroupBy(x => x.SSIN.Trim().ToUpper())
+        //.ToDictionary(g => g.Key, g => g.First());
+
+
+
+        //            int rowNumber = 1;
+
+        //            for (int i = 1; i < lines.Length; i++)
+        //            {
+        //                rowNumber++;
+
+        //                var values = lines[i].Split(',');
+        //                var row = headers.Zip(values, (h, v) => new { h, v }).ToDictionary(x => x.h, x => x.v);
+
+        //                var record = new AppItemtExcelRecordDTO
+        //                {
+        //                    Status = ExcelRecordStatus.Passed.ToString(),
+        //                    FieldsErrors = new List<string>(),
+        //                    ErrorMessage = ""
+        //                };
+
+        //                var dto = new AppItemPriceCsvDto
+        //                {
+        //                    Code = row["stymajor"]?.Trim(),
+        //                    SSIN = row["ssin"]?.Trim(),
+        //                    //StyMajor = row["stymajor"]?.Trim(),
+        //                    Currency = row["currcode"]?.Trim(),
+        //                    Price = row["discsplit"]?.Trim(),
+        //                    RowNumber = rowNumber
+        //                };
+
+        //                record.Code = dto.Code;
+        //                record.RecordType = "Account Code";
+
+        //                bool hasError = false;
+
+        //                // SSIN validation
+        //                if (string.IsNullOrWhiteSpace(dto.SSIN))
+        //                {
+        //                    record.FieldsErrors.Add("SSIN is required.");
+        //                    hasError = true;
+        //                }
+        //                else
+        //                {
+
+        //                    if (!appContactsDict.TryGetValue(dto.SSIN, out var appContact))
+        //                    {
+        //                        record.FieldsErrors.Add("SSIN is not found.");
+        //                        hasError = true;
+        //                    }
+        //                }
+
+        //                var item = _appItemRepository
+        //                    .GetAll()
+        //                    .FirstOrDefault(x => x.Code.Replace(" ", "") == dto.Code.Replace(" ", ""));
+
+
+        //                if (item == null)
+        //                {
+        //                    record.FieldsErrors.Add($"Item code {dto.Code} not found.");
+        //                    hasError = true;
+        //                }
+
+        //                // Price validation
+        //                if (!decimal.TryParse(row["discsplit"], out decimal price) || price <= 0)
+        //                {
+        //                    record.FieldsErrors.Add("Invalid price value.");
+        //                    hasError = true;
+        //                }
+        //                else
+        //                {
+        //                    dto.Price = price.ToString();
+        //                }
+
+        //                // Currency validation
+        //                //if (currencies.All(c => c.Code != dto.Currency))
+        //                //{
+        //                //    record.FieldsErrors.Add("Invalid currency code.");
+        //                //    hasError = true;
+        //                //}
+        //                long currencyId = 0;
+        //                string currencyCode = "";
+        //                var matchedCurrency = currencies
+        //                .FirstOrDefault(c => c.Code.Equals(dto.Currency, StringComparison.OrdinalIgnoreCase));
+
+        //                if (matchedCurrency == null)
+        //                {
+        //                    record.FieldsErrors.Add("Invalid currency code.");
+        //                    hasError = true;
+        //                }
+        //                else
+        //                {
+        //                    // You can now use the matched currency object
+        //                    currencyId = matchedCurrency.Value;
+        //                    currencyCode = matchedCurrency.Code;
+        //                }
+
+        //                if (hasError)
+        //                {
+        //                    record.Status = ExcelRecordStatus.Failed.ToString();
+        //                    record.ErrorMessage = "Invalid price data.";
+        //                    resultDto.TotalFailedRecords++;
+        //                }
+        //                else
+        //                {
+        //                    record.Code = "Item code: " + dto.Code;
+        //                    //record.RecordType = "Account Code: " + dto.SSIN;
+        //                    record.RecordType = "Price";
+
+
+        //                    record.ExcelDto = new AppItemExcelDto
+        //                    {
+        //                        Code = dto.Code,
+        //                        EntityObjectCategoryID = item.Id,
+
+        //                        Name = dto.SSIN,
+        //                        Price = dto.Price.ToString(),
+        //                        Currency = currencyCode,
+        //                        ParentId = currencyId,
+
+        //                    };
+        //                    record.ExcelDto.Code = "Item";
+        //                    record.ExcelDto.RecordType = "Price";
+        //                    record.ExcelDto.ProductDescription = "-";
+        //                    record.ExcelDto.ProductType = "-";
+        //                    record.ExcelDto.Code = "-";
+        //                    record.ExcelDto.Code = "-";
+
+        //                    resultDto.TotalPassedRecords++;
+        //                }
+
+        //                resultDto.ExcelRecords.Add(record);
+        //            }
+
+        //            resultDto.TotalRecords = resultDto.ExcelRecords.Count;
+        //            resultDto.FilePath = path;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            throw new UserFriendlyException(ex.Message);
+        //        }
+
+        //        return resultDto;
+        //    }
+
+        public void UpdateCsvStatusFromErrorLog(
+        string filePath,
+            List<AppItemtExcelRecordDTO> errorLogList)
+        {
+            var guidFile = Path.GetFileName(filePath);
+            var tenantId = AbpSession.TenantId ?? -1;
+            var csvFilePath = Path.Combine(
+                _appConfiguration["Attachment:Path"],
+                tenantId.ToString(),
+                guidFile 
+            );
+
+
+            if (string.IsNullOrWhiteSpace(csvFilePath))
+                throw new UserFriendlyException("CSV file path is empty.");
+
+            if (!System.IO.File.Exists(csvFilePath))
+                throw new UserFriendlyException("CSV file not found.");
+
+            if (errorLogList == null || !errorLogList.Any())
+                return;
+
+            var lines = System.IO.File.ReadAllLines(csvFilePath).ToList();
+            if (lines.Count < 2)
+                return;
+
+            var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+            if (!headers.Any(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase)))
+                throw new UserFriendlyException("CSV does not contain Status column.");
+
+            if (!headers.Any(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase)))
+                throw new UserFriendlyException("CSV does not contain ErrorMessage column.");
+
+            //if (!headers.Any(h => h.Equals("Code", StringComparison.OrdinalIgnoreCase)))
+            //    throw new UserFriendlyException("CSV does not contain Code column.");
+
+            var statusCol = headers.FindIndex(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase));
+            var errorMsgCol = headers.FindIndex(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase));
+            //var codeCol = headers.FindIndex(h => h.Equals("Code", StringComparison.OrdinalIgnoreCase));
+
+            //// Fast lookup for error logs
+            //var errorDict = errorLogList
+            //    .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+            //    .GroupBy(x => x.Code.Trim(), StringComparer.OrdinalIgnoreCase)
+            //    .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+            for (int i = 1; i < lines.Count; i++)
+            {
+                var values = lines[i].Split(',');
+
+                //if (values.Length <= Math.Max(codeCol, Math.Max(statusCol, errorMsgCol)))
+                 //   continue;
+
+                //var code = values[codeCol]?.Trim();
+                //if (string.IsNullOrEmpty(code))
+                //    continue;
+
+                //if (!errorDict.TryGetValue(code, out var error))
+                //    continue;
+
+                values[statusCol] = errorLogList[i-1].Status;
+                values[errorMsgCol] = errorLogList[i-1].ErrorMessage;
+
+                lines[i] = string.Join(",", values);
+            }
+
+            // Save updated file (overwrite)
+            System.IO.File.WriteAllLines(csvFilePath, lines);
+        }
+
+
+        public async Task<ExcelLogDto> SavePriceFromCSV(AppItemExcelResultsDTO itemExcelResultsDTO)
+        {
+            var excelLog = new ExcelLogDto(); // default ExcelLogDto to return
+
+            if (itemExcelResultsDTO?.ExcelRecords == null || !itemExcelResultsDTO.ExcelRecords.Any())
+                return excelLog; // return empty log if no records
+
+            var result = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status !=
+            ExcelRecordStatus.Failed.ToString()).ToList();
+
+            var tenantId = AbpSession.TenantId;
+            var userId = AbpSession.UserId;
+            var now = Clock.Now;
+
+            //// Preload AppItems
+            var appItems = await _appItemRepository.GetAll().ToListAsync();
+            var appItemDict = appItems
+    .GroupBy(x => x.Code?.Trim().ToUpper())
+    .ToDictionary(g => g.Key, g => g.First());
+
+
+            //// Preload Currencies
+            var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
+            var currencyDict = currencies
+    .GroupBy(x => x.Code?.Trim().ToUpper())
+    .ToDictionary(g => g.Key, g => g.First());
+
+            //// Preload Contacts
+            var appContacts = await _appContactRepository.GetAll().ToListAsync();
+            //var currencyDict = currencies.ToDictionary(x => x.Code.Trim().ToUpper, x => x);
+            var appContactsDict = appContacts
+            .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+            .GroupBy(x => x.SSIN.Trim().ToUpper())
+            .ToDictionary(g => g.Key, g => g.First());
+
+
+
+            var updatedAppItemIds = new HashSet<long>();
+
+            // To Do
+            // Validate SSIN
+            // send notificatons to user
+
+            // add for variations
+            // excel sheet path
+
+
+            // Open the Excel document
+            // using (var document = new XLWorkbook(itemExcelResultsDTO.FilePath))
+            {
+                // var sheet = document.Worksheet(1);
+                int rowNumber = 1;
+
+                foreach (var logRecord in result)
+                {
+                    rowNumber++;
+                    var excelDto = logRecord.ExcelDto;
+
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(excelDto.Code) ||
+                            string.IsNullOrWhiteSpace(excelDto.Name) ||
+                            string.IsNullOrWhiteSpace(excelDto.Currency) ||
+                            string.IsNullOrWhiteSpace(excelDto.Price))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "Required field is missing";
+                            continue;
+                        }
+
+                        if (!decimal.TryParse(excelDto.Price, out var price))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "Invalid price value";
+                            continue;
+                        }
+
+                        var appItemKey = excelDto.Code.Trim().ToUpper();
+                        var currencyKey = excelDto.Currency.Trim().ToUpper();
+                        var appContactKey = excelDto.Name.Trim().ToUpper();
+
+                        if (!appItemDict.TryGetValue(appItemKey, out var appItem))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "AppItem not found";
+                            continue;
+                        }
+
+                        if (!appContactsDict.TryGetValue(appContactKey, out var appContact))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "SSIN not found";
+                            continue;
+                        }
+
+
+                        if (!currencyDict.TryGetValue(currencyKey, out var currency))
+                        {
+                            logRecord.Status = "Failed";
+                            logRecord.ErrorMessage = "Currency not found";
+                            continue;
+                        }
+
+                        // Normalize keys
+                        var priceCode = excelDto.Name.Trim();
+                        var currencyCode = currency.Code.Trim();
+
+                        // Query per row (no preload)
+                        var existingPrice = await _appItemPricesRepository.GetAll()
+                            .Where(x =>
+                                x.AppItemId == appItem.Id &&
+                                x.Code == priceCode &&
+                                x.BuyerSSIN == excelDto.Name &&
+                                x.CurrencyCode == currencyCode &&
+                                !x.IsDeleted)
+                            .FirstOrDefaultAsync();
+
+                        if (existingPrice != null)
+                        {
+                            // 🔄 UPDATE
+                            existingPrice.Price = price;
+                            existingPrice.BuyerSSIN = excelDto.Name;
+                            existingPrice.LastModificationTime = now;
+                            existingPrice.LastModifierUserId = userId;
+                            existingPrice.IsDefault = true;
+
+                            await _appItemPricesRepository.UpdateAsync(existingPrice);
+                        }
+                        else
+                        {
+                            //  INSERT
+                            var priceEntity = new AppItemPrices
+                            {
+                                CreationTime = now,
+                                CreatorUserId = userId,
+                                TenantId = tenantId,
+
+                                //Code = excelDto.Name,
+                                Price = price,
+                                BuyerSSIN = excelDto.Name,
+                                AppItemId = (long)excelDto.EntityObjectCategoryID,
+                                AppItemCode = excelDto.Code,
+
+                                CurrencyId = excelDto.ParentId,
+                                CurrencyCode = excelDto.Currency,
+
+                                IsDefault = true,
+                                IsDeleted = false
+                            };
+
+                            await _appItemPricesRepository.InsertAsync(priceEntity);
+                        }
+
+                        // Update AppItem timestamp once
+                        if (updatedAppItemIds.Add(appItem.Id))
+                        {
+                            appItem.LastModificationTime = now;
+                            appItem.LastModifierUserId = userId;
+                            appItem.TimeStamp = now;
+                        }
+
+                        logRecord.Status = "Success";
+                        logRecord.ErrorMessage = "";
+                    }
+                    catch (Exception ex)
+                    {
+                        logRecord.Status = "Failed";
+                        logRecord.ErrorMessage = ex.Message;
+                    }
+
+                    // Write status and error columns to Excel
+                    //sheet.Cell("AB" + rowNumber).Value = logRecord.Status;
+                    //sheet.Cell("AC" + rowNumber).Value = logRecord.ErrorMessage;
+                    //sheet.Cell("AD" + rowNumber).Value = string.Join(",", logRecord.FieldsErrors ?? new List<string>());
+                }
+
+                // Update AppItems in DB
+                foreach (var appItemId in updatedAppItemIds)
+                {
+                    var appItem = appItems.First(x => x.Id == appItemId);
+                    await _appItemRepository.UpdateAsync(appItem);
+                }
+
+                // Move file to attachment folder
+                var attachmentFolder = Path.Combine(_appConfiguration[$"Attachment:Path"], tenantId.ToString());
+                if (!Directory.Exists(attachmentFolder))
+                    Directory.CreateDirectory(attachmentFolder);
+
+                //itemExcelResultsDTO.FilePath = itemExcelResultsDTO.FilePath
+                //    .Replace(_appConfiguration[$"Attachment:PathTemp"], attachmentFolder);
+
+                //document.SaveAs(itemExcelResultsDTO.FilePath);
+            }
+
+            // Populate ExcelLogDTO
+            //excelLog.ExcelLogPath = itemExcelResultsDTO.FilePath
+            //    .Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "")
+            //    .ToLower();
+            //excelLog.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
+
+            this.UpdateCsvStatusFromErrorLog(itemExcelResultsDTO.FilePath, itemExcelResultsDTO.ExcelRecords);
+
+            #region send notification to current user
+            if (AbpSession.UserId != null)
+            {
+                long AbpSessionUserId = (long)AbpSession.UserId;
+                string message = "Items imported successfully.";
+                if (!string.IsNullOrEmpty(itemExcelResultsDTO.FilePath) && !itemExcelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED")) { message = "Importing Item result can be downloaded from <a href=\"" + itemExcelResultsDTO.FilePath + "\" download>" + "here" + "</a>"; }
+                await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, AbpSessionUserId),
+                    message,
+                    Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+            }
+
+            #endregion send notification to current user
+
+            return itemExcelResultsDTO.ExcelLogDTO;
+        }
+
+
         //Iteation#46[Start]
         private async Task<AppEntityClassificationDto> GetItemClassification(string classificationDescription)
         {
@@ -12383,6 +13062,9 @@ namespace onetouch.AppItems
 
         }
     }
+
+
+
     //MMT
     public sealed class AppItemExcelDtoProfile : Profile
     {
@@ -12720,7 +13402,8 @@ namespace onetouch.AppItems
             RuleFor(x => x.Description).NotEmpty().WithMessage("Item Descripion cannot be empty");
             RuleFor(x => x.EntityAttachments).NotNull().Must(x => x.Count > 0).WithMessage("Item must have an image");
             // var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
-            RuleFor(x => x.Code).Custom((z, context) => {
+            RuleFor(x => x.Code).Custom((z, context) =>
+            {
                 if (x.AppItems.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == z.Replace(" ", string.Empty) && x.ItemType == 0) != null)
                 {
                     context.AddFailure("The code:" + z + "is already existing.");

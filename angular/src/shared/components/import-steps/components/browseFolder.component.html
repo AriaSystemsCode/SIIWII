@@ -30,15 +30,23 @@
                 <label for="_input">
                     <img src="../../../../assets/accounts/importAccounts/Vector.png" /><br /><br />
 
-                    <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
-                        multiple  [disabled]="importType==ImportTypes.Items && !isAnyOptionSelected" class="upload-input"/>
-
+                       <div *ngIf="importType!==ImportTypes.price">
                         
+                    <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
+                    multiple  [disabled]="importType==ImportTypes.Items && !isAnyOptionSelected" class="upload-input"/>
+
                     <h5>{{"Dropyourfolderhereorclickheretoupload" | localize}} </h5>
                     <h5> {{"FilesformatsSupportedareXLSX,JPGandPNG" | localize}}</h5>
                     <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB" | localize}}</span>
                     <p style="color: #F6851D !important;">*Image Aspect-Ratio is {{aspectRatioNumbers}} </p>
-                </label>
+                     </div> 
+                     <div *ngIf="importType==ImportTypes.price">
+                      
+                    <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" 
+                     class="upload-input"   accept=".csv" />
+                    <h5> Drop your file here Or Click to Upload </h5>
+                     </div>
+                  </label>
             </div>
             
 
@@ -68,7 +76,7 @@
     </div>
 
 
-    <div class="modal-lg m-auto  Download  pt-4 pb-4">
+    <div class="modal-lg m-auto  Download  pt-4 pb-4" *ngIf="importType!==ImportTypes.price">
         <div class="row align-items-baseline mb-4" *ngIf="importType==ImportTypes.Items">
             <div class="col-2 ml-4">
                 <h6><span style="color: #F6851D;">*</span>{{ 'ProductType' | localize}}</h6>
@@ -117,7 +125,10 @@
 <div class="upload-modal" *ngIf="showUploadModal">
     <div class="modal-header">
       <img class="modal-icon pr-2" src="../../../../assets/accounts/importAccounts/fluent_alert-on.png"/>
-      <span class="modal-title pt-2">Are you sure you want to upload this Folder</span>
+      <span class="modal-title pt-2">
+        Are you sure you want to upload this
+        {{ importType === ImportTypes.price ? 'file' : 'folder' }}?
+      </span>
       <span class="modal-close" (click)="cancelUpload()">✕</span>
     </div>
   

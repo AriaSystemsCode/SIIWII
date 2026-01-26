@@ -50,6 +50,7 @@ export class PricingHelpersService extends AppComponentBase {
         value: prices ? prices[this.getDefaultPricingIndex(prices)]?.price : 0 
       }),
     ]
+     //i49-get all price level from API 
     this.levels.forEach(level => {
       const col = new MatrixGridSelectItem({ 
         label : level,
