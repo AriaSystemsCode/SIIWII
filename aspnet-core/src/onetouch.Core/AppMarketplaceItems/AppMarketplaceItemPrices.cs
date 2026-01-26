@@ -31,6 +31,6 @@ namespace onetouch.AppMarketplaceItems
         [ForeignKey("AppMarketplaceItemId")]
         public virtual AppMarketplaceItems AppItemFk { get; set; }
         public virtual bool IsDefault { set; get; }
-        public virtual string BuyerSSIN { get; set; }
+        
     }
 }
