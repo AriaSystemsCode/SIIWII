@@ -80,7 +80,6 @@ using Z.Expressions;
 using onetouch.Migrations;
 using Newtonsoft.Json;
 using System.Drawing;
-<<<<<<<<< Temporary merge branch 1
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
 using System.Diagnostics;
@@ -6471,15 +6470,10 @@ namespace onetouch.AppItems
                     {
                         importItemInputDto = mapperc.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
                     }
-=========
->>>>>>>>> Temporary merge branch 2
                     catch (Exception exObj)
                     {
                         throw new UserFriendlyException("This Excel file format is invalid");
                     }
-
-
-<<<<<<<<< Temporary merge branch 1
                     AppItemtExcelRecordDTO itemExcelRecordErrorDTO = new AppItemtExcelRecordDTO();
                     itemExcelRecordErrorDTO.RecordType = itemExcelDto.RecordType;
                     itemExcelRecordErrorDTO.ParentCode = itemExcelDto.ParentCode;
